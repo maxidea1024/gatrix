@@ -1,4 +1,5 @@
 import { config, validateConfig } from './config/env';
+import { createServer } from 'http';
 import logger from './config/logger';
 import app from './app';
 import internalApp from './internalApp';
@@ -41,7 +42,57 @@ async function main(): Promise<void> {
     logger.info('Flag Streaming Service initialized');
 
     // Start main HTTP server
-    const server = app.listen(config.port, () => {
+    const server = createServer(app);
+
+    // Handle WebSocket upgrade for flag streaming
+    server.on('upgrade', async (request, socket, head) => {
+      try {
+        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const wsPathMatch = url.pathname.match(/^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/);
+
+        if (!wsPathMatch) {
+          socket.destroy();
+          return;
+        }
+
+        const environment = wsPathMatch[1];
+        const apiToken = url.searchParams.get('x-api-token')
+          || url.searchParams.get('apiToken')
+          || url.searchParams.get('token');
+
+        if (!apiToken) {
+          socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+          socket.destroy();
+          return;
+        }
+
+        // Validate token via tokenMirrorService
+        const result = tokenMirrorService.validateToken(apiToken, 'client', environment);
+        const isUnsecured = apiToken === 'gatrix-unsecured-client-api-token';
+        if (!result.valid && !isUnsecured) {
+          socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+          socket.destroy();
+          return;
+        }
+
+        const wss = flagStreamingService.getWebSocketServer();
+        if (!wss) {
+          socket.destroy();
+          return;
+        }
+
+        wss.handleUpgrade(request, socket, head, async (ws) => {
+          const { ulid } = await import('ulid');
+          const clientId = `edge-flag-ws-${ulid()}`;
+          await flagStreamingService.addWebSocketClient(clientId, environment, ws);
+        });
+      } catch (err) {
+        logger.error('Edge WebSocket upgrade error:', err);
+        socket.destroy();
+      }
+    });
+
+    server.listen(config.port, () => {
       logger.info(`Edge server listening on port ${config.port}`);
       logger.info(`Environment: ${config.nodeEnv}`);
       logger.info(

@@ -117,6 +117,69 @@ export function validateConfig(config: GatrixClientConfig): void {
     }
   }
 
+  // Streaming config
+  const streaming = config.features?.streaming;
+  if (streaming) {
+    // Validate transport type
+    if (streaming.transport !== undefined) {
+      if (streaming.transport !== 'sse' && streaming.transport !== 'websocket') {
+        throw new GatrixError(
+          `Invalid config: streaming.transport must be 'sse' or 'websocket', got '${streaming.transport}'`
+        );
+      }
+    }
+
+    // SSE config
+    if (streaming.sse) {
+      if (streaming.sse.url !== undefined && !isValidUrl(streaming.sse.url)) {
+        throw new GatrixError(`Invalid config: streaming.sse.url must be a valid URL`);
+      }
+      if (streaming.sse.reconnectBase !== undefined) {
+        validatePositiveNumber(streaming.sse.reconnectBase, 'streaming.sse.reconnectBase', 0.5, 60);
+      }
+      if (streaming.sse.reconnectMax !== undefined) {
+        validatePositiveNumber(streaming.sse.reconnectMax, 'streaming.sse.reconnectMax', 1, 300);
+      }
+      if (streaming.sse.pollingJitter !== undefined) {
+        validatePositiveNumber(streaming.sse.pollingJitter, 'streaming.sse.pollingJitter', 0, 30);
+      }
+      if (
+        streaming.sse.reconnectBase !== undefined &&
+        streaming.sse.reconnectMax !== undefined &&
+        streaming.sse.reconnectBase > streaming.sse.reconnectMax
+      ) {
+        throw new GatrixError(
+          `Invalid config: streaming.sse.reconnectBase (${streaming.sse.reconnectBase}) must be <= reconnectMax (${streaming.sse.reconnectMax})`
+        );
+      }
+    }
+
+    // WebSocket config
+    if (streaming.websocket) {
+      if (streaming.websocket.url !== undefined && !isValidUrl(streaming.websocket.url)) {
+        throw new GatrixError(`Invalid config: streaming.websocket.url must be a valid URL`);
+      }
+      if (streaming.websocket.reconnectBase !== undefined) {
+        validatePositiveNumber(streaming.websocket.reconnectBase, 'streaming.websocket.reconnectBase', 0.5, 60);
+      }
+      if (streaming.websocket.reconnectMax !== undefined) {
+        validatePositiveNumber(streaming.websocket.reconnectMax, 'streaming.websocket.reconnectMax', 1, 300);
+      }
+      if (streaming.websocket.pingInterval !== undefined) {
+        validatePositiveNumber(streaming.websocket.pingInterval, 'streaming.websocket.pingInterval', 5, 300);
+      }
+      if (
+        streaming.websocket.reconnectBase !== undefined &&
+        streaming.websocket.reconnectMax !== undefined &&
+        streaming.websocket.reconnectBase > streaming.websocket.reconnectMax
+      ) {
+        throw new GatrixError(
+          `Invalid config: streaming.websocket.reconnectBase (${streaming.websocket.reconnectBase}) must be <= reconnectMax (${streaming.websocket.reconnectMax})`
+        );
+      }
+    }
+  }
+
   // cacheKeyPrefix: string, no special chars
   if (config.cacheKeyPrefix !== undefined) {
     if (typeof config.cacheKeyPrefix !== 'string') {

@@ -1325,7 +1325,7 @@ router.get('/features/:environment/eval', clientAuth, async (req: ClientRequest,
  *               type: string
  */
 router.get(
-  '/features/:environment/stream',
+  '/features/:environment/stream/sse',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {

@@ -29,6 +29,22 @@ public:
   virtual FGatrixVariant GetVariantInternal(const FString &FlagName,
                                             bool bForceRealtime = false) = 0;
 
+  // Metadata access (no metrics tracking)
+  virtual bool HasFlagInternal(const FString &FlagName,
+                               bool bForceRealtime = false) const = 0;
+  virtual EGatrixValueType
+  GetValueTypeInternal(const FString &FlagName,
+                       bool bForceRealtime = false) const = 0;
+  virtual int32 GetVersionInternal(const FString &FlagName,
+                                   bool bForceRealtime = false) const = 0;
+  virtual FString GetReasonInternal(const FString &FlagName,
+                                    bool bForceRealtime = false) const = 0;
+  virtual bool GetImpressionDataInternal(const FString &FlagName,
+                                         bool bForceRealtime = false) const = 0;
+  virtual FGatrixEvaluatedFlag
+  GetRawFlagInternal(const FString &FlagName,
+                     bool bForceRealtime = false) const = 0;
+
   virtual FString VariationInternal(const FString &FlagName,
                                     const FString &FallbackValue,
                                     bool bForceRealtime = false) = 0;

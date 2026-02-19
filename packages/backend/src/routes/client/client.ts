@@ -378,7 +378,7 @@ router.post('/features/:environment/eval', clientSDKAuth, ClientController.evalu
 router.get('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
 
 // Feature Flag streaming route (SSE for real-time invalidation)
-router.get('/features/:environment/stream', clientSDKAuth, ClientController.streamFlags);
+router.get('/features/:environment/stream/sse', clientSDKAuth, ClientController.streamFlags);
 
 // Metrics route
 router.post('/features/:environment/metrics', clientSDKAuth, ClientController.submitMetrics);

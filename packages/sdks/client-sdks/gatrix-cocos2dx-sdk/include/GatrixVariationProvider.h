@@ -21,6 +21,21 @@ public:
   virtual Variant getVariantInternal(const std::string &flagName,
                                      bool forceRealtime = false) = 0;
 
+  // Metadata access (no metrics tracking)
+  virtual bool hasFlagInternal(const std::string &flagName,
+                               bool forceRealtime = false) const = 0;
+  virtual ValueType getValueTypeInternal(const std::string &flagName,
+                                         bool forceRealtime = false) const = 0;
+  virtual int getVersionInternal(const std::string &flagName,
+                                 bool forceRealtime = false) const = 0;
+  virtual std::string getReasonInternal(const std::string &flagName,
+                                        bool forceRealtime = false) const = 0;
+  virtual bool getImpressionDataInternal(const std::string &flagName,
+                                         bool forceRealtime = false) const = 0;
+  virtual const EvaluatedFlag *
+  getRawFlagInternal(const std::string &flagName,
+                     bool forceRealtime = false) const = 0;
+
   virtual std::string variationInternal(const std::string &flagName,
                                         const std::string &fallbackValue,
                                         bool forceRealtime = false) = 0;

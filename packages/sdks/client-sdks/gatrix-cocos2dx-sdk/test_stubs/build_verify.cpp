@@ -122,10 +122,10 @@ int main() {
     std::cout << "Error: " << e.what() << " code: " << e.code() << std::endl;
   }
 
-  // 13. FlagProxy (obtained via watchFlagWithInitialState, not getFlag)
+  // 13. FlagProxy (obtained via watchRealtimeFlagWithInitialState, not getFlag)
   FlagProxy capturedProxy;
   bool proxyCaptured = false;
-  auto unwatchProxy = features->watchFlagWithInitialState(
+  auto unwatchProxy = features->watchRealtimeFlagWithInitialState(
       "test-flag",
       [&capturedProxy, &proxyCaptured](FlagProxy flag) {
         capturedProxy = flag;
@@ -186,7 +186,7 @@ int main() {
   features->syncFlags(false);
 
   // 15. Watch pattern
-  auto unwatch = features->watchFlag(
+  auto unwatch = features->watchRealtimeFlag(
       "test-flag",
       [](FlagProxy flag) {
         std::cout << "Flag changed: " << flag.enabled() << std::endl;
@@ -194,7 +194,7 @@ int main() {
       "watch_test");
   unwatch(); // unsubscribe
 
-  auto unwatchInit = features->watchFlagWithInitialState(
+  auto unwatchInit = features->watchRealtimeFlagWithInitialState(
       "test-flag",
       [](FlagProxy flag) {
         std::cout << "Flag state: " << flag.enabled() << std::endl;
@@ -204,8 +204,8 @@ int main() {
 
   // 16. WatchFlagGroup
   auto *group = features->createWatchFlagGroup("my-group");
-  group->watchFlag("test-flag", [](FlagProxy f) {})
-      .watchFlagWithInitialState("test-flag", [](FlagProxy f) {});
+  group->watchRealtimeFlag("test-flag", [](FlagProxy f) {})
+      .watchRealtimeFlagWithInitialState("test-flag", [](FlagProxy f) {});
   int groupSize = group->size();
   std::string groupName = group->getName();
   group->unwatchAll();

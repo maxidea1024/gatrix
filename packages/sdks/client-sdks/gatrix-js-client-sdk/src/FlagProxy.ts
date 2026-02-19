@@ -1,47 +1,24 @@
 ﻿/**
- * FlagProxy - Convenience wrapper for flag data access.
+ * FlagProxy - Thin shell that delegates ALL logic to VariationProvider.
  *
- * FlagProxy is a thin shell that provides a convenient API for accessing
- * flag values. All variation logic (flag lookup + value extraction +
- * metrics tracking) is handled by FeaturesClient's *Internal methods.
- *
- * FlagProxy delegates all variation calls to FeaturesClient.
- * It only retains read-only property accessors for flag data.
- *
- * Uses null object pattern: this.flag is never undefined.
- * MISSING_FLAG sentinel is used for non-existent flags.
+ * Architecture per CLIENT_SDK_SPEC:
+ * - Holds only flagName + forceRealtime + client reference.
+ * - ALL property reads and variation methods delegate to the client.
+ * - No deep copy of flag data — always reads live state from FeaturesClient cache.
+ * - isRealtime property indicates the proxy's operational mode.
+ * - Client is always present (never null).
  */
 import { EvaluatedFlag, Variant, ValueType, VariationResult } from './types';
 import { VariationProvider } from './VariationProvider';
-import { VARIANT_SOURCE } from './variantSource';
-
-/** Create a missing flag sentinel with per-flag context */
-function createMissingFlag(flagName: string): EvaluatedFlag {
-  return {
-    name: flagName,
-    enabled: false,
-    variant: { name: VARIANT_SOURCE.MISSING, enabled: false },
-    valueType: 'none',
-    version: 0,
-  };
-}
 
 export class FlagProxy {
-  private flag: EvaluatedFlag;
-  private _exists: boolean;
   private _flagName: string;
+  private _forceRealtime: boolean;
   private client: VariationProvider;
 
-  constructor(flag: EvaluatedFlag | undefined, client: VariationProvider, flagName?: string) {
-    this._exists = flag !== undefined;
-    this._flagName = flagName ?? flag?.name ?? '';
-    // Deep-clone so FlagProxy holds an immutable snapshot
-    this.flag = flag
-      ? {
-        ...flag,
-        variant: { ...flag.variant },
-      }
-      : createMissingFlag(this._flagName);
+  constructor(client: VariationProvider, flagName: string, forceRealtime: boolean = false) {
+    this._flagName = flagName ?? '';
+    this._forceRealtime = forceRealtime;
     this.client = client;
   }
 
@@ -51,8 +28,14 @@ export class FlagProxy {
     return this._flagName;
   }
 
+  /** Whether this proxy was created in realtime mode. */
+  get isRealtime(): boolean {
+    return this._forceRealtime;
+  }
+
+  /** Whether the flag exists in the current cache. */
   get exists(): boolean {
-    return this._exists;
+    return this.client.hasFlagInternal(this._flagName, this._forceRealtime);
   }
 
   /**
@@ -60,31 +43,31 @@ export class FlagProxy {
    * Delegates to FeaturesClient for metrics tracking.
    */
   get enabled(): boolean {
-    return this.client.isEnabledInternal(this._flagName);
+    return this.client.isEnabledInternal(this._flagName, this._forceRealtime);
   }
 
   get variant(): Variant {
-    return { ...this.flag.variant }; // defensive copy
+    return this.client.getVariantInternal(this._flagName, this._forceRealtime);
   }
 
   get valueType(): ValueType {
-    return this.flag.valueType;
+    return this.client.getValueTypeInternal(this._flagName, this._forceRealtime);
   }
 
   get version(): number {
-    return this.flag.version;
+    return this.client.getVersionInternal(this._flagName, this._forceRealtime);
   }
 
   get impressionData(): boolean {
-    return this.flag.impressionData ?? false;
+    return this.client.getImpressionDataInternal(this._flagName, this._forceRealtime);
   }
 
   get raw(): EvaluatedFlag | undefined {
-    return this._exists ? this.flag : undefined;
+    return this.client.getRawFlagInternal(this._flagName, this._forceRealtime);
   }
 
   get reason(): string | undefined {
-    return this.flag.reason;
+    return this.client.getReasonInternal(this._flagName, this._forceRealtime);
   }
 
   // ==================== Variation Methods ====================
@@ -92,58 +75,58 @@ export class FlagProxy {
   // FlagProxy is a convenience shell - no own logic.
 
   variation(fallbackValue: string): string {
-    return this.client.variationInternal(this._flagName, fallbackValue);
+    return this.client.variationInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   boolVariation(fallbackValue: boolean): boolean {
-    return this.client.boolVariationInternal(this._flagName, fallbackValue);
+    return this.client.boolVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   stringVariation(fallbackValue: string): string {
-    return this.client.stringVariationInternal(this._flagName, fallbackValue);
+    return this.client.stringVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   numberVariation(fallbackValue: number): number {
-    return this.client.numberVariationInternal(this._flagName, fallbackValue);
+    return this.client.numberVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   jsonVariation<T>(fallbackValue: T): T {
-    return this.client.jsonVariationInternal(this._flagName, fallbackValue);
+    return this.client.jsonVariationInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   // ==================== Variation Details ====================
 
   boolVariationDetails(fallbackValue: boolean): VariationResult<boolean> {
-    return this.client.boolVariationDetailsInternal(this._flagName, fallbackValue);
+    return this.client.boolVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   stringVariationDetails(fallbackValue: string): VariationResult<string> {
-    return this.client.stringVariationDetailsInternal(this._flagName, fallbackValue);
+    return this.client.stringVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   numberVariationDetails(fallbackValue: number): VariationResult<number> {
-    return this.client.numberVariationDetailsInternal(this._flagName, fallbackValue);
+    return this.client.numberVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   jsonVariationDetails<T>(fallbackValue: T): VariationResult<T> {
-    return this.client.jsonVariationDetailsInternal(this._flagName, fallbackValue);
+    return this.client.jsonVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
 
   boolVariationOrThrow(): boolean {
-    return this.client.boolVariationOrThrowInternal(this._flagName);
+    return this.client.boolVariationOrThrowInternal(this._flagName, this._forceRealtime);
   }
 
   stringVariationOrThrow(): string {
-    return this.client.stringVariationOrThrowInternal(this._flagName);
+    return this.client.stringVariationOrThrowInternal(this._flagName, this._forceRealtime);
   }
 
   numberVariationOrThrow(): number {
-    return this.client.numberVariationOrThrowInternal(this._flagName);
+    return this.client.numberVariationOrThrowInternal(this._flagName, this._forceRealtime);
   }
 
   jsonVariationOrThrow<T>(): T {
-    return this.client.jsonVariationOrThrowInternal<T>(this._flagName);
+    return this.client.jsonVariationOrThrowInternal<T>(this._flagName, this._forceRealtime);
   }
 }

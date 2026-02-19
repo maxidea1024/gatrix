@@ -1,134 +1,115 @@
-# Gatrix FlagProxy
-# Thin convenience shell that delegates ALL variation logic to VariationProvider.
-#
-# Architecture per CLIENT_SDK_SPEC:
-# - Property accessors: enabled/variant delegate to client for metrics tracking.
-#   Other properties read flag data directly (read-only).
-# - ALL variation / details / orThrow methods delegate to VariationProvider.
-# - No type checking logic here - that's the VariationProvider's job.
-# - No onAccess callback - metrics tracking handled by VariationProvider.
-# - FlagProxy does NOT expose force_realtime; it is available only through
-#   FeaturesClient's public methods for direct flag access.
-#
-# IMPORTANT: client (VariationProvider) is ALWAYS non-null. FlagProxy is
-# exclusively created by FeaturesClient, which passes itself as the client.
+## FlagProxy - Thin shell that delegates ALL logic to FeaturesClient.
+##
+## Architecture per CLIENT_SDK_SPEC:
+## - Holds only flag_name + force_realtime + client reference.
+## - ALL property reads and variation methods delegate to the client.
+## - No deep copy of flag data - always reads live state from FeaturesClient cache.
+## - is_realtime property indicates the proxy's operational mode.
+## - Client is always present (never null).
 class_name GatrixFlagProxy
+extends RefCounted
 
-var _flag: GatrixTypes.EvaluatedFlag
-var _exists: bool = false
-var _client  # VariationProvider (GatrixFeaturesClient)
+var _client  # GatrixFeaturesClient (VariationProvider)
 var _flag_name: String = ""
+var _force_realtime: bool = false
 
 
-func _init(flag, client, flag_name := "") -> void:
+func _init(client, flag_name: String, force_realtime: bool = false) -> void:
+	assert(client != null, "FlagProxy: client must not be null")
 	_client = client
-	if flag != null:
-		# Deep-clone for immutable snapshot safety
-		_flag = flag.duplicate()
-		_exists = true
-		_flag_name = flag_name if flag_name != "" else flag.name
-	else:
-		_flag = GatrixTypes.MISSING_FLAG
-		_exists = false
-		_flag_name = flag_name
+	_flag_name = flag_name if flag_name else ""
+	_force_realtime = force_realtime
 
 
 # ==================== Properties ====================
 
-var exists: bool:
-	get: return _exists
-
-var enabled: bool:
-	get: return _client.is_enabled_internal(_flag_name)
-
 var name: String:
 	get: return _flag_name
 
-var variant: GatrixTypes.Variant:
-	get: return _client.get_variant_internal(_flag_name)
+var is_realtime: bool:
+	get: return _force_realtime
 
-# Read-only metadata (no metrics needed)
-var value_type: GatrixTypes.ValueType:
-	get: return _flag.value_type
+## Whether the flag exists in the current cache.
+var exists: bool:
+	get: return _client.has_flag_internal(_flag_name, _force_realtime)
+
+## Check if flag is enabled. Delegates to client for metrics tracking.
+var enabled: bool:
+	get: return _client.is_enabled_internal(_flag_name, _force_realtime)
+
+var variant:
+	get: return _client.get_variant_internal(_flag_name, _force_realtime)
+
+var value_type:
+	get: return _client.get_value_type_internal(_flag_name, _force_realtime)
 
 var version: int:
-	get: return _flag.version
-
-var reason: String:
-	get: return _flag.reason
+	get: return _client.get_version_internal(_flag_name, _force_realtime)
 
 var impression_data: bool:
-	get: return _flag.impression_data
+	get: return _client.get_impression_data_internal(_flag_name, _force_realtime)
 
 var raw:
-	get: return _flag if _exists else null
+	get: return _client.get_raw_flag_internal(_flag_name, _force_realtime)
+
+var reason:
+	get: return _client.get_reason_internal(_flag_name, _force_realtime)
 
 
-# ==================== Variation Methods (pure delegation) ====================
+# ==================== Variation Methods ====================
+# All methods delegate to client's internal methods.
+# FlagProxy is a convenience shell - no own logic.
 
 func variation(fallback_value: String) -> String:
-	return _client.variation_internal(_flag_name, fallback_value)
-
+	return _client.variation_internal(_flag_name, fallback_value, _force_realtime)
 
 func bool_variation(fallback_value: bool) -> bool:
-	return _client.bool_variation_internal(_flag_name, fallback_value)
-
+	return _client.bool_variation_internal(_flag_name, fallback_value, _force_realtime)
 
 func string_variation(fallback_value: String) -> String:
-	return _client.string_variation_internal(_flag_name, fallback_value)
-
+	return _client.string_variation_internal(_flag_name, fallback_value, _force_realtime)
 
 func int_variation(fallback_value: int) -> int:
-	return _client.int_variation_internal(_flag_name, fallback_value)
-
+	return _client.int_variation_internal(_flag_name, fallback_value, _force_realtime)
 
 func float_variation(fallback_value: float) -> float:
-	return _client.float_variation_internal(_flag_name, fallback_value)
+	return _client.float_variation_internal(_flag_name, fallback_value, _force_realtime)
+
+func json_variation(fallback_value):
+	return _client.json_variation_internal(_flag_name, fallback_value, _force_realtime)
 
 
-func json_variation(fallback_value = null):
-	return _client.json_variation_internal(_flag_name, fallback_value)
+# ==================== Variation Details ====================
+
+func bool_variation_details(fallback_value: bool) -> Dictionary:
+	return _client.bool_variation_details_internal(_flag_name, fallback_value, _force_realtime)
+
+func string_variation_details(fallback_value: String) -> Dictionary:
+	return _client.string_variation_details_internal(_flag_name, fallback_value, _force_realtime)
+
+func int_variation_details(fallback_value: int) -> Dictionary:
+	return _client.int_variation_details_internal(_flag_name, fallback_value, _force_realtime)
+
+func float_variation_details(fallback_value: float) -> Dictionary:
+	return _client.float_variation_details_internal(_flag_name, fallback_value, _force_realtime)
+
+func json_variation_details(fallback_value) -> Dictionary:
+	return _client.json_variation_details_internal(_flag_name, fallback_value, _force_realtime)
 
 
-# ==================== Variation Details (pure delegation) ====================
-
-func bool_variation_details(fallback_value: bool) -> GatrixTypes.VariationResult:
-	return _client.bool_variation_details_internal(_flag_name, fallback_value)
-
-
-func string_variation_details(fallback_value: String) -> GatrixTypes.VariationResult:
-	return _client.string_variation_details_internal(_flag_name, fallback_value)
-
-
-func int_variation_details(fallback_value: int) -> GatrixTypes.VariationResult:
-	return _client.int_variation_details_internal(_flag_name, fallback_value)
-
-
-func float_variation_details(fallback_value: float) -> GatrixTypes.VariationResult:
-	return _client.float_variation_details_internal(_flag_name, fallback_value)
-
-
-func json_variation_details(fallback_value = null) -> GatrixTypes.VariationResult:
-	return _client.json_variation_details_internal(_flag_name, fallback_value)
-
-
-# ==================== OrThrow Methods (pure delegation) ====================
+# ==================== Strict Variation Methods (OrThrow) ====================
 
 func bool_variation_or_throw() -> bool:
-	return _client.bool_variation_or_throw_internal(_flag_name)
-
+	return _client.bool_variation_or_throw_internal(_flag_name, _force_realtime)
 
 func string_variation_or_throw() -> String:
-	return _client.string_variation_or_throw_internal(_flag_name)
-
+	return _client.string_variation_or_throw_internal(_flag_name, _force_realtime)
 
 func int_variation_or_throw() -> int:
-	return _client.int_variation_or_throw_internal(_flag_name)
-
+	return _client.int_variation_or_throw_internal(_flag_name, _force_realtime)
 
 func float_variation_or_throw() -> float:
-	return _client.float_variation_or_throw_internal(_flag_name)
-
+	return _client.float_variation_or_throw_internal(_flag_name, _force_realtime)
 
 func json_variation_or_throw():
-	return _client.json_variation_or_throw_internal(_flag_name)
+	return _client.json_variation_or_throw_internal(_flag_name, _force_realtime)

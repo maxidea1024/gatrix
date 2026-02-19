@@ -1,18 +1,21 @@
 /**
  * Flag Streaming Service (Edge)
  *
- * Manages SSE connections for real-time feature flag change notifications on the Edge server.
- * Subscribes to Redis Pub/Sub channel 'gatrix-sdk-events' to receive
- * feature_flag.changed events published by the backend FeatureFlagService.
+ * Manages SSE and WebSocket connections for real-time feature flag change
+ * notifications on the Edge server. Subscribes to Redis Pub/Sub channel
+ * 'gatrix-sdk-events' to receive feature_flag.changed events published
+ * by the backend FeatureFlagService.
  *
- * Edge clients connect via `/client/features/:environment/stream` and receive
- * invalidation signals when flags change, triggering them to re-fetch via /eval.
+ * Edge clients connect via:
+ *   - SSE: GET `/client/features/:environment/stream/sse`
+ *   - WebSocket: GET `/client/features/:environment/stream/ws`
  *
  * Revision management uses Redis INCR for consistency across multiple Edge instances.
  */
 
 import { Response } from 'express';
 import { createClient, RedisClientType } from 'redis';
+import WebSocket, { WebSocketServer } from 'ws';
 import { config } from '../config/env';
 import logger from '../config/logger';
 import { sdkManager } from './sdkManager';
@@ -25,12 +28,23 @@ interface StreamingClient {
     lastEventTime: Date;
 }
 
+interface WebSocketClient {
+    id: string;
+    environment: string;
+    ws: WebSocket;
+    connectedAt: Date;
+    lastEventTime: Date;
+    authenticated: boolean;
+}
+
 const SDK_EVENTS_CHANNEL = 'gatrix-sdk-events';
 const REVISION_KEY_PREFIX = 'gatrix:streaming:revision:';
 
 class FlagStreamingService {
     private static instance: FlagStreamingService;
-    private clients: Map<string, StreamingClient> = new Map();
+    private sseClients: Map<string, StreamingClient> = new Map();
+    private wsClients: Map<string, WebSocketClient> = new Map();
+    private wss: WebSocketServer | null = null;
     private heartbeatInterval: NodeJS.Timeout | null = null;
     private cleanupInterval: NodeJS.Timeout | null = null;
     private subscriber: RedisClientType | null = null;
@@ -88,7 +102,7 @@ class FlagStreamingService {
                         const environment = event.data.environment as string;
                         const changedKeys = (event.data.changedKeys as string[]) ?? [];
                         if (environment) {
-                            // Refresh Edge's own cache BEFORE notifying SSE clients
+                            // Refresh Edge's own cache BEFORE notifying clients
                             // so that clients re-fetching immediately get fresh data
                             this.refreshCacheThenNotify(environment, changedKeys);
                         }
@@ -115,7 +129,17 @@ class FlagStreamingService {
             this.cleanupStaleConnections();
         }, 60000);
 
-        logger.info('Edge FlagStreamingService started');
+        // Create WebSocket server (noServer mode — upgrade handled externally)
+        this.wss = new WebSocketServer({ noServer: true });
+
+        logger.info('Edge FlagStreamingService started (SSE + WebSocket)');
+    }
+
+    /**
+     * Get the WebSocketServer instance for handling HTTP upgrade requests.
+     */
+    getWebSocketServer(): WebSocketServer | null {
+        return this.wss;
     }
 
     /**
@@ -131,9 +155,20 @@ class FlagStreamingService {
             this.cleanupInterval = null;
         }
 
-        // Disconnect all clients
-        for (const [clientId] of this.clients) {
+        // Disconnect all SSE clients
+        for (const [clientId] of this.sseClients) {
             this.removeClient(clientId);
+        }
+
+        // Disconnect all WebSocket clients
+        for (const [clientId] of this.wsClients) {
+            this.removeWebSocketClient(clientId);
+        }
+
+        // Close WebSocket server
+        if (this.wss) {
+            this.wss.close();
+            this.wss = null;
         }
 
         // Disconnect Redis subscriber
@@ -181,25 +216,25 @@ class FlagStreamingService {
             lastEventTime: new Date(),
         };
 
-        this.clients.set(clientId, client);
+        this.sseClients.set(clientId, client);
 
         // Send initial 'connected' event with current global revision from Redis
         const globalRevision = await this.getGlobalRevision(environment);
-        this.sendEvent(clientId, 'connected', { globalRevision });
+        this.sendSseEvent(clientId, 'connected', { globalRevision });
 
         // Handle connection close
         res.on('close', () => {
             this.removeClient(clientId);
         });
 
-        logger.debug(`Edge streaming client connected: ${clientId} for env: ${environment}`);
+        logger.debug(`Edge streaming SSE client connected: ${clientId} for env: ${environment}`);
     }
 
     /**
-     * Remove a client connection
+     * Remove a SSE client connection
      */
     removeClient(clientId: string): void {
-        const client = this.clients.get(clientId);
+        const client = this.sseClients.get(clientId);
         if (!client) return;
 
         try {
@@ -210,13 +245,81 @@ class FlagStreamingService {
             // Connection may already be closed
         }
 
-        this.clients.delete(clientId);
-        logger.debug(`Edge streaming client disconnected: ${clientId}`);
+        this.sseClients.delete(clientId);
+        logger.debug(`Edge streaming SSE client disconnected: ${clientId}`);
     }
 
     /**
-     * Refresh the Edge's feature flag cache, then notify SSE clients.
-     * This ensures clients that immediately re-fetch after SSE receive fresh data.
+     * Add a new WebSocket client connection.
+     * Called after HTTP upgrade is handled externally.
+     */
+    async addWebSocketClient(
+        clientId: string,
+        environment: string,
+        ws: WebSocket
+    ): Promise<void> {
+        const client: WebSocketClient = {
+            id: clientId,
+            environment,
+            ws,
+            connectedAt: new Date(),
+            lastEventTime: new Date(),
+            authenticated: true,
+        };
+
+        this.wsClients.set(clientId, client);
+
+        // Send initial 'connected' event with current global revision from Redis
+        const globalRevision = await this.getGlobalRevision(environment);
+        this.sendWebSocketEvent(clientId, 'connected', { globalRevision });
+
+        // Handle WebSocket messages (ping/pong, etc.)
+        ws.on('message', (data: WebSocket.Data) => {
+            try {
+                const msg = JSON.parse(data.toString());
+                if (msg.type === 'ping') {
+                    this.sendWebSocketEvent(clientId, 'pong', { timestamp: Date.now() });
+                }
+            } catch {
+                // Ignore malformed messages
+            }
+        });
+
+        // Handle connection close
+        ws.on('close', () => {
+            this.removeWebSocketClient(clientId);
+        });
+
+        ws.on('error', (err) => {
+            logger.warn(`Edge WebSocket client error ${clientId}:`, err);
+            this.removeWebSocketClient(clientId);
+        });
+
+        logger.debug(`Edge WebSocket client connected: ${clientId} for env: ${environment}`);
+    }
+
+    /**
+     * Remove a WebSocket client connection
+     */
+    removeWebSocketClient(clientId: string): void {
+        const client = this.wsClients.get(clientId);
+        if (!client) return;
+
+        try {
+            if (client.ws.readyState === WebSocket.OPEN || client.ws.readyState === WebSocket.CONNECTING) {
+                client.ws.close();
+            }
+        } catch {
+            // Connection may already be closed
+        }
+
+        this.wsClients.delete(clientId);
+        logger.debug(`Edge WebSocket client disconnected: ${clientId}`);
+    }
+
+    /**
+     * Refresh the Edge's feature flag cache, then notify all clients.
+     * This ensures clients that immediately re-fetch after notification receive fresh data.
      */
     private async refreshCacheThenNotify(
         environment: string,
@@ -227,16 +330,15 @@ class FlagStreamingService {
             if (sdk) {
                 await sdk.featureFlag.refreshByEnvironment(environment);
                 logger.debug(
-                    `Edge FlagStreamingService: Cache refreshed for env=${environment} before SSE notify`
+                    `Edge FlagStreamingService: Cache refreshed for env=${environment} before notify`
                 );
             }
         } catch (err) {
             logger.error(
-                'Edge FlagStreamingService: Failed to refresh cache before SSE notify:',
+                'Edge FlagStreamingService: Failed to refresh cache before notify:',
                 err
             );
             // Still notify clients even if cache refresh fails
-            // They may get stale data, but it's better than no notification
         }
 
         await this.notifyClients(environment, changedKeys);
@@ -244,15 +346,26 @@ class FlagStreamingService {
 
     private async notifyClients(environment: string, changedKeys: string[]): Promise<void> {
         const newRevision = await this.incrementGlobalRevision(environment);
+        const payload = {
+            globalRevision: newRevision,
+            changedKeys,
+            timestamp: Date.now(),
+        };
 
         let notifiedCount = 0;
-        for (const [clientId, client] of this.clients) {
+
+        // Notify SSE clients
+        for (const [clientId, client] of this.sseClients) {
             if (client.environment === environment) {
-                this.sendEvent(clientId, 'flags_changed', {
-                    globalRevision: newRevision,
-                    changedKeys,
-                    timestamp: Date.now(),
-                });
+                this.sendSseEvent(clientId, 'flags_changed', payload);
+                notifiedCount++;
+            }
+        }
+
+        // Notify WebSocket clients
+        for (const [clientId, client] of this.wsClients) {
+            if (client.environment === environment) {
+                this.sendWebSocketEvent(clientId, 'flags_changed', payload);
                 notifiedCount++;
             }
         }
@@ -267,8 +380,8 @@ class FlagStreamingService {
     /**
      * Send an SSE event to a specific client
      */
-    private sendEvent(clientId: string, event: string, data: Record<string, any>): boolean {
-        const client = this.clients.get(clientId);
+    private sendSseEvent(clientId: string, event: string, data: Record<string, any>): boolean {
+        const client = this.sseClients.get(clientId);
         if (!client) return false;
 
         try {
@@ -278,7 +391,7 @@ class FlagStreamingService {
             return true;
         } catch (error) {
             logger.warn(
-                `Edge FlagStreamingService: Failed to send event to client ${clientId}:`,
+                `Edge FlagStreamingService: Failed to send SSE event to client ${clientId}:`,
                 error
             );
             this.removeClient(clientId);
@@ -287,16 +400,53 @@ class FlagStreamingService {
     }
 
     /**
-     * Send heartbeat to all connected clients
+     * Send a WebSocket event to a specific client
+     */
+    private sendWebSocketEvent(clientId: string, event: string, data: Record<string, any>): boolean {
+        const client = this.wsClients.get(clientId);
+        if (!client || client.ws.readyState !== WebSocket.OPEN) return false;
+
+        try {
+            const message = JSON.stringify({ type: event, data });
+            client.ws.send(message);
+            client.lastEventTime = new Date();
+            return true;
+        } catch (error) {
+            logger.warn(
+                `Edge FlagStreamingService: Failed to send WS event to client ${clientId}:`,
+                error
+            );
+            this.removeWebSocketClient(clientId);
+            return false;
+        }
+    }
+
+    /**
+     * Send heartbeat to all connected clients (SSE + WebSocket)
      */
     private sendHeartbeat(): void {
-        for (const [clientId, client] of this.clients) {
+        const heartbeatData = JSON.stringify({ timestamp: Date.now() });
+
+        // SSE heartbeat
+        for (const [clientId, client] of this.sseClients) {
             try {
                 client.response.write(
-                    `event: heartbeat\ndata: ${JSON.stringify({ timestamp: Date.now() })}\n\n`
+                    `event: heartbeat\ndata: ${heartbeatData}\n\n`
                 );
             } catch {
                 this.removeClient(clientId);
+            }
+        }
+
+        // WebSocket heartbeat
+        const wsHeartbeat = JSON.stringify({ type: 'heartbeat', data: { timestamp: Date.now() } });
+        for (const [clientId, client] of this.wsClients) {
+            try {
+                if (client.ws.readyState === WebSocket.OPEN) {
+                    client.ws.send(wsHeartbeat);
+                }
+            } catch {
+                this.removeWebSocketClient(clientId);
             }
         }
     }
@@ -305,9 +455,17 @@ class FlagStreamingService {
      * Remove connections that are no longer writable
      */
     private cleanupStaleConnections(): void {
-        for (const [clientId, client] of this.clients) {
+        // Cleanup SSE
+        for (const [clientId, client] of this.sseClients) {
             if (client.response.writableEnded || client.response.destroyed) {
                 this.removeClient(clientId);
+            }
+        }
+
+        // Cleanup WebSocket
+        for (const [clientId, client] of this.wsClients) {
+            if (client.ws.readyState === WebSocket.CLOSED || client.ws.readyState === WebSocket.CLOSING) {
+                this.removeWebSocketClient(clientId);
             }
         }
     }
@@ -346,16 +504,24 @@ class FlagStreamingService {
      */
     getStats(): {
         totalClients: number;
+        sseClients: number;
+        wsClients: number;
         clientsByEnvironment: Record<string, number>;
     } {
         const clientsByEnvironment: Record<string, number> = {};
-        for (const [, client] of this.clients) {
+        for (const [, client] of this.sseClients) {
+            clientsByEnvironment[client.environment] =
+                (clientsByEnvironment[client.environment] || 0) + 1;
+        }
+        for (const [, client] of this.wsClients) {
             clientsByEnvironment[client.environment] =
                 (clientsByEnvironment[client.environment] || 0) + 1;
         }
 
         return {
-            totalClients: this.clients.size,
+            totalClients: this.sseClients.size + this.wsClients.size,
+            sseClients: this.sseClients.size,
+            wsClients: this.wsClients.size,
             clientsByEnvironment,
         };
     }

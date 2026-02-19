@@ -214,11 +214,20 @@ public:
   // ==================== Watch ====================
 
   /**
-   * Watch a specific flag for changes.
+   * Watch a specific flag for realtime changes.
    * Returns a handle that can be used to unsubscribe.
    */
-  int32 WatchFlag(const FString &FlagName, FGatrixFlagWatchDelegate Callback,
-                  const FString &Name = TEXT(""));
+  int32 WatchRealtimeFlag(const FString &FlagName,
+                          FGatrixFlagWatchDelegate Callback,
+                          const FString &Name = TEXT(""));
+
+  /**
+   * Watch a specific flag for synced changes.
+   * Returns a handle that can be used to unsubscribe.
+   */
+  int32 WatchSyncedFlag(const FString &FlagName,
+                        FGatrixFlagWatchDelegate Callback,
+                        const FString &Name = TEXT(""));
 
   /** Unsubscribe a flag watcher by handle */
   void UnwatchFlag(int32 Handle);
@@ -260,8 +269,27 @@ public:
   UPROPERTY(BlueprintAssignable, Category = "Gatrix|Events")
   FGatrixOnImpression OnImpression;
 
-  // ==================== IGatrixVariationProvider Implementation
+  // ==================== IGatrixVariationProvider Metadata Implementation
   // ====================
+
+  virtual bool HasFlagInternal(const FString &FlagName,
+                               bool bForceRealtime = false) const override;
+  virtual EGatrixValueType
+  GetValueTypeInternal(const FString &FlagName,
+                       bool bForceRealtime = false) const override;
+  virtual int32 GetVersionInternal(const FString &FlagName,
+                                   bool bForceRealtime = false) const override;
+  virtual FString GetReasonInternal(const FString &FlagName,
+                                    bool bForceRealtime = false) const override;
+  virtual bool
+  GetImpressionDataInternal(const FString &FlagName,
+                            bool bForceRealtime = false) const override;
+  virtual FGatrixEvaluatedFlag
+  GetRawFlagInternal(const FString &FlagName,
+                     bool bForceRealtime = false) const override;
+
+  // ==================== IGatrixVariationProvider Implementation
+  // ======================================
 
   virtual bool IsEnabledInternal(const FString &FlagName,
                                  bool bForceRealtime = false) override;
@@ -334,7 +362,8 @@ public:
 private:
   // ==================== Internal Methods ====================
 
-  UGatrixFlagProxy *CreateProxy(const FString &FlagName);
+  UGatrixFlagProxy *CreateProxy(const FString &FlagName,
+                                bool bForceRealtime = true);
   void LoadFromStorage();
   void ApplyBootstrap();
   void DoFetchFlags();
@@ -354,7 +383,8 @@ private:
   void ScheduleNextPoll();
   void StopPolling();
   void
-  InvokeWatchCallbacks(const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
+  InvokeWatchCallbacks(const TArray<FWatchCallbackEntry> &CallbackList,
+                       const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
                        const TMap<FString, FGatrixEvaluatedFlag> &NewFlags);
 
   // Metrics
@@ -432,5 +462,6 @@ private:
     int32 Handle;
   };
   TArray<FWatchCallbackEntry> WatchCallbacks;
+  TArray<FWatchCallbackEntry> SyncedWatchCallbacks;
   int32 NextWatchHandle = 1;
 };

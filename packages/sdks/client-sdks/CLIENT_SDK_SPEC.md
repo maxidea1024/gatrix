@@ -185,6 +185,105 @@ interface FetchRetryOptions {
 }
 ```
 
+### Streaming Configuration
+
+Real-time flag invalidation is supported via two transport types: **SSE** (Server-Sent Events) and **WebSocket**.
+
+```typescript
+type StreamingTransport = 'sse' | 'websocket';
+
+interface SseStreamingConfig {
+  url?: string;           // SSE endpoint URL override (default: derived from apiUrl)
+  reconnectBase?: number; // Reconnect initial delay in seconds (default: 1)
+  reconnectMax?: number;  // Reconnect max delay in seconds (default: 30)
+  pollingJitter?: number; // Polling jitter range in seconds (default: 5)
+}
+
+interface WebSocketStreamingConfig {
+  url?: string;           // WebSocket endpoint URL override (default: derived from apiUrl)
+  reconnectBase?: number; // Reconnect initial delay in seconds (default: 1)
+  reconnectMax?: number;  // Reconnect max delay in seconds (default: 30)
+  pingInterval?: number;  // Client-side ping interval in seconds (default: 30)
+}
+
+interface StreamingConfig {
+  enabled?: boolean;                  // Enable streaming (default: true)
+  transport?: StreamingTransport;     // Transport type (default: 'sse')
+  sse?: SseStreamingConfig;           // SSE-specific settings
+  websocket?: WebSocketStreamingConfig; // WebSocket-specific settings
+}
+```
+
+### Streaming Protocol
+
+#### Endpoints
+
+| Transport | Endpoint |
+|-----------|----------|
+| SSE | `GET /client/features/:environment/stream/sse` |
+| WebSocket | `GET /client/features/:environment/stream/ws` |
+
+#### Authentication
+
+- **SSE**: Uses standard HTTP headers (`X-API-Token`, `X-Application-Name`)
+- **WebSocket**: Uses query parameters (`x-api-token`) since browsers cannot set custom headers on WebSocket upgrade requests
+
+#### Message Format
+
+Both transports use the same event types with identical payloads:
+
+| Event | Description | Payload |
+|-------|-------------|---------|
+| `connected` | Initial connection established | `{ globalRevision: number }` |
+| `flags_changed` | Flag(s) changed on server | `{ globalRevision: number, changedKeys: string[], timestamp: number }` |
+| `heartbeat` | Server heartbeat (keepalive) | `{ timestamp: number }` |
+
+**SSE format:**
+```
+event: connected
+data: {"globalRevision":42}
+```
+
+**WebSocket format (JSON envelope):**
+```json
+{ "type": "connected", "data": { "globalRevision": 42 } }
+```
+
+> [!IMPORTANT]
+> Streaming is an **invalidation signal** mechanism, NOT a data transport. When a `flags_changed` event is received, the SDK clears its ETag and performs a fresh `fetchFlags()` to get updated data. The `changedKeys` payload is used for logging and event emission, not for direct flag updates.
+
+> [!NOTE]
+> **Unity WebGL platform**: The WebSocket transport uses a JS interop layer (`GatrixWebSocket.jslib`) on WebGL builds since `System.Net.WebSockets.ClientWebSocket` is not available in the browser sandbox. The SDK automatically selects the appropriate implementation via `GatrixWebSocketFactory`. Desktop (Windows/macOS/Linux), Android, iOS, and WebGL platforms are all supported.
+
+#### Connection State Machine
+
+```
+disconnected ──► connecting ──► connected
+     ▲                              │
+     │                              ▼
+     └── degraded ◄── reconnecting ◄┘
+```
+
+| State | Description |
+|-------|-------------|
+| `disconnected` | Not connected (initial or intentional disconnect) |
+| `connecting` | Attempting to establish connection |
+| `connected` | Connection active, receiving events |
+| `reconnecting` | Connection lost, attempting reconnection |
+| `degraded` | Multiple reconnection failures (≥5 attempts), polling-only mode |
+
+#### Reconnection Strategy
+
+Exponential backoff with jitter:
+- **Delay** = `min(reconnectBase × 2^(attempt-1), reconnectMax)` + random jitter (0-1000ms)
+- **Degraded mode**: After ≥5 consecutive failures, streaming state transitions to `degraded` and SDK falls back to polling-only until reconnection succeeds
+
+#### Gap Recovery
+
+When a streaming connection is (re-)established, the server sends a `connected` event with the current `globalRevision`. The SDK compares this with its local `localGlobalRevision`:
+- If `serverRevision > localRevision` and `localRevision > 0`: Gap detected, triggers immediate `fetchFlags()` for recovery
+- If `localRevision === 0`: First connection, records initial revision
+
 ### Fetch Retry & Backoff Behavior
 
 All client SDKs implement a **schedule-after-completion** pattern for polling:
@@ -277,11 +376,21 @@ All client SDKs MUST validate configuration at initialization time and fail fast
 | `fetchTimeout` | 1 (or 1000ms) | 120 (or 120000ms) | seconds/ms |
 | `initialBackoffMs` | 100 | 60000 | ms |
 | `maxBackoffMs` | 1000 | 600000 | ms |
+| `streaming.sse.reconnectBase` | 0.5 | 60 | seconds |
+| `streaming.sse.reconnectMax` | 1 | 300 | seconds |
+| `streaming.sse.pollingJitter` | 0 | 30 | seconds |
+| `streaming.websocket.reconnectBase` | 0.5 | 60 | seconds |
+| `streaming.websocket.reconnectMax` | 1 | 300 | seconds |
+| `streaming.websocket.pingInterval` | 5 | 300 | seconds |
 
 #### Cross-Field Validation
 
 - `initialBackoffMs` must be <= `maxBackoffMs`
 - `nonRetryableStatusCodes` entries must be in range 400-599
+- `streaming.transport` must be `'sse'` or `'websocket'` (if provided)
+- `streaming.sse.reconnectBase` must be <= `streaming.sse.reconnectMax` (if both provided)
+- `streaming.websocket.reconnectBase` must be <= `streaming.websocket.reconnectMax` (if both provided)
+- `streaming.sse.url` and `streaming.websocket.url` must be valid URLs (if provided)
 
 ### Dev Mode Logging
 
@@ -370,25 +479,39 @@ Per-flag change events are emitted when a flag is **created** (new flag) or **up
 
 **Flag removals are NOT emitted as per-flag change events.** Instead, a bulk `flags.removed` event is emitted with an array of removed flag names.
 
-### watchFlag Behavior
+### Watch Callback Behavior
 
-`watchFlag(flagName, callback)` and `watchFlagWithInitialState(flagName, callback)` register callbacks that are invoked when the specified flag changes.
+The SDK provides two families of watch functions for different use cases:
 
-**Callback Invocation Mechanism:**
-- Callbacks are stored in an internal `watchCallbacks` map and invoked **directly** (not via event emitter).
-- In **normal mode** (`explicitSyncMode=false`): Callbacks are invoked immediately when flags are fetched from the server.
-- In **explicit sync mode** (`explicitSyncMode=true`): Callbacks are invoked only when `syncFlags()` is called, ensuring controlled synchronization points.
+#### Realtime Watch (`watchRealtimeFlag`, `watchRealtimeFlagWithInitialState`)
 
-**What triggers callbacks:**
+Reacts to the latest server-side flag state **immediately** when flags are fetched, regardless of `explicitSyncMode`.
+
+- Callbacks are stored in an internal `realtimeWatchCallbacks` map.
+- Invoked in `storeFlags()` whenever flag data changes from the server.
+- Useful for debug UIs, monitoring dashboards, or any component that needs the absolute latest flag state.
+
+#### Synced Watch (`watchSyncedFlag`, `watchSyncedFlagWithInitialState`)
+
+Reacts to flag changes only at **controlled synchronization points**.
+
+- Callbacks are stored in an internal `syncedWatchCallbacks` map.
+- In **normal mode** (`explicitSyncMode=false`): Behaves identically to realtime watch — invoked immediately when flags are fetched.
+- In **explicit sync mode** (`explicitSyncMode=true`): Invoked **only** when `syncFlags()` is called, comparing `synchronizedFlags` (old) with `realtimeFlags` (new).
+- Useful for game logic, UI rendering, or any component where mid-session flag changes would cause inconsistent UX.
+
+#### Common Behavior
+
+**What triggers callbacks (both families):**
 - ✅ **Reacts to**: Flag created (`changeType: 'created'`), Flag updated (`changeType: 'updated'`)
 - ✅ **Reacts to**: Flag removal — callback receives a proxy with `null`/`undefined` flag. The bulk `flags.removed` event is also emitted separately.
 
-**explicitSyncMode behavior:**
-- When `explicitSyncMode=true`, watch callbacks are **not** invoked when flags are fetched from the server in the background.
-- Instead, callbacks are invoked when `syncFlags()` is called, comparing `synchronizedFlags` (old) with `realtimeFlags` (new).
-- This prevents mid-session flag changes from affecting the user experience until the application explicitly synchronizes.
+**Behavior comparison in `explicitSyncMode=true`:**
 
-This design ensures that `explicitSyncMode` properly controls when flag changes are applied, preventing mid-session disruptions.
+| Event | `watchRealtimeFlag` | `watchSyncedFlag` |
+|-------|-------------------|------------------|
+| Server fetch completes | ✅ Fires immediately | ❌ Not fired |
+| `syncFlags()` called | ❌ Not fired | ✅ Fires with synced diff |
 
 ## Main Interface
 
@@ -459,17 +582,30 @@ class FeaturesClient implements VariationProvider {
   hasPendingSyncFlags(): boolean;
   syncFlags(fetchNow?: boolean): Promise<void>;
 
-  // Watch (Change Detection) - Returns FlagProxy for convenience
-  watchFlag(
+  // Watch - Realtime (reacts immediately to server-fetched flag changes)
+  watchRealtimeFlag(
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>,
     name?: string
   ): () => void;
-  watchFlagWithInitialState(
+  watchRealtimeFlagWithInitialState(
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>,
     name?: string
   ): () => void;
+
+  // Watch - Synced (reacts at syncFlags() in explicitSyncMode, or immediately in normal mode)
+  watchSyncedFlag(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>,
+    name?: string
+  ): () => void;
+  watchSyncedFlagWithInitialState(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>,
+    name?: string
+  ): () => void;
+
   createWatchFlagGroup(name: string): WatchFlagGroup;
 
   // Event Tracking (future implementation)
@@ -825,8 +961,15 @@ class WatchFlagGroup {
   constructor(client: FeaturesClient, name: string);
 
   getName(): string;
-  watchFlag(flagName: string, callback: (flag: FlagProxy) => void): this;
-  watchFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void): this;
+
+  // Realtime watchers
+  watchRealtimeFlag(flagName: string, callback: (flag: FlagProxy) => void): this;
+  watchRealtimeFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void): this;
+
+  // Synced watchers
+  watchSyncedFlag(flagName: string, callback: (flag: FlagProxy) => void): this;
+  watchSyncedFlagWithInitialState(flagName: string, callback: (flag: FlagProxy) => void): this;
+
   unwatchAll(): void;
   destroy(): void;
   get size(): number;
@@ -834,7 +977,8 @@ class WatchFlagGroup {
 
 // Usage
 const group = client.createWatchGroup('my-group');
-group.watchFlag('flag-1', handler1).watchFlag('flag-2', handler2);
+group.watchRealtimeFlag('flag-1', handler1)
+     .watchSyncedFlag('flag-2', handler2);
 
 // Later, unsubscribe all at once
 group.unwatchAll();
@@ -897,26 +1041,35 @@ client.features.setExplicitSyncMode(false);
 
 ## Watch Pattern
 
-Reactive change detection for individual flags:
+Reactive change detection for individual flags. Two watch families are provided:
 
 > [!CAUTION]
-> **`watchFlag*` methods MUST always read from `realtimeFlags`**, regardless of `explicitSyncMode`.
-> The purpose of watch callbacks is to react to the latest server-side flag state in real-time.
-> If `watchFlagWithInitialState` reads from `synchronizedFlags` (which may be stale in explicit sync mode),
-> the initial callback would receive outdated data, defeating the purpose of watching.
->
-> Implementation: When creating a `FlagProxy` for watch callbacks or emitting the initial state,
+> **`watchRealtimeFlag*` methods MUST always read from `realtimeFlags`**, regardless of `explicitSyncMode`.
+> When creating a `FlagProxy` for realtime watch callbacks or emitting the initial state,
 > always call `selectFlags(forceRealtime: true)` (or equivalent) to ensure the latest data is used.
+>
+> **`watchSyncedFlag*` methods** read from `synchronizedFlags` in `explicitSyncMode` (or `realtimeFlags` in normal mode).
+> When emitting the initial state for synced watchers, call `selectFlags(forceRealtime: false)`.
 
 ```typescript
-// Watch for changes (excludes initial state)
-const unwatch = client.watchFlag('my-feature', (flag) => {
-  console.log('Flag changed:', flag.enabled);
+// Realtime: reacts immediately to server-fetched changes
+const unwatch = client.watchRealtimeFlag('my-feature', (flag) => {
+  console.log('Realtime flag changed:', flag.enabled);
 });
 
-// Watch with initial state callback
-const unwatch = client.watchFlagWithInitialState('my-feature', (flag) => {
-  console.log('Flag state:', flag.enabled);
+// Realtime with initial state
+const unwatch2 = client.watchRealtimeFlagWithInitialState('my-feature', (flag) => {
+  console.log('Realtime flag state:', flag.enabled);
+});
+
+// Synced: reacts only at syncFlags() in explicitSyncMode
+const unwatch3 = client.watchSyncedFlag('my-feature', (flag) => {
+  console.log('Synced flag changed:', flag.enabled);
+});
+
+// Synced with initial state
+const unwatch4 = client.watchSyncedFlagWithInitialState('my-feature', (flag) => {
+  console.log('Synced flag state:', flag.enabled);
 });
 
 // Stop watching
@@ -1259,7 +1412,7 @@ type StreamingConnectionState = 'disconnected' | 'connecting' | 'connected' | 'r
 - [x] Polling mechanism with backoff
 - [x] Context management (global)
 - [x] Explicit sync mode (isExplicitSyncEnabled, hasPendingSyncFlags)
-- [x] Watch pattern for change detection (watchFlag, WatchFlagGroup)
+- [x] Watch pattern for change detection (watchRealtimeFlag, watchSyncedFlag, WatchFlagGroup)
 - [x] Variation functions (bool, string, number, json)
 - [x] Variation details and OrThrow variants
 - [x] FlagProxy convenience shell (delegates to VariationProvider)

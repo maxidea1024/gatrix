@@ -1,5 +1,5 @@
 // Copyright Gatrix. All Rights Reserved.
-// FlagProxy wrapper for convenient flag access
+// FlagProxy - Thin shell that delegates ALL logic to IGatrixVariationProvider.
 
 #pragma once
 
@@ -10,161 +10,151 @@
 class IGatrixVariationProvider;
 
 /**
- * FlagProxy - Single source of truth for flag value extraction.
+ * FlagProxy - Thin shell that delegates ALL logic to IGatrixVariationProvider.
  *
- * This is a thin shell that delegates all evaluation and metrics tracking
- * to an IGatrixVariationProvider (typically the FeaturesClient).
- *
- * IMPORTANT: Provider is ALWAYS non-null. FlagProxy is exclusively created
- * by FeaturesClient, which passes itself as the provider.
+ * Architecture per CLIENT_SDK_SPEC:
+ * - Holds only FlagName + bForceRealtime + Provider pointer.
+ * - ALL property reads and variation methods delegate to the provider.
+ * - No deep copy of flag data - always reads live state from FeaturesClient
+ * cache.
+ * - IsRealtime() indicates the proxy's operational mode.
+ * - Provider is always non-null.
  */
 UCLASS(BlueprintType, Transient)
 class GATRIXSDK_API UGatrixFlagProxy : public UObject {
   GENERATED_BODY()
 
 public:
-  /** Initialize with evaluated flag data and variation provider */
-  void Initialize(const FGatrixEvaluatedFlag &InFlag,
-                  IGatrixVariationProvider *InProvider,
-                  const FString &InFlagName);
+  /** Initialize with variation provider and flag name */
+  void Initialize(IGatrixVariationProvider *InProvider,
+                  const FString &InFlagName, bool bInForceRealtime = false);
 
-  // ==================== Basic Getters ====================
+  // ==================== Properties ====================
 
   /** Get the flag name */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
   FString GetName() const { return FlagName; }
 
-  /** Whether the flag exists */
+  /** Whether this proxy was created in realtime mode */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  bool Exists() const { return bExists; }
+  bool IsRealtime() const { return bForceRealtime; }
 
-  /** Check if the flag is enabled. Triggers metrics. */
+  /** Whether the flag exists in the current cache */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
+  bool Exists() const;
+
+  /** Check if the flag is enabled. Delegates to provider for metrics tracking.
+   */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
   bool IsEnabled() const;
 
   /** Get the variant */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  FGatrixVariant GetVariant() const { return Flag.Variant; }
+  FGatrixVariant GetVariant() const;
 
   /** Get the value type */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  EGatrixValueType GetValueType() const { return Flag.ValueType; }
+  EGatrixValueType GetValueType() const;
 
   /** Get the version number */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  int32 GetVersion() const { return Flag.Version; }
+  int32 GetVersion() const;
 
   /** Get the evaluation reason */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  FString GetReason() const { return Flag.Reason; }
+  FString GetReason() const;
 
   /** Get whether impression data is enabled */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  bool HasImpressionData() const { return Flag.bImpressionData; }
+  bool HasImpressionData() const;
+
+  /** Get the raw evaluated flag data */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
+  FGatrixEvaluatedFlag GetEvaluatedFlag() const;
 
   // ==================== Variation Methods ====================
+  // No per-method bForceRealtime — uses constructor value.
 
   /** Get boolean variation from variant value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  bool BoolVariation(bool FallbackValue, bool bForceRealtime = false) const;
+  bool BoolVariation(bool FallbackValue) const;
 
   /** Get string variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  FString StringVariation(const FString &FallbackValue,
-                          bool bForceRealtime = false) const;
+  FString StringVariation(const FString &FallbackValue) const;
 
   /** Get integer variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  int32 IntVariation(int32 FallbackValue, bool bForceRealtime = false) const;
+  int32 IntVariation(int32 FallbackValue) const;
 
   /** Get float variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  float FloatVariation(float FallbackValue, bool bForceRealtime = false) const;
+  float FloatVariation(float FallbackValue) const;
 
   /** Get double variation from value */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  double DoubleVariation(double FallbackValue,
-                         bool bForceRealtime = false) const;
+  double DoubleVariation(double FallbackValue) const;
 
   /** Get JSON variation as string */
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
-  FString JsonVariation(const FString &FallbackValue,
-                        bool bForceRealtime = false) const;
+  FString JsonVariation(const FString &FallbackValue) const;
 
   // ==================== Variation Details ====================
 
-  /** Get boolean variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult BoolVariationDetails(bool FallbackValue) const;
+
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult
-  BoolVariationDetails(bool FallbackValue, bool bForceRealtime = false) const;
+  StringVariationDetails(const FString &FallbackValue) const;
 
-  /** Get string variation with details */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult IntVariationDetails(int32 FallbackValue) const;
+
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult FloatVariationDetails(float FallbackValue) const;
+
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult DoubleVariationDetails(double FallbackValue) const;
+
   UFUNCTION(BlueprintCallable, BlueprintPure,
             Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult
-  StringVariationDetails(const FString &FallbackValue,
-                         bool bForceRealtime = false) const;
-
-  /** Get integer variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult IntVariationDetails(int32 FallbackValue,
-                                             bool bForceRealtime = false) const;
-
-  /** Get float variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult
-  FloatVariationDetails(float FallbackValue, bool bForceRealtime = false) const;
-
-  /** Get double variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult
-  DoubleVariationDetails(double FallbackValue,
-                         bool bForceRealtime = false) const;
-
-  /** Get JSON variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult
-  JsonVariationDetails(const FString &FallbackValue,
-                       bool bForceRealtime = false) const;
+  JsonVariationDetails(const FString &FallbackValue) const;
 
   // ==================== OrThrow Variations ====================
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
-  bool BoolVariationOrThrow(bool bForceRealtime = false);
+  bool BoolVariationOrThrow();
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
-  FString StringVariationOrThrow(bool bForceRealtime = false);
+  FString StringVariationOrThrow();
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
-  float FloatVariationOrThrow(bool bForceRealtime = false);
+  float FloatVariationOrThrow();
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
-  int32 IntVariationOrThrow(bool bForceRealtime = false);
+  int32 IntVariationOrThrow();
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
-  double DoubleVariationOrThrow(bool bForceRealtime = false);
+  double DoubleVariationOrThrow();
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
-  FString JsonVariationOrThrow(bool bForceRealtime = false);
-
-  /** Get the raw evaluated flag data */
-  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy")
-  FGatrixEvaluatedFlag GetEvaluatedFlag() const { return Flag; }
+  FString JsonVariationOrThrow();
 
 private:
-  FGatrixEvaluatedFlag Flag;
   FString FlagName;
-  bool bExists = false;
+  bool bForceRealtime = false;
   IGatrixVariationProvider *Provider = nullptr;
 };

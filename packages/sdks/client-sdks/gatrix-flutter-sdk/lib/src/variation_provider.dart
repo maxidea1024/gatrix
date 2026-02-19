@@ -10,6 +10,14 @@
 abstract class VariationProvider {
   bool isEnabledInternal(String flagName, {bool forceRealtime = false});
   Variant getVariantInternal(String flagName, {bool forceRealtime = false});
+
+  // Metadata access (no metrics tracking)
+  bool hasFlagInternal(String flagName, {bool forceRealtime = false});
+  ValueType getValueTypeInternal(String flagName, {bool forceRealtime = false});
+  int getVersionInternal(String flagName, {bool forceRealtime = false});
+  String? getReasonInternal(String flagName, {bool forceRealtime = false});
+  bool getImpressionDataInternal(String flagName, {bool forceRealtime = false});
+  EvaluatedFlag? getRawFlagInternal(String flagName, {bool forceRealtime = false});
   String variationInternal(String flagName, String fallbackValue,
       {bool forceRealtime = false});
   bool boolVariationInternal(String flagName, bool fallbackValue,

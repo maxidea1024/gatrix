@@ -74,7 +74,7 @@ async function main() {
 
     // Watch each flag for changes
     for (const flag of flags) {
-      watchGroup.watchFlag(flag.name, (proxy: FlagProxy) => {
+      watchGroup.watchRealtimeFlag(flag.name, (proxy: FlagProxy) => {
         const json = JSON.stringify({
           enabled: proxy.enabled,
           variant: proxy.variant.name,
@@ -106,7 +106,7 @@ async function main() {
     console.log('');
 
     // Keep the process running
-    await new Promise(() => {}); // Never resolves
+    await new Promise(() => { }); // Never resolves
   } catch (error: any) {
     console.error('Error:', error.message);
     await client.stop();

@@ -128,23 +128,20 @@ FGatrixVariant UGatrixFeaturesClient::GetVariant(const FString &FlagName,
       FlagName, bForceRealtime);
 }
 
-UGatrixFlagProxy *UGatrixFeaturesClient::CreateProxy(const FString &FlagName) {
+UGatrixFlagProxy *UGatrixFeaturesClient::CreateProxy(const FString &FlagName,
+                                                     bool bForceRealtime) {
   FScopeLock Lock(&FlagsCriticalSection);
-  // Always read from realtimeFlags for watch/proxy
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(true);
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
   UGatrixFlagProxy *Proxy = NewObject<UGatrixFlagProxy>(this);
 
   const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
   if (Found) {
     TrackAccess(FlagName, Found, TEXT("watch"), Found->Variant.Name);
-    Proxy->Initialize(*Found, this, FlagName);
   } else {
     TrackAccess(FlagName, nullptr, TEXT("watch"), TEXT(""));
-    FGatrixEvaluatedFlag EmptyFlag;
-    EmptyFlag.Name = FlagName;
-    Proxy->Initialize(EmptyFlag, this, FlagName);
   }
 
+  Proxy->Initialize(this, FlagName, bForceRealtime);
   return Proxy;
 }
 
@@ -313,7 +310,7 @@ void UGatrixFeaturesClient::SyncFlags(bool bFetchNow) {
     TMap<FString, FGatrixEvaluatedFlag> OldFlags = SynchronizedFlags;
     SynchronizedFlags = RealtimeFlags;
     EmitFlagChanges(OldFlags, SynchronizedFlags);
-    InvokeWatchCallbacks(OldFlags, SynchronizedFlags);
+    InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, SynchronizedFlags);
   }
 
   {
@@ -740,7 +737,10 @@ void UGatrixFeaturesClient::StoreFlags(
     EmitFlagChanges(OldFlags, CurrentFlags);
 
     if (!ClientConfig.Features.bExplicitSyncMode) {
-      InvokeWatchCallbacks(OldFlags, CurrentFlags);
+      // Always invoke realtime callbacks
+      InvokeWatchCallbacks(WatchCallbacks, OldFlags, CurrentFlags);
+      // In non-explicit mode, also invoke synced callbacks
+      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, CurrentFlags);
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsChange);
       }
@@ -926,9 +926,9 @@ void UGatrixFeaturesClient::TrackAccess(const FString &FlagName,
 
 // ==================== Watch ====================
 
-int32 UGatrixFeaturesClient::WatchFlag(const FString &FlagName,
-                                       FGatrixFlagWatchDelegate Callback,
-                                       const FString &Name) {
+int32 UGatrixFeaturesClient::WatchRealtimeFlag(
+    const FString &FlagName, FGatrixFlagWatchDelegate Callback,
+    const FString &Name) {
   FWatchCallbackEntry Entry;
   Entry.FlagName = FlagName;
   Entry.Callback = Callback;
@@ -937,13 +937,85 @@ int32 UGatrixFeaturesClient::WatchFlag(const FString &FlagName,
   return Entry.Handle;
 }
 
+int32 UGatrixFeaturesClient::WatchSyncedFlag(const FString &FlagName,
+                                             FGatrixFlagWatchDelegate Callback,
+                                             const FString &Name) {
+  FWatchCallbackEntry Entry;
+  Entry.FlagName = FlagName;
+  Entry.Callback = Callback;
+  Entry.Handle = NextWatchHandle++;
+  SyncedWatchCallbacks.Add(Entry);
+  return Entry.Handle;
+}
+
 void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
   WatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
     return Entry.Handle == Handle;
   });
+  SyncedWatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
+    return Entry.Handle == Handle;
+  });
+}
+
+// ==================== Metadata Access Internal Methods ====================
+
+bool UGatrixFeaturesClient::HasFlagInternal(const FString &FlagName,
+                                            bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  return Flags.Contains(FlagName);
+}
+
+EGatrixValueType
+UGatrixFeaturesClient::GetValueTypeInternal(const FString &FlagName,
+                                            bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    return EGatrixValueType::None;
+  return Found->ValueType;
+}
+
+int32 UGatrixFeaturesClient::GetVersionInternal(const FString &FlagName,
+                                                bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    return 0;
+  return static_cast<int32>(Found->Version);
+}
+
+FString UGatrixFeaturesClient::GetReasonInternal(const FString &FlagName,
+                                                 bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    return TEXT("");
+  return Found->Reason;
+}
+
+bool UGatrixFeaturesClient::GetImpressionDataInternal(
+    const FString &FlagName, bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found)
+    return false;
+  return Found->bImpressionData;
+}
+
+FGatrixEvaluatedFlag
+UGatrixFeaturesClient::GetRawFlagInternal(const FString &FlagName,
+                                          bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (Found)
+    return *Found;
+  FGatrixEvaluatedFlag Empty;
+  Empty.Name = FlagName;
+  return Empty;
 }
 
 void UGatrixFeaturesClient::InvokeWatchCallbacks(
+    const TArray<FWatchCallbackEntry> &CallbackList,
     const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
     const TMap<FString, FGatrixEvaluatedFlag> &NewFlags) {
   // Check for changed/new flags
@@ -953,7 +1025,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
         OldFlag->Variant.Name != Pair.Value.Variant.Name ||
         OldFlag->Variant.Value != Pair.Value.Variant.Value) {
       // Invoke watch callbacks for this flag
-      for (const auto &Entry : WatchCallbacks) {
+      for (const auto &Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
           UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key);
           Entry.Callback.ExecuteIfBound(Proxy);
@@ -965,7 +1037,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
   // Check for removed flags
   for (const auto &Pair : OldFlags) {
     if (!NewFlags.Contains(Pair.Key)) {
-      for (const auto &Entry : WatchCallbacks) {
+      for (const auto &Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
           UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key);
           Entry.Callback.ExecuteIfBound(Proxy);

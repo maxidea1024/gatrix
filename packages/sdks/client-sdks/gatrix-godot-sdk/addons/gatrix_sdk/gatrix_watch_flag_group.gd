@@ -17,16 +17,30 @@ func get_group_name() -> String:
 	return _name
 
 
-## Watch a flag for changes. Returns self for chaining.
-func watch_flag(flag_name: String, callback: Callable) -> GatrixWatchFlagGroup:
-	var unwatch := _features.watch_flag(flag_name, callback, "%s/%s" % [_name, flag_name])
+## Watch a flag for realtime changes. Returns self for chaining.
+func watch_realtime_flag(flag_name: String, callback: Callable) -> GatrixWatchFlagGroup:
+	var unwatch := _features.watch_realtime_flag(flag_name, callback, "%s/%s" % [_name, flag_name])
 	_unwatchers.append(unwatch)
 	return self
 
 
-## Watch a flag with initial state callback. Returns self for chaining.
-func watch_flag_with_initial_state(flag_name: String, callback: Callable) -> GatrixWatchFlagGroup:
-	var unwatch := _features.watch_flag_with_initial_state(flag_name, callback, "%s/%s" % [_name, flag_name])
+## Watch a flag for realtime changes with initial state. Returns self for chaining.
+func watch_realtime_flag_with_initial_state(flag_name: String, callback: Callable) -> GatrixWatchFlagGroup:
+	var unwatch := _features.watch_realtime_flag_with_initial_state(flag_name, callback, "%s/%s" % [_name, flag_name])
+	_unwatchers.append(unwatch)
+	return self
+
+
+## Watch a flag for synced changes. Returns self for chaining.
+func watch_synced_flag(flag_name: String, callback: Callable) -> GatrixWatchFlagGroup:
+	var unwatch := _features.watch_synced_flag(flag_name, callback, "%s/%s" % [_name, flag_name])
+	_unwatchers.append(unwatch)
+	return self
+
+
+## Watch a flag for synced changes with initial state. Returns self for chaining.
+func watch_synced_flag_with_initial_state(flag_name: String, callback: Callable) -> GatrixWatchFlagGroup:
+	var unwatch := _features.watch_synced_flag_with_initial_state(flag_name, callback, "%s/%s" % [_name, flag_name])
 	_unwatchers.append(unwatch)
 	return self
 

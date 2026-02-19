@@ -23,24 +23,47 @@ export class WatchFlagGroup {
   }
 
   /**
-   * Watch a flag and add to this group
-   * Returns this group for chaining
+   * Watch a flag for realtime changes and add to this group.
+   * Returns this group for chaining.
    */
-  watchFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): this {
-    const unsubscribe = this.client.watchFlag(flagName, callback);
+  watchRealtimeFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): this {
+    const unsubscribe = this.client.watchRealtimeFlag(flagName, callback);
     this.unsubscribers.push(unsubscribe);
     return this;
   }
 
   /**
-   * Watch a flag with initial state and add to this group
-   * Returns this group for chaining
+   * Watch a flag for realtime changes with initial state and add to this group.
+   * Returns this group for chaining.
    */
-  watchFlagWithInitialState(
+  watchRealtimeFlagWithInitialState(
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): this {
-    const unsubscribe = this.client.watchFlagWithInitialState(flagName, callback);
+    const unsubscribe = this.client.watchRealtimeFlagWithInitialState(flagName, callback);
+    this.unsubscribers.push(unsubscribe);
+    return this;
+  }
+
+  /**
+   * Watch a flag for synced changes and add to this group.
+   * Returns this group for chaining.
+   */
+  watchSyncedFlag(flagName: string, callback: (flag: FlagProxy) => void | Promise<void>): this {
+    const unsubscribe = this.client.watchSyncedFlag(flagName, callback);
+    this.unsubscribers.push(unsubscribe);
+    return this;
+  }
+
+  /**
+   * Watch a flag for synced changes with initial state and add to this group.
+   * Returns this group for chaining.
+   */
+  watchSyncedFlagWithInitialState(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>
+  ): this {
+    const unsubscribe = this.client.watchSyncedFlagWithInitialState(flagName, callback);
     this.unsubscribers.push(unsubscribe);
     return this;
   }

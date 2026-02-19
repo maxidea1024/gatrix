@@ -95,6 +95,22 @@ public:
   std::string jsonVariationOrThrow(const std::string &flagName,
                                    bool forceRealtime = false);
 
+  // ==================== IVariationProvider Metadata Implementation
+  // ====================
+  bool hasFlagInternal(const std::string &flagName,
+                       bool forceRealtime = false) const override;
+  ValueType getValueTypeInternal(const std::string &flagName,
+                                 bool forceRealtime = false) const override;
+  int getVersionInternal(const std::string &flagName,
+                         bool forceRealtime = false) const override;
+  std::string getReasonInternal(const std::string &flagName,
+                                bool forceRealtime = false) const override;
+  bool getImpressionDataInternal(const std::string &flagName,
+                                 bool forceRealtime = false) const override;
+  const EvaluatedFlag *
+  getRawFlagInternal(const std::string &flagName,
+                     bool forceRealtime = false) const override;
+
   // ==================== IVariationProvider Implementation ====================
   bool isEnabledInternal(const std::string &flagName,
                          bool forceRealtime = false) override;
@@ -169,12 +185,13 @@ public:
 
   // ==================== Watch Pattern ====================
   using WatchCallback = std::function<void(FlagProxy)>;
-  std::function<void()> watchFlag(const std::string &flagName,
-                                  WatchCallback callback,
-                                  const std::string &name = "");
-  std::function<void()> watchFlagWithInitialState(const std::string &flagName,
-                                                  WatchCallback callback,
-                                                  const std::string &name = "");
+  std::function<void()> watchRealtimeFlag(const std::string &flagName,
+                                          WatchCallback callback,
+                                          const std::string &name = "");
+  std::function<void()>
+  watchRealtimeFlagWithInitialState(const std::string &flagName,
+                                    WatchCallback callback,
+                                    const std::string &name = "");
   WatchFlagGroup *createWatchFlagGroup(const std::string &name);
 
   // ==================== Lifecycle ====================
@@ -217,6 +234,7 @@ private:
 
   // Watch callbacks — direct callback management (not via emitter)
   std::map<std::string, std::vector<WatchCallback>> _watchCallbacks;
+  std::map<std::string, std::vector<WatchCallback>> _syncedWatchCallbacks;
 
   // Active flags getter
   const std::map<std::string, EvaluatedFlag> &
@@ -228,7 +246,7 @@ private:
                                   bool forceRealtime = false);
 
   // Internal
-  FlagProxy createProxy(const std::string &flagName);
+  FlagProxy createProxy(const std::string &flagName, bool forceRealtime = true);
   void initFromStorage();
   void initFromBootstrap();
   void saveToStorage();
@@ -243,9 +261,10 @@ private:
   void trackImpression(const EvaluatedFlag &flag, const std::string &eventType);
   void scheduleNextRefresh();
   void unschedulePolling();
-  void
-  invokeWatchCallbacks(const std::map<std::string, EvaluatedFlag> &oldFlags,
-                       const std::map<std::string, EvaluatedFlag> &newFlags);
+  void invokeWatchCallbacks(
+      std::map<std::string, std::vector<WatchCallback>> &callbackMap,
+      const std::map<std::string, EvaluatedFlag> &oldFlags,
+      const std::map<std::string, EvaluatedFlag> &newFlags);
 };
 
 // ==================== WatchFlagGroup ====================
@@ -258,11 +277,16 @@ public:
   const std::string &getName() const { return _name; }
   int size() const { return static_cast<int>(_unwatchers.size()); }
 
-  WatchFlagGroup &watchFlag(const std::string &flagName,
-                            FeaturesClient::WatchCallback callback);
+  WatchFlagGroup &watchRealtimeFlag(const std::string &flagName,
+                                    FeaturesClient::WatchCallback callback);
   WatchFlagGroup &
-  watchFlagWithInitialState(const std::string &flagName,
-                            FeaturesClient::WatchCallback callback);
+  watchRealtimeFlagWithInitialState(const std::string &flagName,
+                                    FeaturesClient::WatchCallback callback);
+  WatchFlagGroup &watchSyncedFlag(const std::string &flagName,
+                                  FeaturesClient::WatchCallback callback);
+  WatchFlagGroup &
+  watchSyncedFlagWithInitialState(const std::string &flagName,
+                                  FeaturesClient::WatchCallback callback);
   void unwatchAll();
   void destroy();
 

@@ -358,6 +358,59 @@ const startServer = async () => {
     const server = createServer(app);
     httpServer = server; // Store reference for graceful shutdown
 
+    // Handle WebSocket upgrade for flag streaming
+    server.on('upgrade', async (request, socket, head) => {
+      try {
+        const url = new URL(request.url || '', `http://${request.headers.host}`);
+        const wsPathMatch = url.pathname.match(/^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/);
+
+        if (!wsPathMatch) {
+          socket.destroy();
+          return;
+        }
+
+        const environment = wsPathMatch[1];
+        const apiToken = url.searchParams.get('x-api-token')
+          || url.searchParams.get('apiToken')
+          || url.searchParams.get('token');
+
+        if (!apiToken) {
+          socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+          socket.destroy();
+          return;
+        }
+
+        // Validate token
+        const { ApiAccessToken } = await import('./models/ApiAccessToken');
+        const tokenData = await ApiAccessToken.validateAndUse(apiToken);
+        if (!tokenData) {
+          // Check special tokens
+          const isUnsecured = apiToken === 'gatrix-unsecured-client-api-token';
+          if (!isUnsecured) {
+            socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+            socket.destroy();
+            return;
+          }
+        }
+
+        const { flagStreamingService } = await import('./services/FlagStreamingService');
+        const wss = flagStreamingService.getWebSocketServer();
+        if (!wss) {
+          socket.destroy();
+          return;
+        }
+
+        wss.handleUpgrade(request, socket, head, async (ws) => {
+          const { ulid } = await import('ulid');
+          const clientId = `flag-ws-${ulid()}`;
+          await flagStreamingService.addWebSocketClient(clientId, environment, ws);
+        });
+      } catch (err) {
+        logger.error('WebSocket upgrade error:', err);
+        socket.destroy();
+      }
+    });
+
     server.listen(config.port, async () => {
       logger.info(
         `Server running on port ${config.port} in ${config.nodeEnv} mode`,

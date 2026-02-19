@@ -131,12 +131,6 @@ func is_enabled(flag_name: String) -> bool:
 	return _features.is_enabled(flag_name)
 
 
-## Get a FlagProxy for convenient flag access.
-func get_flag(flag_name: String) -> GatrixFlagProxy:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.get_flag(flag_name)
-
-
 ## Get boolean variation.
 func bool_variation(flag_name: String, default_value: bool) -> bool:
 	assert(_initialized, "GatrixSDK: Not initialized")
@@ -268,16 +262,28 @@ func sync_flags(fetch_now := true) -> void:
 
 # ==================== Watch ====================
 
-## Watch a flag for changes. Returns an unwatch Callable.
-func watch_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+## Watch a flag for realtime changes. Returns an unwatch Callable.
+func watch_realtime_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
 	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.watch_flag(flag_name, callback, watcher_name)
+	return _features.watch_realtime_flag(flag_name, callback, watcher_name)
 
 
-## Watch a flag with immediate initial state callback. Returns an unwatch Callable.
-func watch_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+## Watch a flag for realtime changes with initial state. Returns an unwatch Callable.
+func watch_realtime_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
 	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.watch_flag_with_initial_state(flag_name, callback, watcher_name)
+	return _features.watch_realtime_flag_with_initial_state(flag_name, callback, watcher_name)
+
+
+## Watch a flag for synced changes. Returns an unwatch Callable.
+func watch_synced_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	assert(_initialized, "GatrixSDK: Not initialized")
+	return _features.watch_synced_flag(flag_name, callback, watcher_name)
+
+
+## Watch a flag for synced changes with initial state. Returns an unwatch Callable.
+func watch_synced_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	assert(_initialized, "GatrixSDK: Not initialized")
+	return _features.watch_synced_flag_with_initial_state(flag_name, callback, watcher_name)
 
 
 # ==================== Event Subscription ====================

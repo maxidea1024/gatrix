@@ -119,10 +119,10 @@ class FeaturesClient implements VariationProvider {
 
   /// Always reads from realtimeFlags — watch callbacks must reflect
   /// the latest server state regardless of explicitSyncMode.
-  FlagProxy _createProxy(String flagName) {
-    final flag = _selectFlags(forceRealtime: true)[flagName];
+  FlagProxy _createProxy(String flagName, {bool forceRealtime = true}) {
+    final flag = _selectFlags(forceRealtime: forceRealtime)[flagName];
     _trackFlagAccess(flagName, flag, 'watch', flag?.variant.name);
-    return FlagProxy(flag, client: this, flagName: flagName);
+    return FlagProxy(this, flagName, forceRealtime: forceRealtime);
   }
 
   /// Create a FlagProxy. Used internally by SDK widgets/composables.
@@ -186,6 +186,43 @@ class FeaturesClient implements VariationProvider {
   // ===================================================== Internal methods
   // These implement the VariationProvider interface.
   // All flag lookup + value extraction + metrics tracking happen here.
+
+  // ==================== Metadata Access Internal Methods ====================
+  // No metrics tracking — read-only metadata access for FlagProxy property delegation.
+
+  @override
+  bool hasFlagInternal(String flagName, {bool forceRealtime = false}) {
+    return _getFlag(flagName, forceRealtime: forceRealtime) != null;
+  }
+
+  @override
+  ValueType getValueTypeInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
+    return flag?.valueType ?? ValueType.none;
+  }
+
+  @override
+  int getVersionInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
+    return flag?.version ?? 0;
+  }
+
+  @override
+  String? getReasonInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
+    return flag?.reason;
+  }
+
+  @override
+  bool getImpressionDataInternal(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
+    return flag?.impressionData ?? false;
+  }
+
+  @override
+  EvaluatedFlag? getRawFlagInternal(String flagName, {bool forceRealtime = false}) {
+    return _getFlag(flagName, forceRealtime: forceRealtime);
+  }
 
   @override
   bool isEnabledInternal(String flagName, {bool forceRealtime = false}) {

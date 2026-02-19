@@ -43,6 +43,7 @@ var _stats := GatrixTypes.FeaturesStats.new()
 
 # Per-flag watch callbacks
 var _watch_handles: Dictionary = {}  # handle -> { flag_name, callback }
+var _synced_watch_handles: Dictionary = {}  # handle -> { flag_name, callback }
 var _next_watch_handle: int = 1
 
 # Metrics tracking
@@ -125,11 +126,10 @@ func has_flag(flag_name: String, force_realtime: bool = false) -> bool:
 	return _lookup_flag(flag_name, force_realtime) != null
 
 
-func _create_proxy(flag_name: String) -> GatrixFlagProxy:
-	# Always read from realtimeFlags for watch/proxy
-	var flag = _lookup_flag(flag_name, true)
+func _create_proxy(flag_name: String, force_realtime: bool = true) -> GatrixFlagProxy:
+	var flag = _lookup_flag(flag_name, force_realtime)
 	_track_flag_access(flag_name, flag, "watch", flag.variant.name if flag != null else "")
-	return GatrixFlagProxy.new(flag, self, flag_name)
+	return GatrixFlagProxy.new(self, flag_name, force_realtime)
 
 
 func get_all_flags(force_realtime: bool = false) -> Array:
@@ -138,6 +138,45 @@ func get_all_flags(force_realtime: bool = false) -> Array:
 	var result: Array = flags.values()
 	_mutex.unlock()
 	return result
+
+
+# ==================== Metadata Access Internal Methods ====================
+# No metrics tracking — read-only metadata access for FlagProxy property delegation.
+
+func has_flag_internal(flag_name: String, force_realtime: bool = false) -> bool:
+	return _lookup_flag(flag_name, force_realtime) != null
+
+
+func get_value_type_internal(flag_name: String, force_realtime: bool = false) -> int:
+	var flag = _lookup_flag(flag_name, force_realtime)
+	if flag == null:
+		return GatrixTypes.ValueType.NONE
+	return flag.value_type
+
+
+func get_version_internal(flag_name: String, force_realtime: bool = false) -> int:
+	var flag = _lookup_flag(flag_name, force_realtime)
+	if flag == null:
+		return 0
+	return flag.version
+
+
+func get_reason_internal(flag_name: String, force_realtime: bool = false) -> String:
+	var flag = _lookup_flag(flag_name, force_realtime)
+	if flag == null:
+		return ""
+	return flag.reason
+
+
+func get_impression_data_internal(flag_name: String, force_realtime: bool = false) -> bool:
+	var flag = _lookup_flag(flag_name, force_realtime)
+	if flag == null:
+		return false
+	return flag.impression_data
+
+
+func get_raw_flag_internal(flag_name: String, force_realtime: bool = false) -> GatrixTypes.EvaluatedFlag:
+	return _lookup_flag(flag_name, force_realtime)
 
 
 # ==================== VariationProvider Internal Methods ====================
@@ -551,9 +590,13 @@ func sync_flags(fetch_now := true) -> void:
 		_do_fetch_flags()
 
 	_mutex.lock()
+	var old_synced := _synchronized_flags.duplicate()
 	_synchronized_flags = _realtime_flags.duplicate(true)
 	_has_pending_sync = false
 	_mutex.unlock()
+
+	# Invoke synced watch callbacks
+	_invoke_watch_callbacks(_synced_watch_handles, old_synced, _synchronized_flags)
 
 	_emitter.emit_event(GatrixEvents.FLAGS_SYNC)
 	_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": _synchronized_flags.values() }])
@@ -561,7 +604,7 @@ func sync_flags(fetch_now := true) -> void:
 
 # ==================== Watch ====================
 
-func watch_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+func watch_realtime_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
 	var handle := _next_watch_handle
 	_next_watch_handle += 1
 	_watch_handles[handle] = { "flag_name": flag_name, "callback": callback, "name": watcher_name }
@@ -570,11 +613,30 @@ func watch_flag(flag_name: String, callback: Callable, watcher_name := "") -> Ca
 	return func(): _watch_handles.erase(handle)
 
 
-func watch_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
-	var unwatch := watch_flag(flag_name, callback, watcher_name)
+func watch_realtime_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	var unwatch := watch_realtime_flag(flag_name, callback, watcher_name)
 
-	# Fire immediately with current state
-	var proxy := _create_proxy(flag_name)
+	# Fire immediately with current state — always use realtimeFlags
+	var proxy := _create_proxy(flag_name, true)
+	callback.call(proxy)
+
+	return unwatch
+
+
+func watch_synced_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	var handle := _next_watch_handle
+	_next_watch_handle += 1
+	_synced_watch_handles[handle] = { "flag_name": flag_name, "callback": callback, "name": watcher_name }
+
+	# Return unwatch callable
+	return func(): _synced_watch_handles.erase(handle)
+
+
+func watch_synced_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
+	var unwatch := watch_synced_flag(flag_name, callback, watcher_name)
+
+	# Fire immediately — respect explicitSyncMode for synced watchers
+	var proxy := _create_proxy(flag_name, false)
 	callback.call(proxy)
 
 	return unwatch
@@ -849,7 +911,11 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 	# Emit change events
 	if changed and not is_initial_fetch:
 		_emit_flag_changes(old_flags, _realtime_flags)
+		# Always invoke realtime watch callbacks
+		_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags)
 		if not _config.explicit_sync_mode:
+			# In non-explicit mode, also invoke synced callbacks
+			_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags)
 			_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
 
 
@@ -889,13 +955,6 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 			_emitter.emit_event(GatrixEvents.flag_change_event(flag_name),
 					[new_flag, old_flag, change_type])
 
-			# Notify watch handlers
-			var proxy := GatrixFlagProxy.new(new_flag, self, flag_name)
-			for handle in _watch_handles:
-				var watcher = _watch_handles[handle]
-				if watcher.flag_name == flag_name:
-					watcher.callback.call(proxy)
-
 	# Detect removed flags - emit bulk event
 	var removed_names: Array[String] = []
 	for flag_name in old_flags:
@@ -903,6 +962,27 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 			removed_names.append(flag_name)
 	if removed_names.size() > 0:
 		_emitter.emit_event(GatrixEvents.FLAGS_REMOVED, [removed_names])
+
+
+func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_flags: Dictionary) -> void:
+	for handle in handles:
+		var watcher = handles[handle]
+		var flag_name: String = watcher.flag_name
+		var new_flag = new_flags.get(flag_name)
+		var old_flag = old_flags.get(flag_name)
+
+		var changed := false
+		if new_flag != null and old_flag == null:
+			changed = true
+		elif new_flag != null and old_flag != null:
+			if old_flag.version != new_flag.version:
+				changed = true
+		elif new_flag == null and old_flag != null:
+			changed = true  # Flag removed
+
+		if changed:
+			var proxy := GatrixFlagProxy.new(self, flag_name, true)
+			watcher.callback.call(proxy)
 
 
 func _set_ready() -> void:

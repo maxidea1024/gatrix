@@ -156,9 +156,10 @@ std::vector<EvaluatedFlag> FeaturesClient::getAllFlags() const {
   return result;
 }
 
-FlagProxy FeaturesClient::createProxy(const std::string &flagName) {
-  // Always read from realtimeFlags for watch/proxy
-  const auto &flags = selectFlags(true);
+FlagProxy FeaturesClient::createProxy(const std::string &flagName,
+                                      bool forceRealtime) {
+  // Track access for initial proxy creation
+  const auto &flags = selectFlags(forceRealtime);
   auto it = flags.find(flagName);
   const EvaluatedFlag *flag = (it != flags.end()) ? &it->second : nullptr;
 
@@ -170,7 +171,7 @@ FlagProxy FeaturesClient::createProxy(const std::string &flagName) {
     _stats.missingFlags[flagName]++;
   }
 
-  return FlagProxy(flag, this, flagName);
+  return FlagProxy(this, flagName, forceRealtime);
 }
 
 bool FeaturesClient::hasFlag(const std::string &flagName) const {
@@ -315,7 +316,8 @@ void FeaturesClient::syncFlags(bool fetchNow) {
 
   auto oldSynchronizedFlags = _synchronizedFlags;
   _synchronizedFlags = _realtimeFlags;
-  invokeWatchCallbacks(oldSynchronizedFlags, _synchronizedFlags);
+  invokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags,
+                       _synchronizedFlags);
   _pendingSync = false;
   _stats.syncFlagsCount++;
   _emitter.emit(EVENTS::FLAGS_SYNC);
@@ -328,9 +330,10 @@ void FeaturesClient::syncFlags(bool fetchNow) {
 
 // ==================== Watch Pattern ====================
 
-std::function<void()> FeaturesClient::watchFlag(const std::string &flagName,
-                                                WatchCallback callback,
-                                                const std::string &name) {
+std::function<void()>
+FeaturesClient::watchRealtimeFlag(const std::string &flagName,
+                                  WatchCallback callback,
+                                  const std::string &name) {
   _watchCallbacks[flagName].push_back(callback);
 
   // Capture a copy of the callback for removal
@@ -350,16 +353,47 @@ std::function<void()> FeaturesClient::watchFlag(const std::string &flagName,
 }
 
 std::function<void()>
-FeaturesClient::watchFlagWithInitialState(const std::string &flagName,
-                                          WatchCallback callback,
-                                          const std::string &name) {
-  auto unwatchFn = watchFlag(flagName, callback, name);
+FeaturesClient::watchRealtimeFlagWithInitialState(const std::string &flagName,
+                                                  WatchCallback callback,
+                                                  const std::string &name) {
+  auto unwatchFn = watchRealtimeFlag(flagName, callback, name);
 
-  // Fire immediately with current state — respect explicitSyncMode
-  const auto &flags = selectFlags(false);
-  auto it = flags.find(flagName);
-  const EvaluatedFlag *flag = (it != flags.end()) ? &it->second : nullptr;
-  callback(FlagProxy(flag, this, flagName));
+  // Fire immediately with current state — always use realtimeFlags for realtime
+  // watchers
+  callback(FlagProxy(this, flagName, true));
+
+  return unwatchFn;
+}
+
+std::function<void()>
+FeaturesClient::watchSyncedFlag(const std::string &flagName,
+                                WatchCallback callback,
+                                const std::string &name) {
+  _syncedWatchCallbacks[flagName].push_back(callback);
+
+  auto cbPtr = &_syncedWatchCallbacks[flagName].back();
+  return [this, flagName, cbPtr]() {
+    auto it = _syncedWatchCallbacks.find(flagName);
+    if (it != _syncedWatchCallbacks.end()) {
+      auto &cbs = it->second;
+      for (auto cbIt = cbs.begin(); cbIt != cbs.end(); ++cbIt) {
+        if (&(*cbIt) == cbPtr) {
+          cbs.erase(cbIt);
+          break;
+        }
+      }
+    }
+  };
+}
+
+std::function<void()>
+FeaturesClient::watchSyncedFlagWithInitialState(const std::string &flagName,
+                                                WatchCallback callback,
+                                                const std::string &name) {
+  auto unwatchFn = watchSyncedFlag(flagName, callback, name);
+
+  // Fire immediately — respect explicitSyncMode for synced watchers
+  callback(FlagProxy(this, flagName, false));
 
   return unwatchFn;
 }
@@ -600,10 +634,15 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
     _stats.lastUpdateTime = "now"; // simplified
     _stats.totalFlagCount = static_cast<int>(_realtimeFlags.size());
 
+    // Always invoke realtime watch callbacks
+    invokeWatchCallbacks(_watchCallbacks, oldRealtimeFlags, _realtimeFlags);
+
     if (!_explicitSyncMode) {
       _synchronizedFlags = _realtimeFlags;
       _pendingSync = false;
-      invokeWatchCallbacks(oldRealtimeFlags, _realtimeFlags);
+      // In non-explicit mode, also invoke synced callbacks
+      invokeWatchCallbacks(_syncedWatchCallbacks, oldRealtimeFlags,
+                           _realtimeFlags);
       _emitter.emit(EVENTS::FLAGS_CHANGE);
     } else {
       if (!_pendingSync) {
@@ -813,18 +852,35 @@ WatchFlagGroup::WatchFlagGroup(FeaturesClient &client, const std::string &name)
 WatchFlagGroup::~WatchFlagGroup() { unwatchAll(); }
 
 WatchFlagGroup &
-WatchFlagGroup::watchFlag(const std::string &flagName,
-                          FeaturesClient::WatchCallback callback) {
+WatchFlagGroup::watchRealtimeFlag(const std::string &flagName,
+                                  FeaturesClient::WatchCallback callback) {
   auto unwatcher =
-      _client.watchFlag(flagName, callback, _name + "_" + flagName);
+      _client.watchRealtimeFlag(flagName, callback, _name + "_" + flagName);
   _unwatchers.push_back(unwatcher);
   return *this;
 }
 
-WatchFlagGroup &WatchFlagGroup::watchFlagWithInitialState(
+WatchFlagGroup &WatchFlagGroup::watchRealtimeFlagWithInitialState(
     const std::string &flagName, FeaturesClient::WatchCallback callback) {
-  auto unwatcher = _client.watchFlagWithInitialState(flagName, callback,
-                                                     _name + "_" + flagName);
+  auto unwatcher = _client.watchRealtimeFlagWithInitialState(
+      flagName, callback, _name + "_" + flagName);
+  _unwatchers.push_back(unwatcher);
+  return *this;
+}
+
+WatchFlagGroup &
+WatchFlagGroup::watchSyncedFlag(const std::string &flagName,
+                                FeaturesClient::WatchCallback callback) {
+  auto unwatcher =
+      _client.watchSyncedFlag(flagName, callback, _name + "_" + flagName);
+  _unwatchers.push_back(unwatcher);
+  return *this;
+}
+
+WatchFlagGroup &WatchFlagGroup::watchSyncedFlagWithInitialState(
+    const std::string &flagName, FeaturesClient::WatchCallback callback) {
+  auto unwatcher = _client.watchSyncedFlagWithInitialState(
+      flagName, callback, _name + "_" + flagName);
   _unwatchers.push_back(unwatcher);
   return *this;
 }
@@ -838,9 +894,64 @@ void WatchFlagGroup::unwatchAll() {
 
 void WatchFlagGroup::destroy() { unwatchAll(); }
 
+// ==================== Metadata Access Internal Methods ====================
+
+bool FeaturesClient::hasFlagInternal(const std::string &flagName,
+                                     bool forceRealtime) const {
+  const auto &flags = selectFlags(forceRealtime);
+  return flags.find(flagName) != flags.end();
+}
+
+ValueType FeaturesClient::getValueTypeInternal(const std::string &flagName,
+                                               bool forceRealtime) const {
+  const auto &flags = selectFlags(forceRealtime);
+  auto it = flags.find(flagName);
+  if (it == flags.end())
+    return ValueType::NONE;
+  return it->second.valueType;
+}
+
+int FeaturesClient::getVersionInternal(const std::string &flagName,
+                                       bool forceRealtime) const {
+  const auto &flags = selectFlags(forceRealtime);
+  auto it = flags.find(flagName);
+  if (it == flags.end())
+    return 0;
+  return it->second.version;
+}
+
+std::string FeaturesClient::getReasonInternal(const std::string &flagName,
+                                              bool forceRealtime) const {
+  const auto &flags = selectFlags(forceRealtime);
+  auto it = flags.find(flagName);
+  if (it == flags.end())
+    return "";
+  return it->second.reason;
+}
+
+bool FeaturesClient::getImpressionDataInternal(const std::string &flagName,
+                                               bool forceRealtime) const {
+  const auto &flags = selectFlags(forceRealtime);
+  auto it = flags.find(flagName);
+  if (it == flags.end())
+    return false;
+  return it->second.impressionData;
+}
+
+const EvaluatedFlag *
+FeaturesClient::getRawFlagInternal(const std::string &flagName,
+                                   bool forceRealtime) const {
+  const auto &flags = selectFlags(forceRealtime);
+  auto it = flags.find(flagName);
+  if (it == flags.end())
+    return nullptr;
+  return &it->second;
+}
+
 // ==================== InvokeWatchCallbacks ====================
 
 void FeaturesClient::invokeWatchCallbacks(
+    std::map<std::string, std::vector<WatchCallback>> &callbackMap,
     const std::map<std::string, EvaluatedFlag> &oldFlags,
     const std::map<std::string, EvaluatedFlag> &newFlags) {
   // Check for changed/new flags
@@ -849,16 +960,16 @@ void FeaturesClient::invokeWatchCallbacks(
     if (oldIt == oldFlags.end() || oldIt->second.version != newFlag.version) {
       _stats.flagLastChangedTimes[name] = "now";
 
-      auto cbIt = _watchCallbacks.find(name);
-      if (cbIt != _watchCallbacks.end() && !cbIt->second.empty()) {
-        FlagProxy proxy(&newFlag, this, name);
+      auto cbIt = callbackMap.find(name);
+      if (cbIt != callbackMap.end() && !cbIt->second.empty()) {
+        FlagProxy proxy(this, name, true);
         // Copy to avoid mutation during iteration
         auto callbacks = cbIt->second;
         for (const auto &cb : callbacks) {
           try {
             cb(proxy);
           } catch (const std::exception &e) {
-            CCLOG("[GatrixSDK] Error in watchFlag callback for %s: %s",
+            CCLOG("[GatrixSDK] Error in watch callback for %s: %s",
                   name.c_str(), e.what());
           }
         }
@@ -869,15 +980,15 @@ void FeaturesClient::invokeWatchCallbacks(
   // Check for removed flags
   for (const auto &[name, oldFlag] : oldFlags) {
     if (newFlags.find(name) == newFlags.end()) {
-      auto cbIt = _watchCallbacks.find(name);
-      if (cbIt != _watchCallbacks.end() && !cbIt->second.empty()) {
-        FlagProxy proxy(nullptr, this, name);
+      auto cbIt = callbackMap.find(name);
+      if (cbIt != callbackMap.end() && !cbIt->second.empty()) {
+        FlagProxy proxy(this, name, true);
         auto callbacks = cbIt->second;
         for (const auto &cb : callbacks) {
           try {
             cb(proxy);
           } catch (const std::exception &e) {
-            CCLOG("[GatrixSDK] Error in watchFlag callback for removed flag "
+            CCLOG("[GatrixSDK] Error in watch callback for removed flag "
                   "%s: %s",
                   name.c_str(), e.what());
           }

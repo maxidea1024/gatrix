@@ -83,6 +83,10 @@ export class FeaturesClient implements VariationProvider {
   private streamingReconnectCount: number = 0;
   private lastStreamingEventTime: Date | null = null;
   private localGlobalRevision: number = 0;
+
+  // WebSocket state
+  private webSocket: WebSocket | null = null;
+  private webSocketPingTimer?: ReturnType<typeof setInterval>;
   private pendingFetches: Set<string> = new Set();
 
   // Metrics
@@ -107,6 +111,7 @@ export class FeaturesClient implements VariationProvider {
   private metricsErrorCount: number = 0;
   private watchGroups: Map<string, WatchFlagGroup> = new Map();
   private watchCallbacks: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>> = new Map();
+  private syncedWatchCallbacks: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>> = new Map();
   private flagEnabledCounts: Map<string, { yes: number; no: number }> = new Map();
   private flagVariantCounts: Map<string, Map<string, number>> = new Map();
   private flagLastChangedTimes: Map<string, Date> = new Map();
@@ -389,7 +394,7 @@ export class FeaturesClient implements VariationProvider {
   /**
    * Create a FlagProxy for a given flag name.
    * FlagProxy is a convenience shell - delegates all variation logic back to this client.
-   * Only used by watchFlag*() where returning a proxy object is needed.
+   * Only used by watch*Flag*() where returning a proxy object is needed.
    * Always reads from realtimeFlags — watch callbacks must reflect
    * the latest server state regardless of explicitSyncMode.
    */
@@ -397,7 +402,7 @@ export class FeaturesClient implements VariationProvider {
     const flags = this.selectFlags(true); // always realtime for watch/proxy
     const flag = flags.get(flagName);
     this.trackFlagAccess(flagName, flag, 'watch', flag?.variant?.name);
-    return new FlagProxy(flag, this, flagName);
+    return new FlagProxy(this, flagName, true);
   }
 
   /**
@@ -478,6 +483,37 @@ export class FeaturesClient implements VariationProvider {
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return { ...flag.variant };
+  }
+
+  // ==================== Metadata Access Internal Methods ====================
+  // No metrics tracking — read-only metadata access for FlagProxy property delegation.
+
+  hasFlagInternal(flagName: string, forceRealtime: boolean = false): boolean {
+    return this.lookupFlag(flagName, forceRealtime) !== undefined;
+  }
+
+  getValueTypeInternal(flagName: string, forceRealtime: boolean = false): import('./types').ValueType {
+    const flag = this.lookupFlag(flagName, forceRealtime);
+    return flag?.valueType ?? 'none';
+  }
+
+  getVersionInternal(flagName: string, forceRealtime: boolean = false): number {
+    const flag = this.lookupFlag(flagName, forceRealtime);
+    return flag?.version ?? 0;
+  }
+
+  getReasonInternal(flagName: string, forceRealtime: boolean = false): string | undefined {
+    const flag = this.lookupFlag(flagName, forceRealtime);
+    return flag?.reason;
+  }
+
+  getImpressionDataInternal(flagName: string, forceRealtime: boolean = false): boolean {
+    const flag = this.lookupFlag(flagName, forceRealtime);
+    return flag?.impressionData ?? false;
+  }
+
+  getRawFlagInternal(flagName: string, forceRealtime: boolean = false): EvaluatedFlag | undefined {
+    return this.lookupFlag(flagName, forceRealtime);
   }
 
   variationInternal(
@@ -846,10 +882,10 @@ export class FeaturesClient implements VariationProvider {
       await this.fetchFlagsInternal('syncFlags');
     }
 
-    // Invoke watch callbacks directly for changed flags
+    // Invoke synced watch callbacks for changed flags
     const oldSynchronizedFlags = new Map(this.synchronizedFlags);
     this.synchronizedFlags = new Map(this.realtimeFlags);
-    this.invokeWatchCallbacks(oldSynchronizedFlags, this.synchronizedFlags);
+    this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldSynchronizedFlags, this.synchronizedFlags);
 
     this.pendingSync = false;
     this.syncFlagsCount++;
@@ -915,13 +951,13 @@ export class FeaturesClient implements VariationProvider {
   // ==================== Watch ====================
 
   /**
-   * Watch callback type - supports both sync and async callbacks
+   * Watch for realtime flag changes. Reacts immediately when flags are fetched
+   * from the server, regardless of explicitSyncMode.
    */
-  watchFlag(
+  watchRealtimeFlag(
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
-    // Store callback for direct invocation
     if (!this.watchCallbacks.has(flagName)) {
       this.watchCallbacks.set(flagName, new Set());
     }
@@ -932,32 +968,81 @@ export class FeaturesClient implements VariationProvider {
     };
   }
 
-  watchFlagWithInitialState(
+  /**
+   * Watch for realtime flag changes with initial state callback.
+   * Initial state always uses realtimeFlags (latest server state).
+   */
+  watchRealtimeFlagWithInitialState(
     flagName: string,
     callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
-    // Store callback for direct invocation
     if (!this.watchCallbacks.has(flagName)) {
       this.watchCallbacks.set(flagName, new Set());
     }
     this.watchCallbacks.get(flagName)!.add(callback);
 
-    // Emit initial state — use synchronized flags if in explicitSyncMode
+    // Emit initial state — always use realtimeFlags for realtime watchers
     if (this.readyEventEmitted) {
-      const flags = this.selectFlags(false); // respect explicitSyncMode for initial state
-      callback(new FlagProxy(flags.get(flagName), this, flagName));
+      callback(new FlagProxy(this, flagName, true));
     } else {
       this.emitter.once(
         EVENTS.FLAGS_READY,
         () => {
-          const flags = this.selectFlags(false); // respect explicitSyncMode for initial state
-          callback(new FlagProxy(flags.get(flagName), this, flagName));
+          callback(new FlagProxy(this, flagName, true));
         }
       );
     }
 
     return () => {
       this.watchCallbacks.get(flagName)?.delete(callback);
+    };
+  }
+
+  /**
+   * Watch for synced flag changes. In explicitSyncMode, reacts only when
+   * syncFlags() is called. In normal mode, behaves identically to realtime watch.
+   */
+  watchSyncedFlag(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>
+  ): () => void {
+    if (!this.syncedWatchCallbacks.has(flagName)) {
+      this.syncedWatchCallbacks.set(flagName, new Set());
+    }
+    this.syncedWatchCallbacks.get(flagName)!.add(callback);
+
+    return () => {
+      this.syncedWatchCallbacks.get(flagName)?.delete(callback);
+    };
+  }
+
+  /**
+   * Watch for synced flag changes with initial state callback.
+   * Initial state uses synchronizedFlags in explicitSyncMode, realtimeFlags otherwise.
+   */
+  watchSyncedFlagWithInitialState(
+    flagName: string,
+    callback: (flag: FlagProxy) => void | Promise<void>
+  ): () => void {
+    if (!this.syncedWatchCallbacks.has(flagName)) {
+      this.syncedWatchCallbacks.set(flagName, new Set());
+    }
+    this.syncedWatchCallbacks.get(flagName)!.add(callback);
+
+    // Emit initial state — respect explicitSyncMode for synced watchers
+    if (this.readyEventEmitted) {
+      callback(new FlagProxy(this, flagName));
+    } else {
+      this.emitter.once(
+        EVENTS.FLAGS_READY,
+        () => {
+          callback(new FlagProxy(this, flagName));
+        }
+      );
+    }
+
+    return () => {
+      this.syncedWatchCallbacks.get(flagName)?.delete(callback);
     };
   }
 
@@ -977,7 +1062,7 @@ export class FeaturesClient implements VariationProvider {
   }
 
   private async fetchFlagsInternal(
-    caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange' | 'gap_recovery'
+    caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange' | 'gap_recovery' | 'pending_invalidation'
   ): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.config.offlineMode) {
@@ -1195,7 +1280,7 @@ export class FeaturesClient implements VariationProvider {
     }
 
     // Apply jitter to prevent thundering herd
-    const jitterSec = this.featuresConfig.streaming?.pollingJitter ?? 5;
+    const jitterSec = this.featuresConfig.streaming?.sse?.pollingJitter ?? 5;
     const jitterMs = jitterSec * 1000;
     if (jitterMs > 0 && this.consecutiveFailures === 0) {
       const jitter = Math.random() * jitterMs - jitterMs / 2;
@@ -1259,11 +1344,13 @@ export class FeaturesClient implements VariationProvider {
     this.setFlags(flags, forceSync);
     await this.storage.save(STORAGE_KEY_FLAGS, flags);
 
-    // Emit flag change events only if not in explicitSyncMode or if forced
-    // In explicitSyncMode, watch callbacks are invoked when syncFlags() is called
+    // Always invoke realtime watch callbacks when flags change from server
+    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
+    this.invokeWatchCallbacks(this.watchCallbacks, oldFlags, this.realtimeFlags);
+
+    // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
     if (!this.featuresConfig.explicitSyncMode || forceSync) {
-      this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
-      this.invokeWatchCallbacks(oldFlags, this.realtimeFlags);
+      this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldFlags, this.realtimeFlags);
     }
 
     this.sdkState = 'healthy';
@@ -1314,10 +1401,11 @@ export class FeaturesClient implements VariationProvider {
   }
 
   /**
-   * Invoke watch callbacks directly when syncFlags() is called in explicitSyncMode.
-   * Compares old synchronized flags with new synchronized flags.
+   * Invoke watch callbacks for changed flags.
+   * Used by both realtime and synced watch systems.
    */
   private invokeWatchCallbacks(
+    callbackMap: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>>,
     oldFlags: Map<string, EvaluatedFlag>,
     newFlags: Map<string, EvaluatedFlag>
   ): void {
@@ -1329,15 +1417,14 @@ export class FeaturesClient implements VariationProvider {
       if (!oldFlag || oldFlag.version !== newFlag.version) {
         this.flagLastChangedTimes.set(name, now);
 
-        // Invoke watch callbacks directly
-        const callbacks = this.watchCallbacks.get(name);
+        const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
-          const proxy = new FlagProxy(newFlag, this, name);
+          const proxy = new FlagProxy(this, name);
           callbacks.forEach(callback => {
             try {
               callback(proxy);
             } catch (error) {
-              this.logger.error(`Error in watchFlag callback for ${name}:`, error);
+              this.logger.error(`Error in watch callback for ${name}:`, error);
             }
           });
         }
@@ -1351,15 +1438,14 @@ export class FeaturesClient implements VariationProvider {
         removedNames.push(name);
         this.flagLastChangedTimes.set(name, now);
 
-        // Invoke watch callbacks for removed flags
-        const callbacks = this.watchCallbacks.get(name);
+        const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
-          const proxy = new FlagProxy(undefined, this, name);
+          const proxy = new FlagProxy(this, name);
           callbacks.forEach(callback => {
             try {
               callback(proxy);
             } catch (error) {
-              this.logger.error(`Error in watchFlag callback for removed flag ${name}:`, error);
+              this.logger.error(`Error in watch callback for removed flag ${name}:`, error);
             }
           });
         }
@@ -1476,14 +1562,27 @@ export class FeaturesClient implements VariationProvider {
       return;
     }
 
-    this.streamingState = 'connecting';
-    this.devLog('Connecting to streaming endpoint...');
+    const transport = this.featuresConfig.streaming?.transport ?? 'sse';
+    if (transport === 'websocket') {
+      this.connectWebSocket();
+    } else {
+      this.connectSse();
+    }
+  }
 
-    // Create abort controller for streaming
+  /**
+   * Connect via SSE for real-time invalidation signals.
+   * Uses @microsoft/fetch-event-source for custom header support.
+   */
+  private connectSse(): void {
+    this.streamingState = 'connecting';
+    this.devLog('Connecting to SSE streaming endpoint...');
+
+    // Create abort controller for SSE streaming
     this.streamingAbortController = new AbortController();
 
-    const streamUrl = this.featuresConfig.streaming?.url ??
-      `${this.config.apiUrl}/client/features/${this.config.environment}/stream`;
+    const streamUrl = this.featuresConfig.streaming?.sse?.url ??
+      `${this.config.apiUrl}/client/features/${this.config.environment}/stream/sse`;
 
     const headers = this.buildHeaders();
 
@@ -1610,6 +1709,145 @@ export class FeaturesClient implements VariationProvider {
   }
 
   /**
+   * Connect via WebSocket for real-time invalidation signals.
+   * Uses the browser's native WebSocket API.
+   */
+  private connectWebSocket(): void {
+    this.streamingState = 'connecting';
+    this.devLog('Connecting to WebSocket streaming endpoint...');
+
+    // Build WS URL
+    const baseUrl = this.featuresConfig.streaming?.websocket?.url ??
+      `${this.config.apiUrl}/client/features/${this.config.environment}/stream/ws`;
+
+    // Convert http(s) to ws(s)
+    const wsUrl = baseUrl.replace(/^http/, 'ws');
+
+    // Add auth as query parameter (WebSocket can't send custom headers in browser)
+    const url = new URL(wsUrl);
+    url.searchParams.set('x-api-token', this.config.apiToken);
+
+    try {
+      this.webSocket = new WebSocket(url.toString());
+    } catch (err) {
+      this.logger.error('Failed to create WebSocket:', String(err));
+      this.streamingState = 'reconnecting';
+      this.scheduleStreamingReconnect();
+      return;
+    }
+
+    this.webSocket.onopen = () => {
+      this.streamingState = 'connected';
+      this.streamingReconnectAttempt = 0;
+      this.devLog(`WebSocket connected. URL: ${wsUrl}`);
+      this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, {});
+
+      // Start ping interval
+      const pingInterval = (this.featuresConfig.streaming?.websocket?.pingInterval ?? 30) * 1000;
+      this.webSocketPingTimer = setInterval(() => {
+        if (this.webSocket?.readyState === WebSocket.OPEN) {
+          this.webSocket.send(JSON.stringify({ type: 'ping' }));
+        }
+      }, pingInterval);
+    };
+
+    this.webSocket.onmessage = (event) => {
+      this.lastStreamingEventTime = new Date();
+
+      try {
+        const msg = JSON.parse(event.data as string) as { type: string; data: Record<string, any> };
+
+        switch (msg.type) {
+          case 'connected': {
+            const data = msg.data as { globalRevision: number };
+            this.devLog(`WS 'connected' event: globalRevision=${data.globalRevision}`);
+            this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, { globalRevision: data.globalRevision });
+
+            // Gap recovery
+            if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
+              this.devLog(
+                `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
+              );
+              this.fetchFlagsInternal('gap_recovery');
+            } else if (this.localGlobalRevision === 0) {
+              this.localGlobalRevision = data.globalRevision;
+            }
+            break;
+          }
+
+          case 'flags_changed': {
+            const data = msg.data as { globalRevision: number; changedKeys: string[]; timestamp: number };
+            this.devLog(
+              `WS 'flags_changed': globalRevision=${data.globalRevision}, ` +
+              `changedKeys=[${data.changedKeys.join(',')}]`
+            );
+
+            if (data.globalRevision > this.localGlobalRevision) {
+              this.localGlobalRevision = data.globalRevision;
+              this.emitter.emit(EVENTS.FLAGS_INVALIDATED, {
+                globalRevision: data.globalRevision,
+                changedKeys: data.changedKeys,
+              });
+              this.handleStreamingInvalidation(data.changedKeys);
+            } else {
+              this.devLog(
+                `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`
+              );
+            }
+            break;
+          }
+
+          case 'heartbeat': {
+            this.devLog('WS heartbeat received');
+            break;
+          }
+
+          case 'pong': {
+            this.devLog('WS pong received');
+            break;
+          }
+
+          default:
+            this.devLog(`Unknown WS event: ${msg.type}`);
+            break;
+        }
+      } catch (e) {
+        this.logger.warn('Failed to parse WebSocket message:', String(e));
+      }
+    };
+
+    this.webSocket.onclose = () => {
+      if (this.streamingState === 'disconnected') {
+        return; // Intentional disconnect
+      }
+      this.devLog('WebSocket connection closed by server');
+      this.clearWebSocketPing();
+      this.streamingState = 'reconnecting';
+      this.emitter.emit(EVENTS.FLAGS_STREAMING_DISCONNECTED);
+      this.scheduleStreamingReconnect();
+    };
+
+    this.webSocket.onerror = (err) => {
+      if (this.streamingState === 'disconnected') {
+        return;
+      }
+      this.logger.warn('WebSocket error:', String(err));
+      this.emitter.emit(EVENTS.FLAGS_STREAMING_ERROR, { error: err });
+      // onclose will handle reconnection
+    };
+  }
+
+  /**
+   * Clear WebSocket ping timer
+   */
+  private clearWebSocketPing(): void {
+    if (this.webSocketPingTimer) {
+      clearInterval(this.webSocketPingTimer);
+      this.webSocketPingTimer = undefined;
+    }
+  }
+
+  /**
    * Disconnect from the streaming endpoint
    */
   private disconnectStreaming(): void {
@@ -1621,9 +1859,18 @@ export class FeaturesClient implements VariationProvider {
       this.streamingReconnectTimer = undefined;
     }
 
+    // Disconnect SSE
     if (this.streamingAbortController) {
       this.streamingAbortController.abort();
       this.streamingAbortController = null;
+    }
+
+    // Disconnect WebSocket
+    this.clearWebSocketPing();
+    if (this.webSocket) {
+      this.webSocket.onclose = null; // Prevent reconnection
+      this.webSocket.close();
+      this.webSocket = null;
     }
   }
 
@@ -1643,8 +1890,13 @@ export class FeaturesClient implements VariationProvider {
     this.streamingReconnectAttempt++;
     this.streamingReconnectCount++;
 
-    const baseMs = (this.featuresConfig.streaming?.reconnectBase ?? 1) * 1000;
-    const maxMs = (this.featuresConfig.streaming?.reconnectMax ?? 30) * 1000;
+    const transport = this.featuresConfig.streaming?.transport ?? 'sse';
+    const streamConfig = transport === 'websocket'
+      ? this.featuresConfig.streaming?.websocket
+      : this.featuresConfig.streaming?.sse;
+
+    const baseMs = (streamConfig?.reconnectBase ?? 1) * 1000;
+    const maxMs = (streamConfig?.reconnectMax ?? 30) * 1000;
 
     // Exponential backoff: base * 2^(attempt-1), capped at max
     const exponentialDelay = Math.min(
@@ -1672,10 +1924,17 @@ export class FeaturesClient implements VariationProvider {
 
     this.streamingReconnectTimer = setTimeout(() => {
       this.streamingReconnectTimer = undefined;
-      // Abort previous controller before creating new connection
+      // Abort previous SSE controller before creating new connection
       if (this.streamingAbortController) {
         this.streamingAbortController.abort();
         this.streamingAbortController = null;
+      }
+      // Close previous WebSocket before creating new connection
+      this.clearWebSocketPing();
+      if (this.webSocket) {
+        this.webSocket.onclose = null;
+        this.webSocket.close();
+        this.webSocket = null;
       }
       this.connectStreaming();
     }, delayMs);

@@ -12,12 +12,20 @@
  * When true, the method reads from realtimeFlags directly, bypassing
  * explicitSyncMode's synchronizedFlags.
  */
-import { Variant, VariationResult } from './types';
+import { EvaluatedFlag, Variant, ValueType, VariationResult } from './types';
 
 export interface VariationProvider {
   // Core access
   isEnabledInternal(flagName: string, forceRealtime?: boolean): boolean;
   getVariantInternal(flagName: string, forceRealtime?: boolean): Variant;
+
+  // Metadata access (no metrics tracking)
+  hasFlagInternal(flagName: string, forceRealtime?: boolean): boolean;
+  getValueTypeInternal(flagName: string, forceRealtime?: boolean): ValueType;
+  getVersionInternal(flagName: string, forceRealtime?: boolean): number;
+  getReasonInternal(flagName: string, forceRealtime?: boolean): string | undefined;
+  getImpressionDataInternal(flagName: string, forceRealtime?: boolean): boolean;
+  getRawFlagInternal(flagName: string, forceRealtime?: boolean): EvaluatedFlag | undefined;
 
   // Variation (returns value)
   variationInternal(flagName: string, fallbackValue: string, forceRealtime?: boolean): string;

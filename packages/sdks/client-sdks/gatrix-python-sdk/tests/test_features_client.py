@@ -383,7 +383,7 @@ class TestWatchFlag:
             _config(bootstrap=BOOTSTRAP_SIMPLE), emitter
         )
         changes = []
-        fc.watch_flag("feature-on", lambda *args: changes.append(args))
+        fc.watch_realtime_flag("feature-on", lambda *args: changes.append(args))
 
         # Simulate change
         emitter.emit("flags.feature-on.change", FlagProxy(make_flag("feature-on")), None, "updated")
@@ -395,7 +395,7 @@ class TestWatchFlag:
             _config(bootstrap=BOOTSTRAP_SIMPLE), emitter
         )
         changes = []
-        unwatch = fc.watch_flag("feature-on", lambda *args: changes.append(args))
+        unwatch = fc.watch_realtime_flag("feature-on", lambda *args: changes.append(args))
         unwatch()
 
         emitter.emit("flags.feature-on.change", FlagProxy(make_flag("feature-on")), None, "updated")
@@ -407,7 +407,7 @@ class TestWatchFlag:
             _config(bootstrap=BOOTSTRAP_SIMPLE), emitter
         )
         states = []
-        fc.watch_flag_with_initial_state(
+        fc.watch_realtime_flag_with_initial_state(
             "feature-on", lambda proxy: states.append(proxy.enabled)
         )
         assert len(states) == 1
@@ -422,8 +422,8 @@ class TestWatchFlagGroup:
         )
         group = fc.create_watch_flag_group("test-group")
         changes: list = []
-        group.watch_flag("feature-on", lambda *a: changes.append("on"))
-        group.watch_flag("feature-off", lambda *a: changes.append("off"))
+        group.watch_realtime_flag("feature-on", lambda *a: changes.append("on"))
+        group.watch_realtime_flag("feature-off", lambda *a: changes.append("off"))
 
         assert group.size == 2
         assert group.name == "test-group"
@@ -441,7 +441,7 @@ class TestWatchFlagGroup:
             _config(bootstrap=BOOTSTRAP_SIMPLE), emitter
         )
         group = fc.create_watch_flag_group("my-group")
-        group.watch_flag("feature-on", lambda *a: None)
+        group.watch_realtime_flag("feature-on", lambda *a: None)
 
         stats = fc.get_stats()
         assert "my-group" in stats["features"]["active_watch_groups"]
