@@ -68,7 +68,15 @@ flowchart LR
 string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
 ```
 
+Gatrix allows you to define complex targeting rules based on user segments, custom attributes (like `vipTier`), and percentage rollouts:
+
+![Gatrix Dashboard - Targeting Strategy](doc/images/dashboard-targeting-strategy.png)
+
 > No build, no deploy — change these values from the [Gatrix Dashboard](https://your-dashboard.example.com) and they go live instantly.
+
+Here's what the actual Gatrix Dashboard looks like — manage all your feature flags, toggle environments, and monitor status at a glance:
+
+![Gatrix Dashboard - Feature Flags](doc/images/dashboard-feature-flags.png)
 
 ---
 

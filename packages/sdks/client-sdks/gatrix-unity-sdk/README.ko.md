@@ -68,7 +68,15 @@ flowchart LR
 string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
 ```
 
+Gatrix를 사용하면 사용자 세그먼트, 커스텀 속성(예: `vipTier`), 롤아웃 비율 등을 조합하여 정교한 타게팅 규칙을 설정할 수 있습니다:
+
+![Gatrix 대시보드 - 타게팅 전략](doc/images/dashboard-targeting-strategy.png)
+
 > 빌드도, 배포도 필요 없습니다 — [Gatrix 대시보드](https://your-dashboard.example.com)에서 값을 변경하면 게임에 즉시 반영됩니다.
+
+아래는 실제 Gatrix 대시보드 화면입니다 — 모든 피처 플래그를 관리하고, 환경별 토글을 제어하며, 상태를 한눈에 모니터링할 수 있습니다:
+
+![Gatrix 대시보드 - Feature Flags](doc/images/dashboard-feature-flags.png)
 
 ---
 
