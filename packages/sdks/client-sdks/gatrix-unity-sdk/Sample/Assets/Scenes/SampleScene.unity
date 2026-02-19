@@ -418,7 +418,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 28.9}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &437747029
@@ -435,7 +435,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Gatrix.Unity.SDK::Gatrix.Unity.SDK.GatrixFlagValue
   _flagName: demo-text-value
   _use: 1
-  _format: 
+  _format: 'Realtime: {0}'
   _fallbackText: '-'
   _hideWhenDisabled: 0
   _targetText: {fileID: 437747030}
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Gatrix.Unity.SDK::Gatrix.Unity.SDK.GatrixFlagValue
   _flagName: demo-text-value
   _use: 0
-  _format: 
+  _format: 'Synced: {0}'
   _fallbackText: '-'
   _hideWhenDisabled: 0
   _targetText: {fileID: 848202214}

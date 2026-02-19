@@ -18,8 +18,15 @@ MonoBehaviour:
   _environment: development
   _userId: 
   _sessionId: 
+  _contextProperties:
+  - Key: mycontext
+    Value: hello
+    Type: 0
+  - Key: myfield
+    Value: kkkk
+    Type: 1
   _offlineMode: 0
-  _enableDevMode: 1
+  _enableDevMode: 0
   _cacheKeyPrefix: gatrix_cache
   _impressionDataAll: 0
   _bootstrapJson: 

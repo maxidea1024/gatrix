@@ -172,7 +172,7 @@ Realtime mode is simple and convenient, but applying flag changes **instantly** 
 flowchart LR
     A["🖥️ Server"] -->|fetch| B["SDK Cache"]
     B -->|immediate| C["🎮 Your Game Code"]
-    B -.- D["⚡ Flag changes apply INSTANTLY\neven mid-gameplay!"]
+    B -.- D["⚡ Flag changes apply INSTANTLY<br/>even mid-gameplay!"]
 ```
 
 **Synced Mode (ExplicitSyncMode):**
@@ -181,7 +181,7 @@ flowchart LR
 flowchart LR
     A["🖥️ Server"] -->|fetch| B["SDK Cache"]
     B -->|buffered| C["Pending Store"]
-    C -->|"YOU decide when\nSyncFlagsAsync()"| D["Synced Store"]
+    C -->|"YOU decide when<br/>SyncFlagsAsync()"| D["Synced Store"]
     D -->|safe timing| E["🎮 Your Game Code"]
 ```
 
@@ -594,13 +594,13 @@ Context can be provided at **three different stages**, depending on what informa
 ```mermaid
 flowchart LR
     subgraph S1 ["📱 App Launch"]
-        A["Init Context\ndevice, platform, version"]
+        A["Init Context<br/>device, platform, version"]
     end
     subgraph S2 ["🔑 User Login"]
-        B["Update Context\nuserId, plan, country"]
+        B["Update Context<br/>userId, plan, country"]
     end
     subgraph S3 ["🎮 During Session"]
-        C["Set Field Async\nlevel, plan, score"]
+        C["Set Field Async<br/>level, plan, score"]
     end
     S1 --> S2 --> S3
 ```
@@ -1231,11 +1231,11 @@ await features.SyncFlagsAsync();
 
 ```mermaid
 flowchart TD
-    Q1{"ExplicitSyncMode\nenabled?"}
-    Q1 -->|NO| A1["Both behave the same\nUse WatchRealtimeFlag"]
-    Q1 -->|YES| Q2{"Does this flag affect\ngameplay mid-session?"}
-    Q2 -->|YES| A2["Use WatchSyncedFlag\nApplied at SyncFlagsAsync"]
-    Q2 -->|NO| A3["Use WatchRealtimeFlag\nDebug UI, monitoring"]
+    Q1{"ExplicitSyncMode<br/>enabled?"}
+    Q1 -->|NO| A1["Both behave the same<br/>Use WatchRealtimeFlag"]
+    Q1 -->|YES| Q2{"Does this flag affect<br/>gameplay mid-session?"}
+    Q2 -->|YES| A2["Use WatchSyncedFlag<br/>Applied at SyncFlagsAsync"]
+    Q2 -->|NO| A3["Use WatchRealtimeFlag<br/>Debug UI, monitoring"]
 ```
 
 ---
@@ -1402,13 +1402,13 @@ var config = new GatrixClientConfig
 
 **Symptom:** Watch callbacks keep an old scene or destroyed objects alive.
 
-**Solution:** Always unwatch when a MonoBehaviour is destroyed:
+**Solution A (Manual):** Unwatch when a MonoBehaviour is destroyed:
 ```csharp
-private IDisposable _watcher;
+private Action _unwatch;
 
 void Start()
 {
-    _watcher = features.WatchRealtimeFlagWithInitialState("my-flag", proxy =>
+    _unwatch = features.WatchRealtimeFlagWithInitialState("my-flag", proxy =>
     {
         // ...
     });
@@ -1416,24 +1416,83 @@ void Start()
 
 void OnDestroy()
 {
-    _watcher?.Dispose(); // Clean up the watcher
-}
-
-// Or use watch groups for bulk cleanup
-private WatchGroup _group;
-
-void Start()
-{
-    _group = features.CreateWatchGroup("my-scene");
-    _group.WatchRealtimeFlag("flag-a", p => { /* ... */ })
-          .WatchRealtimeFlag("flag-b", p => { /* ... */ });
-}
-
-void OnDestroy()
-{
-    _group?.Destroy(); // Unwatch all at once
+    _unwatch?.Invoke(); // Clean up the watcher
 }
 ```
+
+**Solution B (Recommended): Use Lifecycle-Bound Extensions** — see below.
+
+---
+
+## 🔄 Lifecycle-Bound Watch Extensions
+
+Unity developers commonly need to bind watch subscriptions to their MonoBehaviour's enable/disable/destroy lifecycle. The SDK provides extension methods that handle this automatically.
+
+### Behavior
+
+| Lifecycle Event | What Happens |
+|----------------|-------------|
+| **OnEnable** | Callbacks start firing. Any deferred initial state is delivered. |
+| **OnDisable** | Callbacks are suppressed (the subscription stays active but callbacks are gated). |
+| **OnDestroy** | All subscriptions are automatically cleaned up. No manual unwatch needed. |
+
+### Individual Watch
+
+```csharp
+public class MyUnit : MonoBehaviour
+{
+    void Start()
+    {
+        // Lifecycle-bound: auto-cleanup on destroy, callbacks gated by isActiveAndEnabled
+        this.WatchRealtimeFlagWithInitialState("boss-buff", proxy =>
+        {
+            EnableBossBuffVfx(proxy.Enabled);
+        });
+
+        this.WatchSyncedFlagWithInitialState("difficulty", proxy =>
+        {
+            SetDifficulty(proxy.StringVariation("normal"));
+        });
+    }
+
+    // No OnDestroy needed! Cleanup is automatic.
+}
+```
+
+### Lifecycle-Bound Watch Group
+
+```csharp
+public class ShopController : MonoBehaviour
+{
+    void Start()
+    {
+        // LifecycleBoundWatchGroup: all callbacks gated + auto-destroy
+        var group = this.CreateGatrixWatchGroup("shop");
+
+        group.WatchSyncedFlagWithInitialState("new-shop-enabled", p =>
+        {
+            shopRoot.SetActive(p.Enabled);
+        })
+        .WatchSyncedFlagWithInitialState("discount-rate", p =>
+        {
+            discountLabel.text = $"{p.FloatVariation(0f) * 100}%";
+        });
+
+        // No OnDestroy needed! Group is auto-destroyed with the GameObject.
+    }
+}
+```
+
+### Comparison Table
+
+| Approach | Auto-Cleanup | Respects Enable/Disable | Deferred Initial State | Manual Code |
+|----------|:----------:|:---------------------:|:--------------------:|:-----------:|
+| Manual `unwatch()` in `OnDestroy` | ❌ | ❌ | ❌ | Must write |
+| `WatchFlagGroup` + manual `Destroy` | ❌ | ❌ | ❌ | Must write |
+| **`this.WatchRealtimeFlag(...)`** | ✅ | ✅ | ✅ | **None** |
+| **`this.CreateGatrixWatchGroup(...)`** | ✅ | ✅ | ✅ | **None** |
+
+> 💡 **Tip:** Built-in components (`GatrixFlagToggle`, `GatrixFlagValue`, etc.) already handle lifecycle through `GatrixFlagComponentBase`. The lifecycle extensions are for your **custom MonoBehaviours**.
 
 ---
 

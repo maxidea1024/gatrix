@@ -172,7 +172,7 @@ await features.SyncFlagsAsync();
 flowchart LR
     A["🖥️ 서버"] -->|fetch| B["SDK 캐시"]
     B -->|즉시 반영| C["🎮 게임 코드"]
-    B -.- D["⚡ 플래그 변경이 즉시 적용됨\n게임플레이 도중에도!"]
+    B -.- D["⚡ 플래그 변경이 즉시 적용됨<br/>게임플레이 도중에도!"]
 ```
 
 **동기화 모드 (ExplicitSyncMode):**
@@ -181,7 +181,7 @@ flowchart LR
 flowchart LR
     A["🖥️ 서버"] -->|fetch| B["SDK 캐시"]
     B -->|버퍼링| C["대기 저장소"]
-    C -->|"개발자가 시점 결정\nSyncFlagsAsync()"| D["동기화 저장소"]
+    C -->|"개발자가 시점 결정<br/>SyncFlagsAsync()"| D["동기화 저장소"]
     D -->|안전한 타이밍| E["🎮 게임 코드"]
 ```
 
@@ -596,13 +596,13 @@ SDK 상태에 대한 실시간 대시보드:
 ```mermaid
 flowchart LR
     subgraph S1 ["📱 앱 실행"]
-        A["초기화 컨텍스트\n디바이스, 플랫폼, 버전"]
+        A["초기화 컨텍스트<br/>디바이스, 플랫폼, 버전"]
     end
     subgraph S2 ["🔑 사용자 로그인"]
-        B["컨텍스트 업데이트\nuserId, plan, country"]
+        B["컨텍스트 업데이트<br/>userId, plan, country"]
     end
     subgraph S3 ["🎮 세션 중"]
-        C["필드 단위 업데이트\nlevel, plan, score"]
+        C["필드 단위 업데이트<br/>level, plan, score"]
     end
     S1 --> S2 --> S3
 ```
@@ -1233,11 +1233,11 @@ await features.SyncFlagsAsync();
 
 ```mermaid
 flowchart TD
-    Q1{"ExplicitSyncMode\n활성화?"}
-    Q1 -->|아니오| A1["둘 다 동일하게 동작\nWatchRealtimeFlag 권장"]
-    Q1 -->|예| Q2{"이 플래그가 세션 중\n게임플레이에 영향?"}
-    Q2 -->|예| A2["WatchSyncedFlag 사용\nSyncFlagsAsync 시점에 적용"]
-    Q2 -->|아니오| A3["WatchRealtimeFlag 사용\n디버그 UI, 모니터링용"]
+    Q1{"ExplicitSyncMode<br/>활성화?"}
+    Q1 -->|아니오| A1["둘 다 동일하게 동작<br/>WatchRealtimeFlag 권장"]
+    Q1 -->|예| Q2{"이 플래그가 세션 중<br/>게임플레이에 영향?"}
+    Q2 -->|예| A2["WatchSyncedFlag 사용<br/>SyncFlagsAsync 시점에 적용"]
+    Q2 -->|아니오| A3["WatchRealtimeFlag 사용<br/>디버그 UI, 모니터링용"]
 ```
 
 ---
@@ -1404,13 +1404,13 @@ var config = new GatrixClientConfig
 
 **증상:** Watch 콜백이 이전 씬이나 파괴된 오브젝트를 참조하여 메모리 해제가 안 됩니다.
 
-**해결:** MonoBehaviour가 파괴될 때 반드시 Unwatch 하세요:
+**해결 A (수동):** MonoBehaviour가 파괴될 때 직접 Unwatch 하세요:
 ```csharp
-private IDisposable _watcher;
+private Action _unwatch;
 
 void Start()
 {
-    _watcher = features.WatchRealtimeFlagWithInitialState("my-flag", proxy =>
+    _unwatch = features.WatchRealtimeFlagWithInitialState("my-flag", proxy =>
     {
         // ...
     });
@@ -1418,24 +1418,83 @@ void Start()
 
 void OnDestroy()
 {
-    _watcher?.Dispose(); // 감지자 정리
-}
-
-// 또는 Watch 그룹으로 일괄 정리
-private WatchGroup _group;
-
-void Start()
-{
-    _group = features.CreateWatchGroup("my-scene");
-    _group.WatchRealtimeFlag("flag-a", p => { /* ... */ })
-          .WatchRealtimeFlag("flag-b", p => { /* ... */ });
-}
-
-void OnDestroy()
-{
-    _group?.Destroy(); // 모두 한 번에 정리
+    _unwatch?.Invoke(); // 감지자 정리
 }
 ```
+
+**해결 B (권장): 라이프사이클 바인딩 확장 메서드 사용** — 아래 참고.
+
+---
+
+## 🔄 라이프사이클 바인딩 Watch 확장
+
+Unity 개발자는 흔히 Watch 구독을 MonoBehaviour의 enable/disable/destroy 라이프사이클에 맞춰야 합니다. SDK가 이를 자동으로 처리하는 확장 메서드를 제공합니다.
+
+### 동작 방식
+
+| 라이프사이클 이벤트 | 동작 |
+|-------------------|------|
+| **OnEnable** | 콜백이 활성화됩니다. 지연된 초기 상태가 전달됩니다. |
+| **OnDisable** | 콜백이 억제됩니다 (구독은 유지되지만 콜백이 게이트됩니다). |
+| **OnDestroy** | 모든 구독이 자동으로 정리됩니다. 수동 Unwatch가 필요 없습니다. |
+
+### 개별 Watch
+
+```csharp
+public class MyUnit : MonoBehaviour
+{
+    void Start()
+    {
+        // 라이프사이클 바인딩: destroy 시 자동 정리, isActiveAndEnabled로 콜백 게이트
+        this.WatchRealtimeFlagWithInitialState("boss-buff", proxy =>
+        {
+            EnableBossBuffVfx(proxy.Enabled);
+        });
+
+        this.WatchSyncedFlagWithInitialState("difficulty", proxy =>
+        {
+            SetDifficulty(proxy.StringVariation("normal"));
+        });
+    }
+
+    // OnDestroy가 필요 없습니다! 정리가 자동으로 됩니다.
+}
+```
+
+### 라이프사이클 바인딩 Watch 그룹
+
+```csharp
+public class ShopController : MonoBehaviour
+{
+    void Start()
+    {
+        // LifecycleBoundWatchGroup: 모든 콜백 게이트 + 자동 파괴
+        var group = this.CreateGatrixWatchGroup("shop");
+
+        group.WatchSyncedFlagWithInitialState("new-shop-enabled", p =>
+        {
+            shopRoot.SetActive(p.Enabled);
+        })
+        .WatchSyncedFlagWithInitialState("discount-rate", p =>
+        {
+            discountLabel.text = $"{p.FloatVariation(0f) * 100}%";
+        });
+
+        // OnDestroy가 필요 없습니다! 그룹이 GameObject와 함께 자동으로 파괴됩니다.
+    }
+}
+```
+
+### 비교 표
+
+| 접근 방식 | 자동 정리 | Enable/Disable 존중 | 초기 상태 지연 전달 | 수동 코드 |
+|----------|:-------:|:-----------------:|:----------------:|:--------:|
+| 수동 `unwatch()` + `OnDestroy` | ❌ | ❌ | ❌ | 직접 작성 필요 |
+| `WatchFlagGroup` + 수동 `Destroy` | ❌ | ❌ | ❌ | 직접 작성 필요 |
+| **`this.WatchRealtimeFlag(...)`** | ✅ | ✅ | ✅ | **없음** |
+| **`this.CreateGatrixWatchGroup(...)`** | ✅ | ✅ | ✅ | **없음** |
+
+> 💡 **팁:** 기본 제공 컴포넌트(`GatrixFlagToggle`, `GatrixFlagValue` 등)는 `GatrixFlagComponentBase`를 통해 이미 라이프사이클을 처리합니다. 이 확장 메서드는 **커스텀 MonoBehaviour**를 위한 것입니다.
 
 ---
 
