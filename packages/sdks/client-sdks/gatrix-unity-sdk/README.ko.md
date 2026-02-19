@@ -1218,7 +1218,7 @@ features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 });
 
 // 안전한 시점에 변경 적용 (예: 라운드 사이):
-if (features.CanSyncFlags())
+if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync(fetchNow: false);
 }
@@ -1470,7 +1470,7 @@ GatrixBehaviour.Client.Dispose();
 | `WatchSyncedFlagWithInitialState(flag, cb)` | `Action` | 동기화 감지 + 즉시 호출 |
 | `CreateWatchGroup(name)` | `WatchFlagGroup` | 명명된 감시자 그룹 생성 |
 | `SyncFlagsAsync()` | `UniTask` | 보류 중인 플래그 변경 적용 |
-| `CanSyncFlags()` | `bool` | 보류 중인 동기화 변경이 있는지 확인 |
+| `HasPendingSyncFlags()` | `bool` | 보류 중인 동기화 변경이 있는지 확인 |
 | `SetExplicitSyncMode(enabled)` | `void` | 런타임에 명시적 동기화 모드 토글 |
 | `GetStats()` | `FeaturesStats` | SDK 통계 가져오기 |
 
@@ -1558,7 +1558,7 @@ features.WatchSyncedFlagWithInitialState("enemy-hp-multiplier", proxy =>
 });
 
 // 안전한 시점에 적용 (예: 라운드 사이)
-if (features.CanSyncFlags())
+if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync();
 }
@@ -1599,7 +1599,7 @@ async void OnLoadingScreenStart()
     var features = GatrixBehaviour.Client.Features;
     
     // 자연스러운 일시정지 시점에 보류 중인 변경 동기화
-    if (features.CanSyncFlags())
+    if (features.HasPendingSyncFlags())
     {
         await features.SyncFlagsAsync(fetchNow: true);
     }
@@ -1745,7 +1745,7 @@ features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 // 3. 안전한 시점에서만 변경 적용
 async void OnRoundEnd()
 {
-    if (features.CanSyncFlags())
+    if (features.HasPendingSyncFlags())
         await features.SyncFlagsAsync();
 }
 ```
@@ -1811,11 +1811,11 @@ client.Once(GatrixEvents.Ready, args =>
 **가능한 원인:**
 - `ExplicitSyncMode`가 활성화되지 않음 — 동기화는 활성화 시에만 의미가 있습니다
 - 보류 중인 변경이 없음 — 동기화 저장소가 이미 최신 상태
-- `CanSyncFlags()`가 `false` 반환 — 동기화할 새 데이터 없음
+- `HasPendingSyncFlags()`가 `false` 반환 — 동기화할 새 데이터 없음
 
 ```csharp
-// 동기화 전 항상 CanSyncFlags 확인
-if (features.CanSyncFlags())
+// 동기화 전 항상 HasPendingSyncFlags 확인
+if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync();
     Debug.Log("플래그 동기화 완료");

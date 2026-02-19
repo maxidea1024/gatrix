@@ -1216,7 +1216,7 @@ features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 });
 
 // Apply changes at a safe moment (e.g., between rounds):
-if (features.CanSyncFlags())
+if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync(fetchNow: false);
 }
@@ -1468,7 +1468,7 @@ GatrixBehaviour.Client.Dispose();
 | `WatchSyncedFlagWithInitialState(flag, cb)` | `Action` | Watch synced + fire immediately |
 | `CreateWatchGroup(name)` | `WatchFlagGroup` | Create a named group of watchers |
 | `SyncFlagsAsync()` | `UniTask` | Apply pending flag changes |
-| `CanSyncFlags()` | `bool` | Check if there are pending sync changes |
+| `HasPendingSyncFlags()` | `bool` | Check if there are pending sync changes |
 | `SetExplicitSyncMode(enabled)` | `void` | Toggle explicit sync mode at runtime |
 | `GetStats()` | `FeaturesStats` | Get SDK statistics |
 
@@ -1556,7 +1556,7 @@ features.WatchSyncedFlagWithInitialState("enemy-hp-multiplier", proxy =>
 });
 
 // Apply at a safe point (e.g., between rounds)
-if (features.CanSyncFlags())
+if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync();
 }
@@ -1597,7 +1597,7 @@ async void OnLoadingScreenStart()
     var features = GatrixBehaviour.Client.Features;
     
     // Sync pending changes during natural pause
-    if (features.CanSyncFlags())
+    if (features.HasPendingSyncFlags())
     {
         await features.SyncFlagsAsync(fetchNow: true);
     }
@@ -1743,7 +1743,7 @@ features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 // 3. Apply changes only at safe points
 async void OnRoundEnd()
 {
-    if (features.CanSyncFlags())
+    if (features.HasPendingSyncFlags())
         await features.SyncFlagsAsync();
 }
 ```
@@ -1809,11 +1809,11 @@ client.Once(GatrixEvents.Ready, args =>
 **Possible causes:**
 - `ExplicitSyncMode` is not enabled — sync is only meaningful with it on
 - No pending changes — the synced store is already up to date
-- `CanSyncFlags()` returns `false` — no new data to sync
+- `HasPendingSyncFlags()` returns `false` — no new data to sync
 
 ```csharp
-// Always check CanSyncFlags before syncing
-if (features.CanSyncFlags())
+// Always check HasPendingSyncFlags before syncing
+if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync();
     Debug.Log("Flags synced");
