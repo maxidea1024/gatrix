@@ -257,6 +257,17 @@ namespace Gatrix.Unity.SDK
 
                 await ws.ConnectAsync(uriBuilder.Uri, ct);
 
+                // Mark connected immediately after successful handshake (same as SSE pattern).
+                // The PollEvent Open event is kept as a safety net for WebGL where
+                // ConnectAsync returns immediately and connection is truly async.
+                PostToMainThread(() =>
+                {
+                    _streamingState = StreamingConnectionState.Connected;
+                    _streamingReconnectAttempt = 0;
+                    DevLog($"WebSocket streaming connected. URL: {baseUrl}");
+                    _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
+                });
+
                 // Start ping loop
                 _wsPingCts?.Cancel();
                 _wsPingCts?.Dispose();
@@ -265,7 +276,7 @@ namespace Gatrix.Unity.SDK
                 RunWebSocketPingLoopAsync(ws, linkedPingCts.Token).Forget();
 
                 // Event polling loop
-                bool connected = false;
+                bool connected = true;
                 while (!ct.IsCancellationRequested && ws.State != WsState.Closed)
                 {
                     var evt = ws.PollEvent();
@@ -279,14 +290,19 @@ namespace Gatrix.Unity.SDK
                     switch (evt.Value.Type)
                     {
                         case WsEventType.Open:
-                            connected = true;
-                            PostToMainThread(() =>
+                            // Already handled above after ConnectAsync.
+                            // This handles the WebGL case where Open arrives via PollEvent.
+                            if (!connected)
                             {
-                                _streamingState = StreamingConnectionState.Connected;
-                                _streamingReconnectAttempt = 0;
-                                DevLog($"WebSocket streaming connected. URL: {baseUrl}");
-                                _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
-                            });
+                                connected = true;
+                                PostToMainThread(() =>
+                                {
+                                    _streamingState = StreamingConnectionState.Connected;
+                                    _streamingReconnectAttempt = 0;
+                                    DevLog($"WebSocket streaming connected (via event). URL: {baseUrl}");
+                                    _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
+                                });
+                            }
                             break;
 
                         case WsEventType.Message:

@@ -48,6 +48,7 @@ namespace Gatrix.Unity.SDK
                 Etag = string.IsNullOrEmpty(_etag) ? null : _etag,
                 MetricsSentCount = _metricsSentCount,
                 MetricsErrorCount = _metricsErrorCount,
+                StreamingEnabled = FeaturesConfig?.Streaming?.Enabled ?? false,
                 StreamingState = _streamingState,
                 StreamingTransport = FeaturesConfig?.Streaming?.Transport ?? StreamingTransport.Sse,
                 StreamingReconnectCount = _streamingReconnectCount,

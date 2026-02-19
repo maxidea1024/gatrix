@@ -169,6 +169,7 @@ namespace Gatrix.Unity.SDK
         private ClientWebSocket _ws;
         private bool _disposed;
         private readonly Queue<WsEvent> _eventQueue = new Queue<WsEvent>();
+        private readonly object _eventQueueLock = new object();
         private CancellationTokenSource _receiveCts;
         private readonly byte[] _receiveBuffer = new byte[8192];
         private readonly StringBuilder _messageBuilder = new StringBuilder();
@@ -204,7 +205,7 @@ namespace Gatrix.Unity.SDK
 
             await _ws.ConnectAsync(uri, ct);
 
-            _eventQueue.Enqueue(new WsEvent { Type = WsEventType.Open, Data = "" });
+            EnqueueEvent(new WsEvent { Type = WsEventType.Open, Data = "" });
 
             // Start background receive loop
             _receiveCts?.Cancel();
@@ -236,8 +237,22 @@ namespace Gatrix.Unity.SDK
 
         public WsEvent? PollEvent()
         {
-            if (_eventQueue.Count == 0) return null;
-            return _eventQueue.Dequeue();
+            lock (_eventQueueLock)
+            {
+                if (_eventQueue.Count == 0) return null;
+                return _eventQueue.Dequeue();
+            }
+        }
+
+        /// <summary>
+        /// Thread-safe event enqueue. Called from both ConnectAsync and ReceiveLoopAsync.
+        /// </summary>
+        private void EnqueueEvent(WsEvent evt)
+        {
+            lock (_eventQueueLock)
+            {
+                _eventQueue.Enqueue(evt);
+            }
         }
 
         private async UniTask ReceiveLoopAsync(CancellationToken ct)
@@ -257,7 +272,7 @@ namespace Gatrix.Unity.SDK
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
                         var closeCode = ((int?)result.CloseStatus ?? 1000).ToString();
-                        _eventQueue.Enqueue(new WsEvent
+                        EnqueueEvent(new WsEvent
                         {
                             Type = WsEventType.Close,
                             Data = closeCode + "|" + (result.CloseStatusDescription ?? "")
@@ -270,7 +285,7 @@ namespace Gatrix.Unity.SDK
                         _messageBuilder.Append(Encoding.UTF8.GetString(_receiveBuffer, 0, result.Count));
                         if (result.EndOfMessage)
                         {
-                            _eventQueue.Enqueue(new WsEvent
+                            EnqueueEvent(new WsEvent
                             {
                                 Type = WsEventType.Message,
                                 Data = _messageBuilder.ToString()
@@ -283,7 +298,7 @@ namespace Gatrix.Unity.SDK
             catch (OperationCanceledException) { /* Expected */ }
             catch (Exception ex)
             {
-                _eventQueue.Enqueue(new WsEvent
+                EnqueueEvent(new WsEvent
                 {
                     Type = WsEventType.Error,
                     Data = ex.Message

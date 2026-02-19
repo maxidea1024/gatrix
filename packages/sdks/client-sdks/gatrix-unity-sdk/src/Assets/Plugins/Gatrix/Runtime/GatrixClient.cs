@@ -65,10 +65,10 @@ namespace Gatrix.Unity.SDK
         public async UniTask StartAsync()
         {
             if (_started) return;
+            _started = true;
 
             await _featuresClient.InitAsync();
             await _featuresClient.StartAsync();
-            _started = true;
         }
 
         /// <summary>Stop the SDK (cancels polling, stops metrics)</summary>

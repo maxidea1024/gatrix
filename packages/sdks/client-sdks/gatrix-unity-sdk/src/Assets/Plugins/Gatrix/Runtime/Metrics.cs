@@ -239,7 +239,7 @@ namespace Gatrix.Unity.SDK
 
                     if (statusCode < 400)
                     {
-                        _logger?.Debug("Metrics sent successfully");
+                        if (_enableDevMode) LogOnMainThread("Metrics sent successfully");
                         EmitOnMainThread(GatrixEvents.FlagsMetricsSent, payload);
                         return;
                     }

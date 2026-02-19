@@ -390,6 +390,9 @@ namespace Gatrix.Unity.SDK
         public int MetricsSentCount { get; set; }
         public int MetricsErrorCount { get; set; }
 
+        /// <summary>Whether streaming is enabled in configuration</summary>
+        public bool StreamingEnabled { get; set; }
+
         /// <summary>Current streaming connection state</summary>
         public StreamingConnectionState StreamingState { get; set; }
 

@@ -12,6 +12,9 @@ namespace Gatrix.Unity.SDK.Editor
     {
         // ==================== Events ====================
 
+        // Auto-scroll: track last known event count to detect new arrivals
+        [NonSerialized] private int _lastEventLogCount;
+
         private void DrawEventsTab()
         {
             bool isDark = EditorGUIUtility.isProSkin;
@@ -101,6 +104,13 @@ namespace Gatrix.Unity.SDK.Editor
                 fontSize = 11,
                 normal = { textColor = isDark ? new Color(0.65f, 0.68f, 0.72f) : new Color(0.30f, 0.33f, 0.38f) }
             };
+
+            // Auto-scroll to top when new events arrive (newest-first display)
+            if (_eventLog.Count > _lastEventLogCount)
+            {
+                _eventLogScroll = Vector2.zero;
+            }
+            _lastEventLogCount = _eventLog.Count;
 
             _eventLogScroll = EditorGUILayout.BeginScrollView(_eventLogScroll, GUILayout.ExpandHeight(true));
 

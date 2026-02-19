@@ -188,6 +188,10 @@ namespace Gatrix.Unity.SDK.Editor
 
             StartListening();
             EditorApplication.update += OnEditorUpdate;
+
+            // Reset refresh timer so auto-refresh starts immediately
+            // (Time.realtimeSinceStartup resets on Play mode, but _lastRefreshTime persists)
+            _lastRefreshTime = 0f;
         }
 
         private void OnDisable()
@@ -556,6 +560,37 @@ namespace Gatrix.Unity.SDK.Editor
                 Repaint();
             }
 
+            // Play mode controls: Pause / Stop
+            if (EditorApplication.isPlaying)
+            {
+                // Separator
+                GUILayout.Space(4);
+                var sepRect = GUILayoutUtility.GetRect(1, 16, GUILayout.Width(1));
+                EditorGUI.DrawRect(sepRect, new Color(0.5f, 0.5f, 0.5f, 0.5f));
+                GUILayout.Space(4);
+
+                // Pause button
+                var isPaused = EditorApplication.isPaused;
+                var pauseStyle = new GUIStyle(EditorStyles.toolbarButton)
+                {
+                    normal = { textColor = isPaused ? new Color(1f, 0.85f, 0.3f) : Color.white }
+                };
+                if (GUILayout.Button(isPaused ? "\u25ae\u25ae Paused" : "\u25ae\u25ae", pauseStyle, GUILayout.Width(isPaused ? 60 : 24)))
+                {
+                    EditorApplication.isPaused = !EditorApplication.isPaused;
+                }
+
+                // Stop button
+                var stopStyle = new GUIStyle(EditorStyles.toolbarButton)
+                {
+                    normal = { textColor = new Color(1f, 0.4f, 0.4f) }
+                };
+                if (GUILayout.Button("\u25a0", stopStyle, GUILayout.Width(24)))
+                {
+                    EditorApplication.isPlaying = false;
+                }
+            }
+
             EditorGUILayout.EndHorizontal();
         }
 
@@ -707,10 +742,12 @@ namespace Gatrix.Unity.SDK.Editor
                     _eventLog.RemoveAt(0);
                 }
 
-                // Immediately refresh data when flags change
+                // Immediately refresh data when flags or streaming state changes
                 if (eventName == GatrixEvents.FlagsChange ||
                     eventName == GatrixEvents.FlagsFetchEnd ||
-                    eventName == GatrixEvents.FlagsPendingSync)
+                    eventName == GatrixEvents.FlagsPendingSync ||
+                    eventName == GatrixEvents.FlagsStreamingConnected ||
+                    eventName == GatrixEvents.FlagsStreamingDisconnected)
                 {
                     RefreshData();
                     Repaint();

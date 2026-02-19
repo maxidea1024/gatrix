@@ -88,8 +88,36 @@ namespace Gatrix.Unity.SDK.Editor
             }
             GatrixEditorStyle.EndBox();
 
-            // ── Metrics & Streaming ──
-            GatrixEditorStyle.DrawSection("Metrics & Streaming", "Real-time data flow");
+            // ── Streaming ──
+            GatrixEditorStyle.DrawSection("Streaming", "Real-time flag updates");
+            GatrixEditorStyle.BeginBox();
+
+            if (stats != null)
+            {
+                if (!stats.StreamingEnabled)
+                {
+                    DrawField("Status", "<color=gray>Not Enabled</color>", true);
+                }
+                else
+                {
+                    var stateColor = stats.StreamingState == StreamingConnectionState.Connected
+                        ? "#88ff88"
+                        : stats.StreamingState == StreamingConnectionState.Disconnected
+                            ? "gray"
+                            : stats.StreamingState == StreamingConnectionState.Degraded
+                                ? "#ff8888"
+                                : "yellow";
+                    DrawField("Status", $"<color={stateColor}>● {stats.StreamingState}</color>", true);
+                    DrawField("Transport", stats.StreamingTransport.ToString());
+                    DrawField("Reconnections", stats.StreamingReconnectCount.ToString());
+                    DrawField("Last Event", FormatTime(stats.LastStreamingEventTime));
+                }
+            }
+
+            GatrixEditorStyle.EndBox();
+
+            // ── Metrics ──
+            GatrixEditorStyle.DrawSection("Metrics", "Impression and delivery");
             GatrixEditorStyle.BeginBox();
 
             if (stats != null)
@@ -97,20 +125,6 @@ namespace Gatrix.Unity.SDK.Editor
                 DrawField("Metrics Sent", stats.MetricsSentCount.ToString());
                 DrawField("Metrics Errors", stats.MetricsErrorCount.ToString());
                 DrawField("Impressions", stats.ImpressionCount.ToString());
-
-                var stateColor = stats.StreamingState == StreamingConnectionState.Connected
-                    ? "#88ff88"
-                    : stats.StreamingState == StreamingConnectionState.Disconnected
-                        ? "gray"
-                        : stats.StreamingState == StreamingConnectionState.Degraded
-                            ? "#ff8888"
-                            : "yellow";
-                var transportLabel = stats.StreamingState != StreamingConnectionState.Disconnected
-                    ? $" ({stats.StreamingTransport})"
-                    : "";
-                DrawField("Streaming", $"<color={stateColor}>● {stats.StreamingState}{transportLabel}</color>", true);
-                DrawField("Reconnections", stats.StreamingReconnectCount.ToString());
-                DrawField("Last Event", FormatTime(stats.LastStreamingEventTime));
             }
 
             GatrixEditorStyle.EndBox();

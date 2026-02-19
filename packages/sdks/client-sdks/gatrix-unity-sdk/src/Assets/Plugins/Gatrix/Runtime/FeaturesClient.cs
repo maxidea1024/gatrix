@@ -330,19 +330,12 @@ namespace Gatrix.Unity.SDK
         // ==================== Private Helpers ====================
 
         /// <summary>
-        /// Post an action to the main thread via captured SynchronizationContext.
-        /// Falls back to direct invocation if no SynchronizationContext was captured.
+        /// Post an action to the main thread via MainThreadDispatcher.
+        /// Falls back to direct invocation if already on main thread.
         /// </summary>
         private void PostToMainThread(Action action)
         {
-            if (_syncContext != null && SynchronizationContext.Current != _syncContext)
-            {
-                _syncContext.Post(_ => action(), null);
-            }
-            else
-            {
-                action();
-            }
+            MainThreadDispatcher.Enqueue(action);
         }
 
         private void SetReady()
