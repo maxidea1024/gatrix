@@ -214,7 +214,10 @@ bool latestValue = features.IsEnabled("boss-buff", forceRealtime: true);
 float latestSpeed = features.FloatVariation("game-speed", 1.0f, forceRealtime: true);
 ```
 
-> `ExplicitSyncMode`가 **비활성**인 경우, `forceRealtime`은 효과가 없습니다 — 모든 읽기가 항상 최신 값을 반환합니다.
+> ⚠️ **`ExplicitSyncMode`가 비활성(기본값)인 경우:**
+> `forceRealtime` 파라미터는 **완전히 무시**되며, `WatchSyncedFlag`와 `WatchRealtimeFlag`는 동일하게 동작합니다.
+> 동기화 저장소 자체가 존재하지 않으므로 모든 읽기와 콜백이 **항상 리얼타임 기반**으로 동작합니다.
+> `forceRealtime`은 **오직 `ExplicitSyncMode = true`일 때만 의미**가 있습니다.
 
 ### 기본 제공 컴포넌트와 동기화 모드
 

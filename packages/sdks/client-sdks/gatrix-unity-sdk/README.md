@@ -213,7 +213,10 @@ bool latestValue = features.IsEnabled("boss-buff", forceRealtime: true);
 float latestSpeed = features.FloatVariation("game-speed", 1.0f, forceRealtime: true);
 ```
 
-> When `ExplicitSyncMode` is **disabled**, `forceRealtime` has no effect — all reads always return the latest values.
+> ⚠️ **When `ExplicitSyncMode` is disabled (default):**
+> The `forceRealtime` parameter is **completely ignored**, and `WatchSyncedFlag` / `WatchRealtimeFlag` behave identically.
+> There is no synced store — all reads and callbacks operate on a **single realtime store** at all times.
+> `forceRealtime` is **only meaningful when `ExplicitSyncMode = true`**.
 
 ### Built-in Components and Sync Mode
 
