@@ -26,7 +26,7 @@ MonoBehaviour:
   _bootstrapOverride: 1
   _refreshInterval: 30
   _disableRefresh: 0
-  _explicitSyncMode: 0
+  _explicitSyncMode: 1
   _disableMetrics: 0
   _metricsIntervalInitial: 2
   _metricsInterval: 60

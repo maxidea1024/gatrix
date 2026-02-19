@@ -72,7 +72,7 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
@@ -127,6 +127,12 @@ export default class ServerFeatureFlagController {
             })
           );
 
+          const envOverride = (flag as any).environments?.find(
+            (e: any) => e.environment === environment
+          );
+          const hasEnvOverride =
+            envOverride?.enabledValue !== undefined || envOverride?.disabledValue !== undefined;
+
           return {
             id: flag.id,
             name: flag.flagName,
@@ -135,12 +141,9 @@ export default class ServerFeatureFlagController {
             strategies: evaluationStrategies,
             variants: evaluationVariants,
             valueType: (flag as any).valueType,
-            enabledValue:
-              (flag as any).environments?.find((e: any) => e.environment === environment)
-                ?.enabledValue ?? (flag as any).enabledValue,
-            disabledValue:
-              (flag as any).environments?.find((e: any) => e.environment === environment)
-                ?.disabledValue ?? (flag as any).disabledValue,
+            enabledValue: envOverride?.enabledValue ?? (flag as any).enabledValue,
+            disabledValue: envOverride?.disabledValue ?? (flag as any).disabledValue,
+            valueSource: hasEnvOverride ? 'environment' : 'flag',
             version: flag.version,
           };
         })
@@ -251,7 +254,7 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
 
       const rawSegments = await FeatureSegmentModel.findAll();
 

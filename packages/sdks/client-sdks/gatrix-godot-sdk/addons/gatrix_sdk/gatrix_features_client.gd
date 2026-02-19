@@ -596,7 +596,7 @@ func sync_flags(fetch_now := true) -> void:
 	_mutex.unlock()
 
 	# Invoke synced watch callbacks
-	_invoke_watch_callbacks(_synced_watch_handles, old_synced, _synchronized_flags)
+	_invoke_watch_callbacks(_synced_watch_handles, old_synced, _synchronized_flags, false)
 
 	_emitter.emit_event(GatrixEvents.FLAGS_SYNC)
 	_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": _synchronized_flags.values() }])
@@ -912,10 +912,10 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 	if changed and not is_initial_fetch:
 		_emit_flag_changes(old_flags, _realtime_flags)
 		# Always invoke realtime watch callbacks
-		_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags)
+		_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags, true)
 		if not _config.explicit_sync_mode:
 			# In non-explicit mode, also invoke synced callbacks
-			_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags)
+			_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags, false)
 			_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
 
 
@@ -964,7 +964,7 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 		_emitter.emit_event(GatrixEvents.FLAGS_REMOVED, [removed_names])
 
 
-func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_flags: Dictionary) -> void:
+func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_flags: Dictionary, force_realtime: bool = false) -> void:
 	for handle in handles:
 		var watcher = handles[handle]
 		var flag_name: String = watcher.flag_name
@@ -981,7 +981,7 @@ func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_fla
 			changed = true  # Flag removed
 
 		if changed:
-			var proxy := GatrixFlagProxy.new(self, flag_name, true)
+			var proxy := GatrixFlagProxy.new(self, flag_name, force_realtime)
 			watcher.callback.call(proxy)
 
 

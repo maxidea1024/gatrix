@@ -264,7 +264,8 @@ private:
   void invokeWatchCallbacks(
       std::map<std::string, std::vector<WatchCallback>> &callbackMap,
       const std::map<std::string, EvaluatedFlag> &oldFlags,
-      const std::map<std::string, EvaluatedFlag> &newFlags);
+      const std::map<std::string, EvaluatedFlag> &newFlags,
+      bool forceRealtime);
 };
 
 // ==================== WatchFlagGroup ====================

@@ -145,7 +145,8 @@ namespace Gatrix.Unity.SDK
         private void InvokeWatchCallbacks(
             Dictionary<string, List<GatrixFlagWatchHandler>> callbackMap,
             Dictionary<string, EvaluatedFlag> oldFlags,
-            Dictionary<string, EvaluatedFlag> newFlags)
+            Dictionary<string, EvaluatedFlag> newFlags,
+            bool forceRealtime)
         {
             var now = DateTime.UtcNow;
 
@@ -159,7 +160,7 @@ namespace Gatrix.Unity.SDK
 
                     if (callbackMap.TryGetValue(kvp.Key, out var callbacks) && callbacks.Count > 0)
                     {
-                        var proxy = new FlagProxy(this, kvp.Key);
+                        var proxy = new FlagProxy(this, kvp.Key, forceRealtime);
                         foreach (var cb in callbacks.ToArray()) // copy to avoid mutation during iteration
                         {
                             try
@@ -182,7 +183,7 @@ namespace Gatrix.Unity.SDK
                 {
                     if (callbackMap.TryGetValue(kvp.Key, out var callbacks) && callbacks.Count > 0)
                     {
-                        var proxy = new FlagProxy(this, kvp.Key);
+                        var proxy = new FlagProxy(this, kvp.Key, forceRealtime);
                         foreach (var cb in callbacks.ToArray())
                         {
                             try

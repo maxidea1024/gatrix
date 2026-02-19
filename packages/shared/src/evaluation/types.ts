@@ -133,6 +133,8 @@ export interface FeatureFlag {
   valueType?: ValueType;
   enabledValue?: any;
   disabledValue?: any;
+  /** Where enabledValue/disabledValue originate: 'environment' if from env override, 'flag' if from global default */
+  valueSource?: 'environment' | 'flag';
   version?: number;
 }
 

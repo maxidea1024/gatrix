@@ -420,7 +420,7 @@ namespace Gatrix.Unity.SDK
 
             var oldSynchronizedFlags = new Dictionary<string, EvaluatedFlag>(_synchronizedFlags);
             _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
-            InvokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags, _synchronizedFlags);
+            InvokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags, _synchronizedFlags, forceRealtime: false);
             _pendingSync = false;
             _syncFlagsCount++;
             _emitter.Emit(GatrixEvents.FlagsSync);

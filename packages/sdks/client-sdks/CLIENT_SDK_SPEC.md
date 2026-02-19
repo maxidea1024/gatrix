@@ -513,6 +513,50 @@ Reacts to flag changes only at **controlled synchronization points**.
 | Server fetch completes | ✅ Fires immediately | ❌ Not fired |
 | `syncFlags()` called | ❌ Not fired | ✅ Fires with synced diff |
 
+#### `invokeWatchCallbacks` Implementation Rules
+
+All SDKs MUST implement the internal `invokeWatchCallbacks` method (or equivalent) with the following rules:
+
+**1. `forceRealtime` parameter is REQUIRED:**
+
+The method MUST accept a `forceRealtime` boolean parameter. When creating `FlagProxy` instances inside watch callbacks, this parameter MUST be passed through to the `FlagProxy` constructor:
+
+- **Realtime watch callbacks** → `forceRealtime = true` (proxy reads from `realtimeFlags`)
+- **Synced watch callbacks** → `forceRealtime = false` (proxy reads from `synchronizedFlags` in explicit sync mode)
+
+```
+// Pseudocode — correct implementation
+invokeWatchCallbacks(callbackMap, oldFlags, newFlags, forceRealtime):
+    for each changed flag:
+        proxy = new FlagProxy(client, flagName, forceRealtime)  // ← MUST pass forceRealtime
+        invoke callbacks with proxy
+```
+
+> [!CAUTION]
+> **Never hardcode `forceRealtime` inside `invokeWatchCallbacks`.** A common bug is to always pass `true` or always use the default (`false`) when creating `FlagProxy`. This causes:
+> - `forceRealtime=false` for realtime watchers → Proxy reads synchronized (stale) flags instead of realtime flags in explicit sync mode.
+> - `forceRealtime=true` for synced watchers → Proxy reads realtime flags instead of synchronized flags, defeating the purpose of explicit sync.
+
+**2. Realtime watch callbacks MUST fire regardless of `explicitSyncMode`:**
+
+In `storeFlags()` (or equivalent), realtime watch callbacks MUST always be invoked when flag data changes from the server. They MUST NOT be gated behind `!explicitSyncMode`:
+
+```
+// Pseudocode — correct implementation in storeFlags()
+invokeWatchCallbacks(realtimeWatchCallbacks, oldFlags, newFlags, forceRealtime=true)   // ← ALWAYS
+
+if not explicitSyncMode:
+    invokeWatchCallbacks(syncedWatchCallbacks, oldFlags, newFlags, forceRealtime=false) // ← only in normal mode
+```
+
+**3. Call site summary:**
+
+| Call Site | Callback Map | `forceRealtime` |
+|-----------|-------------|-----------------|
+| `storeFlags()` — realtime | `realtimeWatchCallbacks` | `true` |
+| `storeFlags()` — synced (non-explicit mode) | `syncedWatchCallbacks` | `false` |
+| `syncFlags()` — synced | `syncedWatchCallbacks` | `false` |
+
 ## Main Interface
 
 ### GatrixClient

@@ -591,6 +591,7 @@ export class ClientController {
 
         const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
 
+
         // Build variant object according to Gatrix client specification
         // Updated to support separate enabled/disabled values
         let variant: {

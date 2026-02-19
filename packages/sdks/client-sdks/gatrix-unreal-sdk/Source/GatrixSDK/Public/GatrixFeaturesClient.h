@@ -382,10 +382,10 @@ private:
                    const FString &EventType, const FString &VariantName) const;
   void ScheduleNextPoll();
   void StopPolling();
-  void
-  InvokeWatchCallbacks(const TArray<FWatchCallbackEntry> &CallbackList,
-                       const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
-                       const TMap<FString, FGatrixEvaluatedFlag> &NewFlags);
+  void InvokeWatchCallbacks(const TArray<FWatchCallbackEntry> &CallbackList,
+                            const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
+                            const TMap<FString, FGatrixEvaluatedFlag> &NewFlags,
+                            bool bForceRealtime);
 
   // Metrics
   void StartMetrics();

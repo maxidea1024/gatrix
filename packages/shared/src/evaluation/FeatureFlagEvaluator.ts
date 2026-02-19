@@ -39,8 +39,11 @@ export class FeatureFlagEvaluator {
         for (const strategy of activeStrategies) {
           if (this.evaluateStrategy(strategy, context, flag, segmentsMap)) {
             const variantData = this.selectVariant(flag, context, strategy);
+            const defaultEnabledName = flag.valueSource === 'environment'
+              ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+              : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
             const variant: Variant = {
-              name: variantData?.name || VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
+              name: variantData?.name || defaultEnabledName,
               weight: variantData?.weight || 100,
               value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
               valueType: flag.valueType || 'string',
@@ -61,8 +64,11 @@ export class FeatureFlagEvaluator {
       } else {
         // No strategies or all disabled - enabled by default
         const variantData = this.selectVariant(flag, context);
+        const defaultEnabledName = flag.valueSource === 'environment'
+          ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+          : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
         const variant: Variant = {
-          name: variantData?.name || VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
+          name: variantData?.name || defaultEnabledName,
           weight: variantData?.weight || 100,
           value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
@@ -82,13 +88,16 @@ export class FeatureFlagEvaluator {
     }
 
     // Disabled or no strategy matched
+    const defaultDisabledName = flag.valueSource === 'environment'
+      ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+      : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
     return {
       id: flag.id || '',
       flagName: flag.name,
       enabled: false,
       reason,
       variant: {
-        name: VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+        name: defaultDisabledName,
         weight: 100,
         value: this.getFallbackValue(flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',

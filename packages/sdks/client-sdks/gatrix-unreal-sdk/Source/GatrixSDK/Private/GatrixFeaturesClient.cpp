@@ -310,7 +310,8 @@ void UGatrixFeaturesClient::SyncFlags(bool bFetchNow) {
     TMap<FString, FGatrixEvaluatedFlag> OldFlags = SynchronizedFlags;
     SynchronizedFlags = RealtimeFlags;
     EmitFlagChanges(OldFlags, SynchronizedFlags);
-    InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, SynchronizedFlags);
+    InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, SynchronizedFlags,
+                         /*bForceRealtime=*/false);
   }
 
   {
@@ -736,11 +737,14 @@ void UGatrixFeaturesClient::StoreFlags(
     TMap<FString, FGatrixEvaluatedFlag> CurrentFlags = SelectFlags();
     EmitFlagChanges(OldFlags, CurrentFlags);
 
+    // Always invoke realtime watch callbacks
+    InvokeWatchCallbacks(WatchCallbacks, OldFlags, CurrentFlags,
+                         /*bForceRealtime=*/true);
+
     if (!ClientConfig.Features.bExplicitSyncMode) {
-      // Always invoke realtime callbacks
-      InvokeWatchCallbacks(WatchCallbacks, OldFlags, CurrentFlags);
       // In non-explicit mode, also invoke synced callbacks
-      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, CurrentFlags);
+      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, CurrentFlags,
+                           /*bForceRealtime=*/false);
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsChange);
       }
@@ -1017,7 +1021,7 @@ UGatrixFeaturesClient::GetRawFlagInternal(const FString &FlagName,
 void UGatrixFeaturesClient::InvokeWatchCallbacks(
     const TArray<FWatchCallbackEntry> &CallbackList,
     const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
-    const TMap<FString, FGatrixEvaluatedFlag> &NewFlags) {
+    const TMap<FString, FGatrixEvaluatedFlag> &NewFlags, bool bForceRealtime) {
   // Check for changed/new flags
   for (const auto &Pair : NewFlags) {
     const FGatrixEvaluatedFlag *OldFlag = OldFlags.Find(Pair.Key);
@@ -1027,7 +1031,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
       // Invoke watch callbacks for this flag
       for (const auto &Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
-          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key);
+          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
         }
       }
@@ -1039,7 +1043,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
     if (!NewFlags.Contains(Pair.Key)) {
       for (const auto &Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
-          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key);
+          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
         }
       }

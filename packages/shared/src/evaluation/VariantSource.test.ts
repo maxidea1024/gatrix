@@ -185,4 +185,69 @@ describe('Variant Source Naming', () => {
             expect(FeatureFlagEvaluator.getFallbackValue({ a: 1 }, 'json')).toEqual({ a: 1 });
         });
     });
+
+    describe('Environment override valueSource', () => {
+        it('should return $env-default-enabled when valueSource is environment', () => {
+            const flag = createFlag({
+                isEnabled: true,
+                enabledValue: 'env-value',
+                valueSource: 'environment',
+            });
+            const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+            expect(result.enabled).toBe(true);
+            expect(result.variant.name).toBe('$env-default-enabled');
+            expect(result.variant.value).toBe('env-value');
+        });
+
+        it('should return $env-default-disabled when disabled with valueSource environment', () => {
+            const flag = createFlag({
+                isEnabled: false,
+                disabledValue: 'env-off',
+                valueSource: 'environment',
+            });
+            const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+            expect(result.enabled).toBe(false);
+            expect(result.variant.name).toBe('$env-default-disabled');
+            expect(result.variant.value).toBe('env-off');
+        });
+
+        it('should return $env-default-enabled on strategy match with no variant and env source', () => {
+            const flag = createFlag({
+                isEnabled: true,
+                enabledValue: 99,
+                valueType: 'number',
+                valueSource: 'environment',
+                strategies: [
+                    {
+                        name: 'default-strategy',
+                        isEnabled: true,
+                        constraints: [],
+                    },
+                ],
+            });
+            const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+            expect(result.enabled).toBe(true);
+            expect(result.variant.name).toBe('$env-default-enabled');
+            expect(result.reason).toBe('strategy_match');
+        });
+
+        it('should return $flag-default-enabled when valueSource is flag (explicit)', () => {
+            const flag = createFlag({
+                isEnabled: true,
+                enabledValue: true,
+                valueSource: 'flag',
+            });
+            const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+            expect(result.variant.name).toBe('$flag-default-enabled');
+        });
+
+        it('should return $flag-default-enabled when valueSource is undefined (backward compat)', () => {
+            const flag = createFlag({
+                isEnabled: true,
+                enabledValue: true,
+            });
+            const result = FeatureFlagEvaluator.evaluate(flag, defaultContext, emptySegmentsMap);
+            expect(result.variant.name).toBe('$flag-default-enabled');
+        });
+    });
 });

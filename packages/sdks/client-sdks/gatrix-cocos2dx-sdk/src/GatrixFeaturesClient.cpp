@@ -317,7 +317,7 @@ void FeaturesClient::syncFlags(bool fetchNow) {
   auto oldSynchronizedFlags = _synchronizedFlags;
   _synchronizedFlags = _realtimeFlags;
   invokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags,
-                       _synchronizedFlags);
+                       _synchronizedFlags, /*forceRealtime=*/false);
   _pendingSync = false;
   _stats.syncFlagsCount++;
   _emitter.emit(EVENTS::FLAGS_SYNC);
@@ -635,14 +635,15 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string &body,
     _stats.totalFlagCount = static_cast<int>(_realtimeFlags.size());
 
     // Always invoke realtime watch callbacks
-    invokeWatchCallbacks(_watchCallbacks, oldRealtimeFlags, _realtimeFlags);
+    invokeWatchCallbacks(_watchCallbacks, oldRealtimeFlags, _realtimeFlags,
+                         /*forceRealtime=*/true);
 
     if (!_explicitSyncMode) {
       _synchronizedFlags = _realtimeFlags;
       _pendingSync = false;
       // In non-explicit mode, also invoke synced callbacks
       invokeWatchCallbacks(_syncedWatchCallbacks, oldRealtimeFlags,
-                           _realtimeFlags);
+                           _realtimeFlags, /*forceRealtime=*/false);
       _emitter.emit(EVENTS::FLAGS_CHANGE);
     } else {
       if (!_pendingSync) {
@@ -953,7 +954,7 @@ FeaturesClient::getRawFlagInternal(const std::string &flagName,
 void FeaturesClient::invokeWatchCallbacks(
     std::map<std::string, std::vector<WatchCallback>> &callbackMap,
     const std::map<std::string, EvaluatedFlag> &oldFlags,
-    const std::map<std::string, EvaluatedFlag> &newFlags) {
+    const std::map<std::string, EvaluatedFlag> &newFlags, bool forceRealtime) {
   // Check for changed/new flags
   for (const auto &[name, newFlag] : newFlags) {
     auto oldIt = oldFlags.find(name);
@@ -962,7 +963,7 @@ void FeaturesClient::invokeWatchCallbacks(
 
       auto cbIt = callbackMap.find(name);
       if (cbIt != callbackMap.end() && !cbIt->second.empty()) {
-        FlagProxy proxy(this, name, true);
+        FlagProxy proxy(this, name, forceRealtime);
         // Copy to avoid mutation during iteration
         auto callbacks = cbIt->second;
         for (const auto &cb : callbacks) {
@@ -982,7 +983,7 @@ void FeaturesClient::invokeWatchCallbacks(
     if (newFlags.find(name) == newFlags.end()) {
       auto cbIt = callbackMap.find(name);
       if (cbIt != callbackMap.end() && !cbIt->second.empty()) {
-        FlagProxy proxy(this, name, true);
+        FlagProxy proxy(this, name, forceRealtime);
         auto callbacks = cbIt->second;
         for (const auto &cb : callbacks) {
           try {

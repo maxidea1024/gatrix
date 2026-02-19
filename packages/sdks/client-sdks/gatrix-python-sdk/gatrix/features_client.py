@@ -762,7 +762,7 @@ class FeaturesClient:
         if self._pending_flags is not None:
             old_flags = dict(self._flags)
             self._apply_flags(self._pending_flags)
-            self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._flags)
+            self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._flags, force_realtime=False)
             self._pending_flags = None
             self._pending_sync = False
             self._sync_count += 1
@@ -946,9 +946,9 @@ class FeaturesClient:
                 old_flags = dict(self._flags)
                 self._apply_flags(new_flags)
                 # Always invoke realtime callbacks
-                self._invoke_watch_callbacks(self._watch_callbacks, old_flags, self._flags)
+                self._invoke_watch_callbacks(self._watch_callbacks, old_flags, self._flags, force_realtime=True)
                 # In non-explicit mode, also invoke synced callbacks
-                self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._flags)
+                self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._flags, force_realtime=False)
 
             self._update_count += 1
             self._last_update_time = datetime.now(timezone.utc)
@@ -1080,6 +1080,7 @@ class FeaturesClient:
         callback_map: Dict[str, List[Callable]],
         old_flags: Dict[str, EvaluatedFlag],
         new_flags: Dict[str, EvaluatedFlag],
+        force_realtime: bool = False,
     ) -> None:
         """Invoke watch callbacks for changed flags."""
         now = datetime.now(timezone.utc)
@@ -1091,7 +1092,7 @@ class FeaturesClient:
                 self._flag_last_changed[name] = now
                 callbacks = callback_map.get(name)
                 if callbacks:
-                    proxy = FlagProxy(client=self, flag_name=name, force_realtime=True)
+                    proxy = FlagProxy(client=self, flag_name=name, force_realtime=force_realtime)
                     for cb in list(callbacks):  # copy to avoid mutation during iteration
                         try:
                             cb(proxy)
@@ -1106,7 +1107,7 @@ class FeaturesClient:
             if name not in new_flags:
                 callbacks = callback_map.get(name)
                 if callbacks:
-                    proxy = FlagProxy(client=self, flag_name=name, force_realtime=True)
+                    proxy = FlagProxy(client=self, flag_name=name, force_realtime=force_realtime)
                     for cb in list(callbacks):
                         try:
                             cb(proxy)

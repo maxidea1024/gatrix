@@ -885,7 +885,7 @@ export class FeaturesClient implements VariationProvider {
     // Invoke synced watch callbacks for changed flags
     const oldSynchronizedFlags = new Map(this.synchronizedFlags);
     this.synchronizedFlags = new Map(this.realtimeFlags);
-    this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldSynchronizedFlags, this.synchronizedFlags);
+    this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldSynchronizedFlags, this.synchronizedFlags, false);
 
     this.pendingSync = false;
     this.syncFlagsCount++;
@@ -1346,11 +1346,11 @@ export class FeaturesClient implements VariationProvider {
 
     // Always invoke realtime watch callbacks when flags change from server
     this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
-    this.invokeWatchCallbacks(this.watchCallbacks, oldFlags, this.realtimeFlags);
+    this.invokeWatchCallbacks(this.watchCallbacks, oldFlags, this.realtimeFlags, true);
 
     // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
     if (!this.featuresConfig.explicitSyncMode || forceSync) {
-      this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldFlags, this.realtimeFlags);
+      this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldFlags, this.realtimeFlags, false);
     }
 
     this.sdkState = 'healthy';
@@ -1407,7 +1407,8 @@ export class FeaturesClient implements VariationProvider {
   private invokeWatchCallbacks(
     callbackMap: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>>,
     oldFlags: Map<string, EvaluatedFlag>,
-    newFlags: Map<string, EvaluatedFlag>
+    newFlags: Map<string, EvaluatedFlag>,
+    forceRealtime: boolean
   ): void {
     const now = new Date();
 
@@ -1419,7 +1420,7 @@ export class FeaturesClient implements VariationProvider {
 
         const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
-          const proxy = new FlagProxy(this, name);
+          const proxy = new FlagProxy(this, name, forceRealtime);
           callbacks.forEach(callback => {
             try {
               callback(proxy);
@@ -1440,7 +1441,7 @@ export class FeaturesClient implements VariationProvider {
 
         const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
-          const proxy = new FlagProxy(this, name);
+          const proxy = new FlagProxy(this, name, forceRealtime);
           callbacks.forEach(callback => {
             try {
               callback(proxy);

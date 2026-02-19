@@ -305,12 +305,12 @@ namespace Gatrix.Unity.SDK
 
             // Always invoke realtime watch callbacks when flags change from server
             EmitRealtimeFlagChanges(oldFlags, _realtimeFlags);
-            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags);
+            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, forceRealtime: true);
 
             // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
             {
-                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags);
+                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, forceRealtime: false);
             }
 
             _sdkState = SdkState.Healthy;
