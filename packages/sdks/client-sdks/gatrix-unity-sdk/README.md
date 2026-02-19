@@ -4,6 +4,72 @@
 
 The Gatrix Unity SDK lets you control your game's behavior in real-time without shipping a new build. Toggle features, run A/B experiments, tune game parameters, and roll out changes gradually — all from the Gatrix dashboard.
 
+### ⚡ Quick Examples
+
+#### 1. Feature Toggle (`IsEnabled`)
+Turn a feature on or off instantly without code deployment.
+
+```mermaid
+flowchart LR
+    DASHBOARD["🖥️ Dashboard<br/>Toggle: ON"]:::dash ==> GAME["🎮 Game Client<br/>if (IsEnabled)"]:::game
+    GAME --> FEATURE("✨ Show New Shop"):::feature
+
+    classDef dash fill:#2d3436,stroke:#00b894,stroke-width:2px,color:white;
+    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
+    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
+```
+
+```csharp
+if (GatrixBehaviour.Client.Features.IsEnabled("new-shop"))
+{
+    // Feature is ON -> Show the new shop UI
+    ShowNewShop();
+}
+```
+
+#### 2. Remote Configuration (`Variation`)
+Tune gameplay values or text remotely. Supports string, number, and JSON.
+
+```mermaid
+flowchart LR
+    DASHBOARD["🖥️ Dashboard<br/>game-speed: 2.0<br/>welcome-msg: 'Hello!'"]:::dash ==> GAME["🎮 Game Client<br/>FloatVariation / StringVariation"]:::game
+    GAME --> VALUE1("🚀 Speed = 2.0"):::feature
+    GAME --> VALUE2("💬 Text = 'Hello!'"):::feature
+
+    classDef dash fill:#2d3436,stroke:#00b894,stroke-width:2px,color:white;
+    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
+    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
+```
+
+```csharp
+// Get a float value (defaulting to 1.0f if not set)
+float speed = GatrixBehaviour.Client.Features.FloatVariation("game-speed", 1.0f);
+
+// Get a string value
+string message = GatrixBehaviour.Client.Features.StringVariation("welcome-msg", "Welcome");
+```
+
+#### 3. Conditional Targeting
+Target specific users based on rules (e.g., country, level, app version).
+
+```mermaid
+flowchart LR
+    RULE["🖥️ Rule:<br/>IF Level >= 10<br/>THEN 'difficulty' = 'Hard'"]:::dash ==> GAME["🎮 Game Client<br/>Context: { Level: 15 }"]:::game
+    GAME --> RESULT("🔥 Difficulty: Hard"):::feature
+
+    classDef dash fill:#2d3436,stroke:#d63031,stroke-width:2px,color:white;
+    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
+    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
+```
+
+```csharp
+// The dashboard rule decides the value based on the user's context (e.g., Level 15)
+// You just read the value — logic stays on the server!
+string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
+```
+
+> No build, no deploy — change these values from the [Gatrix Dashboard](https://your-dashboard.example.com) and they go live instantly.
+
 ---
 
 ## ✨ Why Gatrix?
@@ -129,6 +195,15 @@ flowchart LR
 3. **Simpler SDK.** The client SDK is a thin cache layer — it doesn't need to understand targeting rules, percentage rollouts, or segment membership. This keeps the SDK lightweight and reduces the surface area for bugs.
 
 > 💡 **Offline & Bootstrap:** Even though evaluation happens on the server, the SDK caches the last known flag values locally. You can also provide **bootstrap data** for fully offline scenarios. See the [Operating Modes](#-operating-modes) section for details.
+
+### 🌐 Offline Support & Reliability
+Gatrix SDK is architected to prioritize **Availability** over perfect real-time consistency. Your game must never crash or stop working just because the feature flag server is unreachable.
+
+*   **Works Without Network**: If the internet is down, the SDK seamlessly serves values from its local cache. If no cache exists, it uses the safe `fallbackValue` you provide in code.
+*   **Offline Mode**: Fully supported. Players can start and play the game offline using the last fetched configuration.
+*   **Automatic Recovery**: When network connectivity is restored, the SDK automatically fetches the latest values in the background and updates the local store.
+
+This design ensures that network hiccups never degrade the player experience.
 
 ---
 

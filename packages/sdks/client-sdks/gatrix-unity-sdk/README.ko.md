@@ -4,6 +4,72 @@
 
 Gatrix Unity SDK를 사용하면 새 빌드를 배포하지 않고도 게임의 동작을 실시간으로 제어할 수 있습니다. 기능 토글, A/B 실험, 게임 파라미터 튜닝, 점진적 롤아웃 — 모든 것을 Gatrix 대시보드에서 수행할 수 있습니다.
 
+### ⚡ Quick Examples
+
+#### 1. 피처 토글 (`IsEnabled`)
+코드 배포 없이 기능을 즉시 켜거나 끌 수 있습니다.
+
+```mermaid
+flowchart LR
+    DASHBOARD["🖥️ 대시보드<br/>Toggle: ON"]:::dash ==> GAME["🎮 게임 클라이언트<br/>if (IsEnabled)"]:::game
+    GAME --> FEATURE("✨ 새 상점 UI 표시"):::feature
+
+    classDef dash fill:#2d3436,stroke:#00b894,stroke-width:2px,color:white;
+    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
+    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
+```
+
+```csharp
+if (GatrixBehaviour.Client.Features.IsEnabled("new-shop"))
+{
+    // 기능이 ON 상태 -> 새 상점 UI 표시
+    ShowNewShop();
+}
+```
+
+#### 2. 원격 구성 (`Variation`)
+게임 밸런스, 텍스트 등을 원격에서 조정합니다. 문자열, 숫자, JSON을 지원합니다.
+
+```mermaid
+flowchart LR
+    DASHBOARD["🖥️ 대시보드<br/>game-speed: 2.0<br/>welcome-msg: '안녕!'"]:::dash ==> GAME["🎮 게임 클라이언트<br/>FloatVariation / StringVariation"]:::game
+    GAME --> VALUE1("🚀 속도 = 2.0"):::feature
+    GAME --> VALUE2("💬 텍스트 = '안녕!'"):::feature
+
+    classDef dash fill:#2d3436,stroke:#00b894,stroke-width:2px,color:white;
+    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
+    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
+```
+
+```csharp
+// float 값 가져오기 (설정이 없으면 기본값 1.0f 사용)
+float speed = GatrixBehaviour.Client.Features.FloatVariation("game-speed", 1.0f);
+
+// string 값 가져오기
+string message = GatrixBehaviour.Client.Features.StringVariation("welcome-msg", "환영합니다");
+```
+
+#### 3. 조건부 타겟팅
+특정 사용자 그룹(국가, 레벨, 앱 버전 등)에게만 다른 값을 제공합니다.
+
+```mermaid
+flowchart LR
+    RULE["🖥️ 규칙:<br/>IF 레벨 >= 10<br/>THEN 'difficulty' = 'Hard'"]:::dash ==> GAME["🎮 게임 클라이언트<br/>Context: { Level: 15 }"]:::game
+    GAME --> RESULT("🔥 난이도: Hard"):::feature
+
+    classDef dash fill:#2d3436,stroke:#d63031,stroke-width:2px,color:white;
+    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
+    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
+```
+
+```csharp
+// 대시보드의 규칙이 사용자 컨텍스트(예: Level 15)를 기반으로 값을 결정합니다.
+// 클라이언트는 단순히 값을 읽기만 하면 됩니다 — 로직은 서버에 있습니다!
+string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
+```
+
+> 빌드도, 배포도 필요 없습니다 — [Gatrix 대시보드](https://your-dashboard.example.com)에서 값을 변경하면 게임에 즉시 반영됩니다.
+
 ---
 
 ## ✨ Gatrix를 사용해야 하는 이유
@@ -129,6 +195,15 @@ flowchart LR
 3. **간결한 SDK.** 클라이언트 SDK는 가벼운 캐시 레이어입니다 — 타게팅 규칙, 비율 롤아웃, 세그먼트 멤버십을 이해할 필요가 없습니다. 이로 인해 SDK가 경량화되고 버그 발생 영역이 줄어듭니다.
 
 > 💡 **오프라인 & 부트스트랩:** 평가가 서버에서 이루어지더라도, SDK는 마지막으로 알려진 플래그 값을 로컬에 캐시합니다. 완전한 오프라인 시나리오를 위해 **부트스트랩 데이터**를 제공할 수도 있습니다. 자세한 내용은 [운영 모드](#-운영-모드) 섹션을 참고하세요.
+
+### 🌐 오프라인 지원 및 안정성 (Offline & Availability)
+Gatrix SDK는 **완벽한 실시간 동기화보다 서비스의 가용성(Availability)에 초점**을 맞추어 설계되었습니다. 네트워크 상태가 좋지 않거나 서버에 연결할 수 없더라도 게임은 절대 중단되지 않아야 합니다.
+
+*   **네트워크 장애 시에도 정상 동작**: 네트워크가 끊기면 SDK는 로컬 캐시에 저장된 마지막 값을 사용합니다. 캐시가 없더라도 개발자가 코드에 명시한 안전한 `fallbackValue`를 사용하여 문제없이 실행됩니다.
+*   **완전 오프라인 모드**: 오프라인 상태에서도 게임을 시작하고 플레이할 수 있습니다.
+*   **자동 복구**: 네트워크 연결이 복구되면 백그라운드에서 최신 구성을 자동으로 가져와 로컬 저장소를 업데이트합니다.
+
+이러한 설계는 네트워크 변동성이 플레이어 경험을 저해하지 않도록 보장합니다.
 
 ---
 
