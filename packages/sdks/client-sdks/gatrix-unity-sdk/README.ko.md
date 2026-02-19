@@ -150,6 +150,146 @@ await features.SyncFlagsAsync();
 | **ExplicitSyncMode 비활성** | 변경 시 즉시 호출 | 변경 시 즉시 호출 (리얼타임과 동일) |
 | **ExplicitSyncMode 활성** | 변경 시 즉시 호출 | `SyncFlagsAsync()` 호출 후에만 호출 |
 
+### ⚠️ 동기화 모드가 중요한 이유 (실전 시나리오)
+
+리얼타임 모드는 간단하고 편리하지만, 플래그 변경을 **즉시** 적용하면 실제 서비스에서 심각한 문제를 일으킬 수 있습니다:
+
+| 문제 상황 | 예시 | 영향 |
+|---------|---------|--------|
+| **게임플레이 중간 변경** | 보스전 도중 적 HP 배율이 변경됨 | 플레이어가 치팅을 의심하거나 버그로 느낌 |
+| **의존성 충돌** | UI 레이아웃 플래그가 의존하는 데이터 로드 전에 변경됨 | 크래시 또는 화면 깨짐 |
+| **사용자 신뢰 훼손** | 파밍 중 아이템 드롭률이 변경됨 | 플레이어가 게임의 공정성을 불신 |
+| **시각적 불쾌감** | 플레이어가 읽는 중에 테마나 UI가 갑자기 바뀜 | 답답하고 혼란스러운 UX |
+| **경쟁 무결성** | 매치 중 매칭 파라미터가 변경됨 | 불공정한 유리/불리 발생 |
+
+> 💡 **경험 법칙:** 플래그 변경이 플레이어에게 "뭔가 갑자기 바뀌었다"는 불쾌한 느낌을 줄 수 있다면, **동기화** 모드를 사용하고 자연스러운 전환 시점(로딩 화면, 라운드 사이, 메뉴 전환)에 변경을 적용하세요.
+
+### 📊 흐름 다이어그램: 리얼타임 vs 동기화
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    리얼타임 모드 (REALTIME)                       │
+│                                                                 │
+│  서버 ──fetch──► SDK 캐시 ──즉시반영──► 게임 코드               │
+│                         │                                       │
+│                         └── 플래그 변경이 즉시 적용됨            │
+│                             (게임플레이 도중에도!)               │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    동기화 모드 (SYNCED / ExplicitSyncMode)        │
+│                                                                 │
+│  서버 ──fetch──► SDK 캐시 ──버퍼링──► 대기 저장소               │
+│                                               │                 │
+│                         개발자가 시점 결정 ───┘                 │
+│                              │                                  │
+│                    SyncFlagsAsync() 호출                         │
+│                              │                                  │
+│                              ▼                                  │
+│                    동기화 저장소 ──► 게임 코드                    │
+│                    (안전한 타이밍!)                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+동기화 모드를 활용하면, 대시보드에서 변경한 값이 **개발자가 의도한 안전한 시점**에만 게임에 반영됩니다. 플레이어는 갑작스러운 변화 없이 매끄러운 경험을 유지하고, 운영팀은 언제든 자유롭게 플래그를 조정할 수 있습니다.
+
+### `forceRealtime` 파라미터
+
+모든 플래그 접근 메서드는 선택적 `forceRealtime` 파라미터를 지원합니다 (기본값: `false`).
+
+`ExplicitSyncMode`가 활성화된 경우:
+- **`forceRealtime: false`** (기본값) — **동기화된** 저장소에서 읽습니다 (안전하고 제어된 값)
+- **`forceRealtime: true`** — **리얼타임** 저장소에서 읽습니다 (동기화를 우회하여 최신 서버 값을 즉시 확인)
+
+```csharp
+var features = GatrixBehaviour.Client.Features;
+
+// 기본값: 동기화된 값을 읽음 (게임플레이에 안전)
+bool isEnabled = features.IsEnabled("boss-buff");
+float speed    = features.FloatVariation("game-speed", 1.0f);
+
+// forceRealtime: 아직 동기화되지 않은 최신 서버 값을 읽음
+// 디버그 UI나 동기화 모드와 함께 모니터링할 때 유용
+bool latestValue = features.IsEnabled("boss-buff", forceRealtime: true);
+float latestSpeed = features.FloatVariation("game-speed", 1.0f, forceRealtime: true);
+```
+
+> `ExplicitSyncMode`가 **비활성**인 경우, `forceRealtime`은 효과가 없습니다 — 모든 읽기가 항상 최신 값을 반환합니다.
+
+### 기본 제공 컴포넌트와 동기화 모드
+
+기본 제공 제로 코드 컴포넌트(`GatrixFlagToggle`, `GatrixFlagValue`, `GatrixFlagColor` 등)는 **리얼타임** 감지를 기본으로 사용하므로, 서버 변경에 즉시 반응합니다.
+
+`ExplicitSyncMode`를 사용하는 프로젝트에서는 다음을 고려하세요:
+- **게임플레이에 영향을 주지 않는 UI**에 붙인 컴포넌트(설정 패널, 디버그 오버레이)는 리얼타임으로 두어도 됩니다 — 플레이어에게 방해가 되지 않습니다.
+- **게임플레이에 영향을 주는** 컴포넌트(난이도 수정, 경제 수치)는 코드 기반 `WatchSyncedFlag`를 사용하여 변경 적용 시점을 정확히 제어하는 것을 권장합니다.
+- 현재 동기화된 값(`forceRealtime` 없이)과 리얼타임 값(`forceRealtime: true`)을 비교하여 "새로운 업데이트 대기 중" 표시기를 구현할 수 있습니다.
+
+### FlagProxy — Watch 콜백 파라미터
+
+모든 Watch 콜백은 **`FlagProxy`** 를 전달받습니다 — 특정 플래그 이름에 바인딩된 경량 래퍼입니다. Watch 콜백 내에서 플래그 값을 읽는 주요 수단입니다.
+
+**핵심 특성:**
+- `FlagProxy`는 플래그 데이터의 복사본을 **보관하지 않습니다** — 접근 시점에 항상 클라이언트 캐시에서 **실시간으로** 읽습니다.
+- 생성 시점에 단일 플래그 이름에 바인딩되므로, 플래그 이름을 다시 전달할 필요가 없습니다.
+- `ExplicitSyncMode`에서 proxy의 `forceRealtime` 모드는 Watch 유형에 따라 자동 설정됩니다:
+  - `WatchRealtimeFlag` → proxy는 **리얼타임** 저장소에서 읽음
+  - `WatchSyncedFlag` → proxy는 **동기화된** 저장소에서 읽음
+
+```csharp
+features.WatchRealtimeFlagWithInitialState("difficulty", proxy =>
+{
+    // 속성
+    bool exists    = proxy.Exists;          // 플래그가 캐시에 존재하는가?
+    bool enabled   = proxy.Enabled;         // 플래그가 활성화되었는가?
+    string name    = proxy.Name;            // 플래그 이름 ("difficulty")
+    bool isRT      = proxy.IsRealtime;      // 리얼타임 감지자이면 true
+
+    // 타입별 안전한 값 접근 (폴백 포함, 예외 발생 없음)
+    string diff    = proxy.StringVariation("normal");
+    bool   show    = proxy.BoolVariation(false);
+    int    level   = proxy.IntVariation(1);
+    float  speed   = proxy.FloatVariation(1.0f);
+    double rate    = proxy.DoubleVariation(0.5);
+
+    // 전체 배리언트 정보
+    Variant v = proxy.Variant;
+    Debug.Log($"Variant: {v.Name} = {v.Value}");
+
+    // 평가 상세 정보 (결정 이유 포함)
+    var details = proxy.BoolVariationDetails(false);
+    Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
+
+    // 메타데이터
+    ValueType type = proxy.ValueType;
+    int version    = proxy.Version;
+    string reason  = proxy.Reason;
+});
+```
+
+**FlagProxy API 요약:**
+
+| 카테고리 | 멤버 | 반환 타입 | 설명 |
+|----------|------|---------|------|
+| **속성** | `Name` | `string` | 플래그 이름 |
+| | `Exists` | `bool` | 플래그가 캐시에 존재하는지 여부 |
+| | `Enabled` | `bool` | 플래그 활성화 여부 |
+| | `Variant` | `Variant` | 전체 배리언트 (이름 + 값) |
+| | `IsRealtime` | `bool` | 리얼타임 저장소에서 읽는지 여부 |
+| | `ValueType` | `ValueType` | 값 타입 (bool/string/number/json) |
+| | `Version` | `int` | 플래그 평가 버전 |
+| | `Reason` | `string` | 평가 이유 |
+| **값 접근** | `BoolVariation(fallback)` | `bool` | Boolean 값 |
+| | `StringVariation(fallback)` | `string` | 문자열 값 |
+| | `IntVariation(fallback)` | `int` | 정수 값 |
+| | `FloatVariation(fallback)` | `float` | float 값 |
+| | `DoubleVariation(fallback)` | `double` | double 값 |
+| | `JsonVariation(fallback)` | `Dictionary` | JSON을 Dictionary로 |
+| **상세** | `BoolVariationDetails(fallback)` | `VariationResult<bool>` | 값 + 평가 이유 |
+| | `StringVariationDetails(fallback)` | `VariationResult<string>` | 값 + 평가 이유 |
+| **OrThrow** | `BoolVariationOrThrow()` | `bool` | 값 반환 또는 없으면 예외 |
+| | `StringVariationOrThrow()` | `string` | 값 반환 또는 없으면 예외 |
+
 ### Watch 그룹
 
 여러 플래그를 그룹으로 감지하고 한 번에 구독 해제할 수 있습니다:
@@ -435,12 +575,71 @@ SDK 상태에 대한 실시간 대시보드:
 
 ## 🔄 컨텍스트 관리
 
-컨텍스트는 각 플레이어에 대해 플래그가 어떻게 평가되는지를 결정합니다.
+### 컨텍스트란?
+
+**컨텍스트**는 **현재 사용자와 그 환경**을 설명하는 속성들의 집합입니다. Gatrix 서버는 컨텍스트를 사용하여 각 플래그에 대해 어떤 배리언트를 반환할지 결정합니다 — 모든 타게팅 규칙, 비율 롤아웃, A/B 실험의 입력이 됩니다.
+
+컨텍스트가 없으면 서버는 사용자를 구분할 수 없으며, 모든 사용자에게 기본 플래그 값만 반환할 수 있습니다.
+
+### 컨텍스트 필드
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `AppName` | `string` | 앱 이름 (시스템 필드 — 초기화 시 설정, 변경 불가) |
+| `Environment` | `string` | 환경 이름 (시스템 필드 — 초기화 시 설정, 변경 불가) |
+| `UserId` | `string` | 고유 사용자 식별자 — **타게팅에 가장 중요한 필드** |
+| `SessionId` | `string` | 세션 범위 실험을 위한 세션 식별자 |
+| `CurrentTime` | `string` | 시간 기반 타게팅을 위한 시간 오버라이드 (시스템 필드) |
+| `Properties` | `Dictionary` | 추가 타게팅 속성을 위한 커스텀 키-값 쌍 |
+
+### 컨텍스트 설정 시점
+
+컨텍스트는 사용 가능한 정보에 따라 **세 가지 단계**에서 제공할 수 있습니다:
+
+```
+앱 실행                       사용자 로그인                  세션 중
+    │                              │                              │
+    ▼                              ▼                              ▼
+┌──────────┐              ┌──────────────┐               ┌──────────────┐
+│ 초기화   │              │ 컨텍스트     │               │ 필드 단위    │
+│ 컨텍스트 │              │ 업데이트     │               │ 업데이트     │
+│          │              │              │               │              │
+│ 디바이스,│              │ userId,      │               │ level, plan, │
+│ 플랫폼, │              │ plan,        │               │ score...     │
+│ 버전    │              │ country...   │               │              │
+└──────────┘              └──────────────┘               └──────────────┘
+```
+
+**1단계: 초기화 시점 (로그인 전)**
+
+즉시 사용 가능한 디바이스 수준의 컨텍스트를 제공합니다. SDK가 첫 번째 요청에서 이 컨텍스트를 사용하여 플래그를 가져옵니다.
 
 ```csharp
-var features = GatrixBehaviour.Client.Features;
+var config = new GatrixClientConfig
+{
+    ApiUrl = "https://api.example.com/api/v1",
+    ApiToken = "your-token",
+    AppName = "my-game",
+    Environment = "production",
+    Context = new GatrixContext
+    {
+        // 로그인 전에도 사용 가능한 정보
+        Properties = new Dictionary<string, object>
+        {
+            { "platform", "iOS" },
+            { "appVersion", "2.1.0" },
+            { "deviceType", "tablet" }
+        }
+    }
+};
+await GatrixBehaviour.InitializeAsync(config);
+```
 
-// 전체 컨텍스트 업데이트 (재페치 트리거)
+**2단계: 로그인 이후**
+
+사용자 인증이 완료되면 사용자별 정보로 컨텍스트를 업데이트합니다. 이 시점에서 새로운 컨텍스트로 재페치가 트리거됩니다.
+
+```csharp
 await features.UpdateContextAsync(new GatrixContext
 {
     UserId    = "player-456",
@@ -452,19 +651,87 @@ await features.UpdateContextAsync(new GatrixContext
         { "country", "KR" }
     }
 });
+```
 
-// 단일 필드 업데이트
+**3단계: 세션 중**
+
+게임플레이 도중 사용자 상태가 변할 때 개별 필드를 업데이트합니다.
+
+```csharp
+// 플레이어 레벨 업
 await features.SetContextFieldAsync("level", 43);
 
-// 필드 제거
-await features.RemoveContextFieldAsync("plan");
+// 플레이어 구독 변경
+await features.SetContextFieldAsync("plan", "vip");
+
+// 속성 제거
+await features.RemoveContextFieldAsync("trialUser");
+```
+
+### ⚠️ 컨텍스트 변경의 부작용
+
+> **모든 컨텍스트 변경은 서버에서 자동 재페치를 트리거합니다.** 서버가 업데이트된 컨텍스트로 타게팅 규칙을 다시 평가해야 하기 때문입니다.
+
+| 호출 | 동작 |
+|------|------|
+| `UpdateContextAsync()` | 새 컨텍스트 병합 → 해시 확인 → 변경 시 재페치 |
+| `SetContextFieldAsync()` | 단일 필드 업데이트 → 해시 확인 → 변경 시 재페치 |
+| `RemoveContextFieldAsync()` | 필드 제거 → 해시 확인 → 변경 시 재페치 |
+
+**중요한 영향:**
+- **네트워크 요청**: 실제 값이 변경되는 컨텍스트 변경마다 서버에 HTTP 요청을 보냅니다. 반복문 안에서 컨텍스트를 업데이트하지 마세요.
+- **플래그 값 변경 가능**: 재페치 이후 새로운 타게팅 컨텍스트에 따라 모든 플래그 값이 달라질 수 있습니다. 값이 변경되면 Watch 콜백이 호출됩니다.
+- **해시 기반 중복 제거**: 이미 같은 값으로 필드를 설정하면 네트워크 요청이 발생하지 않습니다 — SDK가 해시 비교를 통해 변경 없음을 감지합니다.
+- **시스템 필드 보호**: `AppName`, `Environment`, `CurrentTime`은 초기화 이후 변경할 수 없습니다. 변경을 시도하면 경고 로그가 기록되고 무시됩니다.
+
+### 모범 사례
+
+```csharp
+// ✅ 좋은 예: 자연스러운 전환 시점에 컨텍스트 설정
+async void OnLoginComplete(UserData user)
+{
+    await features.UpdateContextAsync(new GatrixContext
+    {
+        UserId = user.Id,
+        Properties = new Dictionary<string, object>
+        {
+            { "plan", user.Plan },
+            { "country", user.Country },
+            { "level", user.Level }
+        }
+    });
+}
+
+// ✅ 좋은 예: 여러 변경을 UpdateContextAsync로 일괄 처리
+await features.UpdateContextAsync(new GatrixContext
+{
+    Properties = new Dictionary<string, object>
+    {
+        { "level", 43 },        // 변경
+        { "score", 15000 },     // 변경
+        { "region", "asia" }    // 변경
+    }
+});
+// ↑ 모든 변경에 대해 단일 재페치
+
+// ❌ 나쁜 예: 여러 SetContextFieldAsync 호출은 여러 번의 재페치를 유발
+await features.SetContextFieldAsync("level", 43);    // 재페치 #1
+await features.SetContextFieldAsync("score", 15000); // 재페치 #2
+await features.SetContextFieldAsync("region", "asia"); // 재페치 #3
 ```
 
 ---
 
 ## ⏱️ 명시적 동기화 모드 (Explicit Sync Mode)
 
-플래그 변경이 게임에 적용되는 시점을 정확히 제어합니다 — 세션 중간의 갑작스러운 변경을 방지하는 데 유용합니다.
+플래그 변경이 게임에 적용되는 시점을 정확히 제어합니다 — **라이브 게임을 위한 가장 중요한 기능**입니다.
+
+동기화 모드가 없으면, 서버의 플래그 변경이 즉시 적용됩니다. 간단한 앱에서는 괜찮지만, 게임에서는 다음과 같은 문제를 일으킬 수 있습니다:
+- 🎮 **전투 중 스탯 변경** — 버그나 치팅으로 느껴짐
+- 🔗 **의존성 문제** — 의존하는 시스템이 준비되기 전에 플래그가 변경됨
+- 😤 **갑작스러운 UX 변화** — 플레이어가 상호작용 중인데 UI가 바뀜
+
+명시적 동기화 모드를 사용하면, 변경 적용 시점을 **완벽하게 제어**할 수 있습니다 — 로딩 화면, 라운드 사이, 자연스러운 일시정지 시점에 적용하세요.
 
 ```csharp
 var config = new GatrixClientConfig
@@ -489,6 +756,16 @@ if (features.CanSyncFlags())
     await features.SyncFlagsAsync(fetchNow: false);
 }
 ```
+
+### 권장 동기화 시점
+
+| 동기화 시점 | 예시 |
+|---|---|
+| **로딩 화면** | 씬 전환, 레벨 로딩 |
+| **라운드 사이** | 매치 종료 후, 다음 라운드 시작 전 |
+| **메뉴/일시정지 화면** | 플레이어가 설정이나 인벤토리를 열 때 |
+| **리스폰** | 플레이어 사망 후, 다음 스폰 전 |
+| **로비** | 매치 시작 전, 캐릭터 선택 화면 |
 
 **Monitor → Flags** 탭에서 명시적 동기화 모드일 때 활성 플래그와 보류 중인 변경을 나란히 보여줍니다.
 
@@ -520,16 +797,126 @@ client.Events.OnAny((eventName, args) => Debug.Log($"[Gatrix] {eventName}"));
 
 ---
 
-## 💾 저장소 및 오프라인 모드
+## � 운영 모드
+
+SDK는 세 가지 운영 모드를 지원합니다. 네트워크 환경과 업데이트 빈도 요구사항에 따라 선택하세요.
+
+### 모드 비교
+
+| | 스트리밍 + 폴링 (기본) | 폴링 전용 | 오프라인 |
+|---|---|---|---|
+| **네트워크** | ✅ 필요 | ✅ 필요 | ❌ 불필요 |
+| **실시간 업데이트** | ✅ SSE/WebSocket으로 즉시 | ❌ 주기적 요청만 | ❌ 없음 |
+| **폴링** | ✅ 폴백으로 사용 | ✅ 주요 수단 | ❌ 비활성 |
+| **대역폭** | 중간 (영속 연결) | 낮음 (주기적 요청) | 제로 |
+| **적합한 경우** | 라이브 게임, 실시간 실험 | 변경 빈도 낮음, 제한된 환경 | 테스트, 비행기 모드, CI |
+
+### 흐름 다이어그램
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              스트리밍 + 폴링 (기본값)                              │
+│                                                                 │
+│  서버 ──stream──► SDK (즉시 업데이트)                             │
+│       ──poll────► SDK (RefreshInterval마다 폴백으로 요청)         │
+│                                                                 │
+│  적합: 라이브 게임, A/B 테스트, 실시간 기능 제어                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│              폴링 전용                                           │
+│                                                                 │
+│  서버 ──poll────► SDK (RefreshInterval초마다 요청)                │
+│                                                                 │
+│  적합: 변경이 드문 환경, 대역폭 절약 필요                         │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│              오프라인                                             │
+│                                                                 │
+│  부트스트랩 / 캐시 ──► SDK (네트워크 요청 없음)                   │
+│                                                                 │
+│  적합: 개발, 테스트, 비행기 모드                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 모드 1: 스트리밍 + 폴링 (기본값)
+
+기본 모드입니다. SDK가 영속적인 스트림(SSE 또는 WebSocket)을 연결하여 거의 즉각적인 플래그 업데이트를 받으면서, `RefreshInterval`마다 폴링도 수행하여 안전망으로 사용합니다.
+
+```csharp
+var config = new GatrixClientConfig
+{
+    ApiUrl = "https://api.example.com/api/v1",
+    ApiToken = "your-token",
+    Features = new FeaturesConfig
+    {
+        RefreshInterval = 30,   // 폴백 폴링 30초 간격 (기본값)
+        Streaming = new StreamingConfig
+        {
+            Enabled = true,     // 기본값: true
+            Transport = StreamingTransport.Sse  // SSE (기본값) 또는 WebSocket
+        }
+    }
+};
+```
+
+**사용 권장 시점:**
+- 플래그 변경이 수초 내에 적용되어야 하는 프로덕션 라이브 게임
+- 실시간 실험 전환이 필요한 A/B 테스트
+- 낮은 지연 시간이 중요한 모든 시나리오
+
+### 모드 2: 폴링 전용
+
+스트리밍을 비활성화하고 주기적인 HTTP 폴링에만 의존합니다. 단순하지만 지연 시간이 더 깁니다.
+
+```csharp
+var config = new GatrixClientConfig
+{
+    Features = new FeaturesConfig
+    {
+        RefreshInterval = 60,   // 60초마다 폴링
+        Streaming = new StreamingConfig { Enabled = false }
+    }
+};
+```
+
+**사용 권장 시점:**
+- 플래그가 드물게 변경되는 경우 (일간/주간 배포)
+- 스트리밍을 지원하지 않는 방화벽이나 프록시 서버 환경
+- 종량제 연결에서 대역폭을 줄여야 하는 경우
+
+### 모드 3: 오프라인
+
+네트워크 요청이 전혀 없습니다. SDK가 부트스트랩 데이터 또는 이전에 저장된 플래그 캐시를 사용합니다.
+
+```csharp
+var config = new GatrixClientConfig
+{
+    OfflineMode = true,
+    Features = new FeaturesConfig
+    {
+        Bootstrap = cachedFlagData  // 사전 로드된 플래그 데이터
+    }
+};
+```
+
+**사용 권장 시점:**
+- 단위 테스트 및 CI 환경
+- 백엔드 없이 개발할 때
+- 비행기 모드 또는 오프라인이 보장되는 시나리오
+- 첫 네트워크 요청 완료 전 즉각적인 플래그 가용성 제공
+
+### 저장소 및 영속성
+
+SDK는 세션 간 플래그를 캐시하는 영속 저장소를 지원하여, 네트워크가 느릴 때도 빠르게 시작할 수 있습니다:
 
 ```csharp
 // 파일 기반 영속성 (프로덕션 권장)
 config.StorageProvider = new FileStorageProvider("gatrix");
-
-// 오프라인 모드 + 부트스트랩 데이터 (테스트 또는 네트워크 없는 시나리오)
-config.OfflineMode = true;
-config.Features.Bootstrap = cachedFlagData;
 ```
+
+> 저장소가 활성화되면, SDK가 시작 시 캐시된 플래그를 로드하여 즉시 사용 가능하게 한 후, 비동기적으로 서버에서 최신 데이터를 가져옵니다. 플레이어는 "플래그 로딩 중" 상태를 보지 않습니다.
 
 ---
 

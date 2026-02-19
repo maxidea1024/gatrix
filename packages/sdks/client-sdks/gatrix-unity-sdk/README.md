@@ -150,6 +150,145 @@ await features.SyncFlagsAsync();
 | **ExplicitSyncMode off** | Fires on change | Fires on change (same as realtime) |
 | **ExplicitSyncMode on** | Fires on change | Fires only after `SyncFlagsAsync()` |
 
+### ⚠️ Why Synced Mode Matters (Real-World Scenarios)
+
+Realtime mode is simple and convenient, but applying flag changes **instantly** can cause serious problems in production:
+
+| Problem | Example | Impact |
+|---------|---------|--------|
+| **Mid-gameplay disruption** | Enemy HP multiplier changes in the middle of a boss fight | Player feels cheated; may suspect hacks or bugs |
+| **Dependency conflicts** | UI layout flag updates before the data it depends on is loaded | Crash or visual corruption |
+| **User trust** | Item drop rates change while player is farming | Player loses trust in game fairness |
+| **Visual jarring** | Theme or UI layout shifts while player is reading | Frustrating, disorienting UX |
+| **Competitive integrity** | Matchmaking params change during an active match | Unfair advantage/disadvantage |
+
+> 💡 **Rule of thumb:** If a flag change could cause a player to notice "something just changed" in a disruptive way, use **Synced** mode and apply changes at a natural transition point (loading screens, between rounds, menu transitions).
+
+### 📊 Flow Diagram: Realtime vs Synced
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    REALTIME MODE                                │
+│                                                                 │
+│  Server ──fetch──► SDK Cache ──immediate──► Your Game Code      │
+│                         │                                       │
+│                         └── flag changes apply INSTANTLY        │
+│                             (even mid-gameplay!)                │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    SYNCED MODE (ExplicitSyncMode)                │
+│                                                                 │
+│  Server ──fetch──► SDK Cache ──buffered──► Pending Store        │
+│                                               │                 │
+│                         YOU decide when ──────┘                 │
+│                         to apply changes                        │
+│                              │                                  │
+│                    SyncFlagsAsync()                              │
+│                              │                                  │
+│                              ▼                                  │
+│                    Synced Store ──► Your Game Code               │
+│                    (safe timing!)                                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### `forceRealtime` Parameter
+
+All flag accessor methods accept an optional `forceRealtime` parameter (default: `false`).
+
+When `ExplicitSyncMode` is enabled:
+- **`forceRealtime: false`** (default) — reads from the **synced** store (safe, controlled values)
+- **`forceRealtime: true`** — reads from the **realtime** store (latest server values, bypassing sync)
+
+```csharp
+var features = GatrixBehaviour.Client.Features;
+
+// Default: reads synced values (safe for gameplay)
+bool isEnabled = features.IsEnabled("boss-buff");
+float speed    = features.FloatVariation("game-speed", 1.0f);
+
+// Force realtime: read the latest server value even if not yet synced
+// Useful for debug UIs or monitoring alongside sync mode
+bool latestValue = features.IsEnabled("boss-buff", forceRealtime: true);
+float latestSpeed = features.FloatVariation("game-speed", 1.0f, forceRealtime: true);
+```
+
+> When `ExplicitSyncMode` is **disabled**, `forceRealtime` has no effect — all reads always return the latest values.
+
+### Built-in Components and Sync Mode
+
+All built-in zero-code components (`GatrixFlagToggle`, `GatrixFlagValue`, `GatrixFlagColor`, etc.) use **realtime** watching by default, so they react instantly to server changes.
+
+If your project uses `ExplicitSyncMode`, consider the following:
+- Components like `GatrixFlagToggle` on **non-gameplay UI** (settings panels, debug overlays) can stay realtime — they won't disrupt the player.
+- For **gameplay-critical** components (difficulty modifiers, economy values), prefer using code-based `WatchSyncedFlag` so you control exactly when changes take effect.
+- You can read the current synced value in code using the default accessor (without `forceRealtime`), and compare it with the realtime value to show a "pending update" indicator.
+
+### FlagProxy — The Watch Callback Parameter
+
+Every watch callback receives a **`FlagProxy`** — a lightweight wrapper bound to a specific flag name. It is the primary way to read flag values inside watch callbacks.
+
+**Key characteristics:**
+- `FlagProxy` does **not** hold a copy of the flag data — it always reads **live** from the client's cache at the moment you access it.
+- It is bound to a single flag name at creation time, so you don't need to pass the flag name again.
+- In `ExplicitSyncMode`, the proxy's `forceRealtime` mode is set automatically based on the watch type:
+  - `WatchRealtimeFlag` → proxy reads from the **realtime** store
+  - `WatchSyncedFlag` → proxy reads from the **synced** store
+
+```csharp
+features.WatchRealtimeFlagWithInitialState("difficulty", proxy =>
+{
+    // Properties
+    bool exists    = proxy.Exists;          // Does the flag exist in cache?
+    bool enabled   = proxy.Enabled;         // Is the flag enabled?
+    string name    = proxy.Name;            // Flag name ("difficulty")
+    bool isRT      = proxy.IsRealtime;      // true for realtime watchers
+
+    // Typed value access (with safe fallback, never throws)
+    string diff    = proxy.StringVariation("normal");
+    bool   show    = proxy.BoolVariation(false);
+    int    level   = proxy.IntVariation(1);
+    float  speed   = proxy.FloatVariation(1.0f);
+    double rate    = proxy.DoubleVariation(0.5);
+
+    // Full variant info
+    Variant v = proxy.Variant;
+    Debug.Log($"Variant: {v.Name} = {v.Value}");
+
+    // Evaluation details (includes reason)
+    var details = proxy.BoolVariationDetails(false);
+    Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
+
+    // Metadata
+    ValueType type = proxy.ValueType;
+    int version    = proxy.Version;
+    string reason  = proxy.Reason;
+});
+```
+
+**FlagProxy API Summary:**
+
+| Category | Member | Returns | Description |
+|----------|--------|---------|-------------|
+| **Properties** | `Name` | `string` | Flag name |
+| | `Exists` | `bool` | Flag exists in cache |
+| | `Enabled` | `bool` | Flag is enabled |
+| | `Variant` | `Variant` | Full variant (name + value) |
+| | `IsRealtime` | `bool` | Proxy reads from realtime store |
+| | `ValueType` | `ValueType` | Value type (bool/string/number/json) |
+| | `Version` | `int` | Flag evaluation version |
+| | `Reason` | `string` | Evaluation reason |
+| **Variations** | `BoolVariation(fallback)` | `bool` | Boolean value |
+| | `StringVariation(fallback)` | `string` | String value |
+| | `IntVariation(fallback)` | `int` | Integer value |
+| | `FloatVariation(fallback)` | `float` | Float value |
+| | `DoubleVariation(fallback)` | `double` | Double value |
+| | `JsonVariation(fallback)` | `Dictionary` | JSON as Dictionary |
+| **Details** | `BoolVariationDetails(fallback)` | `VariationResult<bool>` | Value + evaluation reason |
+| | `StringVariationDetails(fallback)` | `VariationResult<string>` | Value + evaluation reason |
+| **OrThrow** | `BoolVariationOrThrow()` | `bool` | Value or throws if missing |
+| | `StringVariationOrThrow()` | `string` | Value or throws if missing |
+
 ### Watch Groups
 
 Watch multiple flags as a group and unsubscribe them all at once:
@@ -435,12 +574,71 @@ Global settings and shortcuts accessible from the Project Settings window.
 
 ## 🔄 Context Management
 
-Context determines how flags are evaluated for each player.
+### What Is Context?
+
+**Context** is the set of attributes that describes the **current user and their environment**. The Gatrix server uses context to decide which variant of each flag to return — it is the input to all targeting rules, percentage rollouts, and A/B experiments.
+
+Without context, the server has no way to differentiate users and can only return the default flag value for everyone.
+
+### Context Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `AppName` | `string` | Application name (system field — set at init, cannot be changed) |
+| `Environment` | `string` | Environment name (system field — set at init, cannot be changed) |
+| `UserId` | `string` | Unique user identifier — **most important field for targeting** |
+| `SessionId` | `string` | Session identifier for session-scoped experiments |
+| `CurrentTime` | `string` | Time override for time-based targeting (system field) |
+| `Properties` | `Dictionary` | Custom key-value pairs for any additional targeting attributes |
+
+### When to Set Context
+
+Context can be provided at **three different stages**, depending on what information is available:
+
+```
+App Launch                    User Login                   During Session
+    │                              │                              │
+    ▼                              ▼                              ▼
+┌──────────┐              ┌──────────────┐               ┌──────────────┐
+│ Init     │              │ Update       │               │ Set Field    │
+│ Context  │              │ Context      │               │ Async        │
+│          │              │              │               │              │
+│ device,  │              │ userId,      │               │ level, plan, │
+│ platform,│              │ plan,        │               │ score...     │
+│ version  │              │ country...   │               │              │
+└──────────┘              └──────────────┘               └──────────────┘
+```
+
+**Stage 1: At Initialization (before login)**
+
+Provide device-level context that's available immediately. The SDK will fetch flags using this context on its first request.
 
 ```csharp
-var features = GatrixBehaviour.Client.Features;
+var config = new GatrixClientConfig
+{
+    ApiUrl = "https://api.example.com/api/v1",
+    ApiToken = "your-token",
+    AppName = "my-game",
+    Environment = "production",
+    Context = new GatrixContext
+    {
+        // Available before login
+        Properties = new Dictionary<string, object>
+        {
+            { "platform", "iOS" },
+            { "appVersion", "2.1.0" },
+            { "deviceType", "tablet" }
+        }
+    }
+};
+await GatrixBehaviour.InitializeAsync(config);
+```
 
-// Update full context (triggers re-fetch)
+**Stage 2: After Login**
+
+Once the user is authenticated, update context with user-specific information. This triggers a re-fetch with the new context.
+
+```csharp
 await features.UpdateContextAsync(new GatrixContext
 {
     UserId    = "player-456",
@@ -452,19 +650,87 @@ await features.UpdateContextAsync(new GatrixContext
         { "country", "KR" }
     }
 });
+```
 
-// Update a single field
+**Stage 3: During Session**
+
+Update individual fields as user state changes during gameplay.
+
+```csharp
+// Player levels up
 await features.SetContextFieldAsync("level", 43);
 
-// Remove a field
-await features.RemoveContextFieldAsync("plan");
+// Player changes subscription
+await features.SetContextFieldAsync("plan", "vip");
+
+// Remove a property
+await features.RemoveContextFieldAsync("trialUser");
+```
+
+### ⚠️ Side Effects of Context Changes
+
+> **Every context change triggers an automatic re-fetch from the server.** This is essential because the server needs the updated context to re-evaluate targeting rules.
+
+| Operation | What Happens |
+|-----------|-------------|
+| `UpdateContextAsync()` | Merges new context → hash check → re-fetch if changed |
+| `SetContextFieldAsync()` | Updates single field → hash check → re-fetch if changed |
+| `RemoveContextFieldAsync()` | Removes field → hash check → re-fetch if changed |
+
+**Important implications:**
+- **Network request**: Each context change that actually modifies a value makes an HTTP request to the server. Avoid updating context in tight loops.
+- **Flag values may change**: After re-fetch, all flag values may differ based on the new targeting context. Watch callbacks will fire if values changed.
+- **Hash-based deduplication**: If you set a field to the same value it already has, no network request is made — the SDK detects no change via hash comparison.
+- **System fields are protected**: `AppName`, `Environment`, and `CurrentTime` cannot be modified after initialization. Attempts to change them will log a warning and be ignored.
+
+### Best Practices
+
+```csharp
+// ✅ Good: Set context at natural transition points
+async void OnLoginComplete(UserData user)
+{
+    await features.UpdateContextAsync(new GatrixContext
+    {
+        UserId = user.Id,
+        Properties = new Dictionary<string, object>
+        {
+            { "plan", user.Plan },
+            { "country", user.Country },
+            { "level", user.Level }
+        }
+    });
+}
+
+// ✅ Good: Batch multiple changes with UpdateContextAsync
+await features.UpdateContextAsync(new GatrixContext
+{
+    Properties = new Dictionary<string, object>
+    {
+        { "level", 43 },        // Changed
+        { "score", 15000 },     // Changed
+        { "region", "asia" }    // Changed
+    }
+});
+// ↑ Single re-fetch for all changes
+
+// ❌ Bad: Multiple SetContextFieldAsync calls cause multiple re-fetches
+await features.SetContextFieldAsync("level", 43);    // re-fetch #1
+await features.SetContextFieldAsync("score", 15000); // re-fetch #2
+await features.SetContextFieldAsync("region", "asia"); // re-fetch #3
 ```
 
 ---
 
 ## ⏱️ Explicit Sync Mode
 
-Control exactly when flag changes are applied to your game — useful for preventing mid-session disruptions.
+Control exactly when flag changes are applied to your game — **the single most important feature for live games**.
+
+Without sync mode, flag changes from the server are applied instantly. This is fine for simple apps, but in games it can cause:
+- 🎮 **Mid-combat stat changes** that feel like bugs or cheating
+- 🔗 **Dependency issues** where flags change before dependent systems are ready
+- 😤 **Jarring UX** where the UI shifts while the player is interacting with it
+
+With Explicit Sync Mode, you gain **complete control** over when changes take effect — apply them at loading screens, between rounds, or during natural pause points.
 
 ```csharp
 var config = new GatrixClientConfig
@@ -489,6 +755,16 @@ if (features.CanSyncFlags())
     await features.SyncFlagsAsync(fetchNow: false);
 }
 ```
+
+### Typical Sync Points
+
+| When to Sync | Example |
+|---|---|
+| **Loading screen** | Scene transitions, level loading |
+| **Between rounds** | After match end, before next round start |
+| **Menu/pause screen** | When player opens settings or inventory |
+| **Respawn** | After player death, before next spawn |
+| **Lobby** | Before match starts, in character select |
 
 The **Monitor → Flags** tab shows both the active flags and pending changes side-by-side when in explicit sync mode.
 
@@ -520,16 +796,126 @@ client.Events.OnAny((eventName, args) => Debug.Log($"[Gatrix] {eventName}"));
 
 ---
 
-## 💾 Storage & Offline Mode
+## 🔌 Operating Modes
+
+The SDK supports three operating modes. Choose based on your connectivity requirements and update frequency needs.
+
+### Mode Comparison
+
+| | Streaming + Polling (Default) | Polling Only | Offline |
+|---|---|---|---|
+| **Network** | ✅ Required | ✅ Required | ❌ Not needed |
+| **Real-time updates** | ✅ Sub-second via SSE/WebSocket | ❌ Interval-based only | ❌ None |
+| **Polling** | ✅ As fallback | ✅ Primary | ❌ Disabled |
+| **Bandwidth** | Medium (persistent connection) | Low (periodic requests) | Zero |
+| **Best for** | Live games, real-time experiments | Low-frequency changes, constrained environments | Testing, airplane mode, CI |
+
+### Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              STREAMING + POLLING (Default)                      │
+│                                                                 │
+│  Server ──stream──► SDK (sub-second updates)                    │
+│         ──poll────► SDK (every RefreshInterval as fallback)     │
+│                                                                 │
+│  Best for: live games, A/B testing, real-time feature control   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│              POLLING ONLY                                       │
+│                                                                 │
+│  Server ──poll────► SDK (every RefreshInterval seconds)         │
+│                                                                 │
+│  Best for: infrequent changes, low-bandwidth environments       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│              OFFLINE                                            │
+│                                                                 │
+│  Bootstrap / Cache ──► SDK (no network at all)                  │
+│                                                                 │
+│  Best for: development, testing, airplane mode                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Mode 1: Streaming + Polling (Default)
+
+The default mode. The SDK connects a persistent stream (SSE or WebSocket) for near-instant flag updates, while also polling at `RefreshInterval` as a fallback safety net.
+
+```csharp
+var config = new GatrixClientConfig
+{
+    ApiUrl = "https://api.example.com/api/v1",
+    ApiToken = "your-token",
+    Features = new FeaturesConfig
+    {
+        RefreshInterval = 30,   // Fallback polling every 30s (default)
+        Streaming = new StreamingConfig
+        {
+            Enabled = true,     // Default: true
+            Transport = StreamingTransport.Sse  // SSE (default) or WebSocket
+        }
+    }
+};
+```
+
+**When to use:**
+- Production live games where flag changes should take effect within seconds
+- A/B testing with real-time experiment switching
+- Any scenario where low latency matters
+
+### Mode 2: Polling Only
+
+Disable streaming and rely purely on periodic HTTP polling. Simpler but higher latency.
+
+```csharp
+var config = new GatrixClientConfig
+{
+    Features = new FeaturesConfig
+    {
+        RefreshInterval = 60,   // Poll every 60 seconds
+        Streaming = new StreamingConfig { Enabled = false }
+    }
+};
+```
+
+**When to use:**
+- Flags rarely change (daily/weekly deployments)
+- Environments with restrictive firewalls or proxy servers that don't support streaming
+- Reducing bandwidth on metered connections
+
+### Mode 3: Offline
+
+No network requests at all. The SDK uses bootstrap data or a previously cached flag set from storage.
+
+```csharp
+var config = new GatrixClientConfig
+{
+    OfflineMode = true,
+    Features = new FeaturesConfig
+    {
+        Bootstrap = cachedFlagData  // Pre-loaded flag data
+    }
+};
+```
+
+**When to use:**
+- Unit testing and CI environments
+- Development without a running backend
+- Airplane mode or guaranteed offline scenarios
+- Providing instant flag availability before the first network request completes
+
+### Storage & Persistence
+
+The SDK supports persistent storage for caching flags across sessions, ensuring fast startup even when the network is slow:
 
 ```csharp
 // File-based persistence (recommended for production)
 config.StorageProvider = new FileStorageProvider("gatrix");
-
-// Offline mode with bootstrap data (for testing or no-network scenarios)
-config.OfflineMode = true;
-config.Features.Bootstrap = cachedFlagData;
 ```
+
+> With storage enabled, the SDK loads cached flags on startup for instant availability, then asynchronously fetches fresh data from the server. This ensures the player never sees a "loading flags" state.
 
 ---
 
