@@ -75,6 +75,8 @@ namespace Gatrix.Unity.SDK.Editor
         private TimeSeriesTrack _tsImpressionCount;
         private TimeSeriesTrack _tsMetricsSentCount;
         private TimeSeriesTrack _tsStreamReconnectCount;
+        private TimeSeriesTrack _tsStreamEventCount;
+        private TimeSeriesTrack _tsStreamErrorCount;
 
         // Per-flag state timelines (non-serialized: rebuilt on domain reload)
         [NonSerialized] private Dictionary<string, FlagStateTimeline> _flagTimelines
@@ -93,7 +95,9 @@ namespace Gatrix.Unity.SDK.Editor
             _tsErrorCount           = new TimeSeriesTrack("Errors",       new Color(1.00f, 0.40f, 0.40f), maxPoints);
             _tsImpressionCount      = new TimeSeriesTrack("Impressions",  new Color(1.00f, 0.80f, 0.30f), maxPoints);
             _tsMetricsSentCount     = new TimeSeriesTrack("Metrics Sent", new Color(0.70f, 0.50f, 1.00f), maxPoints);
-            _tsStreamReconnectCount = new TimeSeriesTrack("Reconnects",   new Color(1.00f, 0.60f, 0.20f), maxPoints);
+            _tsStreamReconnectCount = new TimeSeriesTrack("Reconnects",       new Color(1.00f, 0.60f, 0.20f), maxPoints);
+            _tsStreamEventCount     = new TimeSeriesTrack("Stream Events",    new Color(0.30f, 0.90f, 0.90f), maxPoints);
+            _tsStreamErrorCount     = new TimeSeriesTrack("Stream Errors",    new Color(1.00f, 0.30f, 0.30f), maxPoints);
         }
 
         private void CollectTimeSeriesData(FeaturesStats stats)
@@ -107,6 +111,8 @@ namespace Gatrix.Unity.SDK.Editor
             _tsImpressionCount.Add(stats.ImpressionCount);
             _tsMetricsSentCount.Add(stats.MetricsSentCount);
             _tsStreamReconnectCount.Add(stats.StreamingReconnectCount);
+            _tsStreamEventCount.Add(stats.StreamingEventCount);
+            _tsStreamErrorCount.Add(stats.StreamingErrorCount);
 
             // Per-flag state timeline collection
             CollectFlagTimelines();

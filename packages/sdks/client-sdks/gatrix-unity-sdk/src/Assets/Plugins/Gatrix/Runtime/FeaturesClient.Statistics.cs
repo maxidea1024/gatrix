@@ -52,7 +52,13 @@ namespace Gatrix.Unity.SDK
                 StreamingState = _streamingState,
                 StreamingTransport = FeaturesConfig?.Streaming?.Transport ?? StreamingTransport.Sse,
                 StreamingReconnectCount = _streamingReconnectCount,
-                LastStreamingEventTime = _lastStreamingEventTime
+                LastStreamingEventTime = _lastStreamingEventTime,
+                StreamingEventCount = _streamingEventCount,
+                StreamingErrorCount = _streamingErrorCount,
+                StreamingRecoveryCount = _streamingRecoveryCount,
+                LastStreamingErrorTime = _lastStreamingErrorTime,
+                LastStreamingRecoveryTime = _lastStreamingRecoveryTime,
+                LastStreamingError = _lastStreamingError
             };
         }
 

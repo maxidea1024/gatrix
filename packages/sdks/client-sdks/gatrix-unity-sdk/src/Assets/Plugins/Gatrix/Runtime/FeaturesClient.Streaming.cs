@@ -84,6 +84,7 @@ namespace Gatrix.Unity.SDK
                         _logger.Error(errorMessage);
                         PostToMainThread(() =>
                         {
+                            TrackStreamingError(errorMessage);
                             _streamingState = StreamingConnectionState.Reconnecting;
                             _emitter.Emit(GatrixEvents.FlagsStreamingError,
                                 new ErrorEvent { Type = "streaming_connect", Error = new GatrixException(errorMessage) });
@@ -96,6 +97,11 @@ namespace Gatrix.Unity.SDK
                     // Connected successfully
                     PostToMainThread(() =>
                     {
+                        // Track recovery if this was a reconnection
+                        if (_streamingReconnectCount > 0)
+                        {
+                            TrackStreamingRecovery();
+                        }
                         _streamingState = StreamingConnectionState.Connected;
                         _streamingReconnectAttempt = 0;
                         _devLog.Log($"Streaming connected. URL: {streamUrl}");
@@ -190,6 +196,7 @@ namespace Gatrix.Unity.SDK
 
                 PostToMainThread(() =>
                 {
+                    TrackStreamingError(ex.Message);
                     _logger.Warn($"Streaming error: {ex.Message}");
                     _emitter.Emit(GatrixEvents.FlagsStreamingError,
                         new ErrorEvent { Type = "streaming", Error = ex });
@@ -262,6 +269,11 @@ namespace Gatrix.Unity.SDK
                 // ConnectAsync returns immediately and connection is truly async.
                 PostToMainThread(() =>
                 {
+                    // Track recovery if this was a reconnection
+                    if (_streamingReconnectCount > 0)
+                    {
+                        TrackStreamingRecovery();
+                    }
                     _streamingState = StreamingConnectionState.Connected;
                     _streamingReconnectAttempt = 0;
                     _devLog.Log($"WebSocket streaming connected. URL: {baseUrl}");
@@ -313,6 +325,7 @@ namespace Gatrix.Unity.SDK
                             var errorMsg = evt.Value.Data;
                             PostToMainThread(() =>
                             {
+                                TrackStreamingError(errorMsg);
                                 _logger.Warn($"WebSocket error: {errorMsg}");
                             });
                             break;
@@ -356,6 +369,7 @@ namespace Gatrix.Unity.SDK
 
                 PostToMainThread(() =>
                 {
+                    TrackStreamingError(ex.Message);
                     _logger.Warn($"WebSocket streaming error: {ex.Message}");
                     _emitter.Emit(GatrixEvents.FlagsStreamingError,
                         new ErrorEvent { Type = "websocket_streaming", Error = ex });
@@ -448,6 +462,7 @@ namespace Gatrix.Unity.SDK
         private void ProcessStreamingEvent(string eventType, string eventData)
         {
             _lastStreamingEventTime = DateTime.UtcNow;
+            _streamingEventCount++;
 
             switch (eventType)
             {
@@ -679,6 +694,21 @@ namespace Gatrix.Unity.SDK
                 _pendingInvalidation = true;
                 _devLog.Log("Fetch in progress, marking pending invalidation for re-fetch after completion");
             }
+        }
+
+        /// <summary>Track a streaming error occurrence</summary>
+        private void TrackStreamingError(string errorMessage)
+        {
+            _streamingErrorCount++;
+            _lastStreamingErrorTime = DateTime.UtcNow;
+            _lastStreamingError = errorMessage;
+        }
+
+        /// <summary>Track a streaming recovery (successful reconnection)</summary>
+        private void TrackStreamingRecovery()
+        {
+            _streamingRecoveryCount++;
+            _lastStreamingRecoveryTime = DateTime.UtcNow;
         }
     }
 }

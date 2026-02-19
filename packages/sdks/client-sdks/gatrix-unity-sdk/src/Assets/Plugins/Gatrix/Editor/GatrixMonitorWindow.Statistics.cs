@@ -62,6 +62,40 @@ namespace Gatrix.Unity.SDK.Editor
             }
             GatrixEditorStyle.EndBox();
 
+            // Streaming Counters
+            if (_cachedStats.StreamingEnabled)
+            {
+                GatrixEditorStyle.DrawSection("Streaming Counters");
+                GatrixEditorStyle.BeginBox();
+                DrawField("Events Received", _cachedStats.StreamingEventCount.ToString());
+                DrawField("Reconnections", _cachedStats.StreamingReconnectCount.ToString());
+                DrawField("Errors", _cachedStats.StreamingErrorCount > 0
+                    ? $"<color=#ff8888>{_cachedStats.StreamingErrorCount}</color>"
+                    : "0", true);
+                DrawField("Recoveries", _cachedStats.StreamingRecoveryCount > 0
+                    ? $"<color=#88ff88>{_cachedStats.StreamingRecoveryCount}</color>"
+                    : "0", true);
+
+                if (_showAdvancedStats)
+                {
+                    DrawField("Last Event", FormatTime(_cachedStats.LastStreamingEventTime));
+                    if (_cachedStats.StreamingErrorCount > 0)
+                    {
+                        DrawField("Last Error", FormatTime(_cachedStats.LastStreamingErrorTime));
+                        if (!string.IsNullOrEmpty(_cachedStats.LastStreamingError))
+                        {
+                            DrawField("Error Detail",
+                                $"<color=#ff8888>{TruncateMiddle(_cachedStats.LastStreamingError, 50)}</color>", true);
+                        }
+                    }
+                    if (_cachedStats.StreamingRecoveryCount > 0)
+                    {
+                        DrawField("Last Recovery", FormatTime(_cachedStats.LastStreamingRecoveryTime));
+                    }
+                }
+                GatrixEditorStyle.EndBox();
+            }
+
             // Flag access counts
             if (_cachedStats.FlagEnabledCounts != null && _cachedStats.FlagEnabledCounts.Count > 0)
             {

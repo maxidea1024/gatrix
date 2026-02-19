@@ -1437,15 +1437,37 @@ actualDelay = refreshInterval + random(-jitterSec/2, jitterSec/2)
 interface FeaturesStats {
   // ... existing fields
 
+  // Streaming state
+  /** Whether streaming is enabled in configuration */
+  streamingEnabled: boolean;
   /** Current streaming connection state */
   streamingState: StreamingConnectionState;
+  /** Configured streaming transport type */
+  streamingTransport: StreamingTransport;
+
+  // Streaming counters
+  /** Total number of streaming events received (connected, flags_changed, heartbeat, etc.) */
+  streamingEventCount: number;
   /** Number of streaming reconnection attempts */
   streamingReconnectCount: number;
+  /** Total streaming error count */
+  streamingErrorCount: number;
+  /** Total streaming recovery count (successful reconnections after errors) */
+  streamingRecoveryCount: number;
+
+  // Streaming timestamps
   /** Timestamp of last streaming event received */
   lastStreamingEventTime: Date | null;
+  /** Timestamp of last streaming error */
+  lastStreamingErrorTime: Date | null;
+  /** Timestamp of last streaming recovery */
+  lastStreamingRecoveryTime: Date | null;
+  /** Last streaming error message */
+  lastStreamingError: string | null;
 }
 
 type StreamingConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'degraded';
+type StreamingTransport = 'sse' | 'websocket';
 ```
 
 ## Implementation Checklist (gatrix-js-client-sdk)

@@ -404,6 +404,24 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Timestamp of last streaming event received</summary>
         public DateTime? LastStreamingEventTime { get; set; }
+
+        /// <summary>Total number of streaming events received</summary>
+        public int StreamingEventCount { get; set; }
+
+        /// <summary>Total streaming error count</summary>
+        public int StreamingErrorCount { get; set; }
+
+        /// <summary>Total streaming recovery count (successful reconnections)</summary>
+        public int StreamingRecoveryCount { get; set; }
+
+        /// <summary>Timestamp of last streaming error</summary>
+        public DateTime? LastStreamingErrorTime { get; set; }
+
+        /// <summary>Timestamp of last streaming recovery</summary>
+        public DateTime? LastStreamingRecoveryTime { get; set; }
+
+        /// <summary>Last streaming error message</summary>
+        public string LastStreamingError { get; set; }
     }
 
     /// <summary>

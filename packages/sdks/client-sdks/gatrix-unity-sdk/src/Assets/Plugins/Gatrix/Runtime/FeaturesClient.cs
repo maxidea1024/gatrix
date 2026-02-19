@@ -68,6 +68,12 @@ namespace Gatrix.Unity.SDK
         private CancellationTokenSource _streamingReconnectCts;
         private int _streamingReconnectCount;
         private DateTime? _lastStreamingEventTime;
+        private int _streamingEventCount;
+        private int _streamingErrorCount;
+        private int _streamingRecoveryCount;
+        private DateTime? _lastStreamingErrorTime;
+        private DateTime? _lastStreamingRecoveryTime;
+        private string _lastStreamingError;
         private long _localGlobalRevision;
 
         // WebSocket state

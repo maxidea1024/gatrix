@@ -118,14 +118,29 @@ namespace Gatrix.Unity.SDK.Editor
                     var stateColor = stats.StreamingState == StreamingConnectionState.Connected
                         ? "#88ff88"
                         : stats.StreamingState == StreamingConnectionState.Disconnected
-                            ? "gray"
+                            ? "#888888"
                             : stats.StreamingState == StreamingConnectionState.Degraded
                                 ? "#ff8888"
-                                : "yellow";
+                                : "#ffcc66";
                     DrawField("Status", $"<color={stateColor}>● {stats.StreamingState}</color>", true);
                     DrawField("Transport", stats.StreamingTransport.ToString());
+                    DrawField("Events Received", stats.StreamingEventCount.ToString());
                     DrawField("Reconnections", stats.StreamingReconnectCount.ToString());
+                    DrawField("Errors", stats.StreamingErrorCount > 0
+                        ? $"<color=#ff8888>{stats.StreamingErrorCount}</color>"
+                        : "0", true);
+                    DrawField("Recoveries", stats.StreamingRecoveryCount > 0
+                        ? $"<color=#88ff88>{stats.StreamingRecoveryCount}</color>"
+                        : "0", true);
                     DrawField("Last Event", FormatTime(stats.LastStreamingEventTime));
+                    if (stats.StreamingErrorCount > 0)
+                    {
+                        DrawField("Last Error", FormatTime(stats.LastStreamingErrorTime));
+                        if (!string.IsNullOrEmpty(stats.LastStreamingError))
+                        {
+                            DrawField("Error Detail", $"<color=#ff8888>{TruncateMiddle(stats.LastStreamingError, 50)}</color>", true);
+                        }
+                    }
                 }
             }
 
