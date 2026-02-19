@@ -1108,6 +1108,348 @@ if (features.CanSyncFlags())
 }
 ```
 
+### 로그인 흐름과 컨텍스트 업데이트
+```csharp
+// 1. 디바이스 수준의 컨텍스트로 초기화 (로그인 전)
+var config = new GatrixClientConfig
+{
+    Context = new GatrixContext
+    {
+        Properties = new Dictionary<string, object>
+        {
+            { "platform", Application.platform.ToString() },
+            { "appVersion", Application.version }
+        }
+    }
+};
+await GatrixBehaviour.InitializeAsync(config);
+
+// 2. 로그인 후, 사용자 컨텍스트로 업데이트 (재페치 트리거)
+await features.UpdateContextAsync(new GatrixContext
+{
+    UserId = loginResult.UserId,
+    Properties = new Dictionary<string, object>
+    {
+        { "plan", loginResult.Plan },
+        { "level", loginResult.Level }
+    }
+});
+```
+
+### 로딩 화면에서 안전한 동기화
+```csharp
+async void OnLoadingScreenStart()
+{
+    var features = GatrixBehaviour.Client.Features;
+    
+    // 자연스러운 일시정지 시점에 보류 중인 변경 동기화
+    if (features.CanSyncFlags())
+    {
+        await features.SyncFlagsAsync(fetchNow: true);
+    }
+    
+    // 일관된 플래그 값으로 다음 씬 로드
+    await SceneManager.LoadSceneAsync("GameScene");
+}
+```
+
+### 대기 중인 업데이트 표시기
+```csharp
+// 동기화된 값과 리얼타임 값을 비교하여 "업데이트 대기 중" 배지 표시
+var features = GatrixBehaviour.Client.Features;
+
+bool syncedValue  = features.IsEnabled("new-shop");
+bool realtimeValue = features.IsEnabled("new-shop", forceRealtime: true);
+
+if (syncedValue != realtimeValue)
+{
+    pendingUpdateBadge.SetActive(true); // "새로운 업데이트가 있습니다"
+}
+```
+
+### 오프라인 폴백과 부트스트랩
+```csharp
+// 로컬 JSON 파일에서 플래그를 로드하여 즉시 사용 가능하게 함
+var bootstrapJson = Resources.Load<TextAsset>("default-flags");
+var bootstrapFlags = JsonUtility.FromJson<List<EvaluatedFlag>>(bootstrapJson.text);
+
+var config = new GatrixClientConfig
+{
+    Features = new FeaturesConfig
+    {
+        Bootstrap = bootstrapFlags,
+        BootstrapOverride = false  // 캐시된 플래그를 부트스트랩으로 덮어쓰지 않음
+    }
+};
+```
+
+### Watch 그룹을 이용한 다중 플래그 의존성 관리
+```csharp
+var features = GatrixBehaviour.Client.Features;
+var group = features.CreateWatchGroup("shop-system");
+
+bool shopEnabled = false;
+float discountRate = 0f;
+
+group.WatchSyncedFlag("new-shop-enabled", p => shopEnabled = p.Enabled)
+     .WatchSyncedFlag("discount-rate",    p => discountRate = p.FloatVariation(0f));
+
+// 동기화 시점에 두 플래그가 함께 적용됨
+// 상점은 활성화되었는데 할인율이 오래된 부분 상태가 발생하지 않음
+```
+
+---
+
+## ❓ FAQ & 문제 해결
+
+### 1. 플래그 변경이 실시간으로 감지되지 않음
+
+**증상:** 대시보드에서 플래그를 변경했는데 게임에 반영되지 않습니다.
+
+**가능한 원인 및 해결:**
+
+| 원인 | 해결 방법 |
+|------|---------|
+| 스트리밍이 비활성화됨 | 설정에서 `Streaming.Enabled` 확인 (기본값: `true`) |
+| 방화벽/프록시가 SSE 차단 | WebSocket 전환: `Transport = StreamingTransport.WebSocket` |
+| 폴링 간격이 너무 길음 | `RefreshInterval` 축소 (기본값: 30초) |
+| `ExplicitSyncMode`가 켜져 있음 | 플래그는 업데이트되었으나 버퍼링됨 — `SyncFlagsAsync()` 호출 필요 |
+| `WatchSyncedFlag` 사용 중 | 동기화 감지자는 `SyncFlagsAsync()` 전까지 호출되지 않음 — `WatchRealtimeFlag` 사용 |
+| 오프라인 모드 활성화됨 | `OfflineMode = false`로 라이브 연결 허용 |
+
+---
+
+### 2. `WatchSyncedFlag` 콜백이 호출되지 않음
+
+**증상:** `WatchSyncedFlag` 콜백을 등록했는데 실행되지 않습니다.
+
+**원인:** `ExplicitSyncMode`가 비활성화(기본값)되어 있습니다. 비활성 상태에서는 동기화 저장소가 없으므로, 동기화 감지자가 트리거할 대상이 없습니다.
+
+**해결:**
+```csharp
+// ExplicitSyncMode 활성화
+config.Features = new FeaturesConfig { ExplicitSyncMode = true };
+
+// WithInitialState를 사용하여 첫 번째 콜백을 즉시 받음
+features.WatchSyncedFlagWithInitialState("my-flag", proxy => { /* ... */ });
+
+// SyncFlagsAsync를 호출하여 후속 콜백 트리거
+await features.SyncFlagsAsync();
+```
+
+---
+
+### 3. `WatchRealtimeFlag`와 `WatchSyncedFlag`의 혼동
+
+**증상:** 어떤 Watch 메서드를 사용해야 할지 모르겠습니다.
+
+**빠른 판단 가이드:**
+
+```
+ExplicitSyncMode가 활성화되어 있는가?
+├── 아니오 → 둘 다 동일하게 동작. 아무거나 사용 (WatchRealtimeFlag 권장)
+└── 예    → 이 플래그가 세션 중 게임플레이에 영향을 주는가?
+    ├── 예    → WatchSyncedFlag 사용 (SyncFlagsAsync 시점에 변경 적용)
+    └── 아니오 → WatchRealtimeFlag 사용 (디버그 UI, 모니터링, 비방해 요소)
+```
+
+---
+
+### 4. `forceRealtime` 파라미터가 아무 효과 없음
+
+**증상:** `forceRealtime: true`로 설정해도 `false`와 같은 값이 반환됩니다.
+
+**원인:** `ExplicitSyncMode`가 비활성화되어 있습니다. 비활성 상태에서는 저장소가 하나(리얼타임)뿐이므로 `forceRealtime`은 효과가 없습니다.
+
+**해결:** 별도의 동기화/리얼타임 저장소가 필요한 경우 `ExplicitSyncMode`를 활성화하세요:
+```csharp
+config.Features = new FeaturesConfig { ExplicitSyncMode = true };
+```
+
+---
+
+### 5. 게임플레이 도중 플래그 값이 예기치 않게 변경됨
+
+**증상:** 플레이어가 매치 중 스탯/UI가 갑자기 바뀐다고 보고합니다.
+
+**원인:** `ExplicitSyncMode` 없이 `WatchRealtimeFlag`로 게임플레이에 중요한 값을 사용하고 있습니다.
+
+**해결:**
+```csharp
+// 1. ExplicitSyncMode 활성화
+config.Features = new FeaturesConfig { ExplicitSyncMode = true };
+
+// 2. 게임플레이 값에는 WatchSyncedFlag 사용
+features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
+{
+    SetDifficulty(proxy.StringVariation("normal"));
+});
+
+// 3. 안전한 시점에서만 변경 적용
+async void OnRoundEnd()
+{
+    if (features.CanSyncFlags())
+        await features.SyncFlagsAsync();
+}
+```
+
+---
+
+### 6. 컨텍스트 업데이트 시 다수의 재페치 발생
+
+**증상:** 여러 컨텍스트 필드를 설정하면 여러 네트워크 요청이 발생하고 지연이 생깁니다.
+
+**원인:** 각 `SetContextFieldAsync` 호출이 별도의 재페치를 트리거합니다.
+
+**해결:** `UpdateContextAsync`로 일괄 처리하세요:
+```csharp
+// ❌ 나쁜 예: 3번의 개별 재페치
+await features.SetContextFieldAsync("level", 43);
+await features.SetContextFieldAsync("score", 15000);
+await features.SetContextFieldAsync("region", "asia");
+
+// ✅ 좋은 예: 1번의 재페치
+await features.UpdateContextAsync(new GatrixContext
+{
+    Properties = new Dictionary<string, object>
+    {
+        { "level", 43 },
+        { "score", 15000 },
+        { "region", "asia" }
+    }
+});
+```
+
+---
+
+### 7. 초기화 후 플래그가 폴백 값을 반환함
+
+**증상:** 대시보드에 플래그가 설정되어 있는데 `IsEnabled`가 `false`를 반환하고, 배리에이션이 폴백 값을 반환합니다.
+
+**가능한 원인 및 해결:**
+
+| 원인 | 해결 방법 |
+|------|---------|
+| SDK가 아직 준비되지 않음 | `Ready` 이벤트를 대기하거나 `WatchRealtimeFlagWithInitialState` 사용 |
+| `AppName` 또는 `Environment`가 다름 | 설정이 대시보드와 일치하는지 확인 |
+| 컨텍스트에 `UserId` 미설정 | 사용자 ID 없이 타게팅 규칙이 매치되지 않을 수 있음 |
+| 첫 페치에서 네트워크 오류 | 로그에서 페치 오류 확인; API URL 확인 |
+| 플래그가 이 환경에 할당되지 않음 | 대시보드에서 대상 환경에 플래그가 활성화되어 있는지 확인 |
+
+```csharp
+// SDK 준비 완료 후 플래그 확인
+client.Once(GatrixEvents.Ready, args =>
+{
+    bool enabled = features.IsEnabled("my-flag");
+    Debug.Log($"Flag is {enabled}");
+});
+```
+
+---
+
+### 8. `SyncFlagsAsync`가 효과 없음
+
+**증상:** `SyncFlagsAsync()`를 호출해도 플래그 값이 변경되지 않습니다.
+
+**가능한 원인:**
+- `ExplicitSyncMode`가 활성화되지 않음 — 동기화는 활성화 시에만 의미가 있습니다
+- 보류 중인 변경이 없음 — 동기화 저장소가 이미 최신 상태
+- `CanSyncFlags()`가 `false` 반환 — 동기화할 새 데이터 없음
+
+```csharp
+// 동기화 전 항상 CanSyncFlags 확인
+if (features.CanSyncFlags())
+{
+    await features.SyncFlagsAsync();
+    Debug.Log("플래그 동기화 완료");
+}
+else
+{
+    Debug.Log("보류 중인 변경 없음");
+}
+```
+
+---
+
+### 9. 시작 시 Watch 콜백이 여러 번 호출됨
+
+**증상:** `WithInitialState` 콜백이 한 번 호출된 후, 첫 번째 페치 직후에 다시 호출됩니다.
+
+**원인:** 이것은 정상적인 동작입니다. `WithInitialState`는 현재 캐시된 값으로 즉시 호출된 후, 서버에서 새 데이터가 도착하면(값이 다를 경우) 다시 호출됩니다.
+
+**해결:** 이것은 의도된 설계입니다. 첫 번째 값만 필요한 경우 `WatchRealtimeFlag`(`WithInitialState` 없이)를 사용하고 초기 상태를 수동으로 처리하세요.
+
+---
+
+### 10. 시스템 컨텍스트 필드를 수정할 수 없음
+
+**증상:** `SetContextFieldAsync("appName", ...)`이 경고를 로그하고 아무것도 하지 않습니다.
+
+**원인:** `AppName`, `Environment`, `CurrentTime`은 초기화 이후 변경할 수 없는 시스템 필드입니다.
+
+**해결:** `InitializeAsync` 호출 전에 `GatrixClientConfig`에서 이 값들을 설정하세요:
+```csharp
+var config = new GatrixClientConfig
+{
+    AppName = "my-game",
+    Environment = "production"
+};
+```
+
+---
+
+### 11. 스트리밍이 자주 연결 해제됨
+
+**증상:** 스트리밍 상태가 Connected → Disconnected → Reconnecting 사이를 반복합니다.
+
+**해결:**
+
+| 접근 방식 | 설정 |
+|----------|------|
+| 재연결 허용 범위 증가 | `Streaming.Sse.ReconnectMax = 60` |
+| WebSocket으로 전환 | `Streaming.Transport = StreamingTransport.WebSocket` |
+| 폴링 전용으로 전환 | `Streaming.Enabled = false` + 더 짧은 `RefreshInterval` |
+| 네트워크 안정성 확인 | 디바이스의 연결 상태가 안정적인지 확인 |
+
+---
+
+### 12. Watch 콜백으로 인한 메모리 누수
+
+**증상:** Watch 콜백이 이전 씬이나 파괴된 오브젝트를 참조하여 메모리 해제가 안 됩니다.
+
+**해결:** MonoBehaviour가 파괴될 때 반드시 Unwatch 하세요:
+```csharp
+private IDisposable _watcher;
+
+void Start()
+{
+    _watcher = features.WatchRealtimeFlagWithInitialState("my-flag", proxy =>
+    {
+        // ...
+    });
+}
+
+void OnDestroy()
+{
+    _watcher?.Dispose(); // 감지자 정리
+}
+
+// 또는 Watch 그룹으로 일괄 정리
+private WatchGroup _group;
+
+void Start()
+{
+    _group = features.CreateWatchGroup("my-scene");
+    _group.WatchRealtimeFlag("flag-a", p => { /* ... */ })
+          .WatchRealtimeFlag("flag-b", p => { /* ... */ });
+}
+
+void OnDestroy()
+{
+    _group?.Destroy(); // 모두 한 번에 정리
+}
+```
+
 ---
 
 ## 🔗 링크

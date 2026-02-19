@@ -1107,6 +1107,348 @@ if (features.CanSyncFlags())
 }
 ```
 
+### Login Flow with Context Update
+```csharp
+// 1. Initialize with device-level context (before login)
+var config = new GatrixClientConfig
+{
+    Context = new GatrixContext
+    {
+        Properties = new Dictionary<string, object>
+        {
+            { "platform", Application.platform.ToString() },
+            { "appVersion", Application.version }
+        }
+    }
+};
+await GatrixBehaviour.InitializeAsync(config);
+
+// 2. After login, update with user context (triggers re-fetch)
+await features.UpdateContextAsync(new GatrixContext
+{
+    UserId = loginResult.UserId,
+    Properties = new Dictionary<string, object>
+    {
+        { "plan", loginResult.Plan },
+        { "level", loginResult.Level }
+    }
+});
+```
+
+### Scene-Safe Sync on Loading Screen
+```csharp
+async void OnLoadingScreenStart()
+{
+    var features = GatrixBehaviour.Client.Features;
+    
+    // Sync pending changes during natural pause
+    if (features.CanSyncFlags())
+    {
+        await features.SyncFlagsAsync(fetchNow: true);
+    }
+    
+    // Now load the next scene with consistent flag values
+    await SceneManager.LoadSceneAsync("GameScene");
+}
+```
+
+### Pending Update Indicator
+```csharp
+// Compare synced vs realtime values to show "update pending" badge
+var features = GatrixBehaviour.Client.Features;
+
+bool syncedValue  = features.IsEnabled("new-shop");
+bool realtimeValue = features.IsEnabled("new-shop", forceRealtime: true);
+
+if (syncedValue != realtimeValue)
+{
+    pendingUpdateBadge.SetActive(true); // "New update available"
+}
+```
+
+### Offline Fallback with Bootstrap
+```csharp
+// Load flags from a local JSON file for instant availability
+var bootstrapJson = Resources.Load<TextAsset>("default-flags");
+var bootstrapFlags = JsonUtility.FromJson<List<EvaluatedFlag>>(bootstrapJson.text);
+
+var config = new GatrixClientConfig
+{
+    Features = new FeaturesConfig
+    {
+        Bootstrap = bootstrapFlags,
+        BootstrapOverride = false  // Don't override cached flags with bootstrap
+    }
+};
+```
+
+### Multi-Flag Dependency with Watch Group
+```csharp
+var features = GatrixBehaviour.Client.Features;
+var group = features.CreateWatchGroup("shop-system");
+
+bool shopEnabled = false;
+float discountRate = 0f;
+
+group.WatchSyncedFlag("new-shop-enabled", p => shopEnabled = p.Enabled)
+     .WatchSyncedFlag("discount-rate",    p => discountRate = p.FloatVariation(0f));
+
+// Both flags are applied together at sync time
+// No partial state where shop is enabled but discount is stale
+```
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+### 1. Flag changes are not detected in real time
+
+**Symptom:** You changed a flag on the dashboard, but the game doesn't reflect the change.
+
+**Possible causes & solutions:**
+
+| Cause | Solution |
+|-------|----------|
+| Streaming is disabled | Check `Streaming.Enabled` in config (default: `true`) |
+| Firewall / proxy blocks SSE | Try WebSocket transport: `Transport = StreamingTransport.WebSocket` |
+| Polling interval too long | Reduce `RefreshInterval` (default: 30s) |
+| `ExplicitSyncMode` is on | Flag is updated but buffered — call `SyncFlagsAsync()` to apply |
+| Using `WatchSyncedFlag` | Synced watchers don't fire until `SyncFlagsAsync()` — use `WatchRealtimeFlag` instead |
+| Offline mode is enabled | Set `OfflineMode = false` for live connections |
+
+---
+
+### 2. `WatchSyncedFlag` callback never fires
+
+**Symptom:** You registered a `WatchSyncedFlag` callback but it never executes.
+
+**Cause:** `ExplicitSyncMode` is disabled (default). Without it, there is no synced store, so synced watchers have nothing to trigger on initial value delivery.
+
+**Solution:**
+```csharp
+// Enable ExplicitSyncMode
+config.Features = new FeaturesConfig { ExplicitSyncMode = true };
+
+// Use WithInitialState to get the first callback immediately
+features.WatchSyncedFlagWithInitialState("my-flag", proxy => { /* ... */ });
+
+// Call SyncFlagsAsync to trigger subsequent callbacks
+await features.SyncFlagsAsync();
+```
+
+---
+
+### 3. Confusion between `WatchRealtimeFlag` and `WatchSyncedFlag`
+
+**Symptom:** Not sure which watch method to use.
+
+**Quick decision guide:**
+
+```
+Is ExplicitSyncMode enabled?
+├── NO  → Both behave the same. Use either (WatchRealtimeFlag recommended)
+└── YES → Does this flag affect gameplay mid-session?
+    ├── YES → Use WatchSyncedFlag (changes apply at SyncFlagsAsync)
+    └── NO  → Use WatchRealtimeFlag (debug UI, monitoring, non-disruptive)
+```
+
+---
+
+### 4. `forceRealtime` parameter does nothing
+
+**Symptom:** Setting `forceRealtime: true` returns the same value as `false`.
+
+**Cause:** `ExplicitSyncMode` is disabled. Without it, there is only one store (realtime), so `forceRealtime` has no effect.
+
+**Solution:** Enable `ExplicitSyncMode` if you need separate synced/realtime stores:
+```csharp
+config.Features = new FeaturesConfig { ExplicitSyncMode = true };
+```
+
+---
+
+### 5. Flag values change unexpectedly during gameplay
+
+**Symptom:** Player reports stats/UI suddenly changing mid-match.
+
+**Cause:** Using `WatchRealtimeFlag` for gameplay-critical values without `ExplicitSyncMode`.
+
+**Solution:**
+```csharp
+// 1. Enable ExplicitSyncMode
+config.Features = new FeaturesConfig { ExplicitSyncMode = true };
+
+// 2. Use WatchSyncedFlag for gameplay values
+features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
+{
+    SetDifficulty(proxy.StringVariation("normal"));
+});
+
+// 3. Apply changes only at safe points
+async void OnRoundEnd()
+{
+    if (features.CanSyncFlags())
+        await features.SyncFlagsAsync();
+}
+```
+
+---
+
+### 6. Multiple re-fetches when updating context
+
+**Symptom:** Setting several context fields causes multiple network requests and lag.
+
+**Cause:** Each `SetContextFieldAsync` call triggers a separate re-fetch.
+
+**Solution:** Batch changes with `UpdateContextAsync`:
+```csharp
+// ❌ Bad: 3 separate re-fetches
+await features.SetContextFieldAsync("level", 43);
+await features.SetContextFieldAsync("score", 15000);
+await features.SetContextFieldAsync("region", "asia");
+
+// ✅ Good: 1 re-fetch
+await features.UpdateContextAsync(new GatrixContext
+{
+    Properties = new Dictionary<string, object>
+    {
+        { "level", 43 },
+        { "score", 15000 },
+        { "region", "asia" }
+    }
+});
+```
+
+---
+
+### 7. Flags return fallback values after initialization
+
+**Symptom:** `IsEnabled` returns `false` and variations return fallback values even though the flag is configured on the dashboard.
+
+**Possible causes & solutions:**
+
+| Cause | Solution |
+|-------|----------|
+| SDK not ready yet | Wait for `Ready` event or use `WatchRealtimeFlagWithInitialState` |
+| Wrong `AppName` or `Environment` | Double-check config matches dashboard settings |
+| Context `UserId` not set | Targeting rules may not match without a user ID |
+| Network error on first fetch | Check logs for fetch errors; ensure API URL is correct |
+| Flag not assigned to this environment | Verify flag is enabled for the target environment in the dashboard |
+
+```csharp
+// Wait for SDK to be ready before checking flags
+client.Once(GatrixEvents.Ready, args =>
+{
+    bool enabled = features.IsEnabled("my-flag");
+    Debug.Log($"Flag is {enabled}");
+});
+```
+
+---
+
+### 8. `SyncFlagsAsync` has no effect
+
+**Symptom:** Calling `SyncFlagsAsync()` doesn't change any flag values.
+
+**Possible causes:**
+- `ExplicitSyncMode` is not enabled — sync is only meaningful with it on
+- No pending changes — the synced store is already up to date
+- `CanSyncFlags()` returns `false` — no new data to sync
+
+```csharp
+// Always check CanSyncFlags before syncing
+if (features.CanSyncFlags())
+{
+    await features.SyncFlagsAsync();
+    Debug.Log("Flags synced");
+}
+else
+{
+    Debug.Log("No pending changes");
+}
+```
+
+---
+
+### 9. Watch callback fires multiple times on startup
+
+**Symptom:** `WithInitialState` callback fires once, then fires again immediately after the first fetch.
+
+**Cause:** This is expected behavior. `WithInitialState` fires immediately with the current cached value, and then fires again when fresh data arrives from the server (if the value differs).
+
+**Solution:** This is by design. If you only want the first value, use `WatchRealtimeFlag` (without `WithInitialState`) and handle the initial state manually.
+
+---
+
+### 10. System context fields cannot be modified
+
+**Symptom:** `SetContextFieldAsync("appName", ...)` logs a warning and does nothing.
+
+**Cause:** `AppName`, `Environment`, and `CurrentTime` are system fields that cannot be changed after initialization.
+
+**Solution:** Set these values in `GatrixClientConfig` before calling `InitializeAsync`:
+```csharp
+var config = new GatrixClientConfig
+{
+    AppName = "my-game",
+    Environment = "production"
+};
+```
+
+---
+
+### 11. Streaming disconnects frequently
+
+**Symptom:** Streaming state cycles between Connected → Disconnected → Reconnecting.
+
+**Solutions:**
+
+| Approach | Configuration |
+|----------|--------------|
+| Increase reconnect tolerance | `Streaming.Sse.ReconnectMax = 60` |
+| Switch to WebSocket | `Streaming.Transport = StreamingTransport.WebSocket` |
+| Fall back to polling only | `Streaming.Enabled = false` with lower `RefreshInterval` |
+| Check network stability | Ensure the device has a stable connection |
+
+---
+
+### 12. Memory leak from watch callbacks
+
+**Symptom:** Watch callbacks keep an old scene or destroyed objects alive.
+
+**Solution:** Always unwatch when a MonoBehaviour is destroyed:
+```csharp
+private IDisposable _watcher;
+
+void Start()
+{
+    _watcher = features.WatchRealtimeFlagWithInitialState("my-flag", proxy =>
+    {
+        // ...
+    });
+}
+
+void OnDestroy()
+{
+    _watcher?.Dispose(); // Clean up the watcher
+}
+
+// Or use watch groups for bulk cleanup
+private WatchGroup _group;
+
+void Start()
+{
+    _group = features.CreateWatchGroup("my-scene");
+    _group.WatchRealtimeFlag("flag-a", p => { /* ... */ })
+          .WatchRealtimeFlag("flag-b", p => { /* ... */ });
+}
+
+void OnDestroy()
+{
+    _group?.Destroy(); // Unwatch all at once
+}
+```
+
 ---
 
 ## 🔗 Links
