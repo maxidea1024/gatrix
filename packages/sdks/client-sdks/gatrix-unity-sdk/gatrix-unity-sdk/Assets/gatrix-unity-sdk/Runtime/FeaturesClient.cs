@@ -74,6 +74,10 @@ namespace Gatrix.Unity.SDK
         private DateTime? _lastStreamingEventTime;
         private long _localGlobalRevision;
 
+        // WebSocket state
+        private IGatrixWebSocket _gatrixWs;
+        private CancellationTokenSource _wsPingCts;
+
         // Captured Unity SynchronizationContext for thread-safe callbacks
         private readonly SynchronizationContext _syncContext;
 
@@ -1239,6 +1243,7 @@ namespace Gatrix.Unity.SDK
                 MetricsSentCount = _metricsSentCount,
                 MetricsErrorCount = _metricsErrorCount,
                 StreamingState = _streamingState,
+                StreamingTransport = FeaturesConfig?.Streaming?.Transport ?? StreamingTransport.Sse,
                 StreamingReconnectCount = _streamingReconnectCount,
                 LastStreamingEventTime = _lastStreamingEventTime
             };
@@ -1248,7 +1253,7 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>
         /// Connect to the streaming endpoint for real-time invalidation signals.
-        /// Implements SSE (Server-Sent Events) parsing using HttpClient with streaming response.
+        /// Branches to SSE or WebSocket based on transport configuration.
         /// </summary>
         private void ConnectStreaming()
         {
@@ -1259,7 +1264,6 @@ namespace Gatrix.Unity.SDK
             }
 
             _streamingState = StreamingConnectionState.Connecting;
-            DevLog("Connecting to streaming endpoint...");
 
             // Cancel previous streaming connection
             _streamingCts?.Cancel();
@@ -1267,16 +1271,25 @@ namespace Gatrix.Unity.SDK
             _streamingCts = new CancellationTokenSource();
             var ct = _streamingCts.Token;
 
-            var streamUrl = FeaturesConfig.Streaming.Url
-                ?? $"{_config.ApiUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream";
-
-            _ = RunStreamingLoopAsync(streamUrl, ct);
+            var transport = FeaturesConfig.Streaming.Transport;
+            if (transport == StreamingTransport.WebSocket)
+            {
+                DevLog("Connecting to WebSocket streaming endpoint...");
+                _ = RunWebSocketLoopAsync(ct);
+            }
+            else
+            {
+                DevLog("Connecting to SSE streaming endpoint...");
+                var streamUrl = FeaturesConfig.Streaming.Sse.Url
+                    ?? $"{_config.ApiUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream/sse";
+                _ = RunSseLoopAsync(streamUrl, ct);
+            }
         }
 
         /// <summary>
         /// SSE streaming loop - runs on background thread, dispatches events to main thread.
         /// </summary>
-        private async Task RunStreamingLoopAsync(string streamUrl, CancellationToken ct)
+        private async Task RunSseLoopAsync(string streamUrl, CancellationToken ct)
         {
             try
             {
@@ -1426,6 +1439,222 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>
+        /// WebSocket streaming loop - uses IGatrixWebSocket abstraction for cross-platform support.
+        /// On WebGL uses JS interop, on other platforms uses System.Net.WebSockets.
+        /// </summary>
+        private async Task RunWebSocketLoopAsync(CancellationToken ct)
+        {
+            IGatrixWebSocket ws = null;
+            try
+            {
+                // Build WebSocket URL
+                var wsConfig = FeaturesConfig.Streaming.WebSocket;
+                string baseUrl;
+                if (!string.IsNullOrEmpty(wsConfig.Url))
+                {
+                    baseUrl = wsConfig.Url;
+                }
+                else
+                {
+                    // Convert http(s):// to ws(s)://
+                    baseUrl = _config.ApiUrl.Replace("https://", "wss://").Replace("http://", "ws://");
+                    baseUrl = $"{baseUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream/ws";
+                }
+
+                // Add auth as query parameter (WebSocket can't send custom headers in browser)
+                var uriBuilder = new UriBuilder(baseUrl);
+                var existingQuery = uriBuilder.Query.TrimStart('?');
+                var separator = string.IsNullOrEmpty(existingQuery) ? "" : "&";
+                uriBuilder.Query = $"{existingQuery}{separator}x-api-token={Uri.EscapeDataString(_config.ApiToken)}";
+
+                // Create platform-appropriate WebSocket
+                ws = GatrixWebSocketFactory.Create();
+                ws.SetRequestHeader("X-API-Token", _config.ApiToken);
+                ws.SetRequestHeader("X-Application-Name", _config.AppName);
+                ws.SetRequestHeader("X-Environment", _config.Environment);
+                ws.SetRequestHeader("X-Connection-Id", _connectionId);
+                ws.SetRequestHeader("X-SDK-Version",
+                    $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
+                if (_config.CustomHeaders != null)
+                {
+                    foreach (var kvp in _config.CustomHeaders)
+                    {
+                        ws.SetRequestHeader(kvp.Key, kvp.Value);
+                    }
+                }
+
+                // Store reference for cleanup
+                _gatrixWs = ws;
+
+                await ws.ConnectAsync(uriBuilder.Uri, ct);
+
+                // Start ping loop
+                _wsPingCts?.Cancel();
+                _wsPingCts?.Dispose();
+                _wsPingCts = new CancellationTokenSource();
+                var pingCt = CancellationTokenSource.CreateLinkedTokenSource(ct, _wsPingCts.Token).Token;
+                _ = RunWebSocketPingLoopAsync(ws, pingCt);
+
+                // Event polling loop
+                bool connected = false;
+                while (!ct.IsCancellationRequested && ws.State != WsState.Closed)
+                {
+                    var evt = ws.PollEvent();
+                    if (evt == null)
+                    {
+                        // No event pending - yield and wait
+                        await Task.Delay(50, ct);
+                        continue;
+                    }
+
+                    switch (evt.Value.Type)
+                    {
+                        case WsEventType.Open:
+                            connected = true;
+                            PostToMainThread(() =>
+                            {
+                                _streamingState = StreamingConnectionState.Connected;
+                                _streamingReconnectAttempt = 0;
+                                DevLog($"WebSocket streaming connected. URL: {baseUrl}");
+                                _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
+                            });
+                            break;
+
+                        case WsEventType.Message:
+                            ProcessWebSocketMessage(evt.Value.Data);
+                            break;
+
+                        case WsEventType.Error:
+                            var errorMsg = evt.Value.Data;
+                            PostToMainThread(() =>
+                            {
+                                _logger.Warn($"WebSocket error: {errorMsg}");
+                            });
+                            break;
+
+                        case WsEventType.Close:
+                            if (!ct.IsCancellationRequested &&
+                                _streamingState != StreamingConnectionState.Disconnected)
+                            {
+                                PostToMainThread(() =>
+                                {
+                                    DevLog("WebSocket connection closed by server");
+                                    _streamingState = StreamingConnectionState.Reconnecting;
+                                    _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
+                                    ScheduleStreamingReconnect();
+                                });
+                            }
+                            return; // Exit loop
+                    }
+                }
+
+                // Connection ended without explicit close event
+                if (!ct.IsCancellationRequested && connected &&
+                    _streamingState != StreamingConnectionState.Disconnected)
+                {
+                    PostToMainThread(() =>
+                    {
+                        DevLog("WebSocket connection ended");
+                        _streamingState = StreamingConnectionState.Reconnecting;
+                        _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
+                        ScheduleStreamingReconnect();
+                    });
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Intentional disconnect - ignore
+            }
+            catch (Exception ex)
+            {
+                if (_streamingState == StreamingConnectionState.Disconnected) return;
+
+                PostToMainThread(() =>
+                {
+                    _logger.Warn($"WebSocket streaming error: {ex.Message}");
+                    _emitter.Emit(GatrixEvents.FlagsStreamingError,
+                        new ErrorEvent { Type = "websocket_streaming", Error = ex });
+
+                    if (_streamingState != StreamingConnectionState.Reconnecting)
+                    {
+                        _streamingState = StreamingConnectionState.Reconnecting;
+                        _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
+                    }
+                    ScheduleStreamingReconnect();
+                });
+            }
+            finally
+            {
+                ws?.Dispose();
+                if (_gatrixWs == ws) _gatrixWs = null;
+            }
+        }
+
+        /// <summary>
+        /// Process a single WebSocket JSON message.
+        /// </summary>
+        private void ProcessWebSocketMessage(string message)
+        {
+            try
+            {
+                var index = 0;
+                var parsed = GatrixJson.ParseJsonValue(message, ref index)
+                    as Dictionary<string, object>;
+
+                if (parsed != null &&
+                    parsed.TryGetValue("type", out var typeObj) &&
+                    typeObj is string eventType)
+                {
+                    // Handle pong locally
+                    if (eventType == "pong") return;
+
+                    string eventData = "";
+                    if (parsed.TryGetValue("data", out var dataObj) && dataObj != null)
+                    {
+                        eventData = GatrixJson.Serialize(dataObj);
+                    }
+
+                    PostToMainThread(() => ProcessStreamingEvent(eventType, eventData));
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Warn($"Failed to parse WebSocket message: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// WebSocket ping loop - sends periodic pings to keep connection alive.
+        /// </summary>
+        private async Task RunWebSocketPingLoopAsync(IGatrixWebSocket ws, CancellationToken ct)
+        {
+            var pingIntervalMs = FeaturesConfig.Streaming.WebSocket.PingInterval * 1000;
+            const string pingMessage = "{\"type\":\"ping\"}";
+
+            try
+            {
+                while (!ct.IsCancellationRequested && ws.State == WsState.Open)
+                {
+                    await Task.Delay(pingIntervalMs, ct);
+                    if (ct.IsCancellationRequested) break;
+
+                    if (ws.State == WsState.Open)
+                    {
+                        await ws.SendAsync(pingMessage, ct);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected on disconnect
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn($"WebSocket ping error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Process a single SSE event on the main thread.
         /// </summary>
         private void ProcessStreamingEvent(string eventType, string eventData)
@@ -1532,7 +1761,7 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>
-        /// Disconnect from the streaming endpoint.
+        /// Disconnect from the streaming endpoint (SSE or WebSocket).
         /// </summary>
         private void DisconnectStreaming()
         {
@@ -1546,6 +1775,26 @@ namespace Gatrix.Unity.SDK
             _streamingCts?.Cancel();
             _streamingCts?.Dispose();
             _streamingCts = null;
+
+            // WebSocket cleanup
+            _wsPingCts?.Cancel();
+            _wsPingCts?.Dispose();
+            _wsPingCts = null;
+
+            if (_gatrixWs != null)
+            {
+                try
+                {
+                    if (_gatrixWs.State == WsState.Open ||
+                        _gatrixWs.State == WsState.Closing)
+                    {
+                        _ = _gatrixWs.CloseAsync(CancellationToken.None);
+                    }
+                }
+                catch { /* Ignore close errors */ }
+                _gatrixWs.Dispose();
+                _gatrixWs = null;
+            }
         }
 
         /// <summary>
@@ -1566,8 +1815,17 @@ namespace Gatrix.Unity.SDK
             _streamingReconnectAttempt++;
             _streamingReconnectCount++;
 
-            var baseMs = FeaturesConfig.Streaming.ReconnectBase * 1000;
-            var maxMs = FeaturesConfig.Streaming.ReconnectMax * 1000;
+            int baseMs, maxMs;
+            if (FeaturesConfig.Streaming.Transport == StreamingTransport.WebSocket)
+            {
+                baseMs = FeaturesConfig.Streaming.WebSocket.ReconnectBase * 1000;
+                maxMs = FeaturesConfig.Streaming.WebSocket.ReconnectMax * 1000;
+            }
+            else
+            {
+                baseMs = FeaturesConfig.Streaming.Sse.ReconnectBase * 1000;
+                maxMs = FeaturesConfig.Streaming.Sse.ReconnectMax * 1000;
+            }
 
             // Exponential backoff: base * 2^(attempt-1), capped at max
             var exponentialDelay = (int)Math.Min(

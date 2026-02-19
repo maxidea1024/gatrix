@@ -444,7 +444,10 @@ namespace Gatrix.Unity.SDK.Editor
                 : stats.StreamingState == StreamingConnectionState.Disconnected
                     ? "#888888"
                     : "#ffcc44";
-            DrawRow("Streaming", $"<color={streamColor}>{stats.StreamingState}</color>", richText: true);
+            var transportLabel = stats.StreamingState != StreamingConnectionState.Disconnected
+                ? $" ({stats.StreamingTransport})"
+                : "";
+            DrawRow("Streaming", $"<color={streamColor}>{stats.StreamingState}{transportLabel}</color>", richText: true);
             EditorGUILayout.Space(4);
         }
 

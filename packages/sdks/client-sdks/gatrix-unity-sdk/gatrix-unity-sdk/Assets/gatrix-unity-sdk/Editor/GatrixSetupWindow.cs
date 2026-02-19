@@ -22,12 +22,13 @@ namespace Gatrix.Unity.SDK.Editor
         private bool _offlineMode;
         private int  _refreshInterval  = 30;
         private bool _streamingEnabled = true;
+        private StreamingTransport _streamingTransport = StreamingTransport.Sse;
 
         private Vector2 _scrollPos;
         private GatrixSettings _existingSettings;
         private bool _pendingClearExisting;
 
-        [MenuItem("Window/Gatrix/Setup Wizard", priority = 20)]
+        [MenuItem("Window/Gatrix/Setup Wizard", priority = 1)]
         public static void ShowWindow()
         {
             var window = GetWindow<GatrixSetupWindow>("Gatrix Setup");
@@ -180,7 +181,12 @@ namespace Gatrix.Unity.SDK.Editor
                 _enableDevMode = EditorGUILayout.Toggle("Dev Mode", _enableDevMode);
                 _offlineMode = EditorGUILayout.Toggle("Offline Mode", _offlineMode);
                 _refreshInterval = EditorGUILayout.IntSlider("Refresh Interval", _refreshInterval, 1, 300);
-                _streamingEnabled = EditorGUILayout.Toggle("Streaming (SSE)", _streamingEnabled);
+                _streamingEnabled = EditorGUILayout.Toggle("Streaming", _streamingEnabled);
+                if (_streamingEnabled)
+                {
+                    _streamingTransport = (StreamingTransport)EditorGUILayout.EnumPopup(
+                        "Transport", _streamingTransport);
+                }
                 EditorGUI.indentLevel--;
             }
 
@@ -256,6 +262,7 @@ namespace Gatrix.Unity.SDK.Editor
             so.FindProperty("_offlineMode").boolValue      = _offlineMode;
             so.FindProperty("_refreshInterval").intValue   = _refreshInterval;
             so.FindProperty("_streamingEnabled").boolValue = _streamingEnabled;
+            so.FindProperty("_streamingTransport").enumValueIndex = (int)_streamingTransport;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             var path = "Assets/Gatrix/Resources/GatrixSettings.asset";

@@ -63,7 +63,16 @@ namespace Gatrix.Unity.SDK
         private static GatrixBehaviour _instance;
         private static GatrixClient _client;
         private bool _initializedByEditor;
-        private bool _eventsBound;
+        [NonSerialized] private bool _eventsBound;
+
+        // Domain reload support: reset all static state when assemblies are reloaded
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState()
+        {
+            _client?.Dispose();
+            _client = null;
+            _instance = null;
+        }
 
         /// <summary>Get the active GatrixClient instance</summary>
         public static GatrixClient Client => _client;

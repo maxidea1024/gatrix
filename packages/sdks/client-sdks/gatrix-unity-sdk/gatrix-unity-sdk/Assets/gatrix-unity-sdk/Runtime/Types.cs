@@ -175,14 +175,38 @@ namespace Gatrix.Unity.SDK
     }
 
     /// <summary>
-    /// Streaming configuration for real-time flag invalidation via SSE
+    /// Streaming transport type selection
+    /// </summary>
+    public enum StreamingTransport
+    {
+        Sse,
+        WebSocket
+    }
+
+    /// <summary>
+    /// Streaming configuration for real-time flag invalidation
     /// </summary>
     public class StreamingConfig
     {
         /// <summary>Enable streaming (default: true)</summary>
         public bool Enabled { get; set; } = true;
 
-        /// <summary>Streaming endpoint URL override (default: derived from apiUrl)</summary>
+        /// <summary>Transport type: SSE or WebSocket (default: SSE)</summary>
+        public StreamingTransport Transport { get; set; } = StreamingTransport.Sse;
+
+        /// <summary>SSE-specific configuration</summary>
+        public SseStreamingConfig Sse { get; set; } = new SseStreamingConfig();
+
+        /// <summary>WebSocket-specific configuration</summary>
+        public WebSocketStreamingConfig WebSocket { get; set; } = new WebSocketStreamingConfig();
+    }
+
+    /// <summary>
+    /// SSE (Server-Sent Events) streaming configuration
+    /// </summary>
+    public class SseStreamingConfig
+    {
+        /// <summary>SSE endpoint URL override (default: derived from apiUrl)</summary>
         public string Url { get; set; }
 
         /// <summary>Reconnect initial delay in seconds (default: 1)</summary>
@@ -193,6 +217,24 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Polling jitter range in seconds to prevent thundering herd (default: 5)</summary>
         public int PollingJitter { get; set; } = 5;
+    }
+
+    /// <summary>
+    /// WebSocket streaming configuration
+    /// </summary>
+    public class WebSocketStreamingConfig
+    {
+        /// <summary>WebSocket endpoint URL override (default: derived from apiUrl)</summary>
+        public string Url { get; set; }
+
+        /// <summary>Reconnect initial delay in seconds (default: 1)</summary>
+        public int ReconnectBase { get; set; } = 1;
+
+        /// <summary>Reconnect max delay in seconds (default: 30)</summary>
+        public int ReconnectMax { get; set; } = 30;
+
+        /// <summary>Client-side ping interval in seconds (default: 30)</summary>
+        public int PingInterval { get; set; } = 30;
     }
 
     /// <summary>
@@ -350,6 +392,9 @@ namespace Gatrix.Unity.SDK
 
         /// <summary>Current streaming connection state</summary>
         public StreamingConnectionState StreamingState { get; set; }
+
+        /// <summary>Current streaming transport type</summary>
+        public StreamingTransport StreamingTransport { get; set; }
 
         /// <summary>Number of streaming reconnection attempts</summary>
         public int StreamingReconnectCount { get; set; }

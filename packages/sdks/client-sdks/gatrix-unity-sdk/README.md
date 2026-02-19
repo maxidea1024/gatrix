@@ -346,15 +346,26 @@ A real-time dashboard for your SDK state:
 
 | Tab | What you see |
 |-----|-------------|
-| **Overview** | SDK health, connection ID, network stats, streaming state |
+| **Overview** | SDK health, connection ID, network stats, streaming state with transport type (SSE/WebSocket) |
 | **Flags** | All flags with live ON/OFF state, variant, and value. Highlights recently changed flags in yellow. |
 | **Events** | Live event log — every SDK event with timestamp and details |
 | **Context** | Current evaluation context (userId, sessionId, custom properties) |
-| **Stats** | Detailed counters, flag access counts, missing flags, event handler leak detection |
+| **Metrics** | Dual-view metrics: **Graph** mode with real-time time-series charts, or **Report** mode with detailed tables. Streaming connection status, impression counts, metrics delivery, flag access summary, and missing flags. |
+| **Stats** | Detailed counters, flag access counts, variant hit counts, missing flags, event handler leak detection |
+
+#### Metrics Graph View ⭐ New
+The **Metrics** tab includes interactive time-series graphs rendered directly in the Editor:
+- **Network Activity** — fetches, updates, and errors plotted over time
+- **Impressions & Delivery** — impression count and metrics sent over time
+- **Reconnections** — stream reconnection attempts (shown when reconnects occur)
+- Configurable collection interval (1 second) and data retention (300 seconds)
+- Auto-scaling Y axis, grid lines, time axis labels, and color-coded legends
+- Toggle between **Graph** and **Report** views with a single click
 
 **Quick actions in the toolbar:**
 - **⚡ Sync** — appears when explicit sync mode has pending changes
 - **↻** — manual refresh
+- **● Auto / ○ Auto** — toggle auto-refresh
 - **Setup ↗** — open Setup Wizard
 - **About** — SDK version info
 
@@ -477,6 +488,44 @@ The SDK is designed for Unity's single-threaded model:
 - **ValueTask** — Async methods use `ValueTask`/`ValueTask<T>` for zero heap allocation on synchronous code paths.
 - **Thread-safe metrics** — Metrics bucket uses locking; events are dispatched via `SynchronizationContext`.
 - **MainThreadDispatcher** — Background task results are automatically marshaled to the main thread.
+
+---
+
+## 📡 Streaming Transport
+
+The SDK supports two real-time streaming transports for receiving flag updates:
+
+| Transport | Platforms | Details |
+|-----------|-----------|-------------|
+| **SSE** (Server-Sent Events) | All platforms | Default. One-way HTTP streaming. |
+| **WebSocket** | All platforms including WebGL | Full-duplex, lower latency. Auto-ping to keep connection alive. |
+
+```csharp
+var config = new GatrixClientConfig
+{
+    // ...
+    Streaming = new StreamingConfig
+    {
+        Transport = StreamingTransport.WebSocket  // default: SSE
+    }
+};
+```
+
+### WebGL Support ⭐ New
+
+The SDK fully supports Unity **WebGL** builds:
+
+- WebSocket transport automatically uses a **JavaScript interop layer** (`GatrixWebSocket.jslib`) on WebGL since `System.Net.WebSockets.ClientWebSocket` is unavailable in the browser sandbox.
+- The SDK selects the correct WebSocket implementation via `GatrixWebSocketFactory` — no manual configuration needed.
+- Supported platforms: **Windows, macOS, Linux, Android, iOS, and WebGL**.
+
+### Cross-Platform WebSocket Abstraction
+
+| Class | Platform | Implementation |
+|-------|----------|----------------|
+| `StandaloneWebSocket` | Desktop, Android, iOS | Wraps `System.Net.WebSockets.ClientWebSocket` with event-based polling |
+| `WebGLWebSocket` | WebGL | JavaScript interop via `GatrixWebSocket.jslib` using browser's native WebSocket API |
+| `GatrixWebSocketFactory` | All | Auto-selects the correct implementation at runtime |
 
 ---
 

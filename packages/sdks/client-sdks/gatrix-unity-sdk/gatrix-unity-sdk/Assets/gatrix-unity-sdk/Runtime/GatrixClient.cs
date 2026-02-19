@@ -204,6 +204,58 @@ namespace Gatrix.Unity.SDK
                                 nameof(config));
                     }
                 }
+
+                // Streaming config
+                var streaming = feat.Streaming;
+                if (streaming != null)
+                {
+                    // SSE config
+                    var sse = streaming.Sse;
+                    if (sse != null)
+                    {
+                        ValidateRange(sse.ReconnectBase, "Streaming.Sse.ReconnectBase", 1, 60);
+                        ValidateRange(sse.ReconnectMax, "Streaming.Sse.ReconnectMax", 1, 300);
+                        ValidateRange(sse.PollingJitter, "Streaming.Sse.PollingJitter", 0, 30);
+
+                        if (sse.ReconnectBase > sse.ReconnectMax)
+                            throw new ArgumentException(
+                                $"Streaming.Sse.ReconnectBase ({sse.ReconnectBase}) must be <= Streaming.Sse.ReconnectMax ({sse.ReconnectMax})",
+                                nameof(config));
+
+                        if (!string.IsNullOrEmpty(sse.Url))
+                        {
+                            if (!Uri.TryCreate(sse.Url, UriKind.Absolute, out var streamUri) ||
+                                (streamUri.Scheme != "http" && streamUri.Scheme != "https"))
+                                throw new ArgumentException(
+                                    $"Invalid Streaming.Sse.Url: \"{sse.Url}\". Must be a valid HTTP/HTTPS URL.",
+                                    nameof(config));
+                        }
+                    }
+
+                    // WebSocket config
+                    var ws = streaming.WebSocket;
+                    if (ws != null)
+                    {
+                        ValidateRange(ws.ReconnectBase, "Streaming.WebSocket.ReconnectBase", 1, 60);
+                        ValidateRange(ws.ReconnectMax, "Streaming.WebSocket.ReconnectMax", 1, 300);
+                        ValidateRange(ws.PingInterval, "Streaming.WebSocket.PingInterval", 5, 300);
+
+                        if (ws.ReconnectBase > ws.ReconnectMax)
+                            throw new ArgumentException(
+                                $"Streaming.WebSocket.ReconnectBase ({ws.ReconnectBase}) must be <= Streaming.WebSocket.ReconnectMax ({ws.ReconnectMax})",
+                                nameof(config));
+
+                        if (!string.IsNullOrEmpty(ws.Url))
+                        {
+                            if (!Uri.TryCreate(ws.Url, UriKind.Absolute, out var wsUri) ||
+                                (wsUri.Scheme != "ws" && wsUri.Scheme != "wss" &&
+                                 wsUri.Scheme != "http" && wsUri.Scheme != "https"))
+                                throw new ArgumentException(
+                                    $"Invalid Streaming.WebSocket.Url: \"{ws.Url}\". Must be a valid WS/WSS or HTTP/HTTPS URL.",
+                                    nameof(config));
+                        }
+                    }
+                }
             }
         }
 

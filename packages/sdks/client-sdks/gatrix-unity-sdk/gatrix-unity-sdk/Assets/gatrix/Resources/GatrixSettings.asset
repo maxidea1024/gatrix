@@ -33,6 +33,12 @@ MonoBehaviour:
   _initialBackoff: 1
   _maxBackoff: 60
   _streamingEnabled: 1
-  _streamingUrl: 
-  _reconnectBase: 1
-  _reconnectMax: 30
+  _streamingTransport: 1
+  _sseUrl: 
+  _sseReconnectBase: 1
+  _sseReconnectMax: 30
+  _ssePollingJitter: 5
+  _wsUrl: 
+  _wsReconnectBase: 1
+  _wsReconnectMax: 30
+  _wsPingInterval: 30

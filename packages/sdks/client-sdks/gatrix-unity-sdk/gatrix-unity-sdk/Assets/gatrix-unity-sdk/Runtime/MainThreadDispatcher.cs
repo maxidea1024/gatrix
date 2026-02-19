@@ -21,6 +21,16 @@ namespace Gatrix.Unity.SDK
         private static int _mainThreadId;
         private static bool _initialized;
 
+        // Domain reload support: reset all static state
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState()
+        {
+            _instance = null;
+            _unitySyncContext = null;
+            _mainThreadId = 0;
+            _initialized = false;
+        }
+
         // Lock-free queue using swap pattern to minimize GC
         private readonly List<Action> _pendingActions = new List<Action>(16);
         private readonly List<Action> _executingActions = new List<Action>(16);

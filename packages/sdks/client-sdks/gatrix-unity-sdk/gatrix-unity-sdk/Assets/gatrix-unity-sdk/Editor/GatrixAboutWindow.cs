@@ -12,7 +12,7 @@ namespace Gatrix.Unity.SDK.Editor
     /// </summary>
     public class GatrixAboutWindow : EditorWindow
     {
-        [MenuItem("Window/Gatrix/About", priority = 0)]
+        [MenuItem("Window/Gatrix/About", priority = 100)]
         public static void ShowWindow()
         {
             var window = GetWindow<GatrixAboutWindow>(true, "About Gatrix SDK", true);
