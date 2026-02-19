@@ -1812,7 +1812,7 @@ client.Once(GatrixEvents.Ready, args =>
 - `HasPendingSyncFlags()` returns `false` — no new data to sync
 
 ```csharp
-// Always check HasPendingSyncFlags before syncing
+// Optional: Check if there are pending changes
 if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync();

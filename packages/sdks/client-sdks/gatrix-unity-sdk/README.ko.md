@@ -1814,7 +1814,7 @@ client.Once(GatrixEvents.Ready, args =>
 - `HasPendingSyncFlags()`가 `false` 반환 — 동기화할 새 데이터 없음
 
 ```csharp
-// 동기화 전 항상 HasPendingSyncFlags 확인
+// 선택 사항: 보류 중인 변경 사항 확인
 if (features.HasPendingSyncFlags())
 {
     await features.SyncFlagsAsync();
