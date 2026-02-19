@@ -111,7 +111,7 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 if (!stats.StreamingEnabled)
                 {
-                    DrawField("Status", "<color=gray>Not Enabled</color>", true);
+                    DrawField("Status", "<color=#888888>Not Enabled</color>", true);
                 }
                 else
                 {
