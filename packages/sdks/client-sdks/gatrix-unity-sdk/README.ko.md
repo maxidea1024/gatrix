@@ -753,8 +753,9 @@ Inspector:
 ```
 Inspector:
   Flag Name: "welcome-message"
-  Format: "{0}"          ← {0}이 플래그 값으로 대체됨
-  Fallback Text: "Welcome!"
+  Format: "{0}"              ← {0}이 플래그 값으로 대체됨
+  Fallback Text: "Welcome!"   ← 플래그 값이 null/없을 때 표시
+  Hide When Disabled: ☐       ← 플래그 비활성화 시 텍스트 컴포넌트 숨김
 ```
 
 ---
@@ -1290,6 +1291,8 @@ SDK는 세 가지 운영 모드를 지원합니다. 네트워크 환경과 업�
 
 ```mermaid
 flowchart LR
+    INIT["📦 부트스트랩 / 캐시"] --> SDK["SDK"]
+
     subgraph M1 ["⚡ 스트리밍 + 폴링 (기본값)"]
         direction LR
         A1["🖥️ 서버"] -->|stream| B1["SDK"]
@@ -1303,9 +1306,13 @@ flowchart LR
 
     subgraph M3 ["📴 오프라인"]
         direction LR
-        A3["부트스트랩/캐시"] --> B3["SDK"]
+        A3["네트워크 없음"] -.->|"×"| B3["SDK"]
     end
+
+    SDK --> M1 & M2 & M3
 ```
+
+> 📦 **부트스트랩 / 캐시는 항상 첫 번째 단계입니다.** 운영 모드에 관계없이, SDK는 시작 시 부트스트랩 데이터와 캐시된 플래그를 로드하여 네트워크 요청 전에 즉시 사용할 수 있도록 합니다.
 
 ### 모드 1: 스트리밍 + 폴링 (기본값)
 

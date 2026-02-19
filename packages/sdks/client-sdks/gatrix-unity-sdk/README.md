@@ -751,8 +751,9 @@ Perfect for: displaying server-driven text, showing A/B test copy, live countdow
 ```
 Inspector:
   Flag Name: "welcome-message"
-  Format: "{0}"          ← {0} is replaced with the flag value
-  Fallback Text: "Welcome!"
+  Format: "{0}"              ← {0} is replaced with the flag value
+  Fallback Text: "Welcome!"   ← Shown when flag value is null/missing
+  Hide When Disabled: ☐       ← Hides the text component when flag is disabled
 ```
 
 ---
@@ -1288,6 +1289,8 @@ The SDK supports three operating modes. Choose based on your connectivity requir
 
 ```mermaid
 flowchart LR
+    INIT["📦 Bootstrap / Cache"] --> SDK["SDK"]
+
     subgraph M1 ["⚡ Streaming + Polling (Default)"]
         direction LR
         A1["🖥️ Server"] -->|stream| B1["SDK"]
@@ -1301,9 +1304,13 @@ flowchart LR
 
     subgraph M3 ["📴 Offline"]
         direction LR
-        A3["Bootstrap/Cache"] --> B3["SDK"]
+        A3["No network"] -.->|"×"| B3["SDK"]
     end
+
+    SDK --> M1 & M2 & M3
 ```
+
+> 📦 **Bootstrap / Cache is always the first step.** Regardless of the operating mode, the SDK loads bootstrap data and cached flags on startup for instant availability before any network request.
 
 ### Mode 1: Streaming + Polling (Default)
 

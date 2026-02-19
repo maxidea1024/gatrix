@@ -260,6 +260,7 @@ namespace Gatrix.Unity.SDK
                 OfflineMode = _offlineMode,
                 EnableDevMode = _enableDevMode,
                 CacheKeyPrefix = _cacheKeyPrefix,
+                StorageProvider = new PlayerPrefsStorageProvider(),
                 Features = new FeaturesConfig
                 {
                     RefreshInterval = _refreshInterval,

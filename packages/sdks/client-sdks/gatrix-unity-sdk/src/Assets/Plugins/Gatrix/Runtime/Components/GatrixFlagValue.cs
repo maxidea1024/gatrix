@@ -21,7 +21,7 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Text to show when flag is not found or disabled")]
         [SerializeField] private string _fallbackText = "-";
 
-        [Tooltip("Only show value when flag is enabled")]
+        [Tooltip("Hide the target GameObject when flag is disabled")]
         [SerializeField] private bool _hideWhenDisabled;
 
         [Header("Target (auto-detected if empty)")]
@@ -81,26 +81,27 @@ namespace Gatrix.Unity.SDK
         {
             if (flag == null) return;
 
-            string displayText;
+            // Hide the target text component when flag is disabled
+            // (We cannot use gameObject.SetActive(false) because OnDisable would unsubscribe us)
+            if (_hideWhenDisabled)
+            {
+                SetTargetEnabled(flag.Enabled);
+                if (!flag.Enabled) return;
+            }
 
-            if (!flag.Enabled && _hideWhenDisabled)
+            // Resolve display text
+            string displayText;
+            var value = flag.Variant?.Value;
+            if (value == null)
             {
                 displayText = _fallbackText;
             }
             else
             {
-                var value = flag.Variant?.Value;
-                if (value == null)
-                {
-                    displayText = _fallbackText;
-                }
-                else
-                {
-                    var valueStr = value.ToString();
-                    displayText = string.IsNullOrEmpty(_format)
-                        ? valueStr
-                        : string.Format(_format, valueStr);
-                }
+                var valueStr = value.ToString();
+                displayText = string.IsNullOrEmpty(_format)
+                    ? valueStr
+                    : string.Format(_format, valueStr);
             }
 
             SetText(displayText);
@@ -117,6 +118,24 @@ namespace Gatrix.Unity.SDK
             if (_tmpComponent != null && _tmpTextProperty != null)
             {
                 _tmpTextProperty.SetValue(_tmpComponent, text);
+            }
+        }
+
+        /// <summary>
+        /// Enable or disable the target text component without affecting the GameObject.
+        /// This preserves the subscription lifecycle.
+        /// </summary>
+        private void SetTargetEnabled(bool enabled)
+        {
+            if (_targetText != null)
+            {
+                _targetText.enabled = enabled;
+                return;
+            }
+
+            if (_tmpComponent is Behaviour behaviour)
+            {
+                behaviour.enabled = enabled;
             }
         }
     }

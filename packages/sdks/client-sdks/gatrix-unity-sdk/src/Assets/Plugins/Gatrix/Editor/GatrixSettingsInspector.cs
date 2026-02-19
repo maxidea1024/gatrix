@@ -168,6 +168,10 @@ namespace Gatrix.Unity.SDK.Editor
                             MessageType.Error);
                     }
                 }
+
+                EditorGUILayout.Space(4);
+                DrawBootstrapFillButtons();
+
                 GatrixEditorStyle.EndBox();
             }
 
@@ -536,6 +540,125 @@ namespace Gatrix.Unity.SDK.Editor
                 };
                 EditorGUILayout.LabelField("No custom properties configured", hintStyle);
             }
+        }
+
+        // ==================== Bootstrap Fill ====================
+
+        /// <summary>
+        /// Draws action buttons for populating bootstrap JSON from cached or live data.
+        /// </summary>
+        private void DrawBootstrapFillButtons()
+        {
+            DrawSubSectionLabel("Quick Fill");
+
+            EditorGUILayout.BeginHorizontal();
+
+            // Fill from PlayerPrefs cache (works in both Edit and Play mode)
+            if (GUILayout.Button("Fill from Cache", GUILayout.Height(22)))
+            {
+                FillBootstrapFromCache();
+            }
+
+            // Fill from live SDK (Play Mode only)
+            using (new EditorGUI.DisabledGroupScope(!Application.isPlaying || !GatrixBehaviour.IsInitialized))
+            {
+                if (GUILayout.Button("Fill from Live SDK", GUILayout.Height(22)))
+                {
+                    FillBootstrapFromLiveSdk();
+                }
+            }
+
+            // Clear button
+            using (new EditorGUI.DisabledGroupScope(string.IsNullOrWhiteSpace(_bootstrapJson.stringValue)))
+            {
+                if (GUILayout.Button("Clear", GUILayout.Width(50), GUILayout.Height(22)))
+                {
+                    _bootstrapJson.stringValue = "";
+                }
+            }
+
+            EditorGUILayout.EndHorizontal();
+
+            if (!Application.isPlaying)
+            {
+                EditorGUILayout.HelpBox(
+                    "\"Fill from Live SDK\" is only available in Play Mode.",
+                    MessageType.None);
+            }
+        }
+
+        /// <summary>
+        /// Reads cached flags from persistent storage via FeaturesClient helper.
+        /// </summary>
+        private void FillBootstrapFromCache()
+        {
+            var cachePrefix = string.IsNullOrEmpty(_cacheKeyPrefix.stringValue) ? "gatrix_cache" : _cacheKeyPrefix.stringValue;
+            var cachedJson = FeaturesClient.EditorGetCachedFlagsJson(cachePrefix);
+
+            if (string.IsNullOrWhiteSpace(cachedJson))
+            {
+                EditorUtility.DisplayDialog("Gatrix Bootstrap",
+                    "No cached flag data found.\n\nRun the application at least once to populate the cache.",
+                    "OK");
+                return;
+            }
+
+            try
+            {
+                var flags = GatrixJson.DeserializeFlags(cachedJson);
+                if (flags == null || flags.Count == 0)
+                {
+                    EditorUtility.DisplayDialog("Gatrix Bootstrap",
+                        "Cached data parsed but contains no flags.", "OK");
+                    return;
+                }
+
+                _bootstrapJson.stringValue = GatrixJson.SerializeFlags(flags);
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
+
+                Debug.Log($"[Gatrix] Bootstrap filled from cache: {flags.Count} flag(s) loaded.");
+            }
+            catch (System.Exception ex)
+            {
+                EditorUtility.DisplayDialog("Gatrix Bootstrap",
+                    $"Failed to parse cached data:\n{ex.Message}", "OK");
+            }
+        }
+
+        /// <summary>
+        /// Reads current flags from the live SDK client (Play Mode only).
+        /// </summary>
+        private void FillBootstrapFromLiveSdk()
+        {
+            if (!Application.isPlaying || !GatrixBehaviour.IsInitialized)
+            {
+                EditorUtility.DisplayDialog("Gatrix Bootstrap",
+                    "SDK is not initialized. Enter Play Mode first.", "OK");
+                return;
+            }
+
+            var client = GatrixBehaviour.Client;
+            if (client == null)
+            {
+                EditorUtility.DisplayDialog("Gatrix Bootstrap",
+                    "SDK client is null.", "OK");
+                return;
+            }
+
+            var flags = client.Features.GetAllFlags();
+            if (flags == null || flags.Count == 0)
+            {
+                EditorUtility.DisplayDialog("Gatrix Bootstrap",
+                    "No flags available from the live SDK.", "OK");
+                return;
+            }
+
+            _bootstrapJson.stringValue = GatrixJson.SerializeFlags(flags);
+            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(target);
+
+            Debug.Log($"[Gatrix] Bootstrap filled from live SDK: {flags.Count} flag(s) loaded.");
         }
     }
 }

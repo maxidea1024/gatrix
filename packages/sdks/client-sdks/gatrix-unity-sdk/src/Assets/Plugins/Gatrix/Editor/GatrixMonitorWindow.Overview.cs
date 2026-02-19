@@ -40,10 +40,6 @@ namespace Gatrix.Unity.SDK.Editor
                     EditorGUIUtility.PingObject(go.gameObject);
                 }
             }
-            if (GUILayout.Button("Setup Wizard", GUILayout.Height(26)))
-            {
-                GatrixSetupWindow.ShowWindow();
-            }
 
             // Select GatrixSettings asset directly
 #if UNITY_2023_1_OR_NEWER
@@ -58,6 +54,11 @@ namespace Gatrix.Unity.SDK.Editor
                     UnityEditor.Selection.activeObject = behaviour.Settings;
                     EditorGUIUtility.PingObject(behaviour.Settings);
                 }
+            }
+
+            if (GUILayout.Button("Setup Wizard", GUILayout.Height(26)))
+            {
+                GatrixSetupWindow.ShowWindow();
             }
 
             EditorGUILayout.EndHorizontal();

@@ -86,10 +86,10 @@ namespace Gatrix.Unity.SDK.Editor
             InitTimeSeries();
 
             // Guard against null tracks (domain reload edge case)
-            if (_tsFetchCount == null) return;
+            if (_tsFetchDelta == null) return;
 
-            // -- Time range slider --
-            float maxOffset = MetricsRetentionSec - MetricsGraphTimeWindowSec;
+            // -- Controls: Live button + time offset slider --
+            float maxOffset = MetricsRetentionSec - 30f; // at least 30s visible
             EditorGUILayout.BeginHorizontal();
             {
                 bool isDark = EditorGUIUtility.isProSkin;
@@ -98,7 +98,7 @@ namespace Gatrix.Unity.SDK.Editor
                     normal = { textColor = isDark ? new Color(0.55f, 0.58f, 0.63f) : new Color(0.42f, 0.45f, 0.50f) }
                 };
 
-                // "Live" button to jump to current
+                // "Live" button
                 bool isLive = _metricsTimeOffset < 0.5f;
                 var liveColor = GUI.backgroundColor;
                 if (isLive) GUI.backgroundColor = new Color(0.3f, 0.8f, 0.4f, 0.6f);
@@ -108,61 +108,63 @@ namespace Gatrix.Unity.SDK.Editor
                 }
                 GUI.backgroundColor = liveColor;
 
-                // Slider
+                // Time offset slider (scroll history)
                 GUILayout.Label($"-{MetricsRetentionSec:F0}s", labelStyle, GUILayout.Width(32));
                 _metricsTimeOffset = GUILayout.HorizontalSlider(_metricsTimeOffset, maxOffset, 0f);
                 GUILayout.Label("now", labelStyle, GUILayout.Width(22));
-
-                // Current range indicator
-                if (_metricsTimeOffset > 0.5f)
-                {
-                    float viewEnd = _metricsTimeOffset;
-                    float viewStart = _metricsTimeOffset + MetricsGraphTimeWindowSec;
-                    var rangeStyle = new GUIStyle(EditorStyles.miniLabel)
-                    {
-                        fontStyle = FontStyle.Bold,
-                        normal = { textColor = isDark ? new Color(0.75f, 0.65f, 0.40f) : new Color(0.55f, 0.45f, 0.20f) }
-                    };
-                    GUILayout.Label($"-{viewStart:F0}s ~ -{viewEnd:F0}s", rangeStyle, GUILayout.Width(90));
-                }
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(2);
 
-            // Network Activity graph (Fetches, Updates, Errors)
-            GatrixEditorStyle.DrawSection("Network Activity", $"Window {MetricsGraphTimeWindowSec:F0}s \u00b7 Interval {MetricsCollectIntervalSec:F0}s \u00b7 Retained {MetricsRetentionSec:F0}s");
-            var networkTracks = new List<TimeSeriesTrack> { _tsFetchCount, _tsUpdateCount, _tsErrorCount };
+            // Graphs: pixelsPerSec=3 → chart width determines visible time range
+            const float pps = 3f;
+
+            // Network Activity graph
+            GatrixEditorStyle.DrawSection("Network Activity", "Events per second");
+            var networkTracks = new List<TimeSeriesTrack> { _tsFetchDelta, _tsUpdateDelta, _tsErrorDelta };
             TimeSeriesGraphRenderer.DrawGraph(networkTracks,
-                chartHeight: 100f, timeWindowSec: MetricsGraphTimeWindowSec, timeOffset: _metricsTimeOffset);
+                chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
             EditorGUILayout.Space(4);
 
             // Impressions & Metrics graph
-            GatrixEditorStyle.DrawSection("Impressions & Metrics Delivery");
-            var impressionTracks = new List<TimeSeriesTrack> { _tsImpressionCount, _tsMetricsSentCount };
+            GatrixEditorStyle.DrawSection("Impressions & Metrics Delivery", "Events per second");
+            var impressionTracks = new List<TimeSeriesTrack> { _tsImpressionDelta, _tsMetricsSentDelta };
             TimeSeriesGraphRenderer.DrawGraph(impressionTracks,
-                chartHeight: 100f, timeWindowSec: MetricsGraphTimeWindowSec, timeOffset: _metricsTimeOffset);
+                chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
             EditorGUILayout.Space(4);
 
             // Reconnect graph (shown only if there have been reconnects)
-            if (_tsStreamReconnectCount != null && _tsStreamReconnectCount.GetLatest() > 0)
+            if (_tsStreamReconnectDelta != null && HasAnyActivity(_tsStreamReconnectDelta))
             {
                 GatrixEditorStyle.DrawSection("Stream Reconnections");
-                var reconnectTracks = new List<TimeSeriesTrack> { _tsStreamReconnectCount };
+                var reconnectTracks = new List<TimeSeriesTrack> { _tsStreamReconnectDelta };
                 TimeSeriesGraphRenderer.DrawGraph(reconnectTracks,
-                    chartHeight: 70f, timeWindowSec: MetricsGraphTimeWindowSec, timeOffset: _metricsTimeOffset);
+                    chartHeight: 50f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
                 EditorGUILayout.Space(4);
             }
 
-            // Flag state timelines
-            if (_flagTimelines != null && _flagTimelines.Count > 0)
+            // Flag state counts graph — how many flags are enabled/disabled/missing
+            if (_tsFlagEnabled != null)
             {
-                GatrixEditorStyle.DrawSection("Flag State Timeline", $"{_flagTimelines.Count} flags tracked");
-                FlagTimelineRenderer.DrawTimelines(_flagTimelines, MetricsGraphTimeWindowSec, _metricsTimeOffset);
+                GatrixEditorStyle.DrawSection("Flag State Counts", "Number of flags per state");
+                var flagStateTracks = new List<TimeSeriesTrack> { _tsFlagEnabled, _tsFlagDisabled, _tsFlagMissing };
+                TimeSeriesGraphRenderer.DrawGraph(flagStateTracks,
+                    chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
                 EditorGUILayout.Space(4);
             }
 
             // Compact current values summary
             DrawMetricsCurrentValues();
+        }
+
+        /// <summary>Check if a delta track has any non-zero value (indicating past activity)</summary>
+        private static bool HasAnyActivity(TimeSeriesTrack track)
+        {
+            for (int i = 0; i < track.Points.Count; i++)
+            {
+                if (track.Points[i].Value > 0) return true;
+            }
+            return false;
         }
 
         // ── Report View ──
@@ -250,31 +252,49 @@ namespace Gatrix.Unity.SDK.Editor
             var stats = _cachedStats;
 
             GatrixEditorStyle.DrawSection("Current Values");
-            GatrixEditorStyle.BeginBox();
 
-            EditorGUILayout.BeginHorizontal();
-            DrawCompactMetric("Fetches", stats.FetchFlagsCount, new Color(0.40f, 0.70f, 1.00f));
-            DrawCompactMetric("Updates", stats.UpdateCount, new Color(0.40f, 1.00f, 0.50f));
-            DrawCompactMetric("Errors", stats.ErrorCount, new Color(1.00f, 0.40f, 0.40f));
-            DrawCompactMetric("Impressions", stats.ImpressionCount, new Color(1.00f, 0.80f, 0.30f));
-            DrawCompactMetric("Sent", stats.MetricsSentCount, new Color(0.70f, 0.50f, 1.00f));
-            EditorGUILayout.EndHorizontal();
-
-            GatrixEditorStyle.EndBox();
-        }
-
-        private static void DrawCompactMetric(string label, int value, Color color)
-        {
-            EditorGUILayout.BeginVertical(GUILayout.MinWidth(60));
+            bool isDark = EditorGUIUtility.isProSkin;
             var valueStyle = new GUIStyle(EditorStyles.boldLabel)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = 14,
-                normal = { textColor = color }
+                fontSize = 13
             };
-            var labelStyle = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
-            EditorGUILayout.LabelField(value.ToString(), valueStyle, GUILayout.Height(22));
-            EditorGUILayout.LabelField(label, labelStyle, GUILayout.Height(14));
+            var labelStyle = new GUIStyle(EditorStyles.centeredGreyMiniLabel)
+            {
+                fontSize = 9
+            };
+            var sepStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                normal = { textColor = isDark ? new Color(0.30f, 0.30f, 0.33f) : new Color(0.70f, 0.70f, 0.73f) },
+                alignment = TextAnchor.MiddleCenter
+            };
+
+            GatrixEditorStyle.BeginBox();
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            DrawMetricItem(valueStyle, labelStyle, "Fetches", stats.FetchFlagsCount, new Color(0.40f, 0.70f, 1.00f));
+            GUILayout.Label("|", sepStyle, GUILayout.Width(8), GUILayout.Height(30));
+            DrawMetricItem(valueStyle, labelStyle, "Updates", stats.UpdateCount, new Color(0.40f, 1.00f, 0.50f));
+            GUILayout.Label("|", sepStyle, GUILayout.Width(8), GUILayout.Height(30));
+            DrawMetricItem(valueStyle, labelStyle, "Errors", stats.ErrorCount, new Color(1.00f, 0.40f, 0.40f));
+            GUILayout.Label("|", sepStyle, GUILayout.Width(8), GUILayout.Height(30));
+            DrawMetricItem(valueStyle, labelStyle, "Impressions", stats.ImpressionCount, new Color(1.00f, 0.80f, 0.30f));
+            GUILayout.Label("|", sepStyle, GUILayout.Width(8), GUILayout.Height(30));
+            DrawMetricItem(valueStyle, labelStyle, "Metrics Sent", stats.MetricsSentCount, new Color(0.70f, 0.50f, 1.00f));
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+            GatrixEditorStyle.EndBox();
+        }
+
+        private static void DrawMetricItem(GUIStyle valueStyle, GUIStyle labelStyle,
+            string label, int value, Color color)
+        {
+            float w = Mathf.Max(labelStyle.CalcSize(new GUIContent(label)).x + 8, 40f);
+            valueStyle.normal.textColor = color;
+
+            EditorGUILayout.BeginVertical(GUILayout.Width(w));
+            GUILayout.Label(value.ToString(), valueStyle, GUILayout.Height(18));
+            GUILayout.Label(label, labelStyle, GUILayout.Height(12));
             EditorGUILayout.EndVertical();
         }
     }

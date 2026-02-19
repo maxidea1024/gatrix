@@ -453,5 +453,43 @@ namespace Gatrix.Unity.SDK
             }
             return clone;
         }
+
+#if UNITY_EDITOR
+        // ==================== Editor Helpers ====================
+
+        /// <summary>
+        /// [Editor Only] Read cached flags JSON from persistent storage.
+        /// Probes PlayerPrefs and file-based storage using the given cache key prefix.
+        /// Works without a running SDK instance (Edit Mode).
+        /// </summary>
+        /// <param name="cacheKeyPrefix">Cache key prefix configured in GatrixSettings (default: "gatrix_cache")</param>
+        /// <returns>Cached flags JSON string, or null if not found.</returns>
+        public static string EditorGetCachedFlagsJson(string cacheKeyPrefix = "gatrix_cache")
+        {
+            var storageKey = $"{cacheKeyPrefix}_flags";
+
+            // 1. Try PlayerPrefs (PlayerPrefsStorageProvider: "gatrix_" prefix + storageKey)
+            var playerPrefsKey = $"gatrix_{storageKey}";
+            if (UnityEngine.PlayerPrefs.HasKey(playerPrefsKey))
+            {
+                var json = UnityEngine.PlayerPrefs.GetString(playerPrefsKey);
+                if (!string.IsNullOrWhiteSpace(json))
+                    return json;
+            }
+
+            // 2. Try file storage (FileStorageProvider: persistentDataPath/gatrix/{storageKey}.dat)
+            var safeKey = storageKey.Replace('/', '_').Replace('\\', '_').Replace(':', '_');
+            var filePath = System.IO.Path.Combine(
+                UnityEngine.Application.persistentDataPath, "gatrix", safeKey + ".dat");
+            if (System.IO.File.Exists(filePath))
+            {
+                var json = System.IO.File.ReadAllText(filePath);
+                if (!string.IsNullOrWhiteSpace(json))
+                    return json;
+            }
+
+            return null;
+        }
+#endif
     }
 }

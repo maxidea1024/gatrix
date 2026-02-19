@@ -63,41 +63,53 @@ namespace Gatrix.Unity.SDK.Editor
         // Time-series metrics collection
         private const float MetricsCollectIntervalSec = 1.0f;
         private const float MetricsRetentionSec = 300.0f;
-        private const float MetricsGraphTimeWindowSec = 30.0f;
 
         private enum MetricsViewMode { Graph, Report }
         private MetricsViewMode _metricsViewMode = MetricsViewMode.Graph;
         [NonSerialized] private float _metricsTimeOffset; // 0 = now, positive = looking back
 
-        private TimeSeriesTrack _tsFetchCount;
-        private TimeSeriesTrack _tsUpdateCount;
-        private TimeSeriesTrack _tsErrorCount;
-        private TimeSeriesTrack _tsImpressionCount;
-        private TimeSeriesTrack _tsMetricsSentCount;
-        private TimeSeriesTrack _tsStreamReconnectCount;
-        private TimeSeriesTrack _tsStreamEventCount;
-        private TimeSeriesTrack _tsStreamErrorCount;
+        // Delta-based tracks: show activity per interval (not cumulative)
+        private TimeSeriesTrack _tsFetchDelta;
+        private TimeSeriesTrack _tsUpdateDelta;
+        private TimeSeriesTrack _tsErrorDelta;
+        private TimeSeriesTrack _tsImpressionDelta;
+        private TimeSeriesTrack _tsMetricsSentDelta;
+        private TimeSeriesTrack _tsStreamReconnectDelta;
 
-        // Per-flag state timelines (non-serialized: rebuilt on domain reload)
-        [NonSerialized] private Dictionary<string, FlagStateTimeline> _flagTimelines
-            = new Dictionary<string, FlagStateTimeline>();
+        // Previous cumulative values for delta computation
+        [NonSerialized] private int _prevFetchCount;
+        [NonSerialized] private int _prevUpdateCount;
+        [NonSerialized] private int _prevErrorCount;
+        [NonSerialized] private int _prevImpressionCount;
+        [NonSerialized] private int _prevMetricsSentCount;
+        [NonSerialized] private int _prevStreamReconnectCount;
+        [NonSerialized] private bool _prevValuesInitialized;
+
+        // Flag state count tracks: how many flags are enabled/disabled/missing at each second
+        private TimeSeriesTrack _tsFlagEnabled;
+        private TimeSeriesTrack _tsFlagDisabled;
+        private TimeSeriesTrack _tsFlagMissing;
 
         private void InitTimeSeries()
         {
             // Check actual track instance, not a bool flag.
             // Unity hot-reload serializes bool fields but not custom objects,
             // so a flag could remain true while tracks become null.
-            if (_tsFetchCount != null) return;
+            if (_tsFetchDelta != null) return;
 
             int maxPoints = (int)(MetricsRetentionSec / MetricsCollectIntervalSec) + 10;
-            _tsFetchCount           = new TimeSeriesTrack("Fetches",      new Color(0.40f, 0.70f, 1.00f), maxPoints);
-            _tsUpdateCount          = new TimeSeriesTrack("Updates",      new Color(0.40f, 1.00f, 0.50f), maxPoints);
-            _tsErrorCount           = new TimeSeriesTrack("Errors",       new Color(1.00f, 0.40f, 0.40f), maxPoints);
-            _tsImpressionCount      = new TimeSeriesTrack("Impressions",  new Color(1.00f, 0.80f, 0.30f), maxPoints);
-            _tsMetricsSentCount     = new TimeSeriesTrack("Metrics Sent", new Color(0.70f, 0.50f, 1.00f), maxPoints);
-            _tsStreamReconnectCount = new TimeSeriesTrack("Reconnects",       new Color(1.00f, 0.60f, 0.20f), maxPoints);
-            _tsStreamEventCount     = new TimeSeriesTrack("Stream Events",    new Color(0.30f, 0.90f, 0.90f), maxPoints);
-            _tsStreamErrorCount     = new TimeSeriesTrack("Stream Errors",    new Color(1.00f, 0.30f, 0.30f), maxPoints);
+            _tsFetchDelta           = new TimeSeriesTrack("Fetches",    new Color(0.40f, 0.70f, 1.00f), maxPoints);
+            _tsUpdateDelta          = new TimeSeriesTrack("Updates",    new Color(0.40f, 1.00f, 0.50f), maxPoints);
+            _tsErrorDelta           = new TimeSeriesTrack("Errors",     new Color(1.00f, 0.40f, 0.40f), maxPoints);
+            _tsImpressionDelta      = new TimeSeriesTrack("Impressions",  new Color(1.00f, 0.80f, 0.30f), maxPoints);
+            _tsMetricsSentDelta     = new TimeSeriesTrack("Metrics Sent", new Color(0.70f, 0.50f, 1.00f), maxPoints);
+            _tsStreamReconnectDelta = new TimeSeriesTrack("Reconnects",   new Color(1.00f, 0.60f, 0.20f), maxPoints);
+
+            _tsFlagEnabled  = new TimeSeriesTrack("Enabled",  new Color(0.30f, 0.85f, 0.45f), maxPoints);
+            _tsFlagDisabled = new TimeSeriesTrack("Disabled", new Color(0.55f, 0.55f, 0.60f), maxPoints);
+            _tsFlagMissing  = new TimeSeriesTrack("Missing",  new Color(0.95f, 0.35f, 0.35f), maxPoints);
+
+            _prevValuesInitialized = false;
         }
 
         private void CollectTimeSeriesData(FeaturesStats stats)
@@ -105,53 +117,69 @@ namespace Gatrix.Unity.SDK.Editor
             if (stats == null) return;
             InitTimeSeries();
 
-            _tsFetchCount.Add(stats.FetchFlagsCount);
-            _tsUpdateCount.Add(stats.UpdateCount);
-            _tsErrorCount.Add(stats.ErrorCount);
-            _tsImpressionCount.Add(stats.ImpressionCount);
-            _tsMetricsSentCount.Add(stats.MetricsSentCount);
-            _tsStreamReconnectCount.Add(stats.StreamingReconnectCount);
-            _tsStreamEventCount.Add(stats.StreamingEventCount);
-            _tsStreamErrorCount.Add(stats.StreamingErrorCount);
+            if (!_prevValuesInitialized)
+            {
+                // First sample: seed previous values, record 0 delta
+                _prevFetchCount = stats.FetchFlagsCount;
+                _prevUpdateCount = stats.UpdateCount;
+                _prevErrorCount = stats.ErrorCount;
+                _prevImpressionCount = stats.ImpressionCount;
+                _prevMetricsSentCount = stats.MetricsSentCount;
+                _prevStreamReconnectCount = stats.StreamingReconnectCount;
+                _prevValuesInitialized = true;
 
-            // Per-flag state timeline collection
-            CollectFlagTimelines();
+                _tsFetchDelta.Add(0);
+                _tsUpdateDelta.Add(0);
+                _tsErrorDelta.Add(0);
+                _tsImpressionDelta.Add(0);
+                _tsMetricsSentDelta.Add(0);
+                _tsStreamReconnectDelta.Add(0);
+            }
+            else
+            {
+                // Compute deltas (activity since last sample)
+                _tsFetchDelta.Add(stats.FetchFlagsCount - _prevFetchCount);
+                _tsUpdateDelta.Add(stats.UpdateCount - _prevUpdateCount);
+                _tsErrorDelta.Add(stats.ErrorCount - _prevErrorCount);
+                _tsImpressionDelta.Add(stats.ImpressionCount - _prevImpressionCount);
+                _tsMetricsSentDelta.Add(stats.MetricsSentCount - _prevMetricsSentCount);
+                _tsStreamReconnectDelta.Add(stats.StreamingReconnectCount - _prevStreamReconnectCount);
+
+                _prevFetchCount = stats.FetchFlagsCount;
+                _prevUpdateCount = stats.UpdateCount;
+                _prevErrorCount = stats.ErrorCount;
+                _prevImpressionCount = stats.ImpressionCount;
+                _prevMetricsSentCount = stats.MetricsSentCount;
+                _prevStreamReconnectCount = stats.StreamingReconnectCount;
+            }
+
+            // Count flags by state and record to tracks
+            CollectFlagStateCounts();
         }
 
-        private void CollectFlagTimelines()
+        private void CollectFlagStateCounts()
         {
-            if (_flagTimelines == null) _flagTimelines = new Dictionary<string, FlagStateTimeline>();
-
             var flags = _cachedFlags;
-            if (flags == null || flags.Count == 0) return;
+            int enabled = 0, disabled = 0, missing = 0;
 
-            foreach (var flag in flags)
+            if (flags != null)
             {
-                if (string.IsNullOrEmpty(flag.Name)) continue;
+                foreach (var flag in flags)
+                {
+                    if (flag.Reason == Gatrix.Unity.SDK.VariantSource.Missing)
+                        missing++;
+                    else if (flag.Enabled)
+                        enabled++;
+                    else
+                        disabled++;
+                }
+            }
 
-                if (!_flagTimelines.TryGetValue(flag.Name, out var timeline))
-                {
-                    timeline = new FlagStateTimeline(flag.Name);
-                    _flagTimelines[flag.Name] = timeline;
-                }
-
-                // Determine state: missing, enabled, or disabled
-                FlagStateTimeline.FlagState state;
-                if (flag.Reason == Gatrix.Unity.SDK.VariantSource.Missing)
-                {
-                    state = FlagStateTimeline.FlagState.Missing;
-                }
-                else if (flag.Enabled)
-                {
-                    state = FlagStateTimeline.FlagState.Enabled;
-                }
-                else
-                {
-                    state = FlagStateTimeline.FlagState.Disabled;
-                }
-
-                string variantName = flag.Variant?.Name;
-                timeline.Record(state, variantName);
+            if (_tsFlagEnabled != null)
+            {
+                _tsFlagEnabled.Add(enabled);
+                _tsFlagDisabled.Add(disabled);
+                _tsFlagMissing.Add(missing);
             }
         }
 
@@ -184,7 +212,6 @@ namespace Gatrix.Unity.SDK.Editor
             if (_eventLog == null) _eventLog = new List<EventLogEntry>();
             if (_previousFlagStates == null) _previousFlagStates = new Dictionary<string, FlagSnapshot>();
             if (_changedFlagTimes == null) _changedFlagTimes = new Dictionary<string, float>();
-            if (_flagTimelines == null) _flagTimelines = new Dictionary<string, FlagStateTimeline>();
 
             // After domain reload, _isListening is false (NonSerialized),
             // so StartListening will re-subscribe if SDK is available
@@ -269,25 +296,6 @@ namespace Gatrix.Unity.SDK.Editor
             InitStyles();
             DrawWindowTitleBar();
 
-            // Edit mode (not playing) — show idle screen with config summary
-            if (!EditorApplication.isPlaying)
-            {
-                DrawToolbar();
-                _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(8);
-                EditorGUILayout.BeginVertical();
-
-                DrawEditModeScreen();
-
-                EditorGUILayout.EndVertical();
-                GUILayout.Space(8);
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndScrollView();
-                return;
-            }
-
-            // Play mode — normal monitoring UI
             DrawToolbar();
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
@@ -297,14 +305,36 @@ namespace Gatrix.Unity.SDK.Editor
             GUILayout.Space(8);
             EditorGUILayout.BeginVertical();
 
-            if (!GatrixBehaviour.IsInitialized)
+            // Edit mode banner (shown in Overview tab only)
+            if (!EditorApplication.isPlaying && _currentTab == Tab.Overview)
+            {
+                DrawEditModeScreen();
+            }
+
+            if (!EditorApplication.isPlaying && _currentTab != Tab.Overview)
+            {
+                // Show hint that data comes from play mode
+                if (!GatrixBehaviour.IsInitialized)
+                {
+                    EditorGUILayout.HelpBox(
+                        "SDK is not active. Start Play Mode to collect live data. " +
+                        "Cached data from the previous session (if any) is shown below.",
+                        MessageType.Info);
+                    EditorGUILayout.Space(4);
+                }
+            }
+
+            if (EditorApplication.isPlaying && !GatrixBehaviour.IsInitialized)
             {
                 DrawSdkNotInitializedBanner();
             }
 
             switch (_currentTab)
             {
-                case Tab.Overview: DrawOverview(); break;
+                case Tab.Overview:
+                    if (EditorApplication.isPlaying)
+                        DrawOverview();
+                    break;
                 case Tab.Flags: DrawFlags(); break;
                 case Tab.Events: DrawEventsTab(); break;
                 case Tab.Context: DrawContextTab(); break;
@@ -454,7 +484,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.DrawSection("Scene Configuration", "Detected GatrixBehaviour in current scene");
                 GatrixEditorStyle.BeginBox();
 
-                DrawField("GameObject", behaviour.gameObject.name);
+                DrawClickableField("GameObject", behaviour.gameObject.name, behaviour.gameObject);
                 DrawField("Auto Initialize", behaviour.AutoInitialize ? "<color=#88ff88>Yes</color>" : "<color=#ffcc66>No</color>", true);
 
                 if (behaviour.Settings != null)
@@ -462,7 +492,7 @@ namespace Gatrix.Unity.SDK.Editor
                     var s = behaviour.Settings;
 
                     // ── Connection ──
-                    DrawField("Settings Asset", s.name);
+                    DrawClickableField("Settings Asset", s.name, s);
                     DrawField("App Name", s.AppName ?? "-");
                     DrawField("Environment", s.Environment ?? "-");
                     DrawField("API URL", !string.IsNullOrEmpty(s.ApiUrl)
@@ -512,13 +542,21 @@ namespace Gatrix.Unity.SDK.Editor
 
                 GatrixEditorStyle.EndBox();
 
-                // Select button
+                // Quick action buttons (matching Play mode Overview)
                 EditorGUILayout.Space(4);
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Select in Hierarchy", GUILayout.Height(24)))
+                if (GUILayout.Button("Open Inspector", GUILayout.Height(24)))
                 {
                     Selection.activeGameObject = behaviour.gameObject;
                     EditorGUIUtility.PingObject(behaviour.gameObject);
+                }
+                if (behaviour.Settings != null)
+                {
+                    if (GUILayout.Button("Settings", GUILayout.Height(24)))
+                    {
+                        Selection.activeObject = behaviour.Settings;
+                        EditorGUIUtility.PingObject(behaviour.Settings);
+                    }
                 }
                 if (GUILayout.Button("Setup Wizard", GUILayout.Height(24)))
                 {
@@ -695,6 +733,122 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.EndHorizontal();
         }
 
+        private void DrawClickableField(string label, string value, UnityEngine.Object target)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(label, GUILayout.Width(150));
+
+            var linkStyle = new GUIStyle(EditorStyles.label)
+            {
+                normal = { textColor = new Color(0.4f, 0.7f, 1f) },
+                hover  = { textColor = new Color(0.5f, 0.8f, 1f) }
+            };
+            var valueRect = GUILayoutUtility.GetRect(new GUIContent(value), linkStyle, GUILayout.ExpandWidth(true));
+            EditorGUIUtility.AddCursorRect(valueRect, MouseCursor.Link);
+            GUI.Label(valueRect, value, linkStyle);
+
+            if (Event.current.type == EventType.MouseDown && valueRect.Contains(Event.current.mousePosition) && target != null)
+            {
+                EditorGUIUtility.PingObject(target);
+                Selection.activeObject = target;
+                Event.current.Use();
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private static string FormatEventDetails(string eventName, object[] args)
+        {
+            if (args == null || args.Length == 0) return "";
+
+            var arg0 = args[0];
+            if (arg0 == null) return "";
+
+            // List<EvaluatedFlag> — flags.change, flags.ready, etc.
+            if (arg0 is List<EvaluatedFlag> flagList)
+            {
+                if (flagList.Count == 0) return "0 flags";
+                var names = new List<string>();
+                for (int i = 0; i < Math.Min(flagList.Count, 5); i++)
+                    names.Add(flagList[i].Name ?? "?");
+                var summary = string.Join(", ", names);
+                if (flagList.Count > 5) summary += ", ...";
+                return $"{flagList.Count} flags: {summary}";
+            }
+
+            // ErrorEvent — errors
+            if (arg0 is ErrorEvent errorEvt)
+            {
+                var parts = new List<string>();
+                if (!string.IsNullOrEmpty(errorEvt.Type)) parts.Add(errorEvt.Type);
+                if (errorEvt.Code.HasValue) parts.Add($"code={errorEvt.Code.Value}");
+                if (errorEvt.Error != null) parts.Add(errorEvt.Error.Message);
+                return parts.Count > 0 ? string.Join(" | ", parts) : "error";
+            }
+
+            // FlagsChangedEvent — streaming invalidation
+            if (arg0 is FlagsChangedEvent changedEvt)
+            {
+                var keys = changedEvt.ChangedKeys;
+                var keysSummary = keys != null && keys.Count > 0
+                    ? string.Join(", ", keys.Count <= 5 ? keys : keys.GetRange(0, 5))
+                      + (keys.Count > 5 ? ", ..." : "")
+                    : "none";
+                return $"rev={changedEvt.GlobalRevision}, keys=[{keysSummary}]";
+            }
+
+            // StreamingConnectedEvent
+            if (arg0 is StreamingConnectedEvent connEvt)
+            {
+                return $"rev={connEvt.GlobalRevision}";
+            }
+
+            // ImpressionEvent
+            if (arg0 is ImpressionEvent impEvt)
+            {
+                return $"{impEvt.FeatureName} ({impEvt.EventType})";
+            }
+
+            // string[] — removed flags
+            if (arg0 is string[] strArr)
+            {
+                return strArr.Length > 0 ? string.Join(", ", strArr) : "";
+            }
+
+            // EvaluatedFlag — per-flag change
+            if (arg0 is EvaluatedFlag singleFlag)
+            {
+                var variant = singleFlag.Variant?.Name ?? "-";
+                var changeType = args.Length > 2 ? args[2]?.ToString() : "";
+                return $"{singleFlag.Name}: enabled={singleFlag.Enabled}, variant={variant}" +
+                       (!string.IsNullOrEmpty(changeType) ? $" ({changeType})" : "");
+            }
+
+            // int args — reconnecting (attempt, delayMs)
+            if (arg0 is int intVal)
+            {
+                if (args.Length >= 2 && args[1] is int delayMs)
+                    return $"attempt={intVal}, delay={delayMs}ms";
+                return intVal.ToString();
+            }
+
+            // string — etag, simple messages
+            if (arg0 is string strVal)
+            {
+                return strVal;
+            }
+
+            // Generic IList fallback
+            if (arg0 is System.Collections.IList list)
+            {
+                return $"{list.Count} items";
+            }
+
+            // Last resort — use type name only if ToString() returns type name
+            var str = arg0.ToString();
+            var typeName = arg0.GetType().FullName;
+            return str == typeName ? arg0.GetType().Name : str;
+        }
+
         private static string FormatTime(DateTime? time)
         {
             if (!time.HasValue) return "-";
@@ -798,8 +952,8 @@ namespace Gatrix.Unity.SDK.Editor
 
             _eventListener = (eventName, args) =>
             {
-                var details = args != null && args.Length > 0 ? args[0]?.ToString() ?? "" : "";
-                if (details.Length > 100) details = details.Substring(0, 97) + "...";
+                var details = FormatEventDetails(eventName, args);
+                if (details.Length > 150) details = details.Substring(0, 147) + "...";
 
                 _eventLog.Add(new EventLogEntry
                 {
