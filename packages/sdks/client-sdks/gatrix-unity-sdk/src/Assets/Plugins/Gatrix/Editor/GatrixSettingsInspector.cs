@@ -2,6 +2,7 @@
 // Provides organized, color-coded sections matching GatrixBehaviour inspector style
 
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,6 +26,7 @@ namespace Gatrix.Unity.SDK.Editor
         private SerializedProperty _environment;
         private SerializedProperty _userId;
         private SerializedProperty _sessionId;
+        private SerializedProperty _contextProperties;
         private SerializedProperty _offlineMode;
         private SerializedProperty _enableDevMode;
         private SerializedProperty _cacheKeyPrefix;
@@ -60,6 +62,7 @@ namespace Gatrix.Unity.SDK.Editor
             _environment = serializedObject.FindProperty("_environment");
             _userId = serializedObject.FindProperty("_userId");
             _sessionId = serializedObject.FindProperty("_sessionId");
+            _contextProperties = serializedObject.FindProperty("_contextProperties");
             _offlineMode = serializedObject.FindProperty("_offlineMode");
             _enableDevMode = serializedObject.FindProperty("_enableDevMode");
             _cacheKeyPrefix = serializedObject.FindProperty("_cacheKeyPrefix");
@@ -116,12 +119,18 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             // ── Context ──
-            _showContext = DrawCollapsibleSectionBar("  Initial Context", _showContext, "(optional)", GatrixEditorStyle.AccentTeal);
+            _showContext = DrawCollapsibleSectionBar("  Initial Context", _showContext,
+                _contextProperties.arraySize > 0 ? $"{_contextProperties.arraySize} props" : "(optional)",
+                GatrixEditorStyle.AccentTeal);
             if (_showContext)
             {
                 GatrixEditorStyle.BeginBox();
                 EditorGUILayout.PropertyField(_userId, new GUIContent("User ID"));
                 EditorGUILayout.PropertyField(_sessionId, new GUIContent("Session ID"));
+
+                EditorGUILayout.Space(4);
+                DrawSubSectionLabel("Custom Properties");
+                DrawContextPropertiesList();
                 GatrixEditorStyle.EndBox();
             }
 
@@ -415,6 +424,118 @@ namespace Gatrix.Unity.SDK.Editor
                 normal = { textColor = isDark ? new Color(0.50f, 0.65f, 0.90f) : new Color(0.20f, 0.35f, 0.65f) }
             };
             EditorGUILayout.LabelField(text, style);
+        }
+
+        // ==================== Context Properties List ====================
+
+        private void DrawContextPropertiesList()
+        {
+            int removeIndex = -1;
+            var duplicateKeys = new HashSet<string>();
+            var seenKeys = new HashSet<string>();
+
+            // Detect duplicates
+            for (int i = 0; i < _contextProperties.arraySize; i++)
+            {
+                var element = _contextProperties.GetArrayElementAtIndex(i);
+                var key = element.FindPropertyRelative("Key").stringValue;
+                if (!string.IsNullOrWhiteSpace(key))
+                {
+                    if (!seenKeys.Add(key))
+                        duplicateKeys.Add(key);
+                }
+            }
+
+            // Draw each property row
+            for (int i = 0; i < _contextProperties.arraySize; i++)
+            {
+                var element = _contextProperties.GetArrayElementAtIndex(i);
+                var keyProp = element.FindPropertyRelative("Key");
+                var valueProp = element.FindPropertyRelative("Value");
+                var typeProp = element.FindPropertyRelative("Type");
+
+                EditorGUILayout.BeginHorizontal();
+
+                // Key field
+                var keyValue = keyProp.stringValue;
+                bool isDuplicate = !string.IsNullOrWhiteSpace(keyValue) && duplicateKeys.Contains(keyValue);
+                if (isDuplicate)
+                {
+                    var oldColor = GUI.color;
+                    GUI.color = new Color(1f, 0.6f, 0.4f);
+                    EditorGUILayout.PropertyField(keyProp, GUIContent.none, GUILayout.Width(100));
+                    GUI.color = oldColor;
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(keyProp, GUIContent.none, GUILayout.Width(100));
+                }
+
+                // Type dropdown
+                EditorGUILayout.PropertyField(typeProp, GUIContent.none, GUILayout.Width(65));
+
+                // Value field — show appropriate input based on type
+                var propType = (ContextPropertyType)typeProp.enumValueIndex;
+                switch (propType)
+                {
+                    case ContextPropertyType.Boolean:
+                        bool boolVal = string.Equals(valueProp.stringValue, "true", System.StringComparison.OrdinalIgnoreCase)
+                                       || valueProp.stringValue == "1";
+                        bool newBoolVal = EditorGUILayout.Toggle(boolVal);
+                        if (newBoolVal != boolVal)
+                            valueProp.stringValue = newBoolVal ? "true" : "false";
+                        break;
+                    default:
+                        EditorGUILayout.PropertyField(valueProp, GUIContent.none);
+                        break;
+                }
+
+                // Remove button
+                if (GUILayout.Button("✕", GUILayout.Width(22), GUILayout.Height(18)))
+                {
+                    removeIndex = i;
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
+
+            // Remove deferred
+            if (removeIndex >= 0)
+            {
+                _contextProperties.DeleteArrayElementAtIndex(removeIndex);
+            }
+
+            // Duplicate key warning
+            if (duplicateKeys.Count > 0)
+            {
+                EditorGUILayout.HelpBox(
+                    $"Duplicate key(s) detected: {string.Join(", ", duplicateKeys)}. Only the last value will be used.",
+                    MessageType.Warning);
+            }
+
+            // Add button
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("+ Add Property", GUILayout.Width(120)))
+            {
+                _contextProperties.InsertArrayElementAtIndex(_contextProperties.arraySize);
+                var newElement = _contextProperties.GetArrayElementAtIndex(_contextProperties.arraySize - 1);
+                newElement.FindPropertyRelative("Key").stringValue = "";
+                newElement.FindPropertyRelative("Value").stringValue = "";
+                newElement.FindPropertyRelative("Type").enumValueIndex = 0; // String
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (_contextProperties.arraySize == 0)
+            {
+                var hintStyle = new GUIStyle(EditorStyles.miniLabel)
+                {
+                    fontStyle = FontStyle.Italic,
+                    alignment = TextAnchor.MiddleCenter,
+                    normal = { textColor = new Color(0.5f, 0.5f, 0.5f) }
+                };
+                EditorGUILayout.LabelField("No custom properties configured", hintStyle);
+            }
         }
     }
 }

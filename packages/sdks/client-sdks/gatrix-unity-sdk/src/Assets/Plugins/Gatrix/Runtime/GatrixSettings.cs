@@ -8,6 +8,32 @@ using UnityEngine;
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
+    /// Supported value types for context properties configured in the Inspector.
+    /// </summary>
+    public enum ContextPropertyType
+    {
+        String,
+        Number,
+        Boolean
+    }
+
+    /// <summary>
+    /// A single key-value context property that can be serialized by Unity.
+    /// </summary>
+    [Serializable]
+    public class ContextProperty
+    {
+        [Tooltip("Property key")]
+        public string Key;
+
+        [Tooltip("Property value")]
+        public string Value;
+
+        [Tooltip("Value type for proper conversion")]
+        public ContextPropertyType Type = ContextPropertyType.String;
+    }
+
+    /// <summary>
     /// ScriptableObject that stores Gatrix SDK configuration.
     /// Create via Assets > Create > Gatrix > Settings.
     /// Assign to GatrixBehaviour in the scene for zero-code initialization.
@@ -40,6 +66,9 @@ namespace Gatrix.Unity.SDK
 
         [Tooltip("Initial session ID (optional)")]
         [SerializeField] private string _sessionId;
+
+        [Tooltip("Custom context properties sent with every flag evaluation")]
+        [SerializeField] private List<ContextProperty> _contextProperties = new List<ContextProperty>();
 
         // ==================== General Settings ====================
 
@@ -214,6 +243,9 @@ namespace Gatrix.Unity.SDK
         /// <summary>Bootstrap override flag</summary>
         public bool BootstrapOverride => _bootstrapOverride;
 
+        /// <summary>Custom context properties</summary>
+        public List<ContextProperty> ContextProperties => _contextProperties;
+
         // ==================== Config Builder ====================
 
         /// <summary>Build a GatrixClientConfig from these settings</summary>
@@ -263,14 +295,40 @@ namespace Gatrix.Unity.SDK
                 }
             };
 
-            // Set initial context if userId or sessionId provided
-            if (!string.IsNullOrEmpty(_userId) || !string.IsNullOrEmpty(_sessionId))
+            // Set initial context
+            if (!string.IsNullOrEmpty(_userId) || !string.IsNullOrEmpty(_sessionId) || _contextProperties.Count > 0)
             {
                 config.Context = new GatrixContext
                 {
                     UserId = string.IsNullOrEmpty(_userId) ? null : _userId,
                     SessionId = string.IsNullOrEmpty(_sessionId) ? null : _sessionId
                 };
+
+                // Add custom properties
+                if (_contextProperties.Count > 0)
+                {
+                    config.Context.Properties = new Dictionary<string, object>();
+                    foreach (var prop in _contextProperties)
+                    {
+                        if (string.IsNullOrWhiteSpace(prop.Key)) continue;
+
+                        object value;
+                        switch (prop.Type)
+                        {
+                            case ContextPropertyType.Number:
+                                value = double.TryParse(prop.Value, out var num) ? (object)num : prop.Value;
+                                break;
+                            case ContextPropertyType.Boolean:
+                                value = string.Equals(prop.Value, "true", StringComparison.OrdinalIgnoreCase)
+                                        || prop.Value == "1";
+                                break;
+                            default:
+                                value = prop.Value ?? "";
+                                break;
+                        }
+                        config.Context.Properties[prop.Key] = value;
+                    }
+                }
             }
 
             // Bootstrap data
