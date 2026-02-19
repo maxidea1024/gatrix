@@ -253,15 +253,81 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.Space(3);
         }
 
+        // ==================== Window Header (for EditorWindow) ====================
+
+        /// <summary>
+        /// Draws a window-level header bar.
+        /// Uses EditorGUILayout.GetControlRect for reliable layout reservation.
+        /// Call this BEFORE BeginScrollView.
+        /// </summary>
+        public static void DrawWindowHeader(string title, string subtitle, string icon = "\u25c6", float height = 44f)
+        {
+            var rect = EditorGUILayout.GetControlRect(false, height);
+            float fullWidth = EditorGUIUtility.currentViewWidth;
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(new Rect(0, rect.y, fullWidth, rect.height), TitleBarBg);
+                EditorGUI.DrawRect(new Rect(0, rect.y, 4, rect.height), AccentBlue);
+                EditorGUI.DrawRect(new Rect(0, rect.yMax - 1, fullWidth, 1),
+                    new Color(AccentBlue.r, AccentBlue.g, AccentBlue.b, 0.5f));
+            }
+
+            // Icon
+            var iconStyle = new GUIStyle(EditorStyles.boldLabel)
+            {
+                fontSize = 14, alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = AccentBlue }
+            };
+            GUI.Label(new Rect(rect.x + 8, rect.y, 20, rect.height), icon, iconStyle);
+
+            // Title + subtitle
+            float titleY = string.IsNullOrEmpty(subtitle)
+                ? rect.y + (rect.height - 16) / 2f
+                : rect.y + (rect.height - 34) / 2f;
+            GUI.Label(new Rect(rect.x + 30, titleY, rect.width - 40, 18), title, TitleBarLabel);
+            if (!string.IsNullOrEmpty(subtitle))
+            {
+                GUI.Label(new Rect(rect.x + 30, titleY + 18, rect.width - 40, 14), subtitle, TitleBarSubLabel);
+            }
+        }
+
+        // ==================== Section Header (for EditorWindow content) ====================
+
+        /// <summary>
+        /// Draws a section header bar with left accent color.
+        /// Uses EditorGUILayout.GetControlRect for reliable layout reservation.
+        /// </summary>
+        public static void DrawSectionHeader(string title, Color accentColor)
+        {
+            EditorGUILayout.Space(6);
+            var rect = EditorGUILayout.GetControlRect(false, 22);
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(rect, SectionHeaderBg);
+                EditorGUI.DrawRect(new Rect(rect.x, rect.y, 3, rect.height), accentColor);
+                EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1, rect.width, 1),
+                    new Color(accentColor.r, accentColor.g, accentColor.b, 0.3f));
+            }
+
+            var style = new GUIStyle(EditorStyles.boldLabel)
+            {
+                fontSize = 11, alignment = TextAnchor.MiddleLeft,
+                normal = { textColor = DefaultTextColor }
+            };
+            EditorGUI.LabelField(new Rect(rect.x + 10, rect.y, rect.width - 14, rect.height), title, style);
+
+            EditorGUILayout.Space(4);
+        }
+
         // ==================== Splitter ====================
 
         public static void DrawSplitter()
         {
-            var rect = GUILayoutUtility.GetRect(1f, 1f);
-            rect.xMin = 0f;
-            rect.width = EditorGUIUtility.currentViewWidth;
+            var rect = EditorGUILayout.GetControlRect(false, 1);
             if (Event.current.type == EventType.Repaint)
-                EditorGUI.DrawRect(rect, Splitter);
+                EditorGUI.DrawRect(new Rect(0, rect.y, EditorGUIUtility.currentViewWidth, 1), Splitter);
         }
 
         // ==================== Box / Group ====================
@@ -396,22 +462,24 @@ namespace Gatrix.Unity.SDK.Editor
             };
 
             float textWidth  = EditorGUIUtility.currentViewWidth - 52f;
-            float textHeight = textStyle.CalcHeight(new GUIContent(message), textWidth);
+            float textHeight = textStyle.CalcHeight(new GUIContent(message), Mathf.Max(textWidth, 100f));
             float boxHeight  = Mathf.Max(28f, textHeight + 12f);
 
-            var boxRect = GUILayoutUtility.GetRect(0, boxHeight, GUILayout.ExpandWidth(true));
+            // Use EditorGUILayout.GetControlRect for reliable layout reservation
+            var outerRect = EditorGUILayout.GetControlRect(false, boxHeight + 4f);
+            var boxRect   = new Rect(outerRect.x + 4, outerRect.y + 2, outerRect.width - 8, boxHeight);
 
             if (Event.current.type == EventType.Repaint)
             {
                 EditorGUI.DrawRect(boxRect, bgColor);
-                EditorGUI.DrawRect(new Rect(boxRect.x,          boxRect.y,        boxRect.width, 1),            borderColor);
-                EditorGUI.DrawRect(new Rect(boxRect.x,          boxRect.yMax - 1, boxRect.width, 1),            borderColor);
-                EditorGUI.DrawRect(new Rect(boxRect.x,          boxRect.y,        1,             boxRect.height), borderColor);
-                EditorGUI.DrawRect(new Rect(boxRect.xMax - 1,   boxRect.y,        1,             boxRect.height), borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.x,        boxRect.y,        boxRect.width, 1),             borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.x,        boxRect.yMax - 1, boxRect.width, 1),             borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.x,        boxRect.y,        1,             boxRect.height), borderColor);
+                EditorGUI.DrawRect(new Rect(boxRect.xMax - 1, boxRect.y,        1,             boxRect.height), borderColor);
             }
 
-            GUI.Label(new Rect(boxRect.x + 6,  boxRect.y + 6, 18,                    18),            icon,    iconStyle);
-            GUI.Label(new Rect(boxRect.x + 28, boxRect.y + 6, boxRect.width - 34,    boxHeight - 12), message, textStyle);
+            GUI.Label(new Rect(boxRect.x + 6,  boxRect.y + 6, 18,                 18),            icon,    iconStyle);
+            GUI.Label(new Rect(boxRect.x + 28, boxRect.y + 6, boxRect.width - 34, boxHeight - 12), message, textStyle);
 
             EditorGUILayout.Space(2);
         }

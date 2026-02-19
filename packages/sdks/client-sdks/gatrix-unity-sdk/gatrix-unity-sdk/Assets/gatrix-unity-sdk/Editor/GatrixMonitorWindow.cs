@@ -153,6 +153,11 @@ namespace Gatrix.Unity.SDK.Editor
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
+            // Add left/right padding for breathing room
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(8);
+            EditorGUILayout.BeginVertical();
+
             if (!GatrixBehaviour.IsInitialized)
             {
                 DrawSdkNotInitializedBanner();
@@ -166,6 +171,10 @@ namespace Gatrix.Unity.SDK.Editor
                 case Tab.Context: DrawContextTab(); break;
                 case Tab.Statistics: DrawStatistics(); break;
             }
+
+            EditorGUILayout.EndVertical();
+            GUILayout.Space(8);
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.EndScrollView();
         }
@@ -501,16 +510,66 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void DrawFlagTable(List<EvaluatedFlag> flags, string filter)
         {
-            GatrixEditorStyle.BeginBox();
-            
+            bool isDark = EditorGUIUtility.isProSkin;
+
+            // Column layout: State | Name | Variant | Type | Value | Rev (same as Inspector)
+            const float stateX = 4;
+            const float stateW = 38;
+            const float nameX  = 48;
+            const float typeW  = 50;
+            const float revW   = 30;
+            float totalW   = EditorGUIUtility.currentViewWidth;
+            float dynamicW = totalW - nameX - typeW - revW - 30;
+            float nameW    = dynamicW * 0.25f;
+            float variantX = nameX + nameW;
+            float variantW = dynamicW * 0.38f;
+            float typeX    = variantX + variantW;
+            float valueX   = typeX + typeW;
+            float valueW   = dynamicW * 0.37f;
+            float revX     = valueX + valueW + 4;
+
             // Table header
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-            EditorGUILayout.LabelField("Name", EditorStyles.miniLabel, GUILayout.MinWidth(120));
-            EditorGUILayout.LabelField("State", EditorStyles.miniLabel, GUILayout.Width(30));
-            EditorGUILayout.LabelField("Variant", EditorStyles.miniLabel, GUILayout.Width(90));
-            EditorGUILayout.LabelField("Val", EditorStyles.miniLabel, GUILayout.MinWidth(80));
-            EditorGUILayout.LabelField("Type", EditorStyles.miniLabel, GUILayout.Width(50));
-            EditorGUILayout.EndHorizontal();
+            var headerRect = EditorGUILayout.GetControlRect(false, 18);
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(headerRect,
+                    isDark ? new Color(0.13f, 0.13f, 0.15f, 1f) : new Color(0.70f, 0.70f, 0.72f, 1f));
+            }
+            var hStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                fontStyle = FontStyle.Bold,
+                normal    = { textColor = isDark ? new Color(0.55f, 0.60f, 0.65f) : new Color(0.28f, 0.30f, 0.33f) }
+            };
+            GUI.Label(new Rect(headerRect.x + stateX,   headerRect.y, stateW,   headerRect.height), "State",   hStyle);
+            GUI.Label(new Rect(headerRect.x + nameX,    headerRect.y, nameW,    headerRect.height), "Name",    hStyle);
+            GUI.Label(new Rect(headerRect.x + variantX, headerRect.y, variantW, headerRect.height), "Variant", hStyle);
+            GUI.Label(new Rect(headerRect.x + typeX,    headerRect.y, typeW,    headerRect.height), "Type",    hStyle);
+            GUI.Label(new Rect(headerRect.x + valueX,   headerRect.y, valueW,   headerRect.height), "Value",   hStyle);
+            var revHStyle = new GUIStyle(hStyle) { alignment = TextAnchor.MiddleRight };
+            GUI.Label(new Rect(headerRect.x + revX,     headerRect.y, revW,     headerRect.height), "Rev",     revHStyle);
+
+            // Styles for rows
+            var flagOnStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
+            };
+            var flagOffStyle = new GUIStyle(flagOnStyle);
+            var rowValueStyle = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = 11,
+                normal = { textColor = isDark ? new Color(0.88f, 0.90f, 0.92f) : new Color(0.08f, 0.10f, 0.12f) }
+            };
+            var rowLabelStyle = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = 11,
+                normal = { textColor = isDark ? new Color(0.58f, 0.63f, 0.70f) : new Color(0.32f, 0.35f, 0.40f) }
+            };
+            var revStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                alignment = TextAnchor.MiddleRight,
+                normal = { textColor = isDark ? new Color(0.50f, 0.53f, 0.58f) : new Color(0.40f, 0.42f, 0.45f) }
+            };
 
             int visibleIndex = 0;
             for (int i = 0; i < flags.Count; i++)
@@ -518,73 +577,65 @@ namespace Gatrix.Unity.SDK.Editor
                 var flag = flags[i];
                 if (!string.IsNullOrEmpty(filter) &&
                     !flag.Name.ToLowerInvariant().Contains(filter))
-                {
                     continue;
+
+                var rowRect = EditorGUILayout.GetControlRect(false, 20);
+
+                // Change highlight or alternating tint
+                bool isChanged = _changedFlagTimes.TryGetValue(flag.Name, out float changeTime);
+                float elapsed = isChanged ? (float)EditorApplication.timeSinceStartup - changeTime : HighlightDuration;
+                bool showHighlight = isChanged && elapsed < HighlightDuration;
+
+                if (Event.current.type == EventType.Repaint)
+                {
+                    if (showHighlight)
+                    {
+                        float alpha = Mathf.Lerp(0.35f, 0f, elapsed / HighlightDuration);
+                        EditorGUI.DrawRect(rowRect, new Color(1f, 0.85f, 0f, alpha));
+                    }
+                    else if (visibleIndex % 2 == 0)
+                    {
+                        EditorGUI.DrawRect(rowRect,
+                            isDark ? new Color(0.16f, 0.16f, 0.18f, 0.5f) : new Color(0.84f, 0.84f, 0.86f, 0.5f));
+                    }
                 }
 
-                DrawFlagRow(flag, visibleIndex);
+                // ON/OFF badge
+                bool on = flag.Enabled;
+                var badgeColor = on ? new Color(0.10f, 0.45f, 0.18f, 1f) : new Color(0.45f, 0.10f, 0.10f, 1f);
+                var badgeRect  = new Rect(rowRect.x + stateX, rowRect.y + 3, stateW, 14);
+                if (Event.current.type == EventType.Repaint)
+                    EditorGUI.DrawRect(badgeRect, badgeColor);
+                GUI.Label(badgeRect, on ? "ON" : "OFF", on ? flagOnStyle : flagOffStyle);
+
+                // Name
+                GUI.Label(new Rect(rowRect.x + nameX, rowRect.y, nameW, rowRect.height),
+                    new GUIContent(flag.Name, flag.Name), rowValueStyle);
+
+                // Variant
+                GUI.Label(new Rect(rowRect.x + variantX, rowRect.y, variantW, rowRect.height),
+                    new GUIContent(flag.Variant?.Name ?? "", flag.Variant?.Name ?? ""), rowLabelStyle);
+
+                // Type
+                GUI.Label(new Rect(rowRect.x + typeX, rowRect.y, typeW, rowRect.height),
+                    ValueTypeHelper.ToApiString(flag.ValueType), rowLabelStyle);
+
+                // Value
+                string valueStr = FormatPayload(flag.Variant?.Value);
+                GUI.Label(new Rect(rowRect.x + valueX, rowRect.y, valueW, rowRect.height),
+                    new GUIContent(valueStr, flag.Variant?.Value?.ToString() ?? ""), rowValueStyle);
+
+                // Revision
+                GUI.Label(new Rect(rowRect.x + revX, rowRect.y, revW, rowRect.height),
+                    flag.Version.ToString(), revStyle);
+
                 visibleIndex++;
             }
-            
+
             if (visibleIndex == 0)
             {
                 GatrixEditorStyle.DrawHelpBox("No flags found matching filter.", MessageType.Info);
             }
-            
-            GatrixEditorStyle.EndBox();
-        }
-
-        private void DrawFlagRow(EvaluatedFlag flag, int index)
-        {
-            // Check if this flag was recently changed
-            bool isChanged = _changedFlagTimes.TryGetValue(flag.Name, out float changeTime);
-            float elapsed = isChanged ? (float)EditorApplication.timeSinceStartup - changeTime : HighlightDuration;
-            bool showHighlight = isChanged && elapsed < HighlightDuration;
-
-            Color bgColor;
-            if (showHighlight)
-            {
-                float alpha = Mathf.Lerp(0.35f, 0f, elapsed / HighlightDuration);
-                bgColor = new Color(1f, 0.85f, 0f, alpha);
-            }
-            else
-            {
-                bgColor = index % 2 == 0
-                    ? (EditorGUIUtility.isProSkin ? new Color(0.18f, 0.18f, 0.18f, 0.3f) : new Color(0.9f, 0.9f, 0.9f, 0.3f))
-                    : Color.clear;
-            }
-
-            var rect = EditorGUILayout.BeginHorizontal();
-            if (bgColor != Color.clear)
-            {
-                EditorGUI.DrawRect(rect, bgColor);
-            }
-
-            // Flag name
-            EditorGUILayout.LabelField(new GUIContent(flag.Name, flag.Name), _flagNameStyle, GUILayout.MinWidth(120));
-
-            // Enabled
-            var enabledColor = flag.Enabled ? "#88ff88" : "#ff8888";
-            var enabledText = flag.Enabled ? "ON" : "OFF";
-            EditorGUILayout.LabelField(
-                $"<color={enabledColor}>{enabledText}</color>",
-                _statusLabelStyle, GUILayout.Width(30));
-
-            // Variant name
-            var variantName = flag.Variant?.Name ?? "-";
-            if(variantName.Length > 15) variantName = variantName.Substring(0, 12) + "...";
-            EditorGUILayout.LabelField(new GUIContent(variantName, flag.Variant?.Name), GUILayout.Width(90));
-
-            // Value (bordered box)
-            var payloadStr = FormatPayload(flag.Variant?.Value);
-            var valueRect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight, GUILayout.MinWidth(80));
-            DrawDashedBorderBox(valueRect, payloadStr);
-            
-            // Type
-            EditorGUILayout.LabelField(
-                ValueTypeHelper.ToApiString(flag.ValueType), EditorStyles.miniLabel, GUILayout.Width(50));
-
-            EditorGUILayout.EndHorizontal();
         }
 
         private static string FormatPayload(object payload)
@@ -642,6 +693,8 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void DrawEventsTab()
         {
+            bool isDark = EditorGUIUtility.isProSkin;
+
             // Control bar
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             EditorGUILayout.LabelField(
@@ -688,18 +741,77 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
+            // Column layout: Time | Type | Parameter
+            const float timeW = 90;
+            const float timeX = 4;
+            const float typeX = timeW + 8;
+            float totalW  = EditorGUIUtility.currentViewWidth;
+            float typeW   = (totalW - typeX - 20) * 0.35f;
+            float paramX  = typeX + typeW + 4;
+            float paramW  = totalW - paramX - 16;
+
+            // Table header
+            var headerRect = EditorGUILayout.GetControlRect(false, 18);
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(headerRect,
+                    isDark ? new Color(0.13f, 0.13f, 0.15f, 1f) : new Color(0.70f, 0.70f, 0.72f, 1f));
+            }
+            var hStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                fontStyle = FontStyle.Bold,
+                normal    = { textColor = isDark ? new Color(0.55f, 0.60f, 0.65f) : new Color(0.28f, 0.30f, 0.33f) }
+            };
+            GUI.Label(new Rect(headerRect.x + timeX,  headerRect.y, timeW,  headerRect.height), "Time",      hStyle);
+            GUI.Label(new Rect(headerRect.x + typeX,  headerRect.y, typeW,  headerRect.height), "Type",      hStyle);
+            GUI.Label(new Rect(headerRect.x + paramX, headerRect.y, paramW, headerRect.height), "Parameter", hStyle);
+
+            // Row styles
+            var timeStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                normal = { textColor = isDark ? new Color(0.50f, 0.53f, 0.58f) : new Color(0.45f, 0.48f, 0.52f) }
+            };
+            var typeStyle = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = 11, fontStyle = FontStyle.Bold, richText = true
+            };
+            var paramStyle = new GUIStyle(EditorStyles.label)
+            {
+                fontSize = 11,
+                normal = { textColor = isDark ? new Color(0.65f, 0.68f, 0.72f) : new Color(0.30f, 0.33f, 0.38f) }
+            };
+
             _eventLogScroll = EditorGUILayout.BeginScrollView(_eventLogScroll, GUILayout.ExpandHeight(true));
 
             // Draw events in reverse (newest first)
             for (int i = _eventLog.Count - 1; i >= 0; i--)
             {
                 var entry = _eventLog[i];
-                var timeStr = entry.Time.ToString("HH:mm:ss.fff");
-                var color = GetEventColor(entry.EventName);
+                int visIdx = _eventLog.Count - 1 - i;
+                var rowRect = EditorGUILayout.GetControlRect(false, 20);
 
-                EditorGUILayout.LabelField(
-                    $"<color=#888>{timeStr}</color> <color={color}>{entry.EventName}</color> {entry.Details}",
-                    _eventBoxStyle);
+                // Alternating row tint
+                if (Event.current.type == EventType.Repaint && visIdx % 2 == 0)
+                {
+                    EditorGUI.DrawRect(rowRect,
+                        isDark ? new Color(0.16f, 0.16f, 0.18f, 0.5f) : new Color(0.84f, 0.84f, 0.86f, 0.5f));
+                }
+
+                // Time
+                var timeStr = entry.Time.ToString("HH:mm:ss.fff");
+                GUI.Label(new Rect(rowRect.x + timeX, rowRect.y, timeW, rowRect.height), timeStr, timeStyle);
+
+                // Type (colored)
+                var color = GetEventColor(entry.EventName);
+                GUI.Label(new Rect(rowRect.x + typeX, rowRect.y, typeW, rowRect.height),
+                    $"<color={color}>{entry.EventName}</color>", typeStyle);
+
+                // Parameter
+                if (!string.IsNullOrEmpty(entry.Details))
+                {
+                    GUI.Label(new Rect(rowRect.x + paramX, rowRect.y, paramW, rowRect.height),
+                        new GUIContent(entry.Details, entry.Details), paramStyle);
+                }
             }
 
             EditorGUILayout.EndScrollView();

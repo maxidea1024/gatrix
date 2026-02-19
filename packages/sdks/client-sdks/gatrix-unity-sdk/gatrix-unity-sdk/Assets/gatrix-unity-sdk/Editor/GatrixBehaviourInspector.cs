@@ -18,9 +18,7 @@ namespace Gatrix.Unity.SDK.Editor
         private bool _showContext = false;
         private bool _showStats   = true;
 
-        private const float LabelWidth    = 110f;
-        private const float FlagStateWidth = 36f;
-        private const float FlagNameWidth  = 150f;
+        private const float LabelWidth = 110f;
 
         private bool _stylesInitialized;
         private GUIStyle _richLabel;
@@ -317,6 +315,22 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
+            // Column layout: State | Name | Variant | Type | Value | Rev
+            const float stateX = 4;
+            const float stateW = 38;
+            const float nameX  = 48;
+            const float typeW  = 50;
+            const float revW   = 30;
+            float totalW = EditorGUIUtility.currentViewWidth;
+            float dynamicW     = totalW - nameX - typeW - revW - 50;
+            float nameW        = dynamicW * 0.25f;
+            float variantX     = nameX + nameW;
+            float variantW     = dynamicW * 0.38f;
+            float typeX        = variantX + variantW;
+            float valueX       = typeX + typeW;
+            float valueW       = dynamicW * 0.37f;
+            float revX         = valueX + valueW + 4;
+
             // Table header
             var headerRect = EditorGUILayout.GetControlRect(false, 18);
             if (Event.current.type == EventType.Repaint)
@@ -329,9 +343,14 @@ namespace Gatrix.Unity.SDK.Editor
                 fontStyle = FontStyle.Bold,
                 normal    = { textColor = isDark ? new Color(0.55f, 0.60f, 0.65f) : new Color(0.28f, 0.30f, 0.33f) }
             };
-            GUI.Label(new Rect(headerRect.x + 4,  headerRect.y, 40,           headerRect.height), "State",   hStyle);
-            GUI.Label(new Rect(headerRect.x + 48, headerRect.y, FlagNameWidth, headerRect.height), "Name",    hStyle);
-            GUI.Label(new Rect(headerRect.x + 48 + FlagNameWidth, headerRect.y, 200, headerRect.height), "Variant", hStyle);
+
+            GUI.Label(new Rect(headerRect.x + stateX,   headerRect.y, stateW,   headerRect.height), "State",   hStyle);
+            GUI.Label(new Rect(headerRect.x + nameX,    headerRect.y, nameW,    headerRect.height), "Name",    hStyle);
+            GUI.Label(new Rect(headerRect.x + variantX, headerRect.y, variantW, headerRect.height), "Variant", hStyle);
+            GUI.Label(new Rect(headerRect.x + typeX,    headerRect.y, typeW,    headerRect.height), "Type",    hStyle);
+            GUI.Label(new Rect(headerRect.x + valueX,   headerRect.y, valueW,   headerRect.height), "Value",   hStyle);
+            var revHStyle = new GUIStyle(hStyle) { alignment = TextAnchor.MiddleRight };
+            GUI.Label(new Rect(headerRect.x + revX,     headerRect.y, revW,     headerRect.height), "Rev",     revHStyle);
 
             // Rows
             for (int i = 0; i < flags.Count; i++)
@@ -349,27 +368,45 @@ namespace Gatrix.Unity.SDK.Editor
                 // ON/OFF badge
                 bool on = flag.Enabled;
                 var badgeColor = on ? new Color(0.10f, 0.45f, 0.18f, 1f) : new Color(0.45f, 0.10f, 0.10f, 1f);
-                var badgeRect  = new Rect(rowRect.x + 4, rowRect.y + 3, 38, 14);
+                var badgeRect  = new Rect(rowRect.x + stateX, rowRect.y + 3, stateW, 14);
                 if (Event.current.type == EventType.Repaint)
                     EditorGUI.DrawRect(badgeRect, badgeColor);
                 GUI.Label(badgeRect, on ? "ON" : "OFF", on ? _flagOnStyle : _flagOffStyle);
 
                 // Flag name
-                var name = flag.Name.Length > 24 ? flag.Name.Substring(0, 21) + "..." : flag.Name;
-                GUI.Label(new Rect(rowRect.x + 48, rowRect.y, FlagNameWidth, rowRect.height),
-                    new GUIContent(name, flag.Name), _rowValueStyle);
+                GUI.Label(new Rect(rowRect.x + nameX, rowRect.y, nameW, rowRect.height),
+                    new GUIContent(flag.Name, flag.Name), _rowValueStyle);
 
-                // Variant
-                if (flag.Variant != null)
+                // Variant name
+                GUI.Label(new Rect(rowRect.x + variantX, rowRect.y, variantW, rowRect.height),
+                    new GUIContent(flag.Variant?.Name ?? "", flag.Variant?.Name ?? ""), _rowLabelStyle);
+
+                // Type
+                var typeStr = ValueTypeHelper.ToApiString(flag.ValueType);
+                GUI.Label(new Rect(rowRect.x + typeX, rowRect.y, typeW, rowRect.height), typeStr, _rowLabelStyle);
+
+                // Value
+                var rawValue = flag.Variant?.Value;
+                string valueStr;
+                if (rawValue == null)
+                    valueStr = "";
+                else if (rawValue is bool bVal)
+                    valueStr = bVal ? "true" : "false";
+                else if (rawValue is string s && s == "")
+                    valueStr = "\"\"";
+                else
+                    valueStr = rawValue.ToString();
+                GUI.Label(new Rect(rowRect.x + valueX, rowRect.y, valueW, rowRect.height),
+                    new GUIContent(valueStr, flag.Variant?.Value?.ToString() ?? ""), _rowValueStyle);
+
+                // Revision
+                var revStyle = new GUIStyle(EditorStyles.miniLabel)
                 {
-                    var payload = flag.Variant.Value?.ToString() ?? "";
-                    if (payload.Length > 28) payload = payload.Substring(0, 25) + "...";
-                    var variantText = string.IsNullOrEmpty(flag.Variant.Name)
-                        ? payload
-                        : $"{flag.Variant.Name}: {payload}";
-                    GUI.Label(new Rect(rowRect.x + 48 + FlagNameWidth, rowRect.y, 200, rowRect.height),
-                        variantText, _rowValueStyle);
-                }
+                    alignment = TextAnchor.MiddleRight,
+                    normal    = { textColor = isDark ? new Color(0.50f, 0.53f, 0.58f) : new Color(0.40f, 0.42f, 0.45f) }
+                };
+                GUI.Label(new Rect(rowRect.x + revX, rowRect.y, revW, rowRect.height),
+                    flag.Version.ToString(), revStyle);
             }
 
             EditorGUILayout.Space(4);
