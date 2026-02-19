@@ -15,6 +15,70 @@ The Gatrix Unity SDK lets you control your game's behavior in real-time without 
 | Hard-coded feature flags | Real-time remote configuration |
 | Risky big-bang releases | Gradual rollouts with instant rollback |
 
+### 🎯 Real-World Scenarios
+
+#### 📱 Mobile App Store Review
+
+Mobile game updates go through an app store review process that can take **days or even weeks**. With feature flags, you can submit your build with new features **already coded but disabled**, then enable them instantly from the dashboard once the review is approved — or whenever you're ready.
+
+```mermaid
+sequenceDiagram
+    participant Dev as 🧑‍💻 Developer
+    participant Store as 📱 App Store
+    participant Dashboard as 🖥️ Gatrix Dashboard
+    participant Game as 🎮 Game Client
+
+    Dev->>Store: Submit build v2.1<br/>(new feature code included, flag OFF)
+    Note over Store: Review in progress<br/>(3–7 days)
+    Store->>Game: v2.1 approved & distributed
+
+    Note over Dev: Ready to launch!
+    Dev->>Dashboard: Enable "summer-event" flag
+    Dashboard->>Game: Flag updated via streaming
+    Note over Game: 🎉 Feature goes live instantly!
+
+    Note over Dev: Issue detected!
+    Dev->>Dashboard: Disable "summer-event" flag
+    Dashboard->>Game: Flag updated via streaming
+    Note over Game: 🛑 Feature disabled instantly<br/>No new build needed
+```
+
+> 💡 **Without Gatrix:** You'd either have to time your submission perfectly, or submit *another* update and wait for another review cycle just to enable or disable a feature.
+
+#### ⚖️ Regulatory & Legal Compliance (GDPR, etc.)
+
+Laws and regulations — like GDPR, COPPA, or region-specific gambling laws — can require you to **immediately disable** certain features for specific regions or user segments. Feature flags let you:
+
+- **Disable a feature in specific countries** without an app update
+- **Respond to a regulatory order within minutes**, not days
+- **Target by user context** (region, age group, etc.) to comply with local laws
+
+```
+Example: A new gambling regulation takes effect in Germany tomorrow.
+  → Set targeting rule: country = "DE" → disable "loot-box-feature"
+  → All German players see the change immediately.
+  → No app update, no review, no downtime.
+```
+
+#### 🤷 Uncertain Launch Timing
+
+Sometimes you don't know *when* — or even *if* — a feature should go live:
+
+- **Partnership deal** pending final approval → code is ready, flag stays off until the deal closes
+- **Seasonal event** that might be canceled or postponed → enable only if confirmed
+- **Government policy** that may or may not take effect → prepare both paths, toggle based on the outcome
+- **Competitive response** — quickly enable a counter-feature when a competitor launches
+
+> With feature flags, your code is **always ready**. The business decision of *when to launch* is completely decoupled from the engineering timeline.
+
+#### 🚨 Emergency Kill Switch
+
+When something goes wrong in production — a crash-causing feature, an exploit, or unexpected server load — you need to act *fast*:
+
+- **Disable the problematic feature** in seconds, not hours
+- **No hotfix build required** — just toggle the flag
+- **Gradual re-enable** — roll out to 1% → 10% → 50% → 100% after the fix is verified
+
 ### 🤔 When you might NOT need Gatrix
 
 Gatrix isn't the right fit for every project. Consider whether these apply to you:
