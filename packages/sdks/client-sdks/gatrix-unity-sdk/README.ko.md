@@ -78,18 +78,27 @@ flowchart LR
 flowchart TD
     subgraph SERVER ["🖥️ Gatrix 서버"]
         S1{"이 환경에서<br/>플래그가 활성화?"}
-        S1 -->|아니오| S2["variant.name = $disabled<br/>value = disabledValue"]
+        S1 -->|아니오| S2{"환경 오버라이드<br/>값이 있는가?"}
+        S2 -->|예| S2A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
+        S2 -->|아니오| S2B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
         S1 -->|예| S3{"타게팅 전략이<br/>있는가?"}
-        S3 -->|아니오| S4["variant.name = $default<br/>value = enabledValue"]
+        S3 -->|아니오| S4{"환경 오버라이드<br/>값이 있는가?"}
+        S4 -->|예| S4A["variant.name = $env-default-enabled<br/>value = env.enabledValue"]
+        S4 -->|아니오| S4B["variant.name = $flag-default-enabled<br/>value = flag.enabledValue"]
         S3 -->|예| S5{"컨텍스트와 매칭되는<br/>전략이 있는가?"}
-        S5 -->|예| S6["variant.name = 매칭된 배리언트<br/>value = variant.value"]
-        S5 -->|아니오| S7["variant.name = $disabled<br/>value = disabledValue"]
+        S5 -->|예| S6["variant.name = 매칭된 배리언트 이름<br/>value = variant.value"]
+        S5 -->|아니오| S7{"환경 오버라이드<br/>값이 있는가?"}
+        S7 -->|예| S7A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
+        S7 -->|아니오| S7B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
     end
 
-    S2 --> NET["📡 네트워크"]
-    S4 --> NET
+    S2A --> NET["📡 네트워크"]
+    S2B --> NET
+    S4A --> NET
+    S4B --> NET
     S6 --> NET
-    S7 --> NET
+    S7A --> NET
+    S7B --> NET
 
     subgraph SDK ["🎮 Unity SDK (클라이언트)"]
         NET --> CACHE["SDK 캐시<br/>(realtimeFlags / synchronizedFlags)"]
@@ -103,12 +112,14 @@ flowchart TD
 
 | 우선순위 | 조건 | 값 소스 | `variant.name` |
 |:--------:|------|--------|:---------------|
-| 1 | 플래그 활성화 + 전략 매칭 | 매칭된 배리언트의 `variant.value` | 배리언트 이름 (예: `"dark-theme"`) |
-| 2 | 플래그 활성화 + 전략 매칭 없음 | `env.enabledValue` → `flag.enabledValue` | `$default` |
-| 3 | 플래그 비활성화 | `env.disabledValue` → `flag.disabledValue` | `$disabled` |
-| 4 | 서버에 플래그 없음 | 응답에 포함되지 않음 | *(SDK가 `$missing` 생성)* |
+| 1 | 플래그 활성화 + 배리언트가 있는 전략 매칭 | 매칭된 배리언트의 `variant.value` | 배리언트 이름 (예: `"dark-theme"`) |
+| 2 | 플래그 활성화 + 배리언트 매칭 없음 + 환경 오버라이드 설정됨 | `env.enabledValue` | `$env-default-enabled` |
+| 3 | 플래그 활성화 + 배리언트 매칭 없음 + 환경 오버라이드 없음 | `flag.enabledValue` | `$flag-default-enabled` |
+| 4 | 플래그 비활성화 + 환경 오버라이드 설정됨 | `env.disabledValue` | `$env-default-disabled` |
+| 5 | 플래그 비활성화 + 환경 오버라이드 없음 | `flag.disabledValue` | `$flag-default-disabled` |
+| 6 | 서버에 플래그 없음 | 응답에 포함되지 않음 | *(SDK가 `$missing` 생성)* |
 
-> 💡 환경 수준의 값(`env.enabledValue`, `env.disabledValue`)이 설정되어 있으면 글로벌 수준의 값(`flag.enabledValue`, `flag.disabledValue`)보다 우선합니다.
+> 💡 `variant.name`을 통해 값이 **어디서** 왔는지 정확히 알 수 있습니다. Monitor 창에서 디버깅할 때 매우 유용합니다.
 
 ### SDK 측: 게임 코드가 값을 받는 방식
 
@@ -117,9 +128,9 @@ flowchart TD
     A["게임 코드:<br/>proxy.BoolVariation(false)"] --> B{"SDK 캐시에<br/>플래그가 존재?"}
     B -->|아니오| C["폴백 값 반환<br/>variant = $missing"]
     B -->|예| D{"플래그가<br/>활성화?"}
-    D -->|아니오| E["폴백 값 반환<br/>variant = $disabled"]
+    D -->|아니오| E["폴백 값 반환<br/>variant = $*-default-disabled"]
     D -->|예| F{"valueType이<br/>요청 타입과 일치?"}
-    F -->|아니오| G["폴백 값 반환<br/>(타입 불일치 안전장치)"]
+    F -->|아니오| G["폴백 값 반환<br/>variant = $type-mismatch"]
     F -->|예| H["variant.value 반환<br/>(실제 평가된 값)"]
 
     style C fill:#ff6b6b,color:#fff
@@ -130,57 +141,105 @@ flowchart TD
 
 ### 예약된 배리언트 이름
 
-SDK는 `$` 접두사가 붙은 배리언트 이름으로 특수 상태를 나타냅니다:
+SDK는 `$` 접두사가 붙은 배리언트 이름으로 값의 출처를 나타냅니다. `VariantSource.cs`에 정의되어 있습니다:
 
 | 배리언트 이름 | 의미 | `enabled` | 발생 시점 |
 |:-------------|------|:---------:|----------|
 | `$missing` | SDK 캐시에 플래그가 없음 | `false` | 플래그 이름 오타, 아직 생성되지 않음, 또는 SDK 미초기화 |
-| `$disabled` | 플래그가 비활성화됨 | `false` | 대시보드에서 꺼짐, 또는 모든 전략이 실패 |
-| `$default` | 플래그 활성화, 매칭된 배리언트 없음 | `true` | 타게팅 전략 없음, 또는 배리언트 미정의 |
-| *(사용자 이름)* | 특정 배리언트가 선택됨 | `true` | 전략이 매칭되어 해당 배리언트 선택 |
+| `$type-mismatch` | 요청 타입이 플래그의 `valueType`과 불일치 | — | `string` 플래그에 `BoolVariation` 호출 등 |
+| `$env-default-enabled` | 플래그 활성화, 환경 수준 `enabledValue`에서 값 가져옴 | `true` | 배리언트 매칭 없음; 환경 오버라이드 설정됨 |
+| `$flag-default-enabled` | 플래그 활성화, 플래그 수준(글로벌) `enabledValue`에서 값 가져옴 | `true` | 배리언트 매칭 없음; 환경 오버라이드 없음 |
+| `$env-default-disabled` | 플래그 비활성화, 환경 수준 `disabledValue`에서 값 가져옴 | `false` | 플래그 비활성화; 환경 오버라이드 설정됨 |
+| `$flag-default-disabled` | 플래그 비활성화, 플래그 수준(글로벌) `disabledValue`에서 값 가져옴 | `false` | 플래그 비활성화; 환경 오버라이드 없음 |
+| *(사용자 정의 이름)* | 타게팅에 의해 특정 배리언트가 선택됨 | `true` | 전략이 매칭되어 해당 배리언트 선택 |
+
+### Variation API 시그니처 (`FlagProxy`)
+
+`FlagProxy`의 모든 variation 메서드는 `fallbackValue` 파라미터가 **필수**입니다 — 생략할 수 없습니다:
+
+```csharp
+// 불리언
+bool   BoolVariation(bool fallbackValue)
+
+// 문자열
+string StringVariation(string fallbackValue)
+
+// 숫자
+int    IntVariation(int fallbackValue)
+float  FloatVariation(float fallbackValue)
+double DoubleVariation(double fallbackValue)
+
+// JSON
+Dictionary<string, object> JsonVariation(Dictionary<string, object> fallbackValue)
+
+// 배리언트 이름만
+string Variation(string fallbackValue)
+```
+
+#### `fallbackValue`가 필수인 이유 (생략 불가)
+
+`fallbackValue` 파라미터는 의도적으로 필수로 설계되었습니다. 이를 통해 게임이 **어떤 실패 상황에서도 항상 사용 가능한 값을 받을 수 있습니다**:
+
+1. **SDK 미초기화** — SDK가 아직 연결 중일 수 있습니다. 폴백이 없으면 `null`이나 크래시가 발생합니다.
+2. **플래그 미존재** — 플래그 이름 오타이거나 플래그가 삭제된 경우. 폴백이 예기치 않은 동작을 방지합니다.
+3. **네트워크 실패** — SDK가 서버에 접속할 수 없고 캐시된 데이터도 없을 때, 폴백이 게임 실행을 유지합니다.
+4. **타입 불일치** — `string` 타입 플래그에 `BoolVariation`을 호출한 경우. 폴백이 타입 오류를 방지합니다.
+5. **타입 안전성** — 폴백 값이 컴파일 시점에 기대되는 반환 타입을 확정합니다.
+
+> ⚠️ **기본값 없는 오버로드는 없습니다.** 문제가 발생했을 때 어떤 값을 사용할지 항상 명시적으로 선택해야 합니다. 이것은 모든 Gatrix SDK에서 공유하는 의도적인 설계 결정입니다.
 
 ### 전체 예제: 모든 시나리오
 
 ```csharp
-// 시나리오 1: 플래그 존재, 활성화, 배리언트 매칭 → 실제 값 반환
+// 시나리오 1: 플래그 활성화, 전략 매칭 → 실제 배리언트 값 반환
 this.WatchSyncedFlagWithInitialState("dark-theme", proxy =>
 {
-    // proxy.Exists     == true
-    // proxy.Enabled    == true
-    // proxy.Variant    == { name: "dark", value: true }
-    // proxy.ValueType  == "boolean"
+    // proxy.Exists      == true
+    // proxy.Enabled     == true
+    // proxy.Variant     == { name: "dark", value: true }
+    // proxy.ValueType   == "boolean"
 
-    bool isDark = proxy.BoolVariation(false);
+    bool isDark = proxy.BoolVariation(false);  // fallbackValue: false
     // isDark == true (variant.value에서 가져옴)
 });
 
-// 시나리오 2: 플래그 존재, 활성화, 배리언트 매칭 없음 → enabledValue 반환
+// 시나리오 2: 플래그 활성화, 배리언트 매칭 없음 → enabledValue 반환
 this.WatchSyncedFlagWithInitialState("welcome-message", proxy =>
 {
-    // proxy.Variant == { name: "$default", value: "Hello!" }
+    // proxy.Variant == { name: "$env-default-enabled", value: "Hello!" }
+    //   또는         { name: "$flag-default-enabled", value: "Hello!" }
 
-    string msg = proxy.StringVariation("Fallback");
+    string msg = proxy.StringVariation("Fallback");  // fallbackValue: "Fallback"
     // msg == "Hello!" (enabledValue에서 가져옴)
 });
 
-// 시나리오 3: 플래그 존재, 비활성화 → 폴백 반환
+// 시나리오 3: 플래그 비활성화 → fallbackValue 반환
 this.WatchSyncedFlagWithInitialState("maintenance-mode", proxy =>
 {
-    // proxy.Enabled    == false
-    // proxy.Variant    == { name: "$disabled", value: "..." }
+    // proxy.Enabled     == false
+    // proxy.Variant     == { name: "$flag-default-disabled", value: "..." }
 
-    bool maintenance = proxy.BoolVariation(false);
-    // maintenance == false (플래그가 비활성화이므로 폴백)
+    bool maintenance = proxy.BoolVariation(false);  // fallbackValue: false
+    // maintenance == false (플래그가 비활성화이므로 fallbackValue 반환)
 });
 
-// 시나리오 4: 플래그가 존재하지 않음 → 폴백 반환
+// 시나리오 4: 플래그가 존재하지 않음 → $missing, fallbackValue 반환
 this.WatchSyncedFlagWithInitialState("typo-flag-nmae", proxy =>
 {
-    // proxy.Exists     == false
-    // proxy.Variant    == { name: "$missing" }
+    // proxy.Exists      == false
+    // proxy.Variant     == { name: "$missing" }
 
-    bool val = proxy.BoolVariation(false);
-    // val == false (플래그가 없으므로 폴백)
+    bool val = proxy.BoolVariation(false);  // fallbackValue: false
+    // val == false (플래그가 없으므로 fallbackValue 반환)
+});
+
+// 시나리오 5: 타입 불일치 → fallbackValue 반환
+this.WatchSyncedFlagWithInitialState("string-flag", proxy =>
+{
+    // proxy.ValueType   == "string"
+
+    bool val = proxy.BoolVariation(false);  // fallbackValue: false
+    // val == false (valueType이 "string"이므로 "boolean"과 불일치, fallbackValue 반환)
 });
 ```
 
@@ -191,12 +250,12 @@ this.WatchSyncedFlagWithInitialState("typo-flag-nmae", proxy =>
 | 메서드 | 반환 값 | 용도 |
 |--------|---------|------|
 | `proxy.Enabled` | `flag.enabled` | 피처 플래그가 **켜져 있는가?** |
-| `proxy.BoolVariation(fallback)` | `variant.value` (bool) | 플래그가 평가한 **불리언 값**은 무엇인가? |
+| `proxy.BoolVariation(fallbackValue)` | `variant.value` (`bool`) | 플래그가 평가한 **불리언 값**은 무엇인가? |
 
 ```csharp
 // 플래그가 활성화되어 있지만 불리언 값으로 false를 반환할 수 있습니다!
 // enabled=true, variant.value=false → "기능은 켜졌지만, 불리언 설정은 false"
-bool isOn = proxy.Enabled;           // true (플래그가 켜져 있음)
+bool isOn = proxy.Enabled;              // true (플래그가 켜져 있음)
 bool value = proxy.BoolVariation(true); // false (설정된 값)
 ```
 
