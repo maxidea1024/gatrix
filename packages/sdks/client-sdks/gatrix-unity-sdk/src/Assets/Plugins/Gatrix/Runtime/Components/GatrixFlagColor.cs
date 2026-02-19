@@ -10,20 +10,10 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Changes the color of a Graphic (UI) or Renderer based on a feature flag's state or variant.
     /// Supports smooth color transitions via lerp.
-    ///
-    /// Usage:
-    ///   1. Add this component to a GameObject with a Graphic or Renderer
-    ///   2. Set the Flag Name
-    ///   3. Configure colors for enabled/disabled states or variant name mappings
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Color")]
-    public class GatrixFlagColor : MonoBehaviour
+    public class GatrixFlagColor : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Color Mode")]
         [SerializeField] private ColorMode _mode = ColorMode.ByState;
 
@@ -65,7 +55,6 @@ namespace Gatrix.Unity.SDK
             public Color Color = Color.white;
         }
 
-        private System.Action _unwatch;
         private Color _targetColor;
         private bool _hasTarget;
 
@@ -77,41 +66,11 @@ namespace Gatrix.Unity.SDK
             _hasTarget = _graphic != null || _renderer != null;
         }
 
-        private void OnEnable()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
+            if (flag == null) return;
 
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagColor:{gameObject.name}");
-        }
-
-        private void OnDisable()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void Update()
-        {
-            if (!_animate || !_hasTarget) return;
-
-            if (_graphic != null)
-            {
-                _graphic.color = Color.Lerp(_graphic.color, _targetColor, Time.deltaTime * _lerpSpeed);
-            }
-            else if (_renderer != null)
-            {
-                var mat = _renderer.material;
-                mat.color = Color.Lerp(mat.color, _targetColor, Time.deltaTime * _lerpSpeed);
-            }
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             Color color;
-
             if (_mode == ColorMode.ByState)
             {
                 color = flag.Enabled ? _enabledColor : _disabledColor;
@@ -134,10 +93,29 @@ namespace Gatrix.Unity.SDK
 
             if (!_animate)
             {
-                // Apply immediately
-                if (_graphic != null) _graphic.color = color;
-                else if (_renderer != null) _renderer.material.color = color;
+                ApplyImmediately(color);
             }
+        }
+
+        private void Update()
+        {
+            if (!_animate || !_hasTarget) return;
+
+            if (_graphic != null)
+            {
+                _graphic.color = Color.Lerp(_graphic.color, _targetColor, Time.deltaTime * _lerpSpeed);
+            }
+            else if (_renderer != null)
+            {
+                var mat = _renderer.material;
+                mat.color = Color.Lerp(mat.color, _targetColor, Time.deltaTime * _lerpSpeed);
+            }
+        }
+
+        private void ApplyImmediately(Color color)
+        {
+            if (_graphic != null) _graphic.color = color;
+            else if (_renderer != null) _renderer.material.color = color;
         }
     }
 }

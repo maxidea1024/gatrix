@@ -7,23 +7,12 @@ namespace Gatrix.Unity.SDK
 {
     /// <summary>
     /// Controls a CanvasGroup's visibility and interactability based on a feature flag.
-    /// More powerful than GatrixFlagToggle for UI because it supports alpha fading
-    /// and can disable raycasting without hiding the element.
-    ///
-    /// Usage:
-    ///   1. Add this component to a GameObject with a CanvasGroup
-    ///   2. Set the Flag Name
-    ///   3. Configure alpha and interactable settings for each state
+    /// Supports alpha fading and can disable raycasting without hiding the element.
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Canvas")]
     [RequireComponent(typeof(CanvasGroup))]
-    public class GatrixFlagCanvas : MonoBehaviour
+    public class GatrixFlagCanvas : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Enabled State")]
         [SerializeField] private float _enabledAlpha = 1f;
         [SerializeField] private bool _enabledInteractable = true;
@@ -42,10 +31,7 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private float _fadeSpeed = 4f;
 
         private CanvasGroup _canvasGroup;
-        private System.Action _unwatch;
         private float _targetAlpha;
-        private bool _targetInteractable;
-        private bool _targetBlocksRaycasts;
 
         private void Awake()
         {
@@ -53,32 +39,9 @@ namespace Gatrix.Unity.SDK
             _targetAlpha = _canvasGroup.alpha;
         }
 
-        private void OnEnable()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagCanvas:{gameObject.name}");
-        }
-
-        private void OnDisable()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void Update()
-        {
-            if (!_animate || _canvasGroup == null) return;
-
-            _canvasGroup.alpha = Mathf.Lerp(_canvasGroup.alpha, _targetAlpha, Time.deltaTime * _fadeSpeed);
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
-            if (_canvasGroup == null) return;
+            if (flag == null || _canvasGroup == null) return;
 
             if (flag.Enabled)
             {
@@ -96,6 +59,16 @@ namespace Gatrix.Unity.SDK
             if (!_animate)
             {
                 _canvasGroup.alpha = _targetAlpha;
+            }
+        }
+
+        private void Update()
+        {
+            if (!_animate || _canvasGroup == null) return;
+
+            if (Mathf.Abs(_canvasGroup.alpha - _targetAlpha) > 0.001f)
+            {
+                _canvasGroup.alpha = Mathf.Lerp(_canvasGroup.alpha, _targetAlpha, Time.deltaTime * _fadeSpeed);
             }
         }
     }

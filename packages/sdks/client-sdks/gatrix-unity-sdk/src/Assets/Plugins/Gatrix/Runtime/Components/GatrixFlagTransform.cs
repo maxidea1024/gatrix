@@ -11,14 +11,10 @@ namespace Gatrix.Unity.SDK
     /// Supports JSON objects with "x", "y", "z" fields or raw numeric values.
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Transform")]
-    public class GatrixFlagTransform : MonoBehaviour
+    public class GatrixFlagTransform : GatrixFlagComponentBase
     {
         public enum Mode { Position, Rotation, Scale }
         public enum VectorComponent { Full, X, Y, Z }
-
-        [Header("Flag Configuration")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
 
         [Header("Transform Settings")]
         [SerializeField] private Mode _mode = Mode.Position;
@@ -30,19 +26,18 @@ namespace Gatrix.Unity.SDK
         [Header("Fallbacks")]
         [SerializeField] private bool _resetOnDisable = true;
 
-        private Action _unwatch;
         private Vector3 _originalValue;
         private bool _hasOriginal;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             CaptureOriginal();
-            Subscribe();
+            base.OnEnable();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            Unsubscribe();
+            base.OnDisable();
             if (_resetOnDisable && _hasOriginal)
             {
                 ApplyValue(_originalValue);
@@ -61,25 +56,10 @@ namespace Gatrix.Unity.SDK
             _hasOriginal = true;
         }
 
-        private void Subscribe()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
+            if (flag == null) return;
 
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagTransform:{gameObject.name}");
-        }
-
-        private void Unsubscribe()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             if (!flag.Enabled)
             {
                 ApplyValue(_originalValue);

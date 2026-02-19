@@ -9,22 +9,11 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Plays AudioClips based on a feature flag's state or variant name.
     /// Useful for A/B testing audio, seasonal events, or gradual audio rollouts.
-    ///
-    /// Usage:
-    ///   1. Add this component to a GameObject with an AudioSource
-    ///   2. Set the Flag Name
-    ///   3. Assign AudioClips for each variant or the enabled/disabled states
-    ///   4. Audio plays automatically when the flag changes
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Audio")]
     [RequireComponent(typeof(AudioSource))]
-    public class GatrixFlagAudio : MonoBehaviour
+    public class GatrixFlagAudio : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Playback Mode")]
         [Tooltip("How to determine which clip to play")]
         [SerializeField] private AudioMode _mode = AudioMode.ByVariant;
@@ -40,7 +29,7 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Map variant names to AudioClips")]
         [SerializeField] private List<VariantAudioEntry> _variantClips = new List<VariantAudioEntry>();
 
-        [Header("Options")]
+        [Header("Playback Options")]
         [Tooltip("Play the clip on flag change (vs. just switching the assigned clip)")]
         [SerializeField] private bool _playOnChange = true;
 
@@ -50,9 +39,6 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Volume multiplier")]
         [Range(0f, 1f)]
         [SerializeField] private float _volume = 1f;
-
-        private AudioSource _audioSource;
-        private System.Action _unwatch;
 
         public enum AudioMode
         {
@@ -67,29 +53,17 @@ namespace Gatrix.Unity.SDK
             public AudioClip Clip;
         }
 
+        private AudioSource _audioSource;
+
         private void Awake()
         {
             _audioSource = GetComponent<AudioSource>();
         }
 
-        private void OnEnable()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
+            if (flag == null || _audioSource == null) return;
 
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagAudio:{gameObject.name}");
-        }
-
-        private void OnDisable()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             AudioClip clip = null;
 
             if (_mode == AudioMode.ByState)

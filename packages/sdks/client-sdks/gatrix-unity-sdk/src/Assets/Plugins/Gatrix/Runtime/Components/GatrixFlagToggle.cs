@@ -9,22 +9,11 @@ namespace Gatrix.Unity.SDK
 {
     /// <summary>
     /// Toggles target GameObjects based on a feature flag's enabled state.
-    /// Automatically watches for flag changes and updates in real-time.
-    ///
-    /// Usage:
-    ///   1. Add this component to any GameObject
-    ///   2. Set the Flag Name
-    ///   3. Assign GameObjects to "When Enabled" and/or "When Disabled" lists
-    ///   4. Objects activate/deactivate automatically based on flag state
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Toggle")]
-    public class GatrixFlagToggle : MonoBehaviour
+    public class GatrixFlagToggle : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
+        [Header("Toggle Settings")]
         [Tooltip("Invert the flag logic (ON becomes OFF and vice versa)")]
         [SerializeField] private bool _invertLogic;
 
@@ -42,83 +31,34 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Which state activates this GameObject")]
         [SerializeField] private SelfActivation _selfActivation = SelfActivation.WhenEnabled;
 
-        private Action _unwatch;
-        private bool _lastKnownState;
-
         public enum SelfActivation
         {
             WhenEnabled,
             WhenDisabled
         }
 
-        /// <summary>Current flag name</summary>
-        public string FlagName
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            get => _flagName;
-            set
-            {
-                if (_flagName == value) return;
-                _flagName = value;
-                Resubscribe();
-            }
-        }
+            if (flag == null) return;
 
-        private void OnEnable()
-        {
-            Subscribe();
-        }
-
-        private void OnDisable()
-        {
-            Unsubscribe();
-        }
-
-        private void Subscribe()
-        {
-            if (string.IsNullOrEmpty(_flagName)) return;
-
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagToggle:{gameObject.name}");
-        }
-
-        private void Unsubscribe()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void Resubscribe()
-        {
-            Unsubscribe();
-            if (isActiveAndEnabled) Subscribe();
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             var isEnabled = flag.Enabled;
             if (_invertLogic) isEnabled = !isEnabled;
 
-            _lastKnownState = isEnabled;
             ApplyState(isEnabled);
         }
 
         private void ApplyState(bool flagEnabled)
         {
             // Activate/deactivate "when enabled" targets
-            for (int i = 0; i < _whenEnabled.Count; i++)
+            foreach (var go in _whenEnabled)
             {
-                if (_whenEnabled[i] != null)
-                    _whenEnabled[i].SetActive(flagEnabled);
+                if (go != null) go.SetActive(flagEnabled);
             }
 
             // Activate/deactivate "when disabled" targets
-            for (int i = 0; i < _whenDisabled.Count; i++)
+            foreach (var go in _whenDisabled)
             {
-                if (_whenDisabled[i] != null)
-                    _whenDisabled[i].SetActive(!flagEnabled);
+                if (go != null) go.SetActive(!flagEnabled);
             }
 
             // Self control
@@ -127,7 +67,11 @@ namespace Gatrix.Unity.SDK
                 var shouldBeActive = _selfActivation == SelfActivation.WhenEnabled
                     ? flagEnabled
                     : !flagEnabled;
-                gameObject.SetActive(shouldBeActive);
+                
+                if (gameObject.activeSelf != shouldBeActive)
+                {
+                    gameObject.SetActive(shouldBeActive);
+                }
             }
         }
     }

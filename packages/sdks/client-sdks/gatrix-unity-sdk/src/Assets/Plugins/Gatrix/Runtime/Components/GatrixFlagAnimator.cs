@@ -9,21 +9,11 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Controls Animator parameters based on a feature flag's state or variant.
     /// Supports Bool, Trigger, Int, and Float parameter types.
-    ///
-    /// Usage:
-    ///   1. Add this component to a GameObject with an Animator
-    ///   2. Set the Flag Name
-    ///   3. Configure parameter mappings for enabled/disabled states or variants
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Animator")]
     [RequireComponent(typeof(Animator))]
-    public class GatrixFlagAnimator : MonoBehaviour
+    public class GatrixFlagAnimator : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Bool Parameter")]
         [Tooltip("Animator bool parameter to set based on flag state")]
         [SerializeField] private string _boolParameter;
@@ -35,7 +25,7 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Trigger to fire when flag becomes disabled")]
         [SerializeField] private string _disabledTrigger;
 
-        [Header("Variant ??Int Parameter")]
+        [Header("Variant Int Parameter")]
         [Tooltip("Animator int parameter to set based on variant")]
         [SerializeField] private string _variantIntParameter;
 
@@ -50,7 +40,6 @@ namespace Gatrix.Unity.SDK
         }
 
         private Animator _animator;
-        private System.Action _unwatch;
         private bool _lastEnabled;
 
         private void Awake()
@@ -58,25 +47,9 @@ namespace Gatrix.Unity.SDK
             _animator = GetComponent<Animator>();
         }
 
-        private void OnEnable()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagAnimator:{gameObject.name}");
-        }
-
-        private void OnDisable()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
-            if (_animator == null) return;
+            if (flag == null || _animator == null) return;
 
             // Bool parameter
             if (!string.IsNullOrEmpty(_boolParameter))
@@ -97,7 +70,7 @@ namespace Gatrix.Unity.SDK
                 }
             }
 
-            // Variant ??Int parameter
+            // Variant Int parameter
             if (!string.IsNullOrEmpty(_variantIntParameter))
             {
                 var variantName = flag.Variant?.Name ?? "";

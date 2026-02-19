@@ -10,21 +10,10 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Binds a feature flag's value to a Unity UI Text component.
     /// Supports string, number, and boolean flag values with formatting.
-    ///
-    /// Usage:
-    ///   1. Add this component to a UI Text/TMP GameObject
-    ///   2. Set the Flag Name
-    ///   3. Optionally set a format string (e.g., "Speed: {0}x")
-    ///   4. Text updates automatically when the flag value changes
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Value")]
-    public class GatrixFlagValue : MonoBehaviour
+    public class GatrixFlagValue : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Display Settings")]
         [Tooltip("Format string for the value. Use {0} as placeholder. Leave empty for raw value.")]
         [SerializeField] private string _format = "";
@@ -39,31 +28,14 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Target Text component. If empty, uses Text component on this GameObject.")]
         [SerializeField] private Text _targetText;
 
-        private Action _unwatch;
         private Component _tmpComponent;
         private System.Reflection.PropertyInfo _tmpTextProperty;
         private bool _tmpChecked;
 
-        public string FlagName
-        {
-            get => _flagName;
-            set
-            {
-                if (_flagName == value) return;
-                _flagName = value;
-                Resubscribe();
-            }
-        }
-
-        private void OnEnable()
+        protected override void OnEnable()
         {
             DetectTarget();
-            Subscribe();
-        }
-
-        private void OnDisable()
-        {
-            Unsubscribe();
+            base.OnEnable();
         }
 
         private static Type _cachedTmpType;
@@ -72,13 +44,11 @@ namespace Gatrix.Unity.SDK
 
         private void DetectTarget()
         {
-            // Try Unity UI Text first
             if (_targetText == null)
             {
                 _targetText = GetComponent<Text>();
             }
 
-            // Try TextMeshPro via reflection (avoid hard dependency)
             if (!_tmpChecked)
             {
                 _tmpChecked = true;
@@ -107,31 +77,10 @@ namespace Gatrix.Unity.SDK
             }
         }
 
-        private void Subscribe()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
+            if (flag == null) return;
 
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagValue:{gameObject.name}");
-        }
-
-        private void Unsubscribe()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void Resubscribe()
-        {
-            Unsubscribe();
-            if (isActiveAndEnabled) Subscribe();
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             string displayText;
 
             if (!flag.Enabled && _hideWhenDisabled)
@@ -165,7 +114,6 @@ namespace Gatrix.Unity.SDK
                 return;
             }
 
-            // TextMeshPro fallback
             if (_tmpComponent != null && _tmpTextProperty != null)
             {
                 _tmpTextProperty.SetValue(_tmpComponent, text);

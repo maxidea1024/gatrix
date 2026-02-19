@@ -13,14 +13,10 @@ namespace Gatrix.Unity.SDK
     /// Supports mapping specific variants to specific sprites.
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Image")]
-    public class GatrixFlagImage : MonoBehaviour
+    public class GatrixFlagImage : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Sprite Mapping")]
-        [Tooltip("Default sprite to used when flag is disabled or no variant matches")]
+        [Tooltip("Default sprite used when flag is disabled or no variant matches")]
         [SerializeField] private Sprite _defaultSprite;
 
         [Tooltip("Mapping of variant names to sprites")]
@@ -30,8 +26,6 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private Image _uiImage;
         [SerializeField] private SpriteRenderer _spriteRenderer;
 
-        private Action _unwatch;
-
         [Serializable]
         public class VariantSpriteMap
         {
@@ -39,15 +33,10 @@ namespace Gatrix.Unity.SDK
             public Sprite sprite;
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             DetectTarget();
-            Subscribe();
-        }
-
-        private void OnDisable()
-        {
-            Unsubscribe();
+            base.OnEnable();
         }
 
         private void DetectTarget()
@@ -56,25 +45,10 @@ namespace Gatrix.Unity.SDK
             if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
-        private void Subscribe()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
+            if (flag == null) return;
 
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged, 
-                $"FlagImage:{gameObject.name}");
-        }
-
-        private void Unsubscribe()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             if (!flag.Enabled)
             {
                 SetSprite(_defaultSprite);
@@ -103,18 +77,6 @@ namespace Gatrix.Unity.SDK
         {
             if (_uiImage != null) _uiImage.sprite = sprite;
             if (_spriteRenderer != null) _spriteRenderer.sprite = sprite;
-        }
-
-        public string FlagName
-        {
-            get => _flagName;
-            set { if (_flagName != value) { _flagName = value; Resubscribe(); } }
-        }
-
-        private void Resubscribe()
-        {
-            Unsubscribe();
-            if (isActiveAndEnabled) Subscribe();
         }
     }
 }

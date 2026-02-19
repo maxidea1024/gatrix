@@ -8,22 +8,12 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// Controls a ParticleSystem based on a feature flag's state.
     /// Can play, stop, or pause particles when the flag changes.
-    ///
-    /// Usage:
-    ///   1. Add this component to a GameObject with a ParticleSystem
-    ///   2. Set the Flag Name
-    ///   3. Configure the play/stop behavior
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Particles")]
     [RequireComponent(typeof(ParticleSystem))]
-    public class GatrixFlagParticles : MonoBehaviour
+    public class GatrixFlagParticles : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [Tooltip("The feature flag name to watch")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
-        [Header("Behavior")]
+        [Header("Particle Behavior")]
         [Tooltip("Action when flag is enabled")]
         [SerializeField] private ParticleAction _onEnabled = ParticleAction.Play;
 
@@ -42,32 +32,15 @@ namespace Gatrix.Unity.SDK
         }
 
         private ParticleSystem _particles;
-        private System.Action _unwatch;
 
         private void Awake()
         {
             _particles = GetComponent<ParticleSystem>();
         }
 
-        private void OnEnable()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagParticles:{gameObject.name}");
-        }
-
-        private void OnDisable()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
-            if (_particles == null) return;
+            if (flag == null || _particles == null) return;
 
             var action = flag.Enabled ? _onEnabled : _onDisabled;
             ApplyAction(action);

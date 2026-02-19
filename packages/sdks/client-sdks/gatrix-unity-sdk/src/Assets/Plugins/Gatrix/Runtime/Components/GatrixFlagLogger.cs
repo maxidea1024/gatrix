@@ -1,7 +1,6 @@
 // GatrixFlagLogger - Log flag changes to the console for debugging
 // Quickly see what's happening with flags without writing code
 
-using System;
 using UnityEngine;
 
 namespace Gatrix.Unity.SDK
@@ -11,13 +10,9 @@ namespace Gatrix.Unity.SDK
     /// Useful during development to verify triggering logic.
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Logger")]
-    public class GatrixFlagLogger : MonoBehaviour
+    public class GatrixFlagLogger : GatrixFlagComponentBase
     {
         public enum LogLevel { Info, Warning, Error }
-
-        [Header("Flag Configuration")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
 
         [Header("Logging Settings")]
         [SerializeField] private LogLevel _logLevel = LogLevel.Info;
@@ -25,39 +20,18 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private bool _logValue = true;
         [SerializeField] private bool _logReason = true;
 
-        private Action _unwatch;
         private bool _isFirst = true;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             _isFirst = true;
-            Subscribe();
+            base.OnEnable();
         }
 
-        private void OnDisable()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            Unsubscribe();
-        }
+            if (flag == null) return;
 
-        private void Subscribe()
-        {
-            if (string.IsNullOrEmpty(_flagName)) return;
-
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagLogger:{gameObject.name}");
-        }
-
-        private void Unsubscribe()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
             string type = _isFirst ? "Initial" : "Changed";
             _isFirst = false;
 

@@ -12,13 +12,9 @@ namespace Gatrix.Unity.SDK
     /// Supports mapping variants to materials or using JSON values for colors.
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Material")]
-    public class GatrixFlagMaterial : MonoBehaviour
+    public class GatrixFlagMaterial : GatrixFlagComponentBase
     {
         public enum Mode { SwapMaterial, UpdateColor, UpdateFloat }
-
-        [Header("Flag Configuration")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
 
         [Header("Behavior")]
         [SerializeField] private Mode _mode = Mode.SwapMaterial;
@@ -34,7 +30,6 @@ namespace Gatrix.Unity.SDK
         [Header("Target (auto-detected)")]
         [SerializeField] private Renderer _renderer;
 
-        private Action _unwatch;
         private Material _originalMaterial;
         private Color _originalColor;
         private float _originalFloat;
@@ -47,16 +42,16 @@ namespace Gatrix.Unity.SDK
             public Material material;
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             DetectTarget();
             CaptureOriginal();
-            Subscribe();
+            base.OnEnable();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            Unsubscribe();
+            base.OnDisable();
             RestoreOriginal();
         }
 
@@ -81,26 +76,9 @@ namespace Gatrix.Unity.SDK
             _hasOriginal = true;
         }
 
-        private void Subscribe()
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (string.IsNullOrEmpty(_flagName)) return;
-
-            var client = GatrixBehaviour.Client;
-            if (client == null) return;
-
-            _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged,
-                $"FlagMaterial:{gameObject.name}");
-        }
-
-        private void Unsubscribe()
-        {
-            _unwatch?.Invoke();
-            _unwatch = null;
-        }
-
-        private void OnFlagChanged(FlagProxy flag)
-        {
-            if (_renderer == null) return;
+            if (flag == null || _renderer == null) return;
 
             if (!flag.Enabled)
             {
@@ -129,7 +107,6 @@ namespace Gatrix.Unity.SDK
                 case Mode.UpdateColor:
                     if (value is Dictionary<string, object> dict)
                     {
-                        // JSON Color { r: 1, g: 0, b: 0, a: 1 }
                         float r = GetFloat(dict, "r", _originalColor.r);
                         float g = GetFloat(dict, "g", _originalColor.g);
                         float b = GetFloat(dict, "b", _originalColor.b);
@@ -138,7 +115,6 @@ namespace Gatrix.Unity.SDK
                     }
                     else if (value is string hex)
                     {
-                        // Hex string "#FF0000"
                         if (ColorUtility.TryParseHtmlString(hex, out Color parsed))
                         {
                             _renderer.material.SetColor(_propertyName, parsed);

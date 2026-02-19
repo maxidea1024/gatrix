@@ -1,23 +1,18 @@
 // GatrixFlagSceneRedirect - Load a different scene based on feature flags
 // Useful for A/B testing onboarding flows, gradual rollouts of new areas, or seasonal events
 
-using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
-    /// Redirects to a different scene on Start if a feature flag is enabled.
-    /// Can be used as a "gate" at the end of a loading or splash scene.
+    /// Redirects to a different scene when a feature flag is enabled.
+    /// Can be used as a "gate" in a loading or splash scene.
     /// </summary>
     [AddComponentMenu("Gatrix/Flag Scene Redirect")]
-    public class GatrixFlagSceneRedirect : MonoBehaviour
+    public class GatrixFlagSceneRedirect : GatrixFlagComponentBase
     {
-        [Header("Flag Configuration")]
-        [GatrixFlagName]
-        [SerializeField] private string _flagName;
-
         [Header("Redirect Settings")]
         [Tooltip("Target scene name when the flag is enabled")]
         [SerializeField] private string _redirectScene;
@@ -28,45 +23,34 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Add the scene additively instead of loading cleanly")]
         [SerializeField] private bool _loadAdditively;
 
-        [Tooltip("When to check (default is Start)")]
-        [SerializeField] private bool _checkOnStart = true;
+        [Tooltip("Only redirect once then disable this component")]
+        [SerializeField] private bool _redirectOnce = true;
 
-        private void Start()
+        private bool _hasRedirected;
+
+        protected override void OnFlagChanged(FlagProxy flag)
         {
-            if (_checkOnStart)
+            if (flag == null || _hasRedirected) return;
+
+            if (flag.Enabled)
             {
-                CheckAndRedirect();
-            }
-        }
+                string target = _redirectScene;
+                if (_useVariantAsScene)
+                {
+                    target = flag.Variant?.Name;
+                }
 
-        /// <summary>
-        /// Manually trigger the redirection logic.
-        /// Useful when waiting for custom initialization or data loading.
-        /// </summary>
-        public void CheckAndRedirect()
-        {
-            if (string.IsNullOrEmpty(_flagName)) return;
-
-            var client = GatrixBehaviour.Client;
-            if (client == null || !client.IsReady)
-            {
-                Debug.LogWarning($"[Gatrix] Cannot redirect based on '{_flagName}' because SDK is not ready.");
-                return;
-            }
-
-            if (!client.Features.IsEnabled(_flagName)) return;
-
-            string target = _redirectScene;
-            if (_useVariantAsScene)
-            {
-                var variant = client.Features.GetVariant(_flagName);
-                if (variant != null) target = variant.Name;
-            }
-
-            if (!string.IsNullOrEmpty(target))
-            {
-                Debug.Log($"[Gatrix] Flag '{_flagName}' redirecting to scene: {target}");
-                SceneManager.LoadScene(target, _loadAdditively ? LoadSceneMode.Additive : LoadSceneMode.Single);
+                if (!string.IsNullOrEmpty(target))
+                {
+                    _hasRedirected = true;
+                    Debug.Log($"[Gatrix] Flag '{_flagName}' redirecting to scene: {target}");
+                    SceneManager.LoadScene(target, _loadAdditively ? LoadSceneMode.Additive : LoadSceneMode.Single);
+                    
+                    if (_redirectOnce)
+                    {
+                        enabled = false;
+                    }
+                }
             }
         }
     }
