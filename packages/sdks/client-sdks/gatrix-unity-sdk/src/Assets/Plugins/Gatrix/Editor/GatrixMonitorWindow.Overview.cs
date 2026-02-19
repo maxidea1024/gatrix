@@ -45,6 +45,21 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixSetupWindow.ShowWindow();
             }
 
+            // Select GatrixSettings asset directly
+#if UNITY_2023_1_OR_NEWER
+            var behaviour = UnityEngine.Object.FindFirstObjectByType<GatrixBehaviour>();
+#else
+            var behaviour = UnityEngine.Object.FindObjectOfType<GatrixBehaviour>();
+#endif
+            if (behaviour != null && behaviour.Settings != null)
+            {
+                if (GUILayout.Button("Settings", GUILayout.Height(26)))
+                {
+                    UnityEditor.Selection.activeObject = behaviour.Settings;
+                    EditorGUIUtility.PingObject(behaviour.Settings);
+                }
+            }
+
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space(4);
 

@@ -59,7 +59,7 @@ namespace Gatrix.Unity.SDK
         private readonly string _environment;
         private readonly Dictionary<string, string> _customHeaders;
         private readonly bool _disabled;
-        private readonly bool _enableDevMode;
+        private readonly GatrixDevLogger _devLog;
         private readonly IGatrixLogger _logger;
         private readonly string _connectionId;
         private readonly GatrixEventEmitter _emitter;
@@ -91,7 +91,6 @@ namespace Gatrix.Unity.SDK
             _environment = environment;
             _customHeaders = customHeaders;
             _disabled = disableMetrics;
-            _enableDevMode = enableDevMode;
             _logger = logger;
             _connectionId = connectionId ?? "";
             _emitter = emitter;
@@ -100,6 +99,8 @@ namespace Gatrix.Unity.SDK
 
             // Capture SynchronizationContext for main thread dispatch
             _syncContext = SynchronizationContext.Current;
+
+            _devLog = new GatrixDevLogger(logger, enableDevMode, _syncContext);
         }
 
         /// <summary>Start metrics collection</summary>
@@ -107,13 +108,13 @@ namespace Gatrix.Unity.SDK
         {
             if (_disabled)
             {
-                if (_enableDevMode) LogOnMainThread("Metrics disabled, skipping start");
+                _devLog.Log("Metrics disabled, skipping start");
                 return;
             }
             if (_started) return;
             _started = true;
 
-            if (_enableDevMode) LogOnMainThread($"Metrics started. interval={metricsIntervalMs / 1000f}s, initialDelay={metricsIntervalInitialMs / 1000f}s");
+            _devLog.Log($"Metrics started. interval={metricsIntervalMs / 1000f}s, initialDelay={metricsIntervalInitialMs / 1000f}s");
             _cts = new CancellationTokenSource();
             RunMetricsLoop(metricsIntervalMs, metricsIntervalInitialMs, _cts.Token).Forget();
         }
@@ -197,16 +198,13 @@ namespace Gatrix.Unity.SDK
             var payload = GetPayload();
             if (BucketIsEmpty(payload))
             {
-                if (_enableDevMode)
-                {
-                    LogOnMainThread("Metrics: bucket empty, skipping send");
-                }
+                _devLog.Log("Metrics: bucket empty, skipping send");
                 return;
             }
 
             var flagCount = payload.Bucket.Flags.Count;
             var missingCount = payload.Bucket.Missing.Count;
-            if (_enableDevMode) LogOnMainThread($"Metrics: sending. flags={flagCount}, missing={missingCount}");
+            _devLog.Log($"Metrics: sending. flags={flagCount}, missing={missingCount}");
 
             const int maxRetries = 2;
             // ... rest of method ...
@@ -239,7 +237,7 @@ namespace Gatrix.Unity.SDK
 
                     if (statusCode < 400)
                     {
-                        if (_enableDevMode) LogOnMainThread("Metrics sent successfully");
+                        _devLog.Log("Metrics sent successfully");
                         EmitOnMainThread(GatrixEvents.FlagsMetricsSent, payload);
                         return;
                     }
@@ -324,20 +322,7 @@ namespace Gatrix.Unity.SDK
             }
         }
 
-        /// <summary>
-        /// Log debug message on the main thread to ensure visibility in Unity console
-        /// </summary>
-        private void LogOnMainThread(string message)
-        {
-            if (_syncContext != null && SynchronizationContext.Current != _syncContext)
-            {
-                _syncContext.Post(_ => _logger?.Debug(message), null);
-            }
-            else
-            {
-                _logger?.Debug(message);
-            }
-        }
+
 
         private MetricsBucket CreateEmptyBucket()
         {

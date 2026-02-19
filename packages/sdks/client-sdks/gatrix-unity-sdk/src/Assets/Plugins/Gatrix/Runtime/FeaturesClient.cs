@@ -110,16 +110,7 @@ namespace Gatrix.Unity.SDK
         // Feature-specific config shortcut
         private FeaturesConfig FeaturesConfig => _config.Features ?? new FeaturesConfig();
 
-        /// <summary>
-        /// Log detailed debug information only when devMode is enabled
-        /// </summary>
-        private void DevLog(string message)
-        {
-            if (_config.EnableDevMode)
-            {
-                _logger?.Debug($"[DEV] {message}");
-            }
-        }
+        private readonly GatrixDevLogger _devLog;
 
         public FeaturesClient(GatrixEventEmitter emitter, GatrixClientConfig config, HttpClient httpClient)
         {
@@ -157,6 +148,7 @@ namespace Gatrix.Unity.SDK
 
             // Initialize logger
             _logger = config.Logger ?? new UnityGatrixLogger("GatrixFeatureClient");
+            _devLog = new GatrixDevLogger(_logger, config.EnableDevMode);
 
             // Refresh interval
             var featCfg = FeaturesConfig;
@@ -266,7 +258,7 @@ namespace Gatrix.Unity.SDK
             _consecutiveFailures = 0;
             _pollingStopped = false;
 
-            DevLog($"start() called. offlineMode={_config.OfflineMode}, refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={FeaturesConfig.ExplicitSyncMode}");
+            _devLog.Log($"start() called. offlineMode={_config.OfflineMode}, refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={FeaturesConfig.ExplicitSyncMode}");
 
             // Offline mode: use cached/bootstrap flags only
             if (_config.OfflineMode)
@@ -304,7 +296,7 @@ namespace Gatrix.Unity.SDK
         /// <summary>Stop polling and streaming</summary>
         public void Stop()
         {
-            DevLog("stop() called");
+            _devLog.Log("stop() called");
             _pollCts?.Cancel();
             _pollCts?.Dispose();
             _pollCts = null;

@@ -26,7 +26,7 @@ namespace Gatrix.Unity.SDK
 
             if (_isFetchingFlags) return;
             _isFetchingFlags = true;
-            DevLog($"fetchFlags: starting fetch. etag={_etag}");
+            _devLog.Log($"fetchFlags: starting fetch. etag={_etag}");
 
             try
             {
@@ -111,7 +111,7 @@ namespace Gatrix.Unity.SDK
 
                 if (response == null) return;
 
-                DevLog($"fetchFlags: response received. status={(int)response.StatusCode}");
+                _devLog.Log($"fetchFlags: response received. status={(int)response.StatusCode}");
 
                 // Check for recovery
                 if (_sdkState == SdkState.Error && (int)response.StatusCode < 400)
@@ -140,7 +140,7 @@ namespace Gatrix.Unity.SDK
                     var json = await response.Content.ReadAsStringAsync();
                     var data = GatrixJson.DeserializeFlagsResponse(json);
 
-                    DevLog($"fetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
+                    _devLog.Log($"fetchFlags: parsed response. success={data?.Success}, flagCount={data?.Data?.Flags?.Count ?? 0}");
 
 
                     if (data != null && data.Success && data.Data?.Flags != null)
@@ -165,7 +165,7 @@ namespace Gatrix.Unity.SDK
                 else if (response.StatusCode == HttpStatusCode.NotModified)
                 {
                     _notModifiedCount++;
-                    DevLog($"fetchFlags: 304 Not Modified (etag={_etag})");
+                    _devLog.Log($"fetchFlags: 304 Not Modified (etag={_etag})");
                     if (!_fetchedFromServer)
                     {
                         _fetchedFromServer = true;
@@ -202,7 +202,7 @@ namespace Gatrix.Unity.SDK
             }
             catch (OperationCanceledException)
             {
-                DevLog("fetchFlags: cancelled (timeout or shutdown)");
+                _devLog.Log("fetchFlags: cancelled (timeout or shutdown)");
             }
             catch (Exception e)
             {
@@ -228,7 +228,7 @@ namespace Gatrix.Unity.SDK
                 if (_pendingInvalidation)
                 {
                     _pendingInvalidation = false;
-                    DevLog("Processing pending invalidation after fetch completed");
+                    _devLog.Log("Processing pending invalidation after fetch completed");
                     FetchFlagsAsync().Forget();
                 }
             }
@@ -268,7 +268,7 @@ namespace Gatrix.Unity.SDK
                 _logger.Warn($"Scheduling retry after {delayMs}ms (consecutive failures: {_consecutiveFailures})");
             }
 
-            DevLog($"ScheduleNextRefresh: delay={delayMs}ms, consecutiveFailures={_consecutiveFailures}, pollingStopped={_pollingStopped}");
+            _devLog.Log($"ScheduleNextRefresh: delay={delayMs}ms, consecutiveFailures={_consecutiveFailures}, pollingStopped={_pollingStopped}");
 
             // Use async continuation that returns to the captured SynchronizationContext
             // so that FetchFlagsAsync and all event callbacks run on the main thread.

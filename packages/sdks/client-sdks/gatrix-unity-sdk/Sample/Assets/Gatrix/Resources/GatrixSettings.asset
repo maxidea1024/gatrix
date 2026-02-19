@@ -19,7 +19,7 @@ MonoBehaviour:
   _userId: 
   _sessionId: 
   _offlineMode: 0
-  _enableDevMode: 0
+  _enableDevMode: 1
   _cacheKeyPrefix: gatrix_cache
   _impressionDataAll: 0
   _bootstrapJson: 
@@ -35,7 +35,7 @@ MonoBehaviour:
   _initialBackoff: 1
   _maxBackoff: 60
   _streamingEnabled: 1
-  _streamingTransport: 0
+  _streamingTransport: 1
   _sseUrl: 
   _sseReconnectBase: 1
   _sseReconnectMax: 30

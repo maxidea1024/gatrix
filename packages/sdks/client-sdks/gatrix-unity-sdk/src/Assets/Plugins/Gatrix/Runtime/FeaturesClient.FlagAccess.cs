@@ -24,7 +24,7 @@ namespace Gatrix.Unity.SDK
         public bool HasFlag(string flagName) => LookupFlag(flagName) != null;
 
         /// <summary>Create a FlagProxy. Used internally by WatchFlag.
-        /// Always reads from realtimeFlags — watch callbacks must reflect
+        /// Always reads from realtimeFlags ??watch callbacks must reflect
         /// the latest server state regardless of explicitSyncMode.</summary>
         internal FlagProxy CreateProxy(string flagName)
         {
@@ -71,7 +71,7 @@ namespace Gatrix.Unity.SDK
         }
 
         // ==================== Metadata Access Internal Methods ====================
-        // No metrics tracking — read-only metadata access for FlagProxy property delegation.
+        // No metrics tracking ??read-only metadata access for FlagProxy property delegation.
 
         public bool HasFlagInternal(string flagName, bool forceRealtime = false)
         {
@@ -442,7 +442,7 @@ namespace Gatrix.Unity.SDK
             FeaturesConfig.ExplicitSyncMode = enabled;
             _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
             _pendingSync = false;
-            DevLog($"SetExplicitSyncMode: {enabled}");
+            _devLog.Log($"SetExplicitSyncMode: {enabled}");
         }
 
         /// <summary>Check if offline mode is enabled</summary>

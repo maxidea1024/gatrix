@@ -38,12 +38,12 @@ namespace Gatrix.Unity.SDK
             var transport = FeaturesConfig.Streaming.Transport;
             if (transport == StreamingTransport.WebSocket)
             {
-                DevLog("Connecting to WebSocket streaming endpoint...");
+                _devLog.Log("Connecting to WebSocket streaming endpoint...");
                 RunWebSocketLoopAsync(ct).Forget();
             }
             else
             {
-                DevLog("Connecting to SSE streaming endpoint...");
+                _devLog.Log("Connecting to SSE streaming endpoint...");
                 var streamUrl = FeaturesConfig.Streaming.Sse.Url
                     ?? $"{_config.ApiUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream/sse";
                 RunSseLoopAsync(streamUrl, ct).Forget();
@@ -98,7 +98,7 @@ namespace Gatrix.Unity.SDK
                     {
                         _streamingState = StreamingConnectionState.Connected;
                         _streamingReconnectAttempt = 0;
-                        DevLog($"Streaming connected. URL: {streamUrl}");
+                        _devLog.Log($"Streaming connected. URL: {streamUrl}");
                         _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
                     });
 
@@ -173,7 +173,7 @@ namespace Gatrix.Unity.SDK
                 {
                     PostToMainThread(() =>
                     {
-                        DevLog("Streaming connection closed by server");
+                        _devLog.Log("Streaming connection closed by server");
                         _streamingState = StreamingConnectionState.Reconnecting;
                         _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
                         ScheduleStreamingReconnect();
@@ -264,7 +264,7 @@ namespace Gatrix.Unity.SDK
                 {
                     _streamingState = StreamingConnectionState.Connected;
                     _streamingReconnectAttempt = 0;
-                    DevLog($"WebSocket streaming connected. URL: {baseUrl}");
+                    _devLog.Log($"WebSocket streaming connected. URL: {baseUrl}");
                     _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
                 });
 
@@ -299,7 +299,7 @@ namespace Gatrix.Unity.SDK
                                 {
                                     _streamingState = StreamingConnectionState.Connected;
                                     _streamingReconnectAttempt = 0;
-                                    DevLog($"WebSocket streaming connected (via event). URL: {baseUrl}");
+                                    _devLog.Log($"WebSocket streaming connected (via event). URL: {baseUrl}");
                                     _emitter.Emit(GatrixEvents.FlagsStreamingConnected);
                                 });
                             }
@@ -323,7 +323,7 @@ namespace Gatrix.Unity.SDK
                             {
                                 PostToMainThread(() =>
                                 {
-                                    DevLog("WebSocket connection closed by server");
+                                    _devLog.Log("WebSocket connection closed by server");
                                     _streamingState = StreamingConnectionState.Reconnecting;
                                     _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
                                     ScheduleStreamingReconnect();
@@ -339,7 +339,7 @@ namespace Gatrix.Unity.SDK
                 {
                     PostToMainThread(() =>
                     {
-                        DevLog("WebSocket connection ended");
+                        _devLog.Log("WebSocket connection ended");
                         _streamingState = StreamingConnectionState.Reconnecting;
                         _emitter.Emit(GatrixEvents.FlagsStreamingDisconnected);
                         ScheduleStreamingReconnect();
@@ -464,14 +464,14 @@ namespace Gatrix.Unity.SDK
                             else if (revObj is long rl) serverRevision = rl;
                             else if (revObj is double rd) serverRevision = (long)rd;
 
-                            DevLog($"Streaming 'connected' event: globalRevision={serverRevision}");
+                            _devLog.Log($"Streaming 'connected' event: globalRevision={serverRevision}");
                             _emitter.Emit(GatrixEvents.FlagsStreamingConnected,
                                 new StreamingConnectedEvent { GlobalRevision = serverRevision });
 
                             // Gap recovery: check if we missed any changes
                             if (serverRevision > _localGlobalRevision && _localGlobalRevision > 0)
                             {
-                                DevLog($"Gap detected: server={serverRevision}, local={_localGlobalRevision}. Triggering recovery.");
+                                _devLog.Log($"Gap detected: server={serverRevision}, local={_localGlobalRevision}. Triggering recovery.");
                                 FetchFlagsAsync().Forget();
                             }
                             else if (_localGlobalRevision == 0)
@@ -512,7 +512,7 @@ namespace Gatrix.Unity.SDK
                                 }
                             }
 
-                            DevLog($"Streaming 'flags_changed': globalRevision={serverRevision}, changedKeys=[{string.Join(",", changedKeys)}]");
+                            _devLog.Log($"Streaming 'flags_changed': globalRevision={serverRevision}, changedKeys=[{string.Join(",", changedKeys)}]");
 
                             // Only process if server revision is ahead
                             if (serverRevision > _localGlobalRevision)
@@ -528,7 +528,7 @@ namespace Gatrix.Unity.SDK
                             }
                             else
                             {
-                                DevLog($"Ignoring stale event: server={serverRevision} <= local={_localGlobalRevision}");
+                                _devLog.Log($"Ignoring stale event: server={serverRevision} <= local={_localGlobalRevision}");
                             }
                         }
                     }
@@ -539,11 +539,11 @@ namespace Gatrix.Unity.SDK
                     break;
 
                 case "heartbeat":
-                    DevLog("Streaming heartbeat received");
+                    _devLog.Log("Streaming heartbeat received");
                     break;
 
                 default:
-                    DevLog($"Unknown streaming event: {eventType}");
+                    _devLog.Log($"Unknown streaming event: {eventType}");
                     break;
             }
         }
@@ -553,7 +553,7 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         private void DisconnectStreaming()
         {
-            DevLog("Disconnecting streaming");
+            _devLog.Log("Disconnecting streaming");
             _streamingState = StreamingConnectionState.Disconnected;
 
             _streamingReconnectCts?.Cancel();
@@ -623,7 +623,7 @@ namespace Gatrix.Unity.SDK
             var jitter = UnityEngine.Random.Range(0, 1000);
             var delayMs = exponentialDelay + jitter;
 
-            DevLog($"Scheduling streaming reconnect: attempt={_streamingReconnectAttempt}, delay={delayMs}ms");
+            _devLog.Log($"Scheduling streaming reconnect: attempt={_streamingReconnectAttempt}, delay={delayMs}ms");
 
             _emitter.Emit(GatrixEvents.FlagsStreamingReconnecting,
                 _streamingReconnectAttempt, delayMs);
@@ -677,7 +677,7 @@ namespace Gatrix.Unity.SDK
             else
             {
                 _pendingInvalidation = true;
-                DevLog("Fetch in progress, marking pending invalidation for re-fetch after completion");
+                _devLog.Log("Fetch in progress, marking pending invalidation for re-fetch after completion");
             }
         }
     }
