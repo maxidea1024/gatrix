@@ -1,6 +1,6 @@
 # Gatrix Unity SDK
 
-> **Feature flags, A/B testing, and remote configuration — built for Unity game developers.**
+> **Feature flags, A/B testing, and remote configuration — official Gatrix SDK for Unity.**
 
 The Gatrix Unity SDK lets you control your game's behavior in real-time without shipping a new build. Toggle features, run A/B experiments, tune game parameters, and roll out changes gradually — all from the Gatrix dashboard.
 
@@ -14,6 +14,16 @@ The Gatrix Unity SDK lets you control your game's behavior in real-time without 
 | All players get the same experience | A/B test different experiences |
 | Hard-coded feature flags | Real-time remote configuration |
 | Risky big-bang releases | Gradual rollouts with instant rollback |
+
+### 🤔 When you might NOT need Gatrix
+
+Gatrix isn't the right fit for every project. Consider whether these apply to you:
+
+- **Single-player offline games** with no post-launch updates — if you ship once and never patch, remote configuration adds unnecessary complexity.
+- **Very small or prototype projects** — if your team is 1–2 people and the game's scope is small, hard-coded values may be simpler to manage.
+- **Strict latency budgets** — the SDK adds a network fetch at startup. If your game cannot tolerate any additional startup delay (even a few hundred milliseconds), evaluate carefully.
+- **No server infrastructure** — Gatrix requires a running backend. If your project has no server component at all and you want to stay fully serverless, this may not be the right tool.
+- **Regulatory restrictions** — some environments restrict outbound network requests from the game client. Verify that your deployment context allows SDK communication.
 
 ---
 
