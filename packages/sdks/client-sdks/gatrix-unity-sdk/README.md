@@ -73,28 +73,24 @@ public class GameManager : MonoBehaviour
 ## 🎮 Reading Feature Flags
 
 ```csharp
-var client = GatrixBehaviour.Client;
+var features = GatrixBehaviour.Client.Features;
 
 // Boolean check
-bool newUIEnabled = client.IsEnabled("new-ui");
+bool newUIEnabled = features.IsEnabled("new-ui");
 
 // Typed values with safe defaults (never throws)
-bool   showBanner  = client.BoolVariation("show-banner", false);
-string theme       = client.StringVariation("app-theme", "dark");
-int    maxRetries  = client.IntVariation("max-retries", 3);
-float  gameSpeed   = client.FloatVariation("game-speed", 1.0f);
-double dropRate    = client.NumberVariation("item-drop-rate", 0.05);
+bool   showBanner  = features.BoolVariation("show-banner", false);
+string theme       = features.StringVariation("app-theme", "dark");
+int    maxRetries  = features.IntVariation("max-retries", 3);
+float  gameSpeed   = features.FloatVariation("game-speed", 1.0f);
+double dropRate    = features.NumberVariation("item-drop-rate", 0.05);
 
 // Full variant info (name + value)
-Variant variant = client.GetVariant("experiment-a");
+Variant variant = features.GetVariant("experiment-a");
 Debug.Log($"Variant: {variant.Name}, Value: {variant.Value}");
 
-// FlagProxy — convenient wrapper with all info
-var proxy = client.GetFlag("new-ui");
-Debug.Log($"{proxy.Name}: exists={proxy.Exists}, enabled={proxy.Enabled}, variant={proxy.Variant?.Name}");
-
 // Evaluation details (includes reason for the decision)
-var details = client.Features.BoolVariationDetails("feature-x", false);
+var details = features.BoolVariationDetails("feature-x", false);
 Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
 ```
 
@@ -102,29 +98,69 @@ Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
 
 ## 👁️ Watching for Changes
 
-Gatrix notifies you in real-time when a flag changes — no polling needed.
+Gatrix provides two families of watch methods for different use cases:
+
+### Realtime Watching
+
+**`WatchRealtimeFlag`** fires the callback **immediately** whenever a flag change is fetched from the server, regardless of `ExplicitSyncMode`. Use this for debug UIs, monitoring dashboards, or any case where you always want the latest server value.
 
 ```csharp
-// Watch a single flag
-var unsubscribe = client.WatchFlag("game-speed", proxy =>
+var features = GatrixBehaviour.Client.Features;
+
+// Watch a flag — callback fires on every server-side change
+var unsubscribe = features.WatchRealtimeFlag("game-speed", proxy =>
 {
-    Time.timeScale = proxy.FloatValue(1f);
+    Debug.Log($"Server changed game-speed to: {proxy.FloatVariation(1f)}");
 });
 
 // Stop watching
 unsubscribe();
 
-// Watch with initial state (callback fires immediately with current value)
-client.WatchFlagWithInitialState("dark-mode", proxy =>
+// Watch with initial state (callback fires immediately with current value, then on changes)
+features.WatchRealtimeFlagWithInitialState("dark-mode", proxy =>
 {
     ApplyTheme(proxy.Enabled ? "dark" : "light");
 });
+```
 
-// Watch multiple flags as a group
-var group = client.CreateWatchGroup("ui-flags");
-group.WatchFlag("dark-mode",   p => { /* ... */ })
-     .WatchFlag("show-ads",    p => { /* ... */ })
-     .WatchFlag("premium-ui",  p => { /* ... */ });
+### Synced Watching
+
+**`WatchSyncedFlag`** fires the callback only when the **synchronized** flag store is updated. When `ExplicitSyncMode` is enabled, synced watchers wait until you call `SyncFlagsAsync()` to deliver changes. When `ExplicitSyncMode` is disabled, synced watchers behave identically to realtime watchers.
+
+```csharp
+var features = GatrixBehaviour.Client.Features;
+
+// Synced watch — in ExplicitSyncMode, callback fires only after SyncFlagsAsync()
+features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
+{
+    SetDifficulty(proxy.StringVariation("normal"));
+});
+
+// Apply changes at a safe point (e.g., between rounds)
+await features.SyncFlagsAsync();
+// ↑ At this point, synced watchers will fire with the latest values
+```
+
+### Realtime vs Synced — When to Use Which?
+
+| | Realtime | Synced |
+|---|---|---|
+| **Callback timing** | Immediately on fetch | After `SyncFlagsAsync()` (in ExplicitSyncMode) |
+| **Use case** | Debug UI, monitoring, non-disruptive changes | Gameplay-affecting values that need controlled timing |
+| **ExplicitSyncMode off** | Fires on change | Fires on change (same as realtime) |
+| **ExplicitSyncMode on** | Fires on change | Fires only after `SyncFlagsAsync()` |
+
+### Watch Groups
+
+Watch multiple flags as a group and unsubscribe them all at once:
+
+```csharp
+var features = GatrixBehaviour.Client.Features;
+
+var group = features.CreateWatchGroup("ui-flags");
+group.WatchRealtimeFlag("dark-mode",   p => { /* ... */ })
+     .WatchRealtimeFlag("show-ads",    p => { /* ... */ })
+     .WatchSyncedFlag("premium-ui",    p => { /* ... */ });
 
 // Unwatch all at once
 group.Destroy();
@@ -210,7 +246,7 @@ Inspector:
 
 ---
 
-### `GatrixFlagColor` ⭐ New
+### `GatrixFlagColor`
 **Tint UI Graphics or Renderers based on flag state or variant.**
 
 Perfect for: A/B testing UI color themes, status indicators, seasonal color changes.
@@ -227,7 +263,7 @@ Inspector:
 
 ---
 
-### `GatrixFlagCanvas` ⭐ New
+### `GatrixFlagCanvas`
 **Fade entire UI panels in/out using CanvasGroup.**
 
 More powerful than GatrixFlagToggle for UI — supports alpha fading and disabling raycasts without hiding.
@@ -242,7 +278,7 @@ Inspector:
 
 ---
 
-### `GatrixFlagAudio` ⭐ New
+### `GatrixFlagAudio`
 **Play different AudioClips based on flag state or variant.**
 
 Perfect for: A/B testing music/SFX, seasonal audio, enabling special sound effects.
@@ -259,7 +295,7 @@ Inspector:
 
 ---
 
-### `GatrixFlagAnimator` ⭐ New
+### `GatrixFlagAnimator`
 **Control Animator parameters based on flag state or variant.**
 
 Perfect for: enabling special animations, A/B testing character animations, triggering cutscenes.
@@ -274,7 +310,7 @@ Inspector:
 
 ---
 
-### `GatrixFlagParticles` ⭐ New
+### `GatrixFlagParticles`
 **Play, stop, or pause ParticleSystems based on a flag.**
 
 Perfect for: seasonal particle effects, enabling special VFX, A/B testing visual feedback.
@@ -346,20 +382,22 @@ A real-time dashboard for your SDK state:
 
 | Tab | What you see |
 |-----|-------------|
-| **Overview** | SDK health, connection ID, network stats, streaming state with transport type (SSE/WebSocket) |
+| **Overview** | SDK health, connection ID, fetch stats (count, errors, recoveries), streaming stats (events, errors, recoveries, transport type), and scene configuration |
 | **Flags** | All flags with live ON/OFF state, variant, and value. Highlights recently changed flags in yellow. |
 | **Events** | Live event log — every SDK event with timestamp and details |
 | **Context** | Current evaluation context (userId, sessionId, custom properties) |
-| **Metrics** | Dual-view metrics: **Graph** mode with real-time time-series charts, or **Report** mode with detailed tables. Streaming connection status, impression counts, metrics delivery, flag access summary, and missing flags. |
-| **Stats** | Detailed counters, flag access counts, variant hit counts, missing flags, event handler leak detection |
+| **Metrics** | Dual-view metrics: **Graph** mode with real-time time-series charts, or **Report** mode with detailed tables. Per-flag timeline charts for boolean/variant state history. |
+| **Stats** | Detailed counters, streaming counters, flag access counts, variant hit counts, missing flags, event handler leak detection |
 
-#### Metrics Graph View ⭐ New
+#### Metrics Graph View
 The **Metrics** tab includes interactive time-series graphs rendered directly in the Editor:
 - **Network Activity** — fetches, updates, and errors plotted over time
 - **Impressions & Delivery** — impression count and metrics sent over time
-- **Reconnections** — stream reconnection attempts (shown when reconnects occur)
+- **Streaming** — reconnection attempts, stream events, and stream errors
+- Per-flag timeline charts showing boolean and variant state changes over time
 - Configurable collection interval (1 second) and data retention (300 seconds)
 - Auto-scaling Y axis, grid lines, time axis labels, and color-coded legends
+- Time offset slider for scrolling through historical data
 - Toggle between **Graph** and **Report** views with a single click
 
 **Quick actions in the toolbar:**
@@ -400,10 +438,10 @@ Global settings and shortcuts accessible from the Project Settings window.
 Context determines how flags are evaluated for each player.
 
 ```csharp
-var client = GatrixBehaviour.Client;
+var features = GatrixBehaviour.Client.Features;
 
 // Update full context (triggers re-fetch)
-await client.UpdateContextAsync(new GatrixContext
+await features.UpdateContextAsync(new GatrixContext
 {
     UserId    = "player-456",
     SessionId = "session-abc",
@@ -416,10 +454,10 @@ await client.UpdateContextAsync(new GatrixContext
 });
 
 // Update a single field
-await client.SetContextFieldAsync("level", 43);
+await features.SetContextFieldAsync("level", 43);
 
 // Remove a field
-await client.RemoveContextFieldAsync("plan");
+await features.RemoveContextFieldAsync("plan");
 ```
 
 ---
@@ -436,11 +474,19 @@ var config = new GatrixClientConfig
 
 await GatrixBehaviour.InitializeAsync(config);
 
+var features = GatrixBehaviour.Client.Features;
+
 // Flags update in the background but don't affect gameplay yet.
-// Apply changes at a safe moment (e.g., between rounds):
-if (client.CanSyncFlags())
+// Use WatchSyncedFlag to react only when you apply changes:
+features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 {
-    await client.SyncFlagsAsync(fetchNow: false);
+    SetDifficulty(proxy.StringVariation("normal"));
+});
+
+// Apply changes at a safe moment (e.g., between rounds):
+if (features.CanSyncFlags())
+{
+    await features.SyncFlagsAsync(fetchNow: false);
 }
 ```
 
@@ -451,11 +497,19 @@ The **Monitor → Flags** tab shows both the active flags and pending changes si
 ## 📡 Events
 
 ```csharp
+var client = GatrixBehaviour.Client;
+
 client.On(GatrixEvents.Ready,       args => Debug.Log("SDK Ready"));
 client.On(GatrixEvents.Change,      args => Debug.Log("Flags Updated"));
 client.On(GatrixEvents.Error,       args => Debug.LogError("SDK Error"));
 client.On(GatrixEvents.FetchEnd,    args => Debug.Log("Fetch complete"));
 client.On(GatrixEvents.Impression,  args => Debug.Log("Impression tracked"));
+
+// Streaming events
+client.On(GatrixEvents.FlagsStreamingConnected,    args => Debug.Log("Streaming connected"));
+client.On(GatrixEvents.FlagsStreamingDisconnected, args => Debug.Log("Streaming disconnected"));
+client.On(GatrixEvents.FlagsStreamingReconnecting, args => Debug.Log("Streaming reconnecting"));
+client.On(GatrixEvents.FlagsStreamingError,        args => Debug.LogWarning("Streaming error"));
 
 // Subscribe once
 client.Once(GatrixEvents.Ready, args => ShowWelcomeScreen());
@@ -526,14 +580,17 @@ The SDK supports two real-time streaming transports for receiving flag updates:
 var config = new GatrixClientConfig
 {
     // ...
-    Streaming = new StreamingConfig
+    Features = new FeaturesConfig
     {
-        Transport = StreamingTransport.WebSocket  // default: SSE
+        Streaming = new StreamingConfig
+        {
+            Transport = StreamingTransport.WebSocket  // default: SSE
+        }
     }
 };
 ```
 
-### WebGL Support ⭐ New
+### WebGL Support
 
 The SDK fully supports Unity **WebGL** builds:
 
@@ -558,22 +615,19 @@ The SDK fully supports Unity **WebGL** builds:
 GatrixBehaviour.Shutdown();
 
 // Or manual disposal
-client.Dispose();
+GatrixBehaviour.Client.Dispose();
 ```
 
 ---
 
 ## 📖 API Reference
 
-### GatrixClient
+### FeaturesClient (via `GatrixBehaviour.Client.Features`)
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `StartAsync()` | `ValueTask` | Initialize and start the SDK |
-| `Stop()` | `void` | Stop polling and metrics |
 | `IsEnabled(flagName)` | `bool` | Check if flag is enabled |
 | `HasFlag(flagName)` | `bool` | Check if flag exists in cache |
-| `GetFlag(flagName)` | `FlagProxy` | Get a flag wrapper with all info |
 | `GetVariant(flagName)` | `Variant` | Get variant (never null) |
 | `BoolVariation(flag, default)` | `bool` | Get boolean value |
 | `StringVariation(flag, default)` | `string` | Get string value |
@@ -581,14 +635,36 @@ client.Dispose();
 | `FloatVariation(flag, default)` | `float` | Get float value |
 | `NumberVariation(flag, default)` | `double` | Get double value |
 | `JsonVariation(flag, default)` | `Dictionary` | Get JSON as Dictionary |
-| `UpdateContextAsync(ctx)` | `ValueTask` | Update evaluation context |
-| `WatchFlag(flag, callback)` | `Action` | Watch for flag changes |
-| `WatchFlagWithInitialState(flag, cb)` | `Action` | Watch + fire immediately |
-| `SyncFlagsAsync()` | `ValueTask` | Apply pending flag changes |
+| `BoolVariationDetails(flag, default)` | `VariationResult<bool>` | Bool value with evaluation reason |
+| `StringVariationDetails(flag, default)` | `VariationResult<string>` | String value with evaluation reason |
+| `UpdateContextAsync(ctx)` | `UniTask` | Update evaluation context |
+| `SetContextFieldAsync(key, value)` | `UniTask` | Update a single context field |
+| `RemoveContextFieldAsync(key)` | `UniTask` | Remove a context field |
+| `WatchRealtimeFlag(flag, callback)` | `Action` | Watch for real-time flag changes |
+| `WatchRealtimeFlagWithInitialState(flag, cb)` | `Action` | Watch real-time + fire immediately |
+| `WatchSyncedFlag(flag, callback)` | `Action` | Watch for synced flag changes |
+| `WatchSyncedFlagWithInitialState(flag, cb)` | `Action` | Watch synced + fire immediately |
+| `CreateWatchGroup(name)` | `WatchFlagGroup` | Create a named group of watchers |
+| `SyncFlagsAsync()` | `UniTask` | Apply pending flag changes |
+| `CanSyncFlags()` | `bool` | Check if there are pending sync changes |
+| `SetExplicitSyncMode(enabled)` | `void` | Toggle explicit sync mode at runtime |
 | `GetStats()` | `FeaturesStats` | Get SDK statistics |
+
+### GatrixClient (via `GatrixBehaviour.Client`)
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `StartAsync()` | `UniTask` | Initialize and start the SDK |
+| `Stop()` | `void` | Stop polling and metrics |
+| `On(event, callback)` | `GatrixClient` | Subscribe to an SDK event |
+| `Once(event, callback)` | `GatrixClient` | Subscribe once |
+| `Off(event, callback?)` | `GatrixClient` | Unsubscribe |
+| `OnAny(callback)` | `GatrixClient` | Subscribe to all events |
+| `OffAny(callback)` | `GatrixClient` | Unsubscribe from all events |
+| `GetStats()` | `GatrixSdkStats` | Get combined SDK statistics |
 | `Dispose()` | `void` | Clean up resources |
 
-### GatrixEventEmitter
+### GatrixEventEmitter (via `GatrixBehaviour.Client.Events`)
 
 | Method/Property | Description |
 |----------------|-------------|
@@ -608,9 +684,10 @@ client.Dispose();
 
 ### Game Speed Tuning
 ```csharp
-client.WatchFlagWithInitialState("game-speed", proxy =>
+var features = GatrixBehaviour.Client.Features;
+features.WatchRealtimeFlagWithInitialState("game-speed", proxy =>
 {
-    Time.timeScale = proxy.FloatValue(1f);
+    Time.timeScale = proxy.FloatVariation(1f);
 });
 ```
 
@@ -618,7 +695,8 @@ client.WatchFlagWithInitialState("game-speed", proxy =>
 ```csharp
 // Use GatrixFlagToggle component on your seasonal content root
 // Or in code:
-client.WatchFlagWithInitialState("winter-event", proxy =>
+var features = GatrixBehaviour.Client.Features;
+features.WatchRealtimeFlagWithInitialState("winter-event", proxy =>
 {
     winterEventRoot.SetActive(proxy.Enabled);
 });
@@ -628,37 +706,39 @@ client.WatchFlagWithInitialState("winter-event", proxy =>
 ```csharp
 // Use GatrixFlagValue component on your Text/TMP component
 // Or in code:
-client.WatchFlagWithInitialState("cta-button-text", proxy =>
+var features = GatrixBehaviour.Client.Features;
+features.WatchRealtimeFlagWithInitialState("cta-button-text", proxy =>
 {
-    ctaButton.text = proxy.StringValue("Play Now");
+    ctaButton.text = proxy.StringVariation("Play Now");
 });
 ```
 
 ### Gradual Feature Rollout
 ```csharp
 // Check flag before showing new feature
-if (client.IsEnabled("new-inventory-system"))
+var features = GatrixBehaviour.Client.Features;
+if (features.IsEnabled("new-inventory-system"))
 {
     newInventory.SetActive(true);
     legacyInventory.SetActive(false);
 }
 ```
 
----
+### Controlled Gameplay Updates (Explicit Sync)
+```csharp
+// Use synced watchers for gameplay-affecting values
+var features = GatrixBehaviour.Client.Features;
+features.WatchSyncedFlagWithInitialState("enemy-hp-multiplier", proxy =>
+{
+    enemyHpMultiplier = proxy.FloatVariation(1.0f);
+});
 
-## 📁 Samples
-
-A complete UGUI-based dashboard example is included in `Samples~/Simplit/`.
-
-**Import via:** Package Manager → Gatrix Unity SDK → Samples → Simplit → Import
-
-Components:
-- `SimplitMain` — config and screen manager
-- `SimplitDashboard` — live flag grid
-- `SimplitFlagCard` — individual flag card with flash animation on change
-- `SimplitStatsPanel` — auto-refreshing stats panel
-
-See `Samples~/Simplit/README.md` for setup instructions.
+// Apply at a safe point (e.g., between rounds)
+if (features.CanSyncFlags())
+{
+    await features.SyncFlagsAsync();
+}
+```
 
 ---
 
