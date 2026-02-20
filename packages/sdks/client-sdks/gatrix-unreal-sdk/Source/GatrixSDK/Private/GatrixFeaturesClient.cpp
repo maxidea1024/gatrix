@@ -32,6 +32,10 @@ UGatrixFeaturesClient::UGatrixFeaturesClient() {}
 void UGatrixFeaturesClient::Initialize(
     const FGatrixClientConfig &Config, FGatrixEventEmitter *Emitter,
     TSharedPtr<IGatrixStorageProvider> Storage) {
+  UE_LOG(LogGatrix, Log,
+         TEXT("[Init] Initialize() called. ApiUrl=%s App=%s Env=%s"),
+         *Config.ApiUrl, *Config.AppName, *Config.Environment);
+
   ClientConfig = Config;
   EventEmitter = Emitter;
   StorageProvider = Storage;
@@ -45,6 +49,8 @@ void UGatrixFeaturesClient::Initialize(
 
   // Load cached data from storage
   LoadFromStorage();
+  UE_LOG(LogGatrix, Log, TEXT("[Init] After LoadFromStorage: RealtimeFlags=%d"),
+         RealtimeFlags.Num());
 
   // Apply bootstrap flags if provided
   ApplyBootstrap();
@@ -53,24 +59,30 @@ void UGatrixFeaturesClient::Initialize(
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsInit);
   }
+
+  UE_LOG(LogGatrix, Log, TEXT("[Init] Initialize() completed. ConnectionId=%s"),
+         *ConnectionId);
 }
 
 void UGatrixFeaturesClient::Start() {
-  if (bStarted)
+  if (bStarted) {
+    UE_LOG(LogGatrix, Warning, TEXT("[Start] Already started, skipping."));
     return;
+  }
   bStarted = true;
   ConsecutiveFailures.Reset();
   bPollingStopped = false;
 
-  if (ClientConfig.bEnableDevMode) {
-    UE_LOG(LogGatrix, Log,
-           TEXT("[DEV] Start() called. offlineMode=%s, "
-                "refreshInterval=%.1f, disableRefresh=%s"),
-           ClientConfig.bOfflineMode ? TEXT("True") : TEXT("False"),
-           ClientConfig.Features.RefreshInterval,
-           ClientConfig.Features.bDisableRefresh ? TEXT("True")
-                                                 : TEXT("False"));
-  }
+  UE_LOG(LogGatrix, Log,
+         TEXT("[Start] Start() called. offlineMode=%s, "
+              "refreshInterval=%.1f, disableRefresh=%s, disableMetrics=%s, "
+              "streaming=%s"),
+         ClientConfig.bOfflineMode ? TEXT("True") : TEXT("False"),
+         ClientConfig.Features.RefreshInterval,
+         ClientConfig.Features.bDisableRefresh ? TEXT("True") : TEXT("False"),
+         ClientConfig.Features.bDisableMetrics ? TEXT("True") : TEXT("False"),
+         ClientConfig.Features.Streaming.bEnabled ? TEXT("True")
+                                                  : TEXT("False"));
 
   if (ClientConfig.bOfflineMode) {
     if (RealtimeFlags.Num() == 0) {
@@ -83,6 +95,8 @@ void UGatrixFeaturesClient::Start() {
         EventEmitter->Emit(GatrixEvents::SdkError, ErrorEvent.Message);
       }
       OnError.Broadcast(ErrorEvent);
+      UE_LOG(LogGatrix, Error,
+             TEXT("[Start] offlineMode but no cached flags!"));
       return;
     }
     SetReady();
@@ -90,15 +104,18 @@ void UGatrixFeaturesClient::Start() {
   }
 
   // Start first fetch
+  UE_LOG(LogGatrix, Log, TEXT("[Start] Starting first FetchFlags..."));
   FetchFlags();
 
   // Start metrics if enabled
   if (!ClientConfig.Features.bDisableMetrics) {
+    UE_LOG(LogGatrix, Log, TEXT("[Start] Starting metrics."));
     StartMetrics();
   }
 
   // Start streaming if enabled
   if (ClientConfig.Features.Streaming.bEnabled && !ClientConfig.bOfflineMode) {
+    UE_LOG(LogGatrix, Log, TEXT("[Start] Connecting streaming."));
     ConnectStreaming();
   }
 }
@@ -382,15 +399,18 @@ void UGatrixFeaturesClient::SetExplicitSyncMode(bool bEnabled) {
 // ==================== Fetch ====================
 
 void UGatrixFeaturesClient::FetchFlags() {
-  if (bIsFetching || !bStarted)
+  if (bIsFetching || !bStarted) {
+    UE_LOG(LogGatrix, Log,
+           TEXT("[Fetch] FetchFlags skipped: bIsFetching=%s bStarted=%s"),
+           bIsFetching ? TEXT("True") : TEXT("False"),
+           bStarted ? TEXT("True") : TEXT("False"));
     return;
+  }
 
   bIsFetching = true;
 
-  if (ClientConfig.bEnableDevMode) {
-    UE_LOG(LogGatrix, Log, TEXT("[DEV] FetchFlags: starting fetch. etag=%s"),
-           *Etag);
-  }
+  UE_LOG(LogGatrix, Log, TEXT("[Fetch] FetchFlags: starting fetch. etag=%s"),
+         *Etag);
 
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsFetchStart);
@@ -404,6 +424,9 @@ void UGatrixFeaturesClient::DoFetchFlags() {
 
   FString Url = BuildFetchUrl();
   bool bUsePOST = ClientConfig.Features.bUsePOSTRequests;
+
+  UE_LOG(LogGatrix, Log, TEXT("[Fetch] DoFetchFlags: URL=%s method=%s"), *Url,
+         bUsePOST ? TEXT("POST") : TEXT("GET"));
 
   TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
       FHttpModule::Get().CreateRequest();
@@ -450,6 +473,13 @@ void UGatrixFeaturesClient::DoFetchFlags() {
 
         if (!bWasSuccessful || !Response.IsValid()) {
           FString ErrorMsg = TEXT("Network error: request failed");
+          UE_LOG(
+              LogGatrix, Error,
+              TEXT(
+                  "[Fetch] HTTP request failed! bWasSuccessful=%s Response=%s"),
+              bWasSuccessful ? TEXT("True") : TEXT("False"),
+              Response.IsValid() ? TEXT("Valid") : TEXT("Null"));
+
           if (EventEmitter) {
             EventEmitter->Emit(GatrixEvents::FlagsFetchError, ErrorMsg);
             EventEmitter->Emit(GatrixEvents::SdkError, ErrorMsg);
@@ -471,6 +501,10 @@ void UGatrixFeaturesClient::DoFetchFlags() {
         int32 HttpStatus = Response->GetResponseCode();
         FString ResponseBody = Response->GetContentAsString();
 
+        UE_LOG(LogGatrix, Log,
+               TEXT("[Fetch] HTTP response: status=%d bodyLen=%d"), HttpStatus,
+               ResponseBody.Len());
+
         // ETag from response
         FString NewEtag = Response->GetHeader(TEXT("ETag"));
 
@@ -482,11 +516,16 @@ void UGatrixFeaturesClient::DoFetchFlags() {
       });
 
   HttpRequest->ProcessRequest();
+  UE_LOG(LogGatrix, Log, TEXT("[Fetch] HTTP request sent."));
 }
 
 void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
                                                 int32 HttpStatus,
                                                 const FString &EtagHeader) {
+  UE_LOG(LogGatrix, Log,
+         TEXT("[Fetch] HandleFetchResponse: status=%d etag=%s bodyLen=%d"),
+         HttpStatus, *EtagHeader, ResponseBody.Len());
+
   // Check for recovery from error state
   if (SdkState == EGatrixSdkState::Error && HttpStatus < 400) {
     SdkState = EGatrixSdkState::Healthy;
@@ -524,7 +563,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     bool bSuccess = false;
     JsonObject->TryGetBoolField(TEXT("success"), bSuccess);
     if (!bSuccess) {
-      UE_LOG(LogGatrix, Warning, TEXT("Flags response success=false"));
+      UE_LOG(LogGatrix, Warning, TEXT("[Fetch] Flags response success=false"));
       return;
     }
 
@@ -606,6 +645,8 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     }
 
     bool bIsInitialFetch = !bFetchedFromServer;
+    UE_LOG(LogGatrix, Log, TEXT("[Fetch] Parsed %d flags. isInitial=%s"),
+           ParsedFlags.Num(), bIsInitialFetch ? TEXT("True") : TEXT("False"));
     StoreFlags(ParsedFlags, bIsInitialFetch);
 
     UpdateCount.Increment();
