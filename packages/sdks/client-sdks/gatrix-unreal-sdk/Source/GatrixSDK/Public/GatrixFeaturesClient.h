@@ -15,8 +15,8 @@
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
 
-#include "GatrixFeaturesClient.generated.h"
 #include <atomic>
+#include "GatrixFeaturesClient.generated.h"
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
