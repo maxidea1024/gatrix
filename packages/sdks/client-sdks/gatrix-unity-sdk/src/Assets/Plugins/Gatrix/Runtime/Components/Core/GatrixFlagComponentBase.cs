@@ -1,5 +1,5 @@
 // GatrixFlagComponentBase - Base class for all Gatrix flag-binding components
-// Consolidates common fields (_flagName, _use) and subscription lifecycle.
+// Consolidates common fields (_flagName, _flagSyncMode) and subscription lifecycle.
 
 using System;
 using UnityEngine;
@@ -7,6 +7,18 @@ using UnityEngine.Serialization;
 
 namespace Gatrix.Unity.SDK
 {
+    /// <summary>
+    /// Controls how this component receives flag updates from the SDK.
+    /// </summary>
+    public enum FlagSyncMode
+    {
+        /// <summary>Update only when the client explicitly synchronizes flag states.</summary>
+        Synced   = 0,
+
+        /// <summary>Update immediately whenever the flag changes on the server.</summary>
+        Realtime = 1,
+    }
+
     /// <summary>
     /// Base class for components that bind to a Gatrix feature flag.
     /// Manages the subscription lifecycle and provides a common interface for the inspector.
@@ -16,9 +28,10 @@ namespace Gatrix.Unity.SDK
         [GatrixFlagName]
         [SerializeField] protected string _flagName;
 
-        [Tooltip("Use Realtime mode for immediate updates, or Synced mode for controlled updates")]
+        [Tooltip("Realtime: update immediately on server changes. Synced: update only on explicit sync.")]
         [FormerlySerializedAs("_useRealtime")]
-        [SerializeField] protected bool _use = true;
+        [FormerlySerializedAs("_use")]
+        [SerializeField] protected FlagSyncMode _flagSyncMode = FlagSyncMode.Realtime;
 
         protected Action _unwatch;
 
@@ -59,7 +72,7 @@ namespace Gatrix.Unity.SDK
             // Include instanceID to distinguish objects with the same name (e.g. multiple enemies)
             string componentName = $"{GetType().Name}:{gameObject.name}(#{gameObject.GetInstanceID()})";
 
-            if (_use)
+            if (_flagSyncMode == FlagSyncMode.Realtime)
             {
                 _unwatch = client.Features.WatchRealtimeFlagWithInitialState(_flagName, OnFlagChanged, componentName);
             }
@@ -105,7 +118,7 @@ namespace Gatrix.Unity.SDK
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-            // Re-subscribe when _flagName or _use changes in the Inspector during Play Mode.
+            // Re-subscribe when _flagName or _flagSyncMode changes in the Inspector during Play Mode.
             // OnValidate() is called by Unity whenever a serialized field is modified.
             if (Application.isPlaying && GatrixBehaviour.IsInitialized)
             {

@@ -21,7 +21,7 @@ namespace Gatrix.Unity.SDK.Editor
         private bool _isFlagComponent;
         private bool _isOtherGatrixComponent;
         private SerializedProperty _flagNameProp;
-        private SerializedProperty _useProp;
+        private SerializedProperty _flagSyncModeProp;
 
         private void OnEnable()
         {
@@ -38,7 +38,7 @@ namespace Gatrix.Unity.SDK.Editor
             if (_isFlagComponent)
             {
                 _flagNameProp = serializedObject.FindProperty("_flagName");
-                _useProp = serializedObject.FindProperty("_use");
+                _flagSyncModeProp = serializedObject.FindProperty("_flagSyncMode");
             }
         }
 
@@ -68,26 +68,29 @@ namespace Gatrix.Unity.SDK.Editor
                     EditorGUILayout.PropertyField(_flagNameProp, new GUIContent("Flag Name"));
                 }
 
-                if (_useProp != null)
+                if (_flagSyncModeProp != null)
                 {
-                    // Draw Sync Mode as an Enum-like dropdown instead of a simple toggle
-                    int currentIndex = _useProp.boolValue ? 0 : 1;
+                    // Draw Sync Mode as an enum-like dropdown (Realtime first for prominence)
+                    bool isRealtime = _flagSyncModeProp.enumValueIndex == (int)FlagSyncMode.Realtime;
                     string[] options = { "Realtime (Immediate)", "Synced (Manual · Controlled)" };
 
+                    int currentIndex = isRealtime ? 0 : 1;
                     int newIndex = EditorGUILayout.Popup("Sync Mode", currentIndex, options);
                     if (newIndex != currentIndex)
                     {
-                        _useProp.boolValue = (newIndex == 0);
+                        _flagSyncModeProp.enumValueIndex = (newIndex == 0)
+                            ? (int)FlagSyncMode.Realtime
+                            : (int)FlagSyncMode.Synced;
                     }
 
-                    EditorGUILayout.HelpBox(_useProp.boolValue
+                    EditorGUILayout.HelpBox(isRealtime
                         ? "Immediate updates whenever the flag changes on the server."
                         : "Update only when the client explicitly synchronizes flag states.",
                         MessageType.None);
 
                     // Warn if Synced mode but SDK Explicit Sync is off
                     // Works in both Edit and Play mode
-                    if (!_useProp.boolValue)
+                    if (!isRealtime)
                     {
                         bool explicitSyncOff = false;
                         GatrixSettings settingsToPin = null;
@@ -200,7 +203,8 @@ namespace Gatrix.Unity.SDK.Editor
             if (Application.isPlaying && GatrixBehaviour.IsInitialized)
             {
                 // Play Mode: show realtime / synced distinction
-                bool isRealtime = _useProp != null && _useProp.boolValue;
+                bool isRealtime = _flagSyncModeProp != null &&
+                    _flagSyncModeProp.enumValueIndex == (int)FlagSyncMode.Realtime;
                 bool isExplicitSync = features.IsExplicitSync();
 
                 if (isRealtime)
