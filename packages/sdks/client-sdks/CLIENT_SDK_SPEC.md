@@ -176,6 +176,9 @@ interface GatrixClientConfig {
 
   // Optional - Fetch Retry Options
   fetchRetryOptions?: FetchRetryOptions; // Configure retry/backoff behavior
+
+  // Optional - Request Method
+  usePOSTRequests?: boolean; // Use POST instead of GET for flag evaluation (default: false)
 }
 
 interface FetchRetryOptions {
@@ -312,6 +315,43 @@ All client SDKs MUST include the following standard headers on every HTTP reques
 | `X-SDK-Version` | `{sdkName}/{sdkVersion}` | SDK identification string (e.g., `@gatrix/js-client-sdk/1.0.0`) |
 | `Content-Type` | `application/json` | Required for POST requests |
 | `...customHeaders` | User-defined | Spread/merged from `config.customHeaders` |
+
+### POST vs GET for Flag Evaluation
+
+By default, SDKs use **GET** requests with context in query parameters for flag evaluation. When `usePOSTRequests` is enabled, SDKs switch to **POST** requests with context and flagNames in a JSON body.
+
+#### When to use POST
+
+- **Sensitive context fields**: Query parameters appear in server logs, CDN caches, and browser history. POST keeps context data in the request body.
+- **Large context**: URL length limits (~2048 chars) can be hit with many context properties. POST has no practical body size limit.
+- **Many flagNames**: Partial fetch with many keys can exceed URL length limits.
+
+#### POST Body Format
+
+```json
+{
+  "context": {
+    "appName": "MyApp",
+    "environment": "production",
+    "userId": "user-123",
+    "sessionId": "session-456",
+    "properties": {
+      "country": "KR",
+      "plan": "premium"
+    }
+  },
+  "flagNames": ["feature-a", "feature-b"]
+}
+```
+
+- `context` (required): Same fields as the GET query parameters
+- `flagNames` (optional): Array of specific flag keys to evaluate. If omitted, all flags are evaluated.
+
+#### ETag Behavior with POST
+
+- `If-None-Match` header works the same way with both GET and POST
+- The server generates ETags identically regardless of HTTP method
+- Conditional fetch (304 Not Modified) is fully supported with POST
 
 #### fetchFlags-Only Headers
 

@@ -170,6 +170,9 @@ namespace Gatrix.Unity.SDK
         /// <summary>Maximum backoff delay in seconds for retries (default: 60)</summary>
         public int MaxBackoff { get; set; } = 60;
 
+        /// <summary>Use POST requests instead of GET for flag fetching (prevents sensitive context fields from appearing in URL)</summary>
+        public bool UsePOSTRequests { get; set; }
+
         /// <summary>Streaming configuration for real-time flag invalidation</summary>
         public StreamingConfig Streaming { get; set; } = new StreamingConfig();
     }

@@ -45,13 +45,26 @@ namespace Gatrix.Unity.SDK
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
                 urlBuilder.Append("/client/features/");
                 urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
-                urlBuilder.Append("/eval?");
+                urlBuilder.Append("/eval");
 
-                // Add context as query params
-                AppendContextQueryParams(urlBuilder, _context);
-
-                var url = urlBuilder.ToString();
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                HttpRequestMessage request;
+                if (FeaturesConfig.UsePOSTRequests)
+                {
+                    // POST: context goes in JSON body
+                    var url = urlBuilder.ToString();
+                    var body = GatrixJson.SerializeEvalRequestBody(_context);
+                    request = new HttpRequestMessage(HttpMethod.Post, url)
+                    {
+                        Content = new StringContent(body, Encoding.UTF8, "application/json")
+                    };
+                }
+                else
+                {
+                    // GET: context goes in query params
+                    urlBuilder.Append('?');
+                    AppendContextQueryParams(urlBuilder, _context);
+                    request = new HttpRequestMessage(HttpMethod.Get, urlBuilder.ToString());
+                }
 
                 // Headers
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
@@ -372,13 +385,28 @@ namespace Gatrix.Unity.SDK
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
                 urlBuilder.Append("/client/features/");
                 urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
-                urlBuilder.Append("/eval?");
-                AppendContextQueryParams(urlBuilder, _context);
-                urlBuilder.Append("&flagNames=");
-                urlBuilder.Append(Uri.EscapeDataString(keysStr));
+                urlBuilder.Append("/eval");
 
-                var url = urlBuilder.ToString();
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                HttpRequestMessage request;
+                if (FeaturesConfig.UsePOSTRequests)
+                {
+                    // POST: context and flagNames in JSON body
+                    var url = urlBuilder.ToString();
+                    var body = GatrixJson.SerializeEvalRequestBody(_context, flagKeys);
+                    request = new HttpRequestMessage(HttpMethod.Post, url)
+                    {
+                        Content = new StringContent(body, Encoding.UTF8, "application/json")
+                    };
+                }
+                else
+                {
+                    // GET: context and flagNames in query params
+                    urlBuilder.Append('?');
+                    AppendContextQueryParams(urlBuilder, _context);
+                    urlBuilder.Append("&flagNames=");
+                    urlBuilder.Append(Uri.EscapeDataString(keysStr));
+                    request = new HttpRequestMessage(HttpMethod.Get, urlBuilder.ToString());
+                }
 
                 // Headers — NO If-None-Match (intentionally skip ETag for partial fetch)
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);

@@ -80,13 +80,13 @@ namespace Gatrix.Unity.SDK
             // Emit initial state — respect explicitSyncMode for synced watchers
             if (_readyEventEmitted)
             {
-                callback(new FlagProxy(this, flagName));
+                callback(new FlagProxy(this, flagName, false));
             }
             else
             {
                 _emitter.Once(GatrixEvents.FlagsReady, _ =>
                 {
-                    callback(new FlagProxy(this, flagName));
+                    callback(new FlagProxy(this, flagName, false));
                 }, name != null ? $"{name}_initial" : null);
             }
 

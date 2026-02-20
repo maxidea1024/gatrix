@@ -94,6 +94,69 @@ namespace Gatrix.Unity.SDK
             return ParseValue(json, ref index) as Dictionary<string, object>;
         }
 
+        /// <summary>
+        /// Serialize an eval request body for POST /eval endpoint.
+        /// Body format: { "context": {...}, "flagNames": [...] }
+        /// </summary>
+        public static string SerializeEvalRequestBody(GatrixContext context, ICollection<string> flagNames = null)
+        {
+            var sb = new StringBuilder();
+            sb.Append("{\"context\":{");
+
+            var first = true;
+            void AppendField(string key, string value)
+            {
+                if (string.IsNullOrEmpty(value)) return;
+                if (!first) sb.Append(',');
+                first = false;
+                SerializeString(sb, key);
+                sb.Append(':');
+                SerializeString(sb, value);
+            }
+
+            AppendField("appName", context.AppName);
+            AppendField("environment", context.Environment);
+            AppendField("userId", context.UserId);
+            AppendField("sessionId", context.SessionId);
+            AppendField("currentTime", context.CurrentTime);
+
+            if (context.Properties != null && context.Properties.Count > 0)
+            {
+                if (!first) sb.Append(',');
+                first = false;
+                sb.Append("\"properties\":{");
+                var firstProp = true;
+                foreach (var kvp in context.Properties)
+                {
+                    if (kvp.Value == null) continue;
+                    if (!firstProp) sb.Append(',');
+                    firstProp = false;
+                    SerializeString(sb, kvp.Key);
+                    sb.Append(':');
+                    SerializeValue(sb, kvp.Value);
+                }
+                sb.Append('}');
+            }
+
+            sb.Append('}');
+
+            if (flagNames != null && flagNames.Count > 0)
+            {
+                sb.Append(",\"flagNames\":[");
+                var firstKey = true;
+                foreach (var key in flagNames)
+                {
+                    if (!firstKey) sb.Append(',');
+                    firstKey = false;
+                    SerializeString(sb, key);
+                }
+                sb.Append(']');
+            }
+
+            sb.Append('}');
+            return sb.ToString();
+        }
+
 
         /// <summary>
         /// Serialize a metrics payload to JSON

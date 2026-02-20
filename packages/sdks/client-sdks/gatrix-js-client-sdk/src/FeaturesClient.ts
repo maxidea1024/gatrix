@@ -1099,21 +1099,6 @@ export class FeaturesClient implements VariationProvider {
       // Build endpoint: {apiUrl}/client/features/{environment}/eval
       const url = new URL(`${this.config.apiUrl}/client/features/${this.config.environment}/eval`);
 
-      // Add context as query params for GET request
-      for (const [key, value] of Object.entries(this.context)) {
-        if (value === undefined || value === null) continue;
-
-        if (key === 'properties' && typeof value === 'object') {
-          for (const [propKey, propValue] of Object.entries(value)) {
-            if (propValue !== undefined && propValue !== null) {
-              url.searchParams.set(`properties[${propKey}]`, String(propValue));
-            }
-          }
-        } else {
-          url.searchParams.set(key, String(value));
-        }
-      }
-
       const headers = this.buildHeaders();
 
       if (this.etag) {
@@ -1128,14 +1113,44 @@ export class FeaturesClient implements VariationProvider {
       const timeout = retryOptions.timeout ?? 30000;
       const nonRetryableStatusCodes = retryOptions.nonRetryableStatusCodes ?? [401, 403];
 
-      // SDK manages retry/backoff, so disable ky's built-in retry
-      const response = await ky.get(url.toString(), {
-        headers,
-        signal: this.abortController?.signal,
-        retry: 0,
-        timeout,
-        throwHttpErrors: false, // Handle status codes manually for ETag support
-      });
+      let response;
+
+      if (this.featuresConfig.usePOSTrequests) {
+        // POST: context goes in JSON body
+        headers['Content-Type'] = 'application/json';
+        response = await ky.post(url.toString(), {
+          headers,
+          json: { context: this.context },
+          signal: this.abortController?.signal,
+          retry: 0,
+          timeout,
+          throwHttpErrors: false,
+        });
+      } else {
+        // GET: context goes in query params
+        for (const [key, value] of Object.entries(this.context)) {
+          if (value === undefined || value === null) continue;
+
+          if (key === 'properties' && typeof value === 'object') {
+            for (const [propKey, propValue] of Object.entries(value)) {
+              if (propValue !== undefined && propValue !== null) {
+                url.searchParams.set(`properties[${propKey}]`, String(propValue));
+              }
+            }
+          } else {
+            url.searchParams.set(key, String(value));
+          }
+        }
+
+        // SDK manages retry/backoff, so disable ky's built-in retry
+        response = await ky.get(url.toString(), {
+          headers,
+          signal: this.abortController?.signal,
+          retry: 0,
+          timeout,
+          throwHttpErrors: false, // Handle status codes manually for ETag support
+        });
+      }
 
       // Check for recovery
       if (this.sdkState === 'error' && response.status < 400) {
@@ -2071,23 +2086,6 @@ export class FeaturesClient implements VariationProvider {
       // Build endpoint with flagNames parameter
       const url = new URL(`${this.config.apiUrl}/client/features/${this.config.environment}/eval`);
 
-      // Add context as query params
-      for (const [key, value] of Object.entries(this.context)) {
-        if (value === undefined || value === null) continue;
-        if (key === 'properties' && typeof value === 'object') {
-          for (const [propKey, propValue] of Object.entries(value)) {
-            if (propValue !== undefined && propValue !== null) {
-              url.searchParams.set(`properties[${propKey}]`, String(propValue));
-            }
-          }
-        } else {
-          url.searchParams.set(key, String(value));
-        }
-      }
-
-      // Add flagNames parameter
-      url.searchParams.set('flagNames', keysStr);
-
       const headers = this.buildHeaders();
       // NO If-None-Match header (intentionally skip ETag for partial fetch)
 
@@ -2102,13 +2100,45 @@ export class FeaturesClient implements VariationProvider {
       const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
       const timeout = retryOptions.timeout ?? 30000;
 
-      const response = await ky.get(url.toString(), {
-        headers,
-        signal: this.abortController?.signal,
-        retry: 0,
-        timeout,
-        throwHttpErrors: false,
-      });
+      let response;
+
+      if (this.featuresConfig.usePOSTrequests) {
+        // POST: context and flagNames in JSON body
+        headers['Content-Type'] = 'application/json';
+        response = await ky.post(url.toString(), {
+          headers,
+          json: { context: this.context, flagNames: Array.from(flagKeys) },
+          signal: this.abortController?.signal,
+          retry: 0,
+          timeout,
+          throwHttpErrors: false,
+        });
+      } else {
+        // GET: context and flagNames in query params
+        for (const [key, value] of Object.entries(this.context)) {
+          if (value === undefined || value === null) continue;
+          if (key === 'properties' && typeof value === 'object') {
+            for (const [propKey, propValue] of Object.entries(value)) {
+              if (propValue !== undefined && propValue !== null) {
+                url.searchParams.set(`properties[${propKey}]`, String(propValue));
+              }
+            }
+          } else {
+            url.searchParams.set(key, String(value));
+          }
+        }
+
+        // Add flagNames parameter
+        url.searchParams.set('flagNames', keysStr);
+
+        response = await ky.get(url.toString(), {
+          headers,
+          signal: this.abortController?.signal,
+          retry: 0,
+          timeout,
+          throwHttpErrors: false,
+        });
+      }
 
       this.devLog(`fetchPartialFlags: response received. status=${response.status}`);
 
