@@ -270,11 +270,63 @@ gatrix.Init({
 })
 
 --- SDK를 시작합니다 (페칭, 폴링, 메트릭 시작)
+--- @return deferred?  flags.ready 이벤트 시 resolve (`deferred` 모듈 필요)
 gatrix.Start()
 
 --- SDK를 중지합니다 (폴링 중지, 정리)
 gatrix.Stop()
 ```
+
+### Promise (Deferred) 체이닝
+
+`gatrix.Start()`와 `gatrix.Features.FetchFlags()`는 `deferred` Lua 모듈이 사용 가능한 경우 **deferred (promise) 객체**를 반환합니다. 이를 통해 깔끔한 비동기 체이닝이 가능합니다:
+
+```lua
+-- Start는 플래그가 준비되면 resolve되는 deferred를 반환합니다
+gatrix.Start()
+    :next(function()
+        print("SDK 준비 완료 — 플래그 로드됨!")
+        local speed = gatrix.Features.FloatVariation("game-speed", 1.0)
+        print("게임 속도:", speed)
+    end)
+    :catch(function(err)
+        print("SDK 시작 실패:", err)
+    end)
+
+-- FetchFlags는 성공 시 resolve, 실패 시 reject되는 deferred를 반환합니다
+gatrix.Features.FetchFlags()
+    :next(function()
+        print("플래그 페칭 성공!")
+    end)
+    :catch(function(err)
+        print("페칭 실패:", err)
+    end)
+```
+
+**여러 작업을 체이닝:**
+
+```lua
+gatrix.Init({ --[[ config ]] })
+
+gatrix.Start()
+    :next(function()
+        -- SDK 준비 완료, 워처 설정
+        gatrix.Features.WatchRealtimeFlagWithInitialState("difficulty", function(Proxy)
+            SetDifficulty(Proxy.Variant.Value)
+        end)
+    end)
+```
+
+> 💡 **폴백 동작:** Lua 환경에 `deferred` 모듈이 없으면 `Start()`와 `FetchFlags()`는 `nil`을 반환합니다. 이벤트 기반 폴백으로 `gatrix.Once("flags.ready", ...)`를 사용하세요:
+>
+> ```lua
+> local result = gatrix.Start()
+> if result and result.next then
+>     result:next(function() print("Promise로 준비 완료") end)
+> else
+>     gatrix.Once("flags.ready", function() print("이벤트로 준비 완료") end)
+> end
+> ```
 
 ### 플래그 접근 (`gatrix.Features`)
 
@@ -689,6 +741,7 @@ local Ready = gatrix.Features.IsReady()
 local Initialized = gatrix.Features.IsInitialized()
 
 --- 서버에서 플래그를 강제로 페칭합니다
+--- @return deferred?  fetch_success 시 resolve, fetch_error 시 reject (`deferred` 모듈 필요)
 gatrix.Features.FetchFlags()
 
 --- explicitSyncMode에서 플래그를 동기화합니다

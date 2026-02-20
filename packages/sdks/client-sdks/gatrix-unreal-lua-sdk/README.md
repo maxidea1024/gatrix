@@ -270,11 +270,63 @@ gatrix.Init({
 })
 
 --- Start the SDK (begins fetching, polling, metrics)
+--- @return deferred?  Resolves when flags.ready fires (requires `deferred` module)
 gatrix.Start()
 
 --- Stop the SDK (stops polling, cleans up)
 gatrix.Stop()
 ```
+
+### Promise (Deferred) Chaining
+
+`gatrix.Start()` and `gatrix.Features.FetchFlags()` return **deferred (promise) objects** when the `deferred` Lua module is available. This enables clean asynchronous chaining:
+
+```lua
+-- Start returns a deferred that resolves when flags are ready
+gatrix.Start()
+    :next(function()
+        print("SDK ready — flags loaded!")
+        local speed = gatrix.Features.FloatVariation("game-speed", 1.0)
+        print("Game speed:", speed)
+    end)
+    :catch(function(err)
+        print("SDK start failed:", err)
+    end)
+
+-- FetchFlags returns a deferred that resolves on success, rejects on error
+gatrix.Features.FetchFlags()
+    :next(function()
+        print("Flags fetched successfully!")
+    end)
+    :catch(function(err)
+        print("Fetch failed:", err)
+    end)
+```
+
+**Chaining multiple operations:**
+
+```lua
+gatrix.Init({ --[[ config ]] })
+
+gatrix.Start()
+    :next(function()
+        -- SDK is ready, set up watchers
+        gatrix.Features.WatchRealtimeFlagWithInitialState("difficulty", function(Proxy)
+            SetDifficulty(Proxy.Variant.Value)
+        end)
+    end)
+```
+
+> 💡 **Fallback behavior:** If the `deferred` module is not available in your Lua environment, `Start()` and `FetchFlags()` return `nil`. Use `gatrix.Once("flags.ready", ...)` as the event-based fallback:
+>
+> ```lua
+> local result = gatrix.Start()
+> if result and result.next then
+>     result:next(function() print("Ready via promise") end)
+> else
+>     gatrix.Once("flags.ready", function() print("Ready via event") end)
+> end
+> ```
 
 ### Flag Access (`gatrix.Features`)
 
@@ -690,6 +742,7 @@ local Ready = gatrix.Features.IsReady()
 local Initialized = gatrix.Features.IsInitialized()
 
 --- Force fetch flags from server
+--- @return deferred?  Resolves on fetch_success, rejects on fetch_error (requires `deferred` module)
 gatrix.Features.FetchFlags()
 
 --- Sync flags in explicitSyncMode
