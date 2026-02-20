@@ -65,7 +65,7 @@ export class FeaturesClient implements VariationProvider {
   private readyEventEmitted = false;
   private fetchedFromServer = false;
   private isFetchingFlags = false;
-  private pendingInvalidation = false;
+  private pendingInvalidationKeys = new Set<string>();
   private timerRef?: ReturnType<typeof setTimeout>;
   private etag = '';
   private consecutiveFailures: number = 0;
@@ -1234,10 +1234,27 @@ export class FeaturesClient implements VariationProvider {
       this.emitter.emit(EVENTS.FLAGS_FETCH_END);
 
       // If an invalidation arrived during fetch, re-fetch immediately
-      if (this.pendingInvalidation) {
-        this.pendingInvalidation = false;
-        this.devLog('Processing pending invalidation after fetch completed');
-        this.fetchFlagsInternal('pending_invalidation');
+      if (this.pendingInvalidationKeys.size > 0) {
+        const pendingKeys = new Set(this.pendingInvalidationKeys);
+        this.pendingInvalidationKeys.clear();
+
+        if (pendingKeys.has('*')) {
+          // Sentinel: full fetch needed
+          this.devLog('Processing pending full invalidation after fetch completed');
+          this.etag = '';
+          this.fetchFlagsInternal('pending_invalidation');
+        } else {
+          // Check threshold: if pending keys >= 50% of total flags, do full fetch
+          const totalFlags = this.realtimeFlags.size;
+          if (totalFlags === 0 || pendingKeys.size >= totalFlags / 2) {
+            this.devLog(`Pending keys (${pendingKeys.size}) exceed threshold, doing full fetch`);
+            this.etag = '';
+            this.fetchFlagsInternal('pending_invalidation');
+          } else {
+            this.devLog(`Processing ${pendingKeys.size} pending partial invalidation keys`);
+            this.fetchPartialFlagsInternal(pendingKeys);
+          }
+        }
       }
     }
   }
@@ -1358,6 +1375,62 @@ export class FeaturesClient implements VariationProvider {
     // In synchronous mode or if forced, emit change
     if (!this.featuresConfig.explicitSyncMode || forceSync) {
       this.emitter.emit(EVENTS.FLAGS_CHANGE, { flags });
+    }
+  }
+
+  /**
+   * Merge partial flag updates into the existing cache.
+   * Keys in requestedKeys but absent from the response are treated as deleted.
+   */
+  private mergeFlags(flags: EvaluatedFlag[], requestedKeys: Set<string>): void {
+    // Update or add returned flags
+    for (const flag of flags) {
+      this.realtimeFlags.set(flag.name, flag);
+    }
+
+    // Remove keys that were requested but not returned (deleted on server)
+    const returnedNames = new Set(flags.map(f => f.name));
+    for (const key of requestedKeys) {
+      if (!returnedNames.has(key)) {
+        this.realtimeFlags.delete(key);
+      }
+    }
+
+    if (!this.featuresConfig.explicitSyncMode) {
+      this.synchronizedFlags = new Map(this.realtimeFlags);
+      this.pendingSync = false;
+    } else {
+      const wasPending = this.pendingSync;
+      this.pendingSync = true;
+      if (!wasPending) {
+        this.emitter.emit(EVENTS.FLAGS_PENDING_SYNC);
+      }
+    }
+  }
+
+  /**
+   * Store partial flag updates with merge, persist, and event emission
+   */
+  private async storePartialFlags(flags: EvaluatedFlag[], requestedKeys: Set<string>): Promise<void> {
+    const oldFlags = new Map(this.realtimeFlags);
+    this.mergeFlags(flags, requestedKeys);
+
+    // Persist the full merged flag set
+    const allFlags = Array.from(this.realtimeFlags.values());
+    await this.storage.save(STORAGE_KEY_FLAGS, allFlags);
+
+    // Emit change events
+    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
+    this.invokeWatchCallbacks(this.watchCallbacks, oldFlags, this.realtimeFlags, true);
+
+    if (!this.featuresConfig.explicitSyncMode) {
+      this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldFlags, this.realtimeFlags, false);
+    }
+
+    this.sdkState = 'healthy';
+
+    if (!this.featuresConfig.explicitSyncMode) {
+      this.emitter.emit(EVENTS.FLAGS_CHANGE, { flags: allFlags });
     }
   }
 
@@ -1942,18 +2015,152 @@ export class FeaturesClient implements VariationProvider {
   }
 
   /**
-   * Handle streaming invalidation signal by triggering conditional fetches.
-   * Deduplicates concurrent fetches for the same flag to prevent burst overhead.
+   * Handle streaming invalidation signal.
+   * Uses partial fetch for small change sets, falls back to full fetch when
+   * the number of changed keys exceeds half the cached flag count.
    */
-  private handleStreamingInvalidation(_changedKeys: string[]): void {
-    // Clear ETag to force fresh data fetch (SSE already told us data changed)
-    this.etag = '';
+  private handleStreamingInvalidation(changedKeys: string[]): void {
+    // Threshold: if changed keys >= 50% of total flags, do full fetch
+    const totalFlags = this.realtimeFlags.size;
+    if (changedKeys.length === 0 || totalFlags === 0 || changedKeys.length >= totalFlags / 2) {
+      // Full fetch: clear ETag so server returns fresh data
+      this.etag = '';
+      if (!this.isFetchingFlags) {
+        this.fetchFlagsInternal('manual');
+      } else {
+        // Mark sentinel for full fetch
+        this.pendingInvalidationKeys.clear();
+        this.pendingInvalidationKeys.add('*');
+        this.devLog('Fetch in progress, marking pending full invalidation');
+      }
+      return;
+    }
 
+    // Partial fetch: request only changed keys, keep ETag intact
     if (!this.isFetchingFlags) {
-      this.fetchFlagsInternal('manual');
+      this.fetchPartialFlagsInternal(new Set(changedKeys));
     } else {
-      this.pendingInvalidation = true;
-      this.devLog('Fetch in progress, marking pending invalidation for re-fetch after completion');
+      for (const key of changedKeys) {
+        this.pendingInvalidationKeys.add(key);
+      }
+      this.devLog(`Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`);
+    }
+  }
+
+  /**
+   * Fetch only specific flag keys from the server (partial fetch).
+   * Does NOT send or update ETag — the existing ETag remains intact
+   * for the next full polling cycle.
+   */
+  private async fetchPartialFlagsInternal(flagKeys: Set<string>): Promise<void> {
+    if (this.config.offlineMode || flagKeys.size === 0) {
+      return;
+    }
+
+    if (this.isFetchingFlags) return;
+    this.isFetchingFlags = true;
+
+    const keysStr = Array.from(flagKeys).join(',');
+    this.devLog(`fetchPartialFlags: starting partial fetch for keys=[${keysStr}]`);
+
+    try {
+      this.emitter.emit(EVENTS.FLAGS_FETCH_START);
+      this.fetchFlagsCount++;
+      this.lastFetchTime = new Date();
+
+      // Build endpoint with flagNames parameter
+      const url = new URL(`${this.config.apiUrl}/client/features/${this.config.environment}/eval`);
+
+      // Add context as query params
+      for (const [key, value] of Object.entries(this.context)) {
+        if (value === undefined || value === null) continue;
+        if (key === 'properties' && typeof value === 'object') {
+          for (const [propKey, propValue] of Object.entries(value)) {
+            if (propValue !== undefined && propValue !== null) {
+              url.searchParams.set(`properties[${propKey}]`, String(propValue));
+            }
+          }
+        } else {
+          url.searchParams.set(key, String(value));
+        }
+      }
+
+      // Add flagNames parameter
+      url.searchParams.set('flagNames', keysStr);
+
+      const headers = this.buildHeaders();
+      // NO If-None-Match header (intentionally skip ETag for partial fetch)
+
+      this.emitter.emit(EVENTS.FLAGS_FETCH, { etag: null, partial: true });
+
+      // Cancel previous request
+      if (this.abortController && !this.abortController.signal.aborted) {
+        this.abortController.abort();
+      }
+      this.abortController = this.createAbortController?.() ?? null;
+
+      const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
+      const timeout = retryOptions.timeout ?? 30000;
+
+      const response = await ky.get(url.toString(), {
+        headers,
+        signal: this.abortController?.signal,
+        retry: 0,
+        timeout,
+        throwHttpErrors: false,
+      });
+
+      this.devLog(`fetchPartialFlags: response received. status=${response.status}`);
+
+      if (response.ok) {
+        // Intentionally ignore ETag from partial response
+        const data: FlagsApiResponse = await response.json();
+
+        if (data.success && data.data?.flags) {
+          await this.storePartialFlags(data.data.flags, flagKeys);
+          this.updateCount++;
+          this.lastUpdateTime = new Date();
+        }
+
+        this.consecutiveFailures = 0;
+        this.emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS);
+      } else {
+        this.devLog(`fetchPartialFlags: error ${response.status}, falling back to full fetch`);
+        // On partial fetch failure, fall back to full fetch
+        this.etag = '';
+        this.isFetchingFlags = false;
+        this.fetchFlagsInternal('manual');
+        return;
+      }
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === 'AbortError') {
+        return;
+      }
+      const errorMessage = this.extractErrorMessage(e);
+      this.logger.error('Failed to fetch partial flags:', errorMessage);
+      // On error, fall back to full fetch on next cycle
+    } finally {
+      this.isFetchingFlags = false;
+      this.emitter.emit(EVENTS.FLAGS_FETCH_END);
+
+      // Process accumulated pending invalidation keys
+      if (this.pendingInvalidationKeys.size > 0) {
+        const pendingKeys = new Set(this.pendingInvalidationKeys);
+        this.pendingInvalidationKeys.clear();
+
+        if (pendingKeys.has('*')) {
+          this.etag = '';
+          this.fetchFlagsInternal('pending_invalidation');
+        } else {
+          const totalFlags = this.realtimeFlags.size;
+          if (totalFlags === 0 || pendingKeys.size >= totalFlags / 2) {
+            this.etag = '';
+            this.fetchFlagsInternal('pending_invalidation');
+          } else {
+            this.fetchPartialFlagsInternal(pendingKeys);
+          }
+        }
+      }
     }
   }
 

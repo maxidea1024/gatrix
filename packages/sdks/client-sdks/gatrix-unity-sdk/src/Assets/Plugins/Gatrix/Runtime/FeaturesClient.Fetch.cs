@@ -224,12 +224,35 @@ namespace Gatrix.Unity.SDK
                 _isFetchingFlags = false;
                 _emitter.Emit(GatrixEvents.FlagsFetchEnd);
 
-                // If an invalidation arrived during fetch, re-fetch immediately
-                if (_pendingInvalidation)
+                // Process accumulated pending invalidation keys
+                if (_pendingInvalidationKeys.Count > 0)
                 {
-                    _pendingInvalidation = false;
-                    _devLog.Log("Processing pending invalidation after fetch completed");
-                    FetchFlagsAsync().Forget();
+                    var pendingKeys = new HashSet<string>(_pendingInvalidationKeys);
+                    _pendingInvalidationKeys.Clear();
+
+                    if (pendingKeys.Contains("*"))
+                    {
+                        // Sentinel: full fetch needed
+                        _devLog.Log("Processing pending full invalidation after fetch completed");
+                        _etag = "";
+                        FetchFlagsAsync().Forget();
+                    }
+                    else
+                    {
+                        // Check threshold: if pending keys >= 50% of total flags, do full fetch
+                        var totalFlags = _realtimeFlags.Count;
+                        if (totalFlags == 0 || pendingKeys.Count >= totalFlags / 2)
+                        {
+                            _devLog.Log($"Pending keys ({pendingKeys.Count}) exceed threshold, doing full fetch");
+                            _etag = "";
+                            FetchFlagsAsync().Forget();
+                        }
+                        else
+                        {
+                            _devLog.Log($"Processing {pendingKeys.Count} pending partial invalidation keys");
+                            FetchPartialFlagsAsync(pendingKeys).Forget();
+                        }
+                    }
                 }
             }
         }
@@ -318,6 +341,180 @@ namespace Gatrix.Unity.SDK
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
             {
                 _emitter.Emit(GatrixEvents.FlagsChange, flags);
+            }
+        }
+
+        /// <summary>
+        /// Fetch only specific flag keys from the server (partial fetch).
+        /// Does NOT send or update ETag — the existing ETag remains intact
+        /// for the next full polling cycle.
+        /// </summary>
+        private async UniTask FetchPartialFlagsAsync(HashSet<string> flagKeys)
+        {
+            if (_config.OfflineMode || flagKeys.Count == 0)
+            {
+                return;
+            }
+
+            if (_isFetchingFlags) return;
+            _isFetchingFlags = true;
+
+            var keysStr = string.Join(",", flagKeys);
+            _devLog.Log($"fetchPartialFlags: starting partial fetch for keys=[{keysStr}]");
+
+            try
+            {
+                _emitter.Emit(GatrixEvents.FlagsFetchStart);
+                _fetchFlagsCount++;
+                _lastFetchTime = DateTime.UtcNow;
+
+                // Build URL with flagNames parameter
+                var urlBuilder = new StringBuilder(_config.ApiUrl);
+                urlBuilder.Append("/client/features/");
+                urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
+                urlBuilder.Append("/eval?");
+                AppendContextQueryParams(urlBuilder, _context);
+                urlBuilder.Append("&flagNames=");
+                urlBuilder.Append(Uri.EscapeDataString(keysStr));
+
+                var url = urlBuilder.ToString();
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                // Headers — NO If-None-Match (intentionally skip ETag for partial fetch)
+                request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
+                request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
+                request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
+                request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
+                request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
+                if (_config.CustomHeaders != null)
+                {
+                    foreach (var kvp in _config.CustomHeaders)
+                    {
+                        request.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                    }
+                }
+
+                _emitter.Emit(GatrixEvents.FlagsFetch, "partial");
+
+                // Cancel previous fetch
+                _fetchCts?.Cancel();
+                _fetchCts?.Dispose();
+                _fetchCts = new CancellationTokenSource();
+                var ct = _fetchCts.Token;
+
+                var timeout = FeaturesConfig.FetchTimeout * 1000;
+                HttpResponseMessage response = null;
+
+                using (var timeoutCts = new CancellationTokenSource(timeout))
+                using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token))
+                {
+                    response = await _httpClient.SendAsync(request, linkedCts.Token);
+                }
+
+                if (response == null) return;
+
+                _devLog.Log($"fetchPartialFlags: response received. status={(int)response.StatusCode}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Intentionally ignore ETag from partial response
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = GatrixJson.DeserializeFlagsResponse(json);
+
+                    if (data != null && data.Success && data.Data?.Flags != null)
+                    {
+                        await MergePartialFlagsAsync(data.Data.Flags, flagKeys);
+                        _updateCount++;
+                        _lastUpdateTime = DateTime.UtcNow;
+                    }
+
+                    _consecutiveFailures = 0;
+                    _emitter.Emit(GatrixEvents.FlagsFetchSuccess);
+                }
+                else
+                {
+                    _devLog.Log($"fetchPartialFlags: error {(int)response.StatusCode}, falling back to full fetch");
+                    // On partial fetch failure, fall back to full fetch
+                    _etag = "";
+                    _isFetchingFlags = false;
+                    FetchFlagsAsync().Forget();
+                    return;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _devLog.Log("fetchPartialFlags: cancelled");
+            }
+            catch (Exception e)
+            {
+                _logger.Error($"Failed to fetch partial flags: {e.Message}");
+                // On error, fall back to full fetch on next cycle
+            }
+            finally
+            {
+                _isFetchingFlags = false;
+                _emitter.Emit(GatrixEvents.FlagsFetchEnd);
+
+                // Process accumulated pending invalidation keys
+                if (_pendingInvalidationKeys.Count > 0)
+                {
+                    var pendingKeys = new HashSet<string>(_pendingInvalidationKeys);
+                    _pendingInvalidationKeys.Clear();
+
+                    if (pendingKeys.Contains("*"))
+                    {
+                        _etag = "";
+                        FetchFlagsAsync().Forget();
+                    }
+                    else
+                    {
+                        var totalFlags = _realtimeFlags.Count;
+                        if (totalFlags == 0 || pendingKeys.Count >= totalFlags / 2)
+                        {
+                            _etag = "";
+                            FetchFlagsAsync().Forget();
+                        }
+                        else
+                        {
+                            FetchPartialFlagsAsync(pendingKeys).Forget();
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merge partial flag updates into existing cache, persist to storage,
+        /// and emit change events.
+        /// </summary>
+        private async UniTask MergePartialFlagsAsync(List<EvaluatedFlag> flags, HashSet<string> requestedKeys)
+        {
+            var oldFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+            MergeFlags(flags, requestedKeys);
+
+            // Persist the full merged flag set
+            var allFlags = new List<EvaluatedFlag>(_realtimeFlags.Count);
+            foreach (var kvp in _realtimeFlags)
+            {
+                allFlags.Add(kvp.Value);
+            }
+            var flagsJson = GatrixJson.SerializeFlags(allFlags);
+            await _storage.SaveAsync(StorageKeyFlags, flagsJson);
+
+            // Emit change events
+            EmitRealtimeFlagChanges(oldFlags, _realtimeFlags);
+            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, forceRealtime: true);
+
+            if (!FeaturesConfig.ExplicitSyncMode)
+            {
+                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, forceRealtime: false);
+            }
+
+            _sdkState = SdkState.Healthy;
+
+            if (!FeaturesConfig.ExplicitSyncMode)
+            {
+                _emitter.Emit(GatrixEvents.FlagsChange, allFlags);
             }
         }
 

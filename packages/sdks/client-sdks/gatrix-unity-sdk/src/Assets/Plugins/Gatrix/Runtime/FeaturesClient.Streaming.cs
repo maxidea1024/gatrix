@@ -677,22 +677,44 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>
-        /// Handle streaming invalidation signal by triggering a full re-fetch.
-        /// The ETag mechanism ensures only changed data is transferred.
+        /// Handle streaming invalidation signal.
+        /// Uses partial fetch for small change sets, falls back to full fetch when
+        /// the number of changed keys exceeds half the cached flag count.
         /// </summary>
         private void HandleStreamingInvalidation(List<string> changedKeys)
         {
-            // Clear ETag to force fresh data fetch (SSE already told us data changed)
-            _etag = "";
+            // Threshold: if changed keys >= 50% of total flags, do full fetch
+            var totalFlags = _realtimeFlags.Count;
+            if (changedKeys.Count == 0 || totalFlags == 0 || changedKeys.Count >= totalFlags / 2)
+            {
+                // Full fetch: clear ETag so server returns fresh data
+                _etag = "";
+                if (!_isFetchingFlags)
+                {
+                    FetchFlagsAsync().Forget();
+                }
+                else
+                {
+                    // Mark all keys as pending (null signals full fetch needed)
+                    _pendingInvalidationKeys.Clear();
+                    _pendingInvalidationKeys.Add("*"); // Sentinel for full fetch
+                    _devLog.Log("Fetch in progress, marking pending full invalidation");
+                }
+                return;
+            }
 
+            // Partial fetch: request only changed keys, keep ETag intact
             if (!_isFetchingFlags)
             {
-                FetchFlagsAsync().Forget();
+                FetchPartialFlagsAsync(new HashSet<string>(changedKeys)).Forget();
             }
             else
             {
-                _pendingInvalidation = true;
-                _devLog.Log("Fetch in progress, marking pending invalidation for re-fetch after completion");
+                foreach (var key in changedKeys)
+                {
+                    _pendingInvalidationKeys.Add(key);
+                }
+                _devLog.Log($"Fetch in progress, queued {changedKeys.Count} pending keys for re-fetch after completion");
             }
         }
 

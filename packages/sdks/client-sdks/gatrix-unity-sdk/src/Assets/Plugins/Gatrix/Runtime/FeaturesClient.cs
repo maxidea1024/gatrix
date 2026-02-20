@@ -51,7 +51,7 @@ namespace Gatrix.Unity.SDK
         private bool _readyEventEmitted;
         private bool _fetchedFromServer;
         private bool _isFetchingFlags;
-        private bool _pendingInvalidation;
+        private readonly HashSet<string> _pendingInvalidationKeys = new HashSet<string>();
         private CancellationTokenSource _pollCts;
         private CancellationTokenSource _fetchCts;
         private string _etag = "";
@@ -363,6 +363,47 @@ namespace Gatrix.Unity.SDK
             }
 
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
+            {
+                _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+                _pendingSync = false;
+            }
+            else
+            {
+                if (!_pendingSync)
+                {
+                    _pendingSync = true;
+                    _emitter.Emit(GatrixEvents.FlagsPendingSync);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merge partial flag updates into the existing cache.
+        /// Keys in requestedKeys but absent from the response are treated as deleted.
+        /// </summary>
+        private void MergeFlags(List<EvaluatedFlag> flags, HashSet<string> requestedKeys)
+        {
+            // Update or add returned flags
+            for (int i = 0; i < flags.Count; i++)
+            {
+                _realtimeFlags[flags[i].Name] = flags[i];
+            }
+
+            // Remove keys that were requested but not returned (deleted on server)
+            var returnedNames = new HashSet<string>();
+            for (int i = 0; i < flags.Count; i++)
+            {
+                returnedNames.Add(flags[i].Name);
+            }
+            foreach (var key in requestedKeys)
+            {
+                if (!returnedNames.Contains(key))
+                {
+                    _realtimeFlags.Remove(key);
+                }
+            }
+
+            if (!FeaturesConfig.ExplicitSyncMode)
             {
                 _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
                 _pendingSync = false;

@@ -3,6 +3,7 @@
 // This file provides a unified IWebSocketClient interface for cross-platform use
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -168,8 +169,7 @@ namespace Gatrix.Unity.SDK
     {
         private ClientWebSocket _ws;
         private bool _disposed;
-        private readonly Queue<WsEvent> _eventQueue = new Queue<WsEvent>();
-        private readonly object _eventQueueLock = new object();
+        private readonly ConcurrentQueue<WsEvent> _eventQueue = new ConcurrentQueue<WsEvent>();
         private CancellationTokenSource _receiveCts;
         private readonly byte[] _receiveBuffer = new byte[8192];
         private readonly StringBuilder _messageBuilder = new StringBuilder();
@@ -237,11 +237,9 @@ namespace Gatrix.Unity.SDK
 
         public WsEvent? PollEvent()
         {
-            lock (_eventQueueLock)
-            {
-                if (_eventQueue.Count == 0) return null;
-                return _eventQueue.Dequeue();
-            }
+            if (_eventQueue.TryDequeue(out var evt))
+                return evt;
+            return null;
         }
 
         /// <summary>
@@ -249,10 +247,7 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         private void EnqueueEvent(WsEvent evt)
         {
-            lock (_eventQueueLock)
-            {
-                _eventQueue.Enqueue(evt);
-            }
+            _eventQueue.Enqueue(evt);
         }
 
         private async UniTask ReceiveLoopAsync(CancellationToken ct)

@@ -250,7 +250,10 @@ data: {"globalRevision":42}
 ```
 
 > [!IMPORTANT]
-> Streaming is an **invalidation signal** mechanism, NOT a data transport. When a `flags_changed` event is received, the SDK clears its ETag and performs a fresh `fetchFlags()` to get updated data. The `changedKeys` payload is used for logging and event emission, not for direct flag updates.
+> Streaming is an **invalidation signal** mechanism with **selective partial fetch** optimization. When a `flags_changed` event is received:
+> - If the number of `changedKeys` is small (< 50% of cached flags), the SDK performs a **partial fetch** requesting only those keys via the `flagNames` query parameter. The existing ETag remains intact for the next full polling cycle.
+> - If the number is large (≥ 50% of cached flags), or no flags are cached yet, the SDK clears its ETag and performs a **full fetch**.
+> - Keys present in `changedKeys` but absent from the partial fetch response are treated as **deleted** and removed from the local cache.
 
 > [!NOTE]
 > **Unity WebGL platform**: The WebSocket transport uses a JS interop layer (`GatrixWebSocket.jslib`) on WebGL builds since `System.Net.WebSockets.ClientWebSocket` is not available in the browser sandbox. The SDK automatically selects the appropriate implementation via `GatrixWebSocketFactory`. Desktop (Windows/macOS/Linux), Android, iOS, and WebGL platforms are all supported.
@@ -1374,34 +1377,58 @@ flagETags: Map<string, string>;     // per-flag ETag (e.g., "rev-16")
 2. On successful fetch: update `localGlobalRevision` to `max(localGlobalRevision, response.globalRevision)`
 3. Revisions NEVER decrease; ignore events with `globalRevision <= localGlobalRevision`
 
-### Conditional Fetch Flow
+### Conditional Fetch Flow (Partial Fetch Optimization)
 
 When an invalidation signal is received for specific keys:
 
 ```
-for each changedKey:
-  1. If already fetching this key → skip (deduplication)
-  2. GET /client/features/{env}/eval?flagKey={changedKey}
-     Headers: If-None-Match: {flagETags[changedKey]}
-  3. If 200 OK:
-     - Update local flag cache
-     - Update flagETags[changedKey] from response ETag header
-     - Update localGlobalRevision
-     - Emit flag change events
-  4. If 304 Not Modified:
-     - No action needed (flag unchanged)
+function handleStreamingInvalidation(changedKeys):
+  totalFlags = realtimeFlags.count
+
+  // Threshold check: large change sets use full fetch
+  if changedKeys.count == 0 OR totalFlags == 0 OR changedKeys.count >= totalFlags / 2:
+    etag = ""  // Clear ETag for full fetch
+    if not isFetchingFlags:
+      fetchFlagsAsync()  // Full fetch
+    else:
+      pendingInvalidationKeys.clear()
+      pendingInvalidationKeys.add("*")  // Sentinel for full fetch
+    return
+
+  // Small change set: partial fetch
+  if not isFetchingFlags:
+    fetchPartialFlags(changedKeys)
+  else:
+    pendingInvalidationKeys.addAll(changedKeys)
+
+function fetchPartialFlags(flagKeys):
+  1. GET /client/features/{env}/eval?flagNames={comma-separated-keys}
+     - NO If-None-Match header (ETag intentionally skipped)
+  2. If 200 OK:
+     - Merge returned flags into existing cache
+     - Remove keys from changedKeys not in response (deleted flags)
+     - Ignore ETag from response (keep existing ETag for polling)
+     - Emit flag change events for affected flags
+  3. If error:
+     - Fall back to full fetch (clear ETag + fetchFlags)
 ```
 
 > [!IMPORTANT]
-> **Fetch deduplication**: If a conditional fetch for a key is already in flight, subsequent requests for the same key MUST be skipped. This prevents duplicate requests during burst invalidation events.
+> **Partial fetch ETag handling**: During a partial fetch, the SDK MUST NOT send `If-None-Match` and MUST NOT store the response `ETag`. The existing ETag from the last full fetch is preserved, ensuring the next polling cycle performs correct full-state conditional validation. This provides a natural **self-healing** mechanism: if the partial merge produces an inconsistent state, the next poll will detect the ETag mismatch and get fresh data.
+
+> [!IMPORTANT]
+> **Deleted flag detection**: When a partial fetch is performed for specific keys, any `changedKey` that the server does NOT return in the response is treated as a **deleted flag** and must be removed from the local cache. This prevents "zombie flags" from persisting indefinitely.
 
 > [!CAUTION]
-> **Pending Invalidation**: When an SSE invalidation signal arrives while a fetch is already in progress, the SDK MUST NOT silently drop the invalidation. Instead:
-> 1. Set a `pendingInvalidation` flag to `true`
-> 2. When the current fetch completes (in the `finally` block), check `pendingInvalidation`
-> 3. If `true`, reset the flag and immediately trigger a new fetch
+> **Pending Invalidation (Key Accumulation)**: When an SSE invalidation signal arrives while a fetch is already in progress, the SDK MUST NOT silently drop the invalidation. Instead:
+> 1. Maintain a `pendingInvalidationKeys` Set (not a simple boolean)
+> 2. Add each `changedKey` to the Set. A special sentinel `"*"` indicates a full fetch is needed.
+> 3. When the current fetch completes (in the `finally` block), drain `pendingInvalidationKeys`:
+>    - If the Set contains `"*"` → clear ETag + full fetch
+>    - If the Set size ≥ 50% of total flags → clear ETag + full fetch
+>    - Otherwise → partial fetch for the accumulated keys
 >
-> Without this, rapid flag toggles (e.g., enable → disable within milliseconds) will cause the second change to be lost until the next polling cycle. This is especially noticeable with streaming-based real-time updates where users expect immediate reflection of changes.
+> This Set-based approach correctly handles burst scenarios where multiple streaming events arrive during a single in-flight fetch, ensuring no changes are lost.
 
 ### Gap Recovery
 

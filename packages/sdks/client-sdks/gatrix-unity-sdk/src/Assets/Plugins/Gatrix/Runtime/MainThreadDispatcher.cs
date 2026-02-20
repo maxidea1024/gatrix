@@ -2,6 +2,7 @@
 // Critical for thread safety: Unity API calls must happen on the main thread
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -31,10 +32,9 @@ namespace Gatrix.Unity.SDK
             _initialized = false;
         }
 
-        // Lock-free queue using swap pattern to minimize GC
-        private readonly List<Action> _pendingActions = new List<Action>(16);
+        // Lock-free concurrent queue for thread-safe enqueue from any thread
+        private readonly ConcurrentQueue<Action> _pendingActions = new ConcurrentQueue<Action>();
         private readonly List<Action> _executingActions = new List<Action>(16);
-        private readonly object _lock = new object();
 
         /// <summary>Check if currently on the main thread</summary>
         public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == _mainThreadId;
@@ -77,10 +77,7 @@ namespace Gatrix.Unity.SDK
 
             if (_instance != null)
             {
-                lock (_instance._lock)
-                {
-                    _instance._pendingActions.Add(action);
-                }
+                _instance._pendingActions.Enqueue(action);
             }
             else if (_unitySyncContext != null)
             {
@@ -109,10 +106,7 @@ namespace Gatrix.Unity.SDK
             }
             else if (_instance != null)
             {
-                lock (_instance._lock)
-                {
-                    _instance._pendingActions.Add(action);
-                }
+                _instance._pendingActions.Enqueue(action);
             }
         }
 
@@ -121,17 +115,15 @@ namespace Gatrix.Unity.SDK
 
         private void Update()
         {
-            // Swap-and-execute pattern: minimize lock holding time
-            lock (_lock)
-            {
-                if (_pendingActions.Count == 0) return;
+            // Drain concurrent queue into local batch list
+            if (_pendingActions.IsEmpty) return;
 
-                // Swap lists
-                _executingActions.AddRange(_pendingActions);
-                _pendingActions.Clear();
+            while (_pendingActions.TryDequeue(out var action))
+            {
+                _executingActions.Add(action);
             }
 
-            // Execute outside lock
+            // Execute batch
             for (int i = 0; i < _executingActions.Count; i++)
             {
                 try

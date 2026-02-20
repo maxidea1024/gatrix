@@ -22,7 +22,7 @@ namespace Gatrix.Unity.SDK
         private readonly string _flagName;
         private readonly bool _forceRealtime;
 
-        public FlagProxy(IVariationProvider client, string flagName, bool forceRealtime = false)
+        internal FlagProxy(IVariationProvider client, string flagName, bool forceRealtime = false)
         {
             _client = client;
             _flagName = flagName ?? "";
