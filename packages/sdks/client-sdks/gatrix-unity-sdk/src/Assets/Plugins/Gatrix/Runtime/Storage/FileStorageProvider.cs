@@ -2,6 +2,8 @@
 // Stores data in Unity's Application.persistentDataPath
 
 using System.IO;
+using System.Text;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -10,7 +12,8 @@ namespace Gatrix.Unity.SDK
     /// <summary>
     /// File-based storage provider that saves to Application.persistentDataPath.
     /// More reliable than PlayerPrefs for larger data and survives app reinstalls on some platforms.
-    /// All operations are synchronous; UniTask wraps results efficiently.
+    /// File I/O is performed asynchronously via UniTask.RunOnThreadPool to avoid blocking the main thread.
+    /// On WebGL (single-threaded), operations fall back to synchronous execution.
     /// </summary>
     public class FileStorageProvider : IStorageProvider
     {
@@ -26,33 +29,55 @@ namespace Gatrix.Unity.SDK
             }
         }
 
-        public UniTask<string> GetAsync(string key)
+        public async UniTask<string> GetAsync(string key)
         {
             var path = GetFilePath(key);
             if (!File.Exists(path))
             {
-                return UniTask.FromResult((string)null);
+                return null;
             }
 
-            var value = File.ReadAllText(path);
-            return UniTask.FromResult(value);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // WebGL does not support threads — use synchronous read
+            return File.ReadAllText(path);
+#else
+            return await UniTask.RunOnThreadPool(() => File.ReadAllText(path));
+#endif
         }
 
-        public UniTask SaveAsync(string key, string value)
+        public async UniTask SaveAsync(string key, string value)
         {
             var path = GetFilePath(key);
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // WebGL does not support threads — use synchronous write
             File.WriteAllText(path, value);
-            return UniTask.CompletedTask;
+#else
+            var bytes = Encoding.UTF8.GetBytes(value);
+            await UniTask.RunOnThreadPool(async () =>
+            {
+                using (var stream = new FileStream(
+                    path, FileMode.Create, FileAccess.Write, FileShare.None,
+                    bufferSize: 4096, useAsync: true))
+                {
+                    await stream.WriteAsync(bytes, 0, bytes.Length, CancellationToken.None);
+                }
+            });
+#endif
         }
 
-        public UniTask DeleteAsync(string key)
+        public async UniTask DeleteAsync(string key)
         {
             var path = GetFilePath(key);
-            if (File.Exists(path))
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (File.Exists(path)) File.Delete(path);
+#else
+            await UniTask.RunOnThreadPool(() =>
             {
-                File.Delete(path);
-            }
-            return UniTask.CompletedTask;
+                if (File.Exists(path)) File.Delete(path);
+            });
+#endif
         }
 
         private string GetFilePath(string key)
