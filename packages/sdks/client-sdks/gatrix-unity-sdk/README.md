@@ -1,4 +1,4 @@
-# Gatrix Unity SDK
+﻿# Gatrix Unity SDK
 
 > **Feature flags, A/B testing, and remote configuration — official Gatrix SDK for Unity.**
 
@@ -70,13 +70,13 @@ string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty"
 
 Gatrix allows you to define complex targeting rules based on user segments, custom attributes (like `vipTier`), and percentage rollouts:
 
-![Gatrix Dashboard - Targeting Strategy](doc/images/dashboard-targeting-strategy.png)
+![Gatrix Dashboard - Targeting Strategy](docs/images/dashboard-targeting-strategy.png)
 
 > No build, no deploy — change these values from the [Gatrix Dashboard](https://your-dashboard.example.com) and they go live instantly.
 
 Here's what the actual Gatrix Dashboard looks like — manage all your feature flags, toggle environments, and monitor status at a glance:
 
-![Gatrix Dashboard - Feature Flags](doc/images/dashboard-feature-flags.png)
+![Gatrix Dashboard - Feature Flags](docs/images/dashboard-feature-flags.png)
 
 ---
 
@@ -182,244 +182,25 @@ Gatrix isn't the right fit for every project. Consider whether these apply to yo
 
 ## 🏗️ Evaluation Model: Remote Evaluation Only
 
-Gatrix client SDKs use **remote evaluation** exclusively. This is a deliberate architectural decision for security and consistency.
+Gatrix uses **remote evaluation** exclusively — targeting rules and rollout logic never leave the server.
 
-### How It Works
+1. SDK sends **context** (userId, env, properties) to the server
+2. Server evaluates all rules and returns **final flag values only**
+3. SDK caches results and serves them synchronously
 
-```mermaid
-flowchart LR
-    A["🎮 Client SDK"] -->|"context<br/>(userId, env, properties)"| B["🖥️ Gatrix Server"]
-    B -->|"evaluated flag values"| A
-    B -.- C["🔒 Targeting rules,<br/>segments, rollout %<br/>never leave the server"]
-```
-
-1. The SDK sends **context** (userId, environment, custom properties) to the Gatrix server.
-2. The server evaluates all targeting rules, segments, and rollout percentages **remotely**.
-3. The SDK receives only the **final evaluated flag values** — no rules, no segments, no raw configuration.
-
-### Remote Evaluation vs Local Evaluation
-
-| | Remote Evaluation (Gatrix) | Local Evaluation |
+| | Remote (Gatrix) | Local Evaluation |
 |---|---|---|
-| **How it works** | Server evaluates rules → client receives final values | Client downloads all rules → evaluates locally |
-| **Security** | ✅ Targeting rules, segment definitions, and rollout logic are **never exposed** to the client | ⚠️ All rules are sent to the client and can be inspected, reverse-engineered, or tampered with |
-| **Consistency** | ✅ Evaluation logic is centralized — all SDKs and platforms get identical results | ⚠️ Each SDK must implement the same evaluation engine independently; subtle differences can lead to inconsistent results |
-| **Payload size** | ✅ Only final values are transmitted (small payload) | ⚠️ Full rule set must be downloaded (can be large with many flags/segments) |
-| **Offline support** | ⚠️ Requires an initial network request; offline use relies on cached values or bootstrap data | ✅ Once rules are downloaded, evaluation works fully offline |
-| **Evaluation latency** | ⚠️ Depends on network round-trip for the initial fetch | ✅ No network needed after initial download |
-| **Rule update speed** | ✅ New values are available immediately via streaming/polling | ⚠️ Client must re-download the full rule set to pick up changes |
+| **Security** | ✅ Rules never leave server | ⚠️ Rules exposed to client |
+| **Consistency** | ✅ Same result on all SDKs | ⚠️ SDK must re-implement rules |
+| **Payload** | ✅ Small (final values only) | ⚠️ Large (full rule set) |
+| **Offline** | ⚠️ Needs initial fetch (then cached) | ✅ Works after first download |
 
-### Why Gatrix Chose Remote Evaluation
+> 🌐 **Offline & Availability:** The SDK always serves from local cache if the server is unreachable. Fallback values ensure the game never crashes due to connectivity issues.
 
-1. **Security first.** In game development, clients are inherently untrusted. Sending targeting rules (e.g., "10% rollout for users in segment X") to the client exposes your rollout strategy, internal segments, and business logic. With server-side evaluation, only the final `true`/`false` or variant string reaches the client.
-
-2. **Consistency across SDKs.** Gatrix supports Unity, Unreal, Cocos2d-x, Godot, JavaScript, Flutter, Python, and more. Implementing identical evaluation logic in every language is error-prone. Server-side evaluation guarantees identical results regardless of SDK.
-
-3. **Simpler SDK.** The client SDK is a thin cache layer — it doesn't need to understand targeting rules, percentage rollouts, or segment membership. This keeps the SDK lightweight and reduces the surface area for bugs.
-
-> 💡 **Offline & Bootstrap:** Even though evaluation happens on the server, the SDK caches the last known flag values locally. You can also provide **bootstrap data** for fully offline scenarios. See the [Operating Modes](#-operating-modes) section for details.
-
-### 🌐 Offline Support & Reliability
-Gatrix SDK is architected to prioritize **Availability** over perfect real-time consistency. Your game must never crash or stop working just because the feature flag server is unreachable.
-
-*   **Works Without Network**: If the internet is down, the SDK seamlessly serves values from its local cache. If no cache exists, it uses the safe `fallbackValue` you provide in code.
-*   **Offline Mode**: Fully supported. Players can start and play the game offline using the last fetched configuration.
-*   **Automatic Recovery**: When network connectivity is restored, the SDK automatically fetches the latest values in the background and updates the local store.
-
-This design ensures that network hiccups never degrade the player experience.
-
+> 📖 Full details — value resolution flow, reserved variant names (`$missing`, `$env-default-enabled`, …), and `fallbackValue` rationale:  
+> **[docs/EVALUATION_MODEL.md](docs/EVALUATION_MODEL.md)**
 ---
 
-## 🔍 Flag Value Resolution Flow
-
-Understanding how a flag value travels from the server to your game code is essential for correct usage.
-
-### End-to-End Flow Overview
-
-```mermaid
-flowchart TD
-    subgraph SERVER ["🖥️ Gatrix Server"]
-        S1{"Is flag enabled<br/>in this environment?"}
-        S1 -->|No| S2{"Value from<br/>env override?"}
-        S2 -->|Yes| S2A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
-        S2 -->|No| S2B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
-        S1 -->|Yes| S3{"Are there<br/>targeting strategies?"}
-        S3 -->|No| S4{"Value from<br/>env override?"}
-        S4 -->|Yes| S4A["variant.name = $env-default-enabled<br/>value = env.enabledValue"]
-        S4 -->|No| S4B["variant.name = $flag-default-enabled<br/>value = flag.enabledValue"]
-        S3 -->|Yes| S5{"Does any strategy<br/>match context?"}
-        S5 -->|Yes| S6["variant.name = matched variant name<br/>value = variant.value"]
-        S5 -->|No| S7{"Value from<br/>env override?"}
-        S7 -->|Yes| S7A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
-        S7 -->|No| S7B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
-    end
-
-    S2A --> NET["📡 Network"]
-    S2B --> NET
-    S4A --> NET
-    S4B --> NET
-    S6 --> NET
-    S7A --> NET
-    S7B --> NET
-
-    subgraph SDK ["🎮 Unity SDK (Client)"]
-        NET --> CACHE["SDK Cache<br/>(realtimeFlags / synchronizedFlags)"]
-        CACHE --> ACCESS["Your Code Calls<br/>BoolVariation, StringVariation, etc."]
-    end
-```
-
-### Value Source Priority (Remote)
-
-When the server evaluates a flag, values are resolved in the following priority order:
-
-| Priority | Condition | Value Source | `variant.name` |
-|:--------:|-----------|-------------|:---------------|
-| 1 | Flag enabled + strategy matched with variant | `variant.value` from matched variant | Variant name (e.g., `"dark-theme"`) |
-| 2 | Flag enabled + no variant matched + env override set | `env.enabledValue` | `$env-default-enabled` |
-| 3 | Flag enabled + no variant matched + no env override | `flag.enabledValue` | `$flag-default-enabled` |
-| 4 | Flag disabled + env override set | `env.disabledValue` | `$env-default-disabled` |
-| 5 | Flag disabled + no env override | `flag.disabledValue` | `$flag-default-disabled` |
-| 6 | Flag not found on server | Not included in response | *(SDK generates `$missing`)* |
-
-> 💡 The `variant.name` tells you exactly **where** the value came from. This is very useful for debugging in the Monitor window.
-
-### SDK-Side: How Your Code Receives Values
-
-```mermaid
-flowchart TD
-    A["Your Code:<br/>proxy.BoolVariation(false)"] --> B{"Does flag exist<br/>in SDK cache?"}
-    B -->|No| C["Return fallback value<br/>variant = $missing"]
-    B -->|Yes| D{"Is flag enabled?"}
-    D -->|No| E["Return fallback value<br/>variant = $*-default-disabled"]
-    D -->|Yes| F{"Does valueType<br/>match requested type?"}
-    F -->|No| G["Return fallback value<br/>variant = $type-mismatch"]
-    F -->|Yes| H["Return variant.value<br/>(actual evaluated value)"]
-
-    style C fill:#ff6b6b,color:#fff
-    style E fill:#ffa94d,color:#fff
-    style G fill:#ffa94d,color:#fff
-    style H fill:#51cf66,color:#fff
-```
-
-### Reserved Variant Names
-
-The SDK uses `$`-prefixed variant names to indicate value origin. These are defined in `VariantSource.cs`:
-
-| Variant Name | Meaning | `enabled` | When It Happens |
-|:-------------|---------|:---------:|-----------------|
-| `$missing` | Flag does not exist in SDK cache | `false` | Flag name typo, flag not created yet, or SDK not initialized |
-| `$type-mismatch` | Requested type doesn't match flag's `valueType` | `false` | Called `BoolVariation` on a `string` flag, etc. |
-| `$env-default-enabled` | Flag enabled, value from environment-level `enabledValue` | `true` | No variant matched; env override is set |
-| `$flag-default-enabled` | Flag enabled, value from flag-level (global) `enabledValue` | `true` | No variant matched; no env override |
-| `$env-default-disabled` | Flag disabled, value from environment-level `disabledValue` | `false` | Flag disabled; env override is set |
-| `$flag-default-disabled` | Flag disabled, value from flag-level (global) `disabledValue` | `false` | Flag disabled; no env override |
-| *(user-defined name)* | A specific variant was selected by targeting | `true` | Strategy matched and selected this variant |
-
-### Variation API Signatures (from `FlagProxy`)
-
-All variation methods on `FlagProxy` require a `fallbackValue` parameter — this is **not optional**:
-
-```csharp
-// Boolean
-bool   BoolVariation(bool fallbackValue)
-
-// String
-string StringVariation(string fallbackValue)
-
-// Numeric
-int    IntVariation(int fallbackValue)
-float  FloatVariation(float fallbackValue)
-double DoubleVariation(double fallbackValue)
-
-// JSON
-Dictionary<string, object> JsonVariation(Dictionary<string, object> fallbackValue)
-
-// Variant name only
-string Variation(string fallbackValue)
-```
-
-#### Why `fallbackValue` Is Required (Not Optional)
-
-The `fallbackValue` parameter is mandatory by design. This ensures your game **always receives a usable value**, even in failure scenarios:
-
-1. **SDK not initialized yet** — The SDK may still be connecting. Without a fallback, you'd get `null` or a crash.
-2. **Flag doesn't exist** — A typo in the flag name, or the flag was deleted. The fallback prevents unexpected behavior.
-3. **Network failure** — If the SDK can't reach the server and has no cached data, the fallback keeps the game running.
-4. **Type mismatch** — Called `BoolVariation` on a `string`-type flag. The fallback prevents a type error.
-5. **Type safety** — The fallback value establishes the expected return type at compile time.
-
-> ⚠️ **There is no default-less overload.** You must always explicitly choose what happens when things go wrong. This is a deliberate design decision shared across all Gatrix SDKs.
-
-### Complete Example: All Scenarios
-
-```csharp
-// Scenario 1: Flag enabled, strategy matched → actual variant value
-this.WatchSyncedFlagWithInitialState("dark-theme", proxy =>
-{
-    // proxy.Exists      == true
-    // proxy.Enabled     == true
-    // proxy.Variant     == { name: "dark", value: true }
-    // proxy.ValueType   == "boolean"
-
-    bool isDark = proxy.BoolVariation(false);  // fallbackValue: false
-    // isDark == true (from variant.value)
-});
-
-// Scenario 2: Flag enabled, no variant matched → enabledValue
-this.WatchSyncedFlagWithInitialState("welcome-message", proxy =>
-{
-    // proxy.Variant == { name: "$env-default-enabled", value: "Hello!" }
-    //   or           { name: "$flag-default-enabled", value: "Hello!" }
-
-    string msg = proxy.StringVariation("Fallback");  // fallbackValue: "Fallback"
-    // msg == "Hello!" (from enabledValue)
-});
-
-// Scenario 3: Flag disabled → fallbackValue returned
-this.WatchSyncedFlagWithInitialState("maintenance-mode", proxy =>
-{
-    // proxy.Enabled     == false
-    // proxy.Variant     == { name: "$flag-default-disabled", value: "..." }
-
-    bool maintenance = proxy.BoolVariation(false);  // fallbackValue: false
-    // maintenance == false (fallbackValue returned, because flag is disabled)
-});
-
-// Scenario 4: Flag does NOT exist → $missing, fallbackValue returned
-this.WatchSyncedFlagWithInitialState("typo-flag-nmae", proxy =>
-{
-    // proxy.Exists      == false
-    // proxy.Variant     == { name: "$missing" }
-
-    bool val = proxy.BoolVariation(false);  // fallbackValue: false
-    // val == false (fallbackValue returned, because flag is missing)
-});
-
-// Scenario 5: Type mismatch → fallbackValue returned
-this.WatchSyncedFlagWithInitialState("string-flag", proxy =>
-{
-    // proxy.ValueType   == "string"
-
-    bool val = proxy.BoolVariation(false);  // fallbackValue: false
-    // val == false (fallbackValue returned, because valueType is "string", not "boolean")
-});
-```
-
-### isEnabled vs BoolVariation
-
-These two methods serve **different purposes** — don't confuse them:
-
-| Method | Returns | Purpose |
-|--------|---------|---------|
-| `proxy.Enabled` | `flag.enabled` | Is the feature flag **turned on**? |
-| `proxy.BoolVariation(fallbackValue)` | `variant.value` as `bool` | What **boolean value** did the flag evaluate to? |
-
-```csharp
-// A flag can be enabled but return false as its boolean value!
-// enabled=true, variant.value=false → "Feature is ON, but the bool config is false"
-bool isOn = proxy.Enabled;              // true (flag is on)
-bool value = proxy.BoolVariation(true); // false (the configured value)
-```
 
 ---
 
@@ -449,13 +230,13 @@ Or use **Window → Package Manager → Add package from disk...** and select `p
 2. Enter your API URL, token, and app name
 3. Click **Create SDK Manager** — done!
 
-![Window > Gatrix Menu](doc/images/menu-window-gatrix.png)
+![Window > Gatrix Menu](docs/images/menu-window-gatrix.png)
 
-![Setup Wizard](doc/images/setup-wizard.png)
+![Setup Wizard](docs/images/setup-wizard.png)
 
 Once setup is complete, the **GatrixBehaviour** component is automatically added to your scene:
 
-![GatrixBehaviour Inspector](doc/images/gatrix-behaviour-inspector.png)
+![GatrixBehaviour Inspector](docs/images/gatrix-behaviour-inspector.png)
 
 ### Option B: Code Setup
 
@@ -512,449 +293,64 @@ Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
 
 ## 👁️ Watching for Changes
 
-Gatrix provides two families of watch methods for different use cases:
+Gatrix provides two families of watch methods:
 
-### Realtime Watching
-
-**`WatchRealtimeFlag`** fires the callback **immediately** whenever a flag change is fetched from the server, regardless of `ExplicitSyncMode`. Use this for debug UIs, monitoring dashboards, or any case where you always want the latest server value.
+| Method family | When callback fires |
+|---|---|
+| `WatchRealtimeFlag` | Immediately on every server fetch |
+| `WatchSyncedFlag` | Only after `SyncFlagsAsync()` (when `ExplicitSyncMode = true`) |
 
 ```csharp
 var features = GatrixBehaviour.Client.Features;
 
-// Watch a flag — callback fires on every server-side change
-var unsubscribe = features.WatchRealtimeFlag("game-speed", proxy =>
-{
-    Debug.Log($"Server changed game-speed to: {proxy.FloatVariation(1f)}");
-});
-
-// Stop watching
-unsubscribe();
-
-// Watch with initial state (callback fires immediately with current value, then on changes)
+// Realtime — fires on every change (good for debug UI, non-gameplay props)
 features.WatchRealtimeFlagWithInitialState("dark-mode", proxy =>
 {
     ApplyTheme(proxy.Enabled ? "dark" : "light");
 });
-```
 
-### Synced Watching
-
-**`WatchSyncedFlag`** fires the callback only when the **synchronized** flag store is updated. When `ExplicitSyncMode` is enabled, synced watchers wait until you call `SyncFlagsAsync()` to deliver changes. When `ExplicitSyncMode` is disabled, synced watchers behave identically to realtime watchers.
-
-```csharp
-var features = GatrixBehaviour.Client.Features;
-
-// Synced watch — in ExplicitSyncMode, callback fires only after SyncFlagsAsync()
+// Synced — fires only when YOU call SyncFlagsAsync (safe for gameplay)
 features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 {
     SetDifficulty(proxy.StringVariation("normal"));
 });
 
-// Apply changes at a safe point (e.g., between rounds)
+// Apply at a safe moment (loading screen, between rounds)
 await features.SyncFlagsAsync();
-// ↑ At this point, synced watchers will fire with the latest values
 ```
 
-### Realtime vs Synced — When to Use Which?
-
-| | Realtime | Synced |
-|---|---|---|
-| **Callback timing** | Immediately on fetch | After `SyncFlagsAsync()` (in ExplicitSyncMode) |
-| **Use case** | Debug UI, monitoring, non-disruptive changes | Gameplay-affecting values that need controlled timing |
-| **ExplicitSyncMode off** | Fires on change | Fires on change (same as realtime) |
-| **ExplicitSyncMode on** | Fires on change | Fires only after `SyncFlagsAsync()` |
-
-### ⚠️ Why Synced Mode Matters (Real-World Scenarios)
-
-Realtime mode is simple and convenient, but applying flag changes **instantly** can cause serious problems in production:
-
-| Problem | Example | Impact |
-|---------|---------|--------|
-| **Mid-gameplay disruption** | Enemy HP multiplier changes in the middle of a boss fight | Player feels cheated; may suspect hacks or bugs |
-| **Dependency conflicts** | UI layout flag updates before the data it depends on is loaded | Crash or visual corruption |
-| **User trust** | Item drop rates change while player is farming | Player loses trust in game fairness |
-| **Visual jarring** | Theme or UI layout shifts while player is reading | Frustrating, disorienting UX |
-| **Competitive integrity** | Matchmaking params change during an active match | Unfair advantage/disadvantage |
-
-> 💡 **Rule of thumb:** If a flag change could cause a player to notice "something just changed" in a disruptive way, use **Synced** mode and apply changes at a natural transition point (loading screens, between rounds, menu transitions).
-
-### 📊 Flow Diagram: Realtime vs Synced
-
-**Realtime Mode:**
-
-```mermaid
-flowchart LR
-    A["🖥️ Server"] -->|fetch| B["SDK Cache"]
-    B -->|immediate| C["🎮 Your Game Code"]
-    B -.- D["⚡ Flag changes apply INSTANTLY<br/>even mid-gameplay!"]
-```
-
-**Synced Mode (ExplicitSyncMode):**
-
-```mermaid
-flowchart LR
-    A["🖥️ Server"] -->|fetch| B["SDK Cache"]
-    B -->|buffered| C["Pending Store"]
-    C -->|"YOU decide when<br/>SyncFlagsAsync()"| D["Synced Store"]
-    D -->|safe timing| E["🎮 Your Game Code"]
-```
-
-### `forceRealtime` Parameter
-
-All flag accessor methods accept an optional `forceRealtime` parameter (default: `false`).
-
-When `ExplicitSyncMode` is enabled:
-- **`forceRealtime: false`** (default) — reads from the **synced** store (safe, controlled values)
-- **`forceRealtime: true`** — reads from the **realtime** store (latest server values, bypassing sync)
-
-```csharp
-var features = GatrixBehaviour.Client.Features;
-
-// Default: reads synced values (safe for gameplay)
-bool isEnabled = features.IsEnabled("boss-buff");
-float speed    = features.FloatVariation("game-speed", 1.0f);
-
-// Force realtime: read the latest server value even if not yet synced
-// Useful for debug UIs or monitoring alongside sync mode
-bool latestValue = features.IsEnabled("boss-buff", forceRealtime: true);
-float latestSpeed = features.FloatVariation("game-speed", 1.0f, forceRealtime: true);
-```
-
-> ⚠️ **When `ExplicitSyncMode` is disabled (default):**
-> The `forceRealtime` parameter is **completely ignored**, and `WatchSyncedFlag` / `WatchRealtimeFlag` behave identically.
-> There is no synced store — all reads and callbacks operate on a **single realtime store** at all times.
-> `forceRealtime` is **only meaningful when `ExplicitSyncMode = true`**.
-
-### Built-in Components and Sync Mode
-
-All built-in zero-code components (`GatrixFlagToggle`, `GatrixFlagValue`, `GatrixFlagColor`, etc.) use **realtime** watching by default, so they react instantly to server changes.
-
-If your project uses `ExplicitSyncMode`, consider the following:
-- Components like `GatrixFlagToggle` on **non-gameplay UI** (settings panels, debug overlays) can stay realtime — they won't disrupt the player.
-- For **gameplay-critical** components (difficulty modifiers, economy values), prefer using code-based `WatchSyncedFlag` so you control exactly when changes take effect.
-- You can read the current synced value in code using the default accessor (without `forceRealtime`), and compare it with the realtime value to show a "pending update" indicator.
-
-### FlagProxy — The Watch Callback Parameter
-
-Every watch callback receives a **`FlagProxy`** — a lightweight wrapper bound to a specific flag name. It is the primary way to read flag values inside watch callbacks.
-
-**Key characteristics:**
-- `FlagProxy` does **not** hold a copy of the flag data — it always reads **live** from the client's cache at the moment you access it.
-- It is bound to a single flag name at creation time, so you don't need to pass the flag name again.
-- In `ExplicitSyncMode`, the proxy's `forceRealtime` mode is set automatically based on the watch type:
-  - `WatchRealtimeFlag` → proxy reads from the **realtime** store
-  - `WatchSyncedFlag` → proxy reads from the **synced** store
-
-```csharp
-features.WatchRealtimeFlagWithInitialState("difficulty", proxy =>
-{
-    // Properties
-    bool exists    = proxy.Exists;          // Does the flag exist in cache?
-    bool enabled   = proxy.Enabled;         // Is the flag enabled?
-    string name    = proxy.Name;            // Flag name ("difficulty")
-    bool isRT      = proxy.IsRealtime;      // true for realtime watchers
-
-    // Typed value access (with safe fallback, never throws)
-    string diff    = proxy.StringVariation("normal");
-    bool   show    = proxy.BoolVariation(false);
-    int    level   = proxy.IntVariation(1);
-    float  speed   = proxy.FloatVariation(1.0f);
-    double rate    = proxy.DoubleVariation(0.5);
-
-    // Full variant info
-    Variant v = proxy.Variant;
-    Debug.Log($"Variant: {v.Name} = {v.Value}");
-
-    // Evaluation details (includes reason)
-    var details = proxy.BoolVariationDetails(false);
-    Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
-
-    // Metadata
-    ValueType type = proxy.ValueType;
-    int version    = proxy.Version;
-    string reason  = proxy.Reason;
-});
-```
-
-**FlagProxy API Summary:**
-
-| Category | Member | Returns | Description |
-|----------|--------|---------|-------------|
-| **Properties** | `Name` | `string` | Flag name |
-| | `Exists` | `bool` | Flag exists in cache |
-| | `Enabled` | `bool` | Flag is enabled |
-| | `Variant` | `Variant` | Full variant (name + value) |
-| | `IsRealtime` | `bool` | Proxy reads from realtime store |
-| | `ValueType` | `ValueType` | Value type (bool/string/number/json) |
-| | `Version` | `int` | Flag evaluation version |
-| | `Reason` | `string` | Evaluation reason |
-| **Variations** | `BoolVariation(fallback)` | `bool` | Boolean value |
-| | `StringVariation(fallback)` | `string` | String value |
-| | `IntVariation(fallback)` | `int` | Integer value |
-| | `FloatVariation(fallback)` | `float` | Float value |
-| | `DoubleVariation(fallback)` | `double` | Double value |
-| | `JsonVariation(fallback)` | `Dictionary` | JSON as Dictionary |
-| **Details** | `BoolVariationDetails(fallback)` | `VariationResult<bool>` | Value + evaluation reason |
-| | `StringVariationDetails(fallback)` | `VariationResult<string>` | Value + evaluation reason |
-| **OrThrow** | `BoolVariationOrThrow()` | `bool` | Value or throws if missing |
-| | `StringVariationOrThrow()` | `string` | Value or throws if missing |
-
-### Watch Groups
-
-Watch multiple flags as a group and unsubscribe them all at once:
-
-```csharp
-var features = GatrixBehaviour.Client.Features;
-
-var group = features.CreateWatchGroup("ui-flags");
-group.WatchRealtimeFlag("dark-mode",   p => { /* ... */ })
-     .WatchRealtimeFlag("show-ads",    p => { /* ... */ })
-     .WatchSyncedFlag("premium-ui",    p => { /* ... */ });
-
-// Unwatch all at once
-group.Destroy();
-```
-
+> 📖 Full Watch API reference — `FlagProxy` properties, `FlagProxy` API table, Watch Groups, `forceRealtime`, and real-world sync scenarios:  
+> **[docs/WATCH_API.md](docs/WATCH_API.md)**
 ---
 
 ## 🧩 Zero-Code Components
 
 Drop these `MonoBehaviour` components onto any GameObject — no scripting required.
 
-You can add Gatrix components via the context menu: **Right-click → Gatrix → UI / Logic / Debug / Visual / Audio Animation**
-
-![Context Menu - Gatrix Components](doc/images/context-menu-gatrix-ui.png)
-
-### `GatrixFlagToggle`
-**Enable or disable GameObjects based on a flag.**
-
-Perfect for: feature gating entire game systems, showing/hiding UI panels, enabling debug tools.
-
-![FlagToggle Inspector](doc/images/component-flag-toggle.png)
-
-```
-Inspector:
-  Flag Name: "new-shop-ui"
-  When Enabled: [ShopV2Panel]
-  When Disabled: [ShopV1Panel]
-```
-
----
-
-### `GatrixFlagValue`
-**Bind a flag's string/number value to a UI Text or TextMeshPro component.**
-
-Perfect for: displaying server-driven text, showing A/B test copy, live countdown timers.
-
-![FlagValue Inspector](doc/images/component-flag-value.png)
-
-```
-Inspector:
-  Flag Name: "welcome-message"
-  Format: "{0}"              ← {0} is replaced with the flag value
-  Fallback Text: "Welcome!"   ← Shown when flag value is null/missing
-  Hide When Disabled: ☐       ← Hides the text component when flag is disabled
-```
-
----
-
-### `GatrixFlagImage`
-**Swap sprites based on a flag's variant name.**
-
-Perfect for: seasonal event banners, A/B testing button art, character skin rollouts.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "hero-skin"
-  Default Sprite: [DefaultHero]
-  Variant Maps:
-    "winter" → [WinterHero]
-    "summer" → [SummerHero]
-```
-
----
-
-### `GatrixFlagMaterial`
-**Swap materials or set shader properties based on a flag.**
-
-Perfect for: visual A/B tests, seasonal shader effects, quality tier switching.
-
-![FlagMaterial Inspector](doc/images/component-flag-material.png)
-
-```
-Inspector:
-  Flag Name: "visual-quality"
-  Mode: SwapMaterial
-  Variant Maps:
-    "high"   → [HighQualityMat]
-    "medium" → [MediumQualityMat]
-```
-
----
-
-### `GatrixFlagTransform`
-**Adjust position, rotation, or scale via flag values.**
-
-Perfect for: live-tuning UI layout, adjusting spawn positions, A/B testing element placement.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "button-scale"
-  Mode: Scale
-  Component: Y
-```
-
----
-
-### `GatrixFlagColor`
-**Tint UI Graphics or Renderers based on flag state or variant.**
-
-Perfect for: A/B testing UI color themes, status indicators, seasonal color changes.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "ui-theme"
-  Mode: ByVariant
-  Variant Colors:
-    "red"  → Color(1, 0.2, 0.2)
-    "blue" → Color(0.2, 0.5, 1)
-  Animate: true  ← smooth color lerp
-```
-
----
-
-### `GatrixFlagCanvas`
-**Fade entire UI panels in/out using CanvasGroup.**
-
-More powerful than GatrixFlagToggle for UI — supports alpha fading and disabling raycasts without hiding.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "premium-hud"
-  Enabled Alpha: 1.0
-  Disabled Alpha: 0.0
-  Animate: true  ← smooth fade
-```
-
----
-
-### `GatrixFlagAudio`
-**Play different AudioClips based on flag state or variant.**
-
-Perfect for: A/B testing music/SFX, seasonal audio, enabling special sound effects.
-
-![FlagAudio Inspector](doc/images/component-flag-audio.png)
-
-```
-Inspector:
-  Flag Name: "background-music"
-  Mode: ByVariant
-  Variant Clips:
-    "winter" → [WinterTheme]
-    "summer" → [SummerTheme]
-  Play On Change: true
-```
-
----
-
-### `GatrixFlagAnimator`
-**Control Animator parameters based on flag state or variant.**
-
-Perfect for: enabling special animations, A/B testing character animations, triggering cutscenes.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "hero-animation"
-  Bool Parameter: "IsSpecialMode"
-  Enabled Trigger: "SpecialEnter"
-  Disabled Trigger: "SpecialExit"
-```
-
----
-
-### `GatrixFlagParticles`
-**Play, stop, or pause ParticleSystems based on a flag.**
-
-Perfect for: seasonal particle effects, enabling special VFX, A/B testing visual feedback.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "snow-effect"
-  On Enabled: Play
-  On Disabled: Stop
-  With Children: true
-```
-
----
-
-### `GatrixFlagEvent`
-**Fire UnityEvents when a flag changes.**
-
-Perfect for: triggering custom game logic, integrating with existing event systems.
-
-> 📷 *Screenshot coming soon*
-
-```
-Inspector:
-  Flag Name: "tutorial-mode"
-  On Enabled: [TutorialManager.StartTutorial()]
-  On Disabled: [TutorialManager.StopTutorial()]
-```
-
----
-
-### `GatrixEventListener`
-**Hook into SDK lifecycle events visually.**
-
-Perfect for: showing loading spinners while SDK initializes, handling errors gracefully.
-
-![EventListener Inspector](doc/images/component-event-listener.png)
-
-```
-Inspector:
-  On Ready: [UIManager.HideLoadingScreen()]
-  On Error: [UIManager.ShowErrorBanner()]
-```
-
----
-
-### `GatrixFlagLogger`
-**Log flag changes to the Unity Console.**
-
-Perfect for: debugging flag behavior during development.
-
-> 📷 *Screenshot coming soon*
-
----
-
-### `GatrixVariantSwitch`
-**Activate different child GameObjects based on variant name.**
-
-Perfect for: multi-variant UI layouts, switching between game modes.
-
-> 📷 *Screenshot coming soon*
-
----
-
-### `GatrixFlagSceneRedirect`
-**Load a different scene based on a flag.**
-
-Perfect for: A/B testing onboarding flows, seasonal event scenes, gradual rollouts of new areas.
-
-> 📷 *Screenshot coming soon*
-
+Add via: **Right-click → Gatrix → UI / Logic / Debug / Visual / Audio / Rendering / AI / Environment...**
+
+![Context Menu - Gatrix Components](docs/images/context-menu-gatrix-ui.png)
+
+**Available component categories:**
+
+| Category | Components |
+|---|---|
+| **Logic** | `GatrixFlagToggle`, `GatrixFlagEvent`, `GatrixEventListener`, `GatrixVariantSwitch`, `GatrixFlagSceneRedirect`, `GatrixFlagBehaviourEnabled` |
+| **UI** | `GatrixFlagValue`, `GatrixFlagImage`, `GatrixFlagColor`, `GatrixFlagCanvas`, `GatrixFlagSlider`, `GatrixFlagButtonInteractable`, `GatrixFlagInputField`, `GatrixFlagScrollRect` |
+| **Rendering** | `GatrixFlagMaterial`, `GatrixFlagTransform`, `GatrixFlagSpriteRenderer`, `GatrixFlagRendererToggle`, `GatrixFlagParticles`, `GatrixFlagQualitySettings`, `GatrixFlagShaderProperty`, `GatrixFlagTrailRenderer`, `GatrixFlagLineRenderer`, `GatrixFlagGlobalShader` |
+| **Audio** | `GatrixFlagAudio`, `GatrixFlagAnimator`, `GatrixFlagAudioMixer`, `GatrixFlagAudioSource` |
+| **Camera** | `GatrixFlagCamera` |
+| **Lighting** | `GatrixFlagLight` |
+| **Environment** | `GatrixFlagFog`, `GatrixFlagAmbientLight`, `GatrixFlagSkybox`, `GatrixFlagWindZone` |
+| **Physics** | `GatrixFlagRigidbody`, `GatrixFlagGravity`, `GatrixFlagCollider` |
+| **2D** | `GatrixFlagRigidbody2D`, `GatrixFlagSortingOrder`, `GatrixFlagTilemap`, `GatrixFlagPhysicsMaterial2D`, `GatrixFlagJoint2D`, `GatrixFlagEffector2D` |
+| **AI** | `GatrixFlagNavMeshAgent`, `GatrixFlagNavMeshObstacle`, `GatrixFlagAIAnimator`, `GatrixFlagDetectionRange` |
+| **Time** | `GatrixFlagTimeScale`, `GatrixFlagFrameRate` |
+| **Post FX** | `GatrixFlagPostProcessVolume` |
+| **Debug** | `GatrixFlagLogger` |
+
+> 📖 Detailed component reference — flag value types, all modes, use cases & A/B test scenarios:  
+> **[docs/COMPONENTS.md](docs/COMPONENTS.md)**
 ---
 
 ## 🛠️ Editor Tools
@@ -974,16 +370,16 @@ A real-time dashboard for your SDK state:
 | **Stats** | Detailed counters, streaming counters, flag access counts, variant hit counts, missing flags, event handler leak detection |
 
 #### Overview Tab
-![Monitor Overview](doc/images/monitor-overview.png)
+![Monitor Overview](docs/images/monitor-overview.png)
 
 #### Flags Tab
-![Monitor Flags](doc/images/monitor-flags.png)
+![Monitor Flags](docs/images/monitor-flags.png)
 
 #### Events Tab
-![Monitor Events](doc/images/monitor-events.png)
+![Monitor Events](docs/images/monitor-events.png)
 
 #### Context Tab
-![Monitor Context](doc/images/monitor-context.png)
+![Monitor Context](docs/images/monitor-context.png)
 
 #### Metrics Tab
 The **Metrics** tab includes interactive time-series graphs rendered directly in the Editor:
@@ -996,10 +392,10 @@ The **Metrics** tab includes interactive time-series graphs rendered directly in
 - Time offset slider for scrolling through historical data
 - Toggle between **Graph** and **Report** views with a single click
 
-![Monitor Metrics](doc/images/monitor-metrics.png)
+![Monitor Metrics](docs/images/monitor-metrics.png)
 
 #### Stats Tab
-![Monitor Stats](doc/images/monitor-stats.png)
+![Monitor Stats](docs/images/monitor-stats.png)
 
 **Quick actions in the toolbar:**
 - **⚡ Sync** — appears when explicit sync mode has pending changes
@@ -1015,7 +411,7 @@ The **Metrics** tab includes interactive time-series graphs rendered directly in
 
 Guided setup for first-time configuration. Creates a pre-configured SDK Manager prefab.
 
-![Setup Wizard](doc/images/setup-wizard.png)
+![Setup Wizard](docs/images/setup-wizard.png)
 
 ---
 
@@ -1024,7 +420,7 @@ Guided setup for first-time configuration. Creates a pre-configured SDK Manager 
 
 View SDK version, Unity version, platform information, and runtime connection status.
 
-![About Window](doc/images/about-window.png)
+![About Window](docs/images/about-window.png)
 
 ---
 
@@ -1036,7 +432,7 @@ Every Gatrix component has a polished custom inspector:
 - **Monitor ↗** quick-access button to jump to the Monitor window
 - Organized groups with clear labels
 
-![Inspector - Feature Flags](doc/images/inspector-feature-flags.png)
+![Inspector - Feature Flags](docs/images/inspector-feature-flags.png)
 
 ---
 
@@ -1994,3 +1390,4 @@ public class ShopController : MonoBehaviour
 - [한국어 문서 (README.ko.md)](./README.ko.md)
 - [Known Issues & Gotchas](./ISSUES.md)
 - [Support](mailto:support@gatrix.io)
+

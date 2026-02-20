@@ -70,13 +70,13 @@ string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty"
 
 Gatrix를 사용하면 사용자 세그먼트, 커스텀 속성(예: `vipTier`), 롤아웃 비율 등을 조합하여 정교한 타게팅 규칙을 설정할 수 있습니다:
 
-![Gatrix 대시보드 - 타게팅 전략](doc/images/dashboard-targeting-strategy.png)
+![Gatrix 대시보드 - 타게팅 전략](docs/images/dashboard-targeting-strategy.png)
 
 > 빌드도, 배포도 필요 없습니다 — [Gatrix 대시보드](https://your-dashboard.example.com)에서 값을 변경하면 게임에 즉시 반영됩니다.
 
 아래는 실제 Gatrix 대시보드 화면입니다 — 모든 피처 플래그를 관리하고, 환경별 토글을 제어하며, 상태를 한눈에 모니터링할 수 있습니다:
 
-![Gatrix 대시보드 - Feature Flags](doc/images/dashboard-feature-flags.png)
+![Gatrix 대시보드 - Feature Flags](docs/images/dashboard-feature-flags.png)
 
 ---
 
@@ -182,244 +182,25 @@ Gatrix가 모든 프로젝트에 적합한 것은 아닙니다. 아래 항목에
 
 ## 🏗️ 평가 모델: 원격 평가 전용
 
-Gatrix 클라이언트 SDK들은 **원격 평가(Remote Evaluation)** 방식만을 사용합니다. 이것은 보안과 일관성을 위한 의도적인 아키텍처 결정입니다.
+Gatrix는 **원격 평가** 방식만을 사용합니다 — 타게팅 규칙과 롤아웃 로직은 절대 서버 밖으로 나가지 않습니다.
 
-### 동작 방식
-
-```mermaid
-flowchart LR
-    A["🎮 클라이언트 SDK"] -->|"컨텍스트<br/>(userId, env, properties)"| B["🖥️ Gatrix 서버"]
-    B -->|"평가된 플래그 값"| A
-    B -.- C["🔒 타게팅 규칙,<br/>세그먼트, 롤아웃 %<br/>서버 밖으로 나가지 않음"]
-```
-
-1. SDK가 **컨텍스트**(userId, 환경, 커스텀 속성)를 Gatrix 서버에 전송합니다.
-2. 서버가 모든 타게팅 규칙, 세그먼트, 롤아웃 비율을 **원격으로** 평가합니다.
-3. SDK는 **최종 평가된 플래그 값**만 수신합니다 — 규칙, 세그먼트, 원시 구성은 전달되지 않습니다.
-
-### 원격 평가 vs 로컬 평가
+1. SDK가 **컨텍스트**(userId, env, properties)를 서버로 전송
+2. 서버가 모든 규칙을 평가하고 **최종 플래그 값만** 반환
+3. SDK가 결과를 캐시하고 동기적으로 제공
 
 | | 원격 평가 (Gatrix) | 로컬 평가 |
 |---|---|---|
-| **동작 방식** | 서버가 규칙 평가 → 클라이언트가 최종 값 수신 | 클라이언트가 모든 규칙 다운로드 → 로컬에서 평가 |
-| **보안** | ✅ 타게팅 규칙, 세그먼트 정의, 롤아웃 로직이 **클라이언트에 노출되지 않음** | ⚠️ 모든 규칙이 클라이언트에 전송되어 검사, 역공학, 변조될 수 있음 |
-| **일관성** | ✅ 평가 로직이 중앙 집중화 — 모든 SDK와 플랫폼이 동일한 결과를 받음 | ⚠️ 각 SDK가 동일한 평가 엔진을 독립적으로 구현해야 함; 미묘한 차이로 결과가 달라질 수 있음 |
-| **페이로드 크기** | ✅ 최종 값만 전송됨 (작은 페이로드) | ⚠️ 전체 규칙 세트를 다운로드해야 함 (플래그/세그먼트가 많으면 클 수 있음) |
-| **오프라인 지원** | ⚠️ 초기 네트워크 요청 필요; 오프라인 사용은 캐시된 값이나 부트스트랩 데이터에 의존 | ✅ 규칙을 한 번 다운로드하면 완전한 오프라인 평가 가능 |
-| **평가 지연** | ⚠️ 초기 페치에 네트워크 왕복 시간 필요 | ✅ 초기 다운로드 이후 네트워크 불필요 |
-| **규칙 업데이트 속도** | ✅ 스트리밍/폴링을 통해 새 값이 즉시 사용 가능 | ⚠️ 변경 사항을 적용하려면 전체 규칙 세트를 다시 다운로드해야 함 |
+| **보안** | ✅ 규칙이 서버 밖으로 나가지 않음 | ⚠️ 클라이언트에 규칙 노출 |
+| **일관성** | ✅ 모든 SDK에서 동일한 결과 | ⚠️ 각 SDK가 규칙을 재구현해야 함 |
+| **페이로드** | ✅ 소규모 (최종 값만) | ⚠️ 대규모 (전체 규칙 세트) |
+| **오프라인** | ⚠️ 초기 페치 필요 (이후 캐시) | ✅ 첫 다운로드 이후 가능 |
 
-### Gatrix가 원격 평가를 선택한 이유
+> 🌐 **오프라인 & 가용성:** SDK는 서버에 연결할 수 없을 때 항상 로컬 캐시에서 값을 제공합니다. fallbackValue로 네트워크 문제로 인한 게임 중단은 절대 발생하지 않습니다.
 
-1. **보안 우선.** 게임 개발에서 클라이언트는 본질적으로 신뢰할 수 없습니다. 타게팅 규칙(예: "세그먼트 X의 사용자에게 10% 롤아웃")을 클라이언트에 전송하면 롤아웃 전략, 내부 세그먼트, 비즈니스 로직이 노출됩니다. 원격 평가에서는 최종 `true`/`false` 또는 배리언트 문자열만 클라이언트에 도달합니다.
-
-2. **SDK 간 일관성.** Gatrix는 Unity, Unreal, Cocos2d-x, Godot, JavaScript, Flutter, Python 등을 지원합니다. 모든 언어에서 동일한 평가 로직을 구현하는 것은 오류가 발생하기 쉽습니다. 원격 평가는 SDK에 관계없이 동일한 결과를 보장합니다.
-
-3. **간결한 SDK.** 클라이언트 SDK는 가벼운 캐시 레이어입니다 — 타게팅 규칙, 비율 롤아웃, 세그먼트 멤버십을 이해할 필요가 없습니다. 이로 인해 SDK가 경량화되고 버그 발생 영역이 줄어듭니다.
-
-> 💡 **오프라인 & 부트스트랩:** 평가가 서버에서 이루어지더라도, SDK는 마지막으로 알려진 플래그 값을 로컬에 캐시합니다. 완전한 오프라인 시나리오를 위해 **부트스트랩 데이터**를 제공할 수도 있습니다. 자세한 내용은 [운영 모드](#-운영-모드) 섹션을 참고하세요.
-
-### 🌐 오프라인 지원 및 안정성 (Offline & Availability)
-Gatrix SDK는 **완벽한 실시간 동기화보다 서비스의 가용성(Availability)에 초점**을 맞추어 설계되었습니다. 네트워크 상태가 좋지 않거나 서버에 연결할 수 없더라도 게임은 절대 중단되지 않아야 합니다.
-
-*   **네트워크 장애 시에도 정상 동작**: 네트워크가 끊기면 SDK는 로컬 캐시에 저장된 마지막 값을 사용합니다. 캐시가 없더라도 개발자가 코드에 명시한 안전한 `fallbackValue`를 사용하여 문제없이 실행됩니다.
-*   **완전 오프라인 모드**: 오프라인 상태에서도 게임을 시작하고 플레이할 수 있습니다.
-*   **자동 복구**: 네트워크 연결이 복구되면 백그라운드에서 최신 구성을 자동으로 가져와 로컬 저장소를 업데이트합니다.
-
-이러한 설계는 네트워크 변동성이 플레이어 경험을 저해하지 않도록 보장합니다.
-
+> 📖 전체 상세 내용 — 값 리졸루션 흐름, 예약 배리언트 이름(`$missing`, `$env-default-enabled` ...), `fallbackValue` 설계 이유:  
+> **[docs/EVALUATION_MODEL.ko.md](docs/EVALUATION_MODEL.ko.md)**
 ---
 
-## 🔍 플래그 값 리졸루션 흐름
-
-플래그 값이 서버에서 게임 코드로 전달되는 과정을 이해하는 것이 올바른 사용의 핵심입니다.
-
-### 전체 흐름 개요
-
-```mermaid
-flowchart TD
-    subgraph SERVER ["🖥️ Gatrix 서버"]
-        S1{"이 환경에서<br/>플래그가 활성화?"}
-        S1 -->|아니오| S2{"환경 오버라이드<br/>값이 있는가?"}
-        S2 -->|예| S2A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
-        S2 -->|아니오| S2B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
-        S1 -->|예| S3{"타게팅 전략이<br/>있는가?"}
-        S3 -->|아니오| S4{"환경 오버라이드<br/>값이 있는가?"}
-        S4 -->|예| S4A["variant.name = $env-default-enabled<br/>value = env.enabledValue"]
-        S4 -->|아니오| S4B["variant.name = $flag-default-enabled<br/>value = flag.enabledValue"]
-        S3 -->|예| S5{"컨텍스트와 매칭되는<br/>전략이 있는가?"}
-        S5 -->|예| S6["variant.name = 매칭된 배리언트 이름<br/>value = variant.value"]
-        S5 -->|아니오| S7{"환경 오버라이드<br/>값이 있는가?"}
-        S7 -->|예| S7A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
-        S7 -->|아니오| S7B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
-    end
-
-    S2A --> NET["📡 네트워크"]
-    S2B --> NET
-    S4A --> NET
-    S4B --> NET
-    S6 --> NET
-    S7A --> NET
-    S7B --> NET
-
-    subgraph SDK ["🎮 Unity SDK (클라이언트)"]
-        NET --> CACHE["SDK 캐시<br/>(realtimeFlags / synchronizedFlags)"]
-        CACHE --> ACCESS["게임 코드 호출<br/>BoolVariation, StringVariation 등"]
-    end
-```
-
-### 값 출처 우선순위 (원격)
-
-서버가 플래그를 평가할 때, 다음 우선순위로 값이 결정됩니다:
-
-| 우선순위 | 조건 | 값 소스 | `variant.name` |
-|:--------:|------|--------|:---------------|
-| 1 | 플래그 활성화 + 배리언트가 있는 전략 매칭 | 매칭된 배리언트의 `variant.value` | 배리언트 이름 (예: `"dark-theme"`) |
-| 2 | 플래그 활성화 + 배리언트 매칭 없음 + 환경 오버라이드 설정됨 | `env.enabledValue` | `$env-default-enabled` |
-| 3 | 플래그 활성화 + 배리언트 매칭 없음 + 환경 오버라이드 없음 | `flag.enabledValue` | `$flag-default-enabled` |
-| 4 | 플래그 비활성화 + 환경 오버라이드 설정됨 | `env.disabledValue` | `$env-default-disabled` |
-| 5 | 플래그 비활성화 + 환경 오버라이드 없음 | `flag.disabledValue` | `$flag-default-disabled` |
-| 6 | 서버에 플래그 없음 | 응답에 포함되지 않음 | *(SDK가 `$missing` 생성)* |
-
-> 💡 `variant.name`을 통해 값이 **어디서** 왔는지 정확히 알 수 있습니다. Monitor 창에서 디버깅할 때 매우 유용합니다.
-
-### SDK 측: 게임 코드가 값을 받는 방식
-
-```mermaid
-flowchart TD
-    A["게임 코드:<br/>proxy.BoolVariation(false)"] --> B{"SDK 캐시에<br/>플래그가 존재?"}
-    B -->|아니오| C["폴백 값 반환<br/>variant = $missing"]
-    B -->|예| D{"플래그가<br/>활성화?"}
-    D -->|아니오| E["폴백 값 반환<br/>variant = $*-default-disabled"]
-    D -->|예| F{"valueType이<br/>요청 타입과 일치?"}
-    F -->|아니오| G["폴백 값 반환<br/>variant = $type-mismatch"]
-    F -->|예| H["variant.value 반환<br/>(실제 평가된 값)"]
-
-    style C fill:#ff6b6b,color:#fff
-    style E fill:#ffa94d,color:#fff
-    style G fill:#ffa94d,color:#fff
-    style H fill:#51cf66,color:#fff
-```
-
-### 예약된 배리언트 이름
-
-SDK는 `$` 접두사가 붙은 배리언트 이름으로 값의 출처를 나타냅니다. `VariantSource.cs`에 정의되어 있습니다:
-
-| 배리언트 이름 | 의미 | `enabled` | 발생 시점 |
-|:-------------|------|:---------:|----------|
-| `$missing` | SDK 캐시에 플래그가 없음 | `false` | 플래그 이름 오타, 아직 생성되지 않음, 또는 SDK 미초기화 |
-| `$type-mismatch` | 요청 타입이 플래그의 `valueType`과 불일치 | `false` | `string` 플래그에 `BoolVariation` 호출 등 |
-| `$env-default-enabled` | 플래그 활성화, 환경 수준 `enabledValue`에서 값 가져옴 | `true` | 배리언트 매칭 없음; 환경 오버라이드 설정됨 |
-| `$flag-default-enabled` | 플래그 활성화, 플래그 수준(글로벌) `enabledValue`에서 값 가져옴 | `true` | 배리언트 매칭 없음; 환경 오버라이드 없음 |
-| `$env-default-disabled` | 플래그 비활성화, 환경 수준 `disabledValue`에서 값 가져옴 | `false` | 플래그 비활성화; 환경 오버라이드 설정됨 |
-| `$flag-default-disabled` | 플래그 비활성화, 플래그 수준(글로벌) `disabledValue`에서 값 가져옴 | `false` | 플래그 비활성화; 환경 오버라이드 없음 |
-| *(사용자 정의 이름)* | 타게팅에 의해 특정 배리언트가 선택됨 | `true` | 전략이 매칭되어 해당 배리언트 선택 |
-
-### Variation API 시그니처 (`FlagProxy`)
-
-`FlagProxy`의 모든 variation 메서드는 `fallbackValue` 파라미터가 **필수**입니다 — 생략할 수 없습니다:
-
-```csharp
-// 불리언
-bool   BoolVariation(bool fallbackValue)
-
-// 문자열
-string StringVariation(string fallbackValue)
-
-// 숫자
-int    IntVariation(int fallbackValue)
-float  FloatVariation(float fallbackValue)
-double DoubleVariation(double fallbackValue)
-
-// JSON
-Dictionary<string, object> JsonVariation(Dictionary<string, object> fallbackValue)
-
-// 배리언트 이름만
-string Variation(string fallbackValue)
-```
-
-#### `fallbackValue`가 필수인 이유 (생략 불가)
-
-`fallbackValue` 파라미터는 의도적으로 필수로 설계되었습니다. 이를 통해 게임이 **어떤 실패 상황에서도 항상 사용 가능한 값을 받을 수 있습니다**:
-
-1. **SDK 미초기화** — SDK가 아직 연결 중일 수 있습니다. 폴백이 없으면 `null`이나 크래시가 발생합니다.
-2. **플래그 미존재** — 플래그 이름 오타이거나 플래그가 삭제된 경우. 폴백이 예기치 않은 동작을 방지합니다.
-3. **네트워크 실패** — SDK가 서버에 접속할 수 없고 캐시된 데이터도 없을 때, 폴백이 게임 실행을 유지합니다.
-4. **타입 불일치** — `string` 타입 플래그에 `BoolVariation`을 호출한 경우. 폴백이 타입 오류를 방지합니다.
-5. **타입 안전성** — 폴백 값이 컴파일 시점에 기대되는 반환 타입을 확정합니다.
-
-> ⚠️ **기본값 없는 오버로드는 없습니다.** 문제가 발생했을 때 어떤 값을 사용할지 항상 명시적으로 선택해야 합니다. 이것은 모든 Gatrix SDK에서 공유하는 의도적인 설계 결정입니다.
-
-### 전체 예제: 모든 시나리오
-
-```csharp
-// 시나리오 1: 플래그 활성화, 전략 매칭 → 실제 배리언트 값 반환
-this.WatchSyncedFlagWithInitialState("dark-theme", proxy =>
-{
-    // proxy.Exists      == true
-    // proxy.Enabled     == true
-    // proxy.Variant     == { name: "dark", value: true }
-    // proxy.ValueType   == "boolean"
-
-    bool isDark = proxy.BoolVariation(false);  // fallbackValue: false
-    // isDark == true (variant.value에서 가져옴)
-});
-
-// 시나리오 2: 플래그 활성화, 배리언트 매칭 없음 → enabledValue 반환
-this.WatchSyncedFlagWithInitialState("welcome-message", proxy =>
-{
-    // proxy.Variant == { name: "$env-default-enabled", value: "Hello!" }
-    //   또는         { name: "$flag-default-enabled", value: "Hello!" }
-
-    string msg = proxy.StringVariation("Fallback");  // fallbackValue: "Fallback"
-    // msg == "Hello!" (enabledValue에서 가져옴)
-});
-
-// 시나리오 3: 플래그 비활성화 → fallbackValue 반환
-this.WatchSyncedFlagWithInitialState("maintenance-mode", proxy =>
-{
-    // proxy.Enabled     == false
-    // proxy.Variant     == { name: "$flag-default-disabled", value: "..." }
-
-    bool maintenance = proxy.BoolVariation(false);  // fallbackValue: false
-    // maintenance == false (플래그가 비활성화이므로 fallbackValue 반환)
-});
-
-// 시나리오 4: 플래그가 존재하지 않음 → $missing, fallbackValue 반환
-this.WatchSyncedFlagWithInitialState("typo-flag-nmae", proxy =>
-{
-    // proxy.Exists      == false
-    // proxy.Variant     == { name: "$missing" }
-
-    bool val = proxy.BoolVariation(false);  // fallbackValue: false
-    // val == false (플래그가 없으므로 fallbackValue 반환)
-});
-
-// 시나리오 5: 타입 불일치 → fallbackValue 반환
-this.WatchSyncedFlagWithInitialState("string-flag", proxy =>
-{
-    // proxy.ValueType   == "string"
-
-    bool val = proxy.BoolVariation(false);  // fallbackValue: false
-    // val == false (valueType이 "string"이므로 "boolean"과 불일치, fallbackValue 반환)
-});
-```
-
-### isEnabled vs BoolVariation
-
-이 두 메서드는 **서로 다른 목적**을 가집니다 — 혼동하지 마세요:
-
-| 메서드 | 반환 값 | 용도 |
-|--------|---------|------|
-| `proxy.Enabled` | `flag.enabled` | 피처 플래그가 **켜져 있는가?** |
-| `proxy.BoolVariation(fallbackValue)` | `variant.value` (`bool`) | 플래그가 평가한 **불리언 값**은 무엇인가? |
-
-```csharp
-// 플래그가 활성화되어 있지만 불리언 값으로 false를 반환할 수 있습니다!
-// enabled=true, variant.value=false → "기능은 켜졌지만, 불리언 설정은 false"
-bool isOn = proxy.Enabled;              // true (플래그가 켜져 있음)
-bool value = proxy.BoolVariation(true); // false (설정된 값)
-```
 
 ---
 
@@ -449,13 +230,13 @@ bool value = proxy.BoolVariation(true); // false (설정된 값)
 2. API URL, 토큰, 앱 이름 입력
 3. **Create SDK Manager** 클릭 — 완료!
 
-![Window > Gatrix 메뉴](doc/images/menu-window-gatrix.png)
+![Window > Gatrix 메뉴](docs/images/menu-window-gatrix.png)
 
-![Setup Wizard](doc/images/setup-wizard.png)
+![Setup Wizard](docs/images/setup-wizard.png)
 
 설정이 완료되면 **GatrixBehaviour** 컴포넌트가 자동으로 씬에 추가됩니다:
 
-![GatrixBehaviour Inspector](doc/images/gatrix-behaviour-inspector.png)
+![GatrixBehaviour Inspector](docs/images/gatrix-behaviour-inspector.png)
 
 ### 옵션 B: 코드로 설정
 
@@ -512,454 +293,70 @@ Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
 
 ## 👁️ 변경 감지 (Watch)
 
-Gatrix는 용도에 따라 두 가지 Watch 메서드 패밀리를 제공합니다:
+Gatrix는 두 가지 Watch 방식을 제공합니다:
 
-### 리얼타임 감지 (Realtime)
-
-**`WatchRealtimeFlag`** 는 `ExplicitSyncMode` 설정과 **무관하게**, 서버에서 플래그 변경을 가져오는 즉시 콜백을 호출합니다. 디버그 UI, 모니터링 대시보드, 또는 항상 최신 서버 값이 필요한 경우에 적합합니다.
+| 메서드 | 콜백 발생 시점 |
+|---|---|
+| `WatchRealtimeFlag` | 서버 페치 후 즉시 |
+| `WatchSyncedFlag` | `SyncFlagsAsync()` 호출 시 (`ExplicitSyncMode = true`일 때) |
 
 ```csharp
 var features = GatrixBehaviour.Client.Features;
 
-// 플래그 감지 — 서버 측 변경 시마다 콜백 호출
-var unsubscribe = features.WatchRealtimeFlag("game-speed", proxy =>
-{
-    Debug.Log($"서버에서 game-speed 변경됨: {proxy.FloatVariation(1f)}");
-});
-
-// 감지 중단
-unsubscribe();
-
-// 초기 상태 포함 감지 (현재 값으로 즉시 콜백 호출 후, 변경 시마다 호출)
+// 리얼타임 — 변경 즉시 발생 (디버그 UI, 비게임플레이용)
 features.WatchRealtimeFlagWithInitialState("dark-mode", proxy =>
 {
     ApplyTheme(proxy.Enabled ? "dark" : "light");
 });
-```
 
-### 동기화 감지 (Synced)
-
-**`WatchSyncedFlag`** 는 **동기화된** 플래그 저장소가 업데이트될 때만 콜백을 호출합니다. `ExplicitSyncMode`가 활성화된 경우, 동기화 감지자는 `SyncFlagsAsync()` 호출 시까지 변경 전달을 대기합니다. `ExplicitSyncMode`가 비활성화된 경우에는 리얼타임 감지와 동일하게 동작합니다.
-
-```csharp
-var features = GatrixBehaviour.Client.Features;
-
-// 동기화 감지 — ExplicitSyncMode에서는 SyncFlagsAsync() 이후에만 콜백 호출
+// 동기화 — SyncFlagsAsync() 호출 시 발생 (게임플레이 안전)
 features.WatchSyncedFlagWithInitialState("difficulty", proxy =>
 {
     SetDifficulty(proxy.StringVariation("normal"));
 });
 
-// 안전한 시점에 변경 적용 (예: 라운드 사이)
+// 안전한 시점에 적용 (로딩 화면, 라운드 사이)
 await features.SyncFlagsAsync();
-// ↑ 이 시점에서 동기화 감지자의 콜백이 최신 값으로 호출됨
 ```
 
-### 리얼타임 vs 동기화 — 언제 무엇을 사용할까?
-
-| | 리얼타임 (Realtime) | 동기화 (Synced) |
-|---|---|---|
-| **콜백 타이밍** | 서버에서 가져오는 즉시 | `SyncFlagsAsync()` 호출 후 (ExplicitSyncMode 시) |
-| **적합한 용도** | 디버그 UI, 모니터링, 방해되지 않는 변경 | 게임플레이에 영향을 주는 값, 타이밍 제어 필요 |
-| **ExplicitSyncMode 비활성** | 변경 시 즉시 호출 | 변경 시 즉시 호출 (리얼타임과 동일) |
-| **ExplicitSyncMode 활성** | 변경 시 즉시 호출 | `SyncFlagsAsync()` 호출 후에만 호출 |
-
-### ⚠️ 동기화 모드가 중요한 이유 (실전 시나리오)
-
-리얼타임 모드는 간단하고 편리하지만, 플래그 변경을 **즉시** 적용하면 실제 서비스에서 심각한 문제를 일으킬 수 있습니다:
-
-| 문제 상황 | 예시 | 영향 |
-|---------|---------|--------|
-| **게임플레이 중간 변경** | 보스전 도중 적 HP 배율이 변경됨 | 플레이어가 치팅을 의심하거나 버그로 느낌 |
-| **의존성 충돌** | UI 레이아웃 플래그가 의존하는 데이터 로드 전에 변경됨 | 크래시 또는 화면 깨짐 |
-| **사용자 신뢰 훼손** | 파밍 중 아이템 드롭률이 변경됨 | 플레이어가 게임의 공정성을 불신 |
-| **시각적 불쾌감** | 플레이어가 읽는 중에 테마나 UI가 갑자기 바뀜 | 답답하고 혼란스러운 UX |
-| **경쟁 무결성** | 매치 중 매칭 파라미터가 변경됨 | 불공정한 유리/불리 발생 |
-
-> 💡 **경험 법칙:** 플래그 변경이 플레이어에게 "뭔가 갑자기 바뀌었다"는 불쾌한 느낌을 줄 수 있다면, **동기화** 모드를 사용하고 자연스러운 전환 시점(로딩 화면, 라운드 사이, 메뉴 전환)에 변경을 적용하세요.
-
-### 📊 흐름 다이어그램: 리얼타임 vs 동기화
-
-**리얼타임 모드:**
-
-```mermaid
-flowchart LR
-    A["🖥️ 서버"] -->|fetch| B["SDK 캐시"]
-    B -->|즉시 반영| C["🎮 게임 코드"]
-    B -.- D["⚡ 플래그 변경이 즉시 적용됨<br/>게임플레이 도중에도!"]
-```
-
-**동기화 모드 (ExplicitSyncMode):**
-
-```mermaid
-flowchart LR
-    A["🖥️ 서버"] -->|fetch| B["SDK 캐시"]
-    B -->|버퍼링| C["대기 저장소"]
-    C -->|"개발자가 시점 결정<br/>SyncFlagsAsync()"| D["동기화 저장소"]
-    D -->|안전한 타이밍| E["🎮 게임 코드"]
-```
-
-동기화 모드를 활용하면, 대시보드에서 변경한 값이 **개발자가 의도한 안전한 시점**에만 게임에 반영됩니다. 플레이어는 갑작스러운 변화 없이 매끄러운 경험을 유지하고, 운영팀은 언제든 자유롭게 플래그를 조정할 수 있습니다.
-
-### `forceRealtime` 파라미터
-
-모든 플래그 접근 메서드는 선택적 `forceRealtime` 파라미터를 지원합니다 (기본값: `false`).
-
-`ExplicitSyncMode`가 활성화된 경우:
-- **`forceRealtime: false`** (기본값) — **동기화된** 저장소에서 읽습니다 (안전하고 제어된 값)
-- **`forceRealtime: true`** — **리얼타임** 저장소에서 읽습니다 (동기화를 우회하여 최신 서버 값을 즉시 확인)
-
-```csharp
-var features = GatrixBehaviour.Client.Features;
-
-// 기본값: 동기화된 값을 읽음 (게임플레이에 안전)
-bool isEnabled = features.IsEnabled("boss-buff");
-float speed    = features.FloatVariation("game-speed", 1.0f);
-
-// forceRealtime: 아직 동기화되지 않은 최신 서버 값을 읽음
-// 디버그 UI나 동기화 모드와 함께 모니터링할 때 유용
-bool latestValue = features.IsEnabled("boss-buff", forceRealtime: true);
-float latestSpeed = features.FloatVariation("game-speed", 1.0f, forceRealtime: true);
-```
-
-> ⚠️ **`ExplicitSyncMode`가 비활성(기본값)인 경우:**
-> `forceRealtime` 파라미터는 **완전히 무시**되며, `WatchSyncedFlag`와 `WatchRealtimeFlag`는 동일하게 동작합니다.
-> 동기화 저장소 자체가 존재하지 않으므로 모든 읽기와 콜백이 **항상 리얼타임 기반**으로 동작합니다.
-> `forceRealtime`은 **오직 `ExplicitSyncMode = true`일 때만 의미**가 있습니다.
-
-### 기본 제공 컴포넌트와 동기화 모드
-
-기본 제공 제로 코드 컴포넌트(`GatrixFlagToggle`, `GatrixFlagValue`, `GatrixFlagColor` 등)는 **리얼타임** 감지를 기본으로 사용하므로, 서버 변경에 즉시 반응합니다.
-
-`ExplicitSyncMode`를 사용하는 프로젝트에서는 다음을 고려하세요:
-- **게임플레이에 영향을 주지 않는 UI**에 붙인 컴포넌트(설정 패널, 디버그 오버레이)는 리얼타임으로 두어도 됩니다 — 플레이어에게 방해가 되지 않습니다.
-- **게임플레이에 영향을 주는** 컴포넌트(난이도 수정, 경제 수치)는 코드 기반 `WatchSyncedFlag`를 사용하여 변경 적용 시점을 정확히 제어하는 것을 권장합니다.
-- 현재 동기화된 값(`forceRealtime` 없이)과 리얼타임 값(`forceRealtime: true`)을 비교하여 "새로운 업데이트 대기 중" 표시기를 구현할 수 있습니다.
-
-### FlagProxy — Watch 콜백 파라미터
-
-모든 Watch 콜백은 **`FlagProxy`** 를 전달받습니다 — 특정 플래그 이름에 바인딩된 경량 래퍼입니다. Watch 콜백 내에서 플래그 값을 읽는 주요 수단입니다.
-
-**핵심 특성:**
-- `FlagProxy`는 플래그 데이터의 복사본을 **보관하지 않습니다** — 접근 시점에 항상 클라이언트 캐시에서 **실시간으로** 읽습니다.
-- 생성 시점에 단일 플래그 이름에 바인딩되므로, 플래그 이름을 다시 전달할 필요가 없습니다.
-- `ExplicitSyncMode`에서 proxy의 `forceRealtime` 모드는 Watch 유형에 따라 자동 설정됩니다:
-  - `WatchRealtimeFlag` → proxy는 **리얼타임** 저장소에서 읽음
-  - `WatchSyncedFlag` → proxy는 **동기화된** 저장소에서 읽음
-
-```csharp
-features.WatchRealtimeFlagWithInitialState("difficulty", proxy =>
-{
-    // 속성
-    bool exists    = proxy.Exists;          // 플래그가 캐시에 존재하는가?
-    bool enabled   = proxy.Enabled;         // 플래그가 활성화되었는가?
-    string name    = proxy.Name;            // 플래그 이름 ("difficulty")
-    bool isRT      = proxy.IsRealtime;      // 리얼타임 감지자이면 true
-
-    // 타입별 안전한 값 접근 (폴백 포함, 예외 발생 없음)
-    string diff    = proxy.StringVariation("normal");
-    bool   show    = proxy.BoolVariation(false);
-    int    level   = proxy.IntVariation(1);
-    float  speed   = proxy.FloatVariation(1.0f);
-    double rate    = proxy.DoubleVariation(0.5);
-
-    // 전체 배리언트 정보
-    Variant v = proxy.Variant;
-    Debug.Log($"Variant: {v.Name} = {v.Value}");
-
-    // 평가 상세 정보 (결정 이유 포함)
-    var details = proxy.BoolVariationDetails(false);
-    Debug.Log($"Value: {details.Value}, Reason: {details.Reason}");
-
-    // 메타데이터
-    ValueType type = proxy.ValueType;
-    int version    = proxy.Version;
-    string reason  = proxy.Reason;
-});
-```
-
-**FlagProxy API 요약:**
-
-| 카테고리 | 멤버 | 반환 타입 | 설명 |
-|----------|------|---------|------|
-| **속성** | `Name` | `string` | 플래그 이름 |
-| | `Exists` | `bool` | 플래그가 캐시에 존재하는지 여부 |
-| | `Enabled` | `bool` | 플래그 활성화 여부 |
-| | `Variant` | `Variant` | 전체 배리언트 (이름 + 값) |
-| | `IsRealtime` | `bool` | 리얼타임 저장소에서 읽는지 여부 |
-| | `ValueType` | `ValueType` | 값 타입 (bool/string/number/json) |
-| | `Version` | `int` | 플래그 평가 버전 |
-| | `Reason` | `string` | 평가 이유 |
-| **값 접근** | `BoolVariation(fallback)` | `bool` | Boolean 값 |
-| | `StringVariation(fallback)` | `string` | 문자열 값 |
-| | `IntVariation(fallback)` | `int` | 정수 값 |
-| | `FloatVariation(fallback)` | `float` | float 값 |
-| | `DoubleVariation(fallback)` | `double` | double 값 |
-| | `JsonVariation(fallback)` | `Dictionary` | JSON을 Dictionary로 |
-| **상세** | `BoolVariationDetails(fallback)` | `VariationResult<bool>` | 값 + 평가 이유 |
-| | `StringVariationDetails(fallback)` | `VariationResult<string>` | 값 + 평가 이유 |
-| **OrThrow** | `BoolVariationOrThrow()` | `bool` | 값 반환 또는 없으면 예외 |
-| | `StringVariationOrThrow()` | `string` | 값 반환 또는 없으면 예외 |
-
-### Watch 그룹
-
-여러 플래그를 그룹으로 감지하고 한 번에 구독 해제할 수 있습니다:
-
-```csharp
-var features = GatrixBehaviour.Client.Features;
-
-var group = features.CreateWatchGroup("ui-flags");
-group.WatchRealtimeFlag("dark-mode",   p => { /* ... */ })
-     .WatchRealtimeFlag("show-ads",    p => { /* ... */ })
-     .WatchSyncedFlag("premium-ui",    p => { /* ... */ });
-
-// 모두 한 번에 해제
-group.Destroy();
-```
+> 📖 전체 Watch API 레퍼런스 — `FlagProxy` 속성, API 표, Watch 그룹, `forceRealtime`, 실전 동기화 시나리오:  
+> **[docs/WATCH_API.ko.md](docs/WATCH_API.ko.md)**
 
 ---
 
-## 🧩 제로 코드 컴포넌트
-
-`MonoBehaviour` 컴포넌트를 GameObject에 추가하기만 하면 됩니다 — 코딩이 필요 없습니다.
-
-컨텍스트 메뉴에서 Gatrix 컴포넌트를 추가할 수 있습니다: **우클릭 → Gatrix → UI / Logic / Debug / Visual / Audio Animation**
-
-![컨텍스트 메뉴 - Gatrix 컴포넌트](doc/images/context-menu-gatrix-ui.png)
-
-### `GatrixFlagToggle`
-**플래그에 따라 GameObject를 활성화/비활성화합니다.**
-
-적합한 용도: 기능 게이팅, UI 패널 표시/숨기기, 디버그 도구 활성화.
-
-![FlagToggle Inspector](doc/images/component-flag-toggle.png)
-
-```
-Inspector:
-  Flag Name: "new-shop-ui"
-  When Enabled: [ShopV2Panel]
-  When Disabled: [ShopV1Panel]
-```
-
----
-
-### `GatrixFlagValue`
-**플래그의 문자열/숫자 값을 UI Text 또는 TextMeshPro 컴포넌트에 바인딩합니다.**
-
-적합한 용도: 서버 주도 텍스트 표시, A/B 테스트 카피, 라이브 카운트다운 타이머.
-
-![FlagValue Inspector](doc/images/component-flag-value.png)
-
-```
-Inspector:
-  Flag Name: "welcome-message"
-  Format: "{0}"              ← {0}이 플래그 값으로 대체됨
-  Fallback Text: "Welcome!"   ← 플래그 값이 null/없을 때 표시
-  Hide When Disabled: ☐       ← 플래그 비활성화 시 텍스트 컴포넌트 숨김
-```
-
----
-
-### `GatrixFlagImage`
-**플래그의 배리언트 이름에 따라 스프라이트를 교체합니다.**
-
-적합한 용도: 시즌 이벤트 배너, 버튼 아트 A/B 테스트, 캐릭터 스킨 롤아웃.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "hero-skin"
-  Default Sprite: [DefaultHero]
-  Variant Maps:
-    "winter" → [WinterHero]
-    "summer" → [SummerHero]
-```
-
----
-
-### `GatrixFlagMaterial`
-**플래그에 따라 머티리얼을 교체하거나 셰이더 속성을 설정합니다.**
-
-적합한 용도: 비주얼 A/B 테스트, 시즌 셰이더 효과, 품질 단계 전환.
-
-![FlagMaterial Inspector](doc/images/component-flag-material.png)
-
-```
-Inspector:
-  Flag Name: "visual-quality"
-  Mode: SwapMaterial
-  Variant Maps:
-    "high"   → [HighQualityMat]
-    "medium" → [MediumQualityMat]
-```
-
----
-
-### `GatrixFlagTransform`
-**플래그 값으로 위치, 회전, 스케일을 조정합니다.**
-
-적합한 용도: 라이브 UI 레이아웃 튜닝, 스폰 위치 조정, 요소 배치 A/B 테스트.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "button-scale"
-  Mode: Scale
-  Component: Y
-```
-
----
-
-### `GatrixFlagColor`
-**플래그 상태 또는 배리언트에 따라 UI Graphics 또는 Renderer의 색상을 변경합니다.**
-
-적합한 용도: UI 컬러 테마 A/B 테스트, 상태 표시기, 시즌 색상 변경.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "ui-theme"
-  Mode: ByVariant
-  Variant Colors:
-    "red"  → Color(1, 0.2, 0.2)
-    "blue" → Color(0.2, 0.5, 1)
-  Animate: true  ← 부드러운 색상 보간
-```
-
----
-
-### `GatrixFlagCanvas`
-**CanvasGroup을 사용하여 UI 패널 전체를 페이드 인/아웃합니다.**
-
-GatrixFlagToggle보다 강력한 UI 제어 — 숨기지 않고 알파 페이드 및 레이캐스트 비활성화를 지원합니다.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "premium-hud"
-  Enabled Alpha: 1.0
-  Disabled Alpha: 0.0
-  Animate: true  ← 부드러운 페이드
-```
-
----
-
-### `GatrixFlagAudio`
-**플래그 상태 또는 배리언트에 따라 다른 AudioClip을 재생합니다.**
-
-적합한 용도: 음악/SFX A/B 테스트, 시즌 오디오, 특수 사운드 이펙트 활성화.
-
-![FlagAudio Inspector](doc/images/component-flag-audio.png)
-
-```
-Inspector:
-  Flag Name: "background-music"
-  Mode: ByVariant
-  Variant Clips:
-    "winter" → [WinterTheme]
-    "summer" → [SummerTheme]
-  Play On Change: true
-```
-
----
-
-### `GatrixFlagAnimator`
-**플래그 상태 또는 배리언트에 따라 Animator 파라미터를 제어합니다.**
-
-적합한 용도: 특수 애니메이션 활성화, 캐릭터 애니메이션 A/B 테스트, 컷신 트리거.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "hero-animation"
-  Bool Parameter: "IsSpecialMode"
-  Enabled Trigger: "SpecialEnter"
-  Disabled Trigger: "SpecialExit"
-```
-
----
-
-### `GatrixFlagParticles`
-**플래그에 따라 ParticleSystem을 재생, 중지, 또는 일시정지합니다.**
-
-적합한 용도: 시즌 파티클 이펙트, 특수 VFX 활성화, 비주얼 피드백 A/B 테스트.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "snow-effect"
-  On Enabled: Play
-  On Disabled: Stop
-  With Children: true
-```
-
----
-
-### `GatrixFlagEvent`
-**플래그 변경 시 UnityEvent를 발생시킵니다.**
-
-적합한 용도: 커스텀 게임 로직 트리거, 기존 이벤트 시스템과 통합.
-
-> 📷 *이미지 추가예정*
-
-```
-Inspector:
-  Flag Name: "tutorial-mode"
-  On Enabled: [TutorialManager.StartTutorial()]
-  On Disabled: [TutorialManager.StopTutorial()]
-```
-
----
-
-### `GatrixEventListener`
-**SDK 라이프사이클 이벤트에 시각적으로 연결합니다.**
-
-적합한 용도: SDK 초기화 중 로딩 스피너 표시, 오류의 우아한 처리.
-
-![EventListener Inspector](doc/images/component-event-listener.png)
-
-```
-Inspector:
-  On Ready: [UIManager.HideLoadingScreen()]
-  On Error: [UIManager.ShowErrorBanner()]
-```
-
----
-
-### `GatrixFlagLogger`
-**플래그 변경을 Unity Console에 로깅합니다.**
-
-적합한 용도: 개발 중 플래그 동작 디버깅.
-
-> 📷 *이미지 추가예정*
-
----
-
-### `GatrixVariantSwitch`
-**배리언트 이름에 따라 다른 자식 GameObject를 활성화합니다.**
-
-적합한 용도: 다중 배리언트 UI 레이아웃, 게임 모드 전환.
-
-> 📷 *이미지 추가예정*
-
----
-
-### `GatrixFlagSceneRedirect`
-**플래그에 따라 다른 씬을 로드합니다.**
-
-적합한 용도: 온보딩 플로우 A/B 테스트, 시즌 이벤트 씬, 새로운 영역의 점진적 롤아웃.
-
-> 📷 *이미지 추가예정*
+## 🧩 제로 코드 컴포넌트 (Zero-Code Components)
+
+C# 코드 없이 Unity 씬 속성을 피처 플래그에 바인딩합니다.
+
+추가 방법: **우클릭 → Gatrix → UI / Logic / Debug / Visual / Audio / Rendering / AI / Environment...**
+
+![Context Menu - Gatrix Components](docs/images/context-menu-gatrix-ui.png)
+
+**제공 컴포넌트 카테고리:**
+
+| 카테고리 | 컴포넌트 |
+|---|---|
+| **Logic** | `GatrixFlagToggle`, `GatrixFlagEvent`, `GatrixEventListener`, `GatrixVariantSwitch`, `GatrixFlagSceneRedirect`, `GatrixFlagBehaviourEnabled` |
+| **UI** | `GatrixFlagValue`, `GatrixFlagImage`, `GatrixFlagColor`, `GatrixFlagCanvas`, `GatrixFlagSlider`, `GatrixFlagButtonInteractable`, `GatrixFlagInputField`, `GatrixFlagScrollRect` |
+| **Rendering** | `GatrixFlagMaterial`, `GatrixFlagTransform`, `GatrixFlagSpriteRenderer`, `GatrixFlagRendererToggle`, `GatrixFlagParticles`, `GatrixFlagQualitySettings`, `GatrixFlagShaderProperty`, `GatrixFlagTrailRenderer`, `GatrixFlagLineRenderer`, `GatrixFlagGlobalShader` |
+| **Audio** | `GatrixFlagAudio`, `GatrixFlagAnimator`, `GatrixFlagAudioMixer`, `GatrixFlagAudioSource` |
+| **Camera** | `GatrixFlagCamera` |
+| **Lighting** | `GatrixFlagLight` |
+| **Environment** | `GatrixFlagFog`, `GatrixFlagAmbientLight`, `GatrixFlagSkybox`, `GatrixFlagWindZone` |
+| **Physics** | `GatrixFlagRigidbody`, `GatrixFlagGravity`, `GatrixFlagCollider` |
+| **2D** | `GatrixFlagRigidbody2D`, `GatrixFlagSortingOrder`, `GatrixFlagTilemap`, `GatrixFlagPhysicsMaterial2D`, `GatrixFlagJoint2D`, `GatrixFlagEffector2D` |
+| **AI** | `GatrixFlagNavMeshAgent`, `GatrixFlagNavMeshObstacle`, `GatrixFlagAIAnimator`, `GatrixFlagDetectionRange` |
+| **Time** | `GatrixFlagTimeScale`, `GatrixFlagFrameRate` |
+| **Post FX** | `GatrixFlagPostProcessVolume` |
+| **Debug** | `GatrixFlagLogger` |
+
+> 📖 컴포넌트 상세 레퍼런스 — 플래그 값 타입, 각 모드별 설명, 활용 시나리오:  
+> **[docs/COMPONENTS.ko.md](docs/COMPONENTS.ko.md)**
 
 ---
 
 ## 🛠️ 에디터 도구
+
 
 ### 모니터 윈도우
 **Window → Gatrix → Monitor**
@@ -976,16 +373,16 @@ SDK 상태에 대한 실시간 대시보드:
 | **Stats** | 상세 카운터, 스트리밍 카운터, 플래그 접근 횟수, 배리언트 히트 횟수, 누락된 플래그, 이벤트 핸들러 누수 감지 |
 
 #### Overview 탭
-![Monitor Overview](doc/images/monitor-overview.png)
+![Monitor Overview](docs/images/monitor-overview.png)
 
 #### Flags 탭
-![Monitor Flags](doc/images/monitor-flags.png)
+![Monitor Flags](docs/images/monitor-flags.png)
 
 #### Events 탭
-![Monitor Events](doc/images/monitor-events.png)
+![Monitor Events](docs/images/monitor-events.png)
 
 #### Context 탭
-![Monitor Context](doc/images/monitor-context.png)
+![Monitor Context](docs/images/monitor-context.png)
 
 #### Metrics 탭
 **Metrics** 탭에는 에디터에서 직접 렌더링되는 인터랙티브 시계열 그래프가 포함됩니다:
@@ -998,10 +395,10 @@ SDK 상태에 대한 실시간 대시보드:
 - 시간 오프셋 슬라이더로 과거 데이터 스크롤
 - **Graph**와 **Report** 뷰를 원클릭으로 전환
 
-![Monitor Metrics](doc/images/monitor-metrics.png)
+![Monitor Metrics](docs/images/monitor-metrics.png)
 
 #### Stats 탭
-![Monitor Stats](doc/images/monitor-stats.png)
+![Monitor Stats](docs/images/monitor-stats.png)
 
 **툴바 빠른 동작:**
 - **⚡ Sync** — 명시적 동기화 모드에서 보류 중인 변경이 있을 때 표시
@@ -1017,7 +414,7 @@ SDK 상태에 대한 실시간 대시보드:
 
 최초 구성을 위한 가이드 설정. 사전 구성된 SDK Manager 프리팹을 생성합니다.
 
-![Setup Wizard](doc/images/setup-wizard.png)
+![Setup Wizard](docs/images/setup-wizard.png)
 
 ---
 
@@ -1026,7 +423,7 @@ SDK 상태에 대한 실시간 대시보드:
 
 SDK 버전, Unity 버전, 플랫폼 정보, 런타임 연결 상태를 확인할 수 있습니다.
 
-![About Window](doc/images/about-window.png)
+![About Window](docs/images/about-window.png)
 
 ---
 
@@ -1038,7 +435,7 @@ SDK 버전, Unity 버전, 플랫폼 정보, 런타임 연결 상태를 확인할
 - **Monitor ↗** — 모니터 윈도우로 바로 이동하는 빠른 접근 버튼
 - 명확한 레이블이 있는 정리된 그룹
 
-![Inspector - Feature Flags](doc/images/inspector-feature-flags.png)
+![Inspector - Feature Flags](docs/images/inspector-feature-flags.png)
 
 ---
 
