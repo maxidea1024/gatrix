@@ -15,20 +15,18 @@
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
 
-#include <atomic>
 #include "GatrixFeaturesClient.generated.h"
-
+#include <atomic>
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnSync);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnRecovered);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGatrixOnError, FString, Code,
-                                             FString, Message);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FGatrixOnImpression, FString,
-                                              FlagName, bool, bEnabled, FString,
-                                              VariantName, FString, EventType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnError, FGatrixErrorEvent,
+                                            Error);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnImpression,
+                                            FGatrixImpressionEvent, Event);
 
 /**
  * UGatrixFeaturesClient - Central client for feature flag management in Unreal
@@ -41,6 +39,14 @@ class GATRIXSDK_API UGatrixFeaturesClient : public UObject,
 
 public:
   UGatrixFeaturesClient();
+
+  /**
+   * Initialize the client with config, emitter, and storage.
+   * Called by UGatrixClient::Init() before Start().
+   */
+  void Initialize(const FGatrixClientConfig &Config,
+                  FGatrixEventEmitter *Emitter,
+                  TSharedPtr<IGatrixStorageProvider> Storage);
 
   /**
    * Start the client - initializes storage, bootstrap, and starts polling.
@@ -497,8 +503,8 @@ private:
   };
 
   mutable FCriticalSection MetricsCriticalSection;
-  TMap<FString, FFlagMetrics> MetricsFlagBucket;
-  TMap<FString, int32> MetricsMissingFlags;
+  mutable TMap<FString, FFlagMetrics> MetricsFlagBucket;
+  mutable TMap<FString, int32> MetricsMissingFlags;
   FDateTime MetricsBucketStartTime = FDateTime::UtcNow();
 
   // Polling timer

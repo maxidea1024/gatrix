@@ -859,7 +859,7 @@ void UGatrixFeaturesClient::EmitFlagChanges(
         OldFlag->Variant.Value != Pair.Value.Variant.Value) {
       FString ChangeType = OldFlag ? TEXT("updated") : TEXT("created");
       EventEmitter->Emit(GatrixEvents::FlagChange(Pair.Key),
-                         Pair.Value.Variant.Name, ChangeType);
+                         Pair.Value.Variant.Name + TEXT("|") + ChangeType);
     }
   }
 
