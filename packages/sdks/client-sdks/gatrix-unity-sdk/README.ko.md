@@ -1400,7 +1400,7 @@ SDK는 Unity의 단일 스레드 모델에 맞게 설계되었습니다:
 
 - **동기적 플래그 읽기** — `IsEnabled()`, `BoolVariation()` 등은 인메모리 캐시에서 읽습니다. 비동기 오버헤드 없음.
 - **메인 스레드 콜백** — 모든 이벤트 콜백과 플래그 변경 알림은 메인 스레드에서 호출됩니다.
-- **ValueTask** — 비동기 메서드는 동기 코드 경로에서 힙 할당 없는 `ValueTask`/`ValueTask<T>` 사용.
+- **UniTask** — 비동기 메서드는 제로 할당 및 Unity 통합을 위해 `UniTask`/`UniTask<T>`를 사용합니다.
 - **스레드 안전 메트릭** — 메트릭 버킷은 잠금 사용; 이벤트는 `SynchronizationContext`를 통해 디스패치.
 - **MainThreadDispatcher** — 백그라운드 작업 결과가 자동으로 메인 스레드로 전달됩니다.
 

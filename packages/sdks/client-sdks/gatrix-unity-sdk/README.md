@@ -1398,7 +1398,7 @@ The SDK is designed for Unity's single-threaded model:
 
 - **Synchronous flag reads** — `IsEnabled()`, `BoolVariation()` etc. read from an in-memory cache. Zero async overhead.
 - **Main thread callbacks** — All event callbacks and flag change notifications fire on the main thread.
-- **ValueTask** — Async methods use `ValueTask`/`ValueTask<T>` for zero heap allocation on synchronous code paths.
+- **UniTask** — Async methods use `UniTask`/`UniTask<T>` for zero allocation and Unity integration.
 - **Thread-safe metrics** — Metrics bucket uses locking; events are dispatched via `SynchronizationContext`.
 - **MainThreadDispatcher** — Background task results are automatically marshaled to the main thread.
 
