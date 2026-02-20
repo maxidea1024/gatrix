@@ -96,13 +96,13 @@ namespace Gatrix.Unity.SDK.Editor
                             var client = GatrixBehaviour.Client;
                             explicitSyncOff = client != null && !client.Features.IsExplicitSync();
                             // Try to get settings for ping
-                            var beh = FindObjectOfType<GatrixBehaviour>();
+                            var beh = FindFirstObjectByType<GatrixBehaviour>();
                             settingsToPin = beh != null ? beh.Settings : null;
                         }
                         else
                         {
                             // Edit mode: find the GatrixBehaviour in the scene and read its settings
-                            var behaviour = FindObjectOfType<GatrixBehaviour>();
+                            var behaviour = FindFirstObjectByType<GatrixBehaviour>();
                             if (behaviour != null && behaviour.Settings != null)
                             {
                                 explicitSyncOff = !behaviour.Settings.ExplicitSyncMode;

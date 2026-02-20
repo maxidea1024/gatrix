@@ -78,8 +78,37 @@ namespace Gatrix.Unity.SDK.Editor
                     EditorGUILayout.Space(10);
                     GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
                     EditorGUILayout.Space(4);
-                    if (GUILayout.Button("Open Setup Wizard", GUILayout.Height(28)))
-                        GatrixSetupWindow.ShowWindow();
+                    if (GUILayout.Button("Settings", GUILayout.Height(28)))
+                    {
+                        var behaviour = (GatrixBehaviour)target;
+                        var settings = behaviour.Settings;
+                        
+                        if (settings != null)
+                        {
+                            Selection.activeObject = settings;
+                            EditorGUIUtility.PingObject(settings);
+                        }
+                        else
+                        {
+                            // Try to find any GatrixSettings in the project if not assigned
+                            string[] guids = AssetDatabase.FindAssets("t:GatrixSettings");
+                            if (guids.Length > 0)
+                            {
+                                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                                settings = AssetDatabase.LoadAssetAtPath<GatrixSettings>(path);
+                            }
+
+                            if (settings != null)
+                            {
+                                Selection.activeObject = settings;
+                                EditorGUIUtility.PingObject(settings);
+                            }
+                            else
+                            {
+                                GatrixSetupWindow.ShowWindow();
+                            }
+                        }
+                    }
                 }
                 else
                 {
