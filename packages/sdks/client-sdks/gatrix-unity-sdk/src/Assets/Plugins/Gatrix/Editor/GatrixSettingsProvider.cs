@@ -101,7 +101,7 @@ namespace Gatrix.Unity.SDK.Editor
             var isPlaying = EditorApplication.isPlaying;
             var isInitialized = isPlaying && GatrixBehaviour.IsInitialized;
 
-            var statusColor = isInitialized ? "green" : isPlaying ? "yellow" : "gray";
+            var statusColor = isInitialized ? "#88ff88" : isPlaying ? "#ffcc66" : "#888888";
             var statusText = isInitialized
                 ? "Running"
                 : isPlaying

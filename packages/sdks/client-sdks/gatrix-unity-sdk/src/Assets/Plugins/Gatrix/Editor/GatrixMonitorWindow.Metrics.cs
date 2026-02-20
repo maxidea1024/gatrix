@@ -67,10 +67,10 @@ namespace Gatrix.Unity.SDK.Editor
             var stateColor = stats.StreamingState == StreamingConnectionState.Connected
                 ? "#88ff88"
                 : stats.StreamingState == StreamingConnectionState.Disconnected
-                    ? "gray"
+                    ? "#888888"
                     : stats.StreamingState == StreamingConnectionState.Degraded
                         ? "#ff8888"
-                        : "yellow";
+                        : "#ffcc66";
             DrawField("State", $"<color={stateColor}>● {stats.StreamingState}</color>", true);
             DrawField("Transport", stats.StreamingTransport.ToString());
             DrawField("Reconnect Attempts", stats.StreamingReconnectCount.ToString());
@@ -206,7 +206,7 @@ namespace Gatrix.Unity.SDK.Editor
             GatrixEditorStyle.BeginBox();
 
             DrawField("Metrics Sent", stats.MetricsSentCount.ToString());
-            var metricsErrColor = stats.MetricsErrorCount > 0 ? "#ff8888" : "white";
+            var metricsErrColor = stats.MetricsErrorCount > 0 ? "#ff8888" : "#dddddd";
             DrawField("Metrics Errors",
                 $"<color={metricsErrColor}>{stats.MetricsErrorCount}</color>", true);
 

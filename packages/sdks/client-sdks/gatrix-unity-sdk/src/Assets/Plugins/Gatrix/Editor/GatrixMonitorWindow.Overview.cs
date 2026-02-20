@@ -75,7 +75,7 @@ namespace Gatrix.Unity.SDK.Editor
             if (stats != null)
             {
                 var stateColor = stats.SdkState == SdkState.Healthy ? "#88ff88" :
-                                 stats.SdkState == SdkState.Error ? "#ff8888" : "white";
+                                 stats.SdkState == SdkState.Error ? "#ff8888" : "#dddddd";
                 DrawField("State", $"<color={stateColor}>{stats.SdkState}</color>", true);
                 DrawField("Offline Mode", client.Features.IsOfflineMode() ? "<color=#ffcc66>Yes</color>" : "No", true);
                 DrawField("Explicit Sync", _cachedExplicitSync ? "Yes" : "No");
