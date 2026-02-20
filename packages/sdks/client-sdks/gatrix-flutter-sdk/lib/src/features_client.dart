@@ -570,6 +570,16 @@ class FeaturesClient implements VariationProvider {
 
   bool isEnabled(String flagName, {bool forceRealtime = false}) =>
       isEnabledInternal(flagName, forceRealtime: forceRealtime);
+  /// Get raw flag data. Returns null if not found.
+  EvaluatedFlag? getFlag(String flagName, {bool forceRealtime = false}) {
+    final flag = _getFlag(flagName, forceRealtime: forceRealtime);
+    if (flag == null) {
+      _trackFlagAccess(flagName, null, 'getFlag');
+      return null;
+    }
+    _trackFlagAccess(flagName, flag, 'getFlag', flag.variant.name);
+    return flag;
+  }
   Variant getVariant(String flagName, {bool forceRealtime = false}) =>
       getVariantInternal(flagName, forceRealtime: forceRealtime);
   String variation(String flagName, String fallbackValue,

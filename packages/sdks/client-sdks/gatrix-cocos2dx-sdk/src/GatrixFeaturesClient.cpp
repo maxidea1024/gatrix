@@ -143,6 +143,11 @@ bool FeaturesClient::isEnabled(const std::string &flagName,
   return flag->enabled;
 }
 
+const EvaluatedFlag *FeaturesClient::getFlag(const std::string &flagName,
+                                             bool forceRealtime) {
+  return lookupFlag(flagName, "getFlag", forceRealtime);
+}
+
 Variant FeaturesClient::getVariant(const std::string &flagName,
                                    bool forceRealtime) {
   return getVariantInternal(flagName, forceRealtime);

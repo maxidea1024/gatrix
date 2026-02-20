@@ -662,6 +662,15 @@ class FeaturesClient:
     def is_enabled(self, flag_name: str, force_realtime: bool = False) -> bool:
         return self.is_enabled_internal(flag_name, force_realtime)
 
+    def get_flag(self, flag_name: str, force_realtime: bool = False) -> Optional[EvaluatedFlag]:
+        """Get raw flag data. Returns None if not found."""
+        flag = self._lookup_flag(flag_name, force_realtime)
+        if flag is None:
+            self._track_flag_access(flag_name, None, "getFlag")
+            return None
+        self._track_flag_access(flag_name, flag, "getFlag", flag.variant.name)
+        return flag
+
     def get_variant(self, flag_name: str, force_realtime: bool = False) -> Variant:
         """Never returns None – returns MISSING_VARIANT for missing flags."""
         return self.get_variant_internal(flag_name, force_realtime)

@@ -122,6 +122,18 @@ bool UGatrixFeaturesClient::IsEnabled(const FString &FlagName,
       FlagName, bForceRealtime);
 }
 
+FGatrixEvaluatedFlag UGatrixFeaturesClient::GetFlag(const FString &FlagName,
+                                                    bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
+  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  if (!Found) {
+    TrackAccess(FlagName, nullptr, TEXT("getFlag"), TEXT(""));
+    return FGatrixEvaluatedFlag();
+  }
+  TrackAccess(FlagName, Found, TEXT("getFlag"), Found->Variant.Name);
+  return *Found;
+}
+
 FGatrixVariant UGatrixFeaturesClient::GetVariant(const FString &FlagName,
                                                  bool bForceRealtime) const {
   return const_cast<UGatrixFeaturesClient *>(this)->GetVariantInternal(

@@ -233,6 +233,18 @@ namespace Gatrix.Unity.SDK
         bool IsEnabled(string flagName, bool forceRealtime = false);
 
         /// <summary>
+        /// Get a feature flag's raw evaluated data.
+        /// <para>
+        /// Returns the full <see cref="EvaluatedFlag"/> object, or <c>null</c> if the flag
+        /// does not exist in the cache. Unlike <see cref="FlagProxy"/>, this returns the
+        /// raw data without proxy indirection.
+        /// </para>
+        /// </summary>
+        /// <param name="flagName">The feature flag key (case-sensitive).</param>
+        /// <returns>The <see cref="EvaluatedFlag"/>, or <c>null</c> if not found.</returns>
+        EvaluatedFlag GetFlag(string flagName, bool forceRealtime = false);
+
+        /// <summary>
         /// Get the variant for a feature flag. Never returns <c>null</c>.
         /// <para>
         /// If the flag does not exist, returns a <see cref="Variant"/> with

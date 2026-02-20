@@ -412,7 +412,7 @@ export class FeaturesClient implements VariationProvider {
   private trackFlagAccess(
     flagName: string,
     flag: EvaluatedFlag | undefined,
-    eventType: 'isEnabled' | 'getVariant' | 'watch',
+    eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch',
     variantName?: string
   ): void {
     if (!flag) {
@@ -443,6 +443,16 @@ export class FeaturesClient implements VariationProvider {
 
   isEnabled(flagName: string, forceRealtime: boolean = false): boolean {
     return this.isEnabledInternal(flagName, forceRealtime);
+  }
+
+  getFlag(flagName: string, forceRealtime: boolean = false): EvaluatedFlag | undefined {
+    const flag = this.lookupFlag(flagName, forceRealtime);
+    if (!flag) {
+      this.trackFlagAccess(flagName, undefined, 'getFlag');
+      return undefined;
+    }
+    this.trackFlagAccess(flagName, flag, 'getFlag', flag.variant.name);
+    return flag;
   }
 
   getVariant(flagName: string, forceRealtime: boolean = false): Variant {
@@ -1574,7 +1584,7 @@ export class FeaturesClient implements VariationProvider {
     flagName: string,
     enabled: boolean,
     flag: EvaluatedFlag | undefined,
-    eventType: 'isEnabled' | 'getVariant' | 'watch',
+    eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch',
     variantName?: string
   ): void {
     // Only track if impressionDataAll is enabled or flag has impressionData set

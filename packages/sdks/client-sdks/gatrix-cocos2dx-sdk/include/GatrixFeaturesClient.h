@@ -33,6 +33,8 @@ public:
 
   // ==================== Flag Access - Basic ====================
   bool isEnabled(const std::string &flagName, bool forceRealtime = false);
+  const EvaluatedFlag *getFlag(const std::string &flagName,
+                               bool forceRealtime = false);
   Variant getVariant(const std::string &flagName, bool forceRealtime = false);
   std::vector<EvaluatedFlag> getAllFlags() const;
 
@@ -264,8 +266,7 @@ private:
   void invokeWatchCallbacks(
       std::map<std::string, std::vector<WatchCallback>> &callbackMap,
       const std::map<std::string, EvaluatedFlag> &oldFlags,
-      const std::map<std::string, EvaluatedFlag> &newFlags,
-      bool forceRealtime);
+      const std::map<std::string, EvaluatedFlag> &newFlags, bool forceRealtime);
 };
 
 // ==================== WatchFlagGroup ====================

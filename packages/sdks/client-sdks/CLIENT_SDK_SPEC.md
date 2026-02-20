@@ -640,6 +640,7 @@ class FeaturesClient implements VariationProvider {
   // regardless of `explicitSyncMode`. This is useful for displaying real-time
   // status in dashboards or debug UIs while keeping the main app synchronized.
   isEnabled(flagName: string, forceRealtime?: boolean): boolean;
+  getFlag(flagName: string, forceRealtime?: boolean): EvaluatedFlag | null; // Raw flag data (no FlagProxy), tracks metrics with event "getFlag"
   getVariant(flagName: string, forceRealtime?: boolean): Variant; // Never returns null/undefined
   getAllFlags(forceRealtime?: boolean): EvaluatedFlag[];
   hasFlag(flagName: string, forceRealtime?: boolean): boolean;
@@ -708,7 +709,7 @@ class FeaturesClient implements VariationProvider {
 
 ### Variation Metric Requirements
 
-Every flag access method (`isEnabled`, `variation`, `boolVariation`, etc.) MUST track the following metrics:
+Every flag access method (`isEnabled`, `getFlag`, `variation`, `boolVariation`, etc.) MUST track the following metrics:
 - **Impression**: If the flag being accessed has `impressionData` enabled, an impression event must be sent.
 - **Missing**: If the requested `flagName` does not exist in the SDK's local cache, a `missing` metric MUST be recorded (visible in `SdkStats.missingFlags`).
 - **Access Counts**: Successful flag evaluations should increment internal access counters (`flagEnabledCounts`, `flagVariantCounts`).
@@ -773,7 +774,7 @@ Understanding which methods can be called frequently is important for performanc
 
 **Safe for Hot Paths (call frequently):**
 
-- `isEnabled()`, `boolVariation()`, `stringVariation()`, `numberVariation()`, `jsonVariation()`
+- `isEnabled()`, `getFlag()`, `boolVariation()`, `stringVariation()`, `numberVariation()`, `jsonVariation()`
 - `*VariationDetails()`, `*VariationOrThrow()`
 - `getVariant()`, `getAllFlags()`, `getContext()`
 

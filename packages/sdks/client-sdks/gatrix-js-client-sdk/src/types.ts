@@ -66,7 +66,7 @@ export interface FlagsApiResponse {
  * Impression event data
  */
 export interface ImpressionEvent {
-  eventType: 'isEnabled' | 'getVariant' | 'watch';
+  eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch';
   eventId: string;
   context: GatrixContext;
   enabled: boolean;

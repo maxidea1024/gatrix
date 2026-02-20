@@ -55,6 +55,11 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   bool IsEnabled(const FString &FlagName, bool bForceRealtime = false) const;
 
+  /** Get raw flag data. Returns empty flag if not found (check Name field). */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
+  FGatrixEvaluatedFlag GetFlag(const FString &FlagName,
+                               bool bForceRealtime = false) const;
+
   /** Get variant for a flag */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
   FGatrixVariant GetVariant(const FString &FlagName,

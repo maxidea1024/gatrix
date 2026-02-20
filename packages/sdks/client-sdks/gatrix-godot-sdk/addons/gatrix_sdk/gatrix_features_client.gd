@@ -470,6 +470,16 @@ func is_enabled(flag_name: String, force_realtime: bool = false) -> bool:
 	return is_enabled_internal(flag_name, force_realtime)
 
 
+## Get raw flag data (returns null if not found)
+func get_flag(flag_name: String, force_realtime: bool = false) -> GatrixTypes.EvaluatedFlag:
+	var flag = _lookup_flag(flag_name, force_realtime)
+	if flag == null:
+		_track_flag_access(flag_name, null, "getFlag")
+		return null
+	_track_flag_access(flag_name, flag, "getFlag", flag.variant.name)
+	return flag
+
+
 func get_variant(flag_name: String, force_realtime: bool = false) -> GatrixTypes.Variant:
 	return get_variant_internal(flag_name, force_realtime)
 

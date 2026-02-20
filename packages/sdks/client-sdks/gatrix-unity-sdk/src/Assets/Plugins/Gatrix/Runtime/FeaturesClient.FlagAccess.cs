@@ -354,6 +354,19 @@ namespace Gatrix.Unity.SDK
         /// <summary>Check if a flag is enabled</summary>
         public bool IsEnabled(string flagName, bool forceRealtime = false) => IsEnabledInternal(flagName, forceRealtime);
 
+        /// <summary>Get raw flag data (returns null if not found)</summary>
+        public EvaluatedFlag GetFlag(string flagName, bool forceRealtime = false)
+        {
+            var flag = LookupFlag(flagName, forceRealtime);
+            if (flag == null)
+            {
+                TrackFlagAccess(flagName, null, "getFlag");
+                return null;
+            }
+            TrackFlagAccess(flagName, flag, "getFlag", flag.Variant?.Name);
+            return flag;
+        }
+
         /// <summary>Get variant (never returns null)</summary>
         public Variant GetVariant(string flagName, bool forceRealtime = false) => GetVariantInternal(flagName, forceRealtime);
 
