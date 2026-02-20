@@ -1,11 +1,11 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 // FlagProxy - Thin shell that delegates ALL logic to IGatrixVariationProvider.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixFlagProxy.generated.h"
 #include "GatrixTypes.h"
+#include "GatrixFlagProxy.generated.h"
 
 class IGatrixVariationProvider;
 

@@ -1,12 +1,12 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 // Interface for variation logic delegation
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GatrixTypes.h"
-#include "GatrixVariationProvider.generated.h"
 #include "UObject/Interface.h"
+#include "GatrixVariationProvider.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)

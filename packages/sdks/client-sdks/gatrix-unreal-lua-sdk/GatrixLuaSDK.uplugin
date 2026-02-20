@@ -24,6 +24,10 @@
     {
       "Name": "GatrixSDK",
       "Enabled": true
+    },
+    {
+      "Name": "LuaScript",
+      "Enabled": true
     }
   ]
 }
