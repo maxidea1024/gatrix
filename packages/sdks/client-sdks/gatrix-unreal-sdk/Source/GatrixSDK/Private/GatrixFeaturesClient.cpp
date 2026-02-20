@@ -23,6 +23,10 @@
 const FString UGatrixFeaturesClient::StorageKeyFlags = TEXT("gatrix_flags");
 const FString UGatrixFeaturesClient::StorageKeyEtag = TEXT("gatrix_etag");
 
+// ==================== Constructor ====================
+
+UGatrixFeaturesClient::UGatrixFeaturesClient() {}
+
 // ==================== Initialization ====================
 
 void UGatrixFeaturesClient::Initialize(
@@ -168,6 +172,11 @@ TArray<FGatrixEvaluatedFlag> UGatrixFeaturesClient::GetAllFlags() const {
   TArray<FGatrixEvaluatedFlag> Result;
   Flags.GenerateValueArray(Result);
   return Result;
+}
+
+bool UGatrixFeaturesClient::HasFlag(const FString &FlagName) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+  return Flags.Contains(FlagName);
 }
 
 // ==================== Variation Methods ====================
