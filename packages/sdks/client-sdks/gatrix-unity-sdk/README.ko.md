@@ -201,7 +201,7 @@ Gatrix는 **원격 평가** 방식만을 사용합니다 — 타게팅 규칙과
 > 🌐 **오프라인 & 가용성:** SDK는 서버에 연결할 수 없을 때 항상 로컬 캐시에서 값을 제공합니다. fallbackValue로 네트워크 문제로 인한 게임 중단은 절대 발생하지 않습니다.
 
 > 📖 전체 상세 내용 — 값 리졸루션 흐름, 예약 배리언트 이름(`$missing`, `$env-default-enabled` ...), `fallbackValue` 설계 이유:  
-> **[docs/EVALUATION_MODEL.ko.md](docs/EVALUATION_MODEL.ko.md)**
+> **[→ 평가 모델 자세히 보기](docs/EVALUATION_MODEL.ko.md)**
 ---
 
 
@@ -323,7 +323,7 @@ await features.SyncFlagsAsync();
 ```
 
 > 📖 전체 Watch API 레퍼런스 — `FlagProxy` 속성, API 표, Watch 그룹, `forceRealtime`, 실전 동기화 시나리오:  
-> **[docs/WATCH_API.ko.md](docs/WATCH_API.ko.md)**
+> **[→ Watch API 자세히 보기](docs/WATCH_API.ko.md)**
 
 ---
 
@@ -354,7 +354,7 @@ C# 코드 없이 Unity 씬 속성을 피처 플래그에 바인딩합니다.
 | **Debug** | [`GatrixFlagLogger`](docs/COMPONENTS.ko.md#gatrixflaglogger) |
 
 > 📖 컴포넌트 상세 레퍼런스 — 플래그 값 타입, 각 모드별 설명, 활용 시나리오:  
-> **[docs/COMPONENTS.ko.md](docs/COMPONENTS.ko.md)**
+> **[→ 컴포넌트 레퍼런스 자세히 보기](docs/COMPONENTS.ko.md)**
 
 ---
 
@@ -678,7 +678,7 @@ client.Events.OnAny((eventName, args) => Debug.Log($"[Gatrix] {eventName}"));
 SDK는 세 가지 운영 모드를 지원합니다. 기본값은 **스트리밍 + 폴링 하이브리드** — 스트리밍이 실시간 변경을 전달하고, 폴링은 안전망(fallback)으로 동작합니다. 폴링은 **ETag 기반 HTTP 캐싱**을 사용하므로, 데이터 변경이 없는 폴링은 대역폭을 거의 소모하지 않습니다.
 
 > 📖 심화 내용 — 폴링 주기, ETag 동작, 스트리밍 전송 방식, 하이브리드 장애 시나리오, 설정 레퍼런스:  
-> **[docs/OPERATING_MODES.ko.md](docs/OPERATING_MODES.ko.md)**
+> **[→ 폴링 / 스트리밍 / 하이브리드 자세히 보기](docs/OPERATING_MODES.ko.md)**
 
 
 

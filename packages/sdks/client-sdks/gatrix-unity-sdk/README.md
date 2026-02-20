@@ -200,7 +200,7 @@ Gatrix uses **remote evaluation** exclusively — targeting rules and rollout lo
 > 🌐 **Offline & Availability:** The SDK always serves from local cache if the server is unreachable. Fallback values ensure the game never crashes due to connectivity issues.
 
 > 📖 Full details — value resolution flow, reserved variant names (`$missing`, `$env-default-enabled`, …), and `fallbackValue` rationale:  
-> **[docs/EVALUATION_MODEL.md](docs/EVALUATION_MODEL.md)**
+> **[→ Evaluation Model 자세히 보기](docs/EVALUATION_MODEL.md)**
 ---
 
 
@@ -322,7 +322,7 @@ await features.SyncFlagsAsync();
 ```
 
 > 📖 Full Watch API reference — `FlagProxy` properties, `FlagProxy` API table, Watch Groups, `forceRealtime`, and real-world sync scenarios:  
-> **[docs/WATCH_API.md](docs/WATCH_API.md)**
+> **[→ Watch API 자세히 보기](docs/WATCH_API.md)**
 ---
 
 ## 🧩 Zero-Code Components
@@ -352,7 +352,7 @@ Add via: **Right-click → Gatrix → UI / Logic / Debug / Visual / Audio / Rend
 | **Debug** | [`GatrixFlagLogger`](docs/COMPONENTS.md#gatrixflaglogger) |
 
 > 📖 Detailed component reference — flag value types, all modes, use cases & A/B test scenarios:  
-> **[docs/COMPONENTS.md](docs/COMPONENTS.md)**
+> **[→ Component Reference 자세히 보기](docs/COMPONENTS.md)**
 ---
 
 ## 🛠️ Editor Tools
@@ -674,7 +674,7 @@ client.Events.OnAny((eventName, args) => Debug.Log($"[Gatrix] {eventName}"));
 The SDK supports three operating modes. By default, Gatrix uses a **Streaming + Polling hybrid** — streaming delivers flag changes in real time, while polling acts as a safety fallback. Polling uses **ETag-based HTTP caching**, so polls that find no changes consume near-zero bandwidth.
 
 > 📖 Deep dive — polling intervals, ETag behaviour, streaming transports, hybrid failure scenarios, and configuration reference:  
-> **[docs/OPERATING_MODES.md](docs/OPERATING_MODES.md)**
+> **[→ Polling / Streaming / Hybrid 자세히 보기](docs/OPERATING_MODES.md)**
 
 
 
