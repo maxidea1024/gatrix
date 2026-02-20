@@ -305,23 +305,14 @@ namespace Gatrix.Unity.SDK.Editor
             GUILayout.Space(8);
             EditorGUILayout.BeginVertical();
 
-            // Edit mode banner (shown in Overview tab only)
-            if (!EditorApplication.isPlaying && _currentTab == Tab.Overview)
+            // Show a subtle banner in Edit Mode so the user knows data is from cache
+            if (!EditorApplication.isPlaying && GatrixBehaviour.Client != null)
+            {
+                DrawEditModeCacheBanner();
+            }
+            else if (!EditorApplication.isPlaying)
             {
                 DrawEditModeScreen();
-            }
-
-            if (!EditorApplication.isPlaying && _currentTab != Tab.Overview)
-            {
-                // Show hint that data comes from play mode
-                if (!GatrixBehaviour.IsInitialized)
-                {
-                    EditorGUILayout.HelpBox(
-                        "SDK is not active. Start Play Mode to collect live data. " +
-                        "Cached data from the previous session (if any) is shown below.",
-                        MessageType.Info);
-                    EditorGUILayout.Space(4);
-                }
             }
 
             if (EditorApplication.isPlaying && !GatrixBehaviour.IsInitialized)
@@ -331,15 +322,12 @@ namespace Gatrix.Unity.SDK.Editor
 
             switch (_currentTab)
             {
-                case Tab.Overview:
-                    if (EditorApplication.isPlaying)
-                        DrawOverview();
-                    break;
-                case Tab.Flags: DrawFlags(); break;
-                case Tab.Events: DrawEventsTab(); break;
-                case Tab.Context: DrawContextTab(); break;
-                case Tab.Metrics: DrawMetricsTab(); break;
-                case Tab.Statistics: DrawStatistics(); break;
+                case Tab.Overview:    DrawOverview();     break;
+                case Tab.Flags:       DrawFlags();        break;
+                case Tab.Events:      DrawEventsTab();    break;
+                case Tab.Context:     DrawContextTab();   break;
+                case Tab.Metrics:     DrawMetricsTab();   break;
+                case Tab.Statistics:  DrawStatistics();   break;
             }
 
             EditorGUILayout.EndVertical();
@@ -427,6 +415,40 @@ namespace Gatrix.Unity.SDK.Editor
             }
 
             EditorGUILayout.Space(2);
+        }
+
+        /// <summary>
+        /// Thin info bar shown at the top of the Monitor in Edit Mode when
+        /// cached flag data is available via GatrixEditorClient.
+        /// </summary>
+        private void DrawEditModeCacheBanner()
+        {
+            var rect = GUILayoutUtility.GetRect(0, 22, GUILayout.ExpandWidth(true));
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(rect, new Color(0.15f, 0.35f, 0.55f, 0.30f));
+            }
+
+            var style = new GUIStyle(EditorStyles.miniLabel)
+            {
+                richText = true,
+                normal = { textColor = EditorGUIUtility.isProSkin
+                    ? new Color(0.65f, 0.80f, 1.00f)
+                    : new Color(0.10f, 0.30f, 0.60f) }
+            };
+
+            var btnRect  = new Rect(rect.xMax - 64, rect.y + 2, 60, 18);
+            var labelRect = new Rect(rect.x + 6, rect.y, rect.width - 70, rect.height);
+
+            GUI.Label(labelRect, "\u25a3  Edit Mode \u2014 showing cached flag data (last Play Mode session)", style);
+
+            if (GUI.Button(btnRect, "Refresh", EditorStyles.miniButton))
+            {
+                GatrixEditorClient.Refresh();
+                RefreshData();
+                Repaint();
+            }
         }
 
         private void DrawEditModeScreen()
@@ -937,8 +959,12 @@ namespace Gatrix.Unity.SDK.Editor
 
             _cachedFlags = newFlags;
 
-            // Collect time-series data points (1 sample per RefreshInterval)
-            CollectTimeSeriesData(_cachedStats);
+            // Only collect time-series data during Play Mode so the graph doesn't
+            // keep growing (and time doesn't appear to advance) in Edit Mode.
+            if (EditorApplication.isPlaying)
+            {
+                CollectTimeSeriesData(_cachedStats);
+            }
         }
 
         // ==================== Event Listening ====================

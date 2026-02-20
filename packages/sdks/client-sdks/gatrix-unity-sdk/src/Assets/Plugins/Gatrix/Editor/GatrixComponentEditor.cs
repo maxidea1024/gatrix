@@ -174,9 +174,6 @@ namespace Gatrix.Unity.SDK.Editor
         /// </summary>
         private void DrawLiveFlagStatus()
         {
-            if (!Application.isPlaying || !GatrixBehaviour.IsInitialized)
-                return;
-
             EditorGUILayout.Space(8);
             GatrixEditorStyle.DrawSectionHeader("Flag Status", GatrixEditorStyle.AccentTeal);
 
@@ -187,28 +184,36 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
+            // GatrixBehaviour.Client returns the offline editor client in Edit Mode
+            // and the live runtime client in Play Mode — no special-casing needed here.
             var client = GatrixBehaviour.Client;
-            if (client == null) return;
+            if (client == null)
+            {
+                GatrixEditorStyle.DrawHelpBox(
+                    "No cached data. Assign GatrixSettings to a GatrixBehaviour and run the game once.",
+                    MessageType.Info);
+                return;
+            }
 
             var features = client.Features;
-            bool isRealtime = _useProp != null && _useProp.boolValue;
-            bool isExplicitSync = features.IsExplicitSync();
 
-            if (isRealtime)
+            if (Application.isPlaying && GatrixBehaviour.IsInitialized)
             {
-                // Realtime mode: show current realtime flag
-                DrawFlagStatusForMode(features, flagName, true, "Realtime");
+                // Play Mode: show realtime / synced distinction
+                bool isRealtime = _useProp != null && _useProp.boolValue;
+                bool isExplicitSync = features.IsExplicitSync();
+
+                if (isRealtime)
+                    DrawFlagStatusForMode(features, flagName, true, "Realtime");
+                else
+                    DrawSyncedFlagStatus(features, flagName, isExplicitSync);
+
+                Repaint();
             }
             else
             {
-                // Synced mode
-                DrawSyncedFlagStatus(features, flagName, isExplicitSync);
-            }
-
-            // Repaint during play mode to keep the status updated
-            if (Application.isPlaying)
-            {
-                Repaint();
+                // Edit Mode: GatrixEditorClient loaded cached flags — just display them
+                DrawFlagStatusForMode(features, flagName, false, "Cached");
             }
         }
 
@@ -284,15 +289,8 @@ namespace Gatrix.Unity.SDK.Editor
             GUI.Label(new Rect(rect.x + 4, rect.y, rect.width - 8, rect.height), text, style);
         }
 
-        /// <summary>
-        /// Draws flag info for a specific mode (realtime or synced).
-        /// Renders a monitor-style mini table with State, Variant, Type, Value, and Revision.
-        /// Uses GetAllFlags() to avoid triggering metrics tracking.
-        /// </summary>
         private static void DrawFlagStatusForMode(IFeaturesClient client, string flagName, bool forceRealtime, string label)
         {
-            bool isDark = EditorGUIUtility.isProSkin;
-
             // Use GetFlagRaw() which does NOT trigger metrics tracking (unlike GetFlag/IsEnabled/GetVariant)
             EvaluatedFlag evaluatedFlag = client.GetFlagRaw(flagName, forceRealtime);
 
@@ -302,6 +300,17 @@ namespace Gatrix.Unity.SDK.Editor
                     $"[{label}] Flag \"{flagName}\" not found in cache.", MessageType.Warning);
                 return;
             }
+
+            DrawFlagStatusForEvaluatedFlag(evaluatedFlag, label);
+        }
+
+        /// <summary>
+        /// Renders the flag status mini table for a given EvaluatedFlag.
+        /// Shared by both the live (Play Mode) and cached (Edit Mode) paths.
+        /// </summary>
+        private static void DrawFlagStatusForEvaluatedFlag(EvaluatedFlag evaluatedFlag, string label)
+        {
+            bool isDark = EditorGUIUtility.isProSkin;
 
             // Label row
             var labelRect = EditorGUILayout.GetControlRect(false, 16);
@@ -318,20 +327,10 @@ namespace Gatrix.Unity.SDK.Editor
             // Flag info rows inside a box
             GatrixEditorStyle.BeginBox();
 
-            // Row 1: State (ON/OFF badge)
-            DrawFlagInfoRow("State", null, isDark, evaluatedFlag);
-
-            // Row 2: Variant
+            DrawFlagInfoRow("State",   null, isDark, evaluatedFlag);
             DrawFlagInfoRow("Variant", evaluatedFlag.Variant?.Name ?? "-", isDark);
-
-            // Row 3: Type
-            DrawFlagInfoRow("Type", ValueTypeHelper.ToApiString(evaluatedFlag.ValueType), isDark);
-
-            // Row 4: Value
-            string valueStr = FormatValue(evaluatedFlag.Variant?.Value);
-            DrawFlagInfoRow("Value", valueStr, isDark);
-
-            // Row 5: Revision
+            DrawFlagInfoRow("Type",    ValueTypeHelper.ToApiString(evaluatedFlag.ValueType), isDark);
+            DrawFlagInfoRow("Value",   FormatValue(evaluatedFlag.Variant?.Value), isDark);
             DrawFlagInfoRow("Revision", evaluatedFlag.Version.ToString(), isDark);
 
             GatrixEditorStyle.EndBox();

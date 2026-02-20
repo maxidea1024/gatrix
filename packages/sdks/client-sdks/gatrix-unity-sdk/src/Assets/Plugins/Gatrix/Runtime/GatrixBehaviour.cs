@@ -75,7 +75,19 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>Get the active GatrixClient instance</summary>
-        public static GatrixClient Client => _client;
+        public static GatrixClient Client
+        {
+            get
+            {
+#if UNITY_EDITOR
+                // In Edit Mode, return the offline editor client (populated from local cache).
+                // In Play Mode, return the regular runtime client.
+                if (!Application.isPlaying)
+                    return Gatrix.Unity.SDK.Editor.GatrixEditorClient.Client;
+#endif
+                return _client;
+            }
+        }
 
         /// <summary>Check if SDK is initialized</summary>
         public static bool IsInitialized => _client != null && _client.IsStarted;
