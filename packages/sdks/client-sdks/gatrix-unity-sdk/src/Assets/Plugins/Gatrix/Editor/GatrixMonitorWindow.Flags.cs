@@ -45,8 +45,8 @@ namespace Gatrix.Unity.SDK.Editor
 
             var filter = _flagSearchFilter?.ToLowerInvariant() ?? "";
 
-            // Explicit sync mode: show two sections
-            if (_cachedExplicitSync)
+            // Explicit sync mode is only relevant during Play Mode
+            if (Application.isPlaying && _cachedExplicitSync)
             {
                 DrawExplicitSyncView(filter);
             }
