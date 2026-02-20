@@ -235,8 +235,9 @@ namespace Gatrix.Unity.SDK.Editor
 
         private void OnEditorUpdate()
         {
-            // Auto-start listening when SDK becomes available
-            if (!_isListening && GatrixBehaviour.IsInitialized)
+            // Subscribe as soon as the client exists (before IsStarted) so we
+            // capture startup events like flags.ready that fire during StartAsync().
+            if (!_isListening && GatrixBehaviour.Client != null)
             {
                 StartListening();
             }
