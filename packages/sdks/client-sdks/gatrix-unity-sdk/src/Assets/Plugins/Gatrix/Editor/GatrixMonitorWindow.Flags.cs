@@ -85,17 +85,28 @@ namespace Gatrix.Unity.SDK.Editor
             GatrixEditorStyle.DrawSection("Synchronized Flags (Active)");
             DrawFlagTable(_cachedFlags, filter);
 
-            // Realtime flags section (pending)
+            // Realtime flags section (pending): highlight rows that differ from synchronized
             if (_cachedRealtimeFlags != null && _cachedPendingSync)
             {
                 GatrixEditorStyle.DrawSection("Realtime Flags (Pending Sync)");
-                DrawFlagTable(_cachedRealtimeFlags, filter);
+                DrawFlagTable(_cachedRealtimeFlags, filter, _cachedFlags);
             }
         }
 
-        private void DrawFlagTable(List<EvaluatedFlag> flags, string filter)
+        /// <param name="compareWith">If provided, rows that differ from this list are highlighted persistently.</param>
+        private void DrawFlagTable(List<EvaluatedFlag> flags, string filter,
+            List<EvaluatedFlag> compareWith = null)
         {
             bool isDark = EditorGUIUtility.isProSkin;
+
+            // Build a lookup from the comparison list for O(1) access
+            Dictionary<string, EvaluatedFlag> compareMap = null;
+            if (compareWith != null)
+            {
+                compareMap = new Dictionary<string, EvaluatedFlag>(compareWith.Count);
+                foreach (var f in compareWith)
+                    compareMap[f.Name] = f;
+            }
 
             // Column layout: State | Name | Variant | Type | Value | Rev (same as Inspector)
             const float stateX = 4;
@@ -173,7 +184,26 @@ namespace Gatrix.Unity.SDK.Editor
 
                 if (Event.current.type == EventType.Repaint)
                 {
-                    if (showHighlight)
+                    // Persistent diff highlight: row differs from synchronized value
+                    bool isDiff = false;
+                    if (compareMap != null && compareMap.TryGetValue(flag.Name, out var syncFlag))
+                    {
+                        isDiff = syncFlag.Enabled != flag.Enabled ||
+                                 syncFlag.Variant?.Name != flag.Variant?.Name ||
+                                 !Equals(syncFlag.Variant?.Value, flag.Variant?.Value);
+                    }
+
+                    if (isDiff)
+                    {
+                        // Persistent amber row — value pending sync
+                        EditorGUI.DrawRect(rowRect, isDark
+                            ? new Color(0.75f, 0.45f, 0.05f, 0.25f)
+                            : new Color(0.90f, 0.60f, 0.10f, 0.20f));
+                        // Left accent bar
+                        EditorGUI.DrawRect(new Rect(rowRect.x, rowRect.y, 3, rowRect.height),
+                            new Color(1f, 0.65f, 0.10f, 0.9f));
+                    }
+                    else if (showHighlight)
                     {
                         float alpha = Mathf.Lerp(0.35f, 0f, elapsed / HighlightDuration);
                         EditorGUI.DrawRect(rowRect, new Color(1f, 0.85f, 0f, alpha));
