@@ -3,7 +3,6 @@
 
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Gatrix.Unity.SDK
 {
@@ -29,8 +28,6 @@ namespace Gatrix.Unity.SDK
         [SerializeField] protected string _flagName;
 
         [Tooltip("Realtime: update immediately on server changes. Synced: update only on explicit sync.")]
-        [FormerlySerializedAs("_useRealtime")]
-        [FormerlySerializedAs("_use")]
         [SerializeField] protected FlagSyncMode _flagSyncMode = FlagSyncMode.Realtime;
 
         protected Action _unwatch;
