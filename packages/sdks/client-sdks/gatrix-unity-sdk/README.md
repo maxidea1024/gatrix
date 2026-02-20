@@ -163,10 +163,12 @@ When something goes wrong in production — a crash-causing feature, an exploit,
 - **Gradual re-enable** — roll out to 1% → 10% → 50% → 100% after the fix is verified
 
 #### 🛡️ SafeGuard (Automated Circuit Breaker)
-You're not always awake to press the kill switch. **Gatrix SafeGuard** connects to your monitoring tools (Datadog, Prometheus, Sentry):
+You're not always awake to monitor a release. **Gatrix SafeGuard** collects its own **Impact Metrics** (crash counts, error rates, custom KPIs) directly within the platform — no external tools required:
 
-- **Auto-Disable**: If the crash rate or error count spikes above a threshold after a release, SafeGuard **automatically disables** the flag.
-- **Sleep Soundly**: Let SafeGuard watch your release while you sleep.
+- **Auto-Disable**: If a metric crosses the defined threshold after a release, SafeGuard **automatically disables** the flag — before the problem spreads.
+- **Release Flow Pause**: SafeGuard can also **pause a Release Flow milestone**, stopping the gradual rollout until you review and resume manually.
+- **Sleep Soundly**: No need to stare at dashboards — SafeGuard watches the rollout for you.
+
 
 ### 🤔 When you might NOT need Gatrix
 
