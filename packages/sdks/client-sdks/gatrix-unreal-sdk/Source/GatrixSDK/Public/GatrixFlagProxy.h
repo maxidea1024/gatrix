@@ -95,9 +95,7 @@ public:
             Category = "Gatrix|FlagProxy|Variation")
   float FloatVariation(float FallbackValue) const;
 
-  /** Get double variation from value */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  /** Get double variation (C++ only - Blueprint does not support double) */
   double DoubleVariation(double FallbackValue) const;
 
   /** Get JSON variation as string */
@@ -124,8 +122,8 @@ public:
             Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult FloatVariationDetails(float FallbackValue) const;
 
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  /** Get double variation with details (C++ only - Blueprint does not support
+   * double) */
   FGatrixVariationResult DoubleVariationDetails(double FallbackValue) const;
 
   UFUNCTION(BlueprintCallable, BlueprintPure,
@@ -147,7 +145,7 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
   int32 IntVariationOrThrow();
 
-  UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")
+  /** C++ only - Blueprint does not support double */
   double DoubleVariationOrThrow();
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|FlagProxy|Variation")

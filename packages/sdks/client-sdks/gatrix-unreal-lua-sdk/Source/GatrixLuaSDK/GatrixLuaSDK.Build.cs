@@ -14,7 +14,7 @@ public class GatrixLuaSDK : ModuleRules
             "CoreUObject",
             "Engine",
             "GatrixSDK",
-            "Lua"
+            "LuaJIT"
         });
     }
 }

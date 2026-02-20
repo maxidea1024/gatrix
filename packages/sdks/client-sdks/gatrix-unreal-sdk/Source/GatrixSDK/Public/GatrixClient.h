@@ -1,14 +1,14 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 // Main client for Gatrix Unreal SDK
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixClient.generated.h"
 #include "GatrixEventEmitter.h"
 #include "GatrixFeaturesClient.h"
 #include "GatrixStorageProvider.h"
 #include "GatrixTypes.h"
+#include "GatrixClient.generated.h"
 
 /**
  * Main Gatrix SDK client.
@@ -88,8 +88,7 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Quick")
   float FloatVariation(const FString &FlagName, float DefaultValue) const;
 
-  /** Get double variation (convenience) */
-  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Quick")
+  /** Get double variation (C++ only - Blueprint does not support double) */
   double DoubleVariation(const FString &FlagName, double DefaultValue) const;
 
   /** Get variant (convenience) */

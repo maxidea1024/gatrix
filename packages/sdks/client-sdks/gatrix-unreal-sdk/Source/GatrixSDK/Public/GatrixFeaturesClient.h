@@ -1,10 +1,9 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GatrixEventEmitter.h"
-#include "GatrixFeaturesClient.generated.h"
 #include "GatrixFlagProxy.h"
 #include "GatrixSseConnection.h"
 #include "GatrixTypes.h"
@@ -15,6 +14,8 @@
 #include "Runtime/Engine/Public/TimerManager.h"
 
 #include <atomic>
+#include "GatrixFeaturesClient.generated.h"
+
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
@@ -110,9 +111,7 @@ public:
   float FloatVariation(const FString &FlagName, float FallbackValue,
                        bool bForceRealtime = false) const;
 
-  /** Get double variation */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
+  /** Get double variation (C++ only - Blueprint does not support double) */
   double DoubleVariation(const FString &FlagName, double FallbackValue,
                          bool bForceRealtime = false) const;
 
@@ -152,9 +151,8 @@ public:
   FloatVariationDetails(const FString &FlagName, float FallbackValue,
                         bool bForceRealtime = false) const;
 
-  /** Get double variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
+  /** Get double variation with details (C++ only - Blueprint does not support
+   * double) */
   FGatrixVariationResult
   DoubleVariationDetails(const FString &FlagName, double FallbackValue,
                          bool bForceRealtime = false) const;
@@ -184,7 +182,7 @@ public:
   int32 IntVariationOrThrow(const FString &FlagName,
                             bool bForceRealtime = false);
 
-  UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
+  /** C++ only - Blueprint does not support double */
   double DoubleVariationOrThrow(const FString &FlagName,
                                 bool bForceRealtime = false);
 
@@ -506,7 +504,7 @@ private:
   // Connection ID
   FString ConnectionId;
 
-  // Watch callbacks — direct callback management (not via emitter)
+  // Watch callbacks ??direct callback management (not via emitter)
   struct FWatchCallbackEntry {
     FString FlagName;
     FGatrixFlagWatchDelegate Callback;
