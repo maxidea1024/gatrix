@@ -88,6 +88,25 @@ namespace Gatrix.Unity.SDK.Editor
             // Guard against null tracks (domain reload edge case)
             if (_tsFetchDelta == null) return;
 
+            // In Edit Mode, freeze the graph at the last recorded data point so the
+            // time window doesn't scroll forward as EditorApplication.timeSinceStartup grows.
+            float? frozenNow = null;
+            if (!EditorApplication.isPlaying)
+            {
+                float latest = 0f;
+                foreach (var track in new[] { _tsFetchDelta, _tsUpdateDelta, _tsErrorDelta,
+                                              _tsImpressionDelta, _tsMetricsSentDelta,
+                                              _tsFlagEnabled, _tsFlagDisabled, _tsFlagMissing })
+                {
+                    if (track != null && track.Points.Count > 0)
+                    {
+                        float t = track.Points[track.Points.Count - 1].Time;
+                        if (t > latest) latest = t;
+                    }
+                }
+                if (latest > 0f) frozenNow = latest;
+            }
+
             // -- Controls: Live button + time offset slider --
             float maxOffset = MetricsRetentionSec - 30f; // at least 30s visible
             EditorGUILayout.BeginHorizontal();
@@ -98,10 +117,10 @@ namespace Gatrix.Unity.SDK.Editor
                     normal = { textColor = isDark ? new Color(0.55f, 0.58f, 0.63f) : new Color(0.42f, 0.45f, 0.50f) }
                 };
 
-                // "Live" button
+                // "Live" button (disabled in Edit Mode — data is frozen)
                 bool isLive = _metricsTimeOffset < 0.5f;
                 var liveColor = GUI.backgroundColor;
-                if (isLive) GUI.backgroundColor = new Color(0.3f, 0.8f, 0.4f, 0.6f);
+                if (isLive && EditorApplication.isPlaying) GUI.backgroundColor = new Color(0.3f, 0.8f, 0.4f, 0.6f);
                 if (GUILayout.Button(isLive ? "\u25cf Live" : "\u25b6 Live", GUILayout.Width(52), GUILayout.Height(16)))
                 {
                     _metricsTimeOffset = 0f;
@@ -123,14 +142,14 @@ namespace Gatrix.Unity.SDK.Editor
             GatrixEditorStyle.DrawSection("Network Activity", "Events per second");
             var networkTracks = new List<TimeSeriesTrack> { _tsFetchDelta, _tsUpdateDelta, _tsErrorDelta };
             TimeSeriesGraphRenderer.DrawGraph(networkTracks,
-                chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
+                chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset, frozenNow: frozenNow);
             EditorGUILayout.Space(4);
 
             // Impressions & Metrics graph
             GatrixEditorStyle.DrawSection("Impressions & Metrics Delivery", "Events per second");
             var impressionTracks = new List<TimeSeriesTrack> { _tsImpressionDelta, _tsMetricsSentDelta };
             TimeSeriesGraphRenderer.DrawGraph(impressionTracks,
-                chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
+                chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset, frozenNow: frozenNow);
             EditorGUILayout.Space(4);
 
             // Reconnect graph (shown only if there have been reconnects)
@@ -139,7 +158,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.DrawSection("Stream Reconnections");
                 var reconnectTracks = new List<TimeSeriesTrack> { _tsStreamReconnectDelta };
                 TimeSeriesGraphRenderer.DrawGraph(reconnectTracks,
-                    chartHeight: 50f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
+                    chartHeight: 50f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset, frozenNow: frozenNow);
                 EditorGUILayout.Space(4);
             }
 
@@ -149,7 +168,7 @@ namespace Gatrix.Unity.SDK.Editor
                 GatrixEditorStyle.DrawSection("Flag State Counts", "Number of flags per state");
                 var flagStateTracks = new List<TimeSeriesTrack> { _tsFlagEnabled, _tsFlagDisabled, _tsFlagMissing };
                 TimeSeriesGraphRenderer.DrawGraph(flagStateTracks,
-                    chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset);
+                    chartHeight: 60f, pixelsPerSec: pps, timeOffset: _metricsTimeOffset, frozenNow: frozenNow);
                 EditorGUILayout.Space(4);
             }
 

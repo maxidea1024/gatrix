@@ -85,7 +85,8 @@ namespace Gatrix.Unity.SDK.Editor
             List<TimeSeriesTrack> tracks,
             float chartHeight = 60f,
             float pixelsPerSec = 3f,
-            float timeOffset = 0f)
+            float timeOffset = 0f,
+            float? frozenNow = null)
         {
             bool isDark = EditorGUIUtility.isProSkin;
             float totalHeight = chartHeight + BottomPadding + TopPadding;
@@ -108,10 +109,11 @@ namespace Gatrix.Unity.SDK.Editor
             float timeWindowSec = chart.width / pixelsPerSec;
 
             // Time range
-            float now = (float)EditorApplication.timeSinceStartup - timeOffset;
+            // In Edit Mode pass frozenNow so the graph doesn't scroll while time advances.
+            float realNow   = frozenNow ?? (float)EditorApplication.timeSinceStartup;
+            float now       = realNow - timeOffset;
             float timeStart = now - timeWindowSec;
-            float realNow = (float)EditorApplication.timeSinceStartup;
-            bool isLive = timeOffset < 0.5f;
+            bool isLive = !frozenNow.HasValue && timeOffset < 0.5f;
 
             // Auto-scale Y
             float maxY = 1f;

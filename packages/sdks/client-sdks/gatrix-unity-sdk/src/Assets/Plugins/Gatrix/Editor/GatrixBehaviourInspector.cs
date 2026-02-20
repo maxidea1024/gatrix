@@ -68,21 +68,35 @@ namespace Gatrix.Unity.SDK.Editor
             // ── Title Bar ───────────────────────────────────────
             DrawTitleBar();
 
-            var client = GatrixBehaviour.Client;
-
-            if (client == null)
+            // ── Edit Mode: always show standard inspector fields ──
+            // GatrixBehaviour.Client may return the offline GatrixEditorClient in Edit Mode
+            // (non-null), but we still want to show the serialized fields, not the live panel.
+            if (!Application.isPlaying)
             {
-                if (!Application.isPlaying)
+                DrawDefaultInspector();
+                EditorGUILayout.Space(10);
+                GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
+                EditorGUILayout.Space(4);
+                if (GUILayout.Button("Settings", GUILayout.Height(28)))
                 {
-                    DrawDefaultInspector();
-                    EditorGUILayout.Space(10);
-                    GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
-                    EditorGUILayout.Space(4);
-                    if (GUILayout.Button("Settings", GUILayout.Height(28)))
+                    var behaviour = (GatrixBehaviour)target;
+                    var settings = behaviour.Settings;
+
+                    if (settings != null)
                     {
-                        var behaviour = (GatrixBehaviour)target;
-                        var settings = behaviour.Settings;
-                        
+                        Selection.activeObject = settings;
+                        EditorGUIUtility.PingObject(settings);
+                    }
+                    else
+                    {
+                        // Try to find any GatrixSettings in the project if not assigned
+                        string[] guids = AssetDatabase.FindAssets("t:GatrixSettings");
+                        if (guids.Length > 0)
+                        {
+                            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                            settings = AssetDatabase.LoadAssetAtPath<GatrixSettings>(path);
+                        }
+
                         if (settings != null)
                         {
                             Selection.activeObject = settings;
@@ -90,30 +104,19 @@ namespace Gatrix.Unity.SDK.Editor
                         }
                         else
                         {
-                            // Try to find any GatrixSettings in the project if not assigned
-                            string[] guids = AssetDatabase.FindAssets("t:GatrixSettings");
-                            if (guids.Length > 0)
-                            {
-                                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                                settings = AssetDatabase.LoadAssetAtPath<GatrixSettings>(path);
-                            }
-
-                            if (settings != null)
-                            {
-                                Selection.activeObject = settings;
-                                EditorGUIUtility.PingObject(settings);
-                            }
-                            else
-                            {
-                                GatrixSetupWindow.ShowWindow();
-                            }
+                            GatrixSetupWindow.ShowWindow();
                         }
                     }
                 }
-                else
-                {
-                    GatrixEditorStyle.DrawHelpBox("SDK is not initialized in Play Mode.", MessageType.Warning);
-                }
+                return;
+            }
+
+            // ── Play Mode below this point ────────────────────────
+            var client = GatrixBehaviour.Client;
+
+            if (client == null)
+            {
+                GatrixEditorStyle.DrawHelpBox("SDK is not initialized in Play Mode.", MessageType.Warning);
                 return;
             }
 
