@@ -181,92 +181,112 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 GatrixEditorStyle.BeginBox();
                 EditorGUILayout.PropertyField(_offlineMode, new GUIContent("Offline Mode"));
-                EditorGUILayout.PropertyField(_enableDevMode, new GUIContent("Dev Mode (Verbose Logs)"));
-                EditorGUILayout.PropertyField(_cacheKeyPrefix, new GUIContent("Cache Key Prefix"));
-                EditorGUILayout.PropertyField(_impressionDataAll, new GUIContent("Track All Impressions"));
-                EditorGUILayout.PropertyField(_explicitSyncMode, new GUIContent("Explicit Sync Mode"));
 
-                if (_explicitSyncMode.boolValue)
+                if (_offlineMode.boolValue)
                 {
                     EditorGUILayout.Space(2);
                     EditorGUILayout.HelpBox(
-                        "In explicit sync mode, flag changes are buffered until you call SyncFlagsAsync().",
+                        "Offline mode: no network calls will be made. SDK uses cached/bootstrap flags only. Metrics, polling, and streaming are disabled.",
                         MessageType.Info);
+                }
+
+                EditorGUILayout.PropertyField(_enableDevMode, new GUIContent("Dev Mode (Verbose Logs)"));
+                EditorGUILayout.PropertyField(_cacheKeyPrefix, new GUIContent("Cache Key Prefix"));
+
+                using (new EditorGUI.DisabledGroupScope(_offlineMode.boolValue))
+                {
+                    EditorGUILayout.PropertyField(_impressionDataAll, new GUIContent("Track All Impressions"));
+                    EditorGUILayout.PropertyField(_explicitSyncMode, new GUIContent("Explicit Sync Mode"));
+
+                    if (_explicitSyncMode.boolValue && !_offlineMode.boolValue)
+                    {
+                        EditorGUILayout.Space(2);
+                        EditorGUILayout.HelpBox(
+                            "In explicit sync mode, flag changes are buffered until you call SyncFlagsAsync().",
+                            MessageType.Info);
+                    }
                 }
                 GatrixEditorStyle.EndBox();
             }
 
             // ── Metrics ──
-            _showMetrics = DrawCollapsibleSectionBar("  Metrics", _showMetrics, null, new Color(0.60f, 0.40f, 0.90f));
+            string metricsBadge = _offlineMode.boolValue ? "disabled (offline)" : null;
+            _showMetrics = DrawCollapsibleSectionBar("  Metrics", _showMetrics, metricsBadge, new Color(0.60f, 0.40f, 0.90f));
             if (_showMetrics)
             {
                 GatrixEditorStyle.BeginBox();
-                EditorGUILayout.PropertyField(_disableMetrics, new GUIContent("Disable Metrics"));
-
-                using (new EditorGUI.DisabledGroupScope(_disableMetrics.boolValue))
+                using (new EditorGUI.DisabledGroupScope(_offlineMode.boolValue))
                 {
-                    EditorGUILayout.PropertyField(_metricsIntervalInitial, new GUIContent("Initial Delay (s)"));
-                    EditorGUILayout.PropertyField(_metricsInterval, new GUIContent("Send Interval (s)"));
+                    EditorGUILayout.PropertyField(_disableMetrics, new GUIContent("Disable Metrics"));
+
+                    using (new EditorGUI.DisabledGroupScope(_disableMetrics.boolValue))
+                    {
+                        EditorGUILayout.PropertyField(_metricsIntervalInitial, new GUIContent("Initial Delay (s)"));
+                        EditorGUILayout.PropertyField(_metricsInterval, new GUIContent("Send Interval (s)"));
+                    }
                 }
                 GatrixEditorStyle.EndBox();
             }
 
             // ── Network (Polling + Retry + Streaming) ──
-            _showNetwork = DrawCollapsibleSectionBar("  Network", _showNetwork, null, new Color(0.85f, 0.55f, 0.20f));
+            string networkBadge = _offlineMode.boolValue ? "disabled (offline)" : null;
+            _showNetwork = DrawCollapsibleSectionBar("  Network", _showNetwork, networkBadge, new Color(0.85f, 0.55f, 0.20f));
             if (_showNetwork)
             {
                 GatrixEditorStyle.BeginBox();
-
-                // Polling sub-section
-                DrawSubSectionLabel("Polling");
-                EditorGUILayout.PropertyField(_refreshInterval, new GUIContent("Refresh Interval (s)"));
-                EditorGUILayout.PropertyField(_disableRefresh, new GUIContent("Disable Auto Refresh"));
-
-                EditorGUILayout.Space(6);
-
-                // Retry & Timeout sub-section
-                DrawSubSectionLabel("Retry & Timeout");
-                EditorGUILayout.PropertyField(_fetchRetryLimit, new GUIContent("Retry Limit"));
-                EditorGUILayout.PropertyField(_fetchTimeout, new GUIContent("Timeout (s)"));
-                EditorGUILayout.PropertyField(_initialBackoff, new GUIContent("Initial Backoff (s)"));
-                EditorGUILayout.PropertyField(_maxBackoff, new GUIContent("Max Backoff (s)"));
-
-                EditorGUILayout.Space(6);
-
-                // Streaming sub-section
-                DrawSubSectionLabel("Streaming");
-                EditorGUILayout.PropertyField(_streamingEnabled, new GUIContent("Enabled"));
-
-                using (new EditorGUI.DisabledGroupScope(!_streamingEnabled.boolValue))
+                using (new EditorGUI.DisabledGroupScope(_offlineMode.boolValue))
                 {
-                    EditorGUILayout.PropertyField(_streamingTransport, new GUIContent("Transport"));
+                    // Polling sub-section
+                    DrawSubSectionLabel("Polling");
+                    EditorGUILayout.PropertyField(_refreshInterval, new GUIContent("Refresh Interval (s)"));
+                    EditorGUILayout.PropertyField(_disableRefresh, new GUIContent("Disable Auto Refresh"));
 
-                    var transport = (StreamingTransport)_streamingTransport.enumValueIndex;
+                    EditorGUILayout.Space(6);
 
-                    EditorGUILayout.Space(4);
+                    // Retry & Timeout sub-section
+                    DrawSubSectionLabel("Retry & Timeout");
+                    EditorGUILayout.PropertyField(_fetchRetryLimit, new GUIContent("Retry Limit"));
+                    EditorGUILayout.PropertyField(_fetchTimeout, new GUIContent("Timeout (s)"));
+                    EditorGUILayout.PropertyField(_initialBackoff, new GUIContent("Initial Backoff (s)"));
+                    EditorGUILayout.PropertyField(_maxBackoff, new GUIContent("Max Backoff (s)"));
 
-                    if (transport == StreamingTransport.Sse)
+                    EditorGUILayout.Space(6);
+
+                    // Streaming sub-section
+                    DrawSubSectionLabel("Streaming");
+                    EditorGUILayout.PropertyField(_streamingEnabled, new GUIContent("Enabled"));
+
+                    using (new EditorGUI.DisabledGroupScope(!_streamingEnabled.boolValue))
                     {
-                        DrawSubSectionLabel("SSE Configuration");
-                        EditorGUILayout.PropertyField(_sseUrl, new GUIContent("URL Override"));
-                        EditorGUILayout.PropertyField(_sseReconnectBase, new GUIContent("Reconnect Base (s)"));
-                        EditorGUILayout.PropertyField(_sseReconnectMax, new GUIContent("Reconnect Max (s)"));
-                        EditorGUILayout.PropertyField(_ssePollingJitter, new GUIContent("Polling Jitter (s)"));
-                    }
-                    else
-                    {
-                        DrawSubSectionLabel("WebSocket Configuration");
-                        EditorGUILayout.PropertyField(_wsUrl, new GUIContent("URL Override"));
-                        EditorGUILayout.PropertyField(_wsReconnectBase, new GUIContent("Reconnect Base (s)"));
-                        EditorGUILayout.PropertyField(_wsReconnectMax, new GUIContent("Reconnect Max (s)"));
-                        EditorGUILayout.PropertyField(_wsPingInterval, new GUIContent("Ping Interval (s)"));
+                        EditorGUILayout.PropertyField(_streamingTransport, new GUIContent("Transport"));
+
+                        var transport = (StreamingTransport)_streamingTransport.enumValueIndex;
+
+                        EditorGUILayout.Space(4);
+
+                        if (transport == StreamingTransport.Sse)
+                        {
+                            DrawSubSectionLabel("SSE Configuration");
+                            EditorGUILayout.PropertyField(_sseUrl, new GUIContent("URL Override"));
+                            EditorGUILayout.PropertyField(_sseReconnectBase, new GUIContent("Reconnect Base (s)"));
+                            EditorGUILayout.PropertyField(_sseReconnectMax, new GUIContent("Reconnect Max (s)"));
+                            EditorGUILayout.PropertyField(_ssePollingJitter, new GUIContent("Polling Jitter (s)"));
+                        }
+                        else
+                        {
+                            DrawSubSectionLabel("WebSocket Configuration");
+                            EditorGUILayout.PropertyField(_wsUrl, new GUIContent("URL Override"));
+                            EditorGUILayout.PropertyField(_wsReconnectBase, new GUIContent("Reconnect Base (s)"));
+                            EditorGUILayout.PropertyField(_wsReconnectMax, new GUIContent("Reconnect Max (s)"));
+                            EditorGUILayout.PropertyField(_wsPingInterval, new GUIContent("Ping Interval (s)"));
 
 #if UNITY_WEBGL
-                        EditorGUILayout.Space(2);
-                        EditorGUILayout.HelpBox(
-                            "WebGL: uses browser native WebSocket via JS interop (GatrixWebSocket.jslib).",
-                            MessageType.Info);
+                            EditorGUILayout.Space(2);
+                            EditorGUILayout.HelpBox(
+                                "WebGL: uses browser native WebSocket via JS interop (GatrixWebSocket.jslib).",
+                                MessageType.Info);
 #endif
+                        }
                     }
                 }
                 GatrixEditorStyle.EndBox();

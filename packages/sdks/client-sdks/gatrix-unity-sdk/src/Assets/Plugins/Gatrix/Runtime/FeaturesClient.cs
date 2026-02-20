@@ -184,7 +184,7 @@ namespace Gatrix.Unity.SDK
                 config.ApiToken,
                 config.Environment,
                 config.CustomHeaders,
-                featCfg.DisableMetrics,
+                featCfg.DisableMetrics || config.OfflineMode,
                 config.EnableDevMode,
                 _logger,
                 _connectionId,
@@ -282,7 +282,7 @@ namespace Gatrix.Unity.SDK
                     throw error;
                 }
                 SetReady();
-                StartMetrics();
+                // No metrics, polling, or streaming in offline mode
                 return;
             }
 
