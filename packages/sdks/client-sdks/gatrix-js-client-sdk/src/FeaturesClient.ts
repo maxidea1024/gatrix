@@ -1812,9 +1812,14 @@ export class FeaturesClient implements VariationProvider {
     // Convert http(s) to ws(s)
     const wsUrl = baseUrl.replace(/^http/, 'ws');
 
-    // Add auth as query parameter (WebSocket can't send custom headers in browser)
+    // Add metadata as query parameters (WebSocket can't send custom headers in browser)
     const url = new URL(wsUrl);
     url.searchParams.set('x-api-token', this.config.apiToken);
+    url.searchParams.set('appName', this.config.appName);
+    if (this.connectionId) {
+      url.searchParams.set('connectionId', this.connectionId);
+    }
+    url.searchParams.set('sdkVersion', `${SDK_NAME}/${SDK_VERSION}`);
 
     try {
       this.webSocket = new WebSocket(url.toString());

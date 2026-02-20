@@ -56,11 +56,18 @@ async function main(): Promise<void> {
         }
 
         const environment = wsPathMatch[1];
+
+        // Extract metadata from query parameters or headers
+        // (browsers cannot send custom headers during WebSocket handshake)
         const apiToken = url.searchParams.get('x-api-token')
           || url.searchParams.get('apiToken')
-          || url.searchParams.get('token');
+          || url.searchParams.get('token')
+          || (request.headers['x-api-token'] as string);
+        const appName = url.searchParams.get('appName')
+          || url.searchParams.get('applicationName')
+          || (request.headers['x-application-name'] as string);
 
-        if (!apiToken) {
+        if (!apiToken || !appName) {
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
           socket.destroy();
           return;
@@ -81,9 +88,17 @@ async function main(): Promise<void> {
           return;
         }
 
+        const connectionId = url.searchParams.get('connectionId')
+          || (request.headers['x-connection-id'] as string);
+        const sdkVersion = url.searchParams.get('sdkVersion')
+          || (request.headers['x-sdk-version'] as string);
+
         wss.handleUpgrade(request, socket, head, async (ws) => {
           const { ulid } = await import('ulid');
           const clientId = `edge-flag-ws-${ulid()}`;
+          logger.debug('WebSocket client upgrading', {
+            clientId, environment, appName, connectionId, sdkVersion,
+          });
           await flagStreamingService.addWebSocketClient(clientId, environment, ws);
         });
       } catch (err) {

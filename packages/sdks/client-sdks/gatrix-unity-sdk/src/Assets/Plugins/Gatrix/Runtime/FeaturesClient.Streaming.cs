@@ -237,11 +237,22 @@ namespace Gatrix.Unity.SDK
                     baseUrl = $"{baseUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream/ws";
                 }
 
-                // Add auth as query parameter (WebSocket can't send custom headers in browser)
+                // All essential metadata is sent as query parameters because
+                // browser WebSocket API (WebGL) does NOT support custom headers.
+                // On Standalone, SetRequestHeader will also send them as headers.
                 var uriBuilder = new UriBuilder(baseUrl);
+                var qb = new StringBuilder();
                 var existingQuery = uriBuilder.Query.TrimStart('?');
-                var separator = string.IsNullOrEmpty(existingQuery) ? "" : "&";
-                uriBuilder.Query = $"{existingQuery}{separator}x-api-token={Uri.EscapeDataString(_config.ApiToken)}";
+                if (!string.IsNullOrEmpty(existingQuery))
+                {
+                    qb.Append(existingQuery);
+                    qb.Append('&');
+                }
+                qb.Append("x-api-token="); qb.Append(Uri.EscapeDataString(_config.ApiToken));
+                qb.Append("&appName="); qb.Append(Uri.EscapeDataString(_config.AppName));
+                qb.Append("&connectionId="); qb.Append(Uri.EscapeDataString(_connectionId));
+                qb.Append("&sdkVersion="); qb.Append(Uri.EscapeDataString($"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}"));
+                uriBuilder.Query = qb.ToString();
 
                 // Create platform-appropriate WebSocket
                 ws = GatrixWebSocketFactory.Create();
