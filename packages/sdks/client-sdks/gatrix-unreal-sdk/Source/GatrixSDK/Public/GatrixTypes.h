@@ -1,11 +1,11 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 // Type definitions for Gatrix Unreal SDK
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixTypes.generated.h"
 #include "GatrixVariantSource.h"
+#include "GatrixTypes.generated.h"
 
 // ==================== Enums ====================
 
