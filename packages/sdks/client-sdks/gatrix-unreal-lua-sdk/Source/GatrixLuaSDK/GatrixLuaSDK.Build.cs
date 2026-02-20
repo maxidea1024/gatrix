@@ -14,7 +14,7 @@ public class GatrixLuaSDK : ModuleRules
             "CoreUObject",
             "Engine",
             "GatrixSDK",
-            "LuaJIT"
+            "LuaScriptRuntime" // Unreal Engine custom Lua runtime module (uses LuaJIT internally)
         });
     }
 }
