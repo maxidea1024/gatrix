@@ -81,21 +81,22 @@ namespace Gatrix.Unity.SDK.Editor
             EditorGUILayout.EndHorizontal();
             GatrixEditorStyle.EndBox();
 
-            // Synchronized flags section
+            // Synchronized flags section: mark rows that are about to change
             GatrixEditorStyle.DrawSection("Synchronized Flags (Active)");
-            DrawFlagTable(_cachedFlags, filter);
+            DrawFlagTable(_cachedFlags, filter, _cachedRealtimeFlags, isBeforeState: true);
 
             // Realtime flags section (pending): highlight rows that differ from synchronized
             if (_cachedRealtimeFlags != null && _cachedPendingSync)
             {
                 GatrixEditorStyle.DrawSection("Realtime Flags (Pending Sync)");
-                DrawFlagTable(_cachedRealtimeFlags, filter, _cachedFlags);
+                DrawFlagTable(_cachedRealtimeFlags, filter, _cachedFlags, isBeforeState: false);
             }
         }
 
         /// <param name="compareWith">If provided, rows that differ from this list are highlighted persistently.</param>
+        /// <param name="isBeforeState">True = this is the 'before' (Synchronized) side; False = 'after' (Realtime) side.</param>
         private void DrawFlagTable(List<EvaluatedFlag> flags, string filter,
-            List<EvaluatedFlag> compareWith = null)
+            List<EvaluatedFlag> compareWith = null, bool isBeforeState = false)
         {
             bool isDark = EditorGUIUtility.isProSkin;
 
@@ -184,24 +185,37 @@ namespace Gatrix.Unity.SDK.Editor
 
                 if (Event.current.type == EventType.Repaint)
                 {
-                    // Persistent diff highlight: row differs from synchronized value
+                    // Persistent diff highlight: row differs from the other sync state
                     bool isDiff = false;
-                    if (compareMap != null && compareMap.TryGetValue(flag.Name, out var syncFlag))
+                    if (compareMap != null && compareMap.TryGetValue(flag.Name, out var otherFlag))
                     {
-                        isDiff = syncFlag.Enabled != flag.Enabled ||
-                                 syncFlag.Variant?.Name != flag.Variant?.Name ||
-                                 !Equals(syncFlag.Variant?.Value, flag.Variant?.Value);
+                        isDiff = otherFlag.Enabled != flag.Enabled ||
+                                 otherFlag.Variant?.Name != flag.Variant?.Name ||
+                                 !Equals(otherFlag.Variant?.Value, flag.Variant?.Value);
                     }
 
                     if (isDiff)
                     {
-                        // Persistent amber row — value pending sync
-                        EditorGUI.DrawRect(rowRect, isDark
-                            ? new Color(0.75f, 0.45f, 0.05f, 0.25f)
-                            : new Color(0.90f, 0.60f, 0.10f, 0.20f));
+                        // Before-state (Synchronized): red-orange tint — this value will be replaced
+                        // After-state  (Realtime):     amber tint      — incoming pending value
+                        Color bgColor = isBeforeState
+                            ? (isDark ? new Color(0.60f, 0.15f, 0.10f, 0.25f) : new Color(0.85f, 0.30f, 0.20f, 0.18f))
+                            : (isDark ? new Color(0.75f, 0.45f, 0.05f, 0.25f) : new Color(0.90f, 0.60f, 0.10f, 0.20f));
+                        Color accentColor = isBeforeState
+                            ? new Color(0.90f, 0.30f, 0.20f, 0.9f)
+                            : new Color(1f, 0.65f, 0.10f, 0.9f);
+
+                        EditorGUI.DrawRect(rowRect, bgColor);
+
                         // Left accent bar
-                        EditorGUI.DrawRect(new Rect(rowRect.x, rowRect.y, 3, rowRect.height),
-                            new Color(1f, 0.65f, 0.10f, 0.9f));
+                        EditorGUI.DrawRect(new Rect(rowRect.x, rowRect.y, 3, rowRect.height), accentColor);
+
+                        // Row border box
+                        float bx = rowRect.x + 3;
+                        float bw = rowRect.width - 4;
+                        EditorGUI.DrawRect(new Rect(bx, rowRect.y,                      bw, 1),              accentColor * 0.7f);
+                        EditorGUI.DrawRect(new Rect(bx, rowRect.yMax - 1,               bw, 1),              accentColor * 0.7f);
+                        EditorGUI.DrawRect(new Rect(rowRect.xMax - 1, rowRect.y,         1, rowRect.height), accentColor * 0.7f);
                     }
                     else if (showHighlight)
                     {
