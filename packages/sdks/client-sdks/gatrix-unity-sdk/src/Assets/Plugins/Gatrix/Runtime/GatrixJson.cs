@@ -330,18 +330,15 @@ namespace Gatrix.Unity.SDK
             {
                 sb.Append(",\"reason\":"); SerializeString(sb, flag.Reason);
             }
-            if (flag.Variant != null)
+            sb.Append(",\"variant\":{");
+            sb.Append("\"name\":"); SerializeString(sb, flag.Variant.Name);
+            sb.Append(",\"enabled\":"); sb.Append(flag.Variant.Enabled ? "true" : "false");
+            if (flag.Variant.Value != null)
             {
-                sb.Append(",\"variant\":{");
-                sb.Append("\"name\":"); SerializeString(sb, flag.Variant.Name);
-                sb.Append(",\"enabled\":"); sb.Append(flag.Variant.Enabled ? "true" : "false");
-                if (flag.Variant.Value != null)
-                {
-                    sb.Append(",\"value\":");
-                    SerializeValue(sb, flag.Variant.Value);
-                }
-                sb.Append('}');
+                sb.Append(",\"value\":");
+                SerializeValue(sb, flag.Variant.Value);
             }
+            sb.Append('}');
             sb.Append('}');
         }
 

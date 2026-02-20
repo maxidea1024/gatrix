@@ -54,7 +54,7 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "isEnabled");
                 return false;
             }
-            TrackFlagAccess(flagName, flag, "isEnabled", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "isEnabled", flag.Variant.Name);
             return flag.Enabled;
         }
 
@@ -66,7 +66,7 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return new Variant { Name = VariantSource.Missing, Enabled = false };
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             return flag.Variant;
         }
 
@@ -117,8 +117,8 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
-            return flag.Variant?.Name ?? fallbackValue;
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
+            return string.IsNullOrEmpty(flag.Variant.Name) ? fallbackValue : flag.Variant.Name;
         }
 
         public bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = false)
@@ -129,9 +129,9 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             if (flag.ValueType != ValueType.Boolean) return fallbackValue;
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) return fallbackValue;
             if (val is bool b) return b;
             if (val is string s) return s.ToLowerInvariant() == "true";
@@ -147,9 +147,9 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             if (flag.ValueType != ValueType.String) return fallbackValue;
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             return val?.ToString() ?? fallbackValue;
         }
 
@@ -161,9 +161,9 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             if (flag.ValueType != ValueType.Number) return fallbackValue;
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) return fallbackValue;
             try { return Convert.ToInt32(val, CultureInfo.InvariantCulture); }
             catch { return fallbackValue; }
@@ -177,9 +177,9 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             if (flag.ValueType != ValueType.Number) return fallbackValue;
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) return fallbackValue;
             try { return Convert.ToSingle(val, CultureInfo.InvariantCulture); }
             catch { return fallbackValue; }
@@ -193,9 +193,9 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             if (flag.ValueType != ValueType.Number) return fallbackValue;
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) return fallbackValue;
             try { return Convert.ToDouble(val, CultureInfo.InvariantCulture); }
             catch { return fallbackValue; }
@@ -210,9 +210,9 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 return fallbackValue;
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             if (flag.ValueType != ValueType.Json) return fallbackValue;
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) return fallbackValue;
             if (val is Dictionary<string, object> dict) return dict;
             if (val is string jsonStr)
@@ -280,7 +280,7 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getVariant");
                 throw GatrixFeatureException.FlagNotFoundError(flagName);
             }
-            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             return flag;
         }
 
@@ -293,7 +293,7 @@ namespace Gatrix.Unity.SDK
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Boolean) ThrowTypeMismatch(flagName, "boolean", flag.ValueType);
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) throw GatrixFeatureException.NoPayloadError(flagName);
             if (val is bool b) return b;
             if (val is string s) return s.ToLowerInvariant() == "true";
@@ -304,7 +304,7 @@ namespace Gatrix.Unity.SDK
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.String) ThrowTypeMismatch(flagName, "string", flag.ValueType);
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) throw GatrixFeatureException.NoPayloadError(flagName);
             return val.ToString();
         }
@@ -313,7 +313,7 @@ namespace Gatrix.Unity.SDK
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) throw GatrixFeatureException.NoPayloadError(flagName);
             return Convert.ToInt32(val, CultureInfo.InvariantCulture);
         }
@@ -322,7 +322,7 @@ namespace Gatrix.Unity.SDK
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) throw GatrixFeatureException.NoPayloadError(flagName);
             return Convert.ToSingle(val, CultureInfo.InvariantCulture);
         }
@@ -331,7 +331,7 @@ namespace Gatrix.Unity.SDK
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) throw GatrixFeatureException.NoPayloadError(flagName);
             return Convert.ToDouble(val, CultureInfo.InvariantCulture);
         }
@@ -340,7 +340,7 @@ namespace Gatrix.Unity.SDK
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Json) ThrowTypeMismatch(flagName, "json", flag.ValueType);
-            var val = flag.Variant?.Value;
+            var val = flag.Variant.Value;
             if (val == null) throw GatrixFeatureException.NoPayloadError(flagName);
             if (val is Dictionary<string, object> dict) return dict;
             if (val is string jsonStr)
@@ -365,7 +365,7 @@ namespace Gatrix.Unity.SDK
                 TrackFlagAccess(flagName, null, "getFlag");
                 return null;
             }
-            TrackFlagAccess(flagName, flag, "getFlag", flag.Variant?.Name);
+            TrackFlagAccess(flagName, flag, "getFlag", flag.Variant.Name);
             return flag;
         }
 

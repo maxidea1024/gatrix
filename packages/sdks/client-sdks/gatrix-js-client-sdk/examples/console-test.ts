@@ -69,7 +69,7 @@ async function main() {
       console.log('No flags found. Make sure the server is running and has flags configured.');
     } else {
       for (const flag of allFlags) {
-        console.log(`  ${flag.name}: enabled=${flag.enabled}, variant=${flag.variant?.name}`);
+        console.log(`  ${flag.name}: enabled=${flag.enabled}, variant=${flag.variant.name}`);
       }
     }
 

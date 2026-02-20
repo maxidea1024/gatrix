@@ -131,6 +131,20 @@ The Edge API returns evaluated flags in this format:
 | `impressionData` | boolean? | Whether to track impressions |
 | `reason` | string? | Evaluation reason (e.g., "targeting_match", "disabled", "not_found") |
 
+> [!IMPORTANT]
+> **`variant` is always present and non-null.** The server always includes a `variant` object in every evaluated flag response. SDK implementations MUST NOT use defensive null checks (e.g., `flag.variant?.name`, `flag.Variant?.Name`) when accessing variant properties on a valid `EvaluatedFlag`. The `variant` object is guaranteed to have:
+> - `name`: Always a non-empty string (e.g., `"$disabled"`, `"$flag-default-enabled"`, or a user-defined variant name)
+> - `enabled`: Always a boolean
+> - `value`: May be null/undefined (this is the only nullable variant field)
+>
+> **Implementation by language:**
+> - **C# (Unity)**: `EvaluatedFlag.Variant` uses a default initializer (`new Variant { Name = "$disabled", Enabled = false }`), guaranteeing non-null.
+> - **JavaScript/TypeScript**: Access as `flag.variant.name` (not `flag.variant?.name`). Use `flag?.variant.name` only when `flag` itself may be undefined.
+> - **Dart (Flutter)**: Access as `flag.variant.name`. Use `flag?.variant.name` when `flag` is nullable.
+> - **C++ (Cocos2d-x/Unreal)**: `Variant` is a value type (struct), always initialized.
+> - **Python**: `flag.variant.name` — variant is always a `Variant` instance.
+> - **GDScript (Godot)**: `flag.variant.name` — variant is always populated.
+
 ## SDK Configuration
 
 ```typescript
@@ -1247,6 +1261,9 @@ track(eventName: string, ...eventArgs: any[]): void;
 
 > [!IMPORTANT]
 > **getVariant never returns null/undefined** - Always returns a fallback variant (`{ name: '$missing', enabled: false }`) when flag not found.
+
+> [!IMPORTANT]
+> **`flag.variant` is never null/undefined** — SDK code MUST NOT use defensive null checks (`?.`) for `variant` or `variant.name` on valid `EvaluatedFlag` objects. The server guarantees `variant` is always populated. Use direct access (`flag.variant.name`) instead of optional chaining (`flag.variant?.name`). See the Flag Structure section for details.
 
 - All variation functions return default values for disabled/not-found flags
 - `*VariationOrThrow` methods throw for strict checking scenarios

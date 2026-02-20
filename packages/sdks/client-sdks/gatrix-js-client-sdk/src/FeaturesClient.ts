@@ -401,7 +401,7 @@ export class FeaturesClient implements VariationProvider {
   private createProxy(flagName: string): FlagProxy {
     const flags = this.selectFlags(true); // always realtime for watch/proxy
     const flag = flags.get(flagName);
-    this.trackFlagAccess(flagName, flag, 'watch', flag?.variant?.name);
+    this.trackFlagAccess(flagName, flag, 'watch', flag?.variant.name);
     return new FlagProxy(this, flagName, true);
   }
 

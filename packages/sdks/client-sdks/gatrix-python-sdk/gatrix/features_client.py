@@ -1327,7 +1327,7 @@ class FeaturesClient:
         self._impression_count += 1
 
         # Track variant
-        if flag.variant and flag.variant.enabled and flag.variant.name != "disabled":
+        if flag.variant.enabled and flag.variant.name != "disabled":
             self._count_variant(flag.name, flag.variant.name)
 
         event = ImpressionEvent(
@@ -1338,7 +1338,7 @@ class FeaturesClient:
             feature_name=flag.name,
             impression_data=True,
             variant_name=(
-                flag.variant.name if flag.variant and flag.variant.enabled else None
+                flag.variant.name if flag.variant.enabled else None
             ),
             reason=flag.reason,
         )

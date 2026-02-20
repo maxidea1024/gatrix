@@ -74,7 +74,7 @@ namespace Gatrix.Unity.SDK
     {
         public string Name { get; set; }
         public bool Enabled { get; set; }
-        public Variant Variant { get; set; }
+        public Variant Variant { get; set; } = new Variant { Name = "$disabled", Enabled = false };
         public ValueType ValueType { get; set; }
         public int Version { get; set; }
         public string Reason { get; set; }

@@ -97,9 +97,9 @@ async function main() {
       const name = f.name.padEnd(maxLen);
       const json = JSON.stringify({
         enabled: f.enabled,
-        variant: f.variant?.name,
+        variant: f.variant.name,
         valueType: f.valueType,
-        value: f.variant?.value,
+        value: f.variant.value,
       });
       console.log(`  ${state} ${name}: ${json}`);
     });

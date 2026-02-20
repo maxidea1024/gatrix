@@ -267,7 +267,7 @@ async function main() {
       }
 
       // Variant with colors
-      const rawVariant = flag.variant?.name || '-';
+      const rawVariant = flag.variant.name || '-';
       let variant: Cell = rawVariant;
       if (rawVariant === '-') {
         variant = '-';
@@ -291,9 +291,9 @@ async function main() {
       // Value
       let valueStr = '-';
       if (
-        flag.variant?.value !== undefined &&
-        flag.variant?.value !== null &&
-        flag.variant?.value !== ''
+        flag.variant.value !== undefined &&
+        flag.variant.value !== null &&
+        flag.variant.value !== ''
       ) {
         const rawValueStr =
           typeof flag.variant.value === 'object'
@@ -343,7 +343,7 @@ async function main() {
 
     setInterval(() => render(), 1000);
 
-    await new Promise(() => {});
+    await new Promise(() => { });
   } catch (error: any) {
     process.stdout.write(SHOW_CURSOR);
     console.error('Error:', error.message);
