@@ -83,6 +83,9 @@ namespace Gatrix.Unity.SDK
         [Tooltip("Cache key prefix for storage")]
         [SerializeField] private string _cacheKeyPrefix = "gatrix_cache";
 
+        /// <summary>Cache key prefix used for local storage (read-only accessor for editor tools)</summary>
+        public string CacheKeyPrefix => _cacheKeyPrefix;
+
         [Tooltip("Track impressions for all flags")]
         [SerializeField] private bool _impressionDataAll;
 
