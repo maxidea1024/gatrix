@@ -125,6 +125,9 @@ public:
   static int Lua_UnwatchFlag(lua_State *L);
   static int Lua_CreateWatchGroup(lua_State *L);
 
+  // Push UGatrixFlagProxy fields as a Lua table (called from watch delegates)
+  static void PushFlagProxyTable(lua_State *L, class UGatrixFlagProxy *Proxy);
+
   // State
   static int Lua_IsReady(lua_State *L);
   static int Lua_IsInitialized(lua_State *L);
@@ -152,9 +155,6 @@ private:
   // Push FGatrixContext as a Lua table
   static void PushContextTable(lua_State *L,
                                const struct FGatrixContext &Context);
-
-  // Push UGatrixFlagProxy fields as a Lua table
-  static void PushFlagProxyTable(lua_State *L, class UGatrixFlagProxy *Proxy);
 
   // Read a Lua table at the given index into FGatrixContext
   static struct FGatrixContext ReadContextFromTable(lua_State *L, int Index);
