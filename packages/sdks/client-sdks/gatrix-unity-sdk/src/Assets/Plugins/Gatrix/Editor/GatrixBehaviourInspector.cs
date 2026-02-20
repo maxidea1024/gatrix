@@ -68,46 +68,31 @@ namespace Gatrix.Unity.SDK.Editor
             // ── Title Bar ───────────────────────────────────────
             DrawTitleBar();
 
-            // ── Edit Mode: always show standard inspector fields ──
-            // GatrixBehaviour.Client may return the offline GatrixEditorClient in Edit Mode
-            // (non-null), but we still want to show the serialized fields, not the live panel.
+            // ── Edit Mode: show standard fields + cached flag data if available ──
+            // GatrixBehaviour.Client may return the offline GatrixEditorClient in Edit Mode,
+            // so we gate on Application.isPlaying rather than client == null to decide which
+            // sections to render.
             if (!Application.isPlaying)
             {
                 DrawDefaultInspector();
-                EditorGUILayout.Space(10);
-                GatrixEditorStyle.DrawHelpBox("SDK will initialize automatically in Play Mode.", MessageType.Info);
-                EditorGUILayout.Space(4);
-                if (GUILayout.Button("Settings", GUILayout.Height(28)))
+
+                var editorClient = GatrixBehaviour.Client;
+                if (editorClient != null)
                 {
-                    var behaviour = (GatrixBehaviour)target;
-                    var settings = behaviour.Settings;
+                    EditorGUILayout.Space(4);
 
-                    if (settings != null)
-                    {
-                        Selection.activeObject = settings;
-                        EditorGUIUtility.PingObject(settings);
-                    }
-                    else
-                    {
-                        // Try to find any GatrixSettings in the project if not assigned
-                        string[] guids = AssetDatabase.FindAssets("t:GatrixSettings");
-                        if (guids.Length > 0)
-                        {
-                            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                            settings = AssetDatabase.LoadAssetAtPath<GatrixSettings>(path);
-                        }
+                    // Show cached flag data from GatrixEditorClient
+                    _showFlags = DrawCollapsibleSectionBar("  Feature Flags (Cached)",
+                        _showFlags, $"({editorClient.Features.GetAllFlags().Count})", GatrixEditorStyle.AccentGreen);
+                    if (_showFlags)
+                        DrawFlagsContent(editorClient);
 
-                        if (settings != null)
-                        {
-                            Selection.activeObject = settings;
-                            EditorGUIUtility.PingObject(settings);
-                        }
-                        else
-                        {
-                            GatrixSetupWindow.ShowWindow();
-                        }
-                    }
+                    _showContext = DrawCollapsibleSectionBar("  Evaluation Context",
+                        _showContext, null, GatrixEditorStyle.AccentTeal);
+                    if (_showContext)
+                        DrawContextContent(editorClient);
                 }
+
                 return;
             }
 

@@ -30,8 +30,6 @@ namespace Gatrix.Unity.SDK
     {
         // ==================== Editor Fields ====================
 
-        [Header("Editor Setup (Zero-Code Initialization)")]
-
         [Tooltip("Assign a GatrixSettings asset for editor-based configuration")]
         [SerializeField] private GatrixSettings _settings;
 
