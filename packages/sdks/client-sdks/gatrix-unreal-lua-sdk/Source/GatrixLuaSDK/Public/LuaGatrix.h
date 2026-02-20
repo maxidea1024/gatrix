@@ -1,4 +1,4 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 // LuaJIT binding for Gatrix Unreal SDK
 //
 // Pure lua_State* based binding — no dependency on game-specific Lua wrappers.
