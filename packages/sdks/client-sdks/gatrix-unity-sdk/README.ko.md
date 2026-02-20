@@ -545,6 +545,39 @@ SDK 버전, Unity 버전, 플랫폼 정보, 런타임 연결 상태를 확인할
 | `CurrentTime` | `string` | 시간 기반 타게팅을 위한 시간 오버라이드 (시스템 필드) |
 | `Properties` | `Dictionary` | 추가 타게팅 속성을 위한 커스텀 키-값 쌍 |
 
+> 💡 **함수 호출처럼 생각하세요.** 컨텍스트는 여러분이 전달하는 **인자(argument)**이고, 서버의 타게팅 규칙은 **함수 내부의 조건문**입니다. 서버가 함수를 실행하고 결과를 반환합니다 — 로직 자체는 외부에 노출되지 않습니다.
+
+```
+// 개념적으로 Gatrix 서버가 각 플래그에 대해 하는 일:
+EvaluatedFlag evaluate(flagName, context):
+
+    if context.userId == "admin-1234":
+        return variant("debug-mode-on", value: true)
+
+    if context.properties["vipTier"] == "gold":
+        return variant("gold-shop", value: { discount: 0, gemBonus: 50 })
+
+    if context.properties["country"] == "KR"
+    and context.properties["appVersion"] >= "2.5.0":
+        return variant("kr-summer-event", value: true)
+
+    if context.properties["level"] >= 10:
+        return variant("hard-difficulty", value: "hard")
+
+    if rollout(context.userId, percentage: 20):
+        return variant("new-ui-rollout", value: true)
+
+    return defaultVariant(value: ...)   // 매칭된 규칙 없음
+
+// 게임 코드에서는 단순히 이렇게 호출합니다:
+features.IsEnabled("summer-event")             // context는 자동으로 전송됨
+features.StringVariation("difficulty", "Normal")
+```
+
+> SDK는 모든 요청마다 컨텍스트를 서버로 전송합니다. **게임 코드에서 사용자 속성 기반 `if` 체인을 직접 작성할 필요가 없습니다** — 그것은 서버가 담당하는 일입니다.
+
+
+
 ### 컨텍스트 설정 시점
 
 컨텍스트는 사용 가능한 정보에 따라 **세 가지 단계**에서 제공할 수 있습니다:

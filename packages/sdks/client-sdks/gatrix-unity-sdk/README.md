@@ -542,6 +542,39 @@ Without context, the server has no way to differentiate users and can only retur
 | `CurrentTime` | `string` | Time override for time-based targeting (system field) |
 | `Properties` | `Dictionary` | Custom key-value pairs for any additional targeting attributes |
 
+> 💡 **Think of it like a function call.** Context is the **argument** you pass in; the targeting rules on the server are the **conditions inside the function**. The server runs the function and returns the result — you never see the logic itself.
+
+```
+// Conceptually, what Gatrix does on the server for each flag:
+EvaluatedFlag evaluate(flagName, context):
+
+    if context.userId == "admin-1234":
+        return variant("debug-mode-on", value: true)
+
+    if context.properties["vipTier"] == "gold":
+        return variant("gold-shop", value: { discount: 0, gemBonus: 50 })
+
+    if context.properties["country"] == "KR"
+    and context.properties["appVersion"] >= "2.5.0":
+        return variant("kr-summer-event", value: true)
+
+    if context.properties["level"] >= 10:
+        return variant("hard-difficulty", value: "hard")
+
+    if rollout(context.userId, percentage: 20):
+        return variant("new-ui-rollout", value: true)
+
+    return defaultVariant(value: ...)   // no rules matched
+
+// Your client code just calls:
+features.IsEnabled("summer-event")          // context is sent automatically
+features.StringVariation("difficulty", "Normal")
+```
+
+> The SDK sends context to the server with every request. **You never write `if` chains based on user properties in your game code** — that's the server's job.
+
+
+
 ### When to Set Context
 
 Context can be provided at **three different stages**, depending on what information is available:
