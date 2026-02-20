@@ -26,12 +26,12 @@ namespace Gatrix.Unity.SDK
         {
             if (GatrixBehaviour.IsInitialized)
             {
-                Subscribe();
+                Resubscribe();
             }
             else
             {
                 // Wait for SDK to be ready if it's not yet
-                GatrixBehaviour.Client?.On(GatrixEvents.FlagsReady, _ => Subscribe(), "Base:SubscribeOnReady");
+                GatrixBehaviour.Client?.On(GatrixEvents.FlagsReady, _ => Resubscribe(), "Base:SubscribeOnReady");
             }
         }
 
@@ -42,8 +42,6 @@ namespace Gatrix.Unity.SDK
 
         protected virtual void Subscribe()
         {
-            Unsubscribe();
-            
             var client = GatrixBehaviour.Client;
             if (client == null || string.IsNullOrEmpty(_flagName)) return;
 
@@ -67,6 +65,16 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>
+        /// Cleanly re-subscribes to the current flag, replacing any existing watcher.
+        /// Equivalent to Unsubscribe() followed by Subscribe().
+        /// </summary>
+        protected void Resubscribe()
+        {
+            Unsubscribe();
+            Subscribe();
+        }
+
+        /// <summary>
         /// Called whenever the watched flag changes.
         /// </summary>
         /// <param name="flag">The latest flag state proxy.</param>
@@ -79,7 +87,7 @@ namespace Gatrix.Unity.SDK
             // OnValidate() is called by Unity whenever a serialized field is modified.
             if (Application.isPlaying && GatrixBehaviour.IsInitialized)
             {
-                Subscribe();
+                Resubscribe();
             }
         }
 #endif
