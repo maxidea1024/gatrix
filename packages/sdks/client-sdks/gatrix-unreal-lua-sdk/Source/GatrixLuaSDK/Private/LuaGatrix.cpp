@@ -408,6 +408,105 @@ void FGatrixLuaBindings::RemoveAllCallbacks(lua_State *L) {
   SessionRegistry.Remove(L);
 }
 
+// ==================== Deferred Helper ====================
+
+// Create a Lua deferred object by calling `deferred.new()`.
+// Returns the registry ref to the deferred table, or LUA_NOREF on failure.
+// The deferred table is left on top of the Lua stack.
+static int CreateDeferred(lua_State *L) {
+  lua_getglobal(L, "deferred");
+  if (!lua_istable(L, -1)) {
+    lua_pop(L, 1);
+    UE_LOG(LogGatrixLua, Warning,
+           TEXT("[LuaGatrix] 'deferred' module not available"));
+    return LUA_NOREF;
+  }
+  lua_getfield(L, -1, "new");
+  if (!lua_isfunction(L, -1)) {
+    lua_pop(L, 2);
+    UE_LOG(LogGatrixLua, Warning, TEXT("[LuaGatrix] 'deferred.new' not found"));
+    return LUA_NOREF;
+  }
+  lua_remove(L, -2); // remove deferred table, keep deferred.new function
+  if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
+    const char *Err = lua_tostring(L, -1);
+    UE_LOG(LogGatrixLua, Error, TEXT("[LuaGatrix] deferred.new() failed: %s"),
+           Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+    lua_pop(L, 1);
+    return LUA_NOREF;
+  }
+  // Deferred table is now on top of stack.
+  // Create a reference so we can access it from callbacks.
+  lua_pushvalue(L, -1);
+  int DeferredRef = luaL_ref(L, LUA_REGISTRYINDEX);
+  return DeferredRef;
+}
+
+// Resolve a deferred by its registry ref: d:resolve(...)
+// nArgs values should be on top of the stack before calling.
+static void ResolveDeferred(lua_State *L, int DeferredRef, int nArgs = 0) {
+  if (DeferredRef == LUA_NOREF)
+    return;
+
+  lua_rawgeti(L, LUA_REGISTRYINDEX, DeferredRef);
+  if (!lua_istable(L, -1)) {
+    lua_pop(L, 1 + nArgs);
+    luaL_unref(L, LUA_REGISTRYINDEX, DeferredRef);
+    return;
+  }
+  lua_getfield(L, -1, "resolve");
+  lua_pushvalue(L, -2); // self
+  // Move args if any
+  if (nArgs > 0) {
+    // Args are below the deferred table and resolve function
+    // Stack: [args...] [deferred] [resolve] [self]
+    // We need to move args after self
+    for (int i = 0; i < nArgs; ++i) {
+      lua_pushvalue(L, -(3 + nArgs) + i);
+    }
+  }
+  if (lua_pcall(L, 1 + nArgs, 0, 0) != LUA_OK) {
+    const char *Err = lua_tostring(L, -1);
+    UE_LOG(LogGatrixLua, Error,
+           TEXT("[LuaGatrix] deferred:resolve() failed: %s"),
+           Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+    lua_pop(L, 1);
+  }
+  lua_pop(L, 1); // pop deferred table
+  if (nArgs > 0) {
+    lua_pop(L, nArgs); // pop original args
+  }
+  luaL_unref(L, LUA_REGISTRYINDEX, DeferredRef);
+}
+
+// Reject a deferred by its registry ref: d:reject(errorMsg)
+static void RejectDeferred(lua_State *L, int DeferredRef,
+                           const char *ErrorMsg = nullptr) {
+  if (DeferredRef == LUA_NOREF)
+    return;
+
+  lua_rawgeti(L, LUA_REGISTRYINDEX, DeferredRef);
+  if (!lua_istable(L, -1)) {
+    lua_pop(L, 1);
+    luaL_unref(L, LUA_REGISTRYINDEX, DeferredRef);
+    return;
+  }
+  lua_getfield(L, -1, "reject");
+  lua_pushvalue(L, -2); // self
+  if (ErrorMsg) {
+    lua_pushstring(L, ErrorMsg);
+  }
+  if (lua_pcall(L, ErrorMsg ? 2 : 1, 0, 0) != LUA_OK) {
+    const char *Err = lua_tostring(L, -1);
+    UE_LOG(LogGatrixLua, Error,
+           TEXT("[LuaGatrix] deferred:reject() failed: %s"),
+           Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+    lua_pop(L, 1);
+  }
+  lua_pop(L, 1); // pop deferred table
+  luaL_unref(L, LUA_REGISTRYINDEX, DeferredRef);
+}
+
 // ==================== Lifecycle ====================
 
 int FGatrixLuaBindings::Lua_Init(lua_State *L) {
@@ -480,8 +579,55 @@ int FGatrixLuaBindings::Lua_Init(lua_State *L) {
 }
 
 int FGatrixLuaBindings::Lua_Start(lua_State *L) {
-  UGatrixClient::Get()->Start();
-  return 0;
+  UGatrixClient *Client = UGatrixClient::Get();
+
+  // Create deferred promise
+  int DeferredRef = CreateDeferred(L);
+  // Deferred table is on top of stack (will be returned)
+
+  if (DeferredRef == LUA_NOREF) {
+    // No deferred available, fallback to synchronous
+    Client->Start();
+    lua_pushnil(L);
+    return 1;
+  }
+
+  // If already ready, resolve immediately after Start
+  if (Client->IsReady()) {
+    Client->Start();
+    ResolveDeferred(L, DeferredRef);
+    // Return the deferred (still on stack from CreateDeferred)
+    return 1;
+  }
+
+  // Register one-shot listener for "flags.ready" to resolve
+  TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
+  lua_State *CapturedL = L;
+  int CapturedDeferredRef = DeferredRef;
+  TSharedPtr<bool> CapturedAlive = AliveFlag;
+
+  auto HandlePtr = MakeShared<int32>(0);
+
+  int32 GatrixHandle = Client->Once(
+      TEXT("flags.ready"), [CapturedL, CapturedDeferredRef, CapturedAlive,
+                            HandlePtr](const TArray<FString> &Args) {
+        if (!CapturedAlive.IsValid() || !(*CapturedAlive))
+          return;
+        ResolveDeferred(CapturedL, CapturedDeferredRef);
+        RemoveCallback(CapturedL, *HandlePtr);
+      });
+
+  *HandlePtr = GatrixHandle;
+
+  FLuaSession *Session = SessionRegistry.Find(L);
+  if (Session) {
+    Session->Callbacks.Add({GatrixHandle, LUA_NOREF, false, false});
+  }
+
+  Client->Start();
+
+  // Return the deferred table (already on stack)
+  return 1;
 }
 
 int FGatrixLuaBindings::Lua_Stop(lua_State *L) {
@@ -1108,8 +1254,74 @@ int FGatrixLuaBindings::Lua_IsInitialized(lua_State *L) {
 // ==================== Sync ====================
 
 int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
-  UGatrixClient::Get()->GetFeatures()->FetchFlags();
-  return 0;
+  UGatrixClient *Client = UGatrixClient::Get();
+
+  // Create deferred promise
+  int DeferredRef = CreateDeferred(L);
+
+  if (DeferredRef == LUA_NOREF) {
+    // No deferred available, fallback to fire-and-forget
+    Client->GetFeatures()->FetchFlags();
+    lua_pushnil(L);
+    return 1;
+  }
+
+  TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
+  lua_State *CapturedL = L;
+  int CapturedDeferredRef = DeferredRef;
+  TSharedPtr<bool> CapturedAlive = AliveFlag;
+
+  // Use shared bools to track which event fires first
+  auto bResolved = MakeShared<bool>(false);
+
+  auto SuccessHandlePtr = MakeShared<int32>(0);
+  auto ErrorHandlePtr = MakeShared<int32>(0);
+
+  // On success: resolve and clean up error listener
+  int32 SuccessHandle = Client->Once(
+      TEXT("flags.fetch_success"),
+      [CapturedL, CapturedDeferredRef, CapturedAlive, bResolved,
+       SuccessHandlePtr, ErrorHandlePtr](const TArray<FString> &Args) {
+        if (*bResolved)
+          return;
+        *bResolved = true;
+        if (CapturedAlive.IsValid() && *CapturedAlive) {
+          ResolveDeferred(CapturedL, CapturedDeferredRef);
+          RemoveCallback(CapturedL, *SuccessHandlePtr);
+          RemoveCallback(CapturedL, *ErrorHandlePtr);
+        }
+      });
+
+  // On error: reject and clean up success listener
+  int32 ErrorHandle = Client->Once(
+      TEXT("flags.fetch_error"),
+      [CapturedL, CapturedDeferredRef, CapturedAlive, bResolved,
+       SuccessHandlePtr, ErrorHandlePtr](const TArray<FString> &Args) {
+        if (*bResolved)
+          return;
+        *bResolved = true;
+        if (CapturedAlive.IsValid() && *CapturedAlive) {
+          const char *ErrMsg =
+              Args.Num() > 0 ? TCHAR_TO_UTF8(*Args[0]) : "fetch failed";
+          RejectDeferred(CapturedL, CapturedDeferredRef, ErrMsg);
+          RemoveCallback(CapturedL, *SuccessHandlePtr);
+          RemoveCallback(CapturedL, *ErrorHandlePtr);
+        }
+      });
+
+  *SuccessHandlePtr = SuccessHandle;
+  *ErrorHandlePtr = ErrorHandle;
+
+  FLuaSession *Session = SessionRegistry.Find(L);
+  if (Session) {
+    Session->Callbacks.Add({SuccessHandle, LUA_NOREF, false, false});
+    Session->Callbacks.Add({ErrorHandle, LUA_NOREF, false, false});
+  }
+
+  Client->GetFeatures()->FetchFlags();
+
+  // Return the deferred table (already on stack)
+  return 1;
 }
 
 int FGatrixLuaBindings::Lua_SyncFlags(lua_State *L) {
