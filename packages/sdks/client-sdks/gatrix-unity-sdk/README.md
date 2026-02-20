@@ -1,4 +1,4 @@
-﻿# Gatrix Unity SDK
+# Gatrix Unity SDK
 
 > **Feature flags, A/B testing, and remote configuration — official Gatrix SDK for Unity.**
 
@@ -24,6 +24,11 @@ if (GatrixBehaviour.Client.Features.IsEnabled("new-shop"))
 {
     // Feature is ON -> Show the new shop UI
     ShowNewShop();
+}
+else
+{
+    // Feature is OFF (or flag missing) -> Fall back to the legacy shop
+    ShowLegacyShop();
 }
 ```
 

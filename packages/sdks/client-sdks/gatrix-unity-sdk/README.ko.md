@@ -25,6 +25,11 @@ if (GatrixBehaviour.Client.Features.IsEnabled("new-shop"))
     // 기능이 ON 상태 -> 새 상점 UI 표시
     ShowNewShop();
 }
+else
+{
+    // 기능이 OFF 상태 (또는 플래그 없음) -> 기존 상점으로 폴백
+    ShowLegacyShop();
+}
 ```
 
 #### 2. 원격 구성 (`Variation`)
