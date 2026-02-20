@@ -29,11 +29,11 @@ MonoBehaviour:
   _enableDevMode: 0
   _cacheKeyPrefix: gatrix_cache
   _impressionDataAll: 0
-  _bootstrapJson: 
+  _bootstrapJson: '[{"name":"new-feature-nin8","enabled":false,"valueType":"string","version":9,"impressionData":false,"variant":{"name":"$flag-default-disabled","enabled":false,"value":""}},{"name":"new-feature-v1gf","enabled":true,"valueType":"string","version":5,"impressionData":false,"variant":{"name":"$env-default-enabled","enabled":true,"value":"11112"}},{"name":"demo-text-value","enabled":true,"valueType":"string","version":99,"impressionData":false,"variant":{"name":"$env-default-enabled","enabled":true,"value":"bbbbbb"}},{"name":"new-feature-g1kw","enabled":false,"valueType":"string","version":54,"impressionData":true,"variant":{"name":"$flag-default-disabled","enabled":false,"value":""}},{"name":"test-flag","enabled":false,"valueType":"string","version":79,"impressionData":false,"variant":{"name":"$env-default-disabled","enabled":false,"value":""}},{"name":"slot-spin-speed","enabled":false,"valueType":"number","version":31,"impressionData":false,"variant":{"name":"$flag-default-disabled","enabled":false,"value":0}},{"name":"slot-auto-spin","enabled":true,"valueType":"boolean","version":22,"impressionData":false,"variant":{"name":"$flag-default-enabled","enabled":true,"value":true}},{"name":"new-feature-1yii","enabled":false,"valueType":"boolean","version":27,"impressionData":false,"variant":{"name":"$flag-default-disabled","enabled":false,"value":false}},{"name":"new-feature-zh8l","enabled":false,"valueType":"string","version":4,"impressionData":false,"variant":{"name":"$flag-default-disabled","enabled":false,"value":""}},{"name":"config-p0vg","enabled":false,"valueType":"string","version":18,"impressionData":false,"variant":{"name":"$env-default-disabled","enabled":false,"value":""}},{"name":"new-feature-ndon","enabled":false,"valueType":"boolean","version":18,"impressionData":false,"variant":{"name":"$flag-default-disabled","enabled":false,"value":false}},{"name":"new-feature-jj8y","enabled":true,"valueType":"boolean","version":39,"impressionData":false,"variant":{"name":"$env-default-enabled","enabled":true,"value":true}}]'
   _bootstrapOverride: 1
   _refreshInterval: 30
   _disableRefresh: 0
-  _explicitSyncMode: 0
+  _explicitSyncMode: 1
   _disableMetrics: 0
   _metricsIntervalInitial: 2
   _metricsInterval: 60

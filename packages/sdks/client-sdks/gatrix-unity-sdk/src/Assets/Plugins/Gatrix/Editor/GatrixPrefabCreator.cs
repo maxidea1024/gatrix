@@ -231,6 +231,277 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
+        [MenuItem(RootMenu + "Audio & Animation/Flag Audio Mixer", false, 52)]
+        public static void CreateFlagAudioMixer(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagAudioMixer");
+            go.AddComponent<GatrixFlagAudioMixer>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Audio Mixer");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Audio & Animation/Flag AI Animator", false, 53)]
+        public static void CreateFlagAIAnimator(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagAIAnimator");
+            go.AddComponent<Animator>();
+            go.AddComponent<GatrixFlagAIAnimator>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag AI Animator");
+            Selection.activeObject = go;
+        }
+
+        // ── Lighting ──
+
+        [MenuItem(RootMenu + "Lighting/Flag Light", false, 60)]
+        public static void CreateFlagLight(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagLight");
+            go.AddComponent<Light>();
+            go.AddComponent<GatrixFlagLight>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Light");
+            Selection.activeObject = go;
+        }
+
+        // ── Camera ──
+
+        [MenuItem(RootMenu + "Camera/Flag Camera", false, 70)]
+        public static void CreateFlagCamera(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagCamera");
+            go.AddComponent<Camera>();
+            go.AddComponent<GatrixFlagCamera>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Camera");
+            Selection.activeObject = go;
+        }
+
+        // ── Physics ──
+
+        [MenuItem(RootMenu + "Physics/Flag Rigidbody", false, 80)]
+        public static void CreateFlagRigidbody(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagRigidbody");
+            go.AddComponent<Rigidbody>();
+            go.AddComponent<GatrixFlagRigidbody>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Rigidbody");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Physics/Flag Gravity", false, 81)]
+        public static void CreateFlagGravity(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagGravity");
+            go.AddComponent<GatrixFlagGravity>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Gravity");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Physics/Flag Collider", false, 82)]
+        public static void CreateFlagCollider(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagCollider");
+            go.AddComponent<BoxCollider>();
+            go.AddComponent<GatrixFlagCollider>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Collider");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Physics/Flag Renderer Toggle", false, 83)]
+        public static void CreateFlagRendererToggle(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagRendererToggle");
+            go.AddComponent<MeshRenderer>();
+            go.AddComponent<GatrixFlagRendererToggle>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Renderer Toggle");
+            Selection.activeObject = go;
+        }
+
+        // ── 2D ──
+
+        [MenuItem(RootMenu + "2D/Flag Sprite Renderer", false, 90)]
+        public static void CreateFlagSpriteRenderer(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagSpriteRenderer");
+            go.AddComponent<SpriteRenderer>();
+            go.AddComponent<GatrixFlagSpriteRenderer>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Sprite Renderer");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "2D/Flag Rigidbody 2D", false, 91)]
+        public static void CreateFlagRigidbody2D(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagRigidbody2D");
+            go.AddComponent<Rigidbody2D>();
+            go.AddComponent<GatrixFlagRigidbody2D>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Rigidbody 2D");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "2D/Flag Sorting Order", false, 92)]
+        public static void CreateFlagSortingOrder(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagSortingOrder");
+            go.AddComponent<SpriteRenderer>();
+            go.AddComponent<GatrixFlagSortingOrder>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Sorting Order");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "2D/Flag Joint 2D", false, 93)]
+        public static void CreateFlagJoint2D(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagJoint2D");
+            go.AddComponent<Rigidbody2D>();
+            go.AddComponent<HingeJoint2D>();
+            go.AddComponent<GatrixFlagJoint2D>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Joint 2D");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "2D/Flag Effector 2D", false, 94)]
+        public static void CreateFlagEffector2D(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagEffector2D");
+            go.AddComponent<Collider2D>();
+            go.AddComponent<AreaEffector2D>();
+            go.AddComponent<GatrixFlagEffector2D>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Effector 2D");
+            Selection.activeObject = go;
+        }
+
+        // ── Navigation / AI ──
+
+        [MenuItem(RootMenu + "Navigation & AI/Flag NavMesh Agent", false, 100)]
+        public static void CreateFlagNavMeshAgent(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagNavMeshAgent");
+            go.AddComponent<GatrixFlagNavMeshAgent>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag NavMesh Agent");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Navigation & AI/Flag NavMesh Obstacle", false, 101)]
+        public static void CreateFlagNavMeshObstacle(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagNavMeshObstacle");
+            go.AddComponent<GatrixFlagNavMeshObstacle>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag NavMesh Obstacle");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Navigation & AI/Flag Detection Range", false, 102)]
+        public static void CreateFlagDetectionRange(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagDetectionRange");
+            go.AddComponent<GatrixFlagDetectionRange>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Detection Range");
+            Selection.activeObject = go;
+        }
+
+        // ── Environment ──
+
+        [MenuItem(RootMenu + "Environment/Flag Fog", false, 110)]
+        public static void CreateFlagFog(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagFog");
+            go.AddComponent<GatrixFlagFog>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Fog");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Environment/Flag Ambient Light", false, 111)]
+        public static void CreateFlagAmbientLight(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagAmbientLight");
+            go.AddComponent<GatrixFlagAmbientLight>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Ambient Light");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Environment/Flag Skybox", false, 112)]
+        public static void CreateFlagSkybox(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagSkybox");
+            go.AddComponent<GatrixFlagSkybox>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Skybox");
+            Selection.activeObject = go;
+        }
+
+        // ── Time ──
+
+        [MenuItem(RootMenu + "Time/Flag Time Scale", false, 120)]
+        public static void CreateFlagTimeScale(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagTimeScale");
+            go.AddComponent<GatrixFlagTimeScale>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Time Scale");
+            Selection.activeObject = go;
+        }
+
+        [MenuItem(RootMenu + "Time/Flag Frame Rate", false, 121)]
+        public static void CreateFlagFrameRate(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagFrameRate");
+            go.AddComponent<GatrixFlagFrameRate>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Frame Rate");
+            Selection.activeObject = go;
+        }
+
+        // ── Post FX ──
+
+        [MenuItem(RootMenu + "PostFX/Flag Post Process Volume", false, 130)]
+        public static void CreateFlagPostProcessVolume(MenuCommand menuCommand)
+        {
+            GameObject go = new GameObject("FlagPostProcessVolume");
+            go.AddComponent<GatrixFlagPostProcessVolume>();
+
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create Flag Post Process Volume");
+            Selection.activeObject = go;
+        }
+
         private static GameObject CreateUIObject(string name, MenuCommand menuCommand)
         {
             GameObject go = new GameObject(name);

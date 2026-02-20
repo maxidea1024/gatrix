@@ -757,7 +757,7 @@ MonoBehaviour:
       m_Data: 47108
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 46730
+    - m_Data: 46732
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -790,7 +790,7 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 46730
+    - m_Data: 46732
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1751,10 +1751,10 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 568
-      height: 890
-    m_Scale: {x: 0.221875, y: 0.221875}
-    m_Translation: {x: 284, y: 445}
+      width: 567
+      height: 627
+    m_Scale: {x: 0.22148438, y: 0.22148438}
+    m_Translation: {x: 283.5, y: 313.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
@@ -1762,12 +1762,12 @@ MonoBehaviour:
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
       x: -1280
-      y: -2005.6338
+      y: -1415.4497
       width: 2560
-      height: 4011.2676
+      height: 2830.8994
     m_MinimalGUI: 1
-  m_defaultScale: 0.221875
-  m_LastWindowPixelSize: {x: 568, y: 911}
+  m_defaultScale: 0.22148438
+  m_LastWindowPixelSize: {x: 567, y: 648}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000100000100
