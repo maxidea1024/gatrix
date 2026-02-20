@@ -81,16 +81,16 @@ namespace Gatrix.Unity.SDK.Editor
                 {
                     EditorGUILayout.Space(4);
 
-                    // Show cached flag data from GatrixEditorClient
-                    _showFlags = DrawCollapsibleSectionBar("  Feature Flags (Cached)",
-                        _showFlags, $"({editorClient.Features.GetAllFlags().Count})", GatrixEditorStyle.AccentGreen);
-                    if (_showFlags)
-                        DrawFlagsContent(editorClient);
-
+                    // Show cached context first, then flag data
                     _showContext = DrawCollapsibleSectionBar("  Evaluation Context",
                         _showContext, null, GatrixEditorStyle.AccentTeal);
                     if (_showContext)
                         DrawContextContent(editorClient);
+
+                    _showFlags = DrawCollapsibleSectionBar("  Feature Flags (Cached)",
+                        _showFlags, $"({editorClient.Features.GetAllFlags().Count})", GatrixEditorStyle.AccentGreen);
+                    if (_showFlags)
+                        DrawFlagsContent(editorClient);
                 }
 
                 return;
@@ -109,17 +109,17 @@ namespace Gatrix.Unity.SDK.Editor
             DrawSectionBar("  Status", GatrixEditorStyle.AccentBlue);
             DrawStatusContent(client);
 
-            // ── Feature Flags ────────────────────────────────────
-            _showFlags = DrawCollapsibleSectionBar("  Feature Flags", _showFlags,
-                $"({client.Features.GetAllFlags().Count})", GatrixEditorStyle.AccentGreen);
-            if (_showFlags)
-                DrawFlagsContent(client);
-
             // ── Context ──────────────────────────────────────────
             _showContext = DrawCollapsibleSectionBar("  Evaluation Context", _showContext,
                 null, GatrixEditorStyle.AccentTeal);
             if (_showContext)
                 DrawContextContent(client);
+
+            // ── Feature Flags ────────────────────────────────────
+            _showFlags = DrawCollapsibleSectionBar("  Feature Flags", _showFlags,
+                $"({client.Features.GetAllFlags().Count})", GatrixEditorStyle.AccentGreen);
+            if (_showFlags)
+                DrawFlagsContent(client);
 
             // ── Statistics ───────────────────────────────────────
             _showStats = DrawCollapsibleSectionBar("  Runtime Stats", _showStats,
@@ -330,7 +330,20 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
-            GatrixFlagTable.Draw(flags);
+            // Build pending map when explicit sync mode is active
+            Dictionary<string, EvaluatedFlag> pendingMap = null;
+            if (client.Features.IsExplicitSync() && client.Features.HasPendingSyncFlags())
+            {
+                var realtimeFlags = client.Features.GetAllFlags(forceRealtime: true);
+                if (realtimeFlags != null)
+                {
+                    pendingMap = new Dictionary<string, EvaluatedFlag>(realtimeFlags.Count);
+                    foreach (var f in realtimeFlags)
+                        pendingMap[f.Name] = f;
+                }
+            }
+
+            GatrixFlagTable.Draw(flags, pendingMap: pendingMap);
 
             EditorGUILayout.Space(4);
         }
