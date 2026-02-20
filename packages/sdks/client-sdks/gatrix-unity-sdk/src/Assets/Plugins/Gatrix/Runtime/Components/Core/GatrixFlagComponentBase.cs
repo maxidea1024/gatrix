@@ -71,5 +71,17 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         /// <param name="flag">The latest flag state proxy.</param>
         protected abstract void OnFlagChanged(FlagProxy flag);
+
+#if UNITY_EDITOR
+        protected virtual void OnValidate()
+        {
+            // Re-subscribe when _flagName or _use changes in the Inspector during Play Mode.
+            // OnValidate() is called by Unity whenever a serialized field is modified.
+            if (Application.isPlaying && GatrixBehaviour.IsInitialized)
+            {
+                Subscribe();
+            }
+        }
+#endif
     }
 }
