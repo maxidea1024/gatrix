@@ -41,21 +41,18 @@ static const FString FlagsMetricsSent = TEXT("flags.metrics_sent");
 /** Error sending metrics */
 static const FString FlagsMetricsError = TEXT("flags.metrics_error");
 /** Streaming connected to server */
-static const FString FlagsStreamingConnected =
-    TEXT("flags.streaming_connected");
+static const FString FlagsStreamingConnected = TEXT("flags.streaming_connected");
 /** Streaming disconnected from server */
-static const FString FlagsStreamingDisconnected =
-    TEXT("flags.streaming_disconnected");
+static const FString FlagsStreamingDisconnected = TEXT("flags.streaming_disconnected");
 /** Streaming error occurred */
 static const FString FlagsStreamingError = TEXT("flags.streaming_error");
 /** Streaming reconnecting */
-static const FString FlagsStreamingReconnecting =
-    TEXT("flags.streaming_reconnecting");
+static const FString FlagsStreamingReconnecting = TEXT("flags.streaming_reconnecting");
 /** Flags invalidated by streaming (triggers re-fetch) */
 static const FString FlagsInvalidated = TEXT("flags.invalidated");
 
 /** Get the per-flag change event name */
-inline FString FlagChange(const FString &FlagName) {
+inline FString FlagChange(const FString& FlagName) {
   return FString::Printf(TEXT("flags.change:%s"), *FlagName);
 }
 } // namespace GatrixEvents

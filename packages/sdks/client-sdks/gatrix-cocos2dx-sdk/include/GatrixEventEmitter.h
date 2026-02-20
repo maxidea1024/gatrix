@@ -8,29 +8,22 @@
 #include <string>
 #include <vector>
 
-
 namespace gatrix {
 
-using GatrixEventCallback =
-    std::function<void(const std::vector<std::string> &)>;
-using GatrixAnyCallback =
-    std::function<void(const std::string &, const std::vector<std::string> &)>;
+using GatrixEventCallback = std::function<void(const std::vector<std::string>&)>;
+using GatrixAnyCallback = std::function<void(const std::string&, const std::vector<std::string>&)>;
 
 class GatrixEventEmitter {
 public:
-  void on(const std::string &event, GatrixEventCallback callback,
-          const std::string &name = "") {
-    _listeners[event].push_back(
-        {callback, resolveName(name), nowISO(), false, 0});
+  void on(const std::string& event, GatrixEventCallback callback, const std::string& name = "") {
+    _listeners[event].push_back({callback, resolveName(name), nowISO(), false, 0});
   }
 
-  void once(const std::string &event, GatrixEventCallback callback,
-            const std::string &name = "") {
-    _listeners[event].push_back(
-        {callback, resolveName(name), nowISO(), true, 0});
+  void once(const std::string& event, GatrixEventCallback callback, const std::string& name = "") {
+    _listeners[event].push_back({callback, resolveName(name), nowISO(), true, 0});
   }
 
-  void off(const std::string &event, GatrixEventCallback callback = nullptr) {
+  void off(const std::string& event, GatrixEventCallback callback = nullptr) {
     if (!callback) {
       _listeners.erase(event);
     }
@@ -39,38 +32,36 @@ public:
     // event.
   }
 
-  void onAny(GatrixAnyCallback callback, const std::string &name = "") {
+  void onAny(GatrixAnyCallback callback, const std::string& name = "") {
     _anyListeners.push_back({callback, resolveName(name)});
   }
 
   void offAny() { _anyListeners.clear(); }
 
-  void emit(const std::string &event,
-            const std::vector<std::string> &args = {}) {
+  void emit(const std::string& event, const std::vector<std::string>& args = {}) {
     // Fire specific listeners
     if (_listeners.count(event)) {
-      auto &list = _listeners[event];
-      for (auto &l : list) {
+      auto& list = _listeners[event];
+      for (auto& l : list) {
         l.callCount++;
         l.callback(args);
       }
       // Remove once listeners
-      list.erase(std::remove_if(list.begin(), list.end(),
-                                [](const Listener &l) { return l.isOnce; }),
-                 list.end());
+      list.erase(
+          std::remove_if(list.begin(), list.end(), [](const Listener& l) { return l.isOnce; }),
+          list.end());
     }
 
     // Fire any listeners
-    for (auto &al : _anyListeners) {
+    for (auto& al : _anyListeners) {
       al.callback(event, args);
     }
   }
 
-  std::map<std::string, std::vector<EventHandlerStats>>
-  getHandlerStats() const {
+  std::map<std::string, std::vector<EventHandlerStats>> getHandlerStats() const {
     std::map<std::string, std::vector<EventHandlerStats>> stats;
-    for (const auto &[event, listeners] : _listeners) {
-      for (const auto &l : listeners) {
+    for (const auto& [event, listeners] : _listeners) {
+      for (const auto& l : listeners) {
         stats[event].push_back({l.name, l.callCount, l.isOnce, l.registeredAt});
       }
     }
@@ -95,7 +86,7 @@ private:
   std::vector<AnyListener> _anyListeners;
   int _autoNameCount = 0;
 
-  std::string resolveName(const std::string &name) {
+  std::string resolveName(const std::string& name) {
     if (!name.empty())
       return name;
     return "listener_" + std::to_string(++_autoNameCount);

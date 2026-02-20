@@ -10,9 +10,9 @@
 const FString UGatrixClient::SdkVersion = GATRIX_SDK_VERSION;
 const FString UGatrixClient::SdkName = GATRIX_SDK_NAME;
 
-UGatrixClient *UGatrixClient::Singleton = nullptr;
+UGatrixClient* UGatrixClient::Singleton = nullptr;
 
-UGatrixClient *UGatrixClient::Get() {
+UGatrixClient* UGatrixClient::Get() {
   if (!Singleton) {
     Singleton = NewObject<UGatrixClient>();
     Singleton->AddToRoot(); // Prevent GC
@@ -20,32 +20,27 @@ UGatrixClient *UGatrixClient::Get() {
   return Singleton;
 }
 
-void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
+void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
   if (bInitialized) {
-    UE_LOG(LogGatrix, Log,
-           TEXT("Already initialized. Auto-stopping before re-init."));
+    UE_LOG(LogGatrix, Log, TEXT("Already initialized. Auto-stopping before re-init."));
     Stop();
   }
 
   // Validate required fields
   if (InConfig.ApiUrl.IsEmpty()) {
-    UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: apiUrl is required"));
+    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: apiUrl is required"));
     return;
   }
   if (InConfig.ApiToken.IsEmpty()) {
-    UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: apiToken is required"));
+    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: apiToken is required"));
     return;
   }
   if (InConfig.AppName.IsEmpty()) {
-    UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: appName is required"));
+    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: appName is required"));
     return;
   }
   if (InConfig.Environment.IsEmpty()) {
-    UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: environment is required"));
+    UE_LOG(LogGatrix, Error, TEXT("Config validation failed: environment is required"));
     return;
   }
 
@@ -60,7 +55,7 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   }
 
   // Validate numeric ranges
-  const auto &Feat = InConfig.Features;
+  const auto& Feat = InConfig.Features;
   if (Feat.RefreshInterval < 1.0f || Feat.RefreshInterval > 86400.0f) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: RefreshInterval must be between 1 "
@@ -75,8 +70,7 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
            Feat.MetricsInterval);
     return;
   }
-  if (Feat.MetricsIntervalInitial < 0.0f ||
-      Feat.MetricsIntervalInitial > 3600.0f) {
+  if (Feat.MetricsIntervalInitial < 0.0f || Feat.MetricsIntervalInitial > 3600.0f) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: MetricsIntervalInitial must be "
                 "between 0 and 3600, got %f"),
@@ -85,7 +79,7 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   }
 
   // Validate fetch retry options
-  const auto &Retry = Feat.FetchRetryOptions;
+  const auto& Retry = Feat.FetchRetryOptions;
   if (Retry.Limit < 0 || Retry.Limit > 10) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: FetchRetryOptions.Limit must be "
@@ -123,12 +117,10 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   }
 
   Config = InConfig;
-  ClientConnectionId =
-      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
+  ClientConnectionId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
 
   // Create file-based storage provider (persists flags across sessions)
-  StorageProvider =
-      MakeShareable(new FGatrixFileStorageProvider(Config.CacheKeyPrefix));
+  StorageProvider = MakeShareable(new FGatrixFileStorageProvider(Config.CacheKeyPrefix));
 
   // Create features client
   FeaturesClient = NewObject<UGatrixFeaturesClient>(this);
@@ -136,14 +128,13 @@ void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
 
   bInitialized = true;
 
-  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"),
-         *Config.AppName, *Config.Environment, *ClientConnectionId);
+  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"), *Config.AppName,
+         *Config.Environment, *ClientConnectionId);
 }
 
 void UGatrixClient::Start() {
   if (!bInitialized) {
-    UE_LOG(LogGatrix, Error,
-           TEXT("Cannot start - not initialized. Call Init() first."));
+    UE_LOG(LogGatrix, Error, TEXT("Cannot start - not initialized. Call Init() first."));
     return;
   }
 
@@ -155,6 +146,17 @@ void UGatrixClient::Start() {
   bStarted = true;
   FeaturesClient->Start();
 
+  UE_LOG(LogGatrix, Log, TEXT("Started."));
+}
+
+void UGatrixClient::Start(TFunction<void(bool, const FString&)> OnComplete) {
+  if (!bInitialized) {
+    if (OnComplete)
+      OnComplete(false, TEXT("Not initialized. Call Init() first."));
+    return;
+  }
+  bStarted = true;
+  FeaturesClient->Start(MoveTemp(OnComplete));
   UE_LOG(LogGatrix, Log, TEXT("Started."));
 }
 
@@ -179,77 +181,65 @@ bool UGatrixClient::IsReady() const {
   return FeaturesClient ? FeaturesClient->IsReady() : false;
 }
 
-bool UGatrixClient::IsEnabled(const FString &FlagName) const {
+bool UGatrixClient::IsEnabled(const FString& FlagName) const {
   return FeaturesClient ? FeaturesClient->IsEnabled(FlagName) : false;
 }
 
-bool UGatrixClient::BoolVariation(const FString &FlagName,
-                                  bool DefaultValue) const {
-  return FeaturesClient ? FeaturesClient->BoolVariation(FlagName, DefaultValue)
-                        : DefaultValue;
+bool UGatrixClient::BoolVariation(const FString& FlagName, bool DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->BoolVariation(FlagName, DefaultValue) : DefaultValue;
 }
 
-FString UGatrixClient::StringVariation(const FString &FlagName,
-                                       const FString &DefaultValue) const {
-  return FeaturesClient
-             ? FeaturesClient->StringVariation(FlagName, DefaultValue)
-             : DefaultValue;
+FString UGatrixClient::StringVariation(const FString& FlagName, const FString& DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->StringVariation(FlagName, DefaultValue) : DefaultValue;
 }
 
-int32 UGatrixClient::IntVariation(const FString &FlagName,
-                                  int32 DefaultValue) const {
-  return FeaturesClient ? FeaturesClient->IntVariation(FlagName, DefaultValue)
-                        : DefaultValue;
+int32 UGatrixClient::IntVariation(const FString& FlagName, int32 DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->IntVariation(FlagName, DefaultValue) : DefaultValue;
 }
 
-float UGatrixClient::FloatVariation(const FString &FlagName,
-                                    float DefaultValue) const {
-  return FeaturesClient ? FeaturesClient->FloatVariation(FlagName, DefaultValue)
-                        : DefaultValue;
+float UGatrixClient::FloatVariation(const FString& FlagName, float DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->FloatVariation(FlagName, DefaultValue) : DefaultValue;
 }
 
-double UGatrixClient::DoubleVariation(const FString &FlagName,
-                                      double DefaultValue) const {
-  return FeaturesClient
-             ? FeaturesClient->DoubleVariation(FlagName, DefaultValue)
-             : DefaultValue;
+double UGatrixClient::DoubleVariation(const FString& FlagName, double DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->DoubleVariation(FlagName, DefaultValue) : DefaultValue;
 }
 
-FGatrixVariant UGatrixClient::GetVariant(const FString &FlagName) const {
+FGatrixVariant UGatrixClient::GetVariant(const FString& FlagName) const {
   return FeaturesClient ? FeaturesClient->GetVariant(FlagName)
                         : FGatrixVariant(GatrixVariantSource::Missing, false);
 }
 
 TArray<FGatrixEvaluatedFlag> UGatrixClient::GetAllFlags() const {
-  return FeaturesClient ? FeaturesClient->GetAllFlags()
-                        : TArray<FGatrixEvaluatedFlag>();
+  return FeaturesClient ? FeaturesClient->GetAllFlags() : TArray<FGatrixEvaluatedFlag>();
 }
 
-int32 UGatrixClient::On(const FString &EventName,
-                        TFunction<void(const TArray<FString> &)> Callback,
-                        const FString &Name) {
+int32 UGatrixClient::On(const FString& EventName, TFunction<void(const TArray<FString>&)> Callback,
+                        const FString& Name) {
   return EventEmitter.On(EventName, MoveTemp(Callback), Name);
 }
 
-int32 UGatrixClient::Once(const FString &EventName,
-                          TFunction<void(const TArray<FString> &)> Callback,
-                          const FString &Name) {
+int32 UGatrixClient::Once(const FString& EventName,
+                          TFunction<void(const TArray<FString>&)> Callback, const FString& Name) {
   return EventEmitter.Once(EventName, MoveTemp(Callback), Name);
 }
 
-void UGatrixClient::Off(int32 Handle) { EventEmitter.Off(Handle); }
+void UGatrixClient::Off(int32 Handle) {
+  EventEmitter.Off(Handle);
+}
 
-void UGatrixClient::Off(const FString &EventName) {
+void UGatrixClient::Off(const FString& EventName) {
   EventEmitter.OffAll(EventName);
 }
 
-int32 UGatrixClient::OnAny(
-    TFunction<void(const FString &, const TArray<FString> &)> Callback,
-    const FString &Name) {
+int32 UGatrixClient::OnAny(TFunction<void(const FString&, const TArray<FString>&)> Callback,
+                           const FString& Name) {
   return EventEmitter.OnAny(MoveTemp(Callback), Name);
 }
 
-void UGatrixClient::OffAny(int32 Handle) { EventEmitter.OffAny(Handle); }
+void UGatrixClient::OffAny(int32 Handle) {
+  EventEmitter.OffAny(Handle);
+}
 
 FGatrixSdkStats UGatrixClient::GetStats() const {
   FGatrixSdkStats Stats;
@@ -258,17 +248,25 @@ FGatrixSdkStats UGatrixClient::GetStats() const {
 
   if (FeaturesClient) {
     Stats.Features = FeaturesClient->GetStats();
-    Stats.SdkState = Stats.Features.TotalFlagCount > 0
-                         ? EGatrixSdkState::Healthy
-                         : EGatrixSdkState::Initializing;
+    Stats.SdkState = Stats.Features.TotalFlagCount > 0 ? EGatrixSdkState::Healthy
+                                                       : EGatrixSdkState::Initializing;
   }
 
   return Stats;
 }
 
-void UGatrixClient::UpdateContext(const FGatrixContext &NewContext) {
+void UGatrixClient::UpdateContext(const FGatrixContext& NewContext) {
   if (FeaturesClient) {
     FeaturesClient->UpdateContext(NewContext);
+  }
+}
+
+void UGatrixClient::UpdateContext(const FGatrixContext& NewContext,
+                                  TFunction<void(bool, const FString&)> OnComplete) {
+  if (FeaturesClient) {
+    FeaturesClient->UpdateContext(NewContext, MoveTemp(OnComplete));
+  } else if (OnComplete) {
+    OnComplete(false, TEXT("Client not initialized"));
   }
 }
 
@@ -276,10 +274,14 @@ FGatrixContext UGatrixClient::GetContext() const {
   return FeaturesClient ? FeaturesClient->GetContext() : FGatrixContext();
 }
 
-FGatrixOnReady &UGatrixClient::GetOnReady() { return FeaturesClient->OnReady; }
+FGatrixOnReady& UGatrixClient::GetOnReady() {
+  return FeaturesClient->OnReady;
+}
 
-FGatrixOnChange &UGatrixClient::GetOnChange() {
+FGatrixOnChange& UGatrixClient::GetOnChange() {
   return FeaturesClient->OnChange;
 }
 
-FGatrixOnError &UGatrixClient::GetOnError() { return FeaturesClient->OnError; }
+FGatrixOnError& UGatrixClient::GetOnError() {
+  return FeaturesClient->OnError;
+}

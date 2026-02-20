@@ -21,28 +21,26 @@ class UGatrixFeaturesClient;
  */
 class GATRIXSDK_API FGatrixWatchFlagGroup {
 public:
-  FGatrixWatchFlagGroup(UGatrixFeaturesClient *InClient, const FString &InName);
+  FGatrixWatchFlagGroup(UGatrixFeaturesClient* InClient, const FString& InName);
 
   /** Get the group name */
-  const FString &GetName() const { return Name; }
+  const FString& GetName() const { return Name; }
 
   /** Watch a flag for realtime changes and add to this group */
-  FGatrixWatchFlagGroup &WatchRealtimeFlag(const FString &FlagName,
+  FGatrixWatchFlagGroup& WatchRealtimeFlag(const FString& FlagName,
                                            FGatrixFlagWatchDelegate Callback);
 
   /** Watch a flag for realtime changes with initial state */
-  FGatrixWatchFlagGroup &
-  WatchRealtimeFlagWithInitialState(const FString &FlagName,
-                                    FGatrixFlagWatchDelegate Callback);
+  FGatrixWatchFlagGroup& WatchRealtimeFlagWithInitialState(const FString& FlagName,
+                                                           FGatrixFlagWatchDelegate Callback);
 
   /** Watch a flag for synced changes and add to this group */
-  FGatrixWatchFlagGroup &WatchSyncedFlag(const FString &FlagName,
+  FGatrixWatchFlagGroup& WatchSyncedFlag(const FString& FlagName,
                                          FGatrixFlagWatchDelegate Callback);
 
   /** Watch a flag for synced changes with initial state */
-  FGatrixWatchFlagGroup &
-  WatchSyncedFlagWithInitialState(const FString &FlagName,
-                                  FGatrixFlagWatchDelegate Callback);
+  FGatrixWatchFlagGroup& WatchSyncedFlagWithInitialState(const FString& FlagName,
+                                                         FGatrixFlagWatchDelegate Callback);
 
   /** Unwatch all registered watchers in this group */
   void UnwatchAll();
@@ -54,7 +52,7 @@ public:
   int32 Size() const { return WatchHandles.Num(); }
 
 private:
-  UGatrixFeaturesClient *Client;
+  UGatrixFeaturesClient* Client;
   FString Name;
   TArray<int32> WatchHandles;
 };

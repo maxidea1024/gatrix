@@ -29,14 +29,13 @@ UGatrixFeaturesClient::UGatrixFeaturesClient() {}
 
 // ==================== Initialization ====================
 
-void UGatrixFeaturesClient::Initialize(
-    const FGatrixClientConfig &Config, FGatrixEventEmitter *Emitter,
-    TSharedPtr<IGatrixStorageProvider> Storage) {
+void UGatrixFeaturesClient::Initialize(const FGatrixClientConfig& Config,
+                                       FGatrixEventEmitter* Emitter,
+                                       TSharedPtr<IGatrixStorageProvider> Storage) {
   ClientConfig = Config;
   EventEmitter = Emitter;
   StorageProvider = Storage;
-  ConnectionId =
-      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
+  ConnectionId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
   SdkState = EGatrixSdkState::Initializing;
 
   // Ensure context has system fields
@@ -54,8 +53,8 @@ void UGatrixFeaturesClient::Initialize(
     EventEmitter->Emit(GatrixEvents::FlagsInit);
   }
 
-  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"),
-         *ClientConfig.AppName, *ClientConfig.Environment, *ConnectionId);
+  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"), *ClientConfig.AppName,
+         *ClientConfig.Environment, *ConnectionId);
 }
 
 void UGatrixFeaturesClient::Start() {
@@ -71,8 +70,7 @@ void UGatrixFeaturesClient::Start() {
                 "refreshInterval=%.1f, disableRefresh=%s"),
            ClientConfig.bOfflineMode ? TEXT("True") : TEXT("False"),
            ClientConfig.Features.RefreshInterval,
-           ClientConfig.Features.bDisableRefresh ? TEXT("True")
-                                                 : TEXT("False"));
+           ClientConfig.Features.bDisableRefresh ? TEXT("True") : TEXT("False"));
   }
 
   if (ClientConfig.bOfflineMode) {
@@ -80,8 +78,7 @@ void UGatrixFeaturesClient::Start() {
       SdkState = EGatrixSdkState::Error;
       FGatrixErrorEvent ErrorEvent;
       ErrorEvent.Type = TEXT("offline_no_data");
-      ErrorEvent.Message =
-          TEXT("offlineMode requires bootstrap data or cached flags");
+      ErrorEvent.Message = TEXT("offlineMode requires bootstrap data or cached flags");
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::SdkError, ErrorEvent.Message);
       }
@@ -106,6 +103,24 @@ void UGatrixFeaturesClient::Start() {
   }
 }
 
+void UGatrixFeaturesClient::Start(TFunction<void(bool, const FString&)> OnComplete) {
+  if (!OnComplete) {
+    Start();
+    return;
+  }
+
+  // Already ready — notify immediately
+  if (bReadyEmitted) {
+    OnComplete(true, TEXT(""));
+    return;
+  }
+
+  // In offline mode Start() calls SetReady() synchronously after setting
+  // bStarted, so we queue first and then call Start().
+  PendingStartCallbacks.Add(MoveTemp(OnComplete));
+  Start();
+}
+
 void UGatrixFeaturesClient::Stop() {
   if (ClientConfig.bEnableDevMode) {
     UE_LOG(LogGatrix, Log, TEXT("[DEV] Stop() called"));
@@ -120,8 +135,7 @@ void UGatrixFeaturesClient::Stop() {
 
 // ==================== Flag Access (Thread-Safe) ====================
 
-TMap<FString, FGatrixEvaluatedFlag>
-UGatrixFeaturesClient::SelectFlags(bool bForceRealtime) const {
+TMap<FString, FGatrixEvaluatedFlag> UGatrixFeaturesClient::SelectFlags(bool bForceRealtime) const {
   FScopeLock Lock(&FlagsCriticalSection);
   if (bForceRealtime || !ClientConfig.Features.bExplicitSyncMode) {
     return RealtimeFlags;
@@ -129,16 +143,14 @@ UGatrixFeaturesClient::SelectFlags(bool bForceRealtime) const {
   return SynchronizedFlags;
 }
 
-bool UGatrixFeaturesClient::IsEnabled(const FString &FlagName,
-                                      bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->IsEnabledInternal(
-      FlagName, bForceRealtime);
+bool UGatrixFeaturesClient::IsEnabled(const FString& FlagName, bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->IsEnabledInternal(FlagName, bForceRealtime);
 }
 
-FGatrixEvaluatedFlag UGatrixFeaturesClient::GetFlag(const FString &FlagName,
+FGatrixEvaluatedFlag UGatrixFeaturesClient::GetFlag(const FString& FlagName,
                                                     bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found) {
     TrackAccess(FlagName, nullptr, TEXT("getFlag"), TEXT(""));
     return FGatrixEvaluatedFlag();
@@ -147,19 +159,17 @@ FGatrixEvaluatedFlag UGatrixFeaturesClient::GetFlag(const FString &FlagName,
   return *Found;
 }
 
-FGatrixVariant UGatrixFeaturesClient::GetVariant(const FString &FlagName,
+FGatrixVariant UGatrixFeaturesClient::GetVariant(const FString& FlagName,
                                                  bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->GetVariantInternal(
-      FlagName, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->GetVariantInternal(FlagName, bForceRealtime);
 }
 
-UGatrixFlagProxy *UGatrixFeaturesClient::CreateProxy(const FString &FlagName,
-                                                     bool bForceRealtime) {
+UGatrixFlagProxy* UGatrixFeaturesClient::CreateProxy(const FString& FlagName, bool bForceRealtime) {
   FScopeLock Lock(&FlagsCriticalSection);
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  UGatrixFlagProxy *Proxy = NewObject<UGatrixFlagProxy>(this);
+  UGatrixFlagProxy* Proxy = NewObject<UGatrixFlagProxy>(this);
 
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (Found) {
     TrackAccess(FlagName, Found, TEXT("watch"), Found->Variant.Name);
   } else {
@@ -177,139 +187,135 @@ TArray<FGatrixEvaluatedFlag> UGatrixFeaturesClient::GetAllFlags() const {
   return Result;
 }
 
-bool UGatrixFeaturesClient::HasFlag(const FString &FlagName) const {
+bool UGatrixFeaturesClient::HasFlag(const FString& FlagName) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
   return Flags.Contains(FlagName);
 }
 
 // ==================== Variation Methods ====================
 
-FString UGatrixFeaturesClient::Variation(const FString &FlagName,
-                                         const FString &FallbackValue,
+FString UGatrixFeaturesClient::Variation(const FString& FlagName, const FString& FallbackValue,
                                          bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->VariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->VariationInternal(FlagName, FallbackValue,
+                                                                     bForceRealtime);
 }
 
-bool UGatrixFeaturesClient::BoolVariation(const FString &FlagName,
-                                          bool FallbackValue,
+bool UGatrixFeaturesClient::BoolVariation(const FString& FlagName, bool FallbackValue,
                                           bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->BoolVariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->BoolVariationInternal(FlagName, FallbackValue,
+                                                                         bForceRealtime);
 }
 
-FString UGatrixFeaturesClient::StringVariation(const FString &FlagName,
-                                               const FString &FallbackValue,
+FString UGatrixFeaturesClient::StringVariation(const FString& FlagName,
+                                               const FString& FallbackValue,
                                                bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->StringVariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->StringVariationInternal(FlagName, FallbackValue,
+                                                                           bForceRealtime);
 }
 
-float UGatrixFeaturesClient::FloatVariation(const FString &FlagName,
-                                            float FallbackValue,
+float UGatrixFeaturesClient::FloatVariation(const FString& FlagName, float FallbackValue,
                                             bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->FloatVariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->FloatVariationInternal(FlagName, FallbackValue,
+                                                                          bForceRealtime);
 }
 
-int32 UGatrixFeaturesClient::IntVariation(const FString &FlagName,
-                                          int32 FallbackValue,
+int32 UGatrixFeaturesClient::IntVariation(const FString& FlagName, int32 FallbackValue,
                                           bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->IntVariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->IntVariationInternal(FlagName, FallbackValue,
+                                                                        bForceRealtime);
 }
 
-double UGatrixFeaturesClient::DoubleVariation(const FString &FlagName,
-                                              double FallbackValue,
+double UGatrixFeaturesClient::DoubleVariation(const FString& FlagName, double FallbackValue,
                                               bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->DoubleVariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->DoubleVariationInternal(FlagName, FallbackValue,
+                                                                           bForceRealtime);
 }
 
-FString UGatrixFeaturesClient::JsonVariation(const FString &FlagName,
-                                             const FString &FallbackValue,
+FString UGatrixFeaturesClient::JsonVariation(const FString& FlagName, const FString& FallbackValue,
                                              bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->JsonVariationInternal(
-      FlagName, FallbackValue, bForceRealtime);
+  return const_cast<UGatrixFeaturesClient*>(this)->JsonVariationInternal(FlagName, FallbackValue,
+                                                                         bForceRealtime);
 }
 
 // ==================== Variation Details ====================
 
-FGatrixVariationResult UGatrixFeaturesClient::BoolVariationDetails(
-    const FString &FlagName, bool FallbackValue, bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)
-      ->BoolVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
-}
-
-FGatrixVariationResult
-UGatrixFeaturesClient::StringVariationDetails(const FString &FlagName,
-                                              const FString &FallbackValue,
-                                              bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)
-      ->StringVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
-}
-
-FGatrixVariationResult UGatrixFeaturesClient::IntVariationDetails(
-    const FString &FlagName, int32 FallbackValue, bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)->IntVariationDetailsInternal(
+FGatrixVariationResult UGatrixFeaturesClient::BoolVariationDetails(const FString& FlagName,
+                                                                   bool FallbackValue,
+                                                                   bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->BoolVariationDetailsInternal(
       FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult UGatrixFeaturesClient::FloatVariationDetails(
-    const FString &FlagName, float FallbackValue, bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)
-      ->FloatVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
+FGatrixVariationResult UGatrixFeaturesClient::StringVariationDetails(const FString& FlagName,
+                                                                     const FString& FallbackValue,
+                                                                     bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->StringVariationDetailsInternal(
+      FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult UGatrixFeaturesClient::DoubleVariationDetails(
-    const FString &FlagName, double FallbackValue, bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)
-      ->DoubleVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
+FGatrixVariationResult UGatrixFeaturesClient::IntVariationDetails(const FString& FlagName,
+                                                                  int32 FallbackValue,
+                                                                  bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->IntVariationDetailsInternal(
+      FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult
-UGatrixFeaturesClient::JsonVariationDetails(const FString &FlagName,
-                                            const FString &FallbackValue,
-                                            bool bForceRealtime) const {
-  return const_cast<UGatrixFeaturesClient *>(this)
-      ->JsonVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
+FGatrixVariationResult UGatrixFeaturesClient::FloatVariationDetails(const FString& FlagName,
+                                                                    float FallbackValue,
+                                                                    bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->FloatVariationDetailsInternal(
+      FlagName, FallbackValue, bForceRealtime);
+}
+
+FGatrixVariationResult UGatrixFeaturesClient::DoubleVariationDetails(const FString& FlagName,
+                                                                     double FallbackValue,
+                                                                     bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->DoubleVariationDetailsInternal(
+      FlagName, FallbackValue, bForceRealtime);
+}
+
+FGatrixVariationResult UGatrixFeaturesClient::JsonVariationDetails(const FString& FlagName,
+                                                                   const FString& FallbackValue,
+                                                                   bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient*>(this)->JsonVariationDetailsInternal(
+      FlagName, FallbackValue, bForceRealtime);
 }
 
 // ==================== OrThrow Variations ====================
 
-bool UGatrixFeaturesClient::BoolVariationOrThrow(const FString &FlagName,
-                                                 bool bForceRealtime) {
+bool UGatrixFeaturesClient::BoolVariationOrThrow(const FString& FlagName, bool bForceRealtime) {
   return BoolVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-FString UGatrixFeaturesClient::StringVariationOrThrow(const FString &FlagName,
+FString UGatrixFeaturesClient::StringVariationOrThrow(const FString& FlagName,
                                                       bool bForceRealtime) {
   return StringVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-float UGatrixFeaturesClient::FloatVariationOrThrow(const FString &FlagName,
-                                                   bool bForceRealtime) {
+float UGatrixFeaturesClient::FloatVariationOrThrow(const FString& FlagName, bool bForceRealtime) {
   return FloatVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-int32 UGatrixFeaturesClient::IntVariationOrThrow(const FString &FlagName,
-                                                 bool bForceRealtime) {
+int32 UGatrixFeaturesClient::IntVariationOrThrow(const FString& FlagName, bool bForceRealtime) {
   return IntVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-double UGatrixFeaturesClient::DoubleVariationOrThrow(const FString &FlagName,
-                                                     bool bForceRealtime) {
+double UGatrixFeaturesClient::DoubleVariationOrThrow(const FString& FlagName, bool bForceRealtime) {
   return DoubleVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
-FString UGatrixFeaturesClient::JsonVariationOrThrow(const FString &FlagName,
-                                                    bool bForceRealtime) {
+FString UGatrixFeaturesClient::JsonVariationOrThrow(const FString& FlagName, bool bForceRealtime) {
   return JsonVariationOrThrowInternal(FlagName, bForceRealtime);
 }
 
 // ==================== Context ====================
 
-void UGatrixFeaturesClient::UpdateContext(const FGatrixContext &NewContext) {
+void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext) {
+  UpdateContext(NewContext, nullptr);
+}
+
+void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
+                                          TFunction<void(bool, const FString&)> OnComplete) {
   // Preserve system fields
   FGatrixContext MergedContext = NewContext;
   MergedContext.AppName = ClientConfig.AppName;
@@ -319,10 +325,21 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext &NewContext) {
 
   ContextChangeCount.Increment();
 
-  // Re-fetch with new context
-  if (bStarted && !ClientConfig.bOfflineMode) {
-    FetchFlags();
+  // If not running or offline, no fetch will happen — notify immediately
+  if (!bStarted || ClientConfig.bOfflineMode) {
+    if (OnComplete) {
+      OnComplete(true, TEXT(""));
+    }
+    return;
   }
+
+  // Queue the completion callback before triggering the fetch so it is already
+  // registered when the fetch response arrives.
+  if (OnComplete) {
+    PendingContextCallbacks.Add(MoveTemp(OnComplete));
+  }
+
+  FetchFlags();
 }
 
 FGatrixContext UGatrixFeaturesClient::GetContext() const {
@@ -385,14 +402,21 @@ void UGatrixFeaturesClient::SetExplicitSyncMode(bool bEnabled) {
 // ==================== Fetch ====================
 
 void UGatrixFeaturesClient::FetchFlags() {
+  FetchFlags(nullptr);
+}
+
+void UGatrixFeaturesClient::FetchFlags(TFunction<void(bool, const FString&)> OnComplete) {
+  if (OnComplete) {
+    PendingFetchCallbacks.Add(MoveTemp(OnComplete));
+  }
+
   if (bIsFetching || !bStarted)
     return;
 
   bIsFetching = true;
 
   if (ClientConfig.bEnableDevMode) {
-    UE_LOG(LogGatrix, Log, TEXT("[DEV] FetchFlags: starting fetch. etag=%s"),
-           *Etag);
+    UE_LOG(LogGatrix, Log, TEXT("[DEV] FetchFlags: starting fetch. etag=%s"), *Etag);
   }
 
   if (EventEmitter) {
@@ -408,8 +432,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   FString Url = BuildFetchUrl();
   bool bUsePOST = ClientConfig.Features.bUsePOSTRequests;
 
-  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
-      FHttpModule::Get().CreateRequest();
+  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
   HttpRequest->SetURL(Url);
   HttpRequest->SetVerb(bUsePOST ? TEXT("POST") : TEXT("GET"));
   HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
@@ -417,9 +440,9 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
   HttpRequest->SetHeader(TEXT("X-Environment"), ClientConfig.Environment);
   HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
-  HttpRequest->SetHeader(TEXT("X-SDK-Version"),
-                         FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName,
-                                         *UGatrixClient::SdkVersion));
+  HttpRequest->SetHeader(
+      TEXT("X-SDK-Version"),
+      FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName, *UGatrixClient::SdkVersion));
 
   // ETag for conditional requests
   if (!Etag.IsEmpty()) {
@@ -427,7 +450,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   }
 
   // Custom headers
-  for (const auto &Header : ClientConfig.CustomHeaders) {
+  for (const auto& Header : ClientConfig.CustomHeaders) {
     HttpRequest->SetHeader(Header.Key, Header.Value);
   }
 
@@ -437,8 +460,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   }
 
   // Set timeout
-  HttpRequest->SetTimeout(ClientConfig.Features.FetchRetryOptions.TimeoutMs /
-                          1000.0f);
+  HttpRequest->SetTimeout(ClientConfig.Features.FetchRetryOptions.TimeoutMs / 1000.0f);
 
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsFetch, Etag);
@@ -446,8 +468,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
 
   // HTTP response callback - runs on game thread in UE4
   HttpRequest->OnProcessRequestComplete().BindLambda(
-      [this](FHttpRequestPtr Request, FHttpResponsePtr Response,
-             bool bWasSuccessful) {
+      [this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
         // Already on game thread in UE4 FHttpModule
         bIsFetching = false;
 
@@ -463,6 +484,33 @@ void UGatrixFeaturesClient::DoFetchFlags() {
           ErrorEvent.Type = TEXT("fetch_error");
           ErrorEvent.Message = ErrorMsg;
           OnError.Broadcast(ErrorEvent);
+
+          // Notify UpdateContext callers (safe MoveTemp drain)
+          {
+            auto Pending = MoveTemp(PendingContextCallbacks);
+            for (auto& Cb : Pending) {
+              if (Cb)
+                Cb(false, ErrorMsg);
+            }
+          }
+
+          // Notify FetchFlags(onComplete) callers
+          {
+            auto Pending = MoveTemp(PendingFetchCallbacks);
+            for (auto& Cb : Pending) {
+              if (Cb)
+                Cb(false, ErrorMsg);
+            }
+          }
+
+          // Notify Start(onComplete) callers if we never became ready
+          if (!bReadyEmitted) {
+            auto Pending = MoveTemp(PendingStartCallbacks);
+            for (auto& Cb : Pending) {
+              if (Cb)
+                Cb(false, ErrorMsg);
+            }
+          }
 
           SdkState = EGatrixSdkState::Error;
           // Network error: schedule with backoff
@@ -487,9 +535,8 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   HttpRequest->ProcessRequest();
 }
 
-void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
-                                                int32 HttpStatus,
-                                                const FString &EtagHeader) {
+void UGatrixFeaturesClient::HandleFetchResponse(const FString& ResponseBody, int32 HttpStatus,
+                                                const FString& EtagHeader) {
   // Check for recovery from error state
   if (SdkState == EGatrixSdkState::Error && HttpStatus < 400) {
     SdkState = EGatrixSdkState::Healthy;
@@ -511,14 +558,11 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
 
     // Parse response JSON
     TSharedPtr<FJsonObject> JsonObject;
-    TSharedRef<TJsonReader<>> Reader =
-        TJsonReaderFactory<>::Create(ResponseBody);
-    if (!FJsonSerializer::Deserialize(Reader, JsonObject) ||
-        !JsonObject.IsValid()) {
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
+    if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid()) {
       UE_LOG(LogGatrix, Error, TEXT("Failed to parse flags response JSON"));
       if (EventEmitter) {
-        EventEmitter->Emit(GatrixEvents::FlagsFetchError,
-                           TEXT("JSON parse error"));
+        EventEmitter->Emit(GatrixEvents::FlagsFetchError, TEXT("JSON parse error"));
       }
       return;
     }
@@ -532,19 +576,19 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     }
 
     // Parse flags from data.flags
-    const TSharedPtr<FJsonObject> *DataObj = nullptr;
+    const TSharedPtr<FJsonObject>* DataObj = nullptr;
     if (!JsonObject->TryGetObjectField(TEXT("data"), DataObj)) {
       return;
     }
 
-    const TArray<TSharedPtr<FJsonValue>> *FlagsArray = nullptr;
+    const TArray<TSharedPtr<FJsonValue>>* FlagsArray = nullptr;
     if (!(*DataObj)->TryGetArrayField(TEXT("flags"), FlagsArray)) {
       return;
     }
 
     TArray<FGatrixEvaluatedFlag> ParsedFlags;
-    for (const auto &FlagValue : *FlagsArray) {
-      const TSharedPtr<FJsonObject> *FlagObj = nullptr;
+    for (const auto& FlagValue : *FlagsArray) {
+      const TSharedPtr<FJsonObject>* FlagObj = nullptr;
       if (!FlagValue->TryGetObject(FlagObj))
         continue;
 
@@ -570,14 +614,13 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
         Flag.ValueType = EGatrixValueType::None;
 
       // Parse variant
-      const TSharedPtr<FJsonObject> *VariantObj = nullptr;
+      const TSharedPtr<FJsonObject>* VariantObj = nullptr;
       if ((*FlagObj)->TryGetObjectField(TEXT("variant"), VariantObj)) {
         (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
         (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
 
         // Payload: can be string, number, or object
-        const TSharedPtr<FJsonValue> PayloadValue =
-            (*VariantObj)->TryGetField(TEXT("value"));
+        const TSharedPtr<FJsonValue> PayloadValue = (*VariantObj)->TryGetField(TEXT("value"));
         if (PayloadValue.IsValid()) {
           switch (PayloadValue->Type) {
           case EJson::String:
@@ -593,8 +636,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
           case EJson::Array: {
             // Serialize back to JSON string
             FString JsonStr;
-            TSharedRef<TJsonWriter<>> Writer =
-                TJsonWriterFactory<>::Create(&JsonStr);
+            TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonStr);
             FJsonSerializer::Serialize(PayloadValue, TEXT(""), Writer);
             Flag.Variant.Value = JsonStr;
             break;
@@ -622,6 +664,24 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
       EventEmitter->Emit(GatrixEvents::FlagsFetchSuccess);
     }
 
+    // Notify UpdateContext callers (safe MoveTemp drain)
+    {
+      auto Pending = MoveTemp(PendingContextCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(true, TEXT(""));
+      }
+    }
+
+    // Notify FetchFlags(onComplete) callers
+    {
+      auto Pending = MoveTemp(PendingFetchCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(true, TEXT(""));
+      }
+    }
+
     // Success: reset failure counter and schedule at normal interval
     ConsecutiveFailures.Reset();
     ScheduleNextPoll();
@@ -636,6 +696,24 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
 
     if (EventEmitter) {
       EventEmitter->Emit(GatrixEvents::FlagsFetchSuccess);
+    }
+
+    // Notify UpdateContext callers (safe MoveTemp drain)
+    {
+      auto Pending = MoveTemp(PendingContextCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(true, TEXT(""));
+      }
+    }
+
+    // Notify FetchFlags(onComplete) callers
+    {
+      auto Pending = MoveTemp(PendingFetchCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(true, TEXT(""));
+      }
     }
 
     // 304: reset failure counter and schedule at normal interval
@@ -658,8 +736,8 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     OnError.Broadcast(ErrorEvent);
 
     // Check for non-retryable status codes
-    bool bIsNonRetryable = ClientConfig.Features.FetchRetryOptions
-                               .NonRetryableStatusCodes.Contains(HttpStatus);
+    bool bIsNonRetryable =
+        ClientConfig.Features.FetchRetryOptions.NonRetryableStatusCodes.Contains(HttpStatus);
 
     if (bIsNonRetryable) {
       // Non-retryable error: stop polling entirely
@@ -673,13 +751,40 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
       ConsecutiveFailures.Increment();
       ScheduleNextPoll();
     }
+
+    // Notify UpdateContext callers (safe MoveTemp drain)
+    {
+      auto Pending = MoveTemp(PendingContextCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(false, ErrorMsg);
+      }
+    }
+
+    // Notify FetchFlags(onComplete) callers
+    {
+      auto Pending = MoveTemp(PendingFetchCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(false, ErrorMsg);
+      }
+    }
+
+    // Notify Start(onComplete) callers if we never became ready
+    if (!bReadyEmitted) {
+      auto Pending = MoveTemp(PendingStartCallbacks);
+      for (auto& Cb : Pending) {
+        if (Cb)
+          Cb(false, ErrorMsg);
+      }
+    }
   }
 }
 
 // ==================== Storage ====================
 
-void UGatrixFeaturesClient::StoreFlags(
-    const TArray<FGatrixEvaluatedFlag> &NewFlags, bool bIsInitialFetch) {
+void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFlags,
+                                       bool bIsInitialFetch) {
   TMap<FString, FGatrixEvaluatedFlag> OldFlags;
 
   {
@@ -687,7 +792,7 @@ void UGatrixFeaturesClient::StoreFlags(
     OldFlags = RealtimeFlags;
 
     RealtimeFlags.Empty();
-    for (const auto &Flag : NewFlags) {
+    for (const auto& Flag : NewFlags) {
       RealtimeFlags.Add(Flag.Name, Flag);
     }
 
@@ -709,7 +814,7 @@ void UGatrixFeaturesClient::StoreFlags(
     FString FlagsJson;
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&FlagsJson);
     Writer->WriteArrayStart();
-    for (const auto &Flag : NewFlags) {
+    for (const auto& Flag : NewFlags) {
       Writer->WriteObjectStart();
       Writer->WriteValue(TEXT("name"), Flag.Name);
       Writer->WriteValue(TEXT("enabled"), Flag.bEnabled);
@@ -789,17 +894,16 @@ void UGatrixFeaturesClient::LoadFromStorage() {
 
   TSharedPtr<FJsonValue> ParsedValue;
   TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FlagsJson);
-  if (!FJsonSerializer::Deserialize(Reader, ParsedValue) ||
-      !ParsedValue.IsValid())
+  if (!FJsonSerializer::Deserialize(Reader, ParsedValue) || !ParsedValue.IsValid())
     return;
 
-  const TArray<TSharedPtr<FJsonValue>> *FlagsArray = nullptr;
+  const TArray<TSharedPtr<FJsonValue>>* FlagsArray = nullptr;
   if (!ParsedValue->TryGetArray(FlagsArray))
     return;
 
   FScopeLock Lock(&FlagsCriticalSection);
-  for (const auto &FlagValue : *FlagsArray) {
-    const TSharedPtr<FJsonObject> *FlagObj = nullptr;
+  for (const auto& FlagValue : *FlagsArray) {
+    const TSharedPtr<FJsonObject>* FlagObj = nullptr;
     if (!FlagValue->TryGetObject(FlagObj))
       continue;
 
@@ -820,7 +924,7 @@ void UGatrixFeaturesClient::LoadFromStorage() {
     else if (TypeStr == TEXT("json"))
       Flag.ValueType = EGatrixValueType::Json;
 
-    const TSharedPtr<FJsonObject> *VariantObj = nullptr;
+    const TSharedPtr<FJsonObject>* VariantObj = nullptr;
     if ((*FlagObj)->TryGetObjectField(TEXT("variant"), VariantObj)) {
       (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
       (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
@@ -851,21 +955,28 @@ void UGatrixFeaturesClient::SetReady() {
   }
   OnReady.Broadcast();
 
-  UE_LOG(LogGatrix, Log, TEXT("Features ready. %d flags loaded."),
-         RealtimeFlags.Num());
+  UE_LOG(LogGatrix, Log, TEXT("Features ready. %d flags loaded."), RealtimeFlags.Num());
+
+  // Notify Start(onComplete) callers (safe MoveTemp drain)
+  {
+    auto Pending = MoveTemp(PendingStartCallbacks);
+    for (auto& Cb : Pending) {
+      if (Cb)
+        Cb(true, TEXT(""));
+    }
+  }
 }
 
 // ==================== Flag Change Emission ====================
 
-void UGatrixFeaturesClient::EmitFlagChanges(
-    const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
-    const TMap<FString, FGatrixEvaluatedFlag> &NewFlags) {
+void UGatrixFeaturesClient::EmitFlagChanges(const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
+                                            const TMap<FString, FGatrixEvaluatedFlag>& NewFlags) {
   if (!EventEmitter)
     return;
 
   // Detect changed/created flags
-  for (const auto &Pair : NewFlags) {
-    const FGatrixEvaluatedFlag *OldFlag = OldFlags.Find(Pair.Key);
+  for (const auto& Pair : NewFlags) {
+    const FGatrixEvaluatedFlag* OldFlag = OldFlags.Find(Pair.Key);
     if (!OldFlag || OldFlag->bEnabled != Pair.Value.bEnabled ||
         OldFlag->Variant.Name != Pair.Value.Variant.Name ||
         OldFlag->Variant.Value != Pair.Value.Variant.Value) {
@@ -877,27 +988,23 @@ void UGatrixFeaturesClient::EmitFlagChanges(
 
   // Detect removed flags - emit bulk event, not per-flag change
   TArray<FString> RemovedNames;
-  for (const auto &Pair : OldFlags) {
+  for (const auto& Pair : OldFlags) {
     if (!NewFlags.Contains(Pair.Key)) {
       RemovedNames.Add(Pair.Key);
     }
   }
   if (RemovedNames.Num() > 0) {
-    EventEmitter->Emit(GatrixEvents::FlagsRemoved,
-                       FString::Join(RemovedNames, TEXT(",")));
+    EventEmitter->Emit(GatrixEvents::FlagsRemoved, FString::Join(RemovedNames, TEXT(",")));
   }
 }
 
 // ==================== Impressions ====================
 
-void UGatrixFeaturesClient::TrackImpression(const FString &FlagName,
-                                            bool bEnabled,
-                                            const FString &VariantName,
-                                            const FString &EventType) {
+void UGatrixFeaturesClient::TrackImpression(const FString& FlagName, bool bEnabled,
+                                            const FString& VariantName, const FString& EventType) {
   FGatrixImpressionEvent Event;
   Event.EventType = EventType;
-  Event.EventId =
-      FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
+  Event.EventId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
   Event.Context = ClientConfig.Context;
   Event.bEnabled = bEnabled;
   Event.FeatureName = FlagName;
@@ -912,16 +1019,15 @@ void UGatrixFeaturesClient::TrackImpression(const FString &FlagName,
   OnImpression.Broadcast(Event);
 }
 
-void UGatrixFeaturesClient::TrackAccess(const FString &FlagName,
-                                        const FGatrixEvaluatedFlag *Flag,
-                                        const FString &EventType,
-                                        const FString &VariantName) const {
+void UGatrixFeaturesClient::TrackAccess(const FString& FlagName, const FGatrixEvaluatedFlag* Flag,
+                                        const FString& EventType,
+                                        const FString& VariantName) const {
   {
     FScopeLock Lock(&MetricsCriticalSection);
     if (!Flag) {
       MetricsMissingFlags.FindOrAdd(FlagName)++;
     } else {
-      FFlagMetrics &Metrics = MetricsFlagBucket.FindOrAdd(FlagName);
+      FFlagMetrics& Metrics = MetricsFlagBucket.FindOrAdd(FlagName);
       if (Flag->bEnabled) {
         Metrics.Yes++;
       } else {
@@ -936,19 +1042,19 @@ void UGatrixFeaturesClient::TrackAccess(const FString &FlagName,
   }
 
   if (Flag && Flag->bImpressionData) {
-    const_cast<UGatrixFeaturesClient *>(this)->TrackImpression(
-        FlagName, Flag->bEnabled, VariantName, EventType);
+    const_cast<UGatrixFeaturesClient*>(this)->TrackImpression(FlagName, Flag->bEnabled, VariantName,
+                                                              EventType);
   } else if (ClientConfig.Features.bImpressionDataAll) {
-    const_cast<UGatrixFeaturesClient *>(this)->TrackImpression(
+    const_cast<UGatrixFeaturesClient*>(this)->TrackImpression(
         FlagName, Flag ? Flag->bEnabled : false, VariantName, EventType);
   }
 }
 
 // ==================== Watch ====================
 
-int32 UGatrixFeaturesClient::WatchRealtimeFlag(
-    const FString &FlagName, FGatrixFlagWatchDelegate Callback,
-    const FString &Name) {
+int32 UGatrixFeaturesClient::WatchRealtimeFlag(const FString& FlagName,
+                                               FGatrixFlagWatchDelegate Callback,
+                                               const FString& Name) {
   FWatchCallbackEntry Entry;
   Entry.FlagName = FlagName;
   Entry.Callback = Callback;
@@ -957,9 +1063,9 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlag(
   return Entry.Handle;
 }
 
-int32 UGatrixFeaturesClient::WatchSyncedFlag(const FString &FlagName,
+int32 UGatrixFeaturesClient::WatchSyncedFlag(const FString& FlagName,
                                              FGatrixFlagWatchDelegate Callback,
-                                             const FString &Name) {
+                                             const FString& Name) {
   FWatchCallbackEntry Entry;
   Entry.FlagName = FlagName;
   Entry.Callback = Callback;
@@ -968,14 +1074,14 @@ int32 UGatrixFeaturesClient::WatchSyncedFlag(const FString &FlagName,
   return Entry.Handle;
 }
 
-int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(
-    const FString &FlagName, FGatrixFlagWatchDelegate Callback,
-    const FString &Name) {
+int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(const FString& FlagName,
+                                                               FGatrixFlagWatchDelegate Callback,
+                                                               const FString& Name) {
   int32 Handle = WatchRealtimeFlag(FlagName, Callback, Name);
 
   // Emit initial state — always use realtimeFlags for realtime watchers
   if (bReadyEmitted) {
-    UGatrixFlagProxy *Proxy = CreateProxy(FlagName, /*bForceRealtime=*/true);
+    UGatrixFlagProxy* Proxy = CreateProxy(FlagName, /*bForceRealtime=*/true);
     Callback.ExecuteIfBound(Proxy);
   } else if (EventEmitter) {
     // Capture by value for safe deferred invocation
@@ -983,9 +1089,8 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(
     FGatrixFlagWatchDelegate CapturedCallback = Callback;
     EventEmitter->Once(
         GatrixEvents::FlagsReady,
-        [this, CapturedFlagName, CapturedCallback](const TArray<FString> &) {
-          UGatrixFlagProxy *Proxy =
-              CreateProxy(CapturedFlagName, /*bForceRealtime=*/true);
+        [this, CapturedFlagName, CapturedCallback](const TArray<FString>&) {
+          UGatrixFlagProxy* Proxy = CreateProxy(CapturedFlagName, /*bForceRealtime=*/true);
           CapturedCallback.ExecuteIfBound(Proxy);
         },
         Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
@@ -994,23 +1099,22 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(
   return Handle;
 }
 
-int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(
-    const FString &FlagName, FGatrixFlagWatchDelegate Callback,
-    const FString &Name) {
+int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(const FString& FlagName,
+                                                             FGatrixFlagWatchDelegate Callback,
+                                                             const FString& Name) {
   int32 Handle = WatchSyncedFlag(FlagName, Callback, Name);
 
   // Emit initial state — respect explicitSyncMode for synced watchers
   if (bReadyEmitted) {
-    UGatrixFlagProxy *Proxy = CreateProxy(FlagName, /*bForceRealtime=*/false);
+    UGatrixFlagProxy* Proxy = CreateProxy(FlagName, /*bForceRealtime=*/false);
     Callback.ExecuteIfBound(Proxy);
   } else if (EventEmitter) {
     FString CapturedFlagName = FlagName;
     FGatrixFlagWatchDelegate CapturedCallback = Callback;
     EventEmitter->Once(
         GatrixEvents::FlagsReady,
-        [this, CapturedFlagName, CapturedCallback](const TArray<FString> &) {
-          UGatrixFlagProxy *Proxy =
-              CreateProxy(CapturedFlagName, /*bForceRealtime=*/false);
+        [this, CapturedFlagName, CapturedCallback](const TArray<FString>&) {
+          UGatrixFlagProxy* Proxy = CreateProxy(CapturedFlagName, /*bForceRealtime=*/false);
           CapturedCallback.ExecuteIfBound(Proxy);
         },
         Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
@@ -1020,69 +1124,63 @@ int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(
 }
 
 void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
-  WatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
-    return Entry.Handle == Handle;
-  });
-  SyncedWatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
-    return Entry.Handle == Handle;
-  });
+  WatchCallbacks.RemoveAll(
+      [Handle](const FWatchCallbackEntry& Entry) { return Entry.Handle == Handle; });
+  SyncedWatchCallbacks.RemoveAll(
+      [Handle](const FWatchCallbackEntry& Entry) { return Entry.Handle == Handle; });
 }
 
-FGatrixWatchFlagGroup *
-UGatrixFeaturesClient::CreateWatchGroup(const FString &Name) {
+FGatrixWatchFlagGroup* UGatrixFeaturesClient::CreateWatchGroup(const FString& Name) {
   return new FGatrixWatchFlagGroup(this, Name);
 }
 
 // ==================== Metadata Access Internal Methods ====================
 
-bool UGatrixFeaturesClient::HasFlagInternal(const FString &FlagName,
-                                            bool bForceRealtime) const {
+bool UGatrixFeaturesClient::HasFlagInternal(const FString& FlagName, bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
   return Flags.Contains(FlagName);
 }
 
-EGatrixValueType
-UGatrixFeaturesClient::GetValueTypeInternal(const FString &FlagName,
-                                            bool bForceRealtime) const {
+EGatrixValueType UGatrixFeaturesClient::GetValueTypeInternal(const FString& FlagName,
+                                                             bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     return EGatrixValueType::None;
   return Found->ValueType;
 }
 
-int32 UGatrixFeaturesClient::GetVersionInternal(const FString &FlagName,
+int32 UGatrixFeaturesClient::GetVersionInternal(const FString& FlagName,
                                                 bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     return 0;
   return static_cast<int32>(Found->Version);
 }
 
-FString UGatrixFeaturesClient::GetReasonInternal(const FString &FlagName,
+FString UGatrixFeaturesClient::GetReasonInternal(const FString& FlagName,
                                                  bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     return TEXT("");
   return Found->Reason;
 }
 
-bool UGatrixFeaturesClient::GetImpressionDataInternal(
-    const FString &FlagName, bool bForceRealtime) const {
+bool UGatrixFeaturesClient::GetImpressionDataInternal(const FString& FlagName,
+                                                      bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     return false;
   return Found->bImpressionData;
 }
 
-FGatrixEvaluatedFlag
-UGatrixFeaturesClient::GetRawFlagInternal(const FString &FlagName,
-                                          bool bForceRealtime) const {
+FGatrixEvaluatedFlag UGatrixFeaturesClient::GetRawFlagInternal(const FString& FlagName,
+                                                               bool bForceRealtime) const {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (Found)
     return *Found;
   FGatrixEvaluatedFlag Empty;
@@ -1091,19 +1189,19 @@ UGatrixFeaturesClient::GetRawFlagInternal(const FString &FlagName,
 }
 
 void UGatrixFeaturesClient::InvokeWatchCallbacks(
-    const TArray<FWatchCallbackEntry> &CallbackList,
-    const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
-    const TMap<FString, FGatrixEvaluatedFlag> &NewFlags, bool bForceRealtime) {
+    const TArray<FWatchCallbackEntry>& CallbackList,
+    const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
+    const TMap<FString, FGatrixEvaluatedFlag>& NewFlags, bool bForceRealtime) {
   // Check for changed/new flags
-  for (const auto &Pair : NewFlags) {
-    const FGatrixEvaluatedFlag *OldFlag = OldFlags.Find(Pair.Key);
+  for (const auto& Pair : NewFlags) {
+    const FGatrixEvaluatedFlag* OldFlag = OldFlags.Find(Pair.Key);
     if (!OldFlag || OldFlag->bEnabled != Pair.Value.bEnabled ||
         OldFlag->Variant.Name != Pair.Value.Variant.Name ||
         OldFlag->Variant.Value != Pair.Value.Variant.Value) {
       // Invoke watch callbacks for this flag
-      for (const auto &Entry : CallbackList) {
+      for (const auto& Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
-          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key, bForceRealtime);
+          UGatrixFlagProxy* Proxy = CreateProxy(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
         }
       }
@@ -1111,11 +1209,11 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
   }
 
   // Check for removed flags
-  for (const auto &Pair : OldFlags) {
+  for (const auto& Pair : OldFlags) {
     if (!NewFlags.Contains(Pair.Key)) {
-      for (const auto &Entry : CallbackList) {
+      for (const auto& Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
-          UGatrixFlagProxy *Proxy = CreateProxy(Pair.Key, bForceRealtime);
+          UGatrixFlagProxy* Proxy = CreateProxy(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
         }
       }
@@ -1126,8 +1224,8 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
 // ==================== Polling ====================
 
 void UGatrixFeaturesClient::ScheduleNextPoll() {
-  if (!bStarted || ClientConfig.Features.bDisableRefresh ||
-      ClientConfig.bOfflineMode || bPollingStopped) {
+  if (!bStarted || ClientConfig.Features.bDisableRefresh || ClientConfig.bOfflineMode ||
+      bPollingStopped) {
     return;
   }
 
@@ -1140,15 +1238,13 @@ void UGatrixFeaturesClient::ScheduleNextPoll() {
 
   // Apply exponential backoff on consecutive failures
   if (ConsecutiveFailures.GetValue() > 0) {
-    int32 InitialBackoff =
-        ClientConfig.Features.FetchRetryOptions.InitialBackoffMs;
+    int32 InitialBackoff = ClientConfig.Features.FetchRetryOptions.InitialBackoffMs;
     int32 MaxBackoff = ClientConfig.Features.FetchRetryOptions.MaxBackoffMs;
-    int32 BackoffMs = FMath::Min(
-        static_cast<int32>(
-            InitialBackoff *
-            FMath::Pow(2.0f,
-                       static_cast<float>(ConsecutiveFailures.GetValue() - 1))),
-        MaxBackoff);
+    int32 BackoffMs =
+        FMath::Min(static_cast<int32>(
+                       InitialBackoff *
+                       FMath::Pow(2.0f, static_cast<float>(ConsecutiveFailures.GetValue() - 1))),
+                   MaxBackoff);
     Interval = static_cast<float>(BackoffMs) / 1000.0f;
     UE_LOG(LogGatrix, Warning,
            TEXT("Scheduling retry after %.1fs (consecutive "
@@ -1169,30 +1265,28 @@ void UGatrixFeaturesClient::ScheduleNextPoll() {
   }
 
   // Use engine world timer if available
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine) {
-    World = GEngine->GetWorldContexts().Num() > 0
-                ? GEngine->GetWorldContexts()[0].World()
-                : nullptr;
+    World =
+        GEngine->GetWorldContexts().Num() > 0 ? GEngine->GetWorldContexts()[0].World() : nullptr;
   }
 
   if (World) {
-    World->GetTimerManager().SetTimer(
-        PollTimerHandle,
-        FTimerDelegate::CreateWeakLambda(this,
-                                         [this]() {
-                                           if (bStarted) {
-                                             FetchFlags();
-                                           }
-                                         }),
-        Interval,
-        false // one-shot, will be re-scheduled after each fetch
+    World->GetTimerManager().SetTimer(PollTimerHandle,
+                                      FTimerDelegate::CreateWeakLambda(this,
+                                                                       [this]() {
+                                                                         if (bStarted) {
+                                                                           FetchFlags();
+                                                                         }
+                                                                       }),
+                                      Interval,
+                                      false // one-shot, will be re-scheduled after each fetch
     );
   }
 }
 
 void UGatrixFeaturesClient::StopPolling() {
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }
@@ -1209,7 +1303,7 @@ void UGatrixFeaturesClient::StartMetrics() {
   if (InitialDelay <= 0.0f)
     InitialDelay = 2.0f;
 
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }
@@ -1228,16 +1322,14 @@ void UGatrixFeaturesClient::StartMetrics() {
               if (Interval <= 0.0f)
                 Interval = 60.0f;
 
-              UWorld *W = nullptr;
+              UWorld* W = nullptr;
               if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
                 W = GEngine->GetWorldContexts()[0].World();
               }
               if (W) {
                 W->GetTimerManager().SetTimer(
                     MetricsTimerHandle,
-                    FTimerDelegate::CreateWeakLambda(
-                        this, [this]() { SendMetrics(); }),
-                    Interval,
+                    FTimerDelegate::CreateWeakLambda(this, [this]() { SendMetrics(); }), Interval,
                     true // recurring
                 );
               }
@@ -1247,7 +1339,7 @@ void UGatrixFeaturesClient::StartMetrics() {
 }
 
 void UGatrixFeaturesClient::StopMetrics() {
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }
@@ -1267,31 +1359,27 @@ void UGatrixFeaturesClient::SendMetrics() {
   if (PayloadJson.IsEmpty())
     return;
 
-  FString MetricsUrl = FString::Printf(
-      TEXT("%s/client/features/%s/metrics"), *ClientConfig.ApiUrl,
-      *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+  FString MetricsUrl = FString::Printf(TEXT("%s/client/features/%s/metrics"), *ClientConfig.ApiUrl,
+                                       *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
 
   // Retry with a simple attempt counter via shared pointer
   auto RetryCount = MakeShared<int32>(0);
   const int32 MaxRetries = 2;
 
-  auto DoSendMetrics = [this, MetricsUrl, PayloadJson, RetryCount,
-                        MaxRetries]() {
-    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
-        FHttpModule::Get().CreateRequest();
+  auto DoSendMetrics = [this, MetricsUrl, PayloadJson, RetryCount, MaxRetries]() {
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
     HttpRequest->SetURL(MetricsUrl);
     HttpRequest->SetVerb(TEXT("POST"));
     HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
     HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
     HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
     HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
-    HttpRequest->SetHeader(TEXT("X-SDK-Version"),
-                           FString::Printf(TEXT("%s/%s"),
-                                           *UGatrixClient::SdkName,
-                                           *UGatrixClient::SdkVersion));
+    HttpRequest->SetHeader(
+        TEXT("X-SDK-Version"),
+        FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName, *UGatrixClient::SdkVersion));
 
     // Custom headers
-    for (const auto &Header : ClientConfig.CustomHeaders) {
+    for (const auto& Header : ClientConfig.CustomHeaders) {
       HttpRequest->SetHeader(Header.Key, Header.Value);
     }
 
@@ -1303,27 +1391,24 @@ void UGatrixFeaturesClient::SendMetrics() {
   TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = DoSendMetrics();
 
   HttpRequest->OnProcessRequestComplete().BindLambda(
-      [this, RetryCount, MaxRetries, DoSendMetrics](FHttpRequestPtr Request,
-                                                    FHttpResponsePtr Response,
-                                                    bool bWasSuccessful) {
-        if (bWasSuccessful && Response.IsValid() &&
-            Response->GetResponseCode() < 400) {
+      [this, RetryCount, MaxRetries,
+       DoSendMetrics](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+        if (bWasSuccessful && Response.IsValid() && Response->GetResponseCode() < 400) {
           MetricsSentCount.Increment();
           if (EventEmitter) {
             EventEmitter->Emit(GatrixEvents::FlagsMetricsSent);
           }
         } else {
           // Retry on retryable status codes
-          const int32 StatusCode =
-              Response.IsValid() ? Response->GetResponseCode() : 0;
-          const bool bRetryable = !bWasSuccessful || StatusCode == 408 ||
-                                  StatusCode == 429 || StatusCode >= 500;
+          const int32 StatusCode = Response.IsValid() ? Response->GetResponseCode() : 0;
+          const bool bRetryable =
+              !bWasSuccessful || StatusCode == 408 || StatusCode == 429 || StatusCode >= 500;
 
           if (bRetryable && *RetryCount < MaxRetries) {
             (*RetryCount)++;
             const float Delay = FMath::Pow(2.0f, (float)*RetryCount);
 
-            UWorld *RetryWorld = nullptr;
+            UWorld* RetryWorld = nullptr;
             if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
               RetryWorld = GEngine->GetWorldContexts()[0].World();
             }
@@ -1351,7 +1436,7 @@ void UGatrixFeaturesClient::SendMetrics() {
   HttpRequest->ProcessRequest();
 }
 
-void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
+void UGatrixFeaturesClient::BuildMetricsPayload(FString& OutJson) const {
   TMap<FString, FFlagMetrics> BucketCopy;
   TMap<FString, int32> MissingCopy;
 
@@ -1361,9 +1446,9 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
     MissingCopy = MetricsMissingFlags;
 
     // Clear after reading
-    const_cast<TMap<FString, FFlagMetrics> &>(MetricsFlagBucket).Empty();
-    const_cast<TMap<FString, int32> &>(MetricsMissingFlags).Empty();
-    const_cast<FDateTime &>(MetricsBucketStartTime) = FDateTime::UtcNow();
+    const_cast<TMap<FString, FFlagMetrics>&>(MetricsFlagBucket).Empty();
+    const_cast<TMap<FString, int32>&>(MetricsMissingFlags).Empty();
+    const_cast<FDateTime&>(MetricsBucketStartTime) = FDateTime::UtcNow();
   }
 
   if (BucketCopy.Num() == 0 && MissingCopy.Num() == 0) {
@@ -1386,14 +1471,14 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
 
   // Flag access counts
   Writer->WriteObjectStart(TEXT("flags"));
-  for (const auto &Pair : BucketCopy) {
+  for (const auto& Pair : BucketCopy) {
     Writer->WriteObjectStart(Pair.Key);
     Writer->WriteValue(TEXT("yes"), Pair.Value.Yes);
     Writer->WriteValue(TEXT("no"), Pair.Value.No);
 
     if (Pair.Value.Variants.Num() > 0) {
       Writer->WriteObjectStart(TEXT("variants"));
-      for (const auto &VarPair : Pair.Value.Variants) {
+      for (const auto& VarPair : Pair.Value.Variants) {
         Writer->WriteValue(VarPair.Key, VarPair.Value);
       }
       Writer->WriteObjectEnd();
@@ -1405,7 +1490,7 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
 
   // Missing flags
   Writer->WriteObjectStart(TEXT("missing"));
-  for (const auto &Pair : MissingCopy) {
+  for (const auto& Pair : MissingCopy) {
     Writer->WriteValue(Pair.Key, Pair.Value);
   }
   Writer->WriteObjectEnd(); // missing
@@ -1419,9 +1504,8 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
 
 FString UGatrixFeaturesClient::BuildFetchUrl() const {
   // URL pattern: {apiUrl}/client/features/{environment}/eval
-  FString BaseUrl = FString::Printf(
-      TEXT("%s/client/features/%s/eval"), *ClientConfig.ApiUrl,
-      *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+  FString BaseUrl = FString::Printf(TEXT("%s/client/features/%s/eval"), *ClientConfig.ApiUrl,
+                                    *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
 
   if (!ClientConfig.Features.bUsePOSTRequests) {
     const FString QueryString = BuildContextQueryString();
@@ -1437,22 +1521,18 @@ FString UGatrixFeaturesClient::BuildContextQueryString() const {
   TArray<FString> Params;
 
   Params.Add(
-      FString::Printf(TEXT("appName=%s"),
-                      *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName)));
-  Params.Add(FString::Printf(
-      TEXT("environment=%s"),
-      *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment)));
+      FString::Printf(TEXT("appName=%s"), *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName)));
+  Params.Add(FString::Printf(TEXT("environment=%s"),
+                             *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment)));
 
   if (!ClientConfig.Context.UserId.IsEmpty())
-    Params.Add(FString::Printf(
-        TEXT("userId=%s"),
-        *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.UserId)));
+    Params.Add(FString::Printf(TEXT("userId=%s"),
+                               *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.UserId)));
   if (!ClientConfig.Context.SessionId.IsEmpty())
-    Params.Add(FString::Printf(
-        TEXT("sessionId=%s"),
-        *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.SessionId)));
+    Params.Add(FString::Printf(TEXT("sessionId=%s"),
+                               *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.SessionId)));
 
-  for (const auto &Prop : ClientConfig.Context.Properties) {
+  for (const auto& Prop : ClientConfig.Context.Properties) {
     Params.Add(FString::Printf(TEXT("properties[%s]=%s"),
                                *FGenericPlatformHttp::UrlEncode(Prop.Key),
                                *FGenericPlatformHttp::UrlEncode(Prop.Value)));
@@ -1477,7 +1557,7 @@ FString UGatrixFeaturesClient::ContextToJson() const {
 
   if (ClientConfig.Context.Properties.Num() > 0) {
     Writer->WriteObjectStart(TEXT("properties"));
-    for (const auto &Prop : ClientConfig.Context.Properties) {
+    for (const auto& Prop : ClientConfig.Context.Properties) {
       Writer->WriteValue(Prop.Key, Prop.Value);
     }
     Writer->WriteObjectEnd();
@@ -1521,139 +1601,118 @@ FGatrixFeaturesStats UGatrixFeaturesClient::GetStats() const {
 // ==================== IGatrixVariationProvider Implementation
 // ====================
 
-bool UGatrixFeaturesClient::IsEnabledInternal(const FString &FlagName,
-                                              bool bForceRealtime) {
+bool UGatrixFeaturesClient::IsEnabledInternal(const FString& FlagName, bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("isEnabled"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("isEnabled"), Found ? Found->Variant.Name : TEXT(""));
   return Found ? Found->bEnabled : false;
 }
 
-FGatrixVariant
-UGatrixFeaturesClient::GetVariantInternal(const FString &FlagName,
-                                          bool bForceRealtime) {
+FGatrixVariant UGatrixFeaturesClient::GetVariantInternal(const FString& FlagName,
+                                                         bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found) {
     return FGatrixVariant(GatrixVariantSource::Missing, false);
   }
   return Found->Variant;
 }
 
-FString UGatrixFeaturesClient::VariationInternal(const FString &FlagName,
-                                                 const FString &FallbackValue,
+FString UGatrixFeaturesClient::VariationInternal(const FString& FlagName,
+                                                 const FString& FallbackValue,
                                                  bool bForceRealtime) {
   return GetVariantInternal(FlagName, bForceRealtime).Name;
 }
 
-bool UGatrixFeaturesClient::BoolVariationInternal(const FString &FlagName,
-                                                  bool FallbackValue,
+bool UGatrixFeaturesClient::BoolVariationInternal(const FString& FlagName, bool FallbackValue,
                                                   bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found)
     return FallbackValue;
-  if (Found->ValueType != EGatrixValueType::Boolean &&
-      Found->ValueType != EGatrixValueType::None)
+  if (Found->ValueType != EGatrixValueType::Boolean && Found->ValueType != EGatrixValueType::None)
     return FallbackValue;
   if (Found->Variant.Value.IsEmpty())
     return FallbackValue;
   return Found->Variant.Value.ToBool();
 }
 
-FString
-UGatrixFeaturesClient::StringVariationInternal(const FString &FlagName,
-                                               const FString &FallbackValue,
-                                               bool bForceRealtime) {
+FString UGatrixFeaturesClient::StringVariationInternal(const FString& FlagName,
+                                                       const FString& FallbackValue,
+                                                       bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found)
     return FallbackValue;
-  if (Found->ValueType != EGatrixValueType::String &&
-      Found->ValueType != EGatrixValueType::None)
+  if (Found->ValueType != EGatrixValueType::String && Found->ValueType != EGatrixValueType::None)
     return FallbackValue;
   return Found->Variant.Value;
 }
 
-float UGatrixFeaturesClient::FloatVariationInternal(const FString &FlagName,
-                                                    float FallbackValue,
+float UGatrixFeaturesClient::FloatVariationInternal(const FString& FlagName, float FallbackValue,
                                                     bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found)
     return FallbackValue;
-  if (Found->ValueType != EGatrixValueType::Number &&
-      Found->ValueType != EGatrixValueType::None)
+  if (Found->ValueType != EGatrixValueType::Number && Found->ValueType != EGatrixValueType::None)
     return FallbackValue;
   if (Found->Variant.Value.IsEmpty())
     return FallbackValue;
   return FCString::Atof(*Found->Variant.Value);
 }
 
-int32 UGatrixFeaturesClient::IntVariationInternal(const FString &FlagName,
-                                                  int32 FallbackValue,
+int32 UGatrixFeaturesClient::IntVariationInternal(const FString& FlagName, int32 FallbackValue,
                                                   bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found)
     return FallbackValue;
-  if (Found->ValueType != EGatrixValueType::Number &&
-      Found->ValueType != EGatrixValueType::None)
+  if (Found->ValueType != EGatrixValueType::Number && Found->ValueType != EGatrixValueType::None)
     return FallbackValue;
   if (Found->Variant.Value.IsEmpty())
     return FallbackValue;
   return FCString::Atoi(*Found->Variant.Value);
 }
 
-double UGatrixFeaturesClient::DoubleVariationInternal(const FString &FlagName,
-                                                      double FallbackValue,
+double UGatrixFeaturesClient::DoubleVariationInternal(const FString& FlagName, double FallbackValue,
                                                       bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found)
     return FallbackValue;
-  if (Found->ValueType != EGatrixValueType::Number &&
-      Found->ValueType != EGatrixValueType::None)
+  if (Found->ValueType != EGatrixValueType::Number && Found->ValueType != EGatrixValueType::None)
     return FallbackValue;
   if (Found->Variant.Value.IsEmpty())
     return FallbackValue;
   return FCString::Atod(*Found->Variant.Value);
 }
 
-FString
-UGatrixFeaturesClient::JsonVariationInternal(const FString &FlagName,
-                                             const FString &FallbackValue,
-                                             bool bForceRealtime) {
+FString UGatrixFeaturesClient::JsonVariationInternal(const FString& FlagName,
+                                                     const FString& FallbackValue,
+                                                     bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
-  TrackAccess(FlagName, Found, TEXT("getVariant"),
-              Found ? Found->Variant.Name : TEXT(""));
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
+  TrackAccess(FlagName, Found, TEXT("getVariant"), Found ? Found->Variant.Name : TEXT(""));
   if (!Found)
     return FallbackValue;
-  if (Found->ValueType != EGatrixValueType::Json &&
-      Found->ValueType != EGatrixValueType::None)
+  if (Found->ValueType != EGatrixValueType::Json && Found->ValueType != EGatrixValueType::None)
     return FallbackValue;
   return Found->Variant.Value;
 }
 
-FGatrixVariationResult UGatrixFeaturesClient::BoolVariationDetailsInternal(
-    const FString &FlagName, bool FallbackValue, bool bForceRealtime) {
+FGatrixVariationResult UGatrixFeaturesClient::BoolVariationDetailsInternal(const FString& FlagName,
+                                                                           bool FallbackValue,
+                                                                           bool bForceRealtime) {
   FGatrixVariationResult Result;
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   Result.bFlagExists = Found != nullptr;
   Result.bEnabled = Found ? Found->bEnabled : false;
   bool Val = BoolVariationInternal(FlagName, FallbackValue, bForceRealtime);
@@ -1669,15 +1728,13 @@ FGatrixVariationResult UGatrixFeaturesClient::BoolVariationDetailsInternal(
 }
 
 FGatrixVariationResult UGatrixFeaturesClient::StringVariationDetailsInternal(
-    const FString &FlagName, const FString &FallbackValue,
-    bool bForceRealtime) {
+    const FString& FlagName, const FString& FallbackValue, bool bForceRealtime) {
   FGatrixVariationResult Result;
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   Result.bFlagExists = Found != nullptr;
   Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value =
-      StringVariationInternal(FlagName, FallbackValue, bForceRealtime);
+  Result.Value = StringVariationInternal(FlagName, FallbackValue, bForceRealtime);
   if (!Found)
     Result.Reason = TEXT("flag_not_found");
   else if (Found->ValueType != EGatrixValueType::String &&
@@ -1688,15 +1745,16 @@ FGatrixVariationResult UGatrixFeaturesClient::StringVariationDetailsInternal(
   return Result;
 }
 
-FGatrixVariationResult UGatrixFeaturesClient::FloatVariationDetailsInternal(
-    const FString &FlagName, float FallbackValue, bool bForceRealtime) {
+FGatrixVariationResult UGatrixFeaturesClient::FloatVariationDetailsInternal(const FString& FlagName,
+                                                                            float FallbackValue,
+                                                                            bool bForceRealtime) {
   FGatrixVariationResult Result;
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   Result.bFlagExists = Found != nullptr;
   Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value = FString::SanitizeFloat(
-      FloatVariationInternal(FlagName, FallbackValue, bForceRealtime));
+  Result.Value =
+      FString::SanitizeFloat(FloatVariationInternal(FlagName, FallbackValue, bForceRealtime));
   if (!Found)
     Result.Reason = TEXT("flag_not_found");
   else if (Found->ValueType != EGatrixValueType::Number &&
@@ -1707,15 +1765,15 @@ FGatrixVariationResult UGatrixFeaturesClient::FloatVariationDetailsInternal(
   return Result;
 }
 
-FGatrixVariationResult UGatrixFeaturesClient::IntVariationDetailsInternal(
-    const FString &FlagName, int32 FallbackValue, bool bForceRealtime) {
+FGatrixVariationResult UGatrixFeaturesClient::IntVariationDetailsInternal(const FString& FlagName,
+                                                                          int32 FallbackValue,
+                                                                          bool bForceRealtime) {
   FGatrixVariationResult Result;
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   Result.bFlagExists = Found != nullptr;
   Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value = FString::FromInt(
-      IntVariationInternal(FlagName, FallbackValue, bForceRealtime));
+  Result.Value = FString::FromInt(IntVariationInternal(FlagName, FallbackValue, bForceRealtime));
   if (!Found)
     Result.Reason = TEXT("flag_not_found");
   else if (Found->ValueType != EGatrixValueType::Number &&
@@ -1726,16 +1784,16 @@ FGatrixVariationResult UGatrixFeaturesClient::IntVariationDetailsInternal(
   return Result;
 }
 
-FGatrixVariationResult UGatrixFeaturesClient::DoubleVariationDetailsInternal(
-    const FString &FlagName, double FallbackValue, bool bForceRealtime) {
+FGatrixVariationResult
+UGatrixFeaturesClient::DoubleVariationDetailsInternal(const FString& FlagName, double FallbackValue,
+                                                      bool bForceRealtime) {
   FGatrixVariationResult Result;
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   Result.bFlagExists = Found != nullptr;
   Result.bEnabled = Found ? Found->bEnabled : false;
-  Result.Value = FString::Printf(
-      TEXT("%lf"),
-      DoubleVariationInternal(FlagName, FallbackValue, bForceRealtime));
+  Result.Value = FString::Printf(TEXT("%lf"),
+                                 DoubleVariationInternal(FlagName, FallbackValue, bForceRealtime));
   if (!Found)
     Result.Reason = TEXT("flag_not_found");
   else if (Found->ValueType != EGatrixValueType::Number &&
@@ -1747,76 +1805,71 @@ FGatrixVariationResult UGatrixFeaturesClient::DoubleVariationDetailsInternal(
 }
 
 FGatrixVariationResult UGatrixFeaturesClient::JsonVariationDetailsInternal(
-    const FString &FlagName, const FString &FallbackValue,
-    bool bForceRealtime) {
+    const FString& FlagName, const FString& FallbackValue, bool bForceRealtime) {
   FGatrixVariationResult Result;
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   Result.bFlagExists = Found != nullptr;
   Result.bEnabled = Found ? Found->bEnabled : false;
   Result.Value = JsonVariationInternal(FlagName, FallbackValue, bForceRealtime);
   if (!Found)
     Result.Reason = TEXT("flag_not_found");
-  else if (Found->ValueType != EGatrixValueType::Json &&
-           Found->ValueType != EGatrixValueType::None)
+  else if (Found->ValueType != EGatrixValueType::Json && Found->ValueType != EGatrixValueType::None)
     Result.Reason = TEXT("type_mismatch:expected_json");
   else
     Result.Reason = Found->Reason.IsEmpty() ? TEXT("evaluated") : Found->Reason;
   return Result;
 }
 
-bool UGatrixFeaturesClient::BoolVariationOrThrowInternal(
-    const FString &FlagName, bool bForceRealtime) {
+bool UGatrixFeaturesClient::BoolVariationOrThrowInternal(const FString& FlagName,
+                                                         bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     throw TEXT("Flag not found");
   return BoolVariationInternal(FlagName, false, bForceRealtime);
 }
 
-FString
-UGatrixFeaturesClient::StringVariationOrThrowInternal(const FString &FlagName,
-                                                      bool bForceRealtime) {
+FString UGatrixFeaturesClient::StringVariationOrThrowInternal(const FString& FlagName,
+                                                              bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     throw TEXT("Flag not found");
   return StringVariationInternal(FlagName, TEXT(""), bForceRealtime);
 }
 
-float UGatrixFeaturesClient::FloatVariationOrThrowInternal(
-    const FString &FlagName, bool bForceRealtime) {
+float UGatrixFeaturesClient::FloatVariationOrThrowInternal(const FString& FlagName,
+                                                           bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     throw TEXT("Flag not found");
   return FloatVariationInternal(FlagName, 0.0f, bForceRealtime);
 }
 
-int32 UGatrixFeaturesClient::IntVariationOrThrowInternal(
-    const FString &FlagName, bool bForceRealtime) {
+int32 UGatrixFeaturesClient::IntVariationOrThrowInternal(const FString& FlagName,
+                                                         bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     throw TEXT("Flag not found");
   return IntVariationInternal(FlagName, 0, bForceRealtime);
 }
 
-double
-UGatrixFeaturesClient::DoubleVariationOrThrowInternal(const FString &FlagName,
-                                                      bool bForceRealtime) {
+double UGatrixFeaturesClient::DoubleVariationOrThrowInternal(const FString& FlagName,
+                                                             bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     throw TEXT("Flag not found");
   return DoubleVariationInternal(FlagName, 0.0, bForceRealtime);
 }
 
-FString
-UGatrixFeaturesClient::JsonVariationOrThrowInternal(const FString &FlagName,
-                                                    bool bForceRealtime) {
+FString UGatrixFeaturesClient::JsonVariationOrThrowInternal(const FString& FlagName,
+                                                            bool bForceRealtime) {
   TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
-  const FGatrixEvaluatedFlag *Found = Flags.Find(FlagName);
+  const FGatrixEvaluatedFlag* Found = Flags.Find(FlagName);
   if (!Found)
     throw TEXT("Flag not found");
   return JsonVariationInternal(FlagName, TEXT(""), bForceRealtime);
@@ -1827,7 +1880,7 @@ UGatrixFeaturesClient::JsonVariationOrThrowInternal(const FString &FlagName,
 void UGatrixFeaturesClient::ConnectStreaming() {
   DisconnectStreaming();
 
-  const FGatrixStreamingConfig &StreamConfig = ClientConfig.Features.Streaming;
+  const FGatrixStreamingConfig& StreamConfig = ClientConfig.Features.Streaming;
 
   if (!StreamConfig.bEnabled || ClientConfig.bOfflineMode) {
     return;
@@ -1841,9 +1894,8 @@ void UGatrixFeaturesClient::ConnectStreaming() {
   Headers.Add(TEXT("X-Application-Name"), ClientConfig.AppName);
   Headers.Add(TEXT("X-Connection-Id"), ConnectionId);
   Headers.Add(TEXT("X-SDK-Version"),
-              FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName,
-                              *UGatrixClient::SdkVersion));
-  for (const auto &Header : ClientConfig.CustomHeaders) {
+              FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName, *UGatrixClient::SdkVersion));
+  for (const auto& Header : ClientConfig.CustomHeaders) {
     Headers.Add(Header.Key, Header.Value);
   }
 
@@ -1861,14 +1913,13 @@ void UGatrixFeaturesClient::ConnectStreaming() {
       });
     });
 
-    WebSocketConnection->OnEvent.BindLambda(
-        [this](const FString &EventType, const FString &EventData) {
-          AsyncTask(ENamedThreads::GameThread, [this, EventType, EventData]() {
-            ProcessStreamingEvent(EventType, EventData);
-          });
-        });
+    WebSocketConnection->OnEvent.BindLambda([this](const FString& EventType,
+                                                   const FString& EventData) {
+      AsyncTask(ENamedThreads::GameThread,
+                [this, EventType, EventData]() { ProcessStreamingEvent(EventType, EventData); });
+    });
 
-    WebSocketConnection->OnError.BindLambda([this](const FString &ErrorMsg) {
+    WebSocketConnection->OnError.BindLambda([this](const FString& ErrorMsg) {
       AsyncTask(ENamedThreads::GameThread, [this, ErrorMsg]() {
         StreamingErrorCount++;
         if (EventEmitter) {
@@ -1890,8 +1941,7 @@ void UGatrixFeaturesClient::ConnectStreaming() {
       });
     });
 
-    WebSocketConnection->Connect(Url, Headers,
-                                 StreamConfig.WebSocket.PingInterval);
+    WebSocketConnection->Connect(Url, Headers, StreamConfig.WebSocket.PingInterval);
 
   } else {
     // SSE transport (default)
@@ -1907,14 +1957,12 @@ void UGatrixFeaturesClient::ConnectStreaming() {
       });
     });
 
-    SseConnection->OnEvent.BindLambda(
-        [this](const FString &EventType, const FString &EventData) {
-          AsyncTask(ENamedThreads::GameThread, [this, EventType, EventData]() {
-            ProcessStreamingEvent(EventType, EventData);
-          });
-        });
+    SseConnection->OnEvent.BindLambda([this](const FString& EventType, const FString& EventData) {
+      AsyncTask(ENamedThreads::GameThread,
+                [this, EventType, EventData]() { ProcessStreamingEvent(EventType, EventData); });
+    });
 
-    SseConnection->OnError.BindLambda([this](const FString &ErrorMsg) {
+    SseConnection->OnError.BindLambda([this](const FString& ErrorMsg) {
       AsyncTask(ENamedThreads::GameThread, [this, ErrorMsg]() {
         StreamingErrorCount++;
         if (EventEmitter) {
@@ -1940,15 +1988,14 @@ void UGatrixFeaturesClient::ConnectStreaming() {
   }
 
   UE_LOG(LogGatrix, Log, TEXT("Streaming: Connecting via %s to %s"),
-         StreamConfig.Transport == EGatrixStreamingTransport::WebSocket
-             ? TEXT("WebSocket")
-             : TEXT("SSE"),
+         StreamConfig.Transport == EGatrixStreamingTransport::WebSocket ? TEXT("WebSocket")
+                                                                        : TEXT("SSE"),
          *Url);
 }
 
 void UGatrixFeaturesClient::DisconnectStreaming() {
   // Cancel reconnect timer
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }
@@ -1970,38 +2017,31 @@ void UGatrixFeaturesClient::DisconnectStreaming() {
   StreamingReconnectAttempt = 0;
 }
 
-void UGatrixFeaturesClient::ProcessStreamingEvent(const FString &EventType,
-                                                  const FString &EventData) {
+void UGatrixFeaturesClient::ProcessStreamingEvent(const FString& EventType,
+                                                  const FString& EventData) {
   StreamingEventCount++;
 
   if (EventType == TEXT("connected")) {
     // Server acknowledged connection, extract connectionId if present
     TSharedPtr<FJsonObject> JsonObject;
     TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(EventData);
-    if (FJsonSerializer::Deserialize(Reader, JsonObject) &&
-        JsonObject.IsValid()) {
+    if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid()) {
       FString ServerConnectionId;
-      if (JsonObject->TryGetStringField(TEXT("connectionId"),
-                                        ServerConnectionId)) {
-        UE_LOG(LogGatrix, Log, TEXT("Streaming: Server connectionId=%s"),
-               *ServerConnectionId);
+      if (JsonObject->TryGetStringField(TEXT("connectionId"), ServerConnectionId)) {
+        UE_LOG(LogGatrix, Log, TEXT("Streaming: Server connectionId=%s"), *ServerConnectionId);
       }
     }
-  } else if (EventType == TEXT("flags_changed") ||
-             EventType == TEXT("invalidate")) {
+  } else if (EventType == TEXT("flags_changed") || EventType == TEXT("invalidate")) {
     // Parse changed flag keys
     TSharedPtr<FJsonObject> JsonObject;
     TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(EventData);
-    if (FJsonSerializer::Deserialize(Reader, JsonObject) &&
-        JsonObject.IsValid()) {
+    if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid()) {
       TArray<FString> ChangedKeys;
 
       // Check for globalRevision for gap detection
       int64 ServerRevision = 0;
-      if (JsonObject->TryGetNumberField(TEXT("globalRevision"),
-                                        ServerRevision)) {
-        if (LocalGlobalRevision > 0 &&
-            ServerRevision > LocalGlobalRevision + 1) {
+      if (JsonObject->TryGetNumberField(TEXT("globalRevision"), ServerRevision)) {
+        if (LocalGlobalRevision > 0 && ServerRevision > LocalGlobalRevision + 1) {
           UE_LOG(LogGatrix, Warning,
                  TEXT("Streaming: Gap detected (local=%lld, server=%lld), "
                       "doing full fetch"),
@@ -2015,9 +2055,9 @@ void UGatrixFeaturesClient::ProcessStreamingEvent(const FString &EventType,
       }
 
       // Get changed keys
-      const TArray<TSharedPtr<FJsonValue>> *KeysArray;
+      const TArray<TSharedPtr<FJsonValue>>* KeysArray;
       if (JsonObject->TryGetArrayField(TEXT("keys"), KeysArray)) {
-        for (const auto &KeyVal : *KeysArray) {
+        for (const auto& KeyVal : *KeysArray) {
           FString Key;
           if (KeyVal->TryGetString(Key)) {
             ChangedKeys.Add(Key);
@@ -2042,8 +2082,7 @@ void UGatrixFeaturesClient::ProcessStreamingEvent(const FString &EventType,
   }
 }
 
-void UGatrixFeaturesClient::HandleStreamingInvalidation(
-    const TArray<FString> &ChangedKeys) {
+void UGatrixFeaturesClient::HandleStreamingInvalidation(const TArray<FString>& ChangedKeys) {
   if (ChangedKeys.Num() == 0) {
     FetchFlags();
     return;
@@ -2051,7 +2090,7 @@ void UGatrixFeaturesClient::HandleStreamingInvalidation(
 
   // If already fetching, queue the keys for later
   if (bStreamingFetching) {
-    for (const FString &Key : ChangedKeys) {
+    for (const FString& Key : ChangedKeys) {
       PendingInvalidationKeys.Add(Key);
     }
     return;
@@ -2061,7 +2100,7 @@ void UGatrixFeaturesClient::HandleStreamingInvalidation(
   FetchPartialFlags(ChangedKeys);
 }
 
-void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString> &FlagKeys) {
+void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
   if (FlagKeys.Num() == 0) {
     return;
   }
@@ -2080,35 +2119,31 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString> &FlagKeys) {
   }
   BaseUrl += FString::Printf(TEXT("&flagKeys=%s"), *KeysParam);
 
-  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
-      FHttpModule::Get().CreateRequest();
+  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
   HttpRequest->SetURL(BaseUrl);
   HttpRequest->SetVerb(TEXT("GET"));
   HttpRequest->SetHeader(TEXT("Accept"), TEXT("application/json"));
   HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
   HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
   HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
-  HttpRequest->SetHeader(TEXT("X-SDK-Version"),
-                         FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName,
-                                         *UGatrixClient::SdkVersion));
+  HttpRequest->SetHeader(
+      TEXT("X-SDK-Version"),
+      FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName, *UGatrixClient::SdkVersion));
 
   if (!Etag.IsEmpty()) {
     HttpRequest->SetHeader(TEXT("If-None-Match"), Etag);
   }
 
-  for (const auto &Header : ClientConfig.CustomHeaders) {
+  for (const auto& Header : ClientConfig.CustomHeaders) {
     HttpRequest->SetHeader(Header.Key, Header.Value);
   }
 
   HttpRequest->OnProcessRequestComplete().BindLambda(
-      [this](FHttpRequestPtr Request, FHttpResponsePtr Response,
-             bool bWasSuccessful) {
+      [this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
         bStreamingFetching = false;
 
-        if (bWasSuccessful && Response.IsValid() &&
-            Response->GetResponseCode() == 200) {
-          HandleFetchResponse(Response->GetContentAsString(),
-                              Response->GetResponseCode(),
+        if (bWasSuccessful && Response.IsValid() && Response->GetResponseCode() == 200) {
+          HandleFetchResponse(Response->GetContentAsString(), Response->GetResponseCode(),
                               Response->GetHeader(TEXT("ETag")));
         }
 
@@ -2136,7 +2171,7 @@ void UGatrixFeaturesClient::ScheduleStreamingReconnect() {
   }
 
   // Exponential backoff with jitter
-  const FGatrixStreamingConfig &StreamConfig = ClientConfig.Features.Streaming;
+  const FGatrixStreamingConfig& StreamConfig = ClientConfig.Features.Streaming;
   int32 ReconnectBase, ReconnectMax;
   if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
     ReconnectBase = StreamConfig.WebSocket.ReconnectBase;
@@ -2146,10 +2181,9 @@ void UGatrixFeaturesClient::ScheduleStreamingReconnect() {
     ReconnectMax = StreamConfig.Sse.ReconnectMax;
   }
 
-  float Delay = FMath::Min(
-      static_cast<float>(ReconnectBase) *
-          FMath::Pow(2.0f, static_cast<float>(StreamingReconnectAttempt)),
-      static_cast<float>(ReconnectMax));
+  float Delay = FMath::Min(static_cast<float>(ReconnectBase) *
+                               FMath::Pow(2.0f, static_cast<float>(StreamingReconnectAttempt)),
+                           static_cast<float>(ReconnectMax));
   // Add jitter (+/-25%)
   const float JitterRange = Delay * 0.25f;
   Delay += FMath::FRandRange(-JitterRange, JitterRange);
@@ -2157,37 +2191,34 @@ void UGatrixFeaturesClient::ScheduleStreamingReconnect() {
 
   StreamingReconnectAttempt++;
 
-  UE_LOG(LogGatrix, Log,
-         TEXT("Streaming: Scheduling reconnect in %.1fs (attempt %d)"), Delay,
+  UE_LOG(LogGatrix, Log, TEXT("Streaming: Scheduling reconnect in %.1fs (attempt %d)"), Delay,
          StreamingReconnectAttempt);
 
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }
 
   if (World) {
-    World->GetTimerManager().SetTimer(
-        StreamingReconnectTimerHandle,
-        FTimerDelegate::CreateWeakLambda(this,
-                                         [this]() {
-                                           if (bStarted) {
-                                             ConnectStreaming();
-                                           }
-                                         }),
-        Delay, false);
+    World->GetTimerManager().SetTimer(StreamingReconnectTimerHandle,
+                                      FTimerDelegate::CreateWeakLambda(this,
+                                                                       [this]() {
+                                                                         if (bStarted) {
+                                                                           ConnectStreaming();
+                                                                         }
+                                                                       }),
+                                      Delay, false);
   }
 }
 
-void UGatrixFeaturesClient::SetStreamingState(
-    EGatrixStreamingConnectionState NewState) {
+void UGatrixFeaturesClient::SetStreamingState(EGatrixStreamingConnectionState NewState) {
   if (StreamingState != NewState) {
     StreamingState = NewState;
 
     if (ClientConfig.bEnableDevMode) {
-      static const TCHAR *StateNames[] = {
-          TEXT("Disconnected"), TEXT("Connecting"), TEXT("Connected"),
-          TEXT("Reconnecting"), TEXT("Degraded")};
+      static const TCHAR* StateNames[] = {TEXT("Disconnected"), TEXT("Connecting"),
+                                          TEXT("Connected"), TEXT("Reconnecting"),
+                                          TEXT("Degraded")};
       UE_LOG(LogGatrix, Log, TEXT("[DEV] Streaming state: %s"),
              StateNames[static_cast<int32>(NewState)]);
     }
@@ -2195,7 +2226,7 @@ void UGatrixFeaturesClient::SetStreamingState(
 }
 
 FString UGatrixFeaturesClient::BuildStreamingUrl() const {
-  const FGatrixStreamingConfig &StreamConfig = ClientConfig.Features.Streaming;
+  const FGatrixStreamingConfig& StreamConfig = ClientConfig.Features.Streaming;
 
   FString BaseUrl;
   if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
@@ -2207,29 +2238,26 @@ FString UGatrixFeaturesClient::BuildStreamingUrl() const {
   // If no custom URL, derive from ApiUrl
   // URL pattern: {apiUrl}/client/features/{environment}/stream/sse|ws
   if (BaseUrl.IsEmpty()) {
-    FString EncodedEnv =
-        FGenericPlatformHttp::UrlEncode(ClientConfig.Environment);
+    FString EncodedEnv = FGenericPlatformHttp::UrlEncode(ClientConfig.Environment);
     if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
-      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/ws"),
-                                *ClientConfig.ApiUrl, *EncodedEnv);
+      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/ws"), *ClientConfig.ApiUrl,
+                                *EncodedEnv);
       // Convert http(s) to ws(s)
       BaseUrl = BaseUrl.Replace(TEXT("https://"), TEXT("wss://"));
       BaseUrl = BaseUrl.Replace(TEXT("http://"), TEXT("ws://"));
     } else {
-      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/sse"),
-                                *ClientConfig.ApiUrl, *EncodedEnv);
+      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/sse"), *ClientConfig.ApiUrl,
+                                *EncodedEnv);
     }
   }
 
   // Add query parameters
-  FString QueryString = FString::Printf(
-      TEXT("?appName=%s&environment=%s"),
-      *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName),
-      *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+  FString QueryString = FString::Printf(TEXT("?appName=%s&environment=%s"),
+                                        *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName),
+                                        *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
 
   if (LocalGlobalRevision > 0) {
-    QueryString +=
-        FString::Printf(TEXT("&globalRevision=%lld"), LocalGlobalRevision);
+    QueryString += FString::Printf(TEXT("&globalRevision=%lld"), LocalGlobalRevision);
   }
 
   return BaseUrl + QueryString;

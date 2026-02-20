@@ -16,41 +16,47 @@ namespace gatrix {
  */
 class GatrixClient {
 public:
-  static GatrixClient *getInstance();
-  static const char *sdkName() { return SDK_NAME; }
-  static const char *sdkVersion() { return SDK_VERSION; }
-  static const char *version() { return SDK_VERSION; }
+  static GatrixClient* getInstance();
+  static const char* sdkName() { return SDK_NAME; }
+  static const char* sdkVersion() { return SDK_VERSION; }
+  static const char* version() { return SDK_VERSION; }
 
-  void init(const GatrixClientConfig &config);
+  void init(const GatrixClientConfig& config);
   void start();
+
+  /**
+   * Start the SDK (C++ only).
+   * onComplete(bSuccess, errorMessage) is called when the SDK first becomes
+   * ready, or immediately if already ready.
+   */
+  void start(std::function<void(bool, const std::string&)> onComplete);
+
   void stop();
   bool isReady() const;
   std::string getError() const;
 
   // Access to FeaturesClient
-  FeaturesClient *features() { return _features; }
+  FeaturesClient* features() { return _features; }
 
   // Event Subscription (delegates to EventEmitter)
-  void on(const std::string &event, GatrixEventCallback callback,
-          const std::string &name = "");
-  void once(const std::string &event, GatrixEventCallback callback,
-            const std::string &name = "");
-  void off(const std::string &event, GatrixEventCallback callback = nullptr);
-  void onAny(GatrixAnyCallback callback, const std::string &name = "");
+  void on(const std::string& event, GatrixEventCallback callback, const std::string& name = "");
+  void once(const std::string& event, GatrixEventCallback callback, const std::string& name = "");
+  void off(const std::string& event, GatrixEventCallback callback = nullptr);
+  void onAny(GatrixAnyCallback callback, const std::string& name = "");
   void offAny();
 
   // Direct emitter access (for advanced usage)
-  GatrixEventEmitter &emitter() { return _emitter; }
+  GatrixEventEmitter& emitter() { return _emitter; }
 
 private:
   GatrixClient();
   ~GatrixClient();
 
-  static GatrixClient *_instance;
+  static GatrixClient* _instance;
 
   GatrixClientConfig _config;
   GatrixEventEmitter _emitter;
-  FeaturesClient *_features = nullptr;
+  FeaturesClient* _features = nullptr;
   bool _initialized = false;
 };
 

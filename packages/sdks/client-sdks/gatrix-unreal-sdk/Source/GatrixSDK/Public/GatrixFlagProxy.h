@@ -26,8 +26,8 @@ class GATRIXSDK_API UGatrixFlagProxy : public UObject {
 
 public:
   /** Initialize with variation provider and flag name */
-  void Initialize(IGatrixVariationProvider *InProvider,
-                  const FString &InFlagName, bool bInForceRealtime = false);
+  void Initialize(IGatrixVariationProvider* InProvider, const FString& InFlagName,
+                  bool bInForceRealtime = false);
 
   // ==================== Properties ====================
 
@@ -76,60 +76,48 @@ public:
   // No per-method bForceRealtime — uses constructor value.
 
   /** Get boolean variation from variant value */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
   bool BoolVariation(bool FallbackValue) const;
 
   /** Get string variation from value */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FString StringVariation(const FString &FallbackValue) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
+  FString StringVariation(const FString& FallbackValue) const;
 
   /** Get integer variation from value */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
   int32 IntVariation(int32 FallbackValue) const;
 
   /** Get float variation from value */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
   float FloatVariation(float FallbackValue) const;
 
   /** Get double variation (C++ only - Blueprint does not support double) */
   double DoubleVariation(double FallbackValue) const;
 
   /** Get JSON variation as string */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FString JsonVariation(const FString &FallbackValue) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
+  FString JsonVariation(const FString& FallbackValue) const;
 
   // ==================== Variation Details ====================
 
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult BoolVariationDetails(bool FallbackValue) const;
 
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult
-  StringVariationDetails(const FString &FallbackValue) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult StringVariationDetails(const FString& FallbackValue) const;
 
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult IntVariationDetails(int32 FallbackValue) const;
 
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
   FGatrixVariationResult FloatVariationDetails(float FallbackValue) const;
 
   /** Get double variation with details (C++ only - Blueprint does not support
    * double) */
   FGatrixVariationResult DoubleVariationDetails(double FallbackValue) const;
 
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|FlagProxy|Variation")
-  FGatrixVariationResult
-  JsonVariationDetails(const FString &FallbackValue) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|FlagProxy|Variation")
+  FGatrixVariationResult JsonVariationDetails(const FString& FallbackValue) const;
 
   // ==================== OrThrow Variations ====================
 
@@ -154,5 +142,5 @@ public:
 private:
   FString FlagName;
   bool bForceRealtime = false;
-  IGatrixVariationProvider *Provider = nullptr;
+  IGatrixVariationProvider* Provider = nullptr;
 };

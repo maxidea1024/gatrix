@@ -6,12 +6,10 @@
 #include "CoreMinimal.h"
 #include "IWebSocket.h"
 
-DECLARE_DELEGATE_TwoParams(FGatrixWsEventDelegate,
-                           const FString & /*EventType*/,
-                           const FString & /*EventData*/);
+DECLARE_DELEGATE_TwoParams(FGatrixWsEventDelegate, const FString& /*EventType*/,
+                           const FString& /*EventData*/);
 DECLARE_DELEGATE(FGatrixWsConnectedDelegate);
-DECLARE_DELEGATE_OneParam(FGatrixWsErrorDelegate,
-                          const FString & /*ErrorMessage*/);
+DECLARE_DELEGATE_OneParam(FGatrixWsErrorDelegate, const FString& /*ErrorMessage*/);
 DECLARE_DELEGATE(FGatrixWsDisconnectedDelegate);
 
 /**
@@ -30,7 +28,7 @@ public:
    * @param Headers HTTP headers (X-API-Token, etc.)
    * @param PingIntervalSeconds Client-side ping interval
    */
-  void Connect(const FString &Url, const TMap<FString, FString> &Headers,
+  void Connect(const FString& Url, const TMap<FString, FString>& Headers,
                int32 PingIntervalSeconds = 30);
 
   /** Disconnect and close WebSocket */
@@ -50,13 +48,13 @@ private:
   void HandleConnected();
 
   /** Handle WebSocket connection error */
-  void HandleConnectionError(const FString &Error);
+  void HandleConnectionError(const FString& Error);
 
   /** Handle WebSocket closed */
-  void HandleClosed(int32 StatusCode, const FString &Reason, bool bWasClean);
+  void HandleClosed(int32 StatusCode, const FString& Reason, bool bWasClean);
 
   /** Handle incoming WebSocket message */
-  void HandleMessage(const FString &Message);
+  void HandleMessage(const FString& Message);
 
   /** Start ping timer */
   void StartPingTimer(int32 IntervalSeconds);

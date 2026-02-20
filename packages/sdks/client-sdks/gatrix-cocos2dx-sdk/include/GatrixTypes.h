@@ -157,11 +157,11 @@ struct GatrixClientConfig {
 
 class GatrixFeatureError : public std::exception {
 public:
-  GatrixFeatureError(const std::string &message, const std::string &code = "")
+  GatrixFeatureError(const std::string& message, const std::string& code = "")
       : _message(message), _code(code) {}
 
-  const char *what() const noexcept override { return _message.c_str(); }
-  const std::string &code() const { return _code; }
+  const char* what() const noexcept override { return _message.c_str(); }
+  const std::string& code() const { return _code; }
 
 private:
   std::string _message;
@@ -173,21 +173,19 @@ private:
 class IStorageProvider {
 public:
   virtual ~IStorageProvider() = default;
-  virtual std::string get(const std::string &key) = 0;
-  virtual void save(const std::string &key, const std::string &value) = 0;
-  virtual void remove(const std::string &key) = 0;
+  virtual std::string get(const std::string& key) = 0;
+  virtual void save(const std::string& key, const std::string& value) = 0;
+  virtual void remove(const std::string& key) = 0;
 };
 
 class InMemoryStorageProvider : public IStorageProvider {
 public:
-  std::string get(const std::string &key) override {
+  std::string get(const std::string& key) override {
     auto it = _data.find(key);
     return it != _data.end() ? it->second : "";
   }
-  void save(const std::string &key, const std::string &value) override {
-    _data[key] = value;
-  }
-  void remove(const std::string &key) override { _data.erase(key); }
+  void save(const std::string& key, const std::string& value) override { _data[key] = value; }
+  void remove(const std::string& key) override { _data.erase(key); }
 
 private:
   std::map<std::string, std::string> _data;

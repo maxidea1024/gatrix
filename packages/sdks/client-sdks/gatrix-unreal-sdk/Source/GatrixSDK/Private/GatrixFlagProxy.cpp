@@ -3,8 +3,7 @@
 #include "GatrixFlagProxy.h"
 #include "GatrixVariationProvider.h"
 
-void UGatrixFlagProxy::Initialize(IGatrixVariationProvider *InProvider,
-                                  const FString &InFlagName,
+void UGatrixFlagProxy::Initialize(IGatrixVariationProvider* InProvider, const FString& InFlagName,
                                   bool bInForceRealtime) {
   check(InProvider); // Provider must not be null
   FlagName = InFlagName;
@@ -49,71 +48,54 @@ FGatrixEvaluatedFlag UGatrixFlagProxy::GetEvaluatedFlag() const {
 // ==================== Variation Methods ====================
 
 bool UGatrixFlagProxy::BoolVariation(bool FallbackValue) const {
-  return Provider->BoolVariationInternal(FlagName, FallbackValue,
-                                         bForceRealtime);
+  return Provider->BoolVariationInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
-FString UGatrixFlagProxy::StringVariation(const FString &FallbackValue) const {
-  return Provider->StringVariationInternal(FlagName, FallbackValue,
-                                           bForceRealtime);
+FString UGatrixFlagProxy::StringVariation(const FString& FallbackValue) const {
+  return Provider->StringVariationInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
 int32 UGatrixFlagProxy::IntVariation(int32 FallbackValue) const {
-  return Provider->IntVariationInternal(FlagName, FallbackValue,
-                                        bForceRealtime);
+  return Provider->IntVariationInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
 float UGatrixFlagProxy::FloatVariation(float FallbackValue) const {
-  return Provider->FloatVariationInternal(FlagName, FallbackValue,
-                                          bForceRealtime);
+  return Provider->FloatVariationInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
 double UGatrixFlagProxy::DoubleVariation(double FallbackValue) const {
-  return Provider->DoubleVariationInternal(FlagName, FallbackValue,
-                                           bForceRealtime);
+  return Provider->DoubleVariationInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
-FString UGatrixFlagProxy::JsonVariation(const FString &FallbackValue) const {
-  return Provider->JsonVariationInternal(FlagName, FallbackValue,
-                                         bForceRealtime);
+FString UGatrixFlagProxy::JsonVariation(const FString& FallbackValue) const {
+  return Provider->JsonVariationInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
 // ==================== Variation Details ====================
 
-FGatrixVariationResult
-UGatrixFlagProxy::BoolVariationDetails(bool FallbackValue) const {
-  return Provider->BoolVariationDetailsInternal(FlagName, FallbackValue,
-                                                bForceRealtime);
+FGatrixVariationResult UGatrixFlagProxy::BoolVariationDetails(bool FallbackValue) const {
+  return Provider->BoolVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
 FGatrixVariationResult
-UGatrixFlagProxy::StringVariationDetails(const FString &FallbackValue) const {
-  return Provider->StringVariationDetailsInternal(FlagName, FallbackValue,
-                                                  bForceRealtime);
+UGatrixFlagProxy::StringVariationDetails(const FString& FallbackValue) const {
+  return Provider->StringVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult
-UGatrixFlagProxy::IntVariationDetails(int32 FallbackValue) const {
-  return Provider->IntVariationDetailsInternal(FlagName, FallbackValue,
-                                               bForceRealtime);
+FGatrixVariationResult UGatrixFlagProxy::IntVariationDetails(int32 FallbackValue) const {
+  return Provider->IntVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult
-UGatrixFlagProxy::FloatVariationDetails(float FallbackValue) const {
-  return Provider->FloatVariationDetailsInternal(FlagName, FallbackValue,
-                                                 bForceRealtime);
+FGatrixVariationResult UGatrixFlagProxy::FloatVariationDetails(float FallbackValue) const {
+  return Provider->FloatVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult
-UGatrixFlagProxy::DoubleVariationDetails(double FallbackValue) const {
-  return Provider->DoubleVariationDetailsInternal(FlagName, FallbackValue,
-                                                  bForceRealtime);
+FGatrixVariationResult UGatrixFlagProxy::DoubleVariationDetails(double FallbackValue) const {
+  return Provider->DoubleVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
-FGatrixVariationResult
-UGatrixFlagProxy::JsonVariationDetails(const FString &FallbackValue) const {
-  return Provider->JsonVariationDetailsInternal(FlagName, FallbackValue,
-                                                bForceRealtime);
+FGatrixVariationResult UGatrixFlagProxy::JsonVariationDetails(const FString& FallbackValue) const {
+  return Provider->JsonVariationDetailsInternal(FlagName, FallbackValue, bForceRealtime);
 }
 
 // ==================== OrThrow Variations ====================

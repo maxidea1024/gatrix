@@ -10,20 +10,20 @@
  */
 namespace GatrixVariantSource {
 /** Flag not found in SDK cache */
-static const TCHAR *Missing = TEXT("$missing");
+static const TCHAR* Missing = TEXT("$missing");
 
 /** SDK detected a type mismatch between requested and actual value type */
-static const TCHAR *TypeMismatch = TEXT("$type-mismatch");
+static const TCHAR* TypeMismatch = TEXT("$type-mismatch");
 
 /** Value from environment-level enabledValue */
-static const TCHAR *EnvDefaultEnabled = TEXT("$env-default-enabled");
+static const TCHAR* EnvDefaultEnabled = TEXT("$env-default-enabled");
 
 /** Value from flag-level (global) enabledValue */
-static const TCHAR *FlagDefaultEnabled = TEXT("$flag-default-enabled");
+static const TCHAR* FlagDefaultEnabled = TEXT("$flag-default-enabled");
 
 /** Value from environment-level disabledValue */
-static const TCHAR *EnvDefaultDisabled = TEXT("$env-default-disabled");
+static const TCHAR* EnvDefaultDisabled = TEXT("$env-default-disabled");
 
 /** Value from flag-level (global) disabledValue */
-static const TCHAR *FlagDefaultDisabled = TEXT("$flag-default-disabled");
+static const TCHAR* FlagDefaultDisabled = TEXT("$flag-default-disabled");
 } // namespace GatrixVariantSource

@@ -1577,3 +1577,60 @@ type StreamingTransport = 'sse' | 'websocket';
 - [ ] Revision-based conditional fetch
 - [ ] Gap recovery on reconnection
 - [ ] Polling jitter
+
+---
+
+## C++ SDK Coding Style (Unreal SDK & Cocos2d-x SDK)
+
+The following conventions are **mandatory** for all C++ source files in the Gatrix C++ SDKs.
+They are enforced by the `.clang-format` file located at each SDK root.
+
+### Pointer and Reference Alignment
+
+`&` and `*` are attached to the **type**, not the variable name.
+
+```cpp
+// ✅ Correct
+const FString& name;
+FString* ptr;
+void Foo(const FGatrixContext& ctx, TFunction<void(bool, const FString&)> cb);
+
+// ❌ Wrong
+const FString &name;
+FString *ptr;
+void Foo(const FGatrixContext &ctx, TFunction<void(bool, const FString &)> cb);
+```
+
+This is enforced via `.clang-format` with:
+```yaml
+PointerAlignment: Left
+ReferenceAlignment: Left
+```
+
+To reformat all C++ files in an SDK:
+```bash
+find Source -name "*.cpp" -o -name "*.h" | xargs clang-format -i    # Unreal SDK
+find src include -name "*.cpp" -o -name "*.h" | xargs clang-format -i  # Cocos2d-x SDK
+```
+
+### Completion Callbacks
+
+All async operations (Start, FetchFlags, UpdateContext) expose a C++-only overload accepting a
+completion callback with the signature `void(bool bSuccess, const std::string& errorMessage)`:
+
+```cpp
+// Unreal SDK
+client->Start([](bool bOk, const FString& err) { ... });
+client->GetFeatures()->FetchFlags([](bool bOk, const FString& err) { ... });
+client->UpdateContext(ctx, [](bool bOk, const FString& err) { ... });
+
+// Cocos2d-x SDK
+client->start([](bool ok, const std::string& err) { ... });
+client->features()->fetchFlags([](bool ok, const std::string& err) { ... });
+client->features()->updateContext(ctx, [](bool ok, const std::string& err) { ... });
+```
+
+Callbacks are:
+- Called on the **main/game thread** — safe to manipulate UI or game state
+- Drained with `std::move`/`MoveTemp` for re-entrancy safety (no iterator invalidation)
+- Never called while holding any internal lock

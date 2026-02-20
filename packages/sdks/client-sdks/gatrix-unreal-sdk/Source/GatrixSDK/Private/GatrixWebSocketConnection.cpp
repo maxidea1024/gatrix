@@ -10,10 +10,11 @@
 
 FGatrixWebSocketConnection::FGatrixWebSocketConnection() {}
 
-FGatrixWebSocketConnection::~FGatrixWebSocketConnection() { Disconnect(); }
+FGatrixWebSocketConnection::~FGatrixWebSocketConnection() {
+  Disconnect();
+}
 
-void FGatrixWebSocketConnection::Connect(const FString &Url,
-                                         const TMap<FString, FString> &Headers,
+void FGatrixWebSocketConnection::Connect(const FString& Url, const TMap<FString, FString>& Headers,
                                          int32 PingIntervalSeconds) {
   // Disconnect any existing connection
   Disconnect();
@@ -29,17 +30,13 @@ void FGatrixWebSocketConnection::Connect(const FString &Url,
   const FString Protocol = TEXT("wss");
   TMap<FString, FString> UpgradeHeaders = Headers;
 
-  WebSocket =
-      FWebSocketsModule::Get().CreateWebSocket(Url, Protocol, UpgradeHeaders);
+  WebSocket = FWebSocketsModule::Get().CreateWebSocket(Url, Protocol, UpgradeHeaders);
 
   // Bind delegates
-  WebSocket->OnConnected().AddRaw(this,
-                                  &FGatrixWebSocketConnection::HandleConnected);
-  WebSocket->OnConnectionError().AddRaw(
-      this, &FGatrixWebSocketConnection::HandleConnectionError);
+  WebSocket->OnConnected().AddRaw(this, &FGatrixWebSocketConnection::HandleConnected);
+  WebSocket->OnConnectionError().AddRaw(this, &FGatrixWebSocketConnection::HandleConnectionError);
   WebSocket->OnClosed().AddRaw(this, &FGatrixWebSocketConnection::HandleClosed);
-  WebSocket->OnMessage().AddRaw(this,
-                                &FGatrixWebSocketConnection::HandleMessage);
+  WebSocket->OnMessage().AddRaw(this, &FGatrixWebSocketConnection::HandleMessage);
 
   UE_LOG(LogGatrix, Log, TEXT("WebSocket: Connecting to %s"), *Url);
   WebSocket->Connect();
@@ -72,7 +69,7 @@ void FGatrixWebSocketConnection::HandleConnected() {
   OnConnected.ExecuteIfBound();
 }
 
-void FGatrixWebSocketConnection::HandleConnectionError(const FString &Error) {
+void FGatrixWebSocketConnection::HandleConnectionError(const FString& Error) {
   if (bDisconnecting) {
     return;
   }
@@ -83,21 +80,19 @@ void FGatrixWebSocketConnection::HandleConnectionError(const FString &Error) {
   OnDisconnected.ExecuteIfBound();
 }
 
-void FGatrixWebSocketConnection::HandleClosed(int32 StatusCode,
-                                              const FString &Reason,
+void FGatrixWebSocketConnection::HandleClosed(int32 StatusCode, const FString& Reason,
                                               bool bWasClean) {
   if (bDisconnecting) {
     return;
   }
 
   bConnected = false;
-  UE_LOG(LogGatrix, Log,
-         TEXT("WebSocket: Closed (code=%d, reason=%s, clean=%s)"), StatusCode,
+  UE_LOG(LogGatrix, Log, TEXT("WebSocket: Closed (code=%d, reason=%s, clean=%s)"), StatusCode,
          *Reason, bWasClean ? TEXT("true") : TEXT("false"));
   OnDisconnected.ExecuteIfBound();
 }
 
-void FGatrixWebSocketConnection::HandleMessage(const FString &Message) {
+void FGatrixWebSocketConnection::HandleMessage(const FString& Message) {
   if (bDisconnecting) {
     return;
   }
@@ -106,17 +101,14 @@ void FGatrixWebSocketConnection::HandleMessage(const FString &Message) {
   TSharedPtr<FJsonObject> JsonObject;
   TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Message);
 
-  if (!FJsonSerializer::Deserialize(Reader, JsonObject) ||
-      !JsonObject.IsValid()) {
-    UE_LOG(LogGatrix, Warning, TEXT("WebSocket: Failed to parse message: %s"),
-           *Message);
+  if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid()) {
+    UE_LOG(LogGatrix, Warning, TEXT("WebSocket: Failed to parse message: %s"), *Message);
     return;
   }
 
   FString EventType;
   if (!JsonObject->TryGetStringField(TEXT("type"), EventType)) {
-    UE_LOG(LogGatrix, Warning,
-           TEXT("WebSocket: Message missing 'type' field: %s"), *Message);
+    UE_LOG(LogGatrix, Warning, TEXT("WebSocket: Message missing 'type' field: %s"), *Message);
     return;
   }
 
@@ -127,7 +119,7 @@ void FGatrixWebSocketConnection::HandleMessage(const FString &Message) {
 
   // Extract data as JSON string
   FString EventData;
-  const TSharedPtr<FJsonObject> *DataObject;
+  const TSharedPtr<FJsonObject>* DataObject;
   if (JsonObject->TryGetObjectField(TEXT("data"), DataObject)) {
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&EventData);
     FJsonSerializer::Serialize(DataObject->ToSharedRef(), Writer);
@@ -144,15 +136,14 @@ void FGatrixWebSocketConnection::StartPingTimer(int32 IntervalSeconds) {
     return;
   }
 
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }
 
   if (World) {
     World->GetTimerManager().SetTimer(
-        PingTimerHandle,
-        FTimerDelegate::CreateRaw(this, &FGatrixWebSocketConnection::SendPing),
+        PingTimerHandle, FTimerDelegate::CreateRaw(this, &FGatrixWebSocketConnection::SendPing),
         static_cast<float>(IntervalSeconds),
         true // looping
     );
@@ -160,7 +151,7 @@ void FGatrixWebSocketConnection::StartPingTimer(int32 IntervalSeconds) {
 }
 
 void FGatrixWebSocketConnection::StopPingTimer() {
-  UWorld *World = nullptr;
+  UWorld* World = nullptr;
   if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
     World = GEngine->GetWorldContexts()[0].World();
   }

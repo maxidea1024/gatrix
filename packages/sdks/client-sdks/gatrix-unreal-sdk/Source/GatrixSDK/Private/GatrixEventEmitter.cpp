@@ -2,17 +2,16 @@
 
 #include "GatrixEventEmitter.h"
 
-int32 FGatrixEventEmitter::AddListener(
-    const FString &EventName, TFunction<void(const TArray<FString> &)> Callback,
-    bool bOnce, const FString &Name) {
+int32 FGatrixEventEmitter::AddListener(const FString& EventName,
+                                       TFunction<void(const TArray<FString>&)> Callback, bool bOnce,
+                                       const FString& Name) {
   FScopeLock Lock(&CriticalSection);
 
   int32 Handle = NextHandle++;
 
   FListenerInfo Info;
   Info.Handle = Handle;
-  Info.Name =
-      Name.IsEmpty() ? FString::Printf(TEXT("listener_%d"), Handle) : Name;
+  Info.Name = Name.IsEmpty() ? FString::Printf(TEXT("listener_%d"), Handle) : Name;
   Info.Callback = MoveTemp(Callback);
   Info.bOnce = bOnce;
   Info.CallCount = 0;
@@ -24,27 +23,27 @@ int32 FGatrixEventEmitter::AddListener(
   return Handle;
 }
 
-int32 FGatrixEventEmitter::On(const FString &EventName,
-                              TFunction<void(const TArray<FString> &)> Callback,
-                              const FString &Name) {
+int32 FGatrixEventEmitter::On(const FString& EventName,
+                              TFunction<void(const TArray<FString>&)> Callback,
+                              const FString& Name) {
   return AddListener(EventName, MoveTemp(Callback), false, Name);
 }
 
-int32 FGatrixEventEmitter::Once(
-    const FString &EventName, TFunction<void(const TArray<FString> &)> Callback,
-    const FString &Name) {
+int32 FGatrixEventEmitter::Once(const FString& EventName,
+                                TFunction<void(const TArray<FString>&)> Callback,
+                                const FString& Name) {
   return AddListener(EventName, MoveTemp(Callback), true, Name);
 }
 
 void FGatrixEventEmitter::Off(int32 Handle) {
   FScopeLock Lock(&CriticalSection);
 
-  const FString *EventName = HandleToEvent.Find(Handle);
+  const FString* EventName = HandleToEvent.Find(Handle);
   if (!EventName) {
     return;
   }
 
-  TArray<FListenerInfo> *ListenerList = Listeners.Find(*EventName);
+  TArray<FListenerInfo>* ListenerList = Listeners.Find(*EventName);
   if (ListenerList) {
     for (int32 i = ListenerList->Num() - 1; i >= 0; --i) {
       if ((*ListenerList)[i].Handle == Handle) {
@@ -57,12 +56,12 @@ void FGatrixEventEmitter::Off(int32 Handle) {
   HandleToEvent.Remove(Handle);
 }
 
-void FGatrixEventEmitter::OffAll(const FString &EventName) {
+void FGatrixEventEmitter::OffAll(const FString& EventName) {
   FScopeLock Lock(&CriticalSection);
 
   // Remove handle mappings for this event
   TArray<int32> HandlesToRemove;
-  for (const auto &Pair : HandleToEvent) {
+  for (const auto& Pair : HandleToEvent) {
     if (Pair.Value == EventName) {
       HandlesToRemove.Add(Pair.Key);
     }
@@ -74,17 +73,15 @@ void FGatrixEventEmitter::OffAll(const FString &EventName) {
   Listeners.Remove(EventName);
 }
 
-int32 FGatrixEventEmitter::OnAny(
-    TFunction<void(const FString &, const TArray<FString> &)> Callback,
-    const FString &Name) {
+int32 FGatrixEventEmitter::OnAny(TFunction<void(const FString&, const TArray<FString>&)> Callback,
+                                 const FString& Name) {
   FScopeLock Lock(&CriticalSection);
 
   int32 Handle = NextHandle++;
 
   FAnyListenerInfo Info;
   Info.Handle = Handle;
-  Info.Name =
-      Name.IsEmpty() ? FString::Printf(TEXT("any_listener_%d"), Handle) : Name;
+  Info.Name = Name.IsEmpty() ? FString::Printf(TEXT("any_listener_%d"), Handle) : Name;
   Info.Callback = MoveTemp(Callback);
   Info.RegisteredAt = FDateTime::UtcNow();
 
@@ -104,21 +101,19 @@ void FGatrixEventEmitter::OffAny(int32 Handle) {
   }
 }
 
-void FGatrixEventEmitter::Emit(const FString &EventName,
-                               const TArray<FString> &Args) {
+void FGatrixEventEmitter::Emit(const FString& EventName, const TArray<FString>& Args) {
   // Collect callbacks to invoke outside the lock to avoid deadlocks
-  TArray<TFunction<void(const TArray<FString> &)>> CallbacksToInvoke;
-  TArray<TFunction<void(const FString &, const TArray<FString> &)>>
-      AnyCallbacksToInvoke;
+  TArray<TFunction<void(const TArray<FString>&)>> CallbacksToInvoke;
+  TArray<TFunction<void(const FString&, const TArray<FString>&)>> AnyCallbacksToInvoke;
 
   {
     FScopeLock Lock(&CriticalSection);
 
     // Fire specific listeners
-    TArray<FListenerInfo> *ListenerList = Listeners.Find(EventName);
+    TArray<FListenerInfo>* ListenerList = Listeners.Find(EventName);
     if (ListenerList) {
       for (int32 i = ListenerList->Num() - 1; i >= 0; --i) {
-        FListenerInfo &Info = (*ListenerList)[i];
+        FListenerInfo& Info = (*ListenerList)[i];
         Info.CallCount++;
         CallbacksToInvoke.Add(Info.Callback);
 
@@ -130,7 +125,7 @@ void FGatrixEventEmitter::Emit(const FString &EventName,
     }
 
     // Fire any-event listeners
-    for (FAnyListenerInfo &AnyInfo : AnyListeners) {
+    for (FAnyListenerInfo& AnyInfo : AnyListeners) {
       AnyCallbacksToInvoke.Add(AnyInfo.Callback);
     }
   }
@@ -140,12 +135,12 @@ void FGatrixEventEmitter::Emit(const FString &EventName,
   for (int32 i = CallbacksToInvoke.Num() - 1; i >= 0; --i) {
     CallbacksToInvoke[i](Args);
   }
-  for (auto &AnyCallback : AnyCallbacksToInvoke) {
+  for (auto& AnyCallback : AnyCallbacksToInvoke) {
     AnyCallback(EventName, Args);
   }
 }
 
-void FGatrixEventEmitter::Emit(const FString &EventName, const FString &Arg) {
+void FGatrixEventEmitter::Emit(const FString& EventName, const FString& Arg) {
   TArray<FString> Args;
   Args.Add(Arg);
   Emit(EventName, Args);

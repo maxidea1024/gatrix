@@ -48,8 +48,7 @@ struct GATRIXSDK_API FGatrixVariant {
   FString Value;
 
   FGatrixVariant() {}
-  FGatrixVariant(const FString &InName, bool bInEnabled,
-                 const FString &InValue = TEXT(""))
+  FGatrixVariant(const FString& InName, bool bInEnabled, const FString& InValue = TEXT(""))
       : Name(InName), bEnabled(bInEnabled), Value(InValue) {}
 };
 
@@ -427,8 +426,7 @@ struct GATRIXSDK_API FGatrixFeaturesStats {
   bool bStreamingEnabled = false;
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
-  EGatrixStreamingConnectionState StreamingState =
-      EGatrixStreamingConnectionState::Disconnected;
+  EGatrixStreamingConnectionState StreamingState = EGatrixStreamingConnectionState::Disconnected;
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
   EGatrixStreamingTransport StreamingTransport = EGatrixStreamingTransport::Sse;

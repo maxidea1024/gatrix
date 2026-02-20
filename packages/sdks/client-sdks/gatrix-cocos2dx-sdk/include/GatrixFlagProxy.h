@@ -21,10 +21,8 @@ namespace gatrix {
  */
 class FlagProxy {
 public:
-  FlagProxy(IVariationProvider *provider, const std::string &flagName,
-            bool forceRealtime = false)
-      : _provider(provider), _flagName(flagName),
-        _forceRealtime(forceRealtime) {
+  FlagProxy(IVariationProvider* provider, const std::string& flagName, bool forceRealtime = false)
+      : _provider(provider), _flagName(flagName), _forceRealtime(forceRealtime) {
     assert(_provider != nullptr);
   }
 
@@ -33,115 +31,88 @@ public:
 
   // ==================== Properties ====================
 
-  const std::string &name() const { return _flagName; }
+  const std::string& name() const { return _flagName; }
 
   /// Whether this proxy was created in realtime mode.
   bool isRealtime() const { return _forceRealtime; }
 
   /// Whether the flag exists in the current cache.
-  bool exists() const {
-    return _provider->hasFlagInternal(_flagName, _forceRealtime);
-  }
+  bool exists() const { return _provider->hasFlagInternal(_flagName, _forceRealtime); }
 
   /// Check if the flag is enabled. Delegates to provider for metrics tracking.
-  bool enabled() const {
-    return _provider->isEnabledInternal(_flagName, _forceRealtime);
-  }
+  bool enabled() const { return _provider->isEnabledInternal(_flagName, _forceRealtime); }
 
-  Variant variant() const {
-    return _provider->getVariantInternal(_flagName, _forceRealtime);
-  }
+  Variant variant() const { return _provider->getVariantInternal(_flagName, _forceRealtime); }
 
-  ValueType valueType() const {
-    return _provider->getValueTypeInternal(_flagName, _forceRealtime);
-  }
+  ValueType valueType() const { return _provider->getValueTypeInternal(_flagName, _forceRealtime); }
 
-  int version() const {
-    return _provider->getVersionInternal(_flagName, _forceRealtime);
-  }
+  int version() const { return _provider->getVersionInternal(_flagName, _forceRealtime); }
 
-  std::string reason() const {
-    return _provider->getReasonInternal(_flagName, _forceRealtime);
-  }
+  std::string reason() const { return _provider->getReasonInternal(_flagName, _forceRealtime); }
 
   bool impressionData() const {
     return _provider->getImpressionDataInternal(_flagName, _forceRealtime);
   }
 
-  const EvaluatedFlag *raw() const {
+  const EvaluatedFlag* raw() const {
     return _provider->getRawFlagInternal(_flagName, _forceRealtime);
   }
 
   // ==================== Variation Methods ====================
   // No per-method forceRealtime — uses constructor value.
 
-  std::string variation(const std::string &fallbackValue) const {
-    return _provider->variationInternal(_flagName, fallbackValue,
-                                        _forceRealtime);
+  std::string variation(const std::string& fallbackValue) const {
+    return _provider->variationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   bool boolVariation(bool fallbackValue) const {
-    return _provider->boolVariationInternal(_flagName, fallbackValue,
-                                            _forceRealtime);
+    return _provider->boolVariationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
-  std::string stringVariation(const std::string &fallbackValue) const {
-    return _provider->stringVariationInternal(_flagName, fallbackValue,
-                                              _forceRealtime);
+  std::string stringVariation(const std::string& fallbackValue) const {
+    return _provider->stringVariationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   int intVariation(int fallbackValue) const {
-    return _provider->intVariationInternal(_flagName, fallbackValue,
-                                           _forceRealtime);
+    return _provider->intVariationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   float floatVariation(float fallbackValue) const {
-    return _provider->floatVariationInternal(_flagName, fallbackValue,
-                                             _forceRealtime);
+    return _provider->floatVariationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   double doubleVariation(double fallbackValue) const {
-    return _provider->doubleVariationInternal(_flagName, fallbackValue,
-                                              _forceRealtime);
+    return _provider->doubleVariationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
-  std::string jsonVariation(const std::string &fallbackValue) const {
-    return _provider->jsonVariationInternal(_flagName, fallbackValue,
-                                            _forceRealtime);
+  std::string jsonVariation(const std::string& fallbackValue) const {
+    return _provider->jsonVariationInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   // ==================== Variation Details ====================
 
   VariationResult<bool> boolVariationDetails(bool fallbackValue) const {
-    return _provider->boolVariationDetailsInternal(_flagName, fallbackValue,
-                                                   _forceRealtime);
+    return _provider->boolVariationDetailsInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
-  VariationResult<std::string>
-  stringVariationDetails(const std::string &fallbackValue) const {
-    return _provider->stringVariationDetailsInternal(_flagName, fallbackValue,
-                                                     _forceRealtime);
+  VariationResult<std::string> stringVariationDetails(const std::string& fallbackValue) const {
+    return _provider->stringVariationDetailsInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   VariationResult<float> floatVariationDetails(float fallbackValue) const {
-    return _provider->floatVariationDetailsInternal(_flagName, fallbackValue,
-                                                    _forceRealtime);
+    return _provider->floatVariationDetailsInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   VariationResult<int> intVariationDetails(int fallbackValue) const {
-    return _provider->intVariationDetailsInternal(_flagName, fallbackValue,
-                                                  _forceRealtime);
+    return _provider->intVariationDetailsInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   VariationResult<double> doubleVariationDetails(double fallbackValue) const {
-    return _provider->doubleVariationDetailsInternal(_flagName, fallbackValue,
-                                                     _forceRealtime);
+    return _provider->doubleVariationDetailsInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
-  VariationResult<std::string>
-  jsonVariationDetails(const std::string &fallbackValue) const {
-    return _provider->jsonVariationDetailsInternal(_flagName, fallbackValue,
-                                                   _forceRealtime);
+  VariationResult<std::string> jsonVariationDetails(const std::string& fallbackValue) const {
+    return _provider->jsonVariationDetailsInternal(_flagName, fallbackValue, _forceRealtime);
   }
 
   // ==================== OrThrow Methods ====================
@@ -171,7 +142,7 @@ public:
   }
 
 private:
-  IVariationProvider *_provider;
+  IVariationProvider* _provider;
   std::string _flagName;
   bool _forceRealtime;
 };

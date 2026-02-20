@@ -7,10 +7,11 @@
 
 FGatrixSseConnection::FGatrixSseConnection() {}
 
-FGatrixSseConnection::~FGatrixSseConnection() { Disconnect(); }
+FGatrixSseConnection::~FGatrixSseConnection() {
+  Disconnect();
+}
 
-void FGatrixSseConnection::Connect(const FString &Url,
-                                   const TMap<FString, FString> &Headers) {
+void FGatrixSseConnection::Connect(const FString& Url, const TMap<FString, FString>& Headers) {
   // Disconnect any existing connection
   Disconnect();
 
@@ -28,17 +29,16 @@ void FGatrixSseConnection::Connect(const FString &Url,
   ActiveRequest->SetHeader(TEXT("Cache-Control"), TEXT("no-cache"));
 
   // Apply custom headers
-  for (const auto &Header : Headers) {
+  for (const auto& Header : Headers) {
     ActiveRequest->SetHeader(Header.Key, Header.Value);
   }
 
   // Bind progress callback for real-time data reception
-  ActiveRequest->OnRequestProgress().BindRaw(
-      this, &FGatrixSseConnection::HandleRequestProgress);
+  ActiveRequest->OnRequestProgress().BindRaw(this, &FGatrixSseConnection::HandleRequestProgress);
 
   // Bind completion callback
-  ActiveRequest->OnProcessRequestComplete().BindRaw(
-      this, &FGatrixSseConnection::HandleRequestComplete);
+  ActiveRequest->OnProcessRequestComplete().BindRaw(this,
+                                                    &FGatrixSseConnection::HandleRequestComplete);
 
   UE_LOG(LogGatrix, Log, TEXT("SSE: Connecting to %s"), *Url);
   ActiveRequest->ProcessRequest();
@@ -59,15 +59,14 @@ void FGatrixSseConnection::Disconnect() {
   CurrentEventData.Empty();
 }
 
-void FGatrixSseConnection::HandleRequestProgress(FHttpRequestPtr Request,
-                                                 int32 BytesSent,
+void FGatrixSseConnection::HandleRequestProgress(FHttpRequestPtr Request, int32 BytesSent,
                                                  int32 BytesReceived) {
   if (bDisconnecting || !Request.IsValid()) {
     return;
   }
 
   // Get the response content received so far
-  const TArray<uint8> &Content = Request->GetResponse()->GetContent();
+  const TArray<uint8>& Content = Request->GetResponse()->GetContent();
   if (Content.Num() <= ProcessedBytes) {
     return;
   }
@@ -82,9 +81,8 @@ void FGatrixSseConnection::HandleRequestProgress(FHttpRequestPtr Request,
   const int32 NewBytes = Content.Num() - ProcessedBytes;
   FString NewData;
   // Convert UTF-8 bytes to FString
-  FUTF8ToTCHAR Converter(
-      reinterpret_cast<const ANSICHAR *>(Content.GetData() + ProcessedBytes),
-      NewBytes);
+  FUTF8ToTCHAR Converter(reinterpret_cast<const ANSICHAR*>(Content.GetData() + ProcessedBytes),
+                         NewBytes);
   NewData = FString(Converter.Length(), Converter.Get());
   ProcessedBytes = Content.Num();
 
@@ -93,8 +91,7 @@ void FGatrixSseConnection::HandleRequestProgress(FHttpRequestPtr Request,
   ParseSseBuffer();
 }
 
-void FGatrixSseConnection::HandleRequestComplete(FHttpRequestPtr Request,
-                                                 FHttpResponsePtr Response,
+void FGatrixSseConnection::HandleRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response,
                                                  bool bWasSuccessful) {
   if (bDisconnecting) {
     return;
@@ -105,8 +102,7 @@ void FGatrixSseConnection::HandleRequestComplete(FHttpRequestPtr Request,
   if (!bWasSuccessful) {
     const FString ErrorMsg =
         Response.IsValid()
-            ? FString::Printf(TEXT("SSE connection failed: %d %s"),
-                              Response->GetResponseCode(),
+            ? FString::Printf(TEXT("SSE connection failed: %d %s"), Response->GetResponseCode(),
                               *Response->GetContentAsString())
             : TEXT("SSE connection failed: no response");
     UE_LOG(LogGatrix, Warning, TEXT("%s"), *ErrorMsg);
@@ -129,24 +125,21 @@ void FGatrixSseConnection::ParseSseBuffer() {
   int32 LineStart = 0;
   while (LineStart < ReceiveBuffer.Len()) {
     // Find next newline
-    int32 NewlinePos =
-        ReceiveBuffer.Find(TEXT("\n"), ESearchCase::CaseSensitive,
-                           ESearchDir::FromStart, LineStart);
+    int32 NewlinePos = ReceiveBuffer.Find(TEXT("\n"), ESearchCase::CaseSensitive,
+                                          ESearchDir::FromStart, LineStart);
     if (NewlinePos == INDEX_NONE) {
       // No complete line yet, keep remaining in buffer
       break;
     }
 
     // Extract the line (strip \r if present)
-    FString Line =
-        ReceiveBuffer.Mid(LineStart, NewlinePos - LineStart).TrimEnd();
+    FString Line = ReceiveBuffer.Mid(LineStart, NewlinePos - LineStart).TrimEnd();
     LineStart = NewlinePos + 1;
 
     if (Line.IsEmpty()) {
       // Empty line = dispatch event
       if (!CurrentEventType.IsEmpty() || !CurrentEventData.IsEmpty()) {
-        FString EventType =
-            CurrentEventType.IsEmpty() ? TEXT("message") : CurrentEventType;
+        FString EventType = CurrentEventType.IsEmpty() ? TEXT("message") : CurrentEventType;
         OnEvent.ExecuteIfBound(EventType, CurrentEventData);
         CurrentEventType.Empty();
         CurrentEventData.Empty();

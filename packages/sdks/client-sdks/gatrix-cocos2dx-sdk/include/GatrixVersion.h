@@ -6,8 +6,8 @@
 
 namespace gatrix {
 
-constexpr const char *SDK_NAME = "gatrix-cocos2dx-client-sdk";
-constexpr const char *SDK_VERSION = "1.0.0";
+constexpr const char* SDK_NAME = "gatrix-cocos2dx-client-sdk";
+constexpr const char* SDK_VERSION = "1.0.0";
 
 } // namespace gatrix
 

@@ -14,34 +14,33 @@ public:
   virtual ~IGatrixStorageProvider() {}
 
   /** Save a value by key */
-  virtual void Save(const FString &Key, const FString &Value) = 0;
+  virtual void Save(const FString& Key, const FString& Value) = 0;
 
   /** Load a value by key. Returns empty string if not found. */
-  virtual FString Load(const FString &Key) = 0;
+  virtual FString Load(const FString& Key) = 0;
 
   /** Delete a value by key */
-  virtual void Delete(const FString &Key) = 0;
+  virtual void Delete(const FString& Key) = 0;
 };
 
 /**
  * Default in-memory storage provider.
  * Data is lost when the process exits.
  */
-class GATRIXSDK_API FGatrixInMemoryStorageProvider
-    : public IGatrixStorageProvider {
+class GATRIXSDK_API FGatrixInMemoryStorageProvider : public IGatrixStorageProvider {
 public:
-  virtual void Save(const FString &Key, const FString &Value) override {
+  virtual void Save(const FString& Key, const FString& Value) override {
     FScopeLock Lock(&CriticalSection);
     Storage.Add(Key, Value);
   }
 
-  virtual FString Load(const FString &Key) override {
+  virtual FString Load(const FString& Key) override {
     FScopeLock Lock(&CriticalSection);
-    const FString *Found = Storage.Find(Key);
+    const FString* Found = Storage.Find(Key);
     return Found ? *Found : FString();
   }
 
-  virtual void Delete(const FString &Key) override {
+  virtual void Delete(const FString& Key) override {
     FScopeLock Lock(&CriticalSection);
     Storage.Remove(Key);
   }

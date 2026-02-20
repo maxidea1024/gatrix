@@ -842,8 +842,42 @@ int FGatrixLuaBindings::Lua_HasFlag(lua_State *L) {
 int FGatrixLuaBindings::Lua_UpdateContext(lua_State *L) {
   luaL_checktype(L, 1, LUA_TTABLE);
   FGatrixContext Ctx = ReadContextFromTable(L, 1);
-  UGatrixClient::Get()->UpdateContext(Ctx);
-  return 0;
+
+  // Create deferred promise
+  int DeferredRef = CreateDeferred(L);
+  if (DeferredRef == LUA_NOREF) {
+    // 'deferred' module unavailable — fire and forget
+    UGatrixClient::Get()->UpdateContext(Ctx);
+    lua_pushnil(L);
+    return 1;
+  }
+
+  TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
+  lua_State *CapturedL = L;
+  int CapturedRef = DeferredRef;
+  TSharedPtr<bool> CapturedAlive = AliveFlag;
+
+  // Pass a native C++ completion callback to UpdateContext.
+  // The callback is guaranteed to be called on the game thread once the
+  // resulting FetchFlags completes (or immediately when offline/not started).
+  // We do NOT touch any lock here — all paths are game-thread-only.
+  UGatrixClient::Get()->UpdateContext(
+      Ctx, [CapturedL, CapturedRef, CapturedAlive](bool bSuccess,
+                                                   const FString &ErrorMsg) {
+        // Safety: check that the Lua state is still alive
+        if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
+          return;
+        }
+
+        if (bSuccess) {
+          ResolveDeferred(CapturedL, CapturedRef);
+        } else {
+          RejectDeferred(CapturedL, CapturedRef, TCHAR_TO_UTF8(*ErrorMsg));
+        }
+      });
+
+  // Return the deferred table (already on stack from CreateDeferred)
+  return 1;
 }
 
 int FGatrixLuaBindings::Lua_GetContext(lua_State *L) {

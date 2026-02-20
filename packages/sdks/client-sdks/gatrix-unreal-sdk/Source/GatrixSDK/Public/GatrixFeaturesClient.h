@@ -15,26 +15,23 @@
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
 
-#include <atomic>
 #include "GatrixFeaturesClient.generated.h"
+#include <atomic>
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnSync);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnRecovered);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnError, FGatrixErrorEvent,
-                                            Error);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnImpression,
-                                            FGatrixImpressionEvent, Event);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnError, FGatrixErrorEvent, Error);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnImpression, FGatrixImpressionEvent, Event);
 
 /**
  * UGatrixFeaturesClient - Central client for feature flag management in Unreal
  * SDK. Implementation of CLIENT_SDK_SPEC.md.
  */
 UCLASS(BlueprintType)
-class GATRIXSDK_API UGatrixFeaturesClient : public UObject,
-                                            public IGatrixVariationProvider {
+class GATRIXSDK_API UGatrixFeaturesClient : public UObject, public IGatrixVariationProvider {
   GENERATED_BODY()
 
 public:
@@ -44,8 +41,7 @@ public:
    * Initialize the client with config, emitter, and storage.
    * Called by UGatrixClient::Init() before Start().
    */
-  void Initialize(const FGatrixClientConfig &Config,
-                  FGatrixEventEmitter *Emitter,
+  void Initialize(const FGatrixClientConfig& Config, FGatrixEventEmitter* Emitter,
                   TSharedPtr<IGatrixStorageProvider> Storage);
 
   /**
@@ -53,6 +49,15 @@ public:
    */
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features")
   void Start();
+
+  /**
+   * Start the client (C++ only).
+   * OnComplete(bSuccess, ErrorMessage) is called on the game thread:
+   *   - bSuccess=true  when flags are first loaded (ready event)
+   *   - bSuccess=false if the initial fetch fails
+   * In offline mode it resolves immediately with bSuccess=true.
+   */
+  void Start(TFunction<void(bool, const FString&)> OnComplete);
 
   /**
    * Stop the client - stops polling and metrics.
@@ -64,17 +69,15 @@ public:
 
   /** Check if a flag is enabled */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  bool IsEnabled(const FString &FlagName, bool bForceRealtime = false) const;
+  bool IsEnabled(const FString& FlagName, bool bForceRealtime = false) const;
 
   /** Get raw flag data. Returns empty flag if not found (check Name field). */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  FGatrixEvaluatedFlag GetFlag(const FString &FlagName,
-                               bool bForceRealtime = false) const;
+  FGatrixEvaluatedFlag GetFlag(const FString& FlagName, bool bForceRealtime = false) const;
 
   /** Get variant for a flag */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  FGatrixVariant GetVariant(const FString &FlagName,
-                            bool bForceRealtime = false) const;
+  FGatrixVariant GetVariant(const FString& FlagName, bool bForceRealtime = false) const;
 
   /** Get all evaluated flags */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
@@ -82,128 +85,114 @@ public:
 
   /** Check if a flag is registered in the cache */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  bool HasFlag(const FString &FlagName) const;
+  bool HasFlag(const FString& FlagName) const;
 
   // ==================== Flag Access - Typed Variations ====================
 
   /** Get variant name (returns the matched variant's name, or fallback) */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FString Variation(const FString &FlagName, const FString &FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FString Variation(const FString& FlagName, const FString& FallbackValue,
                     bool bForceRealtime = false) const;
 
   /** Get boolean variation */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  bool BoolVariation(const FString &FlagName, bool FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  bool BoolVariation(const FString& FlagName, bool FallbackValue,
                      bool bForceRealtime = false) const;
 
   /** Get string variation */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FString StringVariation(const FString &FlagName, const FString &FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FString StringVariation(const FString& FlagName, const FString& FallbackValue,
                           bool bForceRealtime = false) const;
 
   /** Get integer variation */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  int32 IntVariation(const FString &FlagName, int32 FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  int32 IntVariation(const FString& FlagName, int32 FallbackValue,
                      bool bForceRealtime = false) const;
 
   /** Get float variation */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  float FloatVariation(const FString &FlagName, float FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  float FloatVariation(const FString& FlagName, float FallbackValue,
                        bool bForceRealtime = false) const;
 
   /** Get double variation (C++ only - Blueprint does not support double) */
-  double DoubleVariation(const FString &FlagName, double FallbackValue,
+  double DoubleVariation(const FString& FlagName, double FallbackValue,
                          bool bForceRealtime = false) const;
 
   /** Get JSON variation as string */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FString JsonVariation(const FString &FlagName, const FString &FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FString JsonVariation(const FString& FlagName, const FString& FallbackValue,
                         bool bForceRealtime = false) const;
 
   // ==================== Variation Details ====================
 
   /** Get boolean variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FGatrixVariationResult
-  BoolVariationDetails(const FString &FlagName, bool FallbackValue,
-                       bool bForceRealtime = false) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult BoolVariationDetails(const FString& FlagName, bool FallbackValue,
+                                              bool bForceRealtime = false) const;
 
   /** Get string variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FGatrixVariationResult
-  StringVariationDetails(const FString &FlagName, const FString &FallbackValue,
-                         bool bForceRealtime = false) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult StringVariationDetails(const FString& FlagName,
+                                                const FString& FallbackValue,
+                                                bool bForceRealtime = false) const;
 
   /** Get integer variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FGatrixVariationResult IntVariationDetails(const FString &FlagName,
-                                             int32 FallbackValue,
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult IntVariationDetails(const FString& FlagName, int32 FallbackValue,
                                              bool bForceRealtime = false) const;
 
   /** Get float variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FGatrixVariationResult
-  FloatVariationDetails(const FString &FlagName, float FallbackValue,
-                        bool bForceRealtime = false) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult FloatVariationDetails(const FString& FlagName, float FallbackValue,
+                                               bool bForceRealtime = false) const;
 
   /** Get double variation with details (C++ only - Blueprint does not support
    * double) */
-  FGatrixVariationResult
-  DoubleVariationDetails(const FString &FlagName, double FallbackValue,
-                         bool bForceRealtime = false) const;
+  FGatrixVariationResult DoubleVariationDetails(const FString& FlagName, double FallbackValue,
+                                                bool bForceRealtime = false) const;
 
   /** Get JSON variation with details */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Variation")
-  FGatrixVariationResult
-  JsonVariationDetails(const FString &FlagName, const FString &FallbackValue,
-                       bool bForceRealtime = false) const;
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
+  FGatrixVariationResult JsonVariationDetails(const FString& FlagName, const FString& FallbackValue,
+                                              bool bForceRealtime = false) const;
 
   // ==================== OrThrow Variations ====================
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  bool BoolVariationOrThrow(const FString &FlagName,
-                            bool bForceRealtime = false);
+  bool BoolVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  FString StringVariationOrThrow(const FString &FlagName,
-                                 bool bForceRealtime = false);
+  FString StringVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  float FloatVariationOrThrow(const FString &FlagName,
-                              bool bForceRealtime = false);
+  float FloatVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  int32 IntVariationOrThrow(const FString &FlagName,
-                            bool bForceRealtime = false);
+  int32 IntVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
 
   /** C++ only - Blueprint does not support double */
-  double DoubleVariationOrThrow(const FString &FlagName,
-                                bool bForceRealtime = false);
+  double DoubleVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  FString JsonVariationOrThrow(const FString &FlagName,
-                               bool bForceRealtime = false);
+  FString JsonVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
 
   // ==================== Context Management ====================
 
-  /** Update the evaluation context and re-fetch flags */
+  /** Update the evaluation context and re-fetch flags (Blueprint) */
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Context")
-  void UpdateContext(const FGatrixContext &NewContext);
+  void UpdateContext(const FGatrixContext& NewContext);
+
+  /**
+   * Update the evaluation context and re-fetch flags (C++ only).
+   * OnComplete is called on the game thread with (bSuccess, ErrorMessage)
+   * once the resulting fetch completes, or immediately when offline/not
+   * started.
+   */
+  void UpdateContext(const FGatrixContext& NewContext,
+                     TFunction<void(bool, const FString&)> OnComplete);
 
   /** Get current context */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Context")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Context")
   FGatrixContext GetContext() const;
 
   // ==================== Explicit Sync ====================
@@ -226,9 +215,16 @@ public:
 
   // ==================== Fetch ====================
 
-  /** Explicitly fetch flags from the server */
+  /** Explicitly fetch flags from the server (Blueprint) */
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features")
   void FetchFlags();
+
+  /**
+   * Explicitly fetch flags from the server (C++ only).
+   * OnComplete(bSuccess, ErrorMessage) is called on the game thread once the
+   * fetch completes (success or failure).
+   */
+  void FetchFlags(TFunction<void(bool, const FString&)> OnComplete);
 
   // ==================== Watch ====================
 
@@ -236,35 +232,32 @@ public:
    * Watch a specific flag for realtime changes.
    * Returns a handle that can be used to unsubscribe.
    */
-  int32 WatchRealtimeFlag(const FString &FlagName,
-                          FGatrixFlagWatchDelegate Callback,
-                          const FString &Name = TEXT(""));
+  int32 WatchRealtimeFlag(const FString& FlagName, FGatrixFlagWatchDelegate Callback,
+                          const FString& Name = TEXT(""));
 
   /**
    * Watch a specific flag for synced changes.
    * Returns a handle that can be used to unsubscribe.
    */
-  int32 WatchSyncedFlag(const FString &FlagName,
-                        FGatrixFlagWatchDelegate Callback,
-                        const FString &Name = TEXT(""));
+  int32 WatchSyncedFlag(const FString& FlagName, FGatrixFlagWatchDelegate Callback,
+                        const FString& Name = TEXT(""));
 
   /**
    * Watch a flag for realtime changes with initial state callback.
    * Immediately invokes the callback with the current flag state if ready,
    * or defers until flags.ready event. Returns a handle for unsubscribe.
    */
-  int32 WatchRealtimeFlagWithInitialState(const FString &FlagName,
+  int32 WatchRealtimeFlagWithInitialState(const FString& FlagName,
                                           FGatrixFlagWatchDelegate Callback,
-                                          const FString &Name = TEXT(""));
+                                          const FString& Name = TEXT(""));
 
   /**
    * Watch a flag for synced changes with initial state callback.
    * Immediately invokes the callback with the current flag state if ready,
    * or defers until flags.ready event. Returns a handle for unsubscribe.
    */
-  int32 WatchSyncedFlagWithInitialState(const FString &FlagName,
-                                        FGatrixFlagWatchDelegate Callback,
-                                        const FString &Name = TEXT(""));
+  int32 WatchSyncedFlagWithInitialState(const FString& FlagName, FGatrixFlagWatchDelegate Callback,
+                                        const FString& Name = TEXT(""));
 
   /** Unsubscribe a flag watcher by handle */
   void UnwatchFlag(int32 Handle);
@@ -273,13 +266,12 @@ public:
    * Create a named watch group for batch management of flag watchers.
    * The caller owns the returned pointer and must delete it when done.
    */
-  FGatrixWatchFlagGroup *CreateWatchGroup(const FString &Name);
+  FGatrixWatchFlagGroup* CreateWatchGroup(const FString& Name);
 
   // ==================== Stats ====================
 
   /** Get feature flag statistics */
-  UFUNCTION(BlueprintCallable, BlueprintPure,
-            Category = "Gatrix|Features|Stats")
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Stats")
   FGatrixFeaturesStats GetStats() const;
 
   /** Check if SDK is ready */
@@ -315,92 +307,71 @@ public:
   // ==================== IGatrixVariationProvider Metadata Implementation
   // ====================
 
-  virtual bool HasFlagInternal(const FString &FlagName,
-                               bool bForceRealtime = false) const override;
-  virtual EGatrixValueType
-  GetValueTypeInternal(const FString &FlagName,
-                       bool bForceRealtime = false) const override;
-  virtual int32 GetVersionInternal(const FString &FlagName,
+  virtual bool HasFlagInternal(const FString& FlagName, bool bForceRealtime = false) const override;
+  virtual EGatrixValueType GetValueTypeInternal(const FString& FlagName,
+                                                bool bForceRealtime = false) const override;
+  virtual int32 GetVersionInternal(const FString& FlagName,
                                    bool bForceRealtime = false) const override;
-  virtual FString GetReasonInternal(const FString &FlagName,
+  virtual FString GetReasonInternal(const FString& FlagName,
                                     bool bForceRealtime = false) const override;
-  virtual bool
-  GetImpressionDataInternal(const FString &FlagName,
-                            bool bForceRealtime = false) const override;
-  virtual FGatrixEvaluatedFlag
-  GetRawFlagInternal(const FString &FlagName,
-                     bool bForceRealtime = false) const override;
+  virtual bool GetImpressionDataInternal(const FString& FlagName,
+                                         bool bForceRealtime = false) const override;
+  virtual FGatrixEvaluatedFlag GetRawFlagInternal(const FString& FlagName,
+                                                  bool bForceRealtime = false) const override;
 
   // ==================== IGatrixVariationProvider Implementation
   // ======================================
 
-  virtual bool IsEnabledInternal(const FString &FlagName,
-                                 bool bForceRealtime = false) override;
-  virtual FGatrixVariant
-  GetVariantInternal(const FString &FlagName,
-                     bool bForceRealtime = false) override;
+  virtual bool IsEnabledInternal(const FString& FlagName, bool bForceRealtime = false) override;
+  virtual FGatrixVariant GetVariantInternal(const FString& FlagName,
+                                            bool bForceRealtime = false) override;
 
-  virtual FString VariationInternal(const FString &FlagName,
-                                    const FString &FallbackValue,
+  virtual FString VariationInternal(const FString& FlagName, const FString& FallbackValue,
                                     bool bForceRealtime = false) override;
-  virtual bool BoolVariationInternal(const FString &FlagName,
-                                     bool FallbackValue,
+  virtual bool BoolVariationInternal(const FString& FlagName, bool FallbackValue,
                                      bool bForceRealtime = false) override;
-  virtual FString StringVariationInternal(const FString &FlagName,
-                                          const FString &FallbackValue,
+  virtual FString StringVariationInternal(const FString& FlagName, const FString& FallbackValue,
                                           bool bForceRealtime = false) override;
-  virtual float FloatVariationInternal(const FString &FlagName,
-                                       float FallbackValue,
+  virtual float FloatVariationInternal(const FString& FlagName, float FallbackValue,
                                        bool bForceRealtime = false) override;
-  virtual int32 IntVariationInternal(const FString &FlagName,
-                                     int32 FallbackValue,
+  virtual int32 IntVariationInternal(const FString& FlagName, int32 FallbackValue,
                                      bool bForceRealtime = false) override;
-  virtual double DoubleVariationInternal(const FString &FlagName,
-                                         double FallbackValue,
+  virtual double DoubleVariationInternal(const FString& FlagName, double FallbackValue,
                                          bool bForceRealtime = false) override;
-  virtual FString JsonVariationInternal(const FString &FlagName,
-                                        const FString &FallbackValue,
+  virtual FString JsonVariationInternal(const FString& FlagName, const FString& FallbackValue,
                                         bool bForceRealtime = false) override;
 
+  virtual FGatrixVariationResult BoolVariationDetailsInternal(const FString& FlagName,
+                                                              bool FallbackValue,
+                                                              bool bForceRealtime = false) override;
   virtual FGatrixVariationResult
-  BoolVariationDetailsInternal(const FString &FlagName, bool FallbackValue,
-                               bool bForceRealtime = false) override;
-  virtual FGatrixVariationResult
-  StringVariationDetailsInternal(const FString &FlagName,
-                                 const FString &FallbackValue,
+  StringVariationDetailsInternal(const FString& FlagName, const FString& FallbackValue,
                                  bool bForceRealtime = false) override;
   virtual FGatrixVariationResult
-  FloatVariationDetailsInternal(const FString &FlagName, float FallbackValue,
+  FloatVariationDetailsInternal(const FString& FlagName, float FallbackValue,
                                 bool bForceRealtime = false) override;
+  virtual FGatrixVariationResult IntVariationDetailsInternal(const FString& FlagName,
+                                                             int32 FallbackValue,
+                                                             bool bForceRealtime = false) override;
   virtual FGatrixVariationResult
-  IntVariationDetailsInternal(const FString &FlagName, int32 FallbackValue,
-                              bool bForceRealtime = false) override;
-  virtual FGatrixVariationResult
-  DoubleVariationDetailsInternal(const FString &FlagName, double FallbackValue,
+  DoubleVariationDetailsInternal(const FString& FlagName, double FallbackValue,
                                  bool bForceRealtime = false) override;
-  virtual FGatrixVariationResult
-  JsonVariationDetailsInternal(const FString &FlagName,
-                               const FString &FallbackValue,
-                               bool bForceRealtime = false) override;
+  virtual FGatrixVariationResult JsonVariationDetailsInternal(const FString& FlagName,
+                                                              const FString& FallbackValue,
+                                                              bool bForceRealtime = false) override;
 
-  virtual bool
-  BoolVariationOrThrowInternal(const FString &FlagName,
-                               bool bForceRealtime = false) override;
-  virtual FString
-  StringVariationOrThrowInternal(const FString &FlagName,
-                                 bool bForceRealtime = false) override;
-  virtual float
-  FloatVariationOrThrowInternal(const FString &FlagName,
-                                bool bForceRealtime = false) override;
-  virtual int32
-  IntVariationOrThrowInternal(const FString &FlagName,
-                              bool bForceRealtime = false) override;
-  virtual double
-  DoubleVariationOrThrowInternal(const FString &FlagName,
-                                 bool bForceRealtime = false) override;
-  virtual FString
-  JsonVariationOrThrowInternal(const FString &FlagName,
-                               bool bForceRealtime = false) override;
+  virtual bool BoolVariationOrThrowInternal(const FString& FlagName,
+                                            bool bForceRealtime = false) override;
+  virtual FString StringVariationOrThrowInternal(const FString& FlagName,
+                                                 bool bForceRealtime = false) override;
+  virtual float FloatVariationOrThrowInternal(const FString& FlagName,
+                                              bool bForceRealtime = false) override;
+  virtual int32 IntVariationOrThrowInternal(const FString& FlagName,
+                                            bool bForceRealtime = false) override;
+  virtual double DoubleVariationOrThrowInternal(const FString& FlagName,
+                                                bool bForceRealtime = false) override;
+  virtual FString JsonVariationOrThrowInternal(const FString& FlagName,
+                                               bool bForceRealtime = false) override;
 
 private:
   // ==================== Internal Structs ====================
@@ -414,36 +385,33 @@ private:
 
   // ==================== Internal Methods ====================
 
-  UGatrixFlagProxy *CreateProxy(const FString &FlagName,
-                                bool bForceRealtime = true);
+  UGatrixFlagProxy* CreateProxy(const FString& FlagName, bool bForceRealtime = true);
   void LoadFromStorage();
   void ApplyBootstrap();
   void DoFetchFlags();
-  void HandleFetchResponse(const FString &ResponseBody, int32 HttpStatus,
-                           const FString &EtagHeader);
-  void StoreFlags(const TArray<FGatrixEvaluatedFlag> &NewFlags,
-                  bool bIsInitialFetch);
-  TMap<FString, FGatrixEvaluatedFlag>
-  SelectFlags(bool bForceRealtime = false) const;
+  void HandleFetchResponse(const FString& ResponseBody, int32 HttpStatus,
+                           const FString& EtagHeader);
+  void StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFlags, bool bIsInitialFetch);
+  TMap<FString, FGatrixEvaluatedFlag> SelectFlags(bool bForceRealtime = false) const;
   void SetReady();
-  void EmitFlagChanges(const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
-                       const TMap<FString, FGatrixEvaluatedFlag> &NewFlags);
-  void TrackImpression(const FString &FlagName, bool bEnabled,
-                       const FString &VariantName, const FString &EventType);
-  void TrackAccess(const FString &FlagName, const FGatrixEvaluatedFlag *Flag,
-                   const FString &EventType, const FString &VariantName) const;
+  void EmitFlagChanges(const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
+                       const TMap<FString, FGatrixEvaluatedFlag>& NewFlags);
+  void TrackImpression(const FString& FlagName, bool bEnabled, const FString& VariantName,
+                       const FString& EventType);
+  void TrackAccess(const FString& FlagName, const FGatrixEvaluatedFlag* Flag,
+                   const FString& EventType, const FString& VariantName) const;
   void ScheduleNextPoll();
   void StopPolling();
-  void InvokeWatchCallbacks(const TArray<FWatchCallbackEntry> &CallbackList,
-                            const TMap<FString, FGatrixEvaluatedFlag> &OldFlags,
-                            const TMap<FString, FGatrixEvaluatedFlag> &NewFlags,
+  void InvokeWatchCallbacks(const TArray<FWatchCallbackEntry>& CallbackList,
+                            const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
+                            const TMap<FString, FGatrixEvaluatedFlag>& NewFlags,
                             bool bForceRealtime);
 
   // Metrics
   void StartMetrics();
   void StopMetrics();
   void SendMetrics();
-  void BuildMetricsPayload(FString &OutJson) const;
+  void BuildMetricsPayload(FString& OutJson) const;
 
   FString BuildFetchUrl() const;
   FString BuildContextQueryString() const;
@@ -452,18 +420,17 @@ private:
   // Streaming
   void ConnectStreaming();
   void DisconnectStreaming();
-  void ProcessStreamingEvent(const FString &EventType,
-                             const FString &EventData);
-  void HandleStreamingInvalidation(const TArray<FString> &ChangedKeys);
+  void ProcessStreamingEvent(const FString& EventType, const FString& EventData);
+  void HandleStreamingInvalidation(const TArray<FString>& ChangedKeys);
   void ScheduleStreamingReconnect();
-  void FetchPartialFlags(const TArray<FString> &FlagKeys);
+  void FetchPartialFlags(const TArray<FString>& FlagKeys);
   void SetStreamingState(EGatrixStreamingConnectionState NewState);
   FString BuildStreamingUrl() const;
 
   // ==================== State ====================
 
   FGatrixClientConfig ClientConfig;
-  FGatrixEventEmitter *EventEmitter = nullptr;
+  FGatrixEventEmitter* EventEmitter = nullptr;
   TSharedPtr<IGatrixStorageProvider> StorageProvider;
 
   // Thread-safe flag storage
@@ -518,6 +485,19 @@ private:
   // Connection ID
   FString ConnectionId;
 
+  // Pending callbacks registered via UpdateContext(ctx, onComplete).
+  // Drained (all called and cleared) on the next fetch success or failure.
+  TArray<TFunction<void(bool, const FString&)>> PendingContextCallbacks;
+
+  // Pending callbacks registered via FetchFlags(onComplete).
+  // Drained on the next fetch success or failure.
+  TArray<TFunction<void(bool, const FString&)>> PendingFetchCallbacks;
+
+  // Pending callbacks registered via Start(onComplete).
+  // Resolved once on the first successful fetch (ready), or rejected on the
+  // first fetch failure before the client ever became ready.
+  TArray<TFunction<void(bool, const FString&)>> PendingStartCallbacks;
+
   // Watch callback storage
   TArray<FWatchCallbackEntry> WatchCallbacks;
   TArray<FWatchCallbackEntry> SyncedWatchCallbacks;
@@ -526,8 +506,7 @@ private:
   // Streaming state
   TUniquePtr<FGatrixSseConnection> SseConnection;
   TUniquePtr<FGatrixWebSocketConnection> WebSocketConnection;
-  EGatrixStreamingConnectionState StreamingState =
-      EGatrixStreamingConnectionState::Disconnected;
+  EGatrixStreamingConnectionState StreamingState = EGatrixStreamingConnectionState::Disconnected;
   int32 StreamingReconnectAttempt = 0;
   int32 StreamingReconnectCount = 0;
   int32 StreamingEventCount = 0;

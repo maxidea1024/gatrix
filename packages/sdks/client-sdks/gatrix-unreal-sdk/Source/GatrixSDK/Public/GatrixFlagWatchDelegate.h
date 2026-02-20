@@ -9,4 +9,4 @@
 class UGatrixFlagProxy;
 
 // Callback delegate invoked when a watched flag changes
-DECLARE_DELEGATE_OneParam(FGatrixFlagWatchDelegate, UGatrixFlagProxy *);
+DECLARE_DELEGATE_OneParam(FGatrixFlagWatchDelegate, UGatrixFlagProxy*);
