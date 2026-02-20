@@ -47,7 +47,8 @@ namespace Gatrix.Unity.SDK
             var client = GatrixBehaviour.Client;
             if (client == null || string.IsNullOrEmpty(_flagName)) return;
 
-            string componentName = $"{GetType().Name}:{gameObject.name}";
+            // Include instanceID to distinguish objects with the same name (e.g. multiple enemies)
+            string componentName = $"{GetType().Name}:{gameObject.name}(#{gameObject.GetInstanceID()})";
 
             if (_use)
             {
