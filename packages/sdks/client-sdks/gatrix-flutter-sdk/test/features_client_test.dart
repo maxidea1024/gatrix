@@ -111,17 +111,17 @@ void main() {
       expect(client.getAllFlags().length, fullBootstrap.length);
     });
 
-    test('getFlag returns FlagProxy for existing flag', () {
+    test('getFlag returns EvaluatedFlag for existing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('bool-flag');
-      expect(proxy.exists, true);
-      expect(proxy.name, 'bool-flag');
+      final flag = client.getFlag('bool-flag');
+      expect(flag, isNotNull);
+      expect(flag!.name, 'bool-flag');
     });
 
-    test('getFlag returns FlagProxy with exists=false for missing flag', () {
+    test('getFlag returns null for missing flag', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('nonexistent');
-      expect(proxy.exists, false);
+      final flag = client.getFlag('nonexistent');
+      expect(flag, isNull);
     });
   });
 
@@ -428,51 +428,45 @@ void main() {
     });
   });
 
-  group('FeaturesClient - FlagProxy Delegation', () {
-    test('FlagProxy delegates boolVariation to client', () {
+  group('FeaturesClient - Direct Variation Methods', () {
+    test('boolVariation via client delegates correctly', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('bool-flag');
-      expect(proxy.boolVariation(false), true);
+      expect(client.boolVariation('bool-flag', false), true);
     });
 
-    test('FlagProxy delegates stringVariation to client', () {
+    test('stringVariation via client delegates correctly', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('string-flag');
-      expect(proxy.stringVariation(''), 'hello world');
+      expect(client.stringVariation('string-flag', ''), 'hello world');
     });
 
-    test('FlagProxy delegates intVariation to client', () {
+    test('intVariation via client delegates correctly', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('number-flag');
-      expect(proxy.intVariation(0), 42);
+      expect(client.intVariation('number-flag', 0), 42);
     });
 
-    test('FlagProxy delegates doubleVariation to client', () {
+    test('doubleVariation via client delegates correctly', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('float-flag');
-      expect(proxy.doubleVariation(0.0), 3.14);
+      expect(client.doubleVariation('float-flag', 0.0), 3.14);
     });
 
-    test('FlagProxy delegates jsonVariation to client', () {
+    test('jsonVariation via client delegates correctly', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('json-flag');
-      final result = proxy.jsonVariation<Map<String, dynamic>>({});
+      final result = client.jsonVariation<Map<String, dynamic>>(
+          'json-flag', <String, dynamic>{});
       expect(result['key'], 'value');
     });
 
-    test('FlagProxy delegates boolVariationOrThrow to client', () {
+    test('boolVariationOrThrow via client delegates correctly', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('bool-flag');
-      expect(proxy.boolVariationOrThrow(), true);
+      expect(client.boolVariationOrThrow('bool-flag'), true);
     });
 
-    test('FlagProxy delegates missing flag correctly', () {
+    test('missing flag returns fallback for all variation methods', () {
       final client = makeClient(bootstrap: fullBootstrap);
-      final proxy = client.getFlag('nonexistent');
-      expect(proxy.boolVariation(true), true);
-      expect(proxy.stringVariation('def'), 'def');
-      expect(proxy.intVariation(99), 99);
-      expect(proxy.doubleVariation(99.0), 99.0);
+      expect(client.boolVariation('nonexistent', true), true);
+      expect(client.stringVariation('nonexistent', 'def'), 'def');
+      expect(client.intVariation('nonexistent', 99), 99);
+      expect(client.doubleVariation('nonexistent', 99.0), 99.0);
     });
   });
 

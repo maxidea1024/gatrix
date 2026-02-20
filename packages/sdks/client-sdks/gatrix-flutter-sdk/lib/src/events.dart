@@ -91,5 +91,12 @@ class GatrixEvents {
   static const String flagsFetchEnd = 'flags.fetch_end';
   static const String flagsImpression = 'flags.impression';
 
+  // Streaming events
+  static const String flagsStreamingConnected = 'flags.streaming.connected';
+  static const String flagsStreamingDisconnected = 'flags.streaming.disconnected';
+  static const String flagsStreamingReconnecting = 'flags.streaming.reconnecting';
+  static const String flagsStreamingError = 'flags.streaming.error';
+  static const String flagsInvalidated = 'flags.invalidated';
+
   static String flagChange(String flagName) => 'flags.$flagName.change';
 }

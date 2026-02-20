@@ -44,6 +44,30 @@ class MockVariationProvider implements VariationProvider {
       _getFlag(flagName)?.variant ?? missingVariant;
 
   @override
+  bool hasFlagInternal(String flagName, {bool forceRealtime = false}) =>
+      _flags.containsKey(flagName);
+
+  @override
+  ValueType getValueTypeInternal(String flagName, {bool forceRealtime = false}) =>
+      _getFlag(flagName)?.valueType ?? ValueType.none;
+
+  @override
+  int getVersionInternal(String flagName, {bool forceRealtime = false}) =>
+      _getFlag(flagName)?.version ?? 0;
+
+  @override
+  String? getReasonInternal(String flagName, {bool forceRealtime = false}) =>
+      _getFlag(flagName)?.reason;
+
+  @override
+  bool getImpressionDataInternal(String flagName, {bool forceRealtime = false}) =>
+      _getFlag(flagName)?.impressionData ?? false;
+
+  @override
+  EvaluatedFlag? getRawFlagInternal(String flagName, {bool forceRealtime = false}) =>
+      _getFlag(flagName);
+
+  @override
   String variationInternal(String flagName, String fallbackValue,
       {bool forceRealtime = false}) {
     final flag = _getFlag(flagName);
@@ -390,7 +414,7 @@ void main() {
     });
 
     test('missing flag properties', () {
-      final proxy = FlagProxy(null, client: mockClient);
+      final proxy = FlagProxy.withFlag(null, client: mockClient);
       expect(proxy.exists, false);
       expect(proxy.enabled, false); // delegates to client, flag not found -> false
       expect(proxy.name, '');
@@ -412,7 +436,7 @@ void main() {
       );
       // Must add to mockClient since enabled/variant delegate to client
       mockClient.addFlag(flag);
-      final proxy = FlagProxy(flag, client: mockClient);
+      final proxy = FlagProxy.withFlag(flag, client: mockClient);
       expect(proxy.exists, true);
       expect(proxy.enabled, true);
       expect(proxy.name, 'test-flag');
@@ -431,7 +455,7 @@ void main() {
         variantName: 'off',
       );
       mockClient.addFlag(flag);
-      final proxy = FlagProxy(flag, client: mockClient);
+      final proxy = FlagProxy.withFlag(flag, client: mockClient);
       expect(proxy.exists, true);
       expect(proxy.enabled, false);
     });
@@ -473,35 +497,35 @@ void main() {
     });
 
     test('variation delegates to client', () {
-      final proxy = FlagProxy(null, client: mockClient, flagName: 'bool-flag');
+      final proxy = FlagProxy.withFlag(null, client: mockClient, flagName: 'bool-flag');
       expect(proxy.variation('fallback'), 'on');
     });
 
     test('boolVariation delegates to client', () {
-      final proxy = FlagProxy(null, client: mockClient, flagName: 'bool-flag');
+      final proxy = FlagProxy.withFlag(null, client: mockClient, flagName: 'bool-flag');
       expect(proxy.boolVariation(false), true);
     });
 
     test('stringVariation delegates to client', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'string-flag');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'string-flag');
       expect(proxy.stringVariation(''), 'hello');
     });
 
     test('intVariation delegates to client', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'number-flag');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'number-flag');
       expect(proxy.intVariation(0), 42);
     });
 
     test('doubleVariation delegates to client', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'number-flag');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'number-flag');
       expect(proxy.doubleVariation(0.0), 42.0);
     });
 
     test('jsonVariation delegates to client', () {
-      final proxy = FlagProxy(null, client: mockClient, flagName: 'json-flag');
+      final proxy = FlagProxy.withFlag(null, client: mockClient, flagName: 'json-flag');
       final result =
           proxy.jsonVariation<Map<String, dynamic>>(<String, dynamic>{});
       expect(result['key'], 'value');
@@ -509,7 +533,7 @@ void main() {
 
     test('missing flag returns fallbackValue', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'nonexistent');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'nonexistent');
       expect(proxy.variation('fallback'), 'fallback');
       expect(proxy.boolVariation(true), true);
       expect(proxy.stringVariation('def'), 'def');
@@ -519,7 +543,7 @@ void main() {
 
     test('type mismatch returns fallbackValue', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'string-flag');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'string-flag');
       expect(proxy.boolVariation(true), true);
       expect(proxy.intVariation(99), 99);
     });
@@ -540,7 +564,7 @@ void main() {
     });
 
     test('boolVariationDetails delegates', () {
-      final proxy = FlagProxy(null, client: mockClient, flagName: 'bool-flag');
+      final proxy = FlagProxy.withFlag(null, client: mockClient, flagName: 'bool-flag');
       final r = proxy.boolVariationDetails(false);
       expect(r.value, true);
       expect(r.flagExists, true);
@@ -548,7 +572,7 @@ void main() {
 
     test('details for missing flag', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'nonexistent');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'nonexistent');
       final r = proxy.boolVariationDetails(true);
       expect(r.value, true);
       expect(r.flagExists, false);
@@ -571,13 +595,13 @@ void main() {
     });
 
     test('boolVariationOrThrow delegates', () {
-      final proxy = FlagProxy(null, client: mockClient, flagName: 'bool-flag');
+      final proxy = FlagProxy.withFlag(null, client: mockClient, flagName: 'bool-flag');
       expect(proxy.boolVariationOrThrow(), true);
     });
 
     test('orThrow throws for missing flag', () {
       final proxy =
-          FlagProxy(null, client: mockClient, flagName: 'nonexistent');
+          FlagProxy.withFlag(null, client: mockClient, flagName: 'nonexistent');
       expect(
           () => proxy.boolVariationOrThrow(), throwsA(isA<GatrixException>()));
     });
@@ -588,7 +612,7 @@ void main() {
         value: 'hello',
         valueType: ValueType.string,
       ));
-      final proxy = FlagProxy(null, client: mockClient, flagName: 'str-flag');
+      final proxy = FlagProxy.withFlag(null, client: mockClient, flagName: 'str-flag');
       expect(
           () => proxy.boolVariationOrThrow(), throwsA(isA<GatrixException>()));
     });

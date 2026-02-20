@@ -93,12 +93,18 @@ void FeaturesClient::start(std::function<void(bool, const std::string&)> onCompl
   } else {
     fetchFlags();
   }
+
+  // Start streaming if enabled
+  if (_config.streaming.enabled && !_config.offlineMode) {
+    connectStreaming();
+  }
 }
 
 void FeaturesClient::stop() {
   if (_config.enableDevMode) {
     CCLOG("[GatrixSDK][DEV] stop() called");
   }
+  disconnectStreaming();
   unschedulePolling();
   _started = false;
   _sdkState = SdkState::STOPPED;
@@ -906,6 +912,21 @@ GatrixSdkStats FeaturesClient::getStats() const {
   }
   stats.activeWatchGroups = groups;
   stats.eventHandlerStats = _emitter.getHandlerStats();
+
+  // Streaming stats
+  if (_streaming) {
+    stats.streamingTransport = _streaming->getTransportName();
+    stats.streamingState = _streaming->getStateName();
+    stats.streamingReconnectCount = _streaming->getReconnectCount();
+    stats.streamingEventCount = _streaming->getEventCount();
+    stats.streamingErrorCount = _streaming->getErrorCount();
+    stats.streamingRecoveryCount = _streaming->getRecoveryCount();
+    stats.lastStreamingError = _streaming->getLastError();
+    stats.lastStreamingEventTime = _streaming->getLastEventTime();
+    stats.lastStreamingErrorTime = _streaming->getLastErrorTime();
+    stats.lastStreamingRecoveryTime = _streaming->getLastRecoveryTime();
+  }
+
   return stats;
 }
 
@@ -1058,6 +1079,53 @@ void FeaturesClient::invokeWatchCallbacks(
         }
       }
     }
+  }
+}
+
+// ==================== Streaming ====================
+
+void FeaturesClient::connectStreaming() {
+  if (_streaming)
+    return;
+
+  _streaming = new StreamingManager(_config, _emitter);
+  _streaming->setConnectionId(_connectionId);
+
+  // Set invalidation callback
+  _streaming->setInvalidationCallback([this](const std::vector<std::string>& changedKeys) {
+    handleStreamingInvalidation(changedKeys);
+  });
+
+  // Set fetch callback (for gap recovery)
+  _streaming->setFetchCallback([this]() {
+    _etag.clear();
+    fetchFlags();
+  });
+
+  _streaming->connect();
+}
+
+void FeaturesClient::disconnectStreaming() {
+  if (!_streaming)
+    return;
+  _streaming->disconnect();
+  delete _streaming;
+  _streaming = nullptr;
+}
+
+void FeaturesClient::handleStreamingInvalidation(const std::vector<std::string>& changedKeys) {
+  // Threshold: if changed keys >= 50% of total flags, do full fetch
+  auto totalFlags = static_cast<int>(_realtimeFlags.size());
+  auto changedCount = static_cast<int>(changedKeys.size());
+
+  if (changedCount == 0 || totalFlags == 0 || changedCount >= totalFlags / 2) {
+    // Full fetch: clear ETag so server returns fresh data
+    _etag.clear();
+    fetchFlags();
+  } else {
+    // For now, do a full fetch for partial invalidation too
+    // (partial fetch support can be added later)
+    fetchFlags();
   }
 }
 

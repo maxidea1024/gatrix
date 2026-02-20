@@ -10,6 +10,9 @@ import 'flag_proxy.dart';
 import 'client.dart';
 import 'variation_provider.dart';
 import 'variant_source.dart';
+import 'streaming_sse.dart';
+import 'streaming_websocket.dart';
+import 'watch_flag_group.dart';
 
 class FeaturesClient implements VariationProvider {
   final String _apiUrl;
@@ -24,8 +27,18 @@ class FeaturesClient implements VariationProvider {
   Map<String, EvaluatedFlag> _realtimeFlags = {};
   Map<String, EvaluatedFlag> _synchronizedFlags = {};
 
+  // Watch callbacks: flagName -> list of handlers
+  final Map<String, List<GatrixFlagWatchHandler>> _watchCallbacks = {};
+  final Map<String, List<GatrixFlagWatchHandler>> _syncedWatchCallbacks = {};
+  final Map<String, WatchFlagGroup> _watchGroups = {};
+
+  bool _readyEventEmitted = false;
+
   final Map<String, int> _missingFlags = {};
-  final List<Map<String, dynamic>> _pendingImpressions = [];
+  // Metrics bucket: flag access counts (yes/no + variants)
+  // Matches JS/Unity SDK structure: {flagName: {yes, no, variants: {variantName: count}}}
+  final Map<String, Map<String, dynamic>> _flagBucket = {};
+  DateTime _bucketStart = DateTime.now().toUtc();
 
   bool _explicitSyncMode = false;
   bool _pendingSync = false;
@@ -61,13 +74,16 @@ class FeaturesClient implements VariationProvider {
   DateTime? _lastUpdateTime;
   DateTime? _lastRecoveryTime;
   DateTime? _lastErrorTime;
-  final Map<String, Map<String, int>> _flagEnabledCounts = {};
-  final Map<String, Map<String, int>> _flagVariantCounts = {};
   final Map<String, DateTime> _flagLastChangedTimes = {};
 
   // Debug / Storage
   final bool _enableDevMode;
   final String _cacheKeyPrefix;
+
+  // Streaming
+  StreamingConfig? _streamingConfig;
+  SseConnection? _sseConnection;
+  WebSocketConnection? _wsConnection;
 
   FeaturesClient({
     required String apiUrl,
@@ -149,22 +165,20 @@ class FeaturesClient implements VariationProvider {
       _countMissing(flagName);
       return;
     }
-    // Count flag access
-    _flagEnabledCounts[flagName] ??= {'yes': 0, 'no': 0};
+    // Update metrics bucket (yes/no count)
+    final entry = _flagBucket.putIfAbsent(
+        flagName, () => {'yes': 0, 'no': 0, 'variants': <String, int>{}});
     if (flag.enabled) {
-      _flagEnabledCounts[flagName]!['yes'] =
-          (_flagEnabledCounts[flagName]!['yes'] ?? 0) + 1;
+      entry['yes'] = (entry['yes'] as int) + 1;
     } else {
-      _flagEnabledCounts[flagName]!['no'] =
-          (_flagEnabledCounts[flagName]!['no'] ?? 0) + 1;
+      entry['no'] = (entry['no'] as int) + 1;
     }
-    // Count variant access
+    // Update variant count
     if (variantName != null) {
-      _flagVariantCounts[flagName] ??= {};
-      _flagVariantCounts[flagName]![variantName] =
-          (_flagVariantCounts[flagName]![variantName] ?? 0) + 1;
+      final variants = entry['variants'] as Map<String, int>;
+      variants[variantName] = (variants[variantName] ?? 0) + 1;
     }
-    // Track impression if enabled
+    // Impression: separate external-service event (only when impressionData=true)
     if (flag.impressionData) {
       final impression = {
         'flagName': flagName,
@@ -173,7 +187,6 @@ class FeaturesClient implements VariationProvider {
         'enabled': flag.enabled,
         'variant': variantName,
       };
-      _pendingImpressions.add(impression);
       _impressionCount++;
       _events.emit(GatrixEvents.flagsImpression, [impression]);
     }
@@ -355,7 +368,7 @@ class FeaturesClient implements VariationProvider {
     final flag = _getFlag(flagName, forceRealtime: forceRealtime);
     final exists = flag != null;
     var reason = (flag?.reason) ?? (exists ? 'evaluated' : 'flag_not_found');
-    if (exists && flag!.valueType.toApiString() != expectedType) {
+    if (exists && flag.valueType.toApiString() != expectedType) {
       reason =
           'type_mismatch:expected_${expectedType}_got_${flag.valueType.toApiString()}';
     }
@@ -364,7 +377,7 @@ class FeaturesClient implements VariationProvider {
       reason: reason,
       flagExists: exists,
       enabled: flag?.enabled ?? false,
-      variant: exists ? flag!.variant : null,
+      variant: exists ? flag.variant : null,
     );
   }
 
@@ -640,6 +653,109 @@ class FeaturesClient implements VariationProvider {
   T jsonVariationOrThrow<T>(String flagName, {bool forceRealtime = false}) =>
       jsonVariationOrThrowInternal<T>(flagName, forceRealtime: forceRealtime);
 
+  // ============================================= Watch
+
+  /// Watch a flag for realtime changes.
+  /// Returns an unsubscribe function.
+  void Function() watchRealtimeFlag(
+      String flagName, GatrixFlagWatchHandler callback) {
+    _watchCallbacks.putIfAbsent(flagName, () => []).add(callback);
+    return () => _watchCallbacks[flagName]?.remove(callback);
+  }
+
+  /// Watch a flag for realtime changes with immediate initial state.
+  /// Fires [callback] immediately if flags are already loaded.
+  void Function() watchRealtimeFlagWithInitialState(
+      String flagName, GatrixFlagWatchHandler callback) {
+    final unsub = watchRealtimeFlag(flagName, callback);
+    if (_readyEventEmitted) {
+      callback(_createProxy(flagName, forceRealtime: true));
+    } else {
+      _events.once(GatrixEvents.flagsReady, (_) {
+        callback(_createProxy(flagName, forceRealtime: true));
+      });
+    }
+    return unsub;
+  }
+
+  /// Watch a flag for synced changes (respects explicitSyncMode).
+  /// Returns an unsubscribe function.
+  void Function() watchSyncedFlag(
+      String flagName, GatrixFlagWatchHandler callback) {
+    _syncedWatchCallbacks.putIfAbsent(flagName, () => []).add(callback);
+    return () => _syncedWatchCallbacks[flagName]?.remove(callback);
+  }
+
+  /// Watch a flag for synced changes with immediate initial state.
+  /// Fires [callback] immediately if flags are already loaded.
+  void Function() watchSyncedFlagWithInitialState(
+      String flagName, GatrixFlagWatchHandler callback) {
+    final unsub = watchSyncedFlag(flagName, callback);
+    if (_readyEventEmitted) {
+      callback(_createProxy(flagName, forceRealtime: false));
+    } else {
+      _events.once(GatrixEvents.flagsReady, (_) {
+        callback(_createProxy(flagName, forceRealtime: false));
+      });
+    }
+    return unsub;
+  }
+
+  /// Create a named watch group for batch management.
+  WatchFlagGroup createWatchGroup(String name) {
+    final group = WatchFlagGroup(
+      name: name,
+      watchRealtime: watchRealtimeFlag,
+      watchRealtimeWithInitial: watchRealtimeFlagWithInitialState,
+      watchSynced: watchSyncedFlag,
+      watchSyncedWithInitial: watchSyncedFlagWithInitialState,
+    );
+    _watchGroups[name] = group;
+    return group;
+  }
+
+  /// Invoke watch callbacks for all changed/removed flags.
+  void _invokeWatchCallbacks(
+    Map<String, List<GatrixFlagWatchHandler>> callbackMap,
+    Map<String, EvaluatedFlag> oldFlags,
+    Map<String, EvaluatedFlag> newFlags, {
+    required bool forceRealtime,
+  }) {
+    // Changed or new flags
+    for (final entry in newFlags.entries) {
+      final oldFlag = oldFlags[entry.key];
+      if (oldFlag == null || oldFlag.version != entry.value.version) {
+        final callbacks = callbackMap[entry.key];
+        if (callbacks != null && callbacks.isNotEmpty) {
+          final proxy = FlagProxy(this, entry.key, forceRealtime: forceRealtime);
+          for (final cb in List.of(callbacks)) {
+            try {
+              cb(proxy);
+            } catch (e) {
+              _devLog('Error in watch callback for ${entry.key}: $e');
+            }
+          }
+        }
+      }
+    }
+    // Removed flags
+    for (final entry in oldFlags.entries) {
+      if (!newFlags.containsKey(entry.key)) {
+        final callbacks = callbackMap[entry.key];
+        if (callbacks != null && callbacks.isNotEmpty) {
+          final proxy = FlagProxy(this, entry.key, forceRealtime: forceRealtime);
+          for (final cb in List.of(callbacks)) {
+            try {
+              cb(proxy);
+            } catch (e) {
+              _devLog('Error in watch callback for removed flag ${entry.key}: $e');
+            }
+          }
+        }
+      }
+    }
+  }
+
   // ============================================= Explicit Sync
 
   bool isExplicitSyncEnabled() => _explicitSyncMode;
@@ -716,57 +832,63 @@ class FeaturesClient implements VariationProvider {
   }
 
   Future<void> _reportMetrics() async {
-    if (_pendingImpressions.isEmpty && _missingFlags.isEmpty) return;
+    if (_flagBucket.isEmpty && _missingFlags.isEmpty) return;
 
-    final impressions = List<Map<String, dynamic>>.from(_pendingImpressions);
-    final missing = Map<String, int>.from(_missingFlags);
-
-    _pendingImpressions.clear();
+    // Snapshot and reset bucket atomically
+    final bucketFlags = Map<String, Map<String, dynamic>>.from(_flagBucket);
+    final bucketMissing = Map<String, int>.from(_missingFlags);
+    final bucketStart = _bucketStart;
+    _flagBucket.clear();
     _missingFlags.clear();
+    _bucketStart = DateTime.now().toUtc();
+
+    final payload = {
+      'appName': _appName,
+      'instanceId': _connectionId,
+      'bucket': {
+        'start': bucketStart.toIso8601String(),
+        'stop': DateTime.now().toUtc().toIso8601String(),
+        'flags': bucketFlags,
+        'missing': bucketMissing,
+      },
+    };
 
     try {
       final headers = _buildHeaders();
       final response = await http.post(
-        Uri.parse('$_apiUrl/metrics'),
+        Uri.parse('$_apiUrl/client/features/$_environment/metrics'),
         headers: headers,
-        body: jsonEncode({
-          'impressions': impressions,
-          'missingFlags': missing,
-        }),
+        body: jsonEncode(payload),
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         _metricsSentCount++;
         _events.emit(GatrixEvents.flagsMetricSent);
       } else {
-        // Retry on retryable status codes
         final retryable = response.statusCode == 408 ||
             response.statusCode == 429 ||
             response.statusCode >= 500;
         if (retryable) {
-          await _retryMetrics(impressions, missing, 0);
+          await _retryMetrics(payload, 0);
           return;
         }
         throw Exception('HTTP ${response.statusCode}');
       }
     } catch (e) {
-      // Restore on failure
-      _pendingImpressions.addAll(impressions);
-      missing.forEach(
+      // Restore bucket on failure
+      bucketFlags.forEach((k, v) => _flagBucket[k] = v);
+      bucketMissing.forEach(
           (k, v) => _missingFlags[k] = (_missingFlags[k] ?? 0) + v);
       _metricsErrorCount++;
       _events.emit(GatrixEvents.flagsMetricError, [e.toString()]);
     }
   }
 
-  /// Retry metrics send with exponential backoff
-  Future<void> _retryMetrics(List<Map<String, dynamic>> impressions,
-      Map<String, int> missing, int attempt) async {
+  /// Retry metrics send with exponential backoff.
+  Future<void> _retryMetrics(
+      Map<String, dynamic> payload, int attempt) async {
     const maxRetries = 2;
     if (attempt >= maxRetries) {
-      _pendingImpressions.addAll(impressions);
-      missing.forEach(
-          (k, v) => _missingFlags[k] = (_missingFlags[k] ?? 0) + v);
       _metricsErrorCount++;
       _events.emit(GatrixEvents.flagsMetricError, ['Max retries exceeded']);
       return;
@@ -778,21 +900,19 @@ class FeaturesClient implements VariationProvider {
     try {
       final headers = _buildHeaders();
       final response = await http.post(
-        Uri.parse('$_apiUrl/metrics'),
+        Uri.parse('$_apiUrl/client/features/$_environment/metrics'),
         headers: headers,
-        body: jsonEncode({
-          'impressions': impressions,
-          'missingFlags': missing,
-        }),
+        body: jsonEncode(payload),
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        _metricsSentCount++;
         _events.emit(GatrixEvents.flagsMetricSent);
       } else {
-        await _retryMetrics(impressions, missing, attempt + 1);
+        await _retryMetrics(payload, attempt + 1);
       }
     } catch (_) {
-      await _retryMetrics(impressions, missing, attempt + 1);
+      await _retryMetrics(payload, attempt + 1);
     }
   }
 
@@ -814,10 +934,12 @@ class FeaturesClient implements VariationProvider {
       if (_etag != null) headers['If-None-Match'] = _etag!;
 
       final response = await http.post(
-        Uri.parse('$_apiUrl/evaluate-all'),
+        Uri.parse('$_apiUrl/client/features'),
         headers: headers,
         body: jsonEncode({
-          'context': _context.toJson(),
+          'appName': _appName,
+          'environment': _environment,
+          ..._context.toJson(),
         }),
       );
 
@@ -857,11 +979,24 @@ class FeaturesClient implements VariationProvider {
         }
 
         if (changed || _realtimeFlags.length != newFlags.length) {
+          final oldFlags = Map<String, EvaluatedFlag>.from(_realtimeFlags);
           _realtimeFlags = newFlags;
           _updateCount++;
           _lastUpdateTime = DateTime.now();
+
+          // Always invoke realtime watch callbacks
+          _invokeWatchCallbacks(
+            _watchCallbacks, oldFlags, _realtimeFlags,
+            forceRealtime: true,
+          );
+
           if (!_explicitSyncMode) {
             _synchronizedFlags = Map.from(_realtimeFlags);
+            // Invoke synced watch callbacks immediately in non-explicit mode
+            _invokeWatchCallbacks(
+              _syncedWatchCallbacks, oldFlags, _realtimeFlags,
+              forceRealtime: false,
+            );
             _events.emit(GatrixEvents.flagsChange);
           } else {
             final wasPending = _pendingSync;
@@ -872,6 +1007,7 @@ class FeaturesClient implements VariationProvider {
           }
           await _saveToStorage();
         }
+        _readyEventEmitted = true;
         _events.emit(GatrixEvents.flagsReady);
 
         // Success: reset failure counter and schedule at normal interval
@@ -946,9 +1082,15 @@ class FeaturesClient implements VariationProvider {
 
   void syncFlags() {
     if (!_explicitSyncMode) return;
+    final oldFlags = Map<String, EvaluatedFlag>.from(_synchronizedFlags);
     _synchronizedFlags = Map.from(_realtimeFlags);
     _pendingSync = false;
     _syncFlagsCount++;
+    // Invoke synced watch callbacks for flags that changed since last sync
+    _invokeWatchCallbacks(
+      _syncedWatchCallbacks, oldFlags, _synchronizedFlags,
+      forceRealtime: false,
+    );
     _events.emit(GatrixEvents.flagsSync);
     _events.emit(GatrixEvents.flagsChange);
   }
@@ -963,6 +1105,7 @@ class FeaturesClient implements VariationProvider {
   }
 
   void stop() {
+    disconnectStreaming();
     _pollTimer?.cancel();
     _pollTimer = null;
     _metricsTimer?.cancel();
@@ -987,12 +1130,8 @@ class FeaturesClient implements VariationProvider {
       'lastUpdateTime': _lastUpdateTime?.toIso8601String(),
       'lastRecoveryTime': _lastRecoveryTime?.toIso8601String(),
       'lastErrorTime': _lastErrorTime?.toIso8601String(),
-      'flagEnabledCounts': Map<String, Map<String, int>>.from(
-          _flagEnabledCounts
-              .map((k, v) => MapEntry(k, Map<String, int>.from(v)))),
-      'flagVariantCounts': Map<String, Map<String, int>>.from(
-          _flagVariantCounts
-              .map((k, v) => MapEntry(k, Map<String, int>.from(v)))),
+      'flagBucketSize': _flagBucket.length,
+      'missingFlagsCount': _missingFlags.length,
       'syncFlagsCount': _syncFlagsCount,
       'etag': _etag,
       'impressionCount': _impressionCount,
@@ -1001,9 +1140,20 @@ class FeaturesClient implements VariationProvider {
           _flagLastChangedTimes.map((k, v) => MapEntry(k, v.toIso8601String())),
       'metricsSentCount': _metricsSentCount,
       'metricsErrorCount': _metricsErrorCount,
-      'pendingImpressions': _pendingImpressions.length,
       'consecutiveFailures': _consecutiveFailures,
       'pollingStopped': _pollingStopped,
+      // Streaming stats
+      'streamingEnabled': _streamingConfig?.enabled ?? false,
+      'streamingTransport': _streamingConfig?.transport.name ?? 'none',
+      'streamingState': _getStreamingStateName(),
+      'streamingReconnectCount': _getStreamingReconnectCount(),
+      'streamingEventCount': _getStreamingEventCount(),
+      'streamingErrorCount': _getStreamingErrorCount(),
+      'streamingRecoveryCount': _getStreamingRecoveryCount(),
+      'lastStreamingError': _getLastStreamingError(),
+      'lastStreamingEventTime': _getStreamingLastEventTime(),
+      'lastStreamingErrorTime': _getStreamingLastErrorTime(),
+      'lastStreamingRecoveryTime': _getStreamingLastRecoveryTime(),
     };
   }
 
@@ -1031,5 +1181,122 @@ class FeaturesClient implements VariationProvider {
     _synchronizedFlags = Map.from(_realtimeFlags);
     _events.emit(GatrixEvents.flagsInit);
     _events.emit(GatrixEvents.flagsReady);
+  }
+
+  // ==================== Streaming ====================
+
+  /// Configure and connect streaming
+  void connectStreaming(StreamingConfig config) {
+    _streamingConfig = config;
+    if (!config.enabled) return;
+
+    final sdkVersionStr = '${GatrixClient.sdkName}/${GatrixClient.sdkVersion}';
+
+    if (config.transport == StreamingTransport.webSocket) {
+      _wsConnection = WebSocketConnection(
+        apiUrl: _apiUrl,
+        apiToken: _apiToken,
+        appName: _appName,
+        environment: _environment,
+        connectionId: _connectionId,
+        sdkVersion: sdkVersionStr,
+        config: config.ws,
+        events: _events,
+        customHeaders: _customHeaders,
+      );
+      _wsConnection!.onInvalidation = _handleStreamingInvalidation;
+      _wsConnection!.onFetchRequest = () {
+        _etag = null;
+        fetchFlags();
+      };
+      _wsConnection!.connect();
+    } else {
+      _sseConnection = SseConnection(
+        apiUrl: _apiUrl,
+        apiToken: _apiToken,
+        appName: _appName,
+        environment: _environment,
+        connectionId: _connectionId,
+        sdkVersion: sdkVersionStr,
+        config: config.sse,
+        events: _events,
+        customHeaders: _customHeaders,
+      );
+      _sseConnection!.onInvalidation = _handleStreamingInvalidation;
+      _sseConnection!.onFetchRequest = () {
+        _etag = null;
+        fetchFlags();
+      };
+      _sseConnection!.connect();
+    }
+  }
+
+  /// Disconnect streaming
+  void disconnectStreaming() {
+    _sseConnection?.disconnect();
+    _sseConnection = null;
+    _wsConnection?.disconnect();
+    _wsConnection = null;
+  }
+
+  /// Handle streaming invalidation signal
+  void _handleStreamingInvalidation(List<String> changedKeys) {
+    final totalFlags = _realtimeFlags.length;
+    final changedCount = changedKeys.length;
+
+    if (changedCount == 0 || totalFlags == 0 || changedCount >= totalFlags ~/ 2) {
+      // Full fetch: clear ETag
+      _etag = null;
+      fetchFlags();
+    } else {
+      // Partial invalidation - for now do full fetch
+      fetchFlags();
+    }
+  }
+
+  // Streaming stats helpers
+  String _getStreamingStateName() {
+    if (_sseConnection != null) return _sseConnection!.state.name;
+    if (_wsConnection != null) return _wsConnection!.state.name;
+    return 'disconnected';
+  }
+
+  int _getStreamingReconnectCount() {
+    return (_sseConnection?.reconnectCount ?? 0) +
+           (_wsConnection?.reconnectCount ?? 0);
+  }
+
+  int _getStreamingEventCount() {
+    return (_sseConnection?.eventCount ?? 0) +
+           (_wsConnection?.eventCount ?? 0);
+  }
+
+  int _getStreamingErrorCount() {
+    return (_sseConnection?.errorCount ?? 0) +
+           (_wsConnection?.errorCount ?? 0);
+  }
+
+  int _getStreamingRecoveryCount() {
+    return (_sseConnection?.recoveryCount ?? 0) +
+           (_wsConnection?.recoveryCount ?? 0);
+  }
+
+  String? _getLastStreamingError() {
+    return _sseConnection?.lastError ?? _wsConnection?.lastError;
+  }
+
+  String? _getStreamingLastEventTime() {
+    return (_sseConnection?.lastEventTime ?? _wsConnection?.lastEventTime)
+        ?.toIso8601String();
+  }
+
+  String? _getStreamingLastErrorTime() {
+    return (_sseConnection?.lastErrorTime ?? _wsConnection?.lastErrorTime)
+        ?.toIso8601String();
+  }
+
+  String? _getStreamingLastRecoveryTime() {
+    return (_sseConnection?.lastRecoveryTime ?? _wsConnection?.lastRecoveryTime)
+        ?.toIso8601String();
   }
 }

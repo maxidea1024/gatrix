@@ -57,6 +57,9 @@ class Variant {
 
 
 
+/// Sentinel variant for missing flags (flag not found)
+const Variant missingVariant = Variant(name: r'$missing', enabled: false);
+
 /// Sentinel variant for disabled flags
 const Variant disabledVariant = Variant(name: r'$disabled', enabled: false);
 
@@ -105,7 +108,6 @@ class EvaluatedFlag {
       };
 }
 
-
 /// Create a missing flag sentinel with per-flag context
 EvaluatedFlag createMissingFlag(String flagName) {
   return EvaluatedFlag(
@@ -116,6 +118,13 @@ EvaluatedFlag createMissingFlag(String flagName) {
     version: 0,
   );
 }
+
+/// Global missing flag sentinel (anonymous)
+final EvaluatedFlag missingFlag = EvaluatedFlag(
+  name: '',
+  enabled: false,
+  variant: missingVariant,
+);
 
 class VariationResult<T> {
   final T value;
@@ -138,6 +147,61 @@ enum SdkState {
   ready,
   error,
   stopped,
+}
+
+enum StreamingTransport {
+  sse,
+  webSocket,
+}
+
+enum StreamingConnectionState {
+  disconnected,
+  connecting,
+  connected,
+  reconnecting,
+  degraded,
+}
+
+class SseStreamingConfig {
+  final String? url;
+  final int reconnectBase;
+  final int reconnectMax;
+  final int pollingJitter;
+
+  const SseStreamingConfig({
+    this.url,
+    this.reconnectBase = 1,
+    this.reconnectMax = 30,
+    this.pollingJitter = 5,
+  });
+}
+
+class WebSocketStreamingConfig {
+  final String? url;
+  final int reconnectBase;
+  final int reconnectMax;
+  final int pingInterval;
+
+  const WebSocketStreamingConfig({
+    this.url,
+    this.reconnectBase = 1,
+    this.reconnectMax = 30,
+    this.pingInterval = 30,
+  });
+}
+
+class StreamingConfig {
+  final bool enabled;
+  final StreamingTransport transport;
+  final SseStreamingConfig sse;
+  final WebSocketStreamingConfig ws;
+
+  const StreamingConfig({
+    this.enabled = false,
+    this.transport = StreamingTransport.sse,
+    this.sse = const SseStreamingConfig(),
+    this.ws = const WebSocketStreamingConfig(),
+  });
 }
 
 class GatrixContext {

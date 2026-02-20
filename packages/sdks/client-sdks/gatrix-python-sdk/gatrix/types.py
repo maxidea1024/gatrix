@@ -15,6 +15,10 @@ from gatrix.variant_source import VariantSource
 
 ValueType = Literal["none", "string", "number", "boolean", "json"]
 SdkState = Literal["initializing", "ready", "healthy", "error"]
+StreamingTransport = Literal["sse", "websocket"]
+StreamingConnectionState = Literal[
+    "disconnected", "connecting", "connected", "reconnecting", "degraded"
+]
 
 # ---------------------------------------------------------------------------
 # Core data structures
@@ -112,6 +116,36 @@ class GatrixClientConfig:
 
     # Optional – Features
     features: FeaturesConfig = field(default_factory=FeaturesConfig)
+
+    # Optional – Streaming
+    streaming: Optional["StreamingConfig"] = None
+
+
+@dataclass
+class SseStreamingConfig:
+    """SSE streaming configuration."""
+    url: Optional[str] = None
+    reconnect_base: int = 1
+    reconnect_max: int = 30
+    polling_jitter: int = 5
+
+
+@dataclass
+class WebSocketStreamingConfig:
+    """WebSocket streaming configuration."""
+    url: Optional[str] = None
+    reconnect_base: int = 1
+    reconnect_max: int = 30
+    ping_interval: int = 30
+
+
+@dataclass
+class StreamingConfig:
+    """Streaming configuration."""
+    enabled: bool = False
+    transport: StreamingTransport = "sse"
+    sse: SseStreamingConfig = field(default_factory=SseStreamingConfig)
+    ws: WebSocketStreamingConfig = field(default_factory=WebSocketStreamingConfig)
 
 
 # ---------------------------------------------------------------------------

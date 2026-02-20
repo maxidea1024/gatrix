@@ -4,6 +4,7 @@
 #include "GatrixEventEmitter.h"
 #include "GatrixEvents.h"
 #include "GatrixFlagProxy.h"
+#include "GatrixStreaming.h"
 #include "GatrixTypes.h"
 #include "GatrixVariationProvider.h"
 #include <functional>
@@ -255,6 +256,12 @@ private:
                             const std::map<std::string, EvaluatedFlag>& oldFlags,
                             const std::map<std::string, EvaluatedFlag>& newFlags,
                             bool forceRealtime);
+
+  // Streaming
+  void connectStreaming();
+  void disconnectStreaming();
+  void handleStreamingInvalidation(const std::vector<std::string>& changedKeys);
+  StreamingManager* _streaming = nullptr;
 };
 
 // ==================== WatchFlagGroup ====================

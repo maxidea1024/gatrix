@@ -14,8 +14,22 @@ class FlagProxy {
   final String _flagName;
   final bool _forceRealtime;
 
+  /// Primary constructor used by FeaturesClient internally.
   FlagProxy(this._client, this._flagName, {bool forceRealtime = false})
       : _forceRealtime = forceRealtime;
+
+  /// Named-parameter constructor for test/mock use.
+  /// [flag] is optional (null means flag doesn't exist).
+  /// [client] is the VariationProvider to delegate to.
+  /// [flagName] overrides the flag name (otherwise uses flag.name or '').
+  FlagProxy.withFlag(
+    EvaluatedFlag? flag, {
+    required VariationProvider client,
+    String? flagName,
+    bool forceRealtime = false,
+  })  : _client = client,
+        _flagName = flagName ?? flag?.name ?? '',
+        _forceRealtime = forceRealtime;
 
   // ==================== Properties ====================
 

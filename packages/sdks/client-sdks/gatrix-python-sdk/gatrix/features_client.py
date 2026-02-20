@@ -24,6 +24,7 @@ from gatrix.types import (
     GatrixClientConfig,
     GatrixContext,
     ImpressionEvent,
+    StreamingConfig,
     Variant,
     VariationResult,
 )
@@ -258,6 +259,10 @@ class FeaturesClient:
         self._metrics_bucket: Dict[str, Any] = {}
         self._bucket_start: Optional[datetime] = None
 
+        # Streaming
+        self._sse_connection = None  # type: ignore[assignment]
+        self._ws_connection = None  # type: ignore[assignment]
+
         # Init from cache/bootstrap
         self._init()
 
@@ -320,11 +325,20 @@ class FeaturesClient:
             if not self._disable_metrics:
                 self._start_metrics()
 
+        # Start streaming if configured
+        if (
+            self._config.streaming is not None
+            and self._config.streaming.enabled
+            and not self._offline_mode
+        ):
+            self.connect_streaming(self._config.streaming)
+
     def stop(self) -> None:
         """Stop polling and flush metrics."""
         if self._dev_mode:
             logger.debug("[DEV] stop() called")
 
+        self.disconnect_streaming()
         self._started = False
         self._polling_stopped = True
         self._consecutive_failures = 0
@@ -893,6 +907,7 @@ class FeaturesClient:
                 "metrics_error_count": self._metrics_error_count,
             },
             "event_handler_stats": self._emitter.get_handler_stats(),
+            "streaming": self._get_streaming_stats(),
         }
 
     # ============================================================ Fetch
@@ -1343,3 +1358,120 @@ class FeaturesClient:
             reason=flag.reason,
         )
         self._emitter.emit(EVENTS.FLAGS_IMPRESSION, event)
+
+    # ============================================================ Streaming
+
+    def connect_streaming(self, config: StreamingConfig) -> None:
+        """Connect SSE or WebSocket streaming."""
+        if not config.enabled:
+            return
+
+        sdk_version_str = f"{SDK_NAME}/{SDK_VERSION}"
+
+        if config.transport == "websocket":
+            from gatrix.streaming_websocket import WebSocketConnection
+
+            self._ws_connection = WebSocketConnection(
+                api_url=self._config.api_url,
+                api_token=self._config.api_token,
+                app_name=self._config.app_name,
+                environment=self._config.environment,
+                connection_id=self._connection_id,
+                sdk_version=sdk_version_str,
+                config=config.ws,
+                emitter=self._emitter,
+                custom_headers=self._config.custom_headers,
+            )
+            self._ws_connection.on_invalidation = (
+                self._handle_streaming_invalidation
+            )
+            self._ws_connection.on_fetch_request = self._streaming_full_fetch
+            self._ws_connection.connect()
+        else:
+            from gatrix.streaming_sse import SseConnection
+
+            self._sse_connection = SseConnection(
+                api_url=self._config.api_url,
+                api_token=self._config.api_token,
+                app_name=self._config.app_name,
+                environment=self._config.environment,
+                connection_id=self._connection_id,
+                sdk_version=sdk_version_str,
+                config=config.sse,
+                emitter=self._emitter,
+                custom_headers=self._config.custom_headers,
+            )
+            self._sse_connection.on_invalidation = (
+                self._handle_streaming_invalidation
+            )
+            self._sse_connection.on_fetch_request = self._streaming_full_fetch
+            self._sse_connection.connect()
+
+    def disconnect_streaming(self) -> None:
+        """Disconnect streaming connections."""
+        if self._sse_connection is not None:
+            self._sse_connection.disconnect()
+            self._sse_connection = None
+        if self._ws_connection is not None:
+            self._ws_connection.disconnect()
+            self._ws_connection = None
+
+    def _streaming_full_fetch(self) -> None:
+        """Full fetch triggered by gap recovery."""
+        self._etag = None
+        self.fetch_flags()
+
+    def _handle_streaming_invalidation(
+        self, changed_keys: List[str]
+    ) -> None:
+        """Handle flag invalidation from streaming."""
+        total_flags = len(self._flags)
+        changed_count = len(changed_keys)
+
+        if (
+            changed_count == 0
+            or total_flags == 0
+            or changed_count >= total_flags // 2
+        ):
+            # Full fetch: clear ETag
+            self._etag = None
+            self.fetch_flags()
+        else:
+            # Partial invalidation - for now do full fetch
+            self.fetch_flags()
+
+    def _get_streaming_stats(self) -> dict:
+        """Collect streaming statistics."""
+        conn = self._sse_connection or self._ws_connection
+        if conn is None:
+            return {"enabled": False}
+
+        return {
+            "enabled": True,
+            "transport": (
+                "websocket"
+                if self._ws_connection is not None
+                else "sse"
+            ),
+            "state": conn.state,
+            "reconnect_count": conn.reconnect_count,
+            "event_count": conn.event_count,
+            "error_count": conn.error_count,
+            "recovery_count": conn.recovery_count,
+            "last_error": conn.last_error,
+            "last_event_time": (
+                conn.last_event_time.isoformat()
+                if conn.last_event_time
+                else None
+            ),
+            "last_error_time": (
+                conn.last_error_time.isoformat()
+                if conn.last_error_time
+                else None
+            ),
+            "last_recovery_time": (
+                conn.last_recovery_time.isoformat()
+                if conn.last_recovery_time
+                else None
+            ),
+        }

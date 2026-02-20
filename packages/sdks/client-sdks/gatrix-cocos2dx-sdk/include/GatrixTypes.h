@@ -16,6 +16,10 @@ enum class ValueType { NONE, STRING, NUMBER, BOOLEAN, JSON };
 
 enum class SdkState { INITIALIZING, READY, HEALTHY, ERROR, STOPPED };
 
+enum class StreamingTransport { SSE, WEBSOCKET };
+
+enum class StreamingConnectionState { DISCONNECTED, CONNECTING, CONNECTED, RECONNECTING, DEGRADED };
+
 // ==================== Data Structures ====================
 
 struct Variant {
@@ -105,8 +109,43 @@ struct GatrixSdkStats {
   std::map<std::string, std::string> flagLastChangedTimes;
   std::vector<std::string> activeWatchGroups;
 
+  // Streaming stats
+  std::string streamingTransport;
+  std::string streamingState;
+  int streamingReconnectCount = 0;
+  int streamingEventCount = 0;
+  int streamingErrorCount = 0;
+  int streamingRecoveryCount = 0;
+  std::string lastStreamingError;
+  std::string lastStreamingEventTime;
+  std::string lastStreamingErrorTime;
+  std::string lastStreamingRecoveryTime;
+
   // Event handler stats
   std::map<std::string, std::vector<EventHandlerStats>> eventHandlerStats;
+};
+
+// ==================== Streaming Config ====================
+
+struct SseStreamingConfig {
+  std::string url;       // Override SSE endpoint URL (optional)
+  int reconnectBase = 1; // Base reconnect delay in seconds
+  int reconnectMax = 30; // Max reconnect delay in seconds
+  int pollingJitter = 5; // Jitter range in seconds
+};
+
+struct WebSocketStreamingConfig {
+  std::string url;       // Override WebSocket endpoint URL (optional)
+  int reconnectBase = 1; // Base reconnect delay in seconds
+  int reconnectMax = 30; // Max reconnect delay in seconds
+  int pingInterval = 30; // Ping interval in seconds
+};
+
+struct StreamingConfig {
+  bool enabled = false;
+  StreamingTransport transport = StreamingTransport::SSE;
+  SseStreamingConfig sse;
+  WebSocketStreamingConfig ws;
 };
 
 // ==================== Config ====================
@@ -147,6 +186,9 @@ struct GatrixClientConfig {
   bool disableStats = false;
   bool impressionDataAll = false;
   FetchRetryOptions fetchRetryOptions;
+
+  // Optional - Streaming
+  StreamingConfig streaming;
 
   // Debug / Storage
   bool enableDevMode = false;

@@ -24,6 +24,13 @@ struct EVENTS {
   static constexpr const char* FLAGS_METRICS_SENT = "flags.metrics.sent";
   static constexpr const char* FLAGS_METRICS_ERROR = "flags.metrics.error";
 
+  // Streaming events
+  static constexpr const char* FLAGS_STREAMING_CONNECTED = "flags.streaming.connected";
+  static constexpr const char* FLAGS_STREAMING_DISCONNECTED = "flags.streaming.disconnected";
+  static constexpr const char* FLAGS_STREAMING_RECONNECTING = "flags.streaming.reconnecting";
+  static constexpr const char* FLAGS_STREAMING_ERROR = "flags.streaming.error";
+  static constexpr const char* FLAGS_INVALIDATED = "flags.invalidated";
+
   // Per-flag change event helper
   static std::string flagChange(const std::string& flagName) {
     return "flags." + flagName + ".change";

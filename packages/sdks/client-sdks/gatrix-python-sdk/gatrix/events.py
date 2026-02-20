@@ -25,6 +25,13 @@ class EVENTS:
     SDK_ERROR = "flags.error"
     FLAGS_RECOVERED = "flags.recovered"
 
+    # Streaming events
+    FLAGS_STREAMING_CONNECTED = "flags.streaming.connected"
+    FLAGS_STREAMING_DISCONNECTED = "flags.streaming.disconnected"
+    FLAGS_STREAMING_RECONNECTING = "flags.streaming.reconnecting"
+    FLAGS_STREAMING_ERROR = "flags.streaming.error"
+    FLAGS_INVALIDATED = "flags.invalidated"
+
 
 # Type aliases
 Callback = Callable[..., Any]

@@ -15,6 +15,7 @@ class GatrixClientConfig {
   final GatrixContext? initialContext;
   final List<EvaluatedFlag>? bootstrap;
   final Map<String, String>? customHeaders;
+  final StreamingConfig? streaming;
 
   GatrixClientConfig({
     required this.apiUrl,
@@ -28,6 +29,7 @@ class GatrixClientConfig {
     this.initialContext,
     this.bootstrap,
     this.customHeaders,
+    this.streaming,
   });
 }
 
@@ -110,6 +112,11 @@ class GatrixClient {
       // Setup periodic tasks
       features.startPolling(config.refreshIntervalSeconds);
       features.startMetricsReporting(config.metricsIntervalSeconds);
+
+      // Start streaming if configured
+      if (config.streaming != null && config.streaming!.enabled) {
+        features.connectStreaming(config.streaming!);
+      }
     }
 
     _state = SdkState.ready;
