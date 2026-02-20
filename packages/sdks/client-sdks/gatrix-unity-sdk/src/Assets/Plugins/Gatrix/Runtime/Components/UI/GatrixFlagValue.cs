@@ -139,5 +139,70 @@ namespace Gatrix.Unity.SDK
                 behaviour.enabled = enabled;
             }
         }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate(); // handles Play Mode Resubscribe
+
+            // Edit Mode: apply a preview from the local flag cache so the
+            // designer can see the flag value without entering Play Mode.
+            if (!Application.isPlaying)
+            {
+                ApplyEditorPreview();
+            }
+        }
+
+        /// <summary>
+        /// Reads the locally cached flags and applies the flag value to the
+        /// target text component for an in-editor preview.
+        /// </summary>
+        private void ApplyEditorPreview()
+        {
+            if (string.IsNullOrEmpty(_flagName)) return;
+
+            // Determine the cache key prefix from GatrixBehaviour in the scene (if any)
+            var behaviour = FindFirstObjectByType<GatrixBehaviour>();
+            var prefix = behaviour?.Settings?.CacheKeyPrefix ?? "gatrix_cache";
+
+            var json = FeaturesClient.EditorGetCachedFlagsJson(prefix);
+            if (string.IsNullOrEmpty(json)) return;
+
+            var flags = GatrixJson.DeserializeFlags(json);
+            if (flags == null) return;
+
+            EvaluatedFlag found = null;
+            foreach (var f in flags)
+            {
+                if (f.Name == _flagName) { found = f; break; }
+            }
+
+            if (found == null) return;
+
+            // Re-detect target each time so component swaps are picked up in Edit Mode
+            _tmpChecked = false;
+            DetectTarget();
+
+            // Replicate the same display logic as OnFlagChanged
+            string displayText;
+            var value = found.Variant?.Value;
+            if (value == null)
+            {
+                displayText = _fallbackText;
+            }
+            else
+            {
+                var valueStr = value.ToString();
+                displayText = string.IsNullOrEmpty(_format)
+                    ? valueStr
+                    : string.Format(_format, valueStr);
+            }
+
+            SetText(displayText);
+
+            // Notify the editor that this object was changed
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }
