@@ -306,15 +306,6 @@ namespace Gatrix.Unity.SDK.Editor
             GUILayout.Space(8);
             EditorGUILayout.BeginVertical();
 
-            // Show a subtle banner in Edit Mode so the user knows data is from cache
-            if (!EditorApplication.isPlaying && GatrixBehaviour.Client != null)
-            {
-                DrawEditModeCacheBanner();
-            }
-            else if (!EditorApplication.isPlaying)
-            {
-                DrawEditModeScreen();
-            }
 
             if (EditorApplication.isPlaying && !GatrixBehaviour.IsInitialized)
             {
