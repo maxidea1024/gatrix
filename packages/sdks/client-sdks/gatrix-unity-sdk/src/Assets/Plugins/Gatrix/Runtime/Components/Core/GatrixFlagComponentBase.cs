@@ -37,11 +37,22 @@ namespace Gatrix.Unity.SDK
 
         protected virtual void OnDisable()
         {
-            Unsubscribe();
+            // Safe teardown: may not be subscribed if _flagName was empty or SDK not ready.
+            if (_unwatch != null)
+            {
+                _unwatch.Invoke();
+                _unwatch = null;
+            }
         }
 
         protected virtual void Subscribe()
         {
+            if (_unwatch != null)
+            {
+                Debug.LogWarning($"[Gatrix] {GetType().Name} Subscribe() called while already subscribed. Use Resubscribe() to replace an existing watcher.", this);
+                return;
+            }
+
             var client = GatrixBehaviour.Client;
             if (client == null || string.IsNullOrEmpty(_flagName)) return;
 
@@ -60,7 +71,13 @@ namespace Gatrix.Unity.SDK
 
         protected virtual void Unsubscribe()
         {
-            _unwatch?.Invoke();
+            if (_unwatch == null)
+            {
+                Debug.LogWarning($"[Gatrix] {GetType().Name} Unsubscribe() called while not subscribed.", this);
+                return;
+            }
+
+            _unwatch.Invoke();
             _unwatch = null;
         }
 
@@ -70,7 +87,12 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         protected void Resubscribe()
         {
-            Unsubscribe();
+            // Suppress individual Subscribe/Unsubscribe warnings — this is an intentional replace.
+            if (_unwatch != null)
+            {
+                _unwatch.Invoke();
+                _unwatch = null;
+            }
             Subscribe();
         }
 
