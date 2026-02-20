@@ -27,7 +27,7 @@ flowchart LR
 | **Security** | ✅ Targeting rules, segment definitions, and rollout logic are **never exposed** to the client | ⚠️ All rules are sent to the client and can be inspected, reverse-engineered, or tampered with |
 | **Consistency** | ✅ Evaluation logic is centralized — all SDKs and platforms get identical results | ⚠️ Each SDK must implement the same evaluation engine independently; subtle differences can lead to inconsistent results |
 | **Payload size** | ✅ Only final values are transmitted (small payload) | ⚠️ Full rule set must be downloaded (can be large with many flags/segments) |
-| **Offline support** | ⚠️ Requires an initial network request; offline use relies on cached values or bootstrap data | ✅ Once rules are downloaded, evaluation works fully offline |
+| **First-run offline** | ⚠️ Needs at least one prior fetch or bootstrap data; once cached, works fully offline | ✅ Rules can be bundled at build time — works offline from first launch |
 | **Evaluation latency** | ⚠️ Depends on network round-trip for the initial fetch | ✅ No network needed after initial download |
 | **Rule update speed** | ✅ New values are available immediately via streaming/polling | ⚠️ Client must re-download the full rule set to pick up changes |
 

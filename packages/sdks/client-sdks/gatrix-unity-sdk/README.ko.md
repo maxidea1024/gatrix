@@ -196,7 +196,7 @@ Gatrix는 **원격 평가** 방식만을 사용합니다 — 타게팅 규칙과
 | **보안** | ✅ 규칙이 서버 밖으로 나가지 않음 | ⚠️ 클라이언트에 규칙 노출 |
 | **일관성** | ✅ 모든 SDK에서 동일한 결과 | ⚠️ 각 SDK가 규칙을 재구현해야 함 |
 | **페이로드** | ✅ 소규모 (최종 값만) | ⚠️ 대규모 (전체 규칙 세트) |
-| **오프라인** | ⚠️ 초기 페치 필요 (이후 캐시) | ✅ 첫 다운로드 이후 가능 |
+| **첫 실행 오프라인** | ⚠️ 최소 1회 연결 또는 부트스트랩 데이터 필요 | ✅ 규칙을 빌드 시점에 번들링 가능 |
 
 > 🌐 **오프라인 & 가용성:** SDK는 서버에 연결할 수 없을 때 항상 로컬 캐시에서 값을 제공합니다. fallbackValue로 네트워크 문제로 인한 게임 중단은 절대 발생하지 않습니다.
 
@@ -339,19 +339,19 @@ C# 코드 없이 Unity 씬 속성을 피처 플래그에 바인딩합니다.
 
 | 카테고리 | 컴포넌트 |
 |---|---|
-| **Logic** | `GatrixFlagToggle`, `GatrixFlagEvent`, `GatrixEventListener`, `GatrixVariantSwitch`, `GatrixFlagSceneRedirect`, `GatrixFlagBehaviourEnabled` |
-| **UI** | `GatrixFlagValue`, `GatrixFlagImage`, `GatrixFlagColor`, `GatrixFlagCanvas`, `GatrixFlagSlider`, `GatrixFlagButtonInteractable`, `GatrixFlagInputField`, `GatrixFlagScrollRect` |
-| **Rendering** | `GatrixFlagMaterial`, `GatrixFlagTransform`, `GatrixFlagSpriteRenderer`, `GatrixFlagRendererToggle`, `GatrixFlagParticles`, `GatrixFlagQualitySettings`, `GatrixFlagShaderProperty`, `GatrixFlagTrailRenderer`, `GatrixFlagLineRenderer`, `GatrixFlagGlobalShader` |
-| **Audio** | `GatrixFlagAudio`, `GatrixFlagAnimator`, `GatrixFlagAudioMixer`, `GatrixFlagAudioSource` |
-| **Camera** | `GatrixFlagCamera` |
-| **Lighting** | `GatrixFlagLight` |
-| **Environment** | `GatrixFlagFog`, `GatrixFlagAmbientLight`, `GatrixFlagSkybox`, `GatrixFlagWindZone` |
-| **Physics** | `GatrixFlagRigidbody`, `GatrixFlagGravity`, `GatrixFlagCollider` |
-| **2D** | `GatrixFlagRigidbody2D`, `GatrixFlagSortingOrder`, `GatrixFlagTilemap`, `GatrixFlagPhysicsMaterial2D`, `GatrixFlagJoint2D`, `GatrixFlagEffector2D` |
-| **AI** | `GatrixFlagNavMeshAgent`, `GatrixFlagNavMeshObstacle`, `GatrixFlagAIAnimator`, `GatrixFlagDetectionRange` |
-| **Time** | `GatrixFlagTimeScale`, `GatrixFlagFrameRate` |
-| **Post FX** | `GatrixFlagPostProcessVolume` |
-| **Debug** | `GatrixFlagLogger` |
+| **Logic** | [`GatrixFlagToggle`](docs/COMPONENTS.ko.md#gatrixflagtoggle), [`GatrixFlagEvent`](docs/COMPONENTS.ko.md#gatrixflagevent), [`GatrixEventListener`](docs/COMPONENTS.ko.md#gatrixeventlistener), [`GatrixVariantSwitch`](docs/COMPONENTS.ko.md#gatrixvariantswitch), [`GatrixFlagSceneRedirect`](docs/COMPONENTS.ko.md#gatrixflagsceneredirect), [`GatrixFlagBehaviourEnabled`](docs/COMPONENTS.ko.md#gatrixflagbehaviourenabled) |
+| **UI** | [`GatrixFlagValue`](docs/COMPONENTS.ko.md#gatrixflagvalue), [`GatrixFlagImage`](docs/COMPONENTS.ko.md#gatrixflagimage), [`GatrixFlagColor`](docs/COMPONENTS.ko.md#gatrixflagcolor), [`GatrixFlagCanvas`](docs/COMPONENTS.ko.md#gatrixflagcanvas), [`GatrixFlagSlider`](docs/COMPONENTS.ko.md#gatrixflagslider), [`GatrixFlagButtonInteractable`](docs/COMPONENTS.ko.md#gatrixflagbuttoninteractable), [`GatrixFlagInputField`](docs/COMPONENTS.ko.md#gatrixflaginputfield), [`GatrixFlagScrollRect`](docs/COMPONENTS.ko.md#gatrixflagscrollrect) |
+| **Rendering** | [`GatrixFlagMaterial`](docs/COMPONENTS.ko.md#gatrixflagmaterial), [`GatrixFlagTransform`](docs/COMPONENTS.ko.md#gatrixflagtransform), [`GatrixFlagSpriteRenderer`](docs/COMPONENTS.ko.md#gatrixflagspriterenderer), [`GatrixFlagRendererToggle`](docs/COMPONENTS.ko.md#gatrixflagrenderertoggle), [`GatrixFlagParticles`](docs/COMPONENTS.ko.md#gatrixflagparticles), [`GatrixFlagQualitySettings`](docs/COMPONENTS.ko.md#gatrixflagqualitysettings), [`GatrixFlagShaderProperty`](docs/COMPONENTS.ko.md#gatrixflagshaderproperty), [`GatrixFlagTrailRenderer`](docs/COMPONENTS.ko.md#gatrixflagtrailrenderer), [`GatrixFlagLineRenderer`](docs/COMPONENTS.ko.md#gatrixflaglinerenderer), [`GatrixFlagGlobalShader`](docs/COMPONENTS.ko.md#gatrixflagglobalshader) |
+| **Audio** | [`GatrixFlagAudio`](docs/COMPONENTS.ko.md#gatrixflagaudio), [`GatrixFlagAnimator`](docs/COMPONENTS.ko.md#gatrixflaganimator), [`GatrixFlagAudioMixer`](docs/COMPONENTS.ko.md#gatrixflagaudiomixer), [`GatrixFlagAudioSource`](docs/COMPONENTS.ko.md#gatrixflagaudiosource) |
+| **Camera** | [`GatrixFlagCamera`](docs/COMPONENTS.ko.md#gatrixflagcamera) |
+| **Lighting** | [`GatrixFlagLight`](docs/COMPONENTS.ko.md#gatrixflaglight) |
+| **Environment** | [`GatrixFlagFog`](docs/COMPONENTS.ko.md#gatrixflagfog), [`GatrixFlagAmbientLight`](docs/COMPONENTS.ko.md#gatrixflagambientlight), [`GatrixFlagSkybox`](docs/COMPONENTS.ko.md#gatrixflagskybox), [`GatrixFlagWindZone`](docs/COMPONENTS.ko.md#gatrixflagwindzone) |
+| **Physics** | [`GatrixFlagRigidbody`](docs/COMPONENTS.ko.md#gatrixflagrigidbody), [`GatrixFlagGravity`](docs/COMPONENTS.ko.md#gatrixflaggravity), [`GatrixFlagCollider`](docs/COMPONENTS.ko.md#gatrixflagcollider) |
+| **2D** | [`GatrixFlagRigidbody2D`](docs/COMPONENTS.ko.md#gatrixflagrigidbody2d), [`GatrixFlagSortingOrder`](docs/COMPONENTS.ko.md#gatrixflagsortingorder), [`GatrixFlagTilemap`](docs/COMPONENTS.ko.md#gatrixflagtilemap), [`GatrixFlagPhysicsMaterial2D`](docs/COMPONENTS.ko.md#gatrixflagphysicsmaterial2d), [`GatrixFlagJoint2D`](docs/COMPONENTS.ko.md#gatrixflagjoint2d), [`GatrixFlagEffector2D`](docs/COMPONENTS.ko.md#gatrixflageffector2d) |
+| **AI** | [`GatrixFlagNavMeshAgent`](docs/COMPONENTS.ko.md#gatrixflagnavmeshagent), [`GatrixFlagNavMeshObstacle`](docs/COMPONENTS.ko.md#gatrixflagnavmeshobstacle), [`GatrixFlagAIAnimator`](docs/COMPONENTS.ko.md#gatrixflagaianimator), [`GatrixFlagDetectionRange`](docs/COMPONENTS.ko.md#gatrixflagdetectionrange) |
+| **Time** | [`GatrixFlagTimeScale`](docs/COMPONENTS.ko.md#gatrixflagtimescale), [`GatrixFlagFrameRate`](docs/COMPONENTS.ko.md#gatrixflagframerate) |
+| **Post FX** | [`GatrixFlagPostProcessVolume`](docs/COMPONENTS.ko.md#gatrixflagpostprocessvolume) |
+| **Debug** | [`GatrixFlagLogger`](docs/COMPONENTS.ko.md#gatrixflaglogger) |
 
 > 📖 컴포넌트 상세 레퍼런스 — 플래그 값 타입, 각 모드별 설명, 활용 시나리오:  
 > **[docs/COMPONENTS.ko.md](docs/COMPONENTS.ko.md)**
@@ -1385,7 +1385,7 @@ public class ShopController : MonoBehaviour
 | **`this.WatchRealtimeFlag(...)`** | ✅ | ✅ | ✅ | **없음** |
 | **`this.CreateGatrixWatchGroup(...)`** | ✅ | ✅ | ✅ | **없음** |
 
-> 💡 **팁:** 기본 제공 컴포넌트(`GatrixFlagToggle`, `GatrixFlagValue` 등)는 `GatrixFlagComponentBase`를 통해 이미 라이프사이클을 처리합니다. 이 확장 메서드는 **커스텀 MonoBehaviour**를 위한 것입니다.
+> 💡 **팁:** 기본 제공 컴포넌트([`GatrixFlagToggle`](docs/COMPONENTS.ko.md#gatrixflagtoggle), [`GatrixFlagValue`](docs/COMPONENTS.ko.md#gatrixflagvalue) 등)는 `GatrixFlagComponentBase`를 통해 이미 라이프사이클을 처리합니다. 이 확장 메서드는 **커스텀 MonoBehaviour**를 위한 것입니다.
 
 ---
 

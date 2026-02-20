@@ -195,7 +195,7 @@ Gatrix uses **remote evaluation** exclusively — targeting rules and rollout lo
 | **Security** | ✅ Rules never leave server | ⚠️ Rules exposed to client |
 | **Consistency** | ✅ Same result on all SDKs | ⚠️ SDK must re-implement rules |
 | **Payload** | ✅ Small (final values only) | ⚠️ Large (full rule set) |
-| **Offline** | ⚠️ Needs initial fetch (then cached) | ✅ Works after first download |
+| **First-run offline** | ⚠️ Needs at least one prior fetch or bootstrap data | ✅ Rules can be bundled at build time |
 
 > 🌐 **Offline & Availability:** The SDK always serves from local cache if the server is unreachable. Fallback values ensure the game never crashes due to connectivity issues.
 
@@ -337,19 +337,19 @@ Add via: **Right-click → Gatrix → UI / Logic / Debug / Visual / Audio / Rend
 
 | Category | Components |
 |---|---|
-| **Logic** | `GatrixFlagToggle`, `GatrixFlagEvent`, `GatrixEventListener`, `GatrixVariantSwitch`, `GatrixFlagSceneRedirect`, `GatrixFlagBehaviourEnabled` |
-| **UI** | `GatrixFlagValue`, `GatrixFlagImage`, `GatrixFlagColor`, `GatrixFlagCanvas`, `GatrixFlagSlider`, `GatrixFlagButtonInteractable`, `GatrixFlagInputField`, `GatrixFlagScrollRect` |
-| **Rendering** | `GatrixFlagMaterial`, `GatrixFlagTransform`, `GatrixFlagSpriteRenderer`, `GatrixFlagRendererToggle`, `GatrixFlagParticles`, `GatrixFlagQualitySettings`, `GatrixFlagShaderProperty`, `GatrixFlagTrailRenderer`, `GatrixFlagLineRenderer`, `GatrixFlagGlobalShader` |
-| **Audio** | `GatrixFlagAudio`, `GatrixFlagAnimator`, `GatrixFlagAudioMixer`, `GatrixFlagAudioSource` |
-| **Camera** | `GatrixFlagCamera` |
-| **Lighting** | `GatrixFlagLight` |
-| **Environment** | `GatrixFlagFog`, `GatrixFlagAmbientLight`, `GatrixFlagSkybox`, `GatrixFlagWindZone` |
-| **Physics** | `GatrixFlagRigidbody`, `GatrixFlagGravity`, `GatrixFlagCollider` |
-| **2D** | `GatrixFlagRigidbody2D`, `GatrixFlagSortingOrder`, `GatrixFlagTilemap`, `GatrixFlagPhysicsMaterial2D`, `GatrixFlagJoint2D`, `GatrixFlagEffector2D` |
-| **AI** | `GatrixFlagNavMeshAgent`, `GatrixFlagNavMeshObstacle`, `GatrixFlagAIAnimator`, `GatrixFlagDetectionRange` |
-| **Time** | `GatrixFlagTimeScale`, `GatrixFlagFrameRate` |
-| **Post FX** | `GatrixFlagPostProcessVolume` |
-| **Debug** | `GatrixFlagLogger` |
+| **Logic** | [`GatrixFlagToggle`](docs/COMPONENTS.md#gatrixflagtoggle), [`GatrixFlagEvent`](docs/COMPONENTS.md#gatrixflagevent), [`GatrixEventListener`](docs/COMPONENTS.md#gatrixeventlistener), [`GatrixVariantSwitch`](docs/COMPONENTS.md#gatrixvariantswitch), [`GatrixFlagSceneRedirect`](docs/COMPONENTS.md#gatrixflagsceneredirect), [`GatrixFlagBehaviourEnabled`](docs/COMPONENTS.md#gatrixflagbehaviourenabled) |
+| **UI** | [`GatrixFlagValue`](docs/COMPONENTS.md#gatrixflagvalue), [`GatrixFlagImage`](docs/COMPONENTS.md#gatrixflagimage), [`GatrixFlagColor`](docs/COMPONENTS.md#gatrixflagcolor), [`GatrixFlagCanvas`](docs/COMPONENTS.md#gatrixflagcanvas), [`GatrixFlagSlider`](docs/COMPONENTS.md#gatrixflagslider), [`GatrixFlagButtonInteractable`](docs/COMPONENTS.md#gatrixflagbuttoninteractable), [`GatrixFlagInputField`](docs/COMPONENTS.md#gatrixflaginputfield), [`GatrixFlagScrollRect`](docs/COMPONENTS.md#gatrixflagscrollrect) |
+| **Rendering** | [`GatrixFlagMaterial`](docs/COMPONENTS.md#gatrixflagmaterial), [`GatrixFlagTransform`](docs/COMPONENTS.md#gatrixflagtransform), [`GatrixFlagSpriteRenderer`](docs/COMPONENTS.md#gatrixflagspriterenderer), [`GatrixFlagRendererToggle`](docs/COMPONENTS.md#gatrixflagrenderertoggle), [`GatrixFlagParticles`](docs/COMPONENTS.md#gatrixflagparticles), [`GatrixFlagQualitySettings`](docs/COMPONENTS.md#gatrixflagqualitysettings), [`GatrixFlagShaderProperty`](docs/COMPONENTS.md#gatrixflagshaderproperty), [`GatrixFlagTrailRenderer`](docs/COMPONENTS.md#gatrixflagtrailrenderer), [`GatrixFlagLineRenderer`](docs/COMPONENTS.md#gatrixflaglinerenderer), [`GatrixFlagGlobalShader`](docs/COMPONENTS.md#gatrixflagglobalshader) |
+| **Audio** | [`GatrixFlagAudio`](docs/COMPONENTS.md#gatrixflagaudio), [`GatrixFlagAnimator`](docs/COMPONENTS.md#gatrixflaganimator), [`GatrixFlagAudioMixer`](docs/COMPONENTS.md#gatrixflagaudiomixer), [`GatrixFlagAudioSource`](docs/COMPONENTS.md#gatrixflagaudiosource) |
+| **Camera** | [`GatrixFlagCamera`](docs/COMPONENTS.md#gatrixflagcamera) |
+| **Lighting** | [`GatrixFlagLight`](docs/COMPONENTS.md#gatrixflaglight) |
+| **Environment** | [`GatrixFlagFog`](docs/COMPONENTS.md#gatrixflagfog), [`GatrixFlagAmbientLight`](docs/COMPONENTS.md#gatrixflagambientlight), [`GatrixFlagSkybox`](docs/COMPONENTS.md#gatrixflagskybox), [`GatrixFlagWindZone`](docs/COMPONENTS.md#gatrixflagwindzone) |
+| **Physics** | [`GatrixFlagRigidbody`](docs/COMPONENTS.md#gatrixflagrigidbody), [`GatrixFlagGravity`](docs/COMPONENTS.md#gatrixflaggravity), [`GatrixFlagCollider`](docs/COMPONENTS.md#gatrixflagcollider) |
+| **2D** | [`GatrixFlagRigidbody2D`](docs/COMPONENTS.md#gatrixflagrigidbody2d), [`GatrixFlagSortingOrder`](docs/COMPONENTS.md#gatrixflagsortingorder), [`GatrixFlagTilemap`](docs/COMPONENTS.md#gatrixflagtilemap), [`GatrixFlagPhysicsMaterial2D`](docs/COMPONENTS.md#gatrixflagphysicsmaterial2d), [`GatrixFlagJoint2D`](docs/COMPONENTS.md#gatrixflagjoint2d), [`GatrixFlagEffector2D`](docs/COMPONENTS.md#gatrixflageffector2d) |
+| **AI** | [`GatrixFlagNavMeshAgent`](docs/COMPONENTS.md#gatrixflagnavmeshagent), [`GatrixFlagNavMeshObstacle`](docs/COMPONENTS.md#gatrixflagnavmeshobstacle), [`GatrixFlagAIAnimator`](docs/COMPONENTS.md#gatrixflagaianimator), [`GatrixFlagDetectionRange`](docs/COMPONENTS.md#gatrixflagdetectionrange) |
+| **Time** | [`GatrixFlagTimeScale`](docs/COMPONENTS.md#gatrixflagtimescale), [`GatrixFlagFrameRate`](docs/COMPONENTS.md#gatrixflagframerate) |
+| **Post FX** | [`GatrixFlagPostProcessVolume`](docs/COMPONENTS.md#gatrixflagpostprocessvolume) |
+| **Debug** | [`GatrixFlagLogger`](docs/COMPONENTS.md#gatrixflaglogger) |
 
 > 📖 Detailed component reference — flag value types, all modes, use cases & A/B test scenarios:  
 > **[docs/COMPONENTS.md](docs/COMPONENTS.md)**
@@ -1381,7 +1381,7 @@ public class ShopController : MonoBehaviour
 | **`this.WatchRealtimeFlag(...)`** | ✅ | ✅ | ✅ | **None** |
 | **`this.CreateGatrixWatchGroup(...)`** | ✅ | ✅ | ✅ | **None** |
 
-> 💡 **Tip:** Built-in components (`GatrixFlagToggle`, `GatrixFlagValue`, etc.) already handle lifecycle through `GatrixFlagComponentBase`. The lifecycle extensions are for your **custom MonoBehaviours**.
+> 💡 **Tip:** Built-in components ([`GatrixFlagToggle`](docs/COMPONENTS.md#gatrixflagtoggle), [`GatrixFlagValue`](docs/COMPONENTS.md#gatrixflagvalue), etc.) already handle lifecycle through `GatrixFlagComponentBase`. The lifecycle extensions are for your **custom MonoBehaviours**.
 
 ---
 
