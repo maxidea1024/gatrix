@@ -25,6 +25,39 @@ namespace Gatrix.Unity.SDK.Editor
             Selection.activeObject = go;
         }
 
+        [MenuItem(RootMenu + "UI/Flag Text", false, 9)]
+        public static void CreateFlagTextTmp(MenuCommand menuCommand)
+        {
+            GameObject go = CreateUIObject("FlagText", menuCommand);
+
+            // Prefer TextMeshProUGUI if TMP is installed; fall back to Legacy Text
+            var tmpType = System.Type.GetType("TMPro.TextMeshProUGUI, Unity.TextMeshPro");
+            if (tmpType != null)
+            {
+                var tmp = go.AddComponent(tmpType) as Behaviour;
+                // Set default text via reflection
+                var textProp = tmpType.GetProperty("text");
+                textProp?.SetValue(tmp, "Feature Flag Value");
+                var alignProp = tmpType.GetProperty("alignment");
+                if (alignProp != null)
+                {
+                    // TextAlignmentOptions.Center = 2
+                    alignProp.SetValue(tmp, System.Enum.ToObject(alignProp.PropertyType, 2));
+                }
+            }
+            else
+            {
+                // TMP not installed — use Legacy Text
+                var text = go.AddComponent<Text>();
+                text.text = "Feature Flag Value";
+                text.alignment = TextAnchor.MiddleCenter;
+                text.color = Color.white;
+            }
+
+            go.AddComponent<GatrixFlagValue>();
+            Selection.activeObject = go;
+        }
+
         [MenuItem(RootMenu + "UI/Flag Text (Legacy)", false, 10)]
         public static void CreateFlagText(MenuCommand menuCommand)
         {
@@ -34,7 +67,7 @@ namespace Gatrix.Unity.SDK.Editor
             text.alignment = TextAnchor.MiddleCenter;
             text.color = Color.white;
             
-            var flagValue = go.AddComponent<GatrixFlagValue>();
+            go.AddComponent<GatrixFlagValue>();
             
             Selection.activeObject = go;
         }

@@ -44,36 +44,37 @@ namespace Gatrix.Unity.SDK
 
         private void DetectTarget()
         {
-            if (_targetText == null)
-            {
-                _targetText = GetComponent<Text>();
-            }
-
             if (!_tmpChecked)
             {
                 _tmpChecked = true;
-                if (_targetText == null)
-                {
-                    if (!_typeResolveAttempted)
-                    {
-                        _typeResolveAttempted = true;
-                        _cachedTmpType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
-                        if (_cachedTmpType != null)
-                        {
-                            _cachedTmpTextProp = _cachedTmpType.GetProperty("text");
-                        }
-                    }
 
+                // Prefer TMP over Legacy Text
+                if (!_typeResolveAttempted)
+                {
+                    _typeResolveAttempted = true;
+                    _cachedTmpType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
                     if (_cachedTmpType != null)
                     {
-                        var cmp = GetComponent(_cachedTmpType);
-                        if (cmp != null)
-                        {
-                            _tmpComponent = cmp;
-                            _tmpTextProperty = _cachedTmpTextProp;
-                        }
+                        _cachedTmpTextProp = _cachedTmpType.GetProperty("text");
                     }
                 }
+
+                if (_cachedTmpType != null)
+                {
+                    var cmp = GetComponent(_cachedTmpType);
+                    if (cmp != null)
+                    {
+                        _tmpComponent = cmp;
+                        _tmpTextProperty = _cachedTmpTextProp;
+                        return; // TMP found — skip legacy Text detection
+                    }
+                }
+            }
+
+            // Fallback: use Legacy Text if TMP is not present
+            if (_targetText == null)
+            {
+                _targetText = GetComponent<Text>();
             }
         }
 
