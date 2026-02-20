@@ -4,6 +4,19 @@
 
 The Gatrix Unity SDK lets you control your game's behavior in real-time without shipping a new build. Toggle features, run A/B experiments, tune game parameters, and roll out changes gradually — all from the Gatrix dashboard.
 
+### 🏷️ What is a Feature Flag?
+
+A feature flag has two parts:
+
+| Part | Type | Description |
+|---|---|---|
+| **State** (`enabled`) | `bool` | Is the feature on or off? — checked with `IsEnabled()` |
+| **Value** (`variant`) | `boolean` `string` `number` `json` | The evaluated configuration value — read with `BoolVariation()`, `StringVariation()`, `FloatVariation()`, `JsonVariation()` |
+
+A flag can be **on** but still carry a value (e.g., `difficulty = "hard"`). State and value are independent — always handle both.
+
+
+
 ### ⚡ Quick Examples
 
 #### 1. Feature Toggle (`IsEnabled`)
@@ -73,7 +86,67 @@ flowchart LR
 string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
 ```
 
-Gatrix allows you to define complex targeting rules based on user segments, custom attributes (like `vipTier`), and percentage rollouts:
+**More complex targeting scenarios — all evaluated server-side:**
+
+```csharp
+var features = GatrixBehaviour.Client.Features;
+
+// ── Example 1: VIP tier branching ─────────────────────────────────────
+// Dashboard rules:
+//   vipTier == "gold"    → "boss-drop-rate" = 2.0
+//   vipTier == "silver"  → "boss-drop-rate" = 1.5
+//   (everyone else)      → "boss-drop-rate" = 1.0  (flag default)
+float dropRate = features.FloatVariation("boss-drop-rate", 1.0f);
+// dropRate is automatically correct for this user's VIP tier
+
+// ── Example 2: Region-specific event rollout ──────────────────────────
+// Dashboard rules:
+//   country == "KR" AND appVersion >= "2.5.0" → "summer-event" enabled
+//   country == "JP"                            → "summer-event" enabled (different rollout)
+//   (everyone else)                            → "summer-event" disabled
+if (features.IsEnabled("summer-event"))
+{
+    ShowSummerEventBanner();
+}
+else
+{
+    ShowDefaultLobby();  // No event for this region/version
+}
+
+// ── Example 3: JSON variant for a full config table ───────────────────
+// Dashboard returns different JSON per segment:
+//   "whales" segment  → { "shopDiscount": 0, "gemBonus": 50, "exclusiveItems": true }
+//   "new users"       → { "shopDiscount": 30, "gemBonus": 0,  "exclusiveItems": false }
+//   (default)         → { "shopDiscount": 10, "gemBonus": 0,  "exclusiveItems": false }
+var defaultConfig = new Dictionary<string, object>
+{
+    ["shopDiscount"]   = 10,
+    ["gemBonus"]       = 0,
+    ["exclusiveItems"] = false
+};
+var shopConfig = features.JsonVariation("shop-config", defaultConfig);
+
+int discount       = Convert.ToInt32(shopConfig["shopDiscount"]);
+int gemBonus       = Convert.ToInt32(shopConfig["gemBonus"]);
+bool hasExclusive  = Convert.ToBoolean(shopConfig["exclusiveItems"]);
+ApplyShopConfig(discount, gemBonus, hasExclusive);
+
+// ── Example 4: Percentage rollout with new feature ────────────────────
+// Dashboard: "new-inventory-ui" enabled for 20% of users (random, sticky)
+// SDK handles the assignment consistently — same user always gets same result
+if (features.IsEnabled("new-inventory-ui"))
+{
+    ShowNewInventoryUI();   // Part of 20% rollout group
+}
+else
+{
+    ShowLegacyInventoryUI();  // The other 80%
+}
+```
+
+Gatrix allows you to define these rules based on user segments, custom attributes (like `vipTier`), and percentage rollouts:
+
+
 
 ![Gatrix Dashboard - Targeting Strategy](docs/images/dashboard-targeting-strategy.png)
 

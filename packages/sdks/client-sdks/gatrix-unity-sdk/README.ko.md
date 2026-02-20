@@ -4,6 +4,19 @@
 
 Gatrix Unity SDK를 사용하면 새 빌드를 배포하지 않고도 게임의 동작을 실시간으로 제어할 수 있습니다. 기능 토글, A/B 실험, 게임 파라미터 튜닝, 점진적 롤아웃 — 모든 것을 Gatrix 대시보드에서 수행할 수 있습니다.
 
+### 🏷️ 피처 플래그란?
+
+피처 플래그는 두 가지 요소로 구성됩니다:
+
+| 요소 | 타입 | 설명 |
+|---|---|---|
+| **상태** (`enabled`) | `bool` | 기능이 켜져 있는가, 꺼져 있는가 — `IsEnabled()`로 확인 |
+| **값** (`variant`) | `boolean` `string` `number` `json` | 평가된 구성 값 — `BoolVariation()`, `StringVariation()`, `FloatVariation()`, `JsonVariation()`으로 읽음 |
+
+플래그는 **켜져 있으면서도** 특정 값을 가질 수 있습니다 (예: `difficulty = "hard"`). 상태와 값은 독립적 — 항상 두 가지 모두 처리해야 합니다.
+
+
+
 ### ⚡ Quick Examples
 
 #### 1. 피처 토글 (`IsEnabled`)
@@ -73,7 +86,66 @@ flowchart LR
 string difficulty = GatrixBehaviour.Client.Features.StringVariation("difficulty", "Normal");
 ```
 
+**더 복잡한 타겟팅 시나리오 — 모두 서버에서 평가됩니다:**
+
+```csharp
+var features = GatrixBehaviour.Client.Features;
+
+// ── 예제 1: VIP 등급별 분기 ────────────────────────────────────────────
+// 대시보드 규칙:
+//   vipTier == "gold"    → "boss-drop-rate" = 2.0
+//   vipTier == "silver"  → "boss-drop-rate" = 1.5
+//   (그 외)              → "boss-drop-rate" = 1.0  (플래그 기본값)
+float dropRate = features.FloatVariation("boss-drop-rate", 1.0f);
+// 이 유저의 VIP 등급에 맞는 값이 자동으로 반환됩니다
+
+// ── 예제 2: 지역 + 버전 조건 이벤트 롤아웃 ──────────────────────────────
+// 대시보드 규칙:
+//   country == "KR" AND appVersion >= "2.5.0" → "summer-event" 활성화
+//   country == "JP"                            → "summer-event" 활성화 (별도 롤아웃)
+//   (그 외)                                    → "summer-event" 비활성화
+if (features.IsEnabled("summer-event"))
+{
+    ShowSummerEventBanner();
+}
+else
+{
+    ShowDefaultLobby();  // 이 지역/버전에는 이벤트 없음
+}
+
+// ── 예제 3: JSON 배리언트로 전체 설정 테이블 제어 ──────────────────────
+// 대시보드가 세그먼트별 다른 JSON을 반환:
+//   "whales" 세그먼트   → { "shopDiscount": 0, "gemBonus": 50, "exclusiveItems": true }
+//   "신규 유저"          → { "shopDiscount": 30, "gemBonus": 0,  "exclusiveItems": false }
+//   (기본)              → { "shopDiscount": 10, "gemBonus": 0,  "exclusiveItems": false }
+var defaultConfig = new Dictionary<string, object>
+{
+    ["shopDiscount"]   = 10,
+    ["gemBonus"]       = 0,
+    ["exclusiveItems"] = false
+};
+var shopConfig = features.JsonVariation("shop-config", defaultConfig);
+
+int discount      = Convert.ToInt32(shopConfig["shopDiscount"]);
+int gemBonus      = Convert.ToInt32(shopConfig["gemBonus"]);
+bool hasExclusive = Convert.ToBoolean(shopConfig["exclusiveItems"]);
+ApplyShopConfig(discount, gemBonus, hasExclusive);
+
+// ── 예제 4: 퍼센트 롤아웃으로 새 UI 점진적 공개 ────────────────────────
+// 대시보드: "new-inventory-ui"를 20% 사용자에게만 활성화 (sticky — 항상 같은 결과)
+if (features.IsEnabled("new-inventory-ui"))
+{
+    ShowNewInventoryUI();     // 20% 롤아웃 그룹
+}
+else
+{
+    ShowLegacyInventoryUI();  // 나머지 80%
+}
+```
+
 Gatrix를 사용하면 사용자 세그먼트, 커스텀 속성(예: `vipTier`), 롤아웃 비율 등을 조합하여 정교한 타게팅 규칙을 설정할 수 있습니다:
+
+
 
 ![Gatrix 대시보드 - 타게팅 전략](docs/images/dashboard-targeting-strategy.png)
 
