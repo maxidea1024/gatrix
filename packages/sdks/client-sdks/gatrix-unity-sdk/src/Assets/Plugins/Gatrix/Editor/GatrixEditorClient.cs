@@ -28,6 +28,11 @@ namespace Gatrix.Unity.SDK.Editor
 
         static GatrixEditorClient()
         {
+            // Inject the Edit Mode client provider into GatrixBehaviour.
+            // GatrixBehaviour (Runtime) cannot reference this assembly directly,
+            // so we use a Func<> callback to avoid a circular assembly dependency.
+            GatrixBehaviour._editorClientProvider = () => _client;
+
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 
             // On every domain reload, populate the client from cache immediately.
