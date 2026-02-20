@@ -369,6 +369,14 @@ namespace Gatrix.Unity.SDK
             return flag;
         }
 
+        /// <summary>
+        /// Get raw flag data WITHOUT triggering metrics tracking.
+        /// Use this for editor tools, monitors, and inspector visualizations
+        /// that read flag state for display purposes only.
+        /// </summary>
+        public EvaluatedFlag GetFlagRaw(string flagName, bool forceRealtime = false)
+            => LookupFlag(flagName, forceRealtime);
+
         /// <summary>Get variant (never returns null)</summary>
         public Variant GetVariant(string flagName, bool forceRealtime = false) => GetVariantInternal(flagName, forceRealtime);
 

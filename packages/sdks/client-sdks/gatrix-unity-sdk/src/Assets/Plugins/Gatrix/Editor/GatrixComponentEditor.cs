@@ -232,16 +232,14 @@ namespace Gatrix.Unity.SDK.Editor
             bool hasPending = client.HasPendingSyncFlags();
             if (hasPending)
             {
-                // Get realtime flag to compare
-                var syncedVariant = client.GetVariant(flagName, forceRealtime: false);
-                var realtimeVariant = client.GetVariant(flagName, forceRealtime: true);
-                bool syncedEnabled = client.IsEnabled(flagName, forceRealtime: false);
-                bool realtimeEnabled = client.IsEnabled(flagName, forceRealtime: true);
+                // Use GetFlagRaw() which does NOT trigger metrics tracking
+                var syncedFlag   = client.GetFlagRaw(flagName, forceRealtime: false);
+                var realtimeFlag = client.GetFlagRaw(flagName, forceRealtime: true);
 
                 // Compare to determine if values differ
-                bool differs = syncedEnabled != realtimeEnabled
-                    || (syncedVariant?.Name ?? "") != (realtimeVariant?.Name ?? "")
-                    || FormatValue(syncedVariant?.Value) != FormatValue(realtimeVariant?.Value);
+                bool differs = (syncedFlag?.Enabled ?? false) != (realtimeFlag?.Enabled ?? false)
+                    || (syncedFlag?.Variant?.Name ?? "") != (realtimeFlag?.Variant?.Name ?? "")
+                    || FormatValue(syncedFlag?.Variant?.Value) != FormatValue(realtimeFlag?.Variant?.Value);
 
                 if (differs)
                 {
@@ -289,25 +287,14 @@ namespace Gatrix.Unity.SDK.Editor
         /// <summary>
         /// Draws flag info for a specific mode (realtime or synced).
         /// Renders a monitor-style mini table with State, Variant, Type, Value, and Revision.
+        /// Uses GetAllFlags() to avoid triggering metrics tracking.
         /// </summary>
         private static void DrawFlagStatusForMode(IFeaturesClient client, string flagName, bool forceRealtime, string label)
         {
             bool isDark = EditorGUIUtility.isProSkin;
 
-            // Get the full flag data for type/version info
-            var allFlags = client.GetAllFlags(forceRealtime);
-            EvaluatedFlag evaluatedFlag = null;
-            if (allFlags != null)
-            {
-                foreach (var f in allFlags)
-                {
-                    if (f.Name == flagName)
-                    {
-                        evaluatedFlag = f;
-                        break;
-                    }
-                }
-            }
+            // Use GetFlagRaw() which does NOT trigger metrics tracking (unlike GetFlag/IsEnabled/GetVariant)
+            EvaluatedFlag evaluatedFlag = client.GetFlagRaw(flagName, forceRealtime);
 
             if (evaluatedFlag == null)
             {

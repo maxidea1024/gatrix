@@ -245,6 +245,19 @@ namespace Gatrix.Unity.SDK
         EvaluatedFlag GetFlag(string flagName, bool forceRealtime = false);
 
         /// <summary>
+        /// Get a feature flag's raw evaluated data WITHOUT triggering metrics tracking.
+        /// <para>
+        /// Unlike <see cref="GetFlag"/>, this method does not count the access in
+        /// the metrics bucket. Intended for editor tools, monitors, and inspector
+        /// visualizations that read flag state for display purposes only.
+        /// </para>
+        /// </summary>
+        /// <param name="flagName">The feature flag key (case-sensitive).</param>
+        /// <param name="forceRealtime">If true, reads from the realtime cache regardless of ExplicitSyncMode.</param>
+        /// <returns>The <see cref="EvaluatedFlag"/>, or <c>null</c> if not found.</returns>
+        EvaluatedFlag GetFlagRaw(string flagName, bool forceRealtime = false);
+
+        /// <summary>
         /// Get the variant for a feature flag. Never returns <c>null</c>.
         /// <para>
         /// If the flag does not exist, returns a <see cref="Variant"/> with
