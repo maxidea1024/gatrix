@@ -82,8 +82,7 @@ static const struct luaL_Reg GatrixFeaturesFunctions[] = {
 
 void FGatrixLuaBindings::Register(lua_State *L) {
   if (!L) {
-    UE_LOG(LogGatrixLua, Error,
-           TEXT("[LuaGatrix] Register called with null lua_State"));
+    UE_LOG(LogGatrixLua, Error, TEXT("Register called with null lua_State"));
     return;
   }
 
@@ -116,8 +115,7 @@ void FGatrixLuaBindings::Register(lua_State *L) {
   }
   lua_pop(L, 1); // pop package
 
-  UE_LOG(LogGatrixLua, Log,
-         TEXT("[LuaGatrix] Registered gatrix module into Lua state %p"), L);
+  UE_LOG(LogGatrixLua, Log, TEXT("Registered into Lua state %p"), L);
 }
 
 void FGatrixLuaBindings::Unregister(lua_State *L) {
@@ -127,8 +125,7 @@ void FGatrixLuaBindings::Unregister(lua_State *L) {
 
   RemoveAllCallbacks(L);
 
-  UE_LOG(LogGatrixLua, Log,
-         TEXT("[LuaGatrix] Unregistered gatrix module from Lua state %p"), L);
+  UE_LOG(LogGatrixLua, Log, TEXT("Unregistered from Lua state %p"), L);
 }
 
 // ==================== Session Helpers ====================
@@ -417,20 +414,19 @@ static int CreateDeferred(lua_State *L) {
   lua_getglobal(L, "deferred");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
-    UE_LOG(LogGatrixLua, Warning,
-           TEXT("[LuaGatrix] 'deferred' module not available"));
+    UE_LOG(LogGatrixLua, Warning, TEXT("'deferred' module not available"));
     return LUA_NOREF;
   }
   lua_getfield(L, -1, "new");
   if (!lua_isfunction(L, -1)) {
     lua_pop(L, 2);
-    UE_LOG(LogGatrixLua, Warning, TEXT("[LuaGatrix] 'deferred.new' not found"));
+    UE_LOG(LogGatrixLua, Warning, TEXT("'deferred.new' not found"));
     return LUA_NOREF;
   }
   lua_remove(L, -2); // remove deferred table, keep deferred.new function
   if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
     const char *Err = lua_tostring(L, -1);
-    UE_LOG(LogGatrixLua, Error, TEXT("[LuaGatrix] deferred.new() failed: %s"),
+    UE_LOG(LogGatrixLua, Error, TEXT("deferred.new() failed: %s"),
            Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
     lua_pop(L, 1);
     return LUA_NOREF;
@@ -467,8 +463,7 @@ static void ResolveDeferred(lua_State *L, int DeferredRef, int nArgs = 0) {
   }
   if (lua_pcall(L, 1 + nArgs, 0, 0) != LUA_OK) {
     const char *Err = lua_tostring(L, -1);
-    UE_LOG(LogGatrixLua, Error,
-           TEXT("[LuaGatrix] deferred:resolve() failed: %s"),
+    UE_LOG(LogGatrixLua, Error, TEXT("deferred:resolve() failed: %s"),
            Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
     lua_pop(L, 1);
   }
@@ -498,8 +493,7 @@ static void RejectDeferred(lua_State *L, int DeferredRef,
   }
   if (lua_pcall(L, ErrorMsg ? 2 : 1, 0, 0) != LUA_OK) {
     const char *Err = lua_tostring(L, -1);
-    UE_LOG(LogGatrixLua, Error,
-           TEXT("[LuaGatrix] deferred:reject() failed: %s"),
+    UE_LOG(LogGatrixLua, Error, TEXT("deferred:reject() failed: %s"),
            Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
     lua_pop(L, 1);
   }
@@ -907,8 +901,7 @@ int FGatrixLuaBindings::Lua_On(lua_State *L) {
         // Call the Lua function with 1 argument (the args table)
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
           const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("[LuaGatrix] Event callback error: %s"),
+          UE_LOG(LogGatrixLua, Error, TEXT("On callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
         }
@@ -983,8 +976,7 @@ int FGatrixLuaBindings::Lua_Once(lua_State *L) {
 
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
           const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("[LuaGatrix] Once callback error: %s"),
+          UE_LOG(LogGatrixLua, Error, TEXT("Once callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
         }
@@ -1026,30 +1018,29 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlag(lua_State *L) {
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda(
-      [CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy *Proxy) {
-        // CRITICAL: check alive flag before touching lua_State
-        if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
-          return;
-        }
+  Delegate.BindLambda([CapturedL, CapturedRef,
+                       CapturedAlive](UGatrixFlagProxy *Proxy) {
+    // CRITICAL: check alive flag before touching lua_State
+    if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
+      return;
+    }
 
-        lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
-        if (!lua_isfunction(CapturedL, -1)) {
-          lua_pop(CapturedL, 1);
-          return;
-        }
+    lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
+    if (!lua_isfunction(CapturedL, -1)) {
+      lua_pop(CapturedL, 1);
+      return;
+    }
 
-        // Push FlagProxy as a Lua table
-        PushFlagProxyTable(CapturedL, Proxy);
+    // Push FlagProxy as a Lua table
+    PushFlagProxyTable(CapturedL, Proxy);
 
-        if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("[LuaGatrix] WatchRealtime callback error: %s"),
-                 Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
-          lua_pop(CapturedL, 1);
-        }
-      });
+    if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
+      const char *Err = lua_tostring(CapturedL, -1);
+      UE_LOG(LogGatrixLua, Error, TEXT("WatchRealtimeFlag callback error: %s"),
+             Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+      lua_pop(CapturedL, 1);
+    }
+  });
 
   int32 Handle = UGatrixClient::Get()->GetFeatures()->WatchRealtimeFlag(
       UTF8_TO_TCHAR(FlagName), Delegate);
@@ -1082,29 +1073,28 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlag(lua_State *L) {
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda(
-      [CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy *Proxy) {
-        // CRITICAL: check alive flag before touching lua_State
-        if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
-          return;
-        }
+  Delegate.BindLambda([CapturedL, CapturedRef,
+                       CapturedAlive](UGatrixFlagProxy *Proxy) {
+    // CRITICAL: check alive flag before touching lua_State
+    if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
+      return;
+    }
 
-        lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
-        if (!lua_isfunction(CapturedL, -1)) {
-          lua_pop(CapturedL, 1);
-          return;
-        }
+    lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
+    if (!lua_isfunction(CapturedL, -1)) {
+      lua_pop(CapturedL, 1);
+      return;
+    }
 
-        PushFlagProxyTable(CapturedL, Proxy);
+    PushFlagProxyTable(CapturedL, Proxy);
 
-        if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("gatrix.Features.WatchSyncedFlag: callback error: %s"),
-                 Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
-          lua_pop(CapturedL, 1);
-        }
-      });
+    if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
+      const char *Err = lua_tostring(CapturedL, -1);
+      UE_LOG(LogGatrixLua, Error, TEXT("WatchSyncedFlag callback error: %s"),
+             Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+      lua_pop(CapturedL, 1);
+    }
+  });
 
   int32 Handle = UGatrixClient::Get()->GetFeatures()->WatchSyncedFlag(
       UTF8_TO_TCHAR(FlagName), Delegate);
@@ -1154,7 +1144,7 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlagWithInitialState(lua_State *L) {
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
           const char *Err = lua_tostring(CapturedL, -1);
           UE_LOG(LogGatrixLua, Error,
-                 TEXT("gatrix.Features.WatchRealtimeFlagWithInitialState "
+                 TEXT("WatchRealtimeFlagWithInitialState "
                       "callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
@@ -1210,7 +1200,7 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState(lua_State *L) {
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
           const char *Err = lua_tostring(CapturedL, -1);
           UE_LOG(LogGatrixLua, Error,
-                 TEXT("gatrix.Features.WatchSyncedFlagWithInitialState "
+                 TEXT("WatchSyncedFlagWithInitialState "
                       "callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
@@ -1372,8 +1362,7 @@ int FGatrixLuaBindings::Lua_OnAny(lua_State *L) {
         // Call the Lua function with 2 arguments (event name, args table)
         if (lua_pcall(CapturedL, 2, 0, 0) != LUA_OK) {
           const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("gatrix.Features.OnAny callback error: %s"),
+          UE_LOG(LogGatrixLua, Error, TEXT("OnAny callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
         }
@@ -1524,8 +1513,7 @@ CreateWatchGroupDelegate(lua_State *L, FLuaWatchGroupData *Data) {
         FGatrixLuaBindings::PushFlagProxyTable(CapturedL, Proxy);
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
           const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("gatrix.Features.WatchGroup callback error: %s"),
+          UE_LOG(LogGatrixLua, Error, TEXT("WatchGroup callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
         }

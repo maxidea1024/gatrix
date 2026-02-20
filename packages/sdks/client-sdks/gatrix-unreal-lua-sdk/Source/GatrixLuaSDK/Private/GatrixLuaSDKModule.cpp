@@ -8,11 +8,11 @@
 DEFINE_LOG_CATEGORY(LogGatrixLua);
 
 void FGatrixLuaSDKModule::StartupModule() {
-  UE_LOG(LogGatrixLua, Log, TEXT("GatrixLuaSDK module loaded."));
+  UE_LOG(LogGatrixLua, Log, TEXT("Module loaded."));
 }
 
 void FGatrixLuaSDKModule::ShutdownModule() {
-  UE_LOG(LogGatrixLua, Log, TEXT("GatrixLuaSDK module unloaded."));
+  UE_LOG(LogGatrixLua, Log, TEXT("Module unloaded."));
 }
 
 #undef LOCTEXT_NAMESPACE
