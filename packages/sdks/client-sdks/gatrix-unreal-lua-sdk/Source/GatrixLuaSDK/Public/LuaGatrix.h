@@ -34,6 +34,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GatrixTypes.h"
 
 // Forward declare lua_State to avoid requiring lua.h in this header
 struct lua_State;

@@ -5,17 +5,20 @@
 #include "CoreMinimal.h"
 #include "GatrixEventEmitter.h"
 #include "GatrixFlagProxy.h"
+#include "GatrixFlagWatchDelegate.h"
 #include "GatrixSseConnection.h"
+#include "GatrixStorageProvider.h"
 #include "GatrixTypes.h"
 #include "GatrixVariationProvider.h"
 #include "GatrixWatchFlagGroup.h"
-#include "GatrixFlagWatchDelegate.h"
 #include "GatrixWebSocketConnection.h"
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
 
-#include <atomic>
+
 #include "GatrixFeaturesClient.generated.h"
+#include <atomic>
+
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
@@ -27,7 +30,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGatrixOnError, FString, Code,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FGatrixOnImpression, FString,
                                               FlagName, bool, bEnabled, FString,
                                               VariantName, FString, EventType);
-
 
 /**
  * UGatrixFeaturesClient - Central client for feature flag management in Unreal
@@ -396,6 +398,15 @@ public:
                                bool bForceRealtime = false) override;
 
 private:
+  // ==================== Internal Structs ====================
+
+  // Watch callback entry — must be declared before InvokeWatchCallbacks
+  struct FWatchCallbackEntry {
+    FString FlagName;
+    FGatrixFlagWatchDelegate Callback;
+    int32 Handle;
+  };
+
   // ==================== Internal Methods ====================
 
   UGatrixFlagProxy *CreateProxy(const FString &FlagName,
@@ -502,12 +513,7 @@ private:
   // Connection ID
   FString ConnectionId;
 
-  // Watch callbacks ??direct callback management (not via emitter)
-  struct FWatchCallbackEntry {
-    FString FlagName;
-    FGatrixFlagWatchDelegate Callback;
-    int32 Handle;
-  };
+  // Watch callback storage
   TArray<FWatchCallbackEntry> WatchCallbacks;
   TArray<FWatchCallbackEntry> SyncedWatchCallbacks;
   int32 NextWatchHandle = 1;

@@ -1,4 +1,4 @@
-// Copyright Gatrix. All Rights Reserved.
+﻿// Copyright Gatrix. All Rights Reserved.
 // Lua binding implementation for Gatrix Unreal SDK
 
 #include "LuaGatrix.h"
@@ -103,10 +103,18 @@ void FGatrixLuaBindings::Register(lua_State *L) {
   lua_setglobal(L, "gatrix");
 
   // Also register as a loadable module for require("gatrix")
-  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
-  lua_getglobal(L, "gatrix");
-  lua_setfield(L, -2, "gatrix");
-  lua_pop(L, 1);
+  // LuaJIT is Lua 5.1 based — use package.loaded directly instead of
+  // luaL_getsubtable/LUA_LOADED_TABLE which are Lua 5.2+ only
+  lua_getglobal(L, "package");
+  if (lua_istable(L, -1)) {
+    lua_getfield(L, -1, "loaded");
+    if (lua_istable(L, -1)) {
+      lua_getglobal(L, "gatrix");
+      lua_setfield(L, -2, "gatrix");
+    }
+    lua_pop(L, 1); // pop loaded
+  }
+  lua_pop(L, 1); // pop package
 
   UE_LOG(LogGatrixLua, Log,
          TEXT("[LuaGatrix] Registered gatrix module into Lua state %p"), L);
@@ -433,37 +441,37 @@ int FGatrixLuaBindings::Lua_Init(lua_State *L) {
 
   lua_getfield(L, 1, "DisableRefresh");
   if (lua_isboolean(L, -1)) {
-    Config.Features.bDisableRefresh = lua_toboolean(L, -1);
+    Config.Features.bDisableRefresh = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
   lua_getfield(L, 1, "EnableDevMode");
   if (lua_isboolean(L, -1)) {
-    Config.bEnableDevMode = lua_toboolean(L, -1);
+    Config.bEnableDevMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
   lua_getfield(L, 1, "ExplicitSyncMode");
   if (lua_isboolean(L, -1)) {
-    Config.Features.bExplicitSyncMode = lua_toboolean(L, -1);
+    Config.Features.bExplicitSyncMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
   lua_getfield(L, 1, "DisableMetrics");
   if (lua_isboolean(L, -1)) {
-    Config.Features.bDisableMetrics = lua_toboolean(L, -1);
+    Config.Features.bDisableMetrics = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
   lua_getfield(L, 1, "ImpressionDataAll");
   if (lua_isboolean(L, -1)) {
-    Config.Features.bImpressionDataAll = lua_toboolean(L, -1);
+    Config.Features.bImpressionDataAll = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
   lua_getfield(L, 1, "OfflineMode");
   if (lua_isboolean(L, -1)) {
-    Config.bOfflineMode = lua_toboolean(L, -1);
+    Config.bOfflineMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
@@ -503,7 +511,7 @@ int FGatrixLuaBindings::Lua_GetFlag(lua_State *L) {
 
 int FGatrixLuaBindings::Lua_BoolVariation(lua_State *L) {
   const char *FlagName = luaL_checkstring(L, 1);
-  bool Fallback = lua_toboolean(L, 2);
+  bool Fallback = (lua_toboolean(L, 2) != 0);
   bool Value = UGatrixClient::Get()->GetFeatures()->BoolVariation(
       UTF8_TO_TCHAR(FlagName), Fallback);
   lua_pushboolean(L, Value);
@@ -569,7 +577,7 @@ static void PushVariationResultTable(lua_State *L,
 
 int FGatrixLuaBindings::Lua_BoolVariationDetails(lua_State *L) {
   const char *FlagName = luaL_checkstring(L, 1);
-  bool Fallback = lua_toboolean(L, 2);
+  bool Fallback = (lua_toboolean(L, 2) != 0);
   FGatrixVariationResult Result =
       UGatrixClient::Get()->GetFeatures()->BoolVariationDetails(
           UTF8_TO_TCHAR(FlagName), Fallback);
@@ -1107,7 +1115,7 @@ int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
 int FGatrixLuaBindings::Lua_SyncFlags(lua_State *L) {
   bool bFetchNow = true;
   if (lua_isboolean(L, 1)) {
-    bFetchNow = lua_toboolean(L, 1);
+    bFetchNow = (lua_toboolean(L, 1) != 0);
   }
   UGatrixClient::Get()->GetFeatures()->SyncFlags(bFetchNow);
   return 0;
