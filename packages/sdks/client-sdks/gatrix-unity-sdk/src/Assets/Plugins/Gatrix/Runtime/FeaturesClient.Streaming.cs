@@ -80,10 +80,10 @@ namespace Gatrix.Unity.SDK
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        var errorMessage = $"Streaming connection failed: {(int)response.StatusCode} {response.ReasonPhrase}";
-                        _logger.Error(errorMessage);
                         PostToMainThread(() =>
                         {
+                            var errorMessage = $"Streaming connection failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+                            _logger.Error(errorMessage);
                             TrackStreamingError(errorMessage);
                             _streamingState = StreamingConnectionState.Reconnecting;
                             _emitter.Emit(GatrixEvents.FlagsStreamingError,

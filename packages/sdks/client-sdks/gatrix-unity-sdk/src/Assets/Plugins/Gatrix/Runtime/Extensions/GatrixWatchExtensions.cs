@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace Gatrix.Unity.SDK
+namespace Gatrix.Unity.SDK.Extensions
 {
     /// <summary>
     /// Extension methods for binding Gatrix flag watches to a MonoBehaviour's lifecycle.
@@ -19,6 +19,8 @@ namespace Gatrix.Unity.SDK
     /// <para>
     /// <b>Usage:</b>
     /// <code>
+    /// using Gatrix.Unity.SDK.Extensions;
+    ///
     /// // Individual watches
     /// this.WatchRealtimeFlag("my-flag", proxy => { ... });
     /// this.WatchRealtimeFlagWithInitialState("my-flag", proxy => { ... });

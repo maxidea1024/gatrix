@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Gatrix.Unity.SDK
+namespace Gatrix.Unity.SDK.Extensions
 {
     /// <summary>
     /// Internal MonoBehaviour that binds flag watch subscriptions to a GameObject's lifecycle.

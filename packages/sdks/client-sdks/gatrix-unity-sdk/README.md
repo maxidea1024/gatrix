@@ -1913,6 +1913,8 @@ void OnDestroy()
 
 Unity developers commonly need to bind watch subscriptions to their MonoBehaviour's enable/disable/destroy lifecycle. The SDK provides extension methods that handle this automatically.
 
+> 💡 **Namespace:** These extension methods live in `Gatrix.Unity.SDK.Extensions`. Add `using Gatrix.Unity.SDK.Extensions;` to use them.
+
 ### Behavior
 
 | Lifecycle Event | What Happens |
@@ -1924,6 +1926,8 @@ Unity developers commonly need to bind watch subscriptions to their MonoBehaviou
 ### Individual Watch
 
 ```csharp
+using Gatrix.Unity.SDK.Extensions;
+
 public class MyUnit : MonoBehaviour
 {
     void Start()
@@ -1947,6 +1951,8 @@ public class MyUnit : MonoBehaviour
 ### Lifecycle-Bound Watch Group
 
 ```csharp
+using Gatrix.Unity.SDK.Extensions;
+
 public class ShopController : MonoBehaviour
 {
     void Start()

@@ -1915,6 +1915,8 @@ void OnDestroy()
 
 Unity 개발자는 흔히 Watch 구독을 MonoBehaviour의 enable/disable/destroy 라이프사이클에 맞춰야 합니다. SDK가 이를 자동으로 처리하는 확장 메서드를 제공합니다.
 
+> 💡 **네임스페이스:** 이 확장 메서드들은 `Gatrix.Unity.SDK.Extensions` 네임스페이스에 있습니다. 사용하려면 `using Gatrix.Unity.SDK.Extensions;`를 추가하세요.
+
 ### 동작 방식
 
 | 라이프사이클 이벤트 | 동작 |
@@ -1926,6 +1928,8 @@ Unity 개발자는 흔히 Watch 구독을 MonoBehaviour의 enable/disable/destro
 ### 개별 Watch
 
 ```csharp
+using Gatrix.Unity.SDK.Extensions;
+
 public class MyUnit : MonoBehaviour
 {
     void Start()
@@ -1949,6 +1953,8 @@ public class MyUnit : MonoBehaviour
 ### 라이프사이클 바인딩 Watch 그룹
 
 ```csharp
+using Gatrix.Unity.SDK.Extensions;
+
 public class ShopController : MonoBehaviour
 {
     void Start()

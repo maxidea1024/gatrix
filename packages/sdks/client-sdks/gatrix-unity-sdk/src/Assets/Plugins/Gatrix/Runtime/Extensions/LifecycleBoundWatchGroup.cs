@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Gatrix.Unity.SDK
+namespace Gatrix.Unity.SDK.Extensions
 {
     /// <summary>
     /// A watch group that respects the owning MonoBehaviour's lifecycle.
