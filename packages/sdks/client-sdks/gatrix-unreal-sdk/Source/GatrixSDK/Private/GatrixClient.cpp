@@ -22,10 +22,9 @@ UGatrixClient *UGatrixClient::Get() {
 
 void UGatrixClient::Init(const FGatrixClientConfig &InConfig) {
   if (bInitialized) {
-    UE_LOG(LogGatrix, Warning,
-           TEXT("Already initialized. Call Stop() first to "
-                "re-initialize."));
-    return;
+    UE_LOG(LogGatrix, Log,
+           TEXT("Already initialized. Auto-stopping before re-init."));
+    Stop();
   }
 
   // Validate required fields
@@ -160,13 +159,15 @@ void UGatrixClient::Start() {
 }
 
 void UGatrixClient::Stop() {
-  if (!bStarted)
+  if (!bInitialized)
     return;
 
   bStarted = false;
+  bInitialized = false;
 
   if (FeaturesClient) {
     FeaturesClient->Stop();
+    FeaturesClient = nullptr;
   }
 
   EventEmitter.RemoveAll();
