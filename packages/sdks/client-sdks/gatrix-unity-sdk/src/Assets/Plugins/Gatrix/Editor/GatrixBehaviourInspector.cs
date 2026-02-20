@@ -322,8 +322,6 @@ namespace Gatrix.Unity.SDK.Editor
         private void DrawFlagsContent(GatrixClient client)
         {
             var flags = client.Features.GetAllFlags();
-            bool isDark = EditorGUIUtility.isProSkin;
-
             if (flags.Count == 0)
             {
                 EditorGUILayout.Space(4);
@@ -332,99 +330,7 @@ namespace Gatrix.Unity.SDK.Editor
                 return;
             }
 
-            // Column layout: State | Name | Variant | Type | Value | Rev
-            const float stateX = 4;
-            const float stateW = 38;
-            const float nameX  = 48;
-            const float typeW  = 50;
-            const float revW   = 30;
-            float totalW = EditorGUIUtility.currentViewWidth;
-            float dynamicW     = totalW - nameX - typeW - revW - 50;
-            float nameW        = dynamicW * 0.25f;
-            float variantX     = nameX + nameW;
-            float variantW     = dynamicW * 0.38f;
-            float typeX        = variantX + variantW;
-            float valueX       = typeX + typeW;
-            float valueW       = dynamicW * 0.37f;
-            float revX         = valueX + valueW + 4;
-
-            // Table header
-            var headerRect = EditorGUILayout.GetControlRect(false, 18);
-            if (Event.current.type == EventType.Repaint)
-            {
-                EditorGUI.DrawRect(headerRect,
-                    isDark ? new Color(0.13f, 0.13f, 0.15f, 1f) : new Color(0.70f, 0.70f, 0.72f, 1f));
-            }
-            var hStyle = new GUIStyle(EditorStyles.miniLabel)
-            {
-                fontStyle = FontStyle.Bold,
-                normal    = { textColor = isDark ? new Color(0.55f, 0.60f, 0.65f) : new Color(0.28f, 0.30f, 0.33f) }
-            };
-
-            GUI.Label(new Rect(headerRect.x + stateX,   headerRect.y, stateW,   headerRect.height), "State",   hStyle);
-            GUI.Label(new Rect(headerRect.x + nameX,    headerRect.y, nameW,    headerRect.height), "Name",    hStyle);
-            GUI.Label(new Rect(headerRect.x + variantX, headerRect.y, variantW, headerRect.height), "Variant", hStyle);
-            GUI.Label(new Rect(headerRect.x + typeX,    headerRect.y, typeW,    headerRect.height), "Type",    hStyle);
-            GUI.Label(new Rect(headerRect.x + valueX,   headerRect.y, valueW,   headerRect.height), "Value",   hStyle);
-            var revHStyle = new GUIStyle(hStyle) { alignment = TextAnchor.MiddleRight };
-            GUI.Label(new Rect(headerRect.x + revX,     headerRect.y, revW,     headerRect.height), "Rev",     revHStyle);
-
-            // Rows
-            for (int i = 0; i < flags.Count; i++)
-            {
-                var flag    = flags[i];
-                var rowRect = EditorGUILayout.GetControlRect(false, 20);
-
-                // Alternating row tint
-                if (Event.current.type == EventType.Repaint && i % 2 == 0)
-                {
-                    EditorGUI.DrawRect(rowRect,
-                        isDark ? new Color(0.16f, 0.16f, 0.18f, 0.5f) : new Color(0.84f, 0.84f, 0.86f, 0.5f));
-                }
-
-                // ON/OFF badge
-                bool on = flag.Enabled;
-                var badgeColor = on ? new Color(0.10f, 0.45f, 0.18f, 1f) : new Color(0.45f, 0.10f, 0.10f, 1f);
-                var badgeRect  = new Rect(rowRect.x + stateX, rowRect.y + 3, stateW, 14);
-                if (Event.current.type == EventType.Repaint)
-                    EditorGUI.DrawRect(badgeRect, badgeColor);
-                GUI.Label(badgeRect, on ? "ON" : "OFF", on ? _flagOnStyle : _flagOffStyle);
-
-                // Flag name
-                GUI.Label(new Rect(rowRect.x + nameX, rowRect.y, nameW, rowRect.height),
-                    new GUIContent(flag.Name, flag.Name), _rowValueStyle);
-
-                // Variant name
-                GUI.Label(new Rect(rowRect.x + variantX, rowRect.y, variantW, rowRect.height),
-                    new GUIContent(flag.Variant?.Name ?? "", flag.Variant?.Name ?? ""), _rowLabelStyle);
-
-                // Type
-                var typeStr = ValueTypeHelper.ToApiString(flag.ValueType);
-                GUI.Label(new Rect(rowRect.x + typeX, rowRect.y, typeW, rowRect.height), typeStr, _rowLabelStyle);
-
-                // Value
-                var rawValue = flag.Variant?.Value;
-                string valueStr;
-                if (rawValue == null)
-                    valueStr = "";
-                else if (rawValue is bool bVal)
-                    valueStr = bVal ? "true" : "false";
-                else if (rawValue is string s && s == "")
-                    valueStr = "\"\"";
-                else
-                    valueStr = rawValue.ToString();
-                GUI.Label(new Rect(rowRect.x + valueX, rowRect.y, valueW, rowRect.height),
-                    new GUIContent(valueStr, flag.Variant?.Value?.ToString() ?? ""), _rowValueStyle);
-
-                // Revision
-                var revStyle = new GUIStyle(EditorStyles.miniLabel)
-                {
-                    alignment = TextAnchor.MiddleRight,
-                    normal    = { textColor = isDark ? new Color(0.50f, 0.53f, 0.58f) : new Color(0.40f, 0.42f, 0.45f) }
-                };
-                GUI.Label(new Rect(rowRect.x + revX, rowRect.y, revW, rowRect.height),
-                    flag.Version.ToString(), revStyle);
-            }
+            GatrixFlagTable.Draw(flags);
 
             EditorGUILayout.Space(4);
         }
