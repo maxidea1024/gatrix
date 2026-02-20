@@ -2205,16 +2205,19 @@ FString UGatrixFeaturesClient::BuildStreamingUrl() const {
   }
 
   // If no custom URL, derive from ApiUrl
+  // URL pattern: {apiUrl}/client/features/{environment}/stream/sse|ws
   if (BaseUrl.IsEmpty()) {
-    BaseUrl = ClientConfig.ApiUrl;
-    // Replace /api/v1 with streaming endpoint
+    FString EncodedEnv =
+        FGenericPlatformHttp::UrlEncode(ClientConfig.Environment);
     if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
-      BaseUrl = BaseUrl.Replace(TEXT("/api/v1"), TEXT("/streaming/ws"));
+      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/ws"),
+                                *ClientConfig.ApiUrl, *EncodedEnv);
       // Convert http(s) to ws(s)
       BaseUrl = BaseUrl.Replace(TEXT("https://"), TEXT("wss://"));
       BaseUrl = BaseUrl.Replace(TEXT("http://"), TEXT("ws://"));
     } else {
-      BaseUrl = BaseUrl.Replace(TEXT("/api/v1"), TEXT("/streaming/sse"));
+      BaseUrl = FString::Printf(TEXT("%s/client/features/%s/stream/sse"),
+                                *ClientConfig.ApiUrl, *EncodedEnv);
     }
   }
 
