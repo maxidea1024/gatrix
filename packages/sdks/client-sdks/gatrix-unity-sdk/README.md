@@ -671,7 +671,12 @@ client.Events.OnAny((eventName, args) => Debug.Log($"[Gatrix] {eventName}"));
 
 ## 🔌 Operating Modes
 
-The SDK supports three operating modes. Choose based on your connectivity requirements and update frequency needs.
+The SDK supports three operating modes. By default, Gatrix uses a **Streaming + Polling hybrid** — streaming delivers flag changes in real time, while polling acts as a safety fallback. Polling uses **ETag-based HTTP caching**, so polls that find no changes consume near-zero bandwidth.
+
+> 📖 Deep dive — polling intervals, ETag behaviour, streaming transports, hybrid failure scenarios, and configuration reference:  
+> **[docs/OPERATING_MODES.md](docs/OPERATING_MODES.md)**
+
+
 
 ### Mode Comparison
 

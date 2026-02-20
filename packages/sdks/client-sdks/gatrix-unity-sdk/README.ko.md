@@ -675,7 +675,12 @@ client.Events.OnAny((eventName, args) => Debug.Log($"[Gatrix] {eventName}"));
 
 ## � 운영 모드
 
-SDK는 세 가지 운영 모드를 지원합니다. 네트워크 환경과 업데이트 빈도 요구사항에 따라 선택하세요.
+SDK는 세 가지 운영 모드를 지원합니다. 기본값은 **스트리밍 + 폴링 하이브리드** — 스트리밍이 실시간 변경을 전달하고, 폴링은 안전망(fallback)으로 동작합니다. 폴링은 **ETag 기반 HTTP 캐싱**을 사용하므로, 데이터 변경이 없는 폴링은 대역폭을 거의 소모하지 않습니다.
+
+> 📖 심화 내용 — 폴링 주기, ETag 동작, 스트리밍 전송 방식, 하이브리드 장애 시나리오, 설정 레퍼런스:  
+> **[docs/OPERATING_MODES.ko.md](docs/OPERATING_MODES.ko.md)**
+
+
 
 ### 모드 비교
 
