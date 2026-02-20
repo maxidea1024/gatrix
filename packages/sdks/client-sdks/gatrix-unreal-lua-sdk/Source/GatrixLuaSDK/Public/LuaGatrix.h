@@ -1,20 +1,35 @@
 // Copyright Gatrix. All Rights Reserved.
-// Lua binding for Gatrix Unreal SDK
+// LuaJIT binding for Gatrix Unreal SDK
 //
 // Pure lua_State* based binding — no dependency on game-specific Lua wrappers.
-// Registers a "gatrix" module into an existing Lua VM.
+// Registers a "gatrix" global module into an existing LuaJIT VM.
 //
 // Usage:
-//   // C++ side — register into existing Lua VM
+//   // C++ side — register into existing LuaJIT VM
 //   #include "LuaGatrix.h"
 //   FGatrixLuaBindings::Register(ExistingLuaState);
 //
-//   -- Lua side
-//   local gatrix = require("gatrix")
-//   gatrix.init("http://host/api/v1", "token", "MyApp", "production")
-//   gatrix.start()
-//   if gatrix.isEnabled("new_feature") then ... end
-//   gatrix.stop()
+//   -- Lua side: lifecycle functions are on the root gatrix table
+//   gatrix.Init({
+//     ApiUrl      = "http://host/api/v1",
+//     ApiToken    = "your-token",
+//     AppName     = "MyApp",
+//     Environment = "production",
+//     -- Optional:
+//     -- RefreshInterval = 30,
+//     -- EnableDevMode   = true,
+//     -- ExplicitSyncMode = false,
+//   })
+//   gatrix.Start()
+//   gatrix.Stop()
+//
+//   -- Feature flag functions live under gatrix.Features.*
+//   -- All names are PascalCase (except the root "gatrix" table itself)
+//   if gatrix.Features.IsEnabled("new_feature") then ... end
+//   local val  = gatrix.Features.StringVariation("flag_name", "default")
+//   local flag = gatrix.Features.GetFlag("flag_name")   -- {Name, Enabled,
+//   Variant, ...} gatrix.Features.WatchRealtimeFlag("flag_name",
+//   function(proxy) ... end)
 
 #pragma once
 
