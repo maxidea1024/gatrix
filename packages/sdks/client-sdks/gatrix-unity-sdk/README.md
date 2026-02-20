@@ -180,9 +180,9 @@ Gatrix isn't the right fit for every project. Consider whether these apply to yo
 
 ---
 
-## 🏗️ Evaluation Model: Server-Side (Remote) Only
+## 🏗️ Evaluation Model: Remote Evaluation Only
 
-Gatrix uses **server-side evaluation** exclusively. This is a deliberate architectural decision for security and consistency.
+Gatrix client SDKs use **remote evaluation** exclusively. This is a deliberate architectural decision for security and consistency.
 
 ### How It Works
 
@@ -194,12 +194,12 @@ flowchart LR
 ```
 
 1. The SDK sends **context** (userId, environment, custom properties) to the Gatrix server.
-2. The server evaluates all targeting rules, segments, and rollout percentages **on the server side**.
+2. The server evaluates all targeting rules, segments, and rollout percentages **remotely**.
 3. The SDK receives only the **final evaluated flag values** — no rules, no segments, no raw configuration.
 
 ### Remote Evaluation vs Local Evaluation
 
-| | Server-Side (Remote) Evaluation | Client-Side (Local) Evaluation |
+| | Remote Evaluation (Gatrix) | Local Evaluation |
 |---|---|---|
 | **How it works** | Server evaluates rules → client receives final values | Client downloads all rules → evaluates locally |
 | **Security** | ✅ Targeting rules, segment definitions, and rollout logic are **never exposed** to the client | ⚠️ All rules are sent to the client and can be inspected, reverse-engineered, or tampered with |
@@ -209,7 +209,7 @@ flowchart LR
 | **Evaluation latency** | ⚠️ Depends on network round-trip for the initial fetch | ✅ No network needed after initial download |
 | **Rule update speed** | ✅ New values are available immediately via streaming/polling | ⚠️ Client must re-download the full rule set to pick up changes |
 
-### Why Gatrix Chose Server-Side Evaluation
+### Why Gatrix Chose Remote Evaluation
 
 1. **Security first.** In game development, clients are inherently untrusted. Sending targeting rules (e.g., "10% rollout for users in segment X") to the client exposes your rollout strategy, internal segments, and business logic. With server-side evaluation, only the final `true`/`false` or variant string reaches the client.
 
@@ -268,7 +268,7 @@ flowchart TD
     end
 ```
 
-### Server-Side: Value Source Priority
+### Value Source Priority (Remote)
 
 When the server evaluates a flag, values are resolved in the following priority order:
 

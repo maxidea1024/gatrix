@@ -6,10 +6,15 @@
 #include "GatrixEventEmitter.h"
 #include "GatrixFeaturesClient.generated.h"
 #include "GatrixFlagProxy.h"
+#include "GatrixSseConnection.h"
 #include "GatrixTypes.h"
 #include "GatrixVariationProvider.h"
+#include "GatrixWatchFlagGroup.h"
+#include "GatrixWebSocketConnection.h"
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
+
+#include <atomic>
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
@@ -74,6 +79,12 @@ public:
   bool HasFlag(const FString &FlagName) const;
 
   // ==================== Flag Access - Typed Variations ====================
+
+  /** Get variant name (returns the matched variant's name, or fallback) */
+  UFUNCTION(BlueprintCallable, BlueprintPure,
+            Category = "Gatrix|Features|Variation")
+  FString Variation(const FString &FlagName, const FString &FallbackValue,
+                    bool bForceRealtime = false) const;
 
   /** Get boolean variation */
   UFUNCTION(BlueprintCallable, BlueprintPure,
@@ -234,8 +245,32 @@ public:
                         FGatrixFlagWatchDelegate Callback,
                         const FString &Name = TEXT(""));
 
+  /**
+   * Watch a flag for realtime changes with initial state callback.
+   * Immediately invokes the callback with the current flag state if ready,
+   * or defers until flags.ready event. Returns a handle for unsubscribe.
+   */
+  int32 WatchRealtimeFlagWithInitialState(const FString &FlagName,
+                                          FGatrixFlagWatchDelegate Callback,
+                                          const FString &Name = TEXT(""));
+
+  /**
+   * Watch a flag for synced changes with initial state callback.
+   * Immediately invokes the callback with the current flag state if ready,
+   * or defers until flags.ready event. Returns a handle for unsubscribe.
+   */
+  int32 WatchSyncedFlagWithInitialState(const FString &FlagName,
+                                        FGatrixFlagWatchDelegate Callback,
+                                        const FString &Name = TEXT(""));
+
   /** Unsubscribe a flag watcher by handle */
   void UnwatchFlag(int32 Handle);
+
+  /**
+   * Create a named watch group for batch management of flag watchers.
+   * The caller owns the returned pointer and must delete it when done.
+   */
+  FGatrixWatchFlagGroup *CreateWatchGroup(const FString &Name);
 
   // ==================== Stats ====================
 
@@ -402,6 +437,17 @@ private:
   FString BuildContextQueryString() const;
   FString ContextToJson() const;
 
+  // Streaming
+  void ConnectStreaming();
+  void DisconnectStreaming();
+  void ProcessStreamingEvent(const FString &EventType,
+                             const FString &EventData);
+  void HandleStreamingInvalidation(const TArray<FString> &ChangedKeys);
+  void ScheduleStreamingReconnect();
+  void FetchPartialFlags(const TArray<FString> &FlagKeys);
+  void SetStreamingState(EGatrixStreamingConnectionState NewState);
+  FString BuildStreamingUrl() const;
+
   // ==================== State ====================
 
   FGatrixClientConfig ClientConfig;
@@ -415,28 +461,27 @@ private:
 
   // State tracking
   EGatrixSdkState SdkState = EGatrixSdkState::Initializing;
-  bool bReadyEmitted = false;
-  bool bFetchedFromServer = false;
-  bool bIsFetching = false;
-  bool bPendingSync = false;
-  bool bStarted = false;
-  int32 ConsecutiveFailures = 0;
-  bool bPollingStopped = false;
+  std::atomic<bool> bReadyEmitted{false};
+  std::atomic<bool> bFetchedFromServer{false};
+  std::atomic<bool> bIsFetching{false};
+  std::atomic<bool> bPendingSync{false};
+  std::atomic<bool> bStarted{false};
+  FThreadSafeCounter ConsecutiveFailures;
+  std::atomic<bool> bPollingStopped{false};
 
   // ETag for conditional requests
   FString Etag;
 
-  // Statistics (atomic or protected by lock)
-  mutable FCriticalSection StatsCriticalSection;
-  int32 FetchFlagsCount = 0;
-  int32 UpdateCount = 0;
-  int32 NotModifiedCount = 0;
-  int32 RecoveryCount = 0;
-  int32 SyncFlagsCount = 0;
-  int32 ImpressionCount = 0;
-  int32 ContextChangeCount = 0;
-  int32 MetricsSentCount = 0;
-  int32 MetricsErrorCount = 0;
+  // Statistics (lock-free via FThreadSafeCounter)
+  FThreadSafeCounter FetchFlagsCount;
+  FThreadSafeCounter UpdateCount;
+  FThreadSafeCounter NotModifiedCount;
+  FThreadSafeCounter RecoveryCount;
+  FThreadSafeCounter SyncFlagsCount;
+  FThreadSafeCounter ImpressionCount;
+  FThreadSafeCounter ContextChangeCount;
+  FThreadSafeCounter MetricsSentCount;
+  FThreadSafeCounter MetricsErrorCount;
 
   // Metrics tracking
   struct FFlagMetrics {
@@ -448,6 +493,7 @@ private:
   mutable FCriticalSection MetricsCriticalSection;
   TMap<FString, FFlagMetrics> MetricsFlagBucket;
   TMap<FString, int32> MetricsMissingFlags;
+  FDateTime MetricsBucketStartTime = FDateTime::UtcNow();
 
   // Polling timer
   FTimerHandle PollTimerHandle;
@@ -469,4 +515,19 @@ private:
   TArray<FWatchCallbackEntry> WatchCallbacks;
   TArray<FWatchCallbackEntry> SyncedWatchCallbacks;
   int32 NextWatchHandle = 1;
+
+  // Streaming state
+  TUniquePtr<FGatrixSseConnection> SseConnection;
+  TUniquePtr<FGatrixWebSocketConnection> WebSocketConnection;
+  EGatrixStreamingConnectionState StreamingState =
+      EGatrixStreamingConnectionState::Disconnected;
+  int32 StreamingReconnectAttempt = 0;
+  int32 StreamingReconnectCount = 0;
+  int32 StreamingEventCount = 0;
+  int32 StreamingErrorCount = 0;
+  int32 StreamingRecoveryCount = 0;
+  int64 LocalGlobalRevision = 0;
+  TSet<FString> PendingInvalidationKeys;
+  bool bStreamingFetching = false;
+  FTimerHandle StreamingReconnectTimerHandle;
 };

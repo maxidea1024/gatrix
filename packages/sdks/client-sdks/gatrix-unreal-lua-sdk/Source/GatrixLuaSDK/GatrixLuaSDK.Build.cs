@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class GatrixSDK : ModuleRules
+public class GatrixLuaSDK : ModuleRules
 {
-    public GatrixSDK(ReadOnlyTargetRules Target) : base(Target)
+    public GatrixLuaSDK(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -13,10 +13,8 @@ public class GatrixSDK : ModuleRules
             "Core",
             "CoreUObject",
             "Engine",
-            "HTTP",
-            "Json",
-            "JsonUtilities",
-            "WebSockets"
+            "GatrixSDK",
+            "Lua"
         });
     }
 }

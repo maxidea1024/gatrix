@@ -195,10 +195,22 @@ FString UGatrixClient::StringVariation(const FString &FlagName,
              : DefaultValue;
 }
 
-float UGatrixClient::NumberVariation(const FString &FlagName,
-                                     float DefaultValue) const {
+int32 UGatrixClient::IntVariation(const FString &FlagName,
+                                  int32 DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->IntVariation(FlagName, DefaultValue)
+                        : DefaultValue;
+}
+
+float UGatrixClient::FloatVariation(const FString &FlagName,
+                                    float DefaultValue) const {
+  return FeaturesClient ? FeaturesClient->FloatVariation(FlagName, DefaultValue)
+                        : DefaultValue;
+}
+
+double UGatrixClient::DoubleVariation(const FString &FlagName,
+                                      double DefaultValue) const {
   return FeaturesClient
-             ? FeaturesClient->NumberVariation(FlagName, DefaultValue)
+             ? FeaturesClient->DoubleVariation(FlagName, DefaultValue)
              : DefaultValue;
 }
 

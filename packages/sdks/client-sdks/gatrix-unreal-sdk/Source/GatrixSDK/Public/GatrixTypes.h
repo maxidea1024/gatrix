@@ -200,6 +200,85 @@ struct GATRIXSDK_API FGatrixFetchRetryOptions {
   int32 MaxBackoffMs = 60000;
 };
 
+/** Streaming transport type */
+UENUM(BlueprintType)
+enum class EGatrixStreamingTransport : uint8 {
+  Sse UMETA(DisplayName = "SSE"),
+  WebSocket UMETA(DisplayName = "WebSocket")
+};
+
+/** Streaming connection state */
+UENUM(BlueprintType)
+enum class EGatrixStreamingConnectionState : uint8 {
+  Disconnected UMETA(DisplayName = "Disconnected"),
+  Connecting UMETA(DisplayName = "Connecting"),
+  Connected UMETA(DisplayName = "Connected"),
+  Reconnecting UMETA(DisplayName = "Reconnecting"),
+  Degraded UMETA(DisplayName = "Degraded")
+};
+
+/** SSE streaming configuration */
+USTRUCT(BlueprintType)
+struct GATRIXSDK_API FGatrixSseStreamingConfig {
+  GENERATED_BODY()
+
+  /** SSE endpoint URL override (default: derived from ApiUrl) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FString Url;
+
+  /** Reconnect initial delay in seconds (default: 1) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 ReconnectBase = 1;
+
+  /** Reconnect max delay in seconds (default: 30) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 ReconnectMax = 30;
+};
+
+/** WebSocket streaming configuration */
+USTRUCT(BlueprintType)
+struct GATRIXSDK_API FGatrixWebSocketStreamingConfig {
+  GENERATED_BODY()
+
+  /** WebSocket endpoint URL override (default: derived from ApiUrl) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FString Url;
+
+  /** Reconnect initial delay in seconds (default: 1) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 ReconnectBase = 1;
+
+  /** Reconnect max delay in seconds (default: 30) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 ReconnectMax = 30;
+
+  /** Client-side ping interval in seconds (default: 30) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  int32 PingInterval = 30;
+};
+
+/** Streaming configuration */
+USTRUCT(BlueprintType)
+struct GATRIXSDK_API FGatrixStreamingConfig {
+  GENERATED_BODY()
+
+  /** Enable streaming (default: true) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  bool bEnabled = true;
+
+  /** Transport type: SSE or WebSocket (default: SSE) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  EGatrixStreamingTransport Transport = EGatrixStreamingTransport::Sse;
+
+  /** SSE-specific configuration */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FGatrixSseStreamingConfig Sse;
+
+  /** WebSocket-specific configuration */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FGatrixWebSocketStreamingConfig WebSocket;
+};
+
 /** Feature flags configuration */
 USTRUCT(BlueprintType)
 struct GATRIXSDK_API FGatrixFeaturesConfig {
@@ -248,6 +327,10 @@ struct GATRIXSDK_API FGatrixFeaturesConfig {
   /** Disable local statistics tracking */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   bool bDisableStats = false;
+
+  /** Streaming configuration */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FGatrixStreamingConfig Streaming;
 };
 
 /** SDK Configuration */
@@ -337,6 +420,30 @@ struct GATRIXSDK_API FGatrixFeaturesStats {
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
   FString Etag;
+
+  // ==================== Streaming Stats ====================
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  bool bStreamingEnabled = false;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  EGatrixStreamingConnectionState StreamingState =
+      EGatrixStreamingConnectionState::Disconnected;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  EGatrixStreamingTransport StreamingTransport = EGatrixStreamingTransport::Sse;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  int32 StreamingReconnectCount = 0;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  int32 StreamingEventCount = 0;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  int32 StreamingErrorCount = 0;
+
+  UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
+  int32 StreamingRecoveryCount = 0;
 };
 
 /** Overall SDK statistics */

@@ -4,7 +4,8 @@ Client SDK for the Gatrix platform in Unreal Engine 4.27+.
 
 ## Features
 
-- **Feature Flags**: Real-time flag evaluation with polling
+- **Feature Flags**: Real-time flag evaluation with polling and streaming
+- **Streaming**: SSE and WebSocket real-time flag invalidation with auto-reconnect
 - **Variations**: Bool, String, Float, Int, Double, JSON variation methods
 - **Context**: Dynamic evaluation context with custom properties
 - **ETag Caching**: Conditional requests to minimize bandwidth
@@ -13,7 +14,7 @@ Client SDK for the Gatrix platform in Unreal Engine 4.27+.
 - **Metrics**: Automatic usage statistics reporting
 - **Impressions**: Track flag access events
 - **Blueprint Support**: Full Blueprint integration via UCLASS/USTRUCT/UFUNCTION
-- **Thread Safe**: FCriticalSection protection on all shared data
+- **Thread Safe**: Lock-free counters, atomic booleans, FCriticalSection on shared maps
 
 ## Installation
 
@@ -89,6 +90,47 @@ Client->UpdateContext(NewContext);
 Client->Stop();
 ```
 
+### Streaming Configuration
+
+Enable SSE or WebSocket streaming for near-instant flag updates:
+
+```cpp
+// SSE streaming (default)
+Config.Features.Streaming.bEnabled = true;
+Config.Features.Streaming.Transport = EGatrixStreamingTransport::Sse;
+Config.Features.Streaming.Sse.ReconnectBase = 1;  // seconds
+Config.Features.Streaming.Sse.ReconnectMax = 30;   // seconds
+
+// Or WebSocket streaming
+Config.Features.Streaming.Transport = EGatrixStreamingTransport::WebSocket;
+Config.Features.Streaming.WebSocket.PingInterval = 30;   // seconds
+Config.Features.Streaming.WebSocket.ReconnectBase = 1;
+Config.Features.Streaming.WebSocket.ReconnectMax = 30;
+
+// Custom streaming URL (optional, auto-derived from ApiUrl by default)
+Config.Features.Streaming.Sse.Url = TEXT("https://example.com/streaming/sse");
+
+// Listen for streaming events
+Client->On(GatrixEvents::FlagsStreamingConnected, [](const TArray<FString>& Args)
+{
+    UE_LOG(LogTemp, Log, TEXT("Streaming connected!"));
+});
+
+Client->On(GatrixEvents::FlagsStreamingError, [](const TArray<FString>& Args)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Streaming error: %s"),
+           Args.Num() > 0 ? *Args[0] : TEXT("unknown"));
+});
+```
+
+### POST Method for Flag Fetching
+
+Use POST requests to send context in the request body (for large contexts):
+
+```cpp
+Config.Features.bUsePOSTRequests = true;
+```
+
 ## Quick Start (Blueprint)
 
 1. Use **"Get Gatrix Client"** node to get the singleton
@@ -117,18 +159,25 @@ UGatrixClient (Singleton)
 └── UGatrixFeaturesClient
     ├── HTTP Fetching (FHttpModule + ETag)
     ├── Flag Storage (FCriticalSection protected)
-    ├── Polling (UWorld TimerManager)
-    ├── Metrics (batched POST)
+    ├── Polling (UWorld TimerManager + jitter)
+    ├── Streaming
+    │   ├── FGatrixSseConnection (SSE via FHttpModule progress)
+    │   ├── FGatrixWebSocketConnection (IWebSocket + ping/pong)
+    │   ├── Gap Recovery (globalRevision tracking)
+    │   └── Auto-Reconnect (exponential backoff + jitter)
+    ├── Metrics (batched POST with retry)
     ├── Watch Pattern (per-flag events)
     └── Blueprint Delegates
 ```
 
 ## Thread Safety
 
-- All flag read/write operations are protected by `FCriticalSection`
+- Flag read/write operations are protected by `FCriticalSection`
+- Statistics counters use lock-free `FThreadSafeCounter` (no lock contention)
+- Boolean state flags use `std::atomic<bool>` for lock-free access
 - HTTP callbacks are handled on the game thread (UE4 FHttpModule behavior)
+- Streaming callbacks are dispatched to game thread via `AsyncTask`
 - Event emission collects callbacks under lock, then invokes outside lock to prevent deadlocks
-- Statistics counters are protected by a separate `FCriticalSection`
 - Storage provider (InMemory) uses its own `FCriticalSection`
 
 ## Event Constants
@@ -150,6 +199,11 @@ All events use the `flags.` prefix namespace:
 | `GatrixEvents::FlagsRecovered` | `flags.recovered` |
 | `GatrixEvents::FlagsMetricsSent` | `flags.metrics_sent` |
 | `GatrixEvents::FlagsMetricsError` | `flags.metrics_error` |
+| `GatrixEvents::FlagsStreamingConnected` | `flags.streaming_connected` |
+| `GatrixEvents::FlagsStreamingDisconnected` | `flags.streaming_disconnected` |
+| `GatrixEvents::FlagsStreamingError` | `flags.streaming_error` |
+| `GatrixEvents::FlagsStreamingReconnecting` | `flags.streaming_reconnecting` |
+| `GatrixEvents::FlagsInvalidated` | `flags.invalidated` |
 
 ## Configuration
 
@@ -165,6 +219,15 @@ All events use the `flags.` prefix namespace:
 | `Features.bExplicitSyncMode` | bool | false | Manual flag sync |
 | `Features.bDisableMetrics` | bool | false | Disable metrics |
 | `Features.bUsePOSTRequests` | bool | false | Use POST for fetching |
+| `Features.Streaming.bEnabled` | bool | false | Enable streaming |
+| `Features.Streaming.Transport` | enum | Sse | SSE or WebSocket |
+| `Features.Streaming.Sse.Url` | FString | auto | Custom SSE endpoint |
+| `Features.Streaming.Sse.ReconnectBase` | int32 | 1 | Base reconnect delay (s) |
+| `Features.Streaming.Sse.ReconnectMax` | int32 | 30 | Max reconnect delay (s) |
+| `Features.Streaming.WebSocket.Url` | FString | auto | Custom WS endpoint |
+| `Features.Streaming.WebSocket.PingInterval` | int32 | 30 | Ping interval (s) |
+| `Features.Streaming.WebSocket.ReconnectBase` | int32 | 1 | Base reconnect delay (s) |
+| `Features.Streaming.WebSocket.ReconnectMax` | int32 | 30 | Max reconnect delay (s) |
 
 ## License
 

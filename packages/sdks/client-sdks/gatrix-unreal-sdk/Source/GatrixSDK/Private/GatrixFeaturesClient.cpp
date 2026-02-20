@@ -55,7 +55,7 @@ void UGatrixFeaturesClient::Start() {
   if (bStarted)
     return;
   bStarted = true;
-  ConsecutiveFailures = 0;
+  ConsecutiveFailures.Reset();
   bPollingStopped = false;
 
   if (ClientConfig.bEnableDevMode) {
@@ -92,6 +92,11 @@ void UGatrixFeaturesClient::Start() {
   if (!ClientConfig.Features.bDisableMetrics) {
     StartMetrics();
   }
+
+  // Start streaming if enabled
+  if (ClientConfig.Features.Streaming.bEnabled && !ClientConfig.bOfflineMode) {
+    ConnectStreaming();
+  }
 }
 
 void UGatrixFeaturesClient::Stop() {
@@ -100,9 +105,10 @@ void UGatrixFeaturesClient::Stop() {
   }
   bStarted = false;
   bPollingStopped = true;
-  ConsecutiveFailures = 0;
+  ConsecutiveFailures.Reset();
   StopPolling();
   StopMetrics();
+  DisconnectStreaming();
 }
 
 // ==================== Flag Access (Thread-Safe) ====================
@@ -165,6 +171,13 @@ TArray<FGatrixEvaluatedFlag> UGatrixFeaturesClient::GetAllFlags() const {
 }
 
 // ==================== Variation Methods ====================
+
+FString UGatrixFeaturesClient::Variation(const FString &FlagName,
+                                         const FString &FallbackValue,
+                                         bool bForceRealtime) const {
+  return const_cast<UGatrixFeaturesClient *>(this)->VariationInternal(
+      FlagName, FallbackValue, bForceRealtime);
+}
 
 bool UGatrixFeaturesClient::BoolVariation(const FString &FlagName,
                                           bool FallbackValue,
@@ -292,10 +305,7 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext &NewContext) {
 
   ClientConfig.Context = MergedContext;
 
-  {
-    FScopeLock Lock(&StatsCriticalSection);
-    ContextChangeCount++;
-  }
+  ContextChangeCount.Increment();
 
   // Re-fetch with new context
   if (bStarted && !ClientConfig.bOfflineMode) {
@@ -326,10 +336,7 @@ void UGatrixFeaturesClient::SyncFlags(bool bFetchNow) {
                          /*bForceRealtime=*/false);
   }
 
-  {
-    FScopeLock Lock(&StatsCriticalSection);
-    SyncFlagsCount++;
-  }
+  SyncFlagsCount.Increment();
 
   bPendingSync = false;
   if (EventEmitter) {
@@ -384,10 +391,7 @@ void UGatrixFeaturesClient::FetchFlags() {
 }
 
 void UGatrixFeaturesClient::DoFetchFlags() {
-  {
-    FScopeLock Lock(&StatsCriticalSection);
-    FetchFlagsCount++;
-  }
+  FetchFlagsCount.Increment();
 
   FString Url = BuildFetchUrl();
   bool bUsePOST = ClientConfig.Features.bUsePOSTRequests;
@@ -450,7 +454,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
 
           SdkState = EGatrixSdkState::Error;
           // Network error: schedule with backoff
-          ConsecutiveFailures++;
+          ConsecutiveFailures.Increment();
           ScheduleNextPoll();
           return;
         }
@@ -477,10 +481,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
   // Check for recovery from error state
   if (SdkState == EGatrixSdkState::Error && HttpStatus < 400) {
     SdkState = EGatrixSdkState::Healthy;
-    {
-      FScopeLock Lock(&StatsCriticalSection);
-      RecoveryCount++;
-    }
+    RecoveryCount.Increment();
     if (EventEmitter) {
       EventEmitter->Emit(GatrixEvents::FlagsRecovered);
     }
@@ -598,10 +599,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     bool bIsInitialFetch = !bFetchedFromServer;
     StoreFlags(ParsedFlags, bIsInitialFetch);
 
-    {
-      FScopeLock Lock(&StatsCriticalSection);
-      UpdateCount++;
-    }
+    UpdateCount.Increment();
 
     if (!bFetchedFromServer) {
       bFetchedFromServer = true;
@@ -613,14 +611,11 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     }
 
     // Success: reset failure counter and schedule at normal interval
-    ConsecutiveFailures = 0;
+    ConsecutiveFailures.Reset();
     ScheduleNextPoll();
   } else if (HttpStatus == 304) {
     // Not Modified
-    {
-      FScopeLock Lock(&StatsCriticalSection);
-      NotModifiedCount++;
-    }
+    NotModifiedCount.Increment();
 
     if (!bFetchedFromServer) {
       bFetchedFromServer = true;
@@ -632,7 +627,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
     }
 
     // 304: reset failure counter and schedule at normal interval
-    ConsecutiveFailures = 0;
+    ConsecutiveFailures.Reset();
     ScheduleNextPoll();
   } else {
     // Error response
@@ -663,7 +658,7 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString &ResponseBody,
              HttpStatus);
     } else {
       // Retryable error: schedule with backoff
-      ConsecutiveFailures++;
+      ConsecutiveFailures.Increment();
       ScheduleNextPoll();
     }
   }
@@ -897,10 +892,7 @@ void UGatrixFeaturesClient::TrackImpression(const FString &FlagName,
   Event.bImpressionData = true;
   Event.VariantName = VariantName;
 
-  {
-    FScopeLock Lock(&StatsCriticalSection);
-    ImpressionCount++;
-  }
+  ImpressionCount.Increment();
 
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsImpression, FlagName);
@@ -964,6 +956,57 @@ int32 UGatrixFeaturesClient::WatchSyncedFlag(const FString &FlagName,
   return Entry.Handle;
 }
 
+int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(
+    const FString &FlagName, FGatrixFlagWatchDelegate Callback,
+    const FString &Name) {
+  int32 Handle = WatchRealtimeFlag(FlagName, Callback, Name);
+
+  // Emit initial state — always use realtimeFlags for realtime watchers
+  if (bReadyEmitted) {
+    UGatrixFlagProxy *Proxy = CreateProxy(FlagName, /*bForceRealtime=*/true);
+    Callback.ExecuteIfBound(Proxy);
+  } else if (EventEmitter) {
+    // Capture by value for safe deferred invocation
+    FString CapturedFlagName = FlagName;
+    FGatrixFlagWatchDelegate CapturedCallback = Callback;
+    EventEmitter->Once(
+        GatrixEvents::FlagsReady,
+        [this, CapturedFlagName, CapturedCallback](const TArray<FString> &) {
+          UGatrixFlagProxy *Proxy =
+              CreateProxy(CapturedFlagName, /*bForceRealtime=*/true);
+          CapturedCallback.ExecuteIfBound(Proxy);
+        },
+        Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
+  }
+
+  return Handle;
+}
+
+int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(
+    const FString &FlagName, FGatrixFlagWatchDelegate Callback,
+    const FString &Name) {
+  int32 Handle = WatchSyncedFlag(FlagName, Callback, Name);
+
+  // Emit initial state — respect explicitSyncMode for synced watchers
+  if (bReadyEmitted) {
+    UGatrixFlagProxy *Proxy = CreateProxy(FlagName, /*bForceRealtime=*/false);
+    Callback.ExecuteIfBound(Proxy);
+  } else if (EventEmitter) {
+    FString CapturedFlagName = FlagName;
+    FGatrixFlagWatchDelegate CapturedCallback = Callback;
+    EventEmitter->Once(
+        GatrixEvents::FlagsReady,
+        [this, CapturedFlagName, CapturedCallback](const TArray<FString> &) {
+          UGatrixFlagProxy *Proxy =
+              CreateProxy(CapturedFlagName, /*bForceRealtime=*/false);
+          CapturedCallback.ExecuteIfBound(Proxy);
+        },
+        Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
+  }
+
+  return Handle;
+}
+
 void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
   WatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
     return Entry.Handle == Handle;
@@ -971,6 +1014,11 @@ void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
   SyncedWatchCallbacks.RemoveAll([Handle](const FWatchCallbackEntry &Entry) {
     return Entry.Handle == Handle;
   });
+}
+
+FGatrixWatchFlagGroup *
+UGatrixFeaturesClient::CreateWatchGroup(const FString &Name) {
+  return new FGatrixWatchFlagGroup(this, Name);
 }
 
 // ==================== Metadata Access Internal Methods ====================
@@ -1079,27 +1127,32 @@ void UGatrixFeaturesClient::ScheduleNextPoll() {
     Interval = 30.0f;
 
   // Apply exponential backoff on consecutive failures
-  if (ConsecutiveFailures > 0) {
+  if (ConsecutiveFailures.GetValue() > 0) {
     int32 InitialBackoff =
         ClientConfig.Features.FetchRetryOptions.InitialBackoffMs;
     int32 MaxBackoff = ClientConfig.Features.FetchRetryOptions.MaxBackoffMs;
     int32 BackoffMs = FMath::Min(
         static_cast<int32>(
             InitialBackoff *
-            FMath::Pow(2.0f, static_cast<float>(ConsecutiveFailures - 1))),
+            FMath::Pow(2.0f,
+                       static_cast<float>(ConsecutiveFailures.GetValue() - 1))),
         MaxBackoff);
     Interval = static_cast<float>(BackoffMs) / 1000.0f;
     UE_LOG(LogGatrix, Warning,
            TEXT("Scheduling retry after %.1fs (consecutive "
                 "failures: %d)"),
-           Interval, ConsecutiveFailures);
+           Interval, ConsecutiveFailures.GetValue());
+  } else {
+    // Add jitter (+/-10%) to prevent thundering herd
+    const float JitterRange = Interval * 0.1f;
+    Interval += FMath::FRandRange(-JitterRange, JitterRange);
   }
 
   if (ClientConfig.bEnableDevMode) {
     UE_LOG(LogGatrix, Log,
            TEXT("[DEV] ScheduleNextPoll: delay=%.1fs, "
                 "consecutiveFailures=%d, pollingStopped=%s"),
-           Interval, ConsecutiveFailures,
+           Interval, ConsecutiveFailures.GetValue(),
            bPollingStopped ? TEXT("True") : TEXT("False"));
   }
 
@@ -1242,10 +1295,7 @@ void UGatrixFeaturesClient::SendMetrics() {
                                                     bool bWasSuccessful) {
         if (bWasSuccessful && Response.IsValid() &&
             Response->GetResponseCode() < 400) {
-          {
-            FScopeLock Lock(&StatsCriticalSection);
-            MetricsSentCount++;
-          }
+          MetricsSentCount.Increment();
           if (EventEmitter) {
             EventEmitter->Emit(GatrixEvents::FlagsMetricsSent);
           }
@@ -1260,21 +1310,25 @@ void UGatrixFeaturesClient::SendMetrics() {
             (*RetryCount)++;
             const float Delay = FMath::Pow(2.0f, (float)*RetryCount);
 
-            FTimerHandle TimerHandle;
-            GetWorld()->GetTimerManager().SetTimer(
-                TimerHandle,
-                [DoSendMetrics]() {
-                  auto Req = DoSendMetrics();
-                  Req->ProcessRequest();
-                },
-                Delay, false);
-            return;
+            UWorld *RetryWorld = nullptr;
+            if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
+              RetryWorld = GEngine->GetWorldContexts()[0].World();
+            }
+            if (RetryWorld) {
+              FTimerHandle TimerHandle;
+              RetryWorld->GetTimerManager().SetTimer(
+                  TimerHandle,
+                  FTimerDelegate::CreateWeakLambda(this,
+                                                   [DoSendMetrics]() {
+                                                     auto Req = DoSendMetrics();
+                                                     Req->ProcessRequest();
+                                                   }),
+                  Delay, false);
+              return;
+            }
           }
 
-          {
-            FScopeLock Lock(&StatsCriticalSection);
-            MetricsErrorCount++;
-          }
+          MetricsErrorCount.Increment();
           if (EventEmitter) {
             EventEmitter->Emit(GatrixEvents::FlagsMetricsError);
           }
@@ -1296,6 +1350,7 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
     // Clear after reading
     const_cast<TMap<FString, FFlagMetrics> &>(MetricsFlagBucket).Empty();
     const_cast<TMap<FString, int32> &>(MetricsMissingFlags).Empty();
+    const_cast<FDateTime &>(MetricsBucketStartTime) = FDateTime::UtcNow();
   }
 
   if (BucketCopy.Num() == 0 && MissingCopy.Num() == 0) {
@@ -1313,11 +1368,8 @@ void UGatrixFeaturesClient::BuildMetricsPayload(FString &OutJson) const {
 
   Writer->WriteObjectStart(TEXT("bucket"));
 
-  // Track start/stop if we had timestamps, otherwise omit or use current
-  // For now, simpler:
-  Writer->WriteValue(
-      TEXT("stop"),
-      FDateTime::UtcNow().ToIso8601()); // SDK usually does this on send
+  Writer->WriteValue(TEXT("start"), MetricsBucketStartTime.ToIso8601());
+  Writer->WriteValue(TEXT("stop"), FDateTime::UtcNow().ToIso8601());
 
   // Flag access counts
   Writer->WriteObjectStart(TEXT("flags"));
@@ -1426,20 +1478,27 @@ FString UGatrixFeaturesClient::ContextToJson() const {
 // ==================== Statistics ====================
 
 FGatrixFeaturesStats UGatrixFeaturesClient::GetStats() const {
-  FScopeLock Lock(&StatsCriticalSection);
-
   FGatrixFeaturesStats Stats;
   Stats.TotalFlagCount = RealtimeFlags.Num();
-  Stats.FetchFlagsCount = FetchFlagsCount;
-  Stats.UpdateCount = UpdateCount;
-  Stats.NotModifiedCount = NotModifiedCount;
-  Stats.RecoveryCount = RecoveryCount;
-  Stats.SyncFlagsCount = SyncFlagsCount;
-  Stats.ImpressionCount = ImpressionCount;
-  Stats.ContextChangeCount = ContextChangeCount;
-  Stats.MetricsSentCount = MetricsSentCount;
-  Stats.MetricsErrorCount = MetricsErrorCount;
+  Stats.FetchFlagsCount = FetchFlagsCount.GetValue();
+  Stats.UpdateCount = UpdateCount.GetValue();
+  Stats.NotModifiedCount = NotModifiedCount.GetValue();
+  Stats.RecoveryCount = RecoveryCount.GetValue();
+  Stats.SyncFlagsCount = SyncFlagsCount.GetValue();
+  Stats.ImpressionCount = ImpressionCount.GetValue();
+  Stats.ContextChangeCount = ContextChangeCount.GetValue();
+  Stats.MetricsSentCount = MetricsSentCount.GetValue();
+  Stats.MetricsErrorCount = MetricsErrorCount.GetValue();
   Stats.Etag = Etag;
+
+  // Streaming stats
+  Stats.bStreamingEnabled = ClientConfig.Features.Streaming.bEnabled;
+  Stats.StreamingState = StreamingState;
+  Stats.StreamingTransport = ClientConfig.Features.Streaming.Transport;
+  Stats.StreamingReconnectCount = StreamingReconnectCount;
+  Stats.StreamingEventCount = StreamingEventCount;
+  Stats.StreamingErrorCount = StreamingErrorCount;
+  Stats.StreamingRecoveryCount = StreamingRecoveryCount;
 
   return Stats;
 }
@@ -1746,4 +1805,414 @@ UGatrixFeaturesClient::JsonVariationOrThrowInternal(const FString &FlagName,
   if (!Found)
     throw TEXT("Flag not found");
   return JsonVariationInternal(FlagName, TEXT(""), bForceRealtime);
+}
+
+// ==================== Streaming ====================
+
+void UGatrixFeaturesClient::ConnectStreaming() {
+  DisconnectStreaming();
+
+  const FGatrixStreamingConfig &StreamConfig = ClientConfig.Features.Streaming;
+
+  if (!StreamConfig.bEnabled || ClientConfig.bOfflineMode) {
+    return;
+  }
+
+  SetStreamingState(EGatrixStreamingConnectionState::Connecting);
+
+  FString Url = BuildStreamingUrl();
+  TMap<FString, FString> Headers;
+  Headers.Add(TEXT("X-API-Token"), ClientConfig.ApiToken);
+  Headers.Add(TEXT("X-Application-Name"), ClientConfig.AppName);
+  Headers.Add(TEXT("X-Connection-Id"), ConnectionId);
+  Headers.Add(TEXT("X-SDK-Version"),
+              FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName,
+                              *UGatrixClient::SdkVersion));
+  for (const auto &Header : ClientConfig.CustomHeaders) {
+    Headers.Add(Header.Key, Header.Value);
+  }
+
+  if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
+    // WebSocket transport
+    WebSocketConnection = MakeUnique<FGatrixWebSocketConnection>();
+
+    WebSocketConnection->OnConnected.BindLambda([this]() {
+      AsyncTask(ENamedThreads::GameThread, [this]() {
+        SetStreamingState(EGatrixStreamingConnectionState::Connected);
+        StreamingReconnectAttempt = 0;
+        if (EventEmitter) {
+          EventEmitter->Emit(GatrixEvents::FlagsStreamingConnected);
+        }
+      });
+    });
+
+    WebSocketConnection->OnEvent.BindLambda(
+        [this](const FString &EventType, const FString &EventData) {
+          AsyncTask(ENamedThreads::GameThread, [this, EventType, EventData]() {
+            ProcessStreamingEvent(EventType, EventData);
+          });
+        });
+
+    WebSocketConnection->OnError.BindLambda([this](const FString &ErrorMsg) {
+      AsyncTask(ENamedThreads::GameThread, [this, ErrorMsg]() {
+        StreamingErrorCount++;
+        if (EventEmitter) {
+          EventEmitter->Emit(GatrixEvents::FlagsStreamingError, ErrorMsg);
+        }
+      });
+    });
+
+    WebSocketConnection->OnDisconnected.BindLambda([this]() {
+      AsyncTask(ENamedThreads::GameThread, [this]() {
+        if (bStarted && ClientConfig.Features.Streaming.bEnabled) {
+          ScheduleStreamingReconnect();
+        } else {
+          SetStreamingState(EGatrixStreamingConnectionState::Disconnected);
+          if (EventEmitter) {
+            EventEmitter->Emit(GatrixEvents::FlagsStreamingDisconnected);
+          }
+        }
+      });
+    });
+
+    WebSocketConnection->Connect(Url, Headers,
+                                 StreamConfig.WebSocket.PingInterval);
+
+  } else {
+    // SSE transport (default)
+    SseConnection = MakeUnique<FGatrixSseConnection>();
+
+    SseConnection->OnConnected.BindLambda([this]() {
+      AsyncTask(ENamedThreads::GameThread, [this]() {
+        SetStreamingState(EGatrixStreamingConnectionState::Connected);
+        StreamingReconnectAttempt = 0;
+        if (EventEmitter) {
+          EventEmitter->Emit(GatrixEvents::FlagsStreamingConnected);
+        }
+      });
+    });
+
+    SseConnection->OnEvent.BindLambda(
+        [this](const FString &EventType, const FString &EventData) {
+          AsyncTask(ENamedThreads::GameThread, [this, EventType, EventData]() {
+            ProcessStreamingEvent(EventType, EventData);
+          });
+        });
+
+    SseConnection->OnError.BindLambda([this](const FString &ErrorMsg) {
+      AsyncTask(ENamedThreads::GameThread, [this, ErrorMsg]() {
+        StreamingErrorCount++;
+        if (EventEmitter) {
+          EventEmitter->Emit(GatrixEvents::FlagsStreamingError, ErrorMsg);
+        }
+      });
+    });
+
+    SseConnection->OnDisconnected.BindLambda([this]() {
+      AsyncTask(ENamedThreads::GameThread, [this]() {
+        if (bStarted && ClientConfig.Features.Streaming.bEnabled) {
+          ScheduleStreamingReconnect();
+        } else {
+          SetStreamingState(EGatrixStreamingConnectionState::Disconnected);
+          if (EventEmitter) {
+            EventEmitter->Emit(GatrixEvents::FlagsStreamingDisconnected);
+          }
+        }
+      });
+    });
+
+    SseConnection->Connect(Url, Headers);
+  }
+
+  UE_LOG(LogGatrix, Log, TEXT("Streaming: Connecting via %s to %s"),
+         StreamConfig.Transport == EGatrixStreamingTransport::WebSocket
+             ? TEXT("WebSocket")
+             : TEXT("SSE"),
+         *Url);
+}
+
+void UGatrixFeaturesClient::DisconnectStreaming() {
+  // Cancel reconnect timer
+  UWorld *World = nullptr;
+  if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
+    World = GEngine->GetWorldContexts()[0].World();
+  }
+  if (World) {
+    World->GetTimerManager().ClearTimer(StreamingReconnectTimerHandle);
+  }
+
+  if (SseConnection.IsValid()) {
+    SseConnection->Disconnect();
+    SseConnection.Reset();
+  }
+
+  if (WebSocketConnection.IsValid()) {
+    WebSocketConnection->Disconnect();
+    WebSocketConnection.Reset();
+  }
+
+  SetStreamingState(EGatrixStreamingConnectionState::Disconnected);
+  StreamingReconnectAttempt = 0;
+}
+
+void UGatrixFeaturesClient::ProcessStreamingEvent(const FString &EventType,
+                                                  const FString &EventData) {
+  StreamingEventCount++;
+
+  if (EventType == TEXT("connected")) {
+    // Server acknowledged connection, extract connectionId if present
+    TSharedPtr<FJsonObject> JsonObject;
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(EventData);
+    if (FJsonSerializer::Deserialize(Reader, JsonObject) &&
+        JsonObject.IsValid()) {
+      FString ServerConnectionId;
+      if (JsonObject->TryGetStringField(TEXT("connectionId"),
+                                        ServerConnectionId)) {
+        UE_LOG(LogGatrix, Log, TEXT("Streaming: Server connectionId=%s"),
+               *ServerConnectionId);
+      }
+    }
+  } else if (EventType == TEXT("flags_changed") ||
+             EventType == TEXT("invalidate")) {
+    // Parse changed flag keys
+    TSharedPtr<FJsonObject> JsonObject;
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(EventData);
+    if (FJsonSerializer::Deserialize(Reader, JsonObject) &&
+        JsonObject.IsValid()) {
+      TArray<FString> ChangedKeys;
+
+      // Check for globalRevision for gap detection
+      int64 ServerRevision = 0;
+      if (JsonObject->TryGetNumberField(TEXT("globalRevision"),
+                                        ServerRevision)) {
+        if (LocalGlobalRevision > 0 &&
+            ServerRevision > LocalGlobalRevision + 1) {
+          UE_LOG(LogGatrix, Warning,
+                 TEXT("Streaming: Gap detected (local=%lld, server=%lld), "
+                      "doing full fetch"),
+                 LocalGlobalRevision, ServerRevision);
+          StreamingRecoveryCount++;
+          FetchFlags();
+          LocalGlobalRevision = ServerRevision;
+          return;
+        }
+        LocalGlobalRevision = ServerRevision;
+      }
+
+      // Get changed keys
+      const TArray<TSharedPtr<FJsonValue>> *KeysArray;
+      if (JsonObject->TryGetArrayField(TEXT("keys"), KeysArray)) {
+        for (const auto &KeyVal : *KeysArray) {
+          FString Key;
+          if (KeyVal->TryGetString(Key)) {
+            ChangedKeys.Add(Key);
+          }
+        }
+      }
+
+      if (ChangedKeys.Num() > 0) {
+        HandleStreamingInvalidation(ChangedKeys);
+      } else {
+        // No specific keys, do a full fetch
+        FetchFlags();
+      }
+    }
+  } else if (EventType == TEXT("heartbeat") || EventType == TEXT("ping")) {
+    // Heartbeat received, connection is alive
+    UE_LOG(LogGatrix, Verbose, TEXT("Streaming: Heartbeat received"));
+  }
+
+  if (EventEmitter) {
+    EventEmitter->Emit(GatrixEvents::FlagsInvalidated, EventType);
+  }
+}
+
+void UGatrixFeaturesClient::HandleStreamingInvalidation(
+    const TArray<FString> &ChangedKeys) {
+  if (ChangedKeys.Num() == 0) {
+    FetchFlags();
+    return;
+  }
+
+  // If already fetching, queue the keys for later
+  if (bStreamingFetching) {
+    for (const FString &Key : ChangedKeys) {
+      PendingInvalidationKeys.Add(Key);
+    }
+    return;
+  }
+
+  // Do partial fetch for affected keys
+  FetchPartialFlags(ChangedKeys);
+}
+
+void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString> &FlagKeys) {
+  if (FlagKeys.Num() == 0) {
+    return;
+  }
+
+  bStreamingFetching = true;
+
+  // Build URL with specific flag keys
+  FString BaseUrl = BuildFetchUrl();
+
+  // Add flagKeys parameter
+  FString KeysParam;
+  for (int32 i = 0; i < FlagKeys.Num(); ++i) {
+    if (i > 0)
+      KeysParam += TEXT(",");
+    KeysParam += FGenericPlatformHttp::UrlEncode(FlagKeys[i]);
+  }
+  BaseUrl += FString::Printf(TEXT("&flagKeys=%s"), *KeysParam);
+
+  TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest =
+      FHttpModule::Get().CreateRequest();
+  HttpRequest->SetURL(BaseUrl);
+  HttpRequest->SetVerb(TEXT("GET"));
+  HttpRequest->SetHeader(TEXT("Accept"), TEXT("application/json"));
+  HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
+  HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
+  HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
+  HttpRequest->SetHeader(TEXT("X-SDK-Version"),
+                         FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName,
+                                         *UGatrixClient::SdkVersion));
+
+  if (!Etag.IsEmpty()) {
+    HttpRequest->SetHeader(TEXT("If-None-Match"), Etag);
+  }
+
+  for (const auto &Header : ClientConfig.CustomHeaders) {
+    HttpRequest->SetHeader(Header.Key, Header.Value);
+  }
+
+  HttpRequest->OnProcessRequestComplete().BindLambda(
+      [this](FHttpRequestPtr Request, FHttpResponsePtr Response,
+             bool bWasSuccessful) {
+        bStreamingFetching = false;
+
+        if (bWasSuccessful && Response.IsValid() &&
+            Response->GetResponseCode() == 200) {
+          HandleFetchResponse(Response->GetContentAsString(),
+                              Response->GetResponseCode(),
+                              Response->GetHeader(TEXT("ETag")));
+        }
+
+        // Check for pending invalidation keys
+        if (PendingInvalidationKeys.Num() > 0) {
+          TArray<FString> PendingKeys = PendingInvalidationKeys.Array();
+          PendingInvalidationKeys.Empty();
+          FetchPartialFlags(PendingKeys);
+        }
+      });
+
+  HttpRequest->ProcessRequest();
+}
+
+void UGatrixFeaturesClient::ScheduleStreamingReconnect() {
+  if (!bStarted || !ClientConfig.Features.Streaming.bEnabled) {
+    return;
+  }
+
+  SetStreamingState(EGatrixStreamingConnectionState::Reconnecting);
+  StreamingReconnectCount++;
+
+  if (EventEmitter) {
+    EventEmitter->Emit(GatrixEvents::FlagsStreamingReconnecting);
+  }
+
+  // Exponential backoff with jitter
+  const FGatrixStreamingConfig &StreamConfig = ClientConfig.Features.Streaming;
+  int32 ReconnectBase, ReconnectMax;
+  if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
+    ReconnectBase = StreamConfig.WebSocket.ReconnectBase;
+    ReconnectMax = StreamConfig.WebSocket.ReconnectMax;
+  } else {
+    ReconnectBase = StreamConfig.Sse.ReconnectBase;
+    ReconnectMax = StreamConfig.Sse.ReconnectMax;
+  }
+
+  float Delay = FMath::Min(
+      static_cast<float>(ReconnectBase) *
+          FMath::Pow(2.0f, static_cast<float>(StreamingReconnectAttempt)),
+      static_cast<float>(ReconnectMax));
+  // Add jitter (+/-25%)
+  const float JitterRange = Delay * 0.25f;
+  Delay += FMath::FRandRange(-JitterRange, JitterRange);
+  Delay = FMath::Max(Delay, 0.5f);
+
+  StreamingReconnectAttempt++;
+
+  UE_LOG(LogGatrix, Log,
+         TEXT("Streaming: Scheduling reconnect in %.1fs (attempt %d)"), Delay,
+         StreamingReconnectAttempt);
+
+  UWorld *World = nullptr;
+  if (GEngine && GEngine->GetWorldContexts().Num() > 0) {
+    World = GEngine->GetWorldContexts()[0].World();
+  }
+
+  if (World) {
+    World->GetTimerManager().SetTimer(
+        StreamingReconnectTimerHandle,
+        FTimerDelegate::CreateWeakLambda(this,
+                                         [this]() {
+                                           if (bStarted) {
+                                             ConnectStreaming();
+                                           }
+                                         }),
+        Delay, false);
+  }
+}
+
+void UGatrixFeaturesClient::SetStreamingState(
+    EGatrixStreamingConnectionState NewState) {
+  if (StreamingState != NewState) {
+    StreamingState = NewState;
+
+    if (ClientConfig.bEnableDevMode) {
+      static const TCHAR *StateNames[] = {
+          TEXT("Disconnected"), TEXT("Connecting"), TEXT("Connected"),
+          TEXT("Reconnecting"), TEXT("Degraded")};
+      UE_LOG(LogGatrix, Log, TEXT("[DEV] Streaming state: %s"),
+             StateNames[static_cast<int32>(NewState)]);
+    }
+  }
+}
+
+FString UGatrixFeaturesClient::BuildStreamingUrl() const {
+  const FGatrixStreamingConfig &StreamConfig = ClientConfig.Features.Streaming;
+
+  FString BaseUrl;
+  if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
+    BaseUrl = StreamConfig.WebSocket.Url;
+  } else {
+    BaseUrl = StreamConfig.Sse.Url;
+  }
+
+  // If no custom URL, derive from ApiUrl
+  if (BaseUrl.IsEmpty()) {
+    BaseUrl = ClientConfig.ApiUrl;
+    // Replace /api/v1 with streaming endpoint
+    if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {
+      BaseUrl = BaseUrl.Replace(TEXT("/api/v1"), TEXT("/streaming/ws"));
+      // Convert http(s) to ws(s)
+      BaseUrl = BaseUrl.Replace(TEXT("https://"), TEXT("wss://"));
+      BaseUrl = BaseUrl.Replace(TEXT("http://"), TEXT("ws://"));
+    } else {
+      BaseUrl = BaseUrl.Replace(TEXT("/api/v1"), TEXT("/streaming/sse"));
+    }
+  }
+
+  // Add query parameters
+  FString QueryString = FString::Printf(
+      TEXT("?appName=%s&environment=%s"),
+      *FGenericPlatformHttp::UrlEncode(ClientConfig.AppName),
+      *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
+
+  if (LocalGlobalRevision > 0) {
+    QueryString +=
+        FString::Printf(TEXT("&globalRevision=%lld"), LocalGlobalRevision);
+  }
+
+  return BaseUrl + QueryString;
 }

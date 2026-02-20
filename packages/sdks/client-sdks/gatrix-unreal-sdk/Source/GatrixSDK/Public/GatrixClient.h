@@ -4,12 +4,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixTypes.h"
+#include "GatrixClient.generated.h"
 #include "GatrixEventEmitter.h"
 #include "GatrixFeaturesClient.h"
 #include "GatrixStorageProvider.h"
-#include "GatrixClient.generated.h"
-
+#include "GatrixTypes.h"
 
 /**
  * Main Gatrix SDK client.
@@ -81,9 +80,17 @@ public:
   FString StringVariation(const FString &FlagName,
                           const FString &DefaultValue) const;
 
-  /** Get number variation (convenience) */
+  /** Get integer variation (convenience) */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Quick")
-  float NumberVariation(const FString &FlagName, float DefaultValue) const;
+  int32 IntVariation(const FString &FlagName, int32 DefaultValue) const;
+
+  /** Get float variation (convenience) */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Quick")
+  float FloatVariation(const FString &FlagName, float DefaultValue) const;
+
+  /** Get double variation (convenience) */
+  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Quick")
+  double DoubleVariation(const FString &FlagName, double DefaultValue) const;
 
   /** Get variant (convenience) */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Quick")
