@@ -61,7 +61,7 @@ namespace Gatrix.Unity.SDK
             switch (_mode)
             {
                 case WindControlMode.ToggleEnabled:
-                    _wind.enabled = flag.Enabled;
+                    _wind.gameObject.SetActive(flag.Enabled);
                     break;
 
                 case WindControlMode.WindMain:
