@@ -2,6 +2,7 @@
 // Emerald AI-inspired: color-coded section bars, badge ON/OFF, clean table layout
 
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
