@@ -9,13 +9,13 @@
 #include "GatrixTypes.h"
 #include "GatrixVariationProvider.h"
 #include "GatrixWatchFlagGroup.h"
+#include "GatrixFlagWatchDelegate.h"
 #include "GatrixWebSocketConnection.h"
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
 
 #include <atomic>
 #include "GatrixFeaturesClient.generated.h"
-
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
@@ -28,8 +28,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FGatrixOnImpression, FString,
                                               FlagName, bool, bEnabled, FString,
                                               VariantName, FString, EventType);
 
-// Delegate for internal flag watching
-DECLARE_DELEGATE_OneParam(FGatrixFlagWatchDelegate, UGatrixFlagProxy *);
 
 /**
  * UGatrixFeaturesClient - Central client for feature flag management in Unreal

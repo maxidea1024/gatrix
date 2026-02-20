@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GatrixFlagWatchDelegate.h"
 
 class UGatrixFeaturesClient;
 
