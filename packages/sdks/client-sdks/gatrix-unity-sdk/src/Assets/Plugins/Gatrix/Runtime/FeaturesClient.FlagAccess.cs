@@ -93,7 +93,9 @@ namespace Gatrix.Unity.SDK
         public string GetReasonInternal(string flagName, bool forceRealtime = false)
         {
             var flag = LookupFlag(flagName, forceRealtime);
-            return flag?.Reason;
+            if (flag == null) return null;
+            // Match MakeDetails logic: treat null/empty reason as "evaluated"
+            return string.IsNullOrEmpty(flag.Reason) ? "evaluated" : flag.Reason;
         }
 
         public bool GetImpressionDataInternal(string flagName, bool forceRealtime = false)

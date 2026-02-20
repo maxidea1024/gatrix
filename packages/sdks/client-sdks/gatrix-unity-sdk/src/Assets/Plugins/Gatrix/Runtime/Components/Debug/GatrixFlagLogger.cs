@@ -47,7 +47,7 @@ namespace Gatrix.Unity.SDK
 
             if (_logReason)
             {
-                sb.Append(", Reason=").Append(flag.Reason ?? "unknown");
+                sb.Append(", Reason=").Append(flag.Reason ?? "missing");
             }
 
             string msg = sb.ToString();
