@@ -494,7 +494,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   }
 
   // Set timeout
-  HttpRequest->SetTimeout(ClientConfig.Features.FetchRetryOptions.TimeoutMs / 1000.0f);
+  HttpRequest->SetTimeout(ClientConfig.Features.FetchRetryOptions.Timeout);
 
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsFetch, Etag);
@@ -1272,14 +1272,12 @@ void UGatrixFeaturesClient::ScheduleNextPoll() {
 
   // Apply exponential backoff on consecutive failures
   if (ConsecutiveFailures.GetValue() > 0) {
-    int32 InitialBackoff = ClientConfig.Features.FetchRetryOptions.InitialBackoffMs;
-    int32 MaxBackoff = ClientConfig.Features.FetchRetryOptions.MaxBackoffMs;
-    int32 BackoffMs =
-        FMath::Min(static_cast<int32>(
-                       InitialBackoff *
-                       FMath::Pow(2.0f, static_cast<float>(ConsecutiveFailures.GetValue() - 1))),
-                   MaxBackoff);
-    Interval = static_cast<float>(BackoffMs) / 1000.0f;
+    float InitialBackoff = ClientConfig.Features.FetchRetryOptions.InitialBackoff;
+    float MaxBackoffVal = ClientConfig.Features.FetchRetryOptions.MaxBackoff;
+    float BackoffSec = FMath::Min(
+        InitialBackoff * FMath::Pow(2.0f, static_cast<float>(ConsecutiveFailures.GetValue() - 1)),
+        MaxBackoffVal);
+    Interval = BackoffSec;
     UE_LOG(LogGatrix, Warning,
            TEXT("Scheduling retry after %.1fs (consecutive "
                 "failures: %d)"),

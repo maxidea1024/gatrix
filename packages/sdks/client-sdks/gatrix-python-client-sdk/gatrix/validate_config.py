@@ -44,13 +44,13 @@ def validate_config(config: GatrixClientConfig) -> None:
 
     # Fetch retry options
     retry = feat.fetch_retry_options
-    _validate_range(retry.initial_backoff_ms, "initialBackoffMs", 100, 60000)
-    _validate_range(retry.max_backoff_ms, "maxBackoffMs", 1000, 600000)
+    _validate_range(retry.initial_backoff, "initialBackoff", 0.1, 60)
+    _validate_range(retry.max_backoff, "maxBackoff", 1, 600)
 
-    if retry.initial_backoff_ms > retry.max_backoff_ms:
+    if retry.initial_backoff > retry.max_backoff:
         raise GatrixConfigError(
-            f"initialBackoffMs ({retry.initial_backoff_ms}) must be <= "
-            f"maxBackoffMs ({retry.max_backoff_ms})"
+            f"initialBackoff ({retry.initial_backoff}) must be <= "
+            f"maxBackoff ({retry.max_backoff})"
         )
 
     for code in retry.non_retryable_status_codes:

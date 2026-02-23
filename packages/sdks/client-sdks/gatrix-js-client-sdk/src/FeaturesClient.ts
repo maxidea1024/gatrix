@@ -1255,17 +1255,17 @@ export class FeaturesClient implements VariationProvider {
     // Apply exponential backoff on consecutive failures
     if (this.consecutiveFailures > 0) {
       const retryOptions = this.featuresConfig.fetchRetryOptions ?? {};
-      const initialBackoff = retryOptions.initialBackoffMs ?? 1000;
-      const maxBackoff = retryOptions.maxBackoffMs ?? 60000;
+      const initialBackoff = retryOptions.initialBackoff ?? 1;
+      const maxBackoff = retryOptions.maxBackoff ?? 60;
 
-      // Exponential backoff: initialBackoff * 2^(failures-1), capped at maxBackoff
+      // Exponential backoff: initialBackoff * 2^(failures-1), capped at maxBackoff (in seconds)
       const backoffDelay = Math.min(
         initialBackoff * Math.pow(2, this.consecutiveFailures - 1),
         maxBackoff
       );
-      delay = backoffDelay;
+      delay = backoffDelay * 1000; // Convert to ms for setTimeout
       this.logger.warn(
-        `Scheduling retry after ${delay}ms (consecutive failures: ${this.consecutiveFailures})`
+        `Scheduling retry after ${backoffDelay}s (consecutive failures: ${this.consecutiveFailures})`
       );
     }
 

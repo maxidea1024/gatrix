@@ -68,12 +68,12 @@ func start(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvide
 		"GatrixSDK: metrics_interval_initial must be between 0 and 3600, got %f" % config.metrics_interval_initial)
 
 	# Validate backoff settings
-	assert(config.initial_backoff_ms >= 100 and config.initial_backoff_ms <= 60000,
-		"GatrixSDK: initial_backoff_ms must be between 100 and 60000, got %d" % config.initial_backoff_ms)
-	assert(config.max_backoff_ms >= 1000 and config.max_backoff_ms <= 600000,
-		"GatrixSDK: max_backoff_ms must be between 1000 and 600000, got %d" % config.max_backoff_ms)
-	assert(config.initial_backoff_ms <= config.max_backoff_ms,
-		"GatrixSDK: initial_backoff_ms (%d) must be <= max_backoff_ms (%d)" % [config.initial_backoff_ms, config.max_backoff_ms])
+	assert(config.initial_backoff >= 0.1 and config.initial_backoff <= 60.0,
+		"GatrixSDK: initial_backoff must be between 0.1 and 60 seconds, got %f" % config.initial_backoff)
+	assert(config.max_backoff >= 1.0 and config.max_backoff <= 600.0,
+		"GatrixSDK: max_backoff must be between 1 and 600 seconds, got %f" % config.max_backoff)
+	assert(config.initial_backoff <= config.max_backoff,
+		"GatrixSDK: initial_backoff (%f) must be <= max_backoff (%f)" % [config.initial_backoff, config.max_backoff])
 
 	# Validate non-retryable status codes
 	for code in config.non_retryable_status_codes:

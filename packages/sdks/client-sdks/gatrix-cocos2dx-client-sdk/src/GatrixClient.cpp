@@ -42,14 +42,14 @@ bool GatrixClient::initInternal(const GatrixClientConfig& config) {
 
   // Validate fetch retry options
   const auto& retry = config.fetchRetryOptions;
-  if (retry.initialBackoffMs < 100 || retry.initialBackoffMs > 60000)
-    throw GatrixFeatureError("Config validation failed: initialBackoffMs must "
-                             "be between 100 and 60000");
-  if (retry.maxBackoffMs < 1000 || retry.maxBackoffMs > 600000)
-    throw GatrixFeatureError("Config validation failed: maxBackoffMs must be "
-                             "between 1000 and 600000");
-  if (retry.initialBackoffMs > retry.maxBackoffMs)
-    throw GatrixFeatureError("Config validation failed: initialBackoffMs must be <= maxBackoffMs");
+  if (retry.initialBackoff < 0.1f || retry.initialBackoff > 60.0f)
+    throw GatrixFeatureError("Config validation failed: initialBackoff must "
+                             "be between 0.1 and 60 seconds");
+  if (retry.maxBackoff < 1.0f || retry.maxBackoff > 600.0f)
+    throw GatrixFeatureError("Config validation failed: maxBackoff must be "
+                             "between 1 and 600 seconds");
+  if (retry.initialBackoff > retry.maxBackoff)
+    throw GatrixFeatureError("Config validation failed: initialBackoff must be <= maxBackoff");
   for (int code : retry.nonRetryableStatusCodes) {
     if (code < 400 || code > 599)
       throw GatrixFeatureError("Config validation failed: nonRetryableStatusCodes must be 400-599");

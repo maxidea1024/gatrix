@@ -209,8 +209,8 @@ class FeaturesClient:
         # Retry options
         retry = feat.fetch_retry_options
         self._non_retryable = set(retry.non_retryable_status_codes)
-        self._initial_backoff_ms = retry.initial_backoff_ms
-        self._max_backoff_ms = retry.max_backoff_ms
+        self._initial_backoff = retry.initial_backoff
+        self._max_backoff = retry.max_backoff
 
         # Internal state
         self._connection_id = str(uuid.uuid4())
@@ -1237,11 +1237,10 @@ class FeaturesClient:
             return
 
         if self._consecutive_failures > 0:
-            delay_ms = min(
-                self._initial_backoff_ms * (2 ** (self._consecutive_failures - 1)),
-                self._max_backoff_ms,
+            delay = min(
+                self._initial_backoff * (2 ** (self._consecutive_failures - 1)),
+                self._max_backoff,
             )
-            delay = delay_ms / 1000.0
         else:
             delay = self._refresh_interval
 

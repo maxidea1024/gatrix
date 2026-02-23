@@ -82,32 +82,32 @@ bool UGatrixClient::InitInternal(const FGatrixClientConfig& InConfig) {
            Retry.Limit);
     return false;
   }
-  if (Retry.TimeoutMs < 1000 || Retry.TimeoutMs > 120000) {
+  if (Retry.Timeout < 1.0f || Retry.Timeout > 120.0f) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: FetchRetryOptions.TimeoutMs must be "
-                "between 1000 and 120000, got %d"),
-           Retry.TimeoutMs);
+           TEXT("Config validation failed: FetchRetryOptions.Timeout must be "
+                "between 1 and 120 seconds, got %f"),
+           Retry.Timeout);
     return false;
   }
-  if (Retry.InitialBackoffMs < 100 || Retry.InitialBackoffMs > 60000) {
+  if (Retry.InitialBackoff < 0.1f || Retry.InitialBackoff > 60.0f) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: InitialBackoffMs must be between "
-                "100 and 60000, got %d"),
-           Retry.InitialBackoffMs);
+           TEXT("Config validation failed: InitialBackoff must be between "
+                "0.1 and 60 seconds, got %f"),
+           Retry.InitialBackoff);
     return false;
   }
-  if (Retry.MaxBackoffMs < 1000 || Retry.MaxBackoffMs > 600000) {
+  if (Retry.MaxBackoff < 1.0f || Retry.MaxBackoff > 600.0f) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: MaxBackoffMs must be between 1000 "
-                "and 600000, got %d"),
-           Retry.MaxBackoffMs);
+           TEXT("Config validation failed: MaxBackoff must be between 1 "
+                "and 600 seconds, got %f"),
+           Retry.MaxBackoff);
     return false;
   }
-  if (Retry.InitialBackoffMs > Retry.MaxBackoffMs) {
+  if (Retry.InitialBackoff > Retry.MaxBackoff) {
     UE_LOG(LogGatrix, Error,
-           TEXT("Config validation failed: InitialBackoffMs (%d) must be <= "
-                "MaxBackoffMs (%d)"),
-           Retry.InitialBackoffMs, Retry.MaxBackoffMs);
+           TEXT("Config validation failed: InitialBackoff (%f) must be <= "
+                "MaxBackoff (%f)"),
+           Retry.InitialBackoff, Retry.MaxBackoff);
     return false;
   }
 

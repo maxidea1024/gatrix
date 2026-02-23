@@ -901,11 +901,11 @@ void FeaturesClient::scheduleNextRefresh() {
 
   // Apply exponential backoff on consecutive failures
   if (_consecutiveFailures > 0) {
-    int initialBackoff = _config.fetchRetryOptions.initialBackoffMs;
-    int maxBackoff = _config.fetchRetryOptions.maxBackoffMs;
-    int backoffMs = std::min(
-        static_cast<int>(initialBackoff * std::pow(2, _consecutiveFailures - 1)), maxBackoff);
-    delay = static_cast<float>(backoffMs) / 1000.0f;
+    float initialBackoff = _config.fetchRetryOptions.initialBackoff;
+    float maxBackoffVal = _config.fetchRetryOptions.maxBackoff;
+    float backoffSec = std::min(
+        initialBackoff * static_cast<float>(std::pow(2, _consecutiveFailures - 1)), maxBackoffVal);
+    delay = backoffSec;
   }
 
   if (_config.enableDevMode) {

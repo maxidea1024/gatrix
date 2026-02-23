@@ -195,10 +195,10 @@ export interface FetchRetryOptions {
    * and must be restarted manually via fetchFlags().
    */
   nonRetryableStatusCodes?: number[];
-  /** Initial SDK-level backoff delay in ms for consecutive failures (default: 1000) */
-  initialBackoffMs?: number;
-  /** Maximum SDK-level backoff delay in ms (default: 60000) */
-  maxBackoffMs?: number;
+  /** Initial SDK-level backoff delay in seconds for consecutive failures (default: 1) */
+  initialBackoff?: number;
+  /** Maximum SDK-level backoff delay in seconds (default: 60) */
+  maxBackoff?: number;
 }
 
 /**

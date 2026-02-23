@@ -152,8 +152,8 @@ struct StreamingConfig {
 
 struct FetchRetryOptions {
   std::vector<int> nonRetryableStatusCodes = {401, 403};
-  int initialBackoffMs = 1000; // Initial backoff delay in ms
-  int maxBackoffMs = 60000;    // Maximum backoff delay in ms
+  float initialBackoff = 1.0f; // Initial backoff delay in seconds
+  float maxBackoff = 60.0f;    // Maximum backoff delay in seconds
 };
 
 struct GatrixClientConfig {

@@ -54,8 +54,8 @@ class FeaturesClient implements VariationProvider {
 
   // Retry options
   final List<int> _nonRetryableStatusCodes;
-  final int _initialBackoffMs;
-  final int _maxBackoffMs;
+  final double _initialBackoff;
+  final double _maxBackoff;
 
   // Stats
   int _fetchCount = 0;
@@ -95,8 +95,8 @@ class FeaturesClient implements VariationProvider {
     bool explicitSyncMode = true,
     int refreshIntervalSeconds = 30,
     List<int>? nonRetryableStatusCodes,
-    int initialBackoffMs = 1000,
-    int maxBackoffMs = 60000,
+    double initialBackoff = 1.0,
+    double maxBackoff = 60.0,
     bool enableDevMode = false,
     String cacheKeyPrefix = 'gatrix_cache',
     Map<String, String>? customHeaders,
@@ -109,8 +109,8 @@ class FeaturesClient implements VariationProvider {
         _explicitSyncMode = explicitSyncMode,
         _refreshIntervalMs = refreshIntervalSeconds * 1000,
         _nonRetryableStatusCodes = nonRetryableStatusCodes ?? [401, 403],
-        _initialBackoffMs = initialBackoffMs,
-        _maxBackoffMs = maxBackoffMs,
+        _initialBackoff = initialBackoff,
+        _maxBackoff = maxBackoff,
         _enableDevMode = enableDevMode,
         _cacheKeyPrefix = cacheKeyPrefix,
         _customHeaders = customHeaders,
@@ -1070,11 +1070,11 @@ class FeaturesClient implements VariationProvider {
 
     // Apply exponential backoff on consecutive failures
     if (_consecutiveFailures > 0) {
-      final backoffMs = min(
-        (_initialBackoffMs * pow(2, _consecutiveFailures - 1)).toInt(),
-        _maxBackoffMs,
+      final backoffSec = min(
+        _initialBackoff * pow(2, _consecutiveFailures - 1),
+        _maxBackoff,
       );
-      delayMs = backoffMs;
+      delayMs = (backoffSec * 1000).toInt();
     }
 
     _pollTimer = Timer(Duration(milliseconds: delayMs), () => fetchFlags());

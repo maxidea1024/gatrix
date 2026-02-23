@@ -312,8 +312,8 @@ interface GatrixClientConfig {
 
 interface FetchRetryOptions {
   nonRetryableStatusCodes?: number[]; // HTTP status codes that stop polling (default: [401, 403])
-  initialBackoffMs?: number; // Initial backoff delay in ms (default: 1000)
-  maxBackoffMs?: number; // Maximum backoff delay in ms (default: 60000)
+  initialBackoff?: number; // Initial backoff delay in seconds (default: 1)
+  maxBackoff?: number; // Maximum backoff delay in seconds (default: 60)
 }
 ```
 
@@ -410,7 +410,7 @@ disconnected ──► connecting ──► connected
 #### Reconnection Strategy
 
 Exponential backoff with jitter:
-- **Delay** = `min(reconnectBase × 2^(attempt-1), reconnectMax)` + random jitter (0-1000ms)
+- **Delay** = `min(reconnectBase × 2^(attempt-1), reconnectMax)` + random jitter (0-1s)
 - **Degraded mode**: After ≥5 consecutive failures, streaming state transitions to `degraded` and SDK falls back to polling-only until reconnection succeeds
 
 #### Gap Recovery
@@ -424,7 +424,7 @@ When a streaming connection is (re-)established, the server sends a `connected` 
 All client SDKs implement a **schedule-after-completion** pattern for polling:
 
 1. **Normal polling**: After a successful fetch (200) or not-modified response (304), the SDK schedules the next fetch after `refreshInterval` seconds.
-2. **Retryable errors**: On HTTP errors not in `nonRetryableStatusCodes` or network errors, the SDK increments a `consecutiveFailures` counter and schedules the next fetch with exponential backoff: `min(initialBackoffMs * 2^(failures-1), maxBackoffMs)`.
+2. **Retryable errors**: On HTTP errors not in `nonRetryableStatusCodes` or network errors, the SDK increments a `consecutiveFailures` counter and schedules the next fetch with exponential backoff: `min(initialBackoff * 2^(failures-1), maxBackoff)` seconds.
 3. **Non-retryable errors**: On HTTP status codes listed in `nonRetryableStatusCodes` (default: 401, 403), polling is stopped entirely. Call `fetchFlags()` manually to resume.
 4. **Recovery**: On any successful response after errors, `consecutiveFailures` is reset to 0 and normal polling resumes.
 5. **Manual fetchFlags()**: Calling `fetchFlags()` manually resets `pollingStopped` and cancels any pending timer, allowing recovery from non-retryable errors.
@@ -549,9 +549,9 @@ All client SDKs MUST validate configuration at initialization time and fail fast
 | `metricsInterval` | 1 | 86400 | seconds |
 | `metricsIntervalInitial` | 0 | 3600 | seconds |
 | `fetchRetryLimit` | 0 | 10 | count |
-| `fetchTimeout` | 1 (or 1000ms) | 120 (or 120000ms) | seconds/ms |
-| `initialBackoffMs` | 100 | 60000 | ms |
-| `maxBackoffMs` | 1000 | 600000 | ms |
+| `fetchTimeout` | 1 | 120 | seconds |
+| `initialBackoff` | 0.1 | 60 | seconds |
+| `maxBackoff` | 1 | 600 | seconds |
 | `streaming.sse.reconnectBase` | 0.5 | 60 | seconds |
 | `streaming.sse.reconnectMax` | 1 | 300 | seconds |
 | `streaming.sse.pollingJitter` | 0 | 30 | seconds |
@@ -561,7 +561,7 @@ All client SDKs MUST validate configuration at initialization time and fail fast
 
 #### Cross-Field Validation
 
-- `initialBackoffMs` must be <= `maxBackoffMs`
+- `initialBackoff` must be <= `maxBackoff`
 - `nonRetryableStatusCodes` entries must be in range 400-599
 - `streaming.transport` must be `'sse'` or `'websocket'` (if provided)
 - `streaming.sse.reconnectBase` must be <= `streaming.sse.reconnectMax` (if both provided)

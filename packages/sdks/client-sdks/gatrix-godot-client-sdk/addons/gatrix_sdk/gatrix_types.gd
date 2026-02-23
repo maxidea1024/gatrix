@@ -221,8 +221,8 @@ class GatrixClientConfig:
 
 	# Fetch retry options
 	var non_retryable_status_codes: Array[int] = [401, 403]
-	var initial_backoff_ms: int = 1000
-	var max_backoff_ms: int = 60000
+	var initial_backoff: float = 1.0
+	var max_backoff: float = 60.0
 
 	# Debug / Storage
 	var enable_dev_mode: bool = false

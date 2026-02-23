@@ -72,31 +72,31 @@ export function validateConfig(config: GatrixClientConfig): void {
         validatePositiveNumber(retry.timeout, 'features.fetchRetryOptions.timeout', 1000, 120000);
       }
 
-      if (retry.initialBackoffMs !== undefined) {
+      if (retry.initialBackoff !== undefined) {
         validatePositiveNumber(
-          retry.initialBackoffMs,
-          'features.fetchRetryOptions.initialBackoffMs',
-          100,
-          60000
+          retry.initialBackoff,
+          'features.fetchRetryOptions.initialBackoff',
+          0.1,
+          60
         );
       }
 
-      if (retry.maxBackoffMs !== undefined) {
+      if (retry.maxBackoff !== undefined) {
         validatePositiveNumber(
-          retry.maxBackoffMs,
-          'features.fetchRetryOptions.maxBackoffMs',
-          1000,
-          600000
+          retry.maxBackoff,
+          'features.fetchRetryOptions.maxBackoff',
+          1,
+          600
         );
       }
 
       if (
-        retry.initialBackoffMs !== undefined &&
-        retry.maxBackoffMs !== undefined &&
-        retry.initialBackoffMs > retry.maxBackoffMs
+        retry.initialBackoff !== undefined &&
+        retry.maxBackoff !== undefined &&
+        retry.initialBackoff > retry.maxBackoff
       ) {
         throw new GatrixError(
-          `Invalid config: fetchRetryOptions.initialBackoffMs (${retry.initialBackoffMs}) must be <= maxBackoffMs (${retry.maxBackoffMs})`
+          `Invalid config: fetchRetryOptions.initialBackoff (${retry.initialBackoff}) must be <= maxBackoff (${retry.maxBackoff})`
         );
       }
 

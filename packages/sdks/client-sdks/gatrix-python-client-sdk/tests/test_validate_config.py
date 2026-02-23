@@ -105,13 +105,13 @@ class TestNumericRanges:
         )
 
     def test_initial_backoff_above_max(self):
-        with pytest.raises(GatrixConfigError, match="initialBackoffMs.*must be <="):
+        with pytest.raises(GatrixConfigError, match="initialBackoff.*must be <="):
             validate_config(
                 _valid_config(
                     features=FeaturesConfig(
                         fetch_retry_options=FetchRetryOptions(
-                            initial_backoff_ms=50000,
-                            max_backoff_ms=10000,
+                            initial_backoff=50.0,
+                            max_backoff=10.0,
                         )
                     )
                 )

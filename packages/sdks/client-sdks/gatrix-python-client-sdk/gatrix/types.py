@@ -75,8 +75,8 @@ class VariationResult:
 class FetchRetryOptions:
     """Retry/backoff configuration for fetch requests."""
     non_retryable_status_codes: List[int] = field(default_factory=lambda: [401, 403])
-    initial_backoff_ms: int = 1000
-    max_backoff_ms: int = 60000
+    initial_backoff: float = 1.0
+    max_backoff: float = 60.0
 
 
 @dataclass

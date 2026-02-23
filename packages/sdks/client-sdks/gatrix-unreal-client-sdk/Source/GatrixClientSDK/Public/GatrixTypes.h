@@ -178,25 +178,25 @@ struct GATRIXCLIENTSDK_API FGatrixFetchRetryOptions {
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   int32 Limit = 3;
 
-  /** Backoff limit in ms (default: 8000) */
+  /** Backoff limit in seconds (default: 8) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
-  int32 BackoffLimitMs = 8000;
+  float BackoffLimit = 8.0f;
 
-  /** Request timeout in ms (default: 30000) */
+  /** Request timeout in seconds (default: 30) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
-  int32 TimeoutMs = 30000;
+  float Timeout = 30.0f;
 
   /** HTTP status codes that should stop polling entirely (default: 401, 403) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   TArray<int32> NonRetryableStatusCodes = {401, 403};
 
-  /** Initial backoff delay in ms for retries (default: 1000) */
+  /** Initial backoff delay in seconds for retries (default: 1) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
-  int32 InitialBackoffMs = 1000;
+  float InitialBackoff = 1.0f;
 
-  /** Maximum backoff delay in ms for retries (default: 60000) */
+  /** Maximum backoff delay in seconds for retries (default: 60) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
-  int32 MaxBackoffMs = 60000;
+  float MaxBackoff = 60.0f;
 };
 
 /** Streaming transport type */
