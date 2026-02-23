@@ -1,5 +1,5 @@
 {
-  "name": "@gatrix/js-client-sdk",
+  "name": "@gatrix/gatrix-js-client-sdk",
   "version": "1.0.0",
   "description": "Gatrix client-side JavaScript SDK for the Gatrix platform",
   "main": "dist/index.cjs.js",

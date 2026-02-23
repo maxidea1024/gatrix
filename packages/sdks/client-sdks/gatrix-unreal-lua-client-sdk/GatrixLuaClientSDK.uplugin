@@ -1,0 +1,33 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0.0",
+  "FriendlyName": "Gatrix Lua Client SDK",
+  "Description": "Lua binding for Gatrix SDK - exposes feature flags, variations, context, events, and watch to Lua scripts via pure lua_State* API",
+  "Category": "Networking",
+  "CreatedBy": "Gatrix",
+  "CreatedByURL": "",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "Installed": true,
+  "Modules": [
+    {
+      "Name": "GatrixLuaClientSDK",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "GatrixClientSDK",
+      "Enabled": true
+    },
+    {
+      "Name": "LuaScript",
+      "Enabled": true
+    }
+  ]
+}

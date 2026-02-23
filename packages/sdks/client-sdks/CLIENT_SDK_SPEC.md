@@ -21,6 +21,46 @@ This document defines the core architecture, API, and behavior for all Gatrix Cl
 > All SDK code, APIs, metrics payloads, documentation, and comments MUST use `flag`/`flags` consistently.
 > For example, metrics payloads use `bucket.flags`, not `bucket.toggles`.
 
+## SDK Naming Convention
+
+All client SDK names (folder, package, module) **MUST** include both `gatrix` and `client` in their identifier.
+
+### Folder Name
+
+Pattern: `gatrix-{platform}-client-sdk`
+
+| Platform | Folder Name |
+|----------|-------------|
+| JavaScript | `gatrix-js-client-sdk` |
+| React | `gatrix-react-client-sdk` |
+| Svelte | `gatrix-svelte-client-sdk` |
+| Vue | `gatrix-vue-client-sdk` |
+| Flutter | `gatrix-flutter-client-sdk` |
+| Python | `gatrix-python-client-sdk` |
+| Unity | `gatrix-unity-client-sdk` |
+| Cocos2d-x | `gatrix-cocos2dx-client-sdk` |
+| Godot | `gatrix-godot-client-sdk` |
+| Unreal | `gatrix-unreal-client-sdk` |
+| Unreal (Lua) | `gatrix-unreal-lua-client-sdk` |
+
+### Package / Module Name
+
+| Platform | Package Name | File |
+|----------|-------------|------|
+| JavaScript | `@gatrix/gatrix-js-client-sdk` | `package.json` |
+| React | `@gatrix/gatrix-react-client-sdk` | `package.json` |
+| Svelte | `@gatrix/gatrix-svelte-client-sdk` | `package.json` |
+| Vue | `@gatrix/gatrix-vue-client-sdk` | `package.json` |
+| Flutter | `gatrix_flutter_client_sdk` | `pubspec.yaml` |
+| Python | `gatrix-python-client-sdk` | `pyproject.toml` |
+| Unity | `com.gatrix.unity.client.sdk` | `package.json` |
+| Cocos2d-x | `gatrix-cocos2dx-client-sdk` | `CMakeLists.txt` |
+| Unreal | `GatrixClientSDK` | `.uplugin` / `Build.cs` |
+| Unreal (Lua) | `GatrixLuaClientSDK` | `.uplugin` / `Build.cs` |
+
+> [!IMPORTANT]
+> The `@gatrix/` npm scope uses `@gatrix/gatrix-{platform}-client-sdk` format (not `@gatrix/{platform}-sdk`). Both `gatrix` and `client` MUST appear in every SDK identifier.
+
 ## Metrics Payload Format
 
 When sending metrics to the backend, the payload MUST follow this structure:
@@ -29,7 +69,7 @@ When sending metrics to the backend, the payload MUST follow this structure:
 {
   "appName": "MyApp",
   "environment": "production",
-  "sdkName": "gatrix-js-client-sdk",
+  "sdkName": "@gatrix/gatrix-js-client-sdk",
   "sdkVersion": "1.0.0",
   "connectionId": "uuid-string",
   "bucket": {
@@ -326,7 +366,7 @@ All client SDKs MUST include the following standard headers on every HTTP reques
 | `X-API-Token` | `{apiToken}` | Client API token for authentication |
 | `X-Application-Name` | `{appName}` | Application name from config |
 | `X-Connection-Id` | `{connectionId}` | Unique connection identifier (UUID, generated once per SDK instance) |
-| `X-SDK-Version` | `{sdkName}/{sdkVersion}` | SDK identification string (e.g., `@gatrix/js-client-sdk/1.0.0`) |
+| `X-SDK-Version` | `{sdkName}/{sdkVersion}` | SDK identification string (e.g., `@gatrix/gatrix-js-client-sdk/1.0.0`) |
 | `Content-Type` | `application/json` | Required for POST requests |
 | `...customHeaders` | User-defined | Spread/merged from `config.customHeaders` |
 
@@ -379,9 +419,13 @@ By default, SDKs use **GET** requests with context in query parameters for flag 
 The `X-SDK-Version` header combines SDK name and version in a single value using the format `{sdkName}/{sdkVersion}`.
 
 Standard SDK names:
-- `@gatrix/js-client-sdk` (JavaScript)
+- `@gatrix/gatrix-js-client-sdk` (JavaScript)
+- `@gatrix/gatrix-react-client-sdk` (React)
+- `@gatrix/gatrix-svelte-client-sdk` (Svelte)
+- `@gatrix/gatrix-vue-client-sdk` (Vue)
 - `gatrix-unity-client-sdk` (Unity)
 - `gatrix-unreal-client-sdk` (Unreal Engine)
+- `gatrix-unreal-lua-client-sdk` (Unreal Lua)
 - `gatrix-cocos2dx-client-sdk` (Cocos2d-x)
 - `gatrix-flutter-client-sdk` (Flutter)
 - `gatrix-godot-client-sdk` (Godot)

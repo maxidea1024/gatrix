@@ -9,4 +9,4 @@ declare const __SDK_NAME__: string;
 export const SDK_VERSION: string =
   typeof __SDK_VERSION__ !== 'undefined' ? __SDK_VERSION__ : '0.0.0-dev';
 export const SDK_NAME: string =
-  typeof __SDK_NAME__ !== 'undefined' ? __SDK_NAME__ : '@gatrix/js-client-sdk';
+  typeof __SDK_NAME__ !== 'undefined' ? __SDK_NAME__ : '@gatrix/gatrix-js-client-sdk';

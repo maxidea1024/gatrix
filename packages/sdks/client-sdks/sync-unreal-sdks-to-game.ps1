@@ -11,8 +11,8 @@ $SourceBase = $ScriptDir
 $TargetBase = Join-Path $ScriptDir "..\..\..\..\game\Unreal\Plugins"
 
 $Plugins = @(
-    "gatrix-unreal-sdk",
-    "gatrix-unreal-lua-sdk"
+    "gatrix-unreal-client-sdk",
+    "gatrix-unreal-lua-client-sdk"
 )
 
 foreach ($Plugin in $Plugins) {
