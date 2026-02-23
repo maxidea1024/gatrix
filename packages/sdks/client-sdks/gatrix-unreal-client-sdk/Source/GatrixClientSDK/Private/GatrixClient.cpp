@@ -221,6 +221,10 @@ void UGatrixClient::Track(const FString& EventName, const TMap<FString, FString>
   }
 }
 
+void UGatrixClient::Track(const FString& EventName) {
+  Track(EventName, TMap<FString, FString>());
+}
+
 FGatrixSdkStats UGatrixClient::GetStats() const {
   FGatrixSdkStats Stats;
   Stats.ConnectionId = ClientConnectionId;

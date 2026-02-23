@@ -100,8 +100,10 @@ public:
    * @param Properties Optional key-value properties
    */
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Tracking")
-  void Track(const FString& EventName,
-             const TMap<FString, FString>& Properties = TMap<FString, FString>());
+  void Track(const FString& EventName, const TMap<FString, FString>& Properties);
+
+  /** C++ convenience overload — no properties */
+  void Track(const FString& EventName);
 
   // ==================== Stats ====================
 
