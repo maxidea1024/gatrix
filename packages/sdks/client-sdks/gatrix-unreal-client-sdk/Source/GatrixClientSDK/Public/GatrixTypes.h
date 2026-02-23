@@ -32,7 +32,7 @@ enum class EGatrixValueType : uint8 {
 
 /** Variant information from server evaluation */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixVariant {
+struct GATRIXCLIENTSDK_API FGatrixVariant {
   GENERATED_BODY()
 
   /** Variant name */
@@ -54,7 +54,7 @@ struct GATRIXSDK_API FGatrixVariant {
 
 /** Evaluated feature flag from the server */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixEvaluatedFlag {
+struct GATRIXCLIENTSDK_API FGatrixEvaluatedFlag {
   GENERATED_BODY()
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
@@ -81,7 +81,7 @@ struct GATRIXSDK_API FGatrixEvaluatedFlag {
 
 /** Evaluation context (global for client-side) */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixContext {
+struct GATRIXCLIENTSDK_API FGatrixContext {
   GENERATED_BODY()
 
   /** Application name (system field) */
@@ -108,7 +108,7 @@ struct GATRIXSDK_API FGatrixContext {
 
 /** Impression event data */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixImpressionEvent {
+struct GATRIXCLIENTSDK_API FGatrixImpressionEvent {
   GENERATED_BODY()
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
@@ -138,7 +138,7 @@ struct GATRIXSDK_API FGatrixImpressionEvent {
 
 /** Error event payload */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixErrorEvent {
+struct GATRIXCLIENTSDK_API FGatrixErrorEvent {
   GENERATED_BODY()
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
@@ -153,7 +153,7 @@ struct GATRIXSDK_API FGatrixErrorEvent {
 
 /** Variation result with details (value + reason) */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixVariationResult {
+struct GATRIXCLIENTSDK_API FGatrixVariationResult {
   GENERATED_BODY()
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
@@ -171,7 +171,7 @@ struct GATRIXSDK_API FGatrixVariationResult {
 
 /** Fetch retry options */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixFetchRetryOptions {
+struct GATRIXCLIENTSDK_API FGatrixFetchRetryOptions {
   GENERATED_BODY()
 
   /** Number of retry attempts (default: 3) */
@@ -218,7 +218,7 @@ enum class EGatrixStreamingConnectionState : uint8 {
 
 /** SSE streaming configuration */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixSseStreamingConfig {
+struct GATRIXCLIENTSDK_API FGatrixSseStreamingConfig {
   GENERATED_BODY()
 
   /** SSE endpoint URL override (default: derived from ApiUrl) */
@@ -236,7 +236,7 @@ struct GATRIXSDK_API FGatrixSseStreamingConfig {
 
 /** WebSocket streaming configuration */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixWebSocketStreamingConfig {
+struct GATRIXCLIENTSDK_API FGatrixWebSocketStreamingConfig {
   GENERATED_BODY()
 
   /** WebSocket endpoint URL override (default: derived from ApiUrl) */
@@ -258,7 +258,7 @@ struct GATRIXSDK_API FGatrixWebSocketStreamingConfig {
 
 /** Streaming configuration */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixStreamingConfig {
+struct GATRIXCLIENTSDK_API FGatrixStreamingConfig {
   GENERATED_BODY()
 
   /** Enable streaming (default: true) */
@@ -280,7 +280,7 @@ struct GATRIXSDK_API FGatrixStreamingConfig {
 
 /** Feature flags configuration */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixFeaturesConfig {
+struct GATRIXCLIENTSDK_API FGatrixFeaturesConfig {
   GENERATED_BODY()
 
   /** Seconds between polls (default: 30) */
@@ -334,7 +334,7 @@ struct GATRIXSDK_API FGatrixFeaturesConfig {
 
 /** SDK Configuration */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixClientConfig {
+struct GATRIXCLIENTSDK_API FGatrixClientConfig {
   GENERATED_BODY()
 
   // ==================== Required ====================
@@ -384,7 +384,7 @@ struct GATRIXSDK_API FGatrixClientConfig {
 
 /** Feature flag statistics */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixFeaturesStats {
+struct GATRIXCLIENTSDK_API FGatrixFeaturesStats {
   GENERATED_BODY()
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
@@ -446,7 +446,7 @@ struct GATRIXSDK_API FGatrixFeaturesStats {
 
 /** Overall SDK statistics */
 USTRUCT(BlueprintType)
-struct GATRIXSDK_API FGatrixSdkStats {
+struct GATRIXCLIENTSDK_API FGatrixSdkStats {
   GENERATED_BODY()
 
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")

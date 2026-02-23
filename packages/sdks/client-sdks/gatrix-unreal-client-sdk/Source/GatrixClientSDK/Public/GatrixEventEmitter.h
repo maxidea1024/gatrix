@@ -14,7 +14,7 @@ DECLARE_DELEGATE_TwoParams(FGatrixAnyEventDelegate, const FString&, const TArray
  * Supports on/once/off, onAny/offAny, and handler statistics.
  * All emission is marshalled to the game thread.
  */
-class GATRIXSDK_API FGatrixEventEmitter {
+class GATRIXCLIENTSDK_API FGatrixEventEmitter {
 public:
   struct FListenerInfo {
     int32 Handle;

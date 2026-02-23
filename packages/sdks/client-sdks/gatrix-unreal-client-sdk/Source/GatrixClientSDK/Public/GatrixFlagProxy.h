@@ -21,7 +21,7 @@ class IGatrixVariationProvider;
  * - Provider is always non-null.
  */
 UCLASS(BlueprintType, Transient)
-class GATRIXSDK_API UGatrixFlagProxy : public UObject {
+class GATRIXCLIENTSDK_API UGatrixFlagProxy : public UObject {
   GENERATED_BODY()
 
 public:

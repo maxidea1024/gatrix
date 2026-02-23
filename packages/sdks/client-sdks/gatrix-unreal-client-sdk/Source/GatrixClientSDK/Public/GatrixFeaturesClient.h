@@ -14,9 +14,8 @@
 #include "GatrixWebSocketConnection.h"
 #include "Http.h"
 #include "Runtime/Engine/Public/TimerManager.h"
-
-#include "GatrixFeaturesClient.generated.h"
 #include <atomic>
+#include "GatrixFeaturesClient.generated.h"
 
 // Delegates for Blueprint events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGatrixOnReady);
@@ -31,7 +30,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGatrixOnImpression, FGatrixImpressi
  * SDK. Implementation of CLIENT_SDK_SPEC.md.
  */
 UCLASS(BlueprintType)
-class GATRIXSDK_API UGatrixFeaturesClient : public UObject, public IGatrixVariationProvider {
+class GATRIXCLIENTSDK_API UGatrixFeaturesClient : public UObject, public IGatrixVariationProvider {
   GENERATED_BODY()
 
 public:

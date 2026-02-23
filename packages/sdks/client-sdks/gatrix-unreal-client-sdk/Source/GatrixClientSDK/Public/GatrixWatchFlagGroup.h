@@ -19,7 +19,7 @@ class UGatrixFeaturesClient;
  *   // Later: clean up all watchers at once
  *   Group->DestroyGroup();
  */
-class GATRIXSDK_API FGatrixWatchFlagGroup {
+class GATRIXCLIENTSDK_API FGatrixWatchFlagGroup {
 public:
   FGatrixWatchFlagGroup(UGatrixFeaturesClient* InClient, const FString& InName);
 

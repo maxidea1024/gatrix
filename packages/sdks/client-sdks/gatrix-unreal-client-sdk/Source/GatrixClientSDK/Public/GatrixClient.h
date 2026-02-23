@@ -4,11 +4,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GatrixClient.generated.h"
 #include "GatrixEventEmitter.h"
 #include "GatrixFeaturesClient.h"
 #include "GatrixStorageProvider.h"
 #include "GatrixTypes.h"
+#include "GatrixClient.generated.h"
 
 /**
  * Main Gatrix SDK client.
@@ -29,7 +29,7 @@
  *   Use the "Get Gatrix Client" node, then call Init and Start.
  */
 UCLASS(BlueprintType)
-class GATRIXSDK_API UGatrixClient : public UObject {
+class GATRIXCLIENTSDK_API UGatrixClient : public UObject {
   GENERATED_BODY()
 
 public:

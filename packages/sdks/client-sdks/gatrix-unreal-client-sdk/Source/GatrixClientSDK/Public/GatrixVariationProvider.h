@@ -20,7 +20,7 @@ class UGatrixVariationProvider : public UInterface {
  * interface (typically FeaturesClient) to ensure consistent metrics tracking
  * and logic.
  */
-class GATRIXSDK_API IGatrixVariationProvider {
+class GATRIXCLIENTSDK_API IGatrixVariationProvider {
   GENERATED_BODY()
 
 public:

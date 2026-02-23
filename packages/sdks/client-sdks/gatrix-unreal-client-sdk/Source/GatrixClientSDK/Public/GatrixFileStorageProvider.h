@@ -14,7 +14,7 @@
  * Persists data as JSON files in the project's Saved directory.
  * Thread-safe via FCriticalSection.
  */
-class GATRIXSDK_API FGatrixFileStorageProvider : public IGatrixStorageProvider {
+class GATRIXCLIENTSDK_API FGatrixFileStorageProvider : public IGatrixStorageProvider {
 public:
   FGatrixFileStorageProvider(const FString& Prefix = TEXT("gatrix_cache")) {
     // Use Saved/Gatrix/ directory for storage

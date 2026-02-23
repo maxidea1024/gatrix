@@ -9,7 +9,7 @@
  * Interface for persistent flag storage.
  * Implement this to provide custom storage (e.g., file-based, cloud saves).
  */
-class GATRIXSDK_API IGatrixStorageProvider {
+class GATRIXCLIENTSDK_API IGatrixStorageProvider {
 public:
   virtual ~IGatrixStorageProvider() {}
 
@@ -27,7 +27,7 @@ public:
  * Default in-memory storage provider.
  * Data is lost when the process exits.
  */
-class GATRIXSDK_API FGatrixInMemoryStorageProvider : public IGatrixStorageProvider {
+class GATRIXCLIENTSDK_API FGatrixInMemoryStorageProvider : public IGatrixStorageProvider {
 public:
   virtual void Save(const FString& Key, const FString& Value) override {
     FScopeLock Lock(&CriticalSection);

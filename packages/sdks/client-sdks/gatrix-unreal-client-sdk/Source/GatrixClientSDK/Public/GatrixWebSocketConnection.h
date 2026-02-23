@@ -17,7 +17,7 @@ DECLARE_DELEGATE(FGatrixWsDisconnectedDelegate);
  * Uses UE4 IWebSocket (FWebSocketsModule). JSON messages with a "type" field
  * are dispatched as events. Includes client-side ping/pong keep-alive.
  */
-class GATRIXSDK_API FGatrixWebSocketConnection {
+class GATRIXCLIENTSDK_API FGatrixWebSocketConnection {
 public:
   FGatrixWebSocketConnection();
   ~FGatrixWebSocketConnection();

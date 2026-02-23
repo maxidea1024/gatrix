@@ -17,7 +17,7 @@ DECLARE_DELEGATE(FGatrixSseDisconnectedDelegate);
  * Uses FHttpModule OnRequestProgress delegate for real-time chunk reception.
  * All callbacks are invoked on the game thread.
  */
-class GATRIXSDK_API FGatrixSseConnection {
+class GATRIXCLIENTSDK_API FGatrixSseConnection {
 public:
   FGatrixSseConnection();
   ~FGatrixSseConnection();

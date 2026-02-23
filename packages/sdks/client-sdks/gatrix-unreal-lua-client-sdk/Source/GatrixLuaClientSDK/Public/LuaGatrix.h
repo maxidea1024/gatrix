@@ -57,7 +57,7 @@ struct lua_State;
  * Call Register(L) once with your existing lua_State* to make the
  * "gatrix" module available to Lua scripts.
  */
-class GATRIXLUASDK_API FGatrixLuaBindings {
+class GATRIXLUACLIENTSDK_API FGatrixLuaBindings {
 public:
   /**
    * Register the "gatrix" module into the given Lua state.
