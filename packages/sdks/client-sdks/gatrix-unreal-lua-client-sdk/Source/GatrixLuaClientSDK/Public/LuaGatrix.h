@@ -11,14 +11,19 @@
 //
 //   -- Lua side: lifecycle functions are on the root gatrix table
 //   gatrix.Init({
-//     ApiUrl      = "http://host/api/v1",
-//     ApiToken    = "your-token",
-//     AppName     = "MyApp",
+//     ApiUrl   = "http://host/api/v1",
+//     ApiToken = "your-token",
+//     AppName  = "MyApp",
 //     Environment = "production",
-//     -- Optional:
-//     -- RefreshInterval = 30,
-//     -- EnableDevMode   = true,
-//     -- ExplicitSyncMode = true, -- (default)
+//     -- Optional fields:
+//     Features = {
+//       RefreshInterval = 30,
+//       OfflineMode = false,
+//       DisableMetrics = false,
+//       DisableRefresh = false,
+//       ExplicitSyncMode = true, -- (default)
+//       ImpressionDataAll = false
+//     }
 //   })
 //   gatrix.Start()
 //   gatrix.Stop()

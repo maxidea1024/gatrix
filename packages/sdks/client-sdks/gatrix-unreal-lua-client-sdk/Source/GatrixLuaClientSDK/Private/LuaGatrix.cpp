@@ -514,65 +514,67 @@ static void RejectDeferred(lua_State* L, int DeferredRef, const char* ErrorMsg =
 static FGatrixClientConfig ParseConfigFromLuaTable(lua_State* L, int TableIndex) {
   FGatrixClientConfig Config;
 
+  // Track original absolute index
+  int AbsIndex = (TableIndex > 0) ? TableIndex : lua_gettop(L) + TableIndex + 1;
+
   // Required fields
-  lua_getfield(L, TableIndex, "ApiUrl");
+  lua_getfield(L, AbsIndex, "ApiUrl");
   Config.ApiUrl = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "ApiToken");
+  lua_getfield(L, AbsIndex, "ApiToken");
   Config.ApiToken = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "AppName");
+  lua_getfield(L, AbsIndex, "AppName");
   Config.AppName = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "Environment");
+  lua_getfield(L, AbsIndex, "Environment");
   Config.Environment = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  // Optional fields
-  lua_getfield(L, TableIndex, "RefreshInterval");
-  if (lua_isnumber(L, -1)) {
-    Config.Features.RefreshInterval = static_cast<float>(lua_tonumber(L, -1));
-  }
-  lua_pop(L, 1);
-
-  lua_getfield(L, TableIndex, "DisableRefresh");
-  if (lua_isboolean(L, -1)) {
-    Config.Features.bDisableRefresh = (lua_toboolean(L, -1) != 0);
-  }
-  lua_pop(L, 1);
-
-  lua_getfield(L, TableIndex, "EnableDevMode");
+  // Root optional fields
+  lua_getfield(L, AbsIndex, "EnableDevMode");
   if (lua_isboolean(L, -1)) {
     Config.bEnableDevMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "ExplicitSyncMode");
-  if (lua_isboolean(L, -1)) {
-    Config.Features.bExplicitSyncMode = (lua_toboolean(L, -1) != 0);
-  }
-  lua_pop(L, 1);
+  // Features nested config
+  lua_getfield(L, AbsIndex, "Features");
+  if (lua_istable(L, -1)) {
+    lua_getfield(L, -1, "RefreshInterval");
+    if (lua_isnumber(L, -1))
+      Config.Features.RefreshInterval = static_cast<float>(lua_tonumber(L, -1));
+    lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "DisableMetrics");
-  if (lua_isboolean(L, -1)) {
-    Config.Features.bDisableMetrics = (lua_toboolean(L, -1) != 0);
-  }
-  lua_pop(L, 1);
+    lua_getfield(L, -1, "DisableRefresh");
+    if (lua_isboolean(L, -1))
+      Config.Features.bDisableRefresh = (lua_toboolean(L, -1) != 0);
+    lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "ImpressionDataAll");
-  if (lua_isboolean(L, -1)) {
-    Config.Features.bImpressionDataAll = (lua_toboolean(L, -1) != 0);
-  }
-  lua_pop(L, 1);
+    lua_getfield(L, -1, "ExplicitSyncMode");
+    if (lua_isboolean(L, -1))
+      Config.Features.bExplicitSyncMode = (lua_toboolean(L, -1) != 0);
+    lua_pop(L, 1);
 
-  lua_getfield(L, TableIndex, "OfflineMode");
-  if (lua_isboolean(L, -1)) {
-    Config.bOfflineMode = (lua_toboolean(L, -1) != 0);
+    lua_getfield(L, -1, "DisableMetrics");
+    if (lua_isboolean(L, -1))
+      Config.Features.bDisableMetrics = (lua_toboolean(L, -1) != 0);
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "ImpressionDataAll");
+    if (lua_isboolean(L, -1))
+      Config.Features.bImpressionDataAll = (lua_toboolean(L, -1) != 0);
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "OfflineMode");
+    if (lua_isboolean(L, -1))
+      Config.Features.bOfflineMode = (lua_toboolean(L, -1) != 0);
+    lua_pop(L, 1);
   }
-  lua_pop(L, 1);
+  lua_pop(L, 1); // Pop Features table
 
   return Config;
 }
