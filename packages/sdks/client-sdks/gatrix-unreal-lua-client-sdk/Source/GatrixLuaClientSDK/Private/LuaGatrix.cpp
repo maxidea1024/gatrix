@@ -18,8 +18,7 @@ extern "C" {
 
 // ==================== Static State ====================
 
-TMap<lua_State *, FGatrixLuaBindings::FLuaSession>
-    FGatrixLuaBindings::SessionRegistry;
+TMap<lua_State*, FGatrixLuaBindings::FLuaSession> FGatrixLuaBindings::SessionRegistry;
 
 // ==================== Registration ====================
 
@@ -68,8 +67,7 @@ static const struct luaL_Reg GatrixFeaturesFunctions[] = {
     {"WatchSyncedFlag", FGatrixLuaBindings::Lua_WatchSyncedFlag},
     {"WatchRealtimeFlagWithInitialState",
      FGatrixLuaBindings::Lua_WatchRealtimeFlagWithInitialState},
-    {"WatchSyncedFlagWithInitialState",
-     FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState},
+    {"WatchSyncedFlagWithInitialState", FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState},
     {"UnwatchFlag", FGatrixLuaBindings::Lua_UnwatchFlag},
     {"CreateWatchGroup", FGatrixLuaBindings::Lua_CreateWatchGroup},
     // State
@@ -80,14 +78,14 @@ static const struct luaL_Reg GatrixFeaturesFunctions[] = {
     {"SyncFlags", FGatrixLuaBindings::Lua_SyncFlags},
     {nullptr, nullptr}};
 
-void FGatrixLuaBindings::Register(lua_State *L) {
+void FGatrixLuaBindings::Register(lua_State* L) {
   if (!L) {
     UE_LOG(LogGatrixLua, Error, TEXT("Register called with null lua_State"));
     return;
   }
 
   // Create session with alive flag
-  FLuaSession &Session = SessionRegistry.FindOrAdd(L);
+  FLuaSession& Session = SessionRegistry.FindOrAdd(L);
   Session.bAlive = MakeShared<bool>(true);
   Session.Callbacks.Empty();
 
@@ -118,7 +116,7 @@ void FGatrixLuaBindings::Register(lua_State *L) {
   UE_LOG(LogGatrixLua, Log, TEXT("Registered into Lua state %p"), L);
 }
 
-void FGatrixLuaBindings::Unregister(lua_State *L) {
+void FGatrixLuaBindings::Unregister(lua_State* L) {
   if (!L) {
     return;
   }
@@ -130,8 +128,8 @@ void FGatrixLuaBindings::Unregister(lua_State *L) {
 
 // ==================== Session Helpers ====================
 
-TSharedPtr<bool> FGatrixLuaBindings::GetAliveFlag(lua_State *L) {
-  FLuaSession *Session = SessionRegistry.Find(L);
+TSharedPtr<bool> FGatrixLuaBindings::GetAliveFlag(lua_State* L) {
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     return Session->bAlive;
   }
@@ -140,7 +138,7 @@ TSharedPtr<bool> FGatrixLuaBindings::GetAliveFlag(lua_State *L) {
 
 // ==================== Value Helpers ====================
 
-FString FGatrixLuaBindings::SafeToString(lua_State *L, int Index) {
+FString FGatrixLuaBindings::SafeToString(lua_State* L, int Index) {
   int AbsIndex = (Index > 0) ? Index : lua_gettop(L) + Index + 1;
 
   if (lua_isuserdata(L, AbsIndex)) {
@@ -148,7 +146,7 @@ FString FGatrixLuaBindings::SafeToString(lua_State *L, int Index) {
     lua_getglobal(L, "tostring");
     lua_pushvalue(L, AbsIndex);
     if (lua_pcall(L, 1, 1, 0) == LUA_OK) {
-      const char *Str = lua_tostring(L, -1);
+      const char* Str = lua_tostring(L, -1);
       FString Result = Str ? UTF8_TO_TCHAR(Str) : FString();
       lua_pop(L, 1);
       return Result;
@@ -166,7 +164,7 @@ FString FGatrixLuaBindings::SafeToString(lua_State *L, int Index) {
     return lua_toboolean(L, AbsIndex) ? TEXT("true") : TEXT("false");
   }
 
-  const char *Str = lua_tostring(L, AbsIndex);
+  const char* Str = lua_tostring(L, AbsIndex);
   return Str ? UTF8_TO_TCHAR(Str) : FString();
 }
 
@@ -176,8 +174,7 @@ FString FGatrixLuaBindings::SafeToString(lua_State *L, int Index) {
 //   Number      → lua_pushnumber
 //   Boolean     → lua_pushboolean
 //   None        → lua_pushstring (fallback)
-void FGatrixLuaBindings::PushVariantTable(lua_State *L,
-                                          const FGatrixVariant &Variant,
+void FGatrixLuaBindings::PushVariantTable(lua_State* L, const FGatrixVariant& Variant,
                                           EGatrixValueType ValueType) {
   lua_createtable(L, 0, 3);
 
@@ -190,8 +187,7 @@ void FGatrixLuaBindings::PushVariantTable(lua_State *L,
   // Push Value as native Lua type based on ValueType
   switch (ValueType) {
   case EGatrixValueType::Boolean:
-    lua_pushboolean(
-        L, Variant.Value.Equals(TEXT("true"), ESearchCase::IgnoreCase));
+    lua_pushboolean(L, Variant.Value.Equals(TEXT("true"), ESearchCase::IgnoreCase));
     break;
   case EGatrixValueType::Number: {
     double NumVal = FCString::Atod(*Variant.Value);
@@ -209,8 +205,7 @@ void FGatrixLuaBindings::PushVariantTable(lua_State *L,
 
 // FGatrixEvaluatedFlag: { Name, bEnabled, Variant{}, ValueType, Version,
 // Reason, bImpressionData }
-void FGatrixLuaBindings::PushEvaluatedFlagTable(
-    lua_State *L, const FGatrixEvaluatedFlag &Flag) {
+void FGatrixLuaBindings::PushEvaluatedFlagTable(lua_State* L, const FGatrixEvaluatedFlag& Flag) {
   lua_createtable(L, 0, 7);
 
   lua_pushstring(L, TCHAR_TO_UTF8(*Flag.Name));
@@ -238,8 +233,7 @@ void FGatrixLuaBindings::PushEvaluatedFlagTable(
 
 // FGatrixContext: { AppName, Environment, UserId, SessionId, CurrentTime,
 // Properties }
-void FGatrixLuaBindings::PushContextTable(lua_State *L,
-                                          const FGatrixContext &Context) {
+void FGatrixLuaBindings::PushContextTable(lua_State* L, const FGatrixContext& Context) {
   lua_createtable(L, 0, 6);
 
   lua_pushstring(L, TCHAR_TO_UTF8(*Context.AppName));
@@ -260,7 +254,7 @@ void FGatrixLuaBindings::PushContextTable(lua_State *L,
   // Push custom properties as a sub-table
   if (Context.Properties.Num() > 0) {
     lua_createtable(L, 0, Context.Properties.Num());
-    for (const auto &Pair : Context.Properties) {
+    for (const auto& Pair : Context.Properties) {
       lua_pushstring(L, TCHAR_TO_UTF8(*Pair.Value));
       lua_setfield(L, -2, TCHAR_TO_UTF8(*Pair.Key));
     }
@@ -268,8 +262,7 @@ void FGatrixLuaBindings::PushContextTable(lua_State *L,
   }
 }
 
-void FGatrixLuaBindings::PushFlagProxyTable(lua_State *L,
-                                            UGatrixFlagProxy *Proxy) {
+void FGatrixLuaBindings::PushFlagProxyTable(lua_State* L, UGatrixFlagProxy* Proxy) {
   if (!Proxy) {
     lua_pushnil(L);
     return;
@@ -303,8 +296,7 @@ void FGatrixLuaBindings::PushFlagProxyTable(lua_State *L,
   lua_setfield(L, -2, "Reason");
 }
 
-FGatrixContext FGatrixLuaBindings::ReadContextFromTable(lua_State *L,
-                                                        int Index) {
+FGatrixContext FGatrixLuaBindings::ReadContextFromTable(lua_State* L, int Index) {
   FGatrixContext Ctx;
   int AbsIndex = (Index > 0) ? Index : lua_gettop(L) + Index + 1;
 
@@ -359,8 +351,8 @@ FGatrixContext FGatrixLuaBindings::ReadContextFromTable(lua_State *L,
 
 // ==================== Callback Management ====================
 
-void FGatrixLuaBindings::RemoveCallback(lua_State *L, int32 Handle) {
-  FLuaSession *Session = SessionRegistry.Find(L);
+void FGatrixLuaBindings::RemoveCallback(lua_State* L, int32 Handle) {
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (!Session) {
     return;
   }
@@ -375,8 +367,8 @@ void FGatrixLuaBindings::RemoveCallback(lua_State *L, int32 Handle) {
   }
 }
 
-void FGatrixLuaBindings::RemoveAllCallbacks(lua_State *L) {
-  FLuaSession *Session = SessionRegistry.Find(L);
+void FGatrixLuaBindings::RemoveAllCallbacks(lua_State* L) {
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (!Session) {
     return;
   }
@@ -387,8 +379,8 @@ void FGatrixLuaBindings::RemoveAllCallbacks(lua_State *L) {
     *Session->bAlive = false;
   }
 
-  UGatrixClient *Client = UGatrixClient::Get();
-  for (const FCallbackEntry &Entry : Session->Callbacks) {
+  UGatrixClient* Client = UGatrixClient::Get();
+  for (const FCallbackEntry& Entry : Session->Callbacks) {
     if (Client) {
       if (Entry.bIsWatch) {
         Client->GetFeatures()->UnwatchFlag(Entry.Handle);
@@ -410,7 +402,7 @@ void FGatrixLuaBindings::RemoveAllCallbacks(lua_State *L) {
 // Create a Lua deferred object by calling `deferred.new()`.
 // Returns the registry ref to the deferred table, or LUA_NOREF on failure.
 // The deferred table is left on top of the Lua stack.
-static int CreateDeferred(lua_State *L) {
+static int CreateDeferred(lua_State* L) {
   lua_getglobal(L, "deferred");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
@@ -425,7 +417,7 @@ static int CreateDeferred(lua_State *L) {
   }
   lua_remove(L, -2); // remove deferred table, keep deferred.new function
   if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
-    const char *Err = lua_tostring(L, -1);
+    const char* Err = lua_tostring(L, -1);
     UE_LOG(LogGatrixLua, Error, TEXT("deferred.new() failed: %s"),
            Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
     lua_pop(L, 1);
@@ -440,7 +432,7 @@ static int CreateDeferred(lua_State *L) {
 
 // Resolve a deferred by its registry ref: d:resolve(...)
 // nArgs values should be on top of the stack before calling.
-static void ResolveDeferred(lua_State *L, int DeferredRef, int nArgs = 0) {
+static void ResolveDeferred(lua_State* L, int DeferredRef, int nArgs = 0) {
   if (DeferredRef == LUA_NOREF)
     return;
 
@@ -462,7 +454,7 @@ static void ResolveDeferred(lua_State *L, int DeferredRef, int nArgs = 0) {
     }
   }
   if (lua_pcall(L, 1 + nArgs, 0, 0) != LUA_OK) {
-    const char *Err = lua_tostring(L, -1);
+    const char* Err = lua_tostring(L, -1);
     UE_LOG(LogGatrixLua, Error, TEXT("deferred:resolve() failed: %s"),
            Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
     lua_pop(L, 1);
@@ -475,8 +467,7 @@ static void ResolveDeferred(lua_State *L, int DeferredRef, int nArgs = 0) {
 }
 
 // Reject a deferred by its registry ref: d:reject(errorMsg)
-static void RejectDeferred(lua_State *L, int DeferredRef,
-                           const char *ErrorMsg = nullptr) {
+static void RejectDeferred(lua_State* L, int DeferredRef, const char* ErrorMsg = nullptr) {
   if (DeferredRef == LUA_NOREF)
     return;
 
@@ -492,7 +483,7 @@ static void RejectDeferred(lua_State *L, int DeferredRef,
     lua_pushstring(L, ErrorMsg);
   }
   if (lua_pcall(L, ErrorMsg ? 2 : 1, 0, 0) != LUA_OK) {
-    const char *Err = lua_tostring(L, -1);
+    const char* Err = lua_tostring(L, -1);
     UE_LOG(LogGatrixLua, Error, TEXT("deferred:reject() failed: %s"),
            Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
     lua_pop(L, 1);
@@ -503,7 +494,7 @@ static void RejectDeferred(lua_State *L, int DeferredRef,
 
 // ==================== Lifecycle ====================
 
-int FGatrixLuaBindings::Lua_Init(lua_State *L) {
+int FGatrixLuaBindings::Lua_Init(lua_State* L) {
   luaL_checktype(L, 1, LUA_TTABLE);
 
   FGatrixClientConfig Config;
@@ -572,8 +563,8 @@ int FGatrixLuaBindings::Lua_Init(lua_State *L) {
   return 0;
 }
 
-int FGatrixLuaBindings::Lua_Start(lua_State *L) {
-  UGatrixClient *Client = UGatrixClient::Get();
+int FGatrixLuaBindings::Lua_Start(lua_State* L) {
+  UGatrixClient* Client = UGatrixClient::Get();
 
   // Create deferred promise
   int DeferredRef = CreateDeferred(L);
@@ -596,15 +587,15 @@ int FGatrixLuaBindings::Lua_Start(lua_State *L) {
 
   // Register one-shot listener for "flags.ready" to resolve
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedDeferredRef = DeferredRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   auto HandlePtr = MakeShared<int32>(0);
 
-  int32 GatrixHandle = Client->Once(
-      TEXT("flags.ready"), [CapturedL, CapturedDeferredRef, CapturedAlive,
-                            HandlePtr](const TArray<FString> &Args) {
+  int32 GatrixHandle =
+      Client->Once(TEXT("flags.ready"), [CapturedL, CapturedDeferredRef, CapturedAlive,
+                                         HandlePtr](const TArray<FString>& Args) {
         if (!CapturedAlive.IsValid() || !(*CapturedAlive))
           return;
         ResolveDeferred(CapturedL, CapturedDeferredRef);
@@ -613,7 +604,7 @@ int FGatrixLuaBindings::Lua_Start(lua_State *L) {
 
   *HandlePtr = GatrixHandle;
 
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({GatrixHandle, LUA_NOREF, false, false});
   }
@@ -624,7 +615,7 @@ int FGatrixLuaBindings::Lua_Start(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_Stop(lua_State *L) {
+int FGatrixLuaBindings::Lua_Stop(lua_State* L) {
   // Clean up all Lua callbacks before stopping
   RemoveAllCallbacks(L);
   UGatrixClient::Get()->Stop();
@@ -633,71 +624,68 @@ int FGatrixLuaBindings::Lua_Stop(lua_State *L) {
 
 // ==================== Flag Access ====================
 
-int FGatrixLuaBindings::Lua_IsEnabled(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
-  bool bEnabled =
-      UGatrixClient::Get()->GetFeatures()->IsEnabled(UTF8_TO_TCHAR(FlagName));
+int FGatrixLuaBindings::Lua_IsEnabled(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
+  bool bEnabled = UGatrixClient::Get()->GetFeatures()->IsEnabled(UTF8_TO_TCHAR(FlagName));
   lua_pushboolean(L, bEnabled);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_GetFlag(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
-  FGatrixEvaluatedFlag Flag =
-      UGatrixClient::Get()->GetFeatures()->GetFlag(UTF8_TO_TCHAR(FlagName));
+int FGatrixLuaBindings::Lua_GetFlag(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
+  FGatrixEvaluatedFlag Flag = UGatrixClient::Get()->GetFeatures()->GetFlag(UTF8_TO_TCHAR(FlagName));
   PushEvaluatedFlagTable(L, Flag);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_BoolVariation(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_BoolVariation(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   bool Fallback = (lua_toboolean(L, 2) != 0);
-  bool Value = UGatrixClient::Get()->GetFeatures()->BoolVariation(
-      UTF8_TO_TCHAR(FlagName), Fallback);
+  bool Value =
+      UGatrixClient::Get()->GetFeatures()->BoolVariation(UTF8_TO_TCHAR(FlagName), Fallback);
   lua_pushboolean(L, Value);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_StringVariation(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
-  const char *Fallback = luaL_optstring(L, 2, "");
-  FString Value = UGatrixClient::Get()->GetFeatures()->StringVariation(
-      UTF8_TO_TCHAR(FlagName), UTF8_TO_TCHAR(Fallback));
+int FGatrixLuaBindings::Lua_StringVariation(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
+  const char* Fallback = luaL_optstring(L, 2, "");
+  FString Value = UGatrixClient::Get()->GetFeatures()->StringVariation(UTF8_TO_TCHAR(FlagName),
+                                                                       UTF8_TO_TCHAR(Fallback));
   lua_pushstring(L, TCHAR_TO_UTF8(*Value));
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_IntVariation(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_IntVariation(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   int32 Fallback = static_cast<int32>(luaL_optinteger(L, 2, 0));
-  int32 Value = UGatrixClient::Get()->GetFeatures()->IntVariation(
-      UTF8_TO_TCHAR(FlagName), Fallback);
+  int32 Value =
+      UGatrixClient::Get()->GetFeatures()->IntVariation(UTF8_TO_TCHAR(FlagName), Fallback);
   lua_pushinteger(L, Value);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_FloatVariation(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_FloatVariation(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   float Fallback = static_cast<float>(luaL_optnumber(L, 2, 0.0));
-  float Value = UGatrixClient::Get()->GetFeatures()->FloatVariation(
-      UTF8_TO_TCHAR(FlagName), Fallback);
+  float Value =
+      UGatrixClient::Get()->GetFeatures()->FloatVariation(UTF8_TO_TCHAR(FlagName), Fallback);
   lua_pushnumber(L, Value);
   return 1;
 }
 
 // Variation — returns variant name as string
-int FGatrixLuaBindings::Lua_Variation(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
-  const char *Fallback = luaL_optstring(L, 2, "");
-  FString Value = UGatrixClient::Get()->GetFeatures()->Variation(
-      UTF8_TO_TCHAR(FlagName), UTF8_TO_TCHAR(Fallback));
+int FGatrixLuaBindings::Lua_Variation(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
+  const char* Fallback = luaL_optstring(L, 2, "");
+  FString Value = UGatrixClient::Get()->GetFeatures()->Variation(UTF8_TO_TCHAR(FlagName),
+                                                                 UTF8_TO_TCHAR(Fallback));
   lua_pushstring(L, TCHAR_TO_UTF8(*Value));
   return 1;
 }
 
 // Helper: push FGatrixVariationResult as a Lua table
-static void PushVariationResultTable(lua_State *L,
-                                     const FGatrixVariationResult &Result) {
+static void PushVariationResultTable(lua_State* L, const FGatrixVariationResult& Result) {
   lua_createtable(L, 0, 4);
 
   lua_pushstring(L, TCHAR_TO_UTF8(*Result.Value));
@@ -715,101 +703,94 @@ static void PushVariationResultTable(lua_State *L,
 
 // ==================== Variation Details ====================
 
-int FGatrixLuaBindings::Lua_BoolVariationDetails(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_BoolVariationDetails(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   bool Fallback = (lua_toboolean(L, 2) != 0);
   FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->BoolVariationDetails(
-          UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->BoolVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback);
   PushVariationResultTable(L, Result);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_StringVariationDetails(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
-  const char *Fallback = luaL_optstring(L, 2, "");
-  FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->StringVariationDetails(
-          UTF8_TO_TCHAR(FlagName), UTF8_TO_TCHAR(Fallback));
+int FGatrixLuaBindings::Lua_StringVariationDetails(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
+  const char* Fallback = luaL_optstring(L, 2, "");
+  FGatrixVariationResult Result = UGatrixClient::Get()->GetFeatures()->StringVariationDetails(
+      UTF8_TO_TCHAR(FlagName), UTF8_TO_TCHAR(Fallback));
   PushVariationResultTable(L, Result);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_IntVariationDetails(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_IntVariationDetails(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   int32 Fallback = static_cast<int32>(luaL_optinteger(L, 2, 0));
   FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->IntVariationDetails(
-          UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->IntVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback);
   PushVariationResultTable(L, Result);
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_FloatVariationDetails(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_FloatVariationDetails(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   float Fallback = static_cast<float>(luaL_optnumber(L, 2, 0.0));
   FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->FloatVariationDetails(
-          UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->FloatVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback);
   PushVariationResultTable(L, Result);
   return 1;
 }
 
 // ==================== Variation OrThrow ====================
 
-int FGatrixLuaBindings::Lua_BoolVariationOrThrow(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_BoolVariationOrThrow(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   try {
-    bool Value = UGatrixClient::Get()->GetFeatures()->BoolVariationOrThrow(
-        UTF8_TO_TCHAR(FlagName));
+    bool Value = UGatrixClient::Get()->GetFeatures()->BoolVariationOrThrow(UTF8_TO_TCHAR(FlagName));
     lua_pushboolean(L, Value);
     return 1;
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     return luaL_error(L, "BoolVariationOrThrow(%s): %s", FlagName, e.what());
   }
 }
 
-int FGatrixLuaBindings::Lua_StringVariationOrThrow(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_StringVariationOrThrow(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   try {
-    FString Value = UGatrixClient::Get()->GetFeatures()->StringVariationOrThrow(
-        UTF8_TO_TCHAR(FlagName));
+    FString Value =
+        UGatrixClient::Get()->GetFeatures()->StringVariationOrThrow(UTF8_TO_TCHAR(FlagName));
     lua_pushstring(L, TCHAR_TO_UTF8(*Value));
     return 1;
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     return luaL_error(L, "StringVariationOrThrow(%s): %s", FlagName, e.what());
   }
 }
 
-int FGatrixLuaBindings::Lua_IntVariationOrThrow(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_IntVariationOrThrow(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   try {
-    int32 Value = UGatrixClient::Get()->GetFeatures()->IntVariationOrThrow(
-        UTF8_TO_TCHAR(FlagName));
+    int32 Value = UGatrixClient::Get()->GetFeatures()->IntVariationOrThrow(UTF8_TO_TCHAR(FlagName));
     lua_pushinteger(L, Value);
     return 1;
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     return luaL_error(L, "IntVariationOrThrow(%s): %s", FlagName, e.what());
   }
 }
 
-int FGatrixLuaBindings::Lua_FloatVariationOrThrow(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_FloatVariationOrThrow(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   try {
-    float Value = UGatrixClient::Get()->GetFeatures()->FloatVariationOrThrow(
-        UTF8_TO_TCHAR(FlagName));
+    float Value =
+        UGatrixClient::Get()->GetFeatures()->FloatVariationOrThrow(UTF8_TO_TCHAR(FlagName));
     lua_pushnumber(L, Value);
     return 1;
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     return luaL_error(L, "FloatVariationOrThrow(%s): %s", FlagName, e.what());
   }
 }
 
-int FGatrixLuaBindings::Lua_GetVariant(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_GetVariant(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   FString FlagStr = UTF8_TO_TCHAR(FlagName);
-  FGatrixVariant Variant =
-      UGatrixClient::Get()->GetFeatures()->GetVariant(FlagStr);
+  FGatrixVariant Variant = UGatrixClient::Get()->GetFeatures()->GetVariant(FlagStr);
   // Get ValueType from the flag to push Value as native Lua type
   EGatrixValueType ValType =
       UGatrixClient::Get()->GetFeatures()->GetValueTypeInternal(FlagStr, false);
@@ -817,9 +798,8 @@ int FGatrixLuaBindings::Lua_GetVariant(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_GetAllFlags(lua_State *L) {
-  TArray<FGatrixEvaluatedFlag> Flags =
-      UGatrixClient::Get()->GetFeatures()->GetAllFlags();
+int FGatrixLuaBindings::Lua_GetAllFlags(lua_State* L) {
+  TArray<FGatrixEvaluatedFlag> Flags = UGatrixClient::Get()->GetFeatures()->GetAllFlags();
 
   lua_createtable(L, Flags.Num(), 0);
   for (int32 i = 0; i < Flags.Num(); ++i) {
@@ -829,17 +809,16 @@ int FGatrixLuaBindings::Lua_GetAllFlags(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_HasFlag(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
-  bool bExists =
-      UGatrixClient::Get()->GetFeatures()->HasFlag(UTF8_TO_TCHAR(FlagName));
+int FGatrixLuaBindings::Lua_HasFlag(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
+  bool bExists = UGatrixClient::Get()->GetFeatures()->HasFlag(UTF8_TO_TCHAR(FlagName));
   lua_pushboolean(L, bExists);
   return 1;
 }
 
 // ==================== Context ====================
 
-int FGatrixLuaBindings::Lua_UpdateContext(lua_State *L) {
+int FGatrixLuaBindings::Lua_UpdateContext(lua_State* L) {
   luaL_checktype(L, 1, LUA_TTABLE);
   FGatrixContext Ctx = ReadContextFromTable(L, 1);
 
@@ -853,7 +832,7 @@ int FGatrixLuaBindings::Lua_UpdateContext(lua_State *L) {
   }
 
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = DeferredRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
@@ -862,8 +841,7 @@ int FGatrixLuaBindings::Lua_UpdateContext(lua_State *L) {
   // resulting FetchFlags completes (or immediately when offline/not started).
   // We do NOT touch any lock here — all paths are game-thread-only.
   UGatrixClient::Get()->UpdateContext(
-      Ctx, [CapturedL, CapturedRef, CapturedAlive](bool bSuccess,
-                                                   const FString &ErrorMsg) {
+      Ctx, [CapturedL, CapturedRef, CapturedAlive](bool bSuccess, const FString& ErrorMsg) {
         // Safety: check that the Lua state is still alive
         if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
           return;
@@ -880,7 +858,7 @@ int FGatrixLuaBindings::Lua_UpdateContext(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_GetContext(lua_State *L) {
+int FGatrixLuaBindings::Lua_GetContext(lua_State* L) {
   FGatrixContext Ctx = UGatrixClient::Get()->GetContext();
   PushContextTable(L, Ctx);
   return 1;
@@ -888,8 +866,8 @@ int FGatrixLuaBindings::Lua_GetContext(lua_State *L) {
 
 // ==================== Events ====================
 
-int FGatrixLuaBindings::Lua_On(lua_State *L) {
-  const char *EventName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_On(lua_State* L) {
+  const char* EventName = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
   // Store a reference to the Lua function in the registry
@@ -900,19 +878,18 @@ int FGatrixLuaBindings::Lua_On(lua_State *L) {
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
   if (!AliveFlag.IsValid()) {
     luaL_unref(L, LUA_REGISTRYINDEX, LuaRef);
-    return luaL_error(
-        L, "gatrix.Features.On: module not registered (call Register first)");
+    return luaL_error(L, "gatrix.Features.On: module not registered (call Register first)");
   }
 
   // Capture alive flag (shared ptr copy) and lua_State for the callback.
   // The alive flag is checked before every lua_State access.
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   int32 GatrixHandle = UGatrixClient::Get()->On(
       UTF8_TO_TCHAR(EventName),
-      [CapturedL, CapturedRef, CapturedAlive](const TArray<FString> &Args) {
+      [CapturedL, CapturedRef, CapturedAlive](const TArray<FString>& Args) {
         // CRITICAL: check alive flag before touching lua_State
         if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
           return;
@@ -934,7 +911,7 @@ int FGatrixLuaBindings::Lua_On(lua_State *L) {
 
         // Call the Lua function with 1 argument (the args table)
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
+          const char* Err = lua_tostring(CapturedL, -1);
           UE_LOG(LogGatrixLua, Error, TEXT("On callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
@@ -942,7 +919,7 @@ int FGatrixLuaBindings::Lua_On(lua_State *L) {
       });
 
   // Track the callback for cleanup
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({GatrixHandle, LuaRef, false, false});
   }
@@ -951,7 +928,7 @@ int FGatrixLuaBindings::Lua_On(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_Off(lua_State *L) {
+int FGatrixLuaBindings::Lua_Off(lua_State* L) {
   int32 Handle = static_cast<int32>(luaL_checkinteger(L, 1));
 
   // Unsubscribe from Gatrix
@@ -963,8 +940,8 @@ int FGatrixLuaBindings::Lua_Off(lua_State *L) {
   return 0;
 }
 
-int FGatrixLuaBindings::Lua_Once(lua_State *L) {
-  const char *EventName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_Once(lua_State* L) {
+  const char* EventName = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
   // Store a reference to the Lua function
@@ -974,11 +951,10 @@ int FGatrixLuaBindings::Lua_Once(lua_State *L) {
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
   if (!AliveFlag.IsValid()) {
     luaL_unref(L, LUA_REGISTRYINDEX, LuaRef);
-    return luaL_error(
-        L, "gatrix.Once: module not registered (call Register first)");
+    return luaL_error(L, "gatrix.Once: module not registered (call Register first)");
   }
 
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
@@ -986,8 +962,8 @@ int FGatrixLuaBindings::Lua_Once(lua_State *L) {
   auto HandlePtr = MakeShared<int32>(0);
 
   int32 GatrixHandle = UGatrixClient::Get()->Once(
-      UTF8_TO_TCHAR(EventName), [CapturedL, CapturedRef, CapturedAlive,
-                                 HandlePtr](const TArray<FString> &Args) {
+      UTF8_TO_TCHAR(EventName),
+      [CapturedL, CapturedRef, CapturedAlive, HandlePtr](const TArray<FString>& Args) {
         // CRITICAL: check alive flag before touching lua_State
         if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
           return;
@@ -1009,7 +985,7 @@ int FGatrixLuaBindings::Lua_Once(lua_State *L) {
         }
 
         if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
+          const char* Err = lua_tostring(CapturedL, -1);
           UE_LOG(LogGatrixLua, Error, TEXT("Once callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
@@ -1022,7 +998,7 @@ int FGatrixLuaBindings::Lua_Once(lua_State *L) {
   *HandlePtr = GatrixHandle;
 
   // Track the callback
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({GatrixHandle, LuaRef, false, false});
   }
@@ -1033,8 +1009,8 @@ int FGatrixLuaBindings::Lua_Once(lua_State *L) {
 
 // ==================== Watch ====================
 
-int FGatrixLuaBindings::Lua_WatchRealtimeFlag(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_WatchRealtimeFlag(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
   lua_pushvalue(L, 2);
@@ -1043,17 +1019,15 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlag(lua_State *L) {
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
   if (!AliveFlag.IsValid()) {
     luaL_unref(L, LUA_REGISTRYINDEX, LuaRef);
-    return luaL_error(
-        L, "gatrix.Features.WatchRealtimeFlag: module not registered");
+    return luaL_error(L, "gatrix.Features.WatchRealtimeFlag: module not registered");
   }
 
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda([CapturedL, CapturedRef,
-                       CapturedAlive](UGatrixFlagProxy *Proxy) {
+  Delegate.BindLambda([CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy* Proxy) {
     // CRITICAL: check alive flag before touching lua_State
     if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
       return;
@@ -1069,17 +1043,17 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlag(lua_State *L) {
     PushFlagProxyTable(CapturedL, Proxy);
 
     if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-      const char *Err = lua_tostring(CapturedL, -1);
+      const char* Err = lua_tostring(CapturedL, -1);
       UE_LOG(LogGatrixLua, Error, TEXT("WatchRealtimeFlag callback error: %s"),
              Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
       lua_pop(CapturedL, 1);
     }
   });
 
-  int32 Handle = UGatrixClient::Get()->GetFeatures()->WatchRealtimeFlag(
-      UTF8_TO_TCHAR(FlagName), Delegate);
+  int32 Handle =
+      UGatrixClient::Get()->GetFeatures()->WatchRealtimeFlag(UTF8_TO_TCHAR(FlagName), Delegate);
 
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({Handle, LuaRef, true, false});
   }
@@ -1088,8 +1062,8 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlag(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_WatchSyncedFlag(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_WatchSyncedFlag(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
   lua_pushvalue(L, 2);
@@ -1098,17 +1072,15 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlag(lua_State *L) {
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
   if (!AliveFlag.IsValid()) {
     luaL_unref(L, LUA_REGISTRYINDEX, LuaRef);
-    return luaL_error(L,
-                      "gatrix.Features.WatchSyncedFlag: module not registered");
+    return luaL_error(L, "gatrix.Features.WatchSyncedFlag: module not registered");
   }
 
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda([CapturedL, CapturedRef,
-                       CapturedAlive](UGatrixFlagProxy *Proxy) {
+  Delegate.BindLambda([CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy* Proxy) {
     // CRITICAL: check alive flag before touching lua_State
     if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
       return;
@@ -1123,17 +1095,17 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlag(lua_State *L) {
     PushFlagProxyTable(CapturedL, Proxy);
 
     if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-      const char *Err = lua_tostring(CapturedL, -1);
+      const char* Err = lua_tostring(CapturedL, -1);
       UE_LOG(LogGatrixLua, Error, TEXT("WatchSyncedFlag callback error: %s"),
              Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
       lua_pop(CapturedL, 1);
     }
   });
 
-  int32 Handle = UGatrixClient::Get()->GetFeatures()->WatchSyncedFlag(
-      UTF8_TO_TCHAR(FlagName), Delegate);
+  int32 Handle =
+      UGatrixClient::Get()->GetFeatures()->WatchSyncedFlag(UTF8_TO_TCHAR(FlagName), Delegate);
 
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({Handle, LuaRef, true, false});
   }
@@ -1142,8 +1114,8 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlag(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_WatchRealtimeFlagWithInitialState(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_WatchRealtimeFlagWithInitialState(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
   lua_pushvalue(L, 2);
@@ -1156,40 +1128,38 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlagWithInitialState(lua_State *L) {
                          "module not registered");
   }
 
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda(
-      [CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy *Proxy) {
-        if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
-          return;
-        }
+  Delegate.BindLambda([CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy* Proxy) {
+    if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
+      return;
+    }
 
-        lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
-        if (!lua_isfunction(CapturedL, -1)) {
-          lua_pop(CapturedL, 1);
-          return;
-        }
+    lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
+    if (!lua_isfunction(CapturedL, -1)) {
+      lua_pop(CapturedL, 1);
+      return;
+    }
 
-        PushFlagProxyTable(CapturedL, Proxy);
+    PushFlagProxyTable(CapturedL, Proxy);
 
-        if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("WatchRealtimeFlagWithInitialState "
-                      "callback error: %s"),
-                 Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
-          lua_pop(CapturedL, 1);
-        }
-      });
+    if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
+      const char* Err = lua_tostring(CapturedL, -1);
+      UE_LOG(LogGatrixLua, Error,
+             TEXT("WatchRealtimeFlagWithInitialState "
+                  "callback error: %s"),
+             Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+      lua_pop(CapturedL, 1);
+    }
+  });
 
-  int32 Handle =
-      UGatrixClient::Get()->GetFeatures()->WatchRealtimeFlagWithInitialState(
-          UTF8_TO_TCHAR(FlagName), Delegate);
+  int32 Handle = UGatrixClient::Get()->GetFeatures()->WatchRealtimeFlagWithInitialState(
+      UTF8_TO_TCHAR(FlagName), Delegate);
 
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({Handle, LuaRef, true, false});
   }
@@ -1198,8 +1168,8 @@ int FGatrixLuaBindings::Lua_WatchRealtimeFlagWithInitialState(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState(lua_State *L) {
-  const char *FlagName = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState(lua_State* L) {
+  const char* FlagName = luaL_checkstring(L, 1);
   luaL_checktype(L, 2, LUA_TFUNCTION);
 
   lua_pushvalue(L, 2);
@@ -1212,40 +1182,38 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState(lua_State *L) {
                          "module not registered");
   }
 
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda(
-      [CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy *Proxy) {
-        if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
-          return;
-        }
+  Delegate.BindLambda([CapturedL, CapturedRef, CapturedAlive](UGatrixFlagProxy* Proxy) {
+    if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
+      return;
+    }
 
-        lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
-        if (!lua_isfunction(CapturedL, -1)) {
-          lua_pop(CapturedL, 1);
-          return;
-        }
+    lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, CapturedRef);
+    if (!lua_isfunction(CapturedL, -1)) {
+      lua_pop(CapturedL, 1);
+      return;
+    }
 
-        PushFlagProxyTable(CapturedL, Proxy);
+    PushFlagProxyTable(CapturedL, Proxy);
 
-        if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error,
-                 TEXT("WatchSyncedFlagWithInitialState "
-                      "callback error: %s"),
-                 Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
-          lua_pop(CapturedL, 1);
-        }
-      });
+    if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
+      const char* Err = lua_tostring(CapturedL, -1);
+      UE_LOG(LogGatrixLua, Error,
+             TEXT("WatchSyncedFlagWithInitialState "
+                  "callback error: %s"),
+             Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+      lua_pop(CapturedL, 1);
+    }
+  });
 
-  int32 Handle =
-      UGatrixClient::Get()->GetFeatures()->WatchSyncedFlagWithInitialState(
-          UTF8_TO_TCHAR(FlagName), Delegate);
+  int32 Handle = UGatrixClient::Get()->GetFeatures()->WatchSyncedFlagWithInitialState(
+      UTF8_TO_TCHAR(FlagName), Delegate);
 
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({Handle, LuaRef, true, false});
   }
@@ -1254,7 +1222,7 @@ int FGatrixLuaBindings::Lua_WatchSyncedFlagWithInitialState(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_UnwatchFlag(lua_State *L) {
+int FGatrixLuaBindings::Lua_UnwatchFlag(lua_State* L) {
   int32 Handle = static_cast<int32>(luaL_checkinteger(L, 1));
 
   UGatrixClient::Get()->GetFeatures()->UnwatchFlag(Handle);
@@ -1265,20 +1233,20 @@ int FGatrixLuaBindings::Lua_UnwatchFlag(lua_State *L) {
 
 // ==================== State ====================
 
-int FGatrixLuaBindings::Lua_IsReady(lua_State *L) {
+int FGatrixLuaBindings::Lua_IsReady(lua_State* L) {
   lua_pushboolean(L, UGatrixClient::Get()->IsReady());
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_IsInitialized(lua_State *L) {
+int FGatrixLuaBindings::Lua_IsInitialized(lua_State* L) {
   lua_pushboolean(L, UGatrixClient::Get()->IsInitialized());
   return 1;
 }
 
 // ==================== Sync ====================
 
-int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
-  UGatrixClient *Client = UGatrixClient::Get();
+int FGatrixLuaBindings::Lua_FetchFlags(lua_State* L) {
+  UGatrixClient* Client = UGatrixClient::Get();
 
   // Create deferred promise
   int DeferredRef = CreateDeferred(L);
@@ -1291,7 +1259,7 @@ int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
   }
 
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedDeferredRef = DeferredRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
@@ -1303,9 +1271,8 @@ int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
 
   // On success: resolve and clean up error listener
   int32 SuccessHandle = Client->Once(
-      TEXT("flags.fetch_success"),
-      [CapturedL, CapturedDeferredRef, CapturedAlive, bResolved,
-       SuccessHandlePtr, ErrorHandlePtr](const TArray<FString> &Args) {
+      TEXT("flags.fetch_success"), [CapturedL, CapturedDeferredRef, CapturedAlive, bResolved,
+                                    SuccessHandlePtr, ErrorHandlePtr](const TArray<FString>& Args) {
         if (*bResolved)
           return;
         *bResolved = true;
@@ -1318,15 +1285,13 @@ int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
 
   // On error: reject and clean up success listener
   int32 ErrorHandle = Client->Once(
-      TEXT("flags.fetch_error"),
-      [CapturedL, CapturedDeferredRef, CapturedAlive, bResolved,
-       SuccessHandlePtr, ErrorHandlePtr](const TArray<FString> &Args) {
+      TEXT("flags.fetch_error"), [CapturedL, CapturedDeferredRef, CapturedAlive, bResolved,
+                                  SuccessHandlePtr, ErrorHandlePtr](const TArray<FString>& Args) {
         if (*bResolved)
           return;
         *bResolved = true;
         if (CapturedAlive.IsValid() && *CapturedAlive) {
-          const char *ErrMsg =
-              Args.Num() > 0 ? TCHAR_TO_UTF8(*Args[0]) : "fetch failed";
+          const char* ErrMsg = Args.Num() > 0 ? TCHAR_TO_UTF8(*Args[0]) : "fetch failed";
           RejectDeferred(CapturedL, CapturedDeferredRef, ErrMsg);
           RemoveCallback(CapturedL, *SuccessHandlePtr);
           RemoveCallback(CapturedL, *ErrorHandlePtr);
@@ -1336,7 +1301,7 @@ int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
   *SuccessHandlePtr = SuccessHandle;
   *ErrorHandlePtr = ErrorHandle;
 
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({SuccessHandle, LUA_NOREF, false, false});
     Session->Callbacks.Add({ErrorHandle, LUA_NOREF, false, false});
@@ -1348,13 +1313,13 @@ int FGatrixLuaBindings::Lua_FetchFlags(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_SyncFlags(lua_State *L) {
+int FGatrixLuaBindings::Lua_SyncFlags(lua_State* L) {
   bool bFetchNow = true;
   if (lua_isboolean(L, 1)) {
     bFetchNow = (lua_toboolean(L, 1) != 0);
   }
 
-  UGatrixClient *Client = UGatrixClient::Get();
+  UGatrixClient* Client = UGatrixClient::Get();
 
   // Create deferred promise
   int DeferredRef = CreateDeferred(L);
@@ -1375,21 +1340,19 @@ int FGatrixLuaBindings::Lua_SyncFlags(lua_State *L) {
 
   // Async sync with fetch — use callback to resolve/reject
   TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedDeferredRef = DeferredRef;
   TSharedPtr<bool> CapturedAlive = AliveFlag;
 
   Client->GetFeatures()->SyncFlags(
-      true, [CapturedL, CapturedDeferredRef,
-             CapturedAlive](bool bSuccess, const FString &Message) {
+      true, [CapturedL, CapturedDeferredRef, CapturedAlive](bool bSuccess, const FString& Message) {
         if (!CapturedAlive.IsValid() || !*CapturedAlive) {
           return;
         }
         if (bSuccess) {
           ResolveDeferred(CapturedL, CapturedDeferredRef);
         } else {
-          RejectDeferred(CapturedL, CapturedDeferredRef,
-                         TCHAR_TO_UTF8(*Message));
+          RejectDeferred(CapturedL, CapturedDeferredRef, TCHAR_TO_UTF8(*Message));
         }
       });
 
@@ -1399,7 +1362,7 @@ int FGatrixLuaBindings::Lua_SyncFlags(lua_State *L) {
 
 // ==================== OnAny / OffAny ====================
 
-int FGatrixLuaBindings::Lua_OnAny(lua_State *L) {
+int FGatrixLuaBindings::Lua_OnAny(lua_State* L) {
   luaL_checktype(L, 1, LUA_TFUNCTION);
 
   TSharedPtr<bool> CapturedAlive = GetAliveFlag(L);
@@ -1410,12 +1373,12 @@ int FGatrixLuaBindings::Lua_OnAny(lua_State *L) {
   lua_pushvalue(L, 1);
   int LuaRef = luaL_ref(L, LUA_REGISTRYINDEX);
 
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
   int CapturedRef = LuaRef;
 
-  int32 GatrixHandle = UGatrixClient::Get()->OnAny(
-      [CapturedL, CapturedRef, CapturedAlive](const FString &EventName,
-                                              const TArray<FString> &Args) {
+  int32 GatrixHandle =
+      UGatrixClient::Get()->OnAny([CapturedL, CapturedRef, CapturedAlive](
+                                      const FString& EventName, const TArray<FString>& Args) {
         if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
           return;
         }
@@ -1435,7 +1398,7 @@ int FGatrixLuaBindings::Lua_OnAny(lua_State *L) {
 
         // Call the Lua function with 2 arguments (event name, args table)
         if (lua_pcall(CapturedL, 2, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
+          const char* Err = lua_tostring(CapturedL, -1);
           UE_LOG(LogGatrixLua, Error, TEXT("OnAny callback error: %s"),
                  Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
           lua_pop(CapturedL, 1);
@@ -1443,7 +1406,7 @@ int FGatrixLuaBindings::Lua_OnAny(lua_State *L) {
       });
 
   // Track the callback for cleanup (bIsWatch=false, bIsAny=true)
-  FLuaSession *Session = SessionRegistry.Find(L);
+  FLuaSession* Session = SessionRegistry.Find(L);
   if (Session) {
     Session->Callbacks.Add({GatrixHandle, LuaRef, false, true});
   }
@@ -1452,7 +1415,7 @@ int FGatrixLuaBindings::Lua_OnAny(lua_State *L) {
   return 1;
 }
 
-int FGatrixLuaBindings::Lua_OffAny(lua_State *L) {
+int FGatrixLuaBindings::Lua_OffAny(lua_State* L) {
   int32 Handle = static_cast<int32>(luaL_checkinteger(L, 1));
 
   UGatrixClient::Get()->OffAny(Handle);
@@ -1464,7 +1427,7 @@ int FGatrixLuaBindings::Lua_OffAny(lua_State *L) {
 // ==================== CreateWatchGroup ====================
 
 // Lua userdata metatype name for watch group
-static const char *WATCHGROUP_METATABLE = "GatrixWatchGroup";
+static const char* WATCHGROUP_METATABLE = "GatrixWatchGroup";
 
 // Heap-allocated data for WatchGroup.
 // lua_newuserdata only provides raw memory (no constructors), so we must NOT
@@ -1472,8 +1435,8 @@ static const char *WATCHGROUP_METATABLE = "GatrixWatchGroup";
 // Instead, userdata holds a single pointer to this heap-allocated struct,
 // whose constructor/destructor run normally.
 struct FLuaWatchGroupData {
-  FGatrixWatchFlagGroup *Group = nullptr;
-  lua_State *OwnerState = nullptr;
+  FGatrixWatchFlagGroup* Group = nullptr;
+  lua_State* OwnerState = nullptr;
   TSharedPtr<bool> Alive;
   TArray<int> LuaRefs; // Tracked luaL_ref references for cleanup
 
@@ -1499,23 +1462,21 @@ struct FLuaWatchGroupData {
 };
 
 // Forward declarations for WatchGroup metamethods
-static int WatchGroup_WatchRealtimeFlag(lua_State *L);
-static int WatchGroup_WatchSyncedFlag(lua_State *L);
-static int WatchGroup_WatchRealtimeFlagWithInitialState(lua_State *L);
-static int WatchGroup_WatchSyncedFlagWithInitialState(lua_State *L);
-static int WatchGroup_UnwatchAll(lua_State *L);
-static int WatchGroup_Destroy(lua_State *L);
-static int WatchGroup_Size(lua_State *L);
-static int WatchGroup_GetName(lua_State *L);
-static int WatchGroup_GC(lua_State *L);
+static int WatchGroup_WatchRealtimeFlag(lua_State* L);
+static int WatchGroup_WatchSyncedFlag(lua_State* L);
+static int WatchGroup_WatchRealtimeFlagWithInitialState(lua_State* L);
+static int WatchGroup_WatchSyncedFlagWithInitialState(lua_State* L);
+static int WatchGroup_UnwatchAll(lua_State* L);
+static int WatchGroup_Destroy(lua_State* L);
+static int WatchGroup_Size(lua_State* L);
+static int WatchGroup_GetName(lua_State* L);
+static int WatchGroup_GC(lua_State* L);
 
 static const luaL_Reg WatchGroupMethods[] = {
     {"WatchRealtimeFlag", WatchGroup_WatchRealtimeFlag},
     {"WatchSyncedFlag", WatchGroup_WatchSyncedFlag},
-    {"WatchRealtimeFlagWithInitialState",
-     WatchGroup_WatchRealtimeFlagWithInitialState},
-    {"WatchSyncedFlagWithInitialState",
-     WatchGroup_WatchSyncedFlagWithInitialState},
+    {"WatchRealtimeFlagWithInitialState", WatchGroup_WatchRealtimeFlagWithInitialState},
+    {"WatchSyncedFlagWithInitialState", WatchGroup_WatchSyncedFlagWithInitialState},
     {"UnwatchAll", WatchGroup_UnwatchAll},
     {"Destroy", WatchGroup_Destroy},
     {"Size", WatchGroup_Size},
@@ -1523,9 +1484,9 @@ static const luaL_Reg WatchGroupMethods[] = {
     {nullptr, nullptr}};
 
 // Helper to get FLuaWatchGroupData** from Lua userdata
-static FLuaWatchGroupData *CheckWatchGroup(lua_State *L) {
-  FLuaWatchGroupData **Ptr = static_cast<FLuaWatchGroupData **>(
-      luaL_checkudata(L, 1, WATCHGROUP_METATABLE));
+static FLuaWatchGroupData* CheckWatchGroup(lua_State* L) {
+  FLuaWatchGroupData** Ptr =
+      static_cast<FLuaWatchGroupData**>(luaL_checkudata(L, 1, WATCHGROUP_METATABLE));
   if (!Ptr || !*Ptr) {
     luaL_error(L, "WatchGroup has been destroyed");
     return nullptr;
@@ -1533,18 +1494,17 @@ static FLuaWatchGroupData *CheckWatchGroup(lua_State *L) {
   return *Ptr;
 }
 
-int FGatrixLuaBindings::Lua_CreateWatchGroup(lua_State *L) {
-  const char *Name = luaL_checkstring(L, 1);
+int FGatrixLuaBindings::Lua_CreateWatchGroup(lua_State* L) {
+  const char* Name = luaL_checkstring(L, 1);
 
-  FGatrixWatchFlagGroup *Group =
-      UGatrixClient::Get()->GetFeatures()->CreateWatchGroup(
-          UTF8_TO_TCHAR(Name));
+  FGatrixWatchFlagGroup* Group =
+      UGatrixClient::Get()->GetFeatures()->CreateWatchGroup(UTF8_TO_TCHAR(Name));
 
   // Allocate userdata as a pointer-to-heap-object.
   // lua_newuserdata provides raw memory; we store only a pointer (trivial type)
   // which avoids the UB of placing TSharedPtr/TArray in raw memory.
-  FLuaWatchGroupData **UDPtr = static_cast<FLuaWatchGroupData **>(
-      lua_newuserdata(L, sizeof(FLuaWatchGroupData *)));
+  FLuaWatchGroupData** UDPtr =
+      static_cast<FLuaWatchGroupData**>(lua_newuserdata(L, sizeof(FLuaWatchGroupData*)));
   *UDPtr = new FLuaWatchGroupData();
   (*UDPtr)->Group = Group;
   (*UDPtr)->OwnerState = L;
@@ -1567,38 +1527,36 @@ int FGatrixLuaBindings::Lua_CreateWatchGroup(lua_State *L) {
 
 // Helper to create a watch delegate that captures alive flag and Lua ref,
 // and register the Lua ref for cleanup.
-static FGatrixFlagWatchDelegate
-CreateWatchGroupDelegate(lua_State *L, FLuaWatchGroupData *Data) {
+static FGatrixFlagWatchDelegate CreateWatchGroupDelegate(lua_State* L, FLuaWatchGroupData* Data) {
   TSharedPtr<bool> CapturedAlive = Data->Alive;
   lua_pushvalue(L, 3);
   int LuaRef = luaL_ref(L, LUA_REGISTRYINDEX);
-  lua_State *CapturedL = L;
+  lua_State* CapturedL = L;
 
   // Track the ref for cleanup on Destroy/GC
   Data->LuaRefs.Add(LuaRef);
 
   FGatrixFlagWatchDelegate Delegate;
-  Delegate.BindLambda(
-      [CapturedL, LuaRef, CapturedAlive](UGatrixFlagProxy *Proxy) {
-        if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
-          return;
-        }
-        lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, LuaRef);
-        FGatrixLuaBindings::PushFlagProxyTable(CapturedL, Proxy);
-        if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
-          const char *Err = lua_tostring(CapturedL, -1);
-          UE_LOG(LogGatrixLua, Error, TEXT("WatchGroup callback error: %s"),
-                 Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
-          lua_pop(CapturedL, 1);
-        }
-      });
+  Delegate.BindLambda([CapturedL, LuaRef, CapturedAlive](UGatrixFlagProxy* Proxy) {
+    if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
+      return;
+    }
+    lua_rawgeti(CapturedL, LUA_REGISTRYINDEX, LuaRef);
+    FGatrixLuaBindings::PushFlagProxyTable(CapturedL, Proxy);
+    if (lua_pcall(CapturedL, 1, 0, 0) != LUA_OK) {
+      const char* Err = lua_tostring(CapturedL, -1);
+      UE_LOG(LogGatrixLua, Error, TEXT("WatchGroup callback error: %s"),
+             Err ? UTF8_TO_TCHAR(Err) : TEXT("unknown"));
+      lua_pop(CapturedL, 1);
+    }
+  });
 
   return Delegate;
 }
 
-static int WatchGroup_WatchRealtimeFlag(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
-  const char *FlagName = luaL_checkstring(L, 2);
+static int WatchGroup_WatchRealtimeFlag(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
+  const char* FlagName = luaL_checkstring(L, 2);
   luaL_checktype(L, 3, LUA_TFUNCTION);
 
   FGatrixFlagWatchDelegate Delegate = CreateWatchGroupDelegate(L, Data);
@@ -1609,9 +1567,9 @@ static int WatchGroup_WatchRealtimeFlag(lua_State *L) {
   return 1;
 }
 
-static int WatchGroup_WatchSyncedFlag(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
-  const char *FlagName = luaL_checkstring(L, 2);
+static int WatchGroup_WatchSyncedFlag(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
+  const char* FlagName = luaL_checkstring(L, 2);
   luaL_checktype(L, 3, LUA_TFUNCTION);
 
   FGatrixFlagWatchDelegate Delegate = CreateWatchGroupDelegate(L, Data);
@@ -1621,43 +1579,41 @@ static int WatchGroup_WatchSyncedFlag(lua_State *L) {
   return 1;
 }
 
-static int WatchGroup_WatchRealtimeFlagWithInitialState(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
-  const char *FlagName = luaL_checkstring(L, 2);
+static int WatchGroup_WatchRealtimeFlagWithInitialState(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
+  const char* FlagName = luaL_checkstring(L, 2);
   luaL_checktype(L, 3, LUA_TFUNCTION);
 
   FGatrixFlagWatchDelegate Delegate = CreateWatchGroupDelegate(L, Data);
-  Data->Group->WatchRealtimeFlagWithInitialState(UTF8_TO_TCHAR(FlagName),
-                                                 Delegate);
+  Data->Group->WatchRealtimeFlagWithInitialState(UTF8_TO_TCHAR(FlagName), Delegate);
 
   lua_pushvalue(L, 1);
   return 1;
 }
 
-static int WatchGroup_WatchSyncedFlagWithInitialState(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
-  const char *FlagName = luaL_checkstring(L, 2);
+static int WatchGroup_WatchSyncedFlagWithInitialState(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
+  const char* FlagName = luaL_checkstring(L, 2);
   luaL_checktype(L, 3, LUA_TFUNCTION);
 
   FGatrixFlagWatchDelegate Delegate = CreateWatchGroupDelegate(L, Data);
-  Data->Group->WatchSyncedFlagWithInitialState(UTF8_TO_TCHAR(FlagName),
-                                               Delegate);
+  Data->Group->WatchSyncedFlagWithInitialState(UTF8_TO_TCHAR(FlagName), Delegate);
 
   lua_pushvalue(L, 1);
   return 1;
 }
 
-static int WatchGroup_UnwatchAll(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
+static int WatchGroup_UnwatchAll(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
   // Release Lua refs first, then unwatch
   Data->ReleaseAllLuaRefs();
   Data->Group->UnwatchAll();
   return 0;
 }
 
-static int WatchGroup_Destroy(lua_State *L) {
-  FLuaWatchGroupData **Ptr = static_cast<FLuaWatchGroupData **>(
-      luaL_checkudata(L, 1, WATCHGROUP_METATABLE));
+static int WatchGroup_Destroy(lua_State* L) {
+  FLuaWatchGroupData** Ptr =
+      static_cast<FLuaWatchGroupData**>(luaL_checkudata(L, 1, WATCHGROUP_METATABLE));
   if (Ptr && *Ptr) {
     (*Ptr)->DestroyInternal();
     delete *Ptr;
@@ -1666,14 +1622,14 @@ static int WatchGroup_Destroy(lua_State *L) {
   return 0;
 }
 
-static int WatchGroup_Size(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
+static int WatchGroup_Size(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
   lua_pushinteger(L, Data->Group ? Data->Group->Size() : 0);
   return 1;
 }
 
-static int WatchGroup_GetName(lua_State *L) {
-  FLuaWatchGroupData *Data = CheckWatchGroup(L);
+static int WatchGroup_GetName(lua_State* L) {
+  FLuaWatchGroupData* Data = CheckWatchGroup(L);
   if (Data->Group) {
     lua_pushstring(L, TCHAR_TO_UTF8(*Data->Group->GetName()));
   } else {
@@ -1682,9 +1638,9 @@ static int WatchGroup_GetName(lua_State *L) {
   return 1;
 }
 
-static int WatchGroup_GC(lua_State *L) {
-  FLuaWatchGroupData **Ptr = static_cast<FLuaWatchGroupData **>(
-      luaL_checkudata(L, 1, WATCHGROUP_METATABLE));
+static int WatchGroup_GC(lua_State* L) {
+  FLuaWatchGroupData** Ptr =
+      static_cast<FLuaWatchGroupData**>(luaL_checkudata(L, 1, WATCHGROUP_METATABLE));
   if (Ptr && *Ptr) {
     // DestroyInternal releases Lua refs and unwatches
     (*Ptr)->DestroyInternal();
