@@ -1293,7 +1293,7 @@ int FGatrixLuaBindings::Lua_Track(lua_State* L) {
   // gatrix.Track(eventName [, propertiesTable])
   // Not yet implemented — reserved for the upcoming Gatrix Analytics service.
   const char* EventName = luaL_checkstring(L, 1);
-  UE_LOG(LogGatrix, Log,
+  UE_LOG(LogGatrixLua, Log,
          TEXT("[Gatrix] Track() called from Lua: eventName=\"%hs\" "
               "— tracking is not yet supported but will be available soon."),
          EventName);
