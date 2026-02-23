@@ -255,12 +255,9 @@ await GatrixBehaviour.Client.UpdateContextAsync(new GatrixContext
     }
 });
 
-// Single field update
-GatrixBehaviour.Client.Features.SetContextField("level", "43");
-GatrixBehaviour.Client.Features.RemoveContextField("trialUser");
 ```
 
-> ⚠️ Every context change triggers an automatic re-fetch. Don't update context in a loop. Use `UpdateContextAsync` to batch multiple field changes.
+> ⚠️ 모든 컨텍스트 변경은 자동 리페치를 트리거합니다. 반복 루프 안에서 컨텍스트를 업데이트하지 마세요. 여러 필드를 동시에 변경하려면 `UpdateContextAsync`를 사용하세요.
 
 ---
 
@@ -411,8 +408,6 @@ GatrixBehaviour.Client.Stop();
 | `SyncFlags(fetchNow)` | Apply pending changes (explicit sync mode) |
 | `HasPendingSyncFlags()` | Check if pending changes exist |
 | `FetchFlagsAsync()` | Force server fetch |
-| `SetContextField(key, value)` | Update one context property |
-| `RemoveContextField(key)` | Remove one context property |
 
 ### GatrixClient (`GatrixBehaviour.Client`)
 

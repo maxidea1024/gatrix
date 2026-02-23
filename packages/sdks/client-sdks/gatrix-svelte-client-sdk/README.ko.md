@@ -1,0 +1,211 @@
+# Gatrix Svelte SDK
+
+Gatrix 플랫폼용 Svelte SDK — 자동 정리 기능을 갖춘 반응형 피처 플래그 스토어입니다.
+
+`@gatrix/gatrix-js-client-sdk` 위에 구축되어 플래그 접근, 배리에이션, 상태 추적을 위한 관용적 Svelte 스토어를 제공합니다.
+
+## 설치
+
+```bash
+yarn add @gatrix/gatrix-svelte-client-sdk @gatrix/gatrix-js-client-sdk
+```
+
+## 빠른 시작
+
+### 1. 루트 레이아웃에서 초기화
+
+```svelte
+<!-- +layout.svelte -->
+<script>
+  import { initGatrix } from '@gatrix/gatrix-svelte-client-sdk';
+
+  initGatrix({
+    config: {
+      apiUrl: 'http://localhost:3400/api/v1',
+      apiToken: 'your-client-api-token',
+      appName: 'MyApp',
+      environment: 'development',
+      context: {
+        userId: 'user-123',
+        properties: { platform: 'web' },
+      },
+    },
+  });
+</script>
+
+<slot />
+```
+
+### 2. 자식 컴포넌트에서 플래그 사용
+
+```svelte
+<script>
+  import { flag, numberVariation } from '@gatrix/gatrix-svelte-client-sdk';
+
+  const darkMode = flag('dark-mode');
+  const speed = numberVariation('game-speed', 1.0);
+</script>
+
+{#if $darkMode}
+  <DarkTheme />
+{/if}
+
+<p>속도: {$speed}x</p>
+```
+
+## API 레퍼런스
+
+### Provider
+
+#### `initGatrix(options)`
+
+루트/레이아웃 컴포넌트에서 초기화 시 호출해야 합니다.
+
+```typescript
+interface GatrixInitOptions {
+  config?: GatrixClientConfig;
+  client?: GatrixClient;     // 기존 클라이언트 인스턴스 사용
+  startClient?: boolean;     // 자동 시작, 기본: true
+}
+```
+
+### 플래그 스토어
+
+#### `flag(flagName): Readable<boolean>`
+
+플래그 활성화 상태를 위한 반응형 불리언 스토어.
+
+```svelte
+<script>
+  import { flag } from '@gatrix/gatrix-svelte-client-sdk';
+  const isEnabled = flag('my-feature');
+</script>
+{#if $isEnabled}
+  <NewFeature />
+{/if}
+```
+
+#### `flagProxy(flagName): Readable<FlagProxy>`
+
+모든 배리에이션 메서드에 접근 가능한 전체 FlagProxy 스토어.
+
+```svelte
+<script>
+  import { flagProxy } from '@gatrix/gatrix-svelte-client-sdk';
+  const myFlag = flagProxy('my-feature');
+</script>
+{#if $myFlag.enabled}
+  <p>배리언트: {$myFlag.variant.name}</p>
+  <p>값: {$myFlag.stringVariation('default')}</p>
+{/if}
+```
+
+#### `allFlags(): Readable<EvaluatedFlag[]>`
+
+모든 평가된 플래그의 스토어.
+
+```svelte
+<script>
+  import { allFlags } from '@gatrix/gatrix-svelte-client-sdk';
+  const flags = allFlags();
+</script>
+{#each $flags as f}
+  <p>{f.name}: {f.enabled ? 'ON' : 'OFF'}</p>
+{/each}
+```
+
+### Variation 스토어
+
+모든 variation 스토어는 `Readable<T>`를 반환합니다 — 템플릿에서 `$` 접두사로 사용합니다.
+
+```svelte
+<script>
+  import { boolVariation, stringVariation, numberVariation, jsonVariation, variant } from '@gatrix/gatrix-svelte-client-sdk';
+
+  const darkMode = boolVariation('dark-mode', false);
+  const welcome = stringVariation('welcome-text', 'Hello!');
+  const speed = numberVariation('game-speed', 1.0);
+  const uiConfig = jsonVariation('ui-config', { theme: 'default' });
+  const myVariant = variant('my-flag');
+</script>
+
+<p>다크 모드: {$darkMode}</p>
+<p>환영: {$welcome}</p>
+<p>속도: {$speed}x</p>
+<p>테마: {$uiConfig.theme}</p>
+<p>배리언트: {$myVariant.name}</p>
+```
+
+### 상태
+
+#### `flagsStatus(): FlagsStatus`
+
+SDK 상태를 위한 반응형 스토어를 반환합니다.
+
+```svelte
+<script>
+  import { flagsStatus } from '@gatrix/gatrix-svelte-client-sdk';
+  const { ready, healthy, error } = flagsStatus();
+</script>
+
+{#if !$ready}
+  <LoadingSpinner />
+{:else if $error}
+  <ErrorBanner message={$error.message} />
+{:else}
+  <App />
+{/if}
+```
+
+### 액션
+
+```svelte
+<script>
+  import { updateContext, syncFlags, fetchFlags } from '@gatrix/gatrix-svelte-client-sdk';
+
+  const setContext = updateContext();
+  const sync = syncFlags();
+  const fetch = fetchFlags();
+</script>
+
+<button on:click={() => setContext({ userId: 'new-user' })}>
+  사용자 전환
+</button>
+<button on:click={() => sync()}>플래그 동기화</button>
+<button on:click={() => fetch()}>새로고침</button>
+```
+
+### 직접 클라이언트 접근
+
+```svelte
+<script>
+  import { getGatrixClient } from '@gatrix/gatrix-svelte-client-sdk';
+  const client = getGatrixClient();
+
+  client.on(EVENTS.FLAGS_CHANGE, (data) => {
+    console.log('플래그 변경:', data);
+  });
+</script>
+```
+
+## 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| **반응형 스토어** | 모든 값이 Svelte `Readable` 스토어 — 플래그 변경 시 자동 업데이트 |
+| **자동 정리** | 컴포넌트 파괴 시 스토어 구독 자동 해제 |
+| **타입 배리에이션** | `boolVariation`, `stringVariation`, `numberVariation`, `jsonVariation` |
+| **FlagProxy** | 플래그 상세, 배리언트, 모든 배리에이션 메서드에 대한 완전한 접근 |
+| **상태 추적** | SDK 상태를 위한 `ready`, `healthy`, `error` 스토어 |
+| **컨텍스트 관리** | `updateContext()`가 자동 리페치 트리거 |
+| **명시적 동기화** | 안전한 게임플레이 중 플래그 적용을 위한 `syncFlags()` |
+| **개별 플래그 감시** | 각 스토어가 특정 플래그를 감시하여 세밀한 업데이트 |
+
+## 요구 사항
+
+- Svelte 4.x 또는 5.x
+- `@gatrix/gatrix-js-client-sdk`
+
+## 라이선스
+
+MIT

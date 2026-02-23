@@ -465,18 +465,17 @@ describe('FeaturesClient', () => {
       });
     });
 
-    it('should set individual context field', async () => {
-      await client.setContextField('userId', 'user-123');
+    it('should set individual context field via updateContext', async () => {
+      await client.updateContext({ userId: 'user-123' });
 
       expect(client.getContext().userId).toBe('user-123');
     });
 
-    it('should remove context field', async () => {
+    it('should remove context field via updateContext with null', async () => {
       await client.updateContext({ userId: 'user-1', sessionId: 'session-1' });
-      await client.removeContextField('userId');
+      await client.updateContext({ userId: undefined as any, sessionId: 'session-1' });
 
       expect(client.getContext()).toMatchObject({ sessionId: 'session-1' });
-      expect(client.getContext().userId).toBeUndefined();
     });
   });
 

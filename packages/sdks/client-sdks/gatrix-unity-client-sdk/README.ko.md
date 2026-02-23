@@ -254,10 +254,6 @@ await GatrixBehaviour.Client.UpdateContextAsync(new GatrixContext
         { "country", "KR" }
     }
 });
-
-// 단일 필드 업데이트
-GatrixBehaviour.Client.Features.SetContextField("level", "43");
-GatrixBehaviour.Client.Features.RemoveContextField("trialUser");
 ```
 
 > ⚠️ 모든 컨텍스트 변경은 자동 리페치를 트리거합니다. 반복 루프 안에서 컨텍스트를 업데이트하지 마세요. 여러 필드를 동시에 변경하려면 `UpdateContextAsync`를 사용하세요.
@@ -410,8 +406,6 @@ GatrixBehaviour.Client.Stop();
 | `SyncFlags(fetchNow)` | 보류 중인 변경 적용 (명시적 동기화 모드) |
 | `HasPendingSyncFlags()` | 보류 중인 변경 존재 여부 |
 | `FetchFlagsAsync()` | 서버 강제 페치 |
-| `SetContextField(key, value)` | 컨텍스트 단일 속성 업데이트 |
-| `RemoveContextField(key)` | 컨텍스트 단일 속성 제거 |
 
 ### GatrixClient (`GatrixBehaviour.Client`)
 

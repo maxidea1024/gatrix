@@ -5,15 +5,15 @@ Client-side JavaScript SDK for the Gatrix platform.
 ## Installation
 
 ```bash
-npm install @gatrix/js-client-sdk
+npm install @gatrix/gatrix-js-client-sdk
 # or
-yarn add @gatrix/js-client-sdk
+yarn add @gatrix/gatrix-js-client-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { GatrixClient } from '@gatrix/js-client-sdk';
+import { GatrixClient } from '@gatrix/gatrix-js-client-sdk';
 
 const client = new GatrixClient({
   apiUrl: 'https://your-api.com/api/v1', // Base URL only (required)
@@ -108,7 +108,7 @@ When `fetchFlags` is called, the SDK logs identify the caller:
 | `polling`        | Automatic periodic polling (via `refreshInterval`)       |
 | `manual`         | External call via `client.features.fetchFlags()`         |
 | `syncFlags`      | Explicit sync via `client.features.syncFlags()`          |
-| `contextChange`  | Triggered by `updateContext()` / `setContextField()` etc |
+| `contextChange`  | Triggered by `updateContext()`                           |
 
 Log format: `fetchFlags [caller]: starting fetch. etag=...`
 
@@ -234,7 +234,7 @@ console.log(result);
 Throws `GatrixFeatureError` if evaluation fails:
 
 ```typescript
-import { GatrixFeatureError } from '@gatrix/js-client-sdk';
+import { GatrixFeatureError } from '@gatrix/gatrix-js-client-sdk';
 
 try {
   const value = client.features.stringVariationOrThrow('my-flag');
@@ -287,7 +287,7 @@ group.destroy();
 ## Events
 
 ```typescript
-import { GatrixClient, EVENTS } from '@gatrix/js-client-sdk';
+import { GatrixClient, EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
 client.on(EVENTS.READY, () => {
   console.log('SDK is ready');
@@ -396,7 +396,7 @@ await client.features.syncFlags();
 | `createWatchFlagGroup(name)`                    | Create a watch group        |
 | `isFetching()`                                  | Check if currently fetching |
 | `isExplicitSync()`                              | Check if explicit mode      |
-| `canSyncFlags()`                                | Check if sync can be called |
+| `hasPendingSyncFlags()`                          | Check if pending changes exist |
 | `syncFlags(fetchNow?)`                          | Manual sync (explicit mode) |
 | `updateContext(context)`                        | Update evaluation context   |
 | `getContext()`                                  | Get current context         |
@@ -411,3 +411,7 @@ await client.features.syncFlags();
 | `destroy()`                                     | Alias for unwatchAll                       |
 | `size`                                          | Number of active watchers                  |
 | `getName()`                                     | Get group name                             |
+
+## License
+
+MIT

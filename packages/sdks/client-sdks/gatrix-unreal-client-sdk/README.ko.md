@@ -307,12 +307,6 @@ NewContext.UserId = TEXT("player-456");
 NewContext.Properties.Add(TEXT("level"), TEXT("42"));
 NewContext.Properties.Add(TEXT("country"), TEXT("KR"));
 Client->UpdateContext(NewContext);
-
-// 단일 필드 업데이트
-Client->GetFeatures()->SetContextField(TEXT("level"), TEXT("43"));
-
-// 필드 제거
-Client->GetFeatures()->RemoveContextField(TEXT("trialUser"));
 ```
 
 > ⚠️ **모든 컨텍스트 변경은 자동 리페치를 트리거합니다.** 반복 루프 안에서 컨텍스트를 업데이트하지 마세요. 여러 필드를 동시에 변경하려면 `UpdateContext`를 사용하세요.

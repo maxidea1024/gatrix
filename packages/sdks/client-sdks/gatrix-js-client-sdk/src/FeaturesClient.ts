@@ -336,59 +336,6 @@ export class FeaturesClient implements VariationProvider {
     await this.fetchFlagsInternal('contextChange');
   }
 
-  async setContextField(field: string, value: string | number | boolean): Promise<void> {
-    // Prevent modifying system fields
-    if (FeaturesClient.SYSTEM_CONTEXT_FIELDS.includes(field)) {
-      this.logger.warn(`Cannot modify system context field: ${field}`);
-      return;
-    }
-
-    const definedFields = ['userId', 'sessionId', 'currentTime'];
-
-    if (definedFields.includes(field)) {
-      (this.context as Record<string, any>)[field] = value;
-    } else {
-      if (!this.context.properties) {
-        this.context.properties = {};
-      }
-      this.context.properties[field] = value;
-    }
-
-    // Check if context actually changed
-    const newHash = await computeContextHash(this.context);
-    if (newHash === this.lastContextHash) {
-      return;
-    }
-    this.lastContextHash = newHash;
-    this.contextChangeCount++;
-    await this.fetchFlagsInternal('contextChange');
-  }
-
-  async removeContextField(field: string): Promise<void> {
-    // Prevent removing system fields
-    if (FeaturesClient.SYSTEM_CONTEXT_FIELDS.includes(field)) {
-      this.logger.warn(`Cannot remove system context field: ${field}`);
-      return;
-    }
-
-    const definedFields = ['userId', 'sessionId', 'currentTime'];
-
-    if (definedFields.includes(field)) {
-      delete (this.context as Record<string, any>)[field];
-    } else if (this.context.properties) {
-      delete this.context.properties[field];
-    }
-
-    // Check if context actually changed
-    const newHash = await computeContextHash(this.context);
-    if (newHash === this.lastContextHash) {
-      return;
-    }
-    this.lastContextHash = newHash;
-    this.contextChangeCount++;
-    await this.fetchFlagsInternal('contextChange');
-  }
-
   // ==================== Flag Access ====================
 
   /**

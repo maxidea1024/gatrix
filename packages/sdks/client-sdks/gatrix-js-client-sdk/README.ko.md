@@ -5,15 +5,15 @@ Gatrix 플랫폼용 클라이언트 사이드 JavaScript SDK입니다.
 ## 설치
 
 ```bash
-npm install @gatrix/js-client-sdk
+npm install @gatrix/gatrix-js-client-sdk
 # 또는
-yarn add @gatrix/js-client-sdk
+yarn add @gatrix/gatrix-js-client-sdk
 ```
 
 ## 빠른 시작
 
 ```typescript
-import { GatrixClient } from '@gatrix/js-client-sdk';
+import { GatrixClient } from '@gatrix/gatrix-js-client-sdk';
 
 const client = new GatrixClient({
   apiUrl: 'https://your-api.com/api/v1', // 기본 URL (필수)
@@ -173,7 +173,7 @@ const result = client.features.stringVariationDetails('my-flag', 'default');
 평가 실패 시 `GatrixFeatureError` 발생:
 
 ```typescript
-import { GatrixFeatureError } from '@gatrix/js-client-sdk';
+import { GatrixFeatureError } from '@gatrix/gatrix-js-client-sdk';
 
 try {
   const value = client.features.stringVariationOrThrow('my-flag');
@@ -224,7 +224,7 @@ group.destroy();
 ## 이벤트
 
 ```typescript
-import { GatrixClient, EVENTS } from '@gatrix/js-client-sdk';
+import { GatrixClient, EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
 client.on(EVENTS.READY, () => console.log('SDK 준비 완료'));
 client.on(EVENTS.FETCH_START, () => console.log('플래그 페칭 시작'));
@@ -308,7 +308,7 @@ await client.features.syncFlags();
 | `createWatchFlagGroup(name)` | Watch 그룹 생성 |
 | `isFetching()` | 현재 페칭 중인지 확인 |
 | `isExplicitSync()` | 명시적 동기화 모드 확인 |
-| `canSyncFlags()` | 동기화 호출 가능 여부 |
+| `hasPendingSyncFlags()` | 보류 중인 변경 존재 여부 |
 | `syncFlags(fetchNow?)` | 수동 동기화 (명시적 모드) |
 | `updateContext(context)` | 평가 컨텍스트 업데이트 |
 | `getContext()` | 현재 컨텍스트 가져오기 |
@@ -323,3 +323,7 @@ await client.features.syncFlags();
 | `destroy()` | unwatchAll의 별칭 |
 | `size` | 활성 워처 수 |
 | `getName()` | 그룹 이름 가져오기 |
+
+## 라이선스
+
+MIT

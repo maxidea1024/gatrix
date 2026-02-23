@@ -164,42 +164,6 @@ namespace Gatrix.Unity.SDK
         /// <returns>A <see cref="UniTask"/> that completes when the re-fetch finishes.</returns>
         UniTask UpdateContextAsync(GatrixContext context);
 
-        /// <summary>
-        /// Set a single context field and re-fetch flags.
-        /// <para>
-        /// Supported field names: "userId", "sessionId", "currentTime",
-        /// "ipAddress", and any custom property key (stored in Properties dictionary).
-        /// Unknown field names are stored as custom properties.
-        /// </para>
-        /// </summary>
-        /// <param name="fieldName">The field name to set (case-sensitive).</param>
-        /// <param name="value">The value to set. Accepts string, number, bool, or object.</param>
-        /// <returns>A <see cref="UniTask"/> that completes when the re-fetch finishes.</returns>
-        UniTask SetContextFieldAsync(string fieldName, object value);
-
-        /// <summary>Set a string context field and re-fetch flags (boxing-free for system fields)</summary>
-        UniTask SetContextFieldAsync(string fieldName, string value);
-
-        /// <summary>Set a boolean context field and re-fetch flags</summary>
-        UniTask SetContextFieldAsync(string fieldName, bool value);
-
-        /// <summary>Set a numeric context field and re-fetch flags</summary>
-        UniTask SetContextFieldAsync(string fieldName, double value);
-
-        /// <summary>Set an integer context field and re-fetch flags</summary>
-        UniTask SetContextFieldAsync(string fieldName, int value);
-
-        /// <summary>
-        /// Remove a context field and re-fetch flags.
-        /// <para>
-        /// Built-in fields (userId, sessionId, etc.) are set to <c>null</c>.
-        /// Custom properties are removed from the Properties dictionary.
-        /// </para>
-        /// </summary>
-        /// <param name="fieldName">The field name to remove (case-sensitive).</param>
-        /// <returns>A <see cref="UniTask"/> that completes when the re-fetch finishes.</returns>
-        UniTask RemoveContextFieldAsync(string fieldName);
-
         // ==================== Flag Access (Synchronous) ====================
 
         /// <summary>
