@@ -479,7 +479,7 @@ UGatrixClient (싱글톤)
 | `bEnableDevMode` | bool | false | 개발 모드 활성화 |
 | `Features.RefreshInterval` | float | 30.0 | 폴링 간격 (초) |
 | `Features.bDisableRefresh` | bool | false | 자동 폴링 비활성화 |
-| `Features.bExplicitSyncMode` | bool | false | 수동 플래그 동기화 |
+| `Features.bExplicitSyncMode` | bool | true | 수동 플래그 동기화 |
 | `Features.bDisableMetrics` | bool | false | 메트릭 비활성화 |
 | `Features.bImpressionDataAll` | bool | false | 모든 플래그 임프레션 추적 |
 | `Features.bUsePOSTRequests` | bool | false | 페칭에 POST 요청 사용 |

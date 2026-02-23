@@ -200,7 +200,7 @@ GatrixClient.init_sdk(config, storage)
 | `environment` | String | **필수** | 환경 (예: "production") |
 | `refresh_interval` | float | `30.0` | 폴링 간격 (초) |
 | `disable_refresh` | bool | `false` | 자동 폴링 비활성화 |
-| `explicit_sync_mode` | bool | `false` | 명시적 동기화 모드 |
+| `explicit_sync_mode` | bool | `true` | 명시적 동기화 모드 |
 | `offline_mode` | bool | `false` | 오프라인 모드 시작 |
 | `bootstrap` | Array | `[]` | 즉시 사용을 위한 초기 플래그 |
 | `bootstrap_override` | bool | `true` | 저장된 플래그를 부트스트랩으로 덮어쓰기 |

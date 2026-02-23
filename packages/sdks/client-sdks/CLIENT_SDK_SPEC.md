@@ -235,7 +235,7 @@ interface GatrixClientConfig {
   storageProvider?: IStorageProvider; // Custom storage provider
 
   // Optional - Sync Mode
-  explicitSyncMode?: boolean; // Enable explicit sync mode
+  explicitSyncMode?: boolean; // Enable explicit sync mode (default: true)
 
   // Optional - Offline Mode
   offlineMode?: boolean; // Start in offline mode (no network requests)

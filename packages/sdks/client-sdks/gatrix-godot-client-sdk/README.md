@@ -202,7 +202,7 @@ GatrixClient.init_sdk(config, storage)
 | `environment` | String | **required** | Environment (e.g., "production") |
 | `refresh_interval` | float | `30.0` | Polling interval in seconds |
 | `disable_refresh` | bool | `false` | Disable automatic polling |
-| `explicit_sync_mode` | bool | `false` | Enable explicit sync mode |
+| `explicit_sync_mode` | bool | `true` | Enable explicit sync mode |
 | `offline_mode` | bool | `false` | Start in offline mode |
 | `bootstrap` | Array | `[]` | Initial flags for instant availability |
 | `bootstrap_override` | bool | `true` | Override stored flags with bootstrap |

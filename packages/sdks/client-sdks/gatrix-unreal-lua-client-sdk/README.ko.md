@@ -179,7 +179,7 @@ gatrix.Init({
     Environment     = "production",
     RefreshInterval  = 30,     -- 폴링 간격 (초, 기본값: 30)
     DisableRefresh   = false,  -- 자동 폴링 비활성화
-    ExplicitSyncMode = false,  -- 명시적 동기화 모드
+    ExplicitSyncMode = true,   -- 명시적 동기화 모드 (기본값: true)
     DisableMetrics   = false,  -- 메트릭 비활성화
     ImpressionDataAll = false, -- 모든 플래그 임프레션 추적
     EnableDevMode    = false,  -- 상세 디버그 로깅
@@ -407,7 +407,7 @@ gatrix.Features.SyncFlags()
 
 > 💡 플래그 변경이 플레이어 경험을 방해할 수 있다면 **동기화** 모드를 사용하고, 자연스러운 전환 시점에 `SyncFlags()`를 호출하세요.
 
-> ⚠️ `ExplicitSyncMode`가 비활성화된 경우(기본값), 두 Watch 방식은 **동일하게** 동작합니다.
+> ⚠️ `ExplicitSyncMode`가 비활성화된 경우, 두 Watch 방식은 **동일하게** 동작합니다. 참고: `ExplicitSyncMode`는 **기본적으로 활성화**되어 있습니다.
 
 ### Watch Group (`gatrix.Features`)
 

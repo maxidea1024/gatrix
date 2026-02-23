@@ -72,7 +72,7 @@ GatrixFlagBuilder(
 | `apiToken` | (필수) | 클라이언트 SDK 토큰 |
 | `refreshIntervalSeconds` | 60 | 플래그 업데이트 폴링 간격 |
 | `metricsIntervalSeconds` | 30 | 임프레션/누락 메트릭 보고 간격 |
-| `explicitSyncMode` | false | true일 경우 수동 동기화까지 업데이트 버퍼링 |
+| `explicitSyncMode` | true | true일 경우 수동 동기화까지 업데이트 버퍼링 |
 
 ### 플래그 접근 (`client.features`)
 

@@ -72,7 +72,7 @@ GatrixFlagBuilder(
 | `apiToken` | (required) | Client SDK token |
 | `refreshIntervalSeconds` | 60 | How often to poll for flag updates |
 | `metricsIntervalSeconds` | 30 | How often to report impressions/missing metrics |
-| `explicitSyncMode` | false | If true, updates are buffered until manually synced |
+| `explicitSyncMode` | true | If true, updates are buffered until manually synced |
 
 ### Flag Access (via `client.features`)
 

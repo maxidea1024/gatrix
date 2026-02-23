@@ -216,7 +216,7 @@ All events use the `flags.` prefix namespace:
 | `bOfflineMode` | bool | false | Start in offline mode |
 | `Features.RefreshInterval` | float | 30.0 | Seconds between polls |
 | `Features.bDisableRefresh` | bool | false | Disable automatic polling |
-| `Features.bExplicitSyncMode` | bool | false | Manual flag sync |
+| `Features.bExplicitSyncMode` | bool | true | Manual flag sync |
 | `Features.bDisableMetrics` | bool | false | Disable metrics |
 | `Features.bUsePOSTRequests` | bool | false | Use POST for fetching |
 | `Features.Streaming.bEnabled` | bool | false | Enable streaming |

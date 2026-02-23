@@ -262,7 +262,7 @@ gatrix.Init({
     Environment     = "production",          -- string   Environment name
     RefreshInterval  = 30,     -- number?  Seconds between polls (default: 30)
     DisableRefresh   = false,  -- boolean? Disable automatic polling
-    ExplicitSyncMode = false,  -- boolean? Enable explicit sync mode
+    ExplicitSyncMode = true,   -- boolean? Enable explicit sync mode (default: true)
     DisableMetrics   = false,  -- boolean? Disable server-side metrics
     ImpressionDataAll = false, -- boolean? Track impressions for all flags
     EnableDevMode    = false,  -- boolean? Enable detailed debug logging
@@ -690,7 +690,7 @@ gatrix.Features.SyncFlags()
 
 > 💡 **Rule of thumb:** If a flag change could disrupt the player experience, use **Synced** mode and call `SyncFlags()` at natural transition points (loading screens, between rounds, menu transitions).
 
-> ⚠️ When `ExplicitSyncMode` is **disabled** (default), `WatchSyncedFlag` and `WatchRealtimeFlag` behave **identically**. There is no buffering — all reads and callbacks operate on a single realtime store.
+> ⚠️ When `ExplicitSyncMode` is **disabled**, `WatchSyncedFlag` and `WatchRealtimeFlag` behave **identically**. There is no buffering — all reads and callbacks operate on a single realtime store. Note that `ExplicitSyncMode` is **enabled by default**.
 
 ### Watch Group (`gatrix.Features`)
 
@@ -854,7 +854,7 @@ Group
 
 **Symptom:** You registered a `WatchSyncedFlag` callback but it never executes.
 
-**Cause:** `ExplicitSyncMode` is disabled (default). Without it, there is no synced store, so synced watchers have nothing to trigger on.
+**Cause:** `ExplicitSyncMode` is disabled. Without it, there is no synced store, so synced watchers have nothing to trigger on. Note: `ExplicitSyncMode` is enabled by default, so this issue only occurs if you explicitly set it to `false`.
 
 **Solution:**
 ```lua
