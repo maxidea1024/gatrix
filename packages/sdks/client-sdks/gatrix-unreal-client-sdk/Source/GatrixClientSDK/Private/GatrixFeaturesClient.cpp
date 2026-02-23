@@ -653,30 +653,76 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString& ResponseBody, int
         (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
         (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
 
-        // Payload: can be string, number, or object
+        // Parse variant value using the declared valueType, not JSON parse type.
+        // JSON may parse "1234" as a number, but if valueType is "string",
+        // we must store it as the string "1234", not "1234.0".
         const TSharedPtr<FJsonValue> PayloadValue = (*VariantObj)->TryGetField(TEXT("value"));
         if (PayloadValue.IsValid()) {
-          switch (PayloadValue->Type) {
-          case EJson::String:
-            PayloadValue->TryGetString(Flag.Variant.Value);
+          switch (Flag.ValueType) {
+          case EGatrixValueType::String:
+            // Always extract as string regardless of JSON type
+            if (PayloadValue->Type == EJson::String) {
+              PayloadValue->TryGetString(Flag.Variant.Value);
+            } else if (PayloadValue->Type == EJson::Number) {
+              // Value was sent as number but type is string — convert without ".0"
+              double NumVal = 0;
+              PayloadValue->TryGetNumber(NumVal);
+              if (FMath::IsNearlyEqual(NumVal, FMath::RoundToDouble(NumVal))) {
+                Flag.Variant.Value = FString::Printf(TEXT("%lld"), static_cast<int64>(NumVal));
+              } else {
+                Flag.Variant.Value = FString::SanitizeFloat(NumVal);
+              }
+            } else if (PayloadValue->Type == EJson::Boolean) {
+              bool BoolVal = false;
+              PayloadValue->TryGetBool(BoolVal);
+              Flag.Variant.Value = BoolVal ? TEXT("true") : TEXT("false");
+            } else {
+              Flag.Variant.Value = PayloadValue->AsString();
+            }
             break;
-          case EJson::Number: {
+          case EGatrixValueType::Number: {
             double NumVal = 0;
-            PayloadValue->TryGetNumber(NumVal);
+            if (PayloadValue->Type == EJson::Number) {
+              PayloadValue->TryGetNumber(NumVal);
+            } else if (PayloadValue->Type == EJson::String) {
+              FString StrVal;
+              PayloadValue->TryGetString(StrVal);
+              NumVal = FCString::Atod(*StrVal);
+            }
             Flag.Variant.Value = FString::SanitizeFloat(NumVal);
             break;
           }
-          case EJson::Object:
-          case EJson::Array: {
-            // Serialize back to JSON string
-            FString JsonStr;
-            TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonStr);
-            FJsonSerializer::Serialize(PayloadValue, TEXT(""), Writer);
-            Flag.Variant.Value = JsonStr;
+          case EGatrixValueType::Boolean: {
+            bool BoolVal = false;
+            if (PayloadValue->Type == EJson::Boolean) {
+              PayloadValue->TryGetBool(BoolVal);
+            } else if (PayloadValue->Type == EJson::String) {
+              FString StrVal;
+              PayloadValue->TryGetString(StrVal);
+              BoolVal = StrVal.Equals(TEXT("true"), ESearchCase::IgnoreCase);
+            } else if (PayloadValue->Type == EJson::Number) {
+              double NumVal = 0;
+              PayloadValue->TryGetNumber(NumVal);
+              BoolVal = (NumVal != 0);
+            }
+            Flag.Variant.Value = BoolVal ? TEXT("true") : TEXT("false");
             break;
           }
-          default:
+          case EGatrixValueType::Json:
+          default: {
+            // For JSON or unknown types, serialize back to JSON string
+            if (PayloadValue->Type == EJson::String) {
+              PayloadValue->TryGetString(Flag.Variant.Value);
+            } else if (PayloadValue->Type == EJson::Object || PayloadValue->Type == EJson::Array) {
+              FString JsonStr;
+              TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonStr);
+              FJsonSerializer::Serialize(PayloadValue, TEXT(""), Writer);
+              Flag.Variant.Value = JsonStr;
+            } else {
+              Flag.Variant.Value = PayloadValue->AsString();
+            }
             break;
+          }
           }
         }
       }
