@@ -17,7 +17,7 @@ namespace gatrix {
 // ==================== FeaturesClient ====================
 
 FeaturesClient::FeaturesClient(const GatrixClientConfig& config, GatrixEventEmitter& emitter)
-    : _config(config), _emitter(emitter), _context(config.context) {
+    : _config(config), _emitter(emitter), _context(config.features.context) {
   // Generate connection ID
   auto genHex = [](int len) {
     static const char chars[] = "0123456789abcdef";
@@ -36,7 +36,7 @@ FeaturesClient::FeaturesClient(const GatrixClientConfig& config, GatrixEventEmit
 
   // Storage
   _storage = &_defaultStorage;
-  _explicitSyncMode = _config.explicitSyncMode;
+  _explicitSyncMode = _config.features.explicitSyncMode;
 }
 
 FeaturesClient::~FeaturesClient() {
@@ -69,18 +69,18 @@ void FeaturesClient::start(std::function<void(bool, const std::string&)> onCompl
   if (_config.enableDevMode) {
     CCLOG("[GatrixSDK][DEV] start() called. offlineMode=%s, "
           "refreshInterval=%d, explicitSyncMode=%s",
-          _config.offlineMode ? "True" : "False", _config.refreshInterval,
+          _config.features.offlineMode ? "True" : "False", _config.features.refreshInterval,
           _explicitSyncMode ? "True" : "False");
   }
   _stats.startTime = GatrixEventEmitter::nowISO();
 
-  if (!_config.bootstrap.empty()) {
+  if (!_config.features.bootstrap.empty()) {
     initFromBootstrap();
   }
 
   initFromStorage();
 
-  if (_config.offlineMode) {
+  if (_config.features.offlineMode) {
     // No fetch in offline mode — resolve start callbacks immediately
     _readyEventEmitted = true;
     _sdkState = SdkState::READY;
@@ -95,7 +95,7 @@ void FeaturesClient::start(std::function<void(bool, const std::string&)> onCompl
   }
 
   // Start streaming if enabled
-  if (_config.streaming.enabled && !_config.offlineMode) {
+  if (_config.features.streaming.enabled && !_config.features.offlineMode) {
     connectStreaming();
   }
 }
@@ -145,7 +145,7 @@ void FeaturesClient::updateContext(const GatrixContext& context,
   _lastContextHash = newHash;
   _stats.contextChangeCount++;
 
-  if (!_started || _config.offlineMode) {
+  if (!_started || _config.features.offlineMode) {
     // No fetch — notify caller immediately
     if (onComplete)
       onComplete(true, "");
@@ -190,7 +190,7 @@ const EvaluatedFlag* FeaturesClient::lookupFlag(const std::string& flagName,
     return nullptr;
   }
   trackAccess(flagName, it->second.enabled, it->second.variant.name, eventType);
-  if (it->second.impressionData || _config.impressionDataAll)
+  if (it->second.impressionData || _config.features.impressionDataAll)
     trackImpression(it->second, eventType);
   return &it->second;
 }
@@ -226,7 +226,7 @@ FlagProxy FeaturesClient::createProxy(const std::string& flagName, bool forceRea
 
   if (flag) {
     trackAccess(flagName, flag->enabled, flag->variant.name, "watch");
-    if (flag->impressionData || _config.impressionDataAll)
+    if (flag->impressionData || _config.features.impressionDataAll)
       trackImpression(*flag, "watch");
   } else {
     _stats.missingFlags[flagName]++;
@@ -565,7 +565,7 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
       scheduleNextRefresh();
     } else {
       // Check for non-retryable status codes
-      const auto& nonRetryable = _config.fetchRetryOptions.nonRetryableStatusCodes;
+      const auto& nonRetryable = _config.features.fetchRetryOptions.nonRetryableStatusCodes;
       bool isNonRetryable =
           std::find(nonRetryable.begin(), nonRetryable.end(), statusCode) != nonRetryable.end();
 
@@ -797,7 +797,7 @@ void FeaturesClient::onFetchError(int statusCode, const std::string& error) {
 
 void FeaturesClient::trackAccess(const std::string& flagName, bool enabled,
                                  const std::string& variantName, const std::string& eventType) {
-  if (_config.disableStats)
+  if (_config.features.disableStats)
     return;
   if (enabled) {
     _stats.flagEnabledCounts[flagName].yes++;
@@ -810,7 +810,7 @@ void FeaturesClient::trackAccess(const std::string& flagName, bool enabled,
 }
 
 void FeaturesClient::trackImpression(const EvaluatedFlag& flag, const std::string& eventType) {
-  if (_config.disableMetrics)
+  if (_config.features.disableMetrics)
     return;
   _stats.impressionCount++;
   _emitter.emit(EVENTS::FLAGS_IMPRESSION,
@@ -818,7 +818,7 @@ void FeaturesClient::trackImpression(const EvaluatedFlag& flag, const std::strin
 }
 
 void FeaturesClient::initFromBootstrap() {
-  for (const auto& flag : _config.bootstrap) {
+  for (const auto& flag : _config.features.bootstrap) {
     _realtimeFlags[flag.name] = flag;
   }
   _synchronizedFlags = _realtimeFlags;
@@ -851,7 +851,7 @@ void FeaturesClient::initFromStorage() {
     _realtimeFlags[flag.name] = flag;
   }
 
-  if (!_config.bootstrapOverride || _config.bootstrap.empty()) {
+  if (!_config.features.bootstrapOverride || _config.features.bootstrap.empty()) {
     _synchronizedFlags = _realtimeFlags;
   }
 
@@ -890,19 +890,19 @@ void FeaturesClient::saveToStorage() {
 }
 
 void FeaturesClient::scheduleNextRefresh() {
-  if (!_started || _config.disableRefresh || _pollingStopped) {
+  if (!_started || _config.features.disableRefresh || _pollingStopped) {
     return;
   }
 
   // Cancel existing timer
   unschedulePolling();
 
-  float delay = static_cast<float>(_config.refreshInterval);
+  float delay = static_cast<float>(_config.features.refreshInterval);
 
   // Apply exponential backoff on consecutive failures
   if (_consecutiveFailures > 0) {
-    float initialBackoff = _config.fetchRetryOptions.initialBackoff;
-    float maxBackoffVal = _config.fetchRetryOptions.maxBackoff;
+    float initialBackoff = _config.features.fetchRetryOptions.initialBackoff;
+    float maxBackoffVal = _config.features.fetchRetryOptions.maxBackoff;
     float backoffSec = std::min(
         initialBackoff * static_cast<float>(std::pow(2, _consecutiveFailures - 1)), maxBackoffVal);
     delay = backoffSec;
@@ -929,7 +929,7 @@ GatrixSdkStats FeaturesClient::getStats() const {
   stats.totalFlagCount = static_cast<int>(selectFlags().size());
   stats.sdkState = _sdkState;
   stats.etag = _etag;
-  stats.offlineMode = _config.offlineMode;
+  stats.offlineMode = _config.features.offlineMode;
   stats.missingFlags = stats.missingFlags;
   stats.flagEnabledCounts = stats.flagEnabledCounts;
   stats.flagVariantCounts = stats.flagVariantCounts;

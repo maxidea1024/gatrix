@@ -105,7 +105,7 @@ export class GatrixClient {
       errorCount: featStats.errorCount ?? 0,
       lastError: featStats.lastError ?? this.getError(),
       lastErrorTime: featStats.lastErrorTime || null,
-      offlineMode: this.config.offlineMode ?? false,
+      offlineMode: this.config.features?.offlineMode ?? false,
       features: featStats,
       eventHandlerStats: this.emitter.getHandlerStats(),
     };

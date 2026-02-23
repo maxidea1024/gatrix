@@ -156,6 +156,43 @@ struct FetchRetryOptions {
   float maxBackoff = 60.0f;    // Maximum backoff delay in seconds
 };
 
+// Feature flags configuration
+struct FeaturesConfig {
+  // Context
+  GatrixContext context;
+
+  // Offline / Storage
+  bool offlineMode = false;
+  std::string cacheKeyPrefix = "gatrix_cache";
+
+  // Polling
+  int refreshInterval = 30; // seconds
+  bool disableRefresh = false;
+
+  // Sync Mode
+  bool explicitSyncMode = true;
+
+  // Bootstrap
+  std::vector<EvaluatedFlag> bootstrap;
+  bool bootstrapOverride = true;
+
+  // Metrics
+  bool disableMetrics = false;
+  bool disableStats = false;
+  bool impressionDataAll = false;
+  float metricsIntervalInitial = 2.0f; // seconds
+  float metricsInterval = 60.0f;       // seconds
+
+  // Request
+  bool usePOSTRequests = false;
+
+  // Retry
+  FetchRetryOptions fetchRetryOptions;
+
+  // Streaming
+  StreamingConfig streaming;
+};
+
 struct GatrixClientConfig {
   // Required
   std::string apiUrl;
@@ -163,36 +200,12 @@ struct GatrixClientConfig {
   std::string appName;
   std::string environment;
 
-  // Optional - Polling
-  int refreshInterval = 30; // seconds
-  bool disableRefresh = false;
-
-  // Optional - Context
-  GatrixContext context;
-
-  // Optional - Sync Mode
-  bool explicitSyncMode = true;
-
-  // Optional - Offline
-  bool offlineMode = false;
-
-  // Optional - Bootstrap
-  std::vector<EvaluatedFlag> bootstrap;
-  bool bootstrapOverride = false;
-
-  // Optional - Advanced
+  // Optional
   std::map<std::string, std::string> customHeaders;
-  bool disableMetrics = false;
-  bool disableStats = false;
-  bool impressionDataAll = false;
-  FetchRetryOptions fetchRetryOptions;
-
-  // Optional - Streaming
-  StreamingConfig streaming;
-
-  // Debug / Storage
   bool enableDevMode = false;
-  std::string cacheKeyPrefix = "gatrix_cache";
+
+  // Feature flags configuration
+  FeaturesConfig features;
 };
 
 // ==================== Error ====================

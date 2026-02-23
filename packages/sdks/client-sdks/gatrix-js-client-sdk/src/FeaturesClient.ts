@@ -1,4 +1,4 @@
-﻿/**
+/**
  * FeaturesClient - Feature Flags client for Gatrix SDK
  * Handles feature flag fetching, caching, and access
  */
@@ -135,9 +135,10 @@ export class FeaturesClient implements VariationProvider {
     this.connectionId = uuidv4();
 
     // Initialize storage (pass cacheKeyPrefix to default providers)
-    const cachePrefix = config.cacheKeyPrefix ? `${config.cacheKeyPrefix}:` : undefined;
+    const fc = config.features;
+    const cachePrefix = fc?.cacheKeyPrefix ? `${fc.cacheKeyPrefix}:` : undefined;
     this.storage =
-      config.storageProvider ??
+      fc?.storageProvider ??
       (typeof window !== 'undefined'
         ? new LocalStorageProvider(cachePrefix)
         : new InMemoryStorageProvider());
@@ -160,7 +161,7 @@ export class FeaturesClient implements VariationProvider {
     this.context = {
       appName: config.appName,
       environment: config.environment,
-      ...config.context,
+      ...config.features?.context,
     };
 
     // Initialize metrics
@@ -250,11 +251,11 @@ export class FeaturesClient implements VariationProvider {
     // --- Start phase (formerly start) ---
 
     this.devLog(
-      `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`
+      `start() called. offlineMode=${this.featuresConfig.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`
     );
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
-    if (this.config.offlineMode) {
+    if (this.featuresConfig.offlineMode) {
       if (this.realtimeFlags.size === 0) {
         const error = new GatrixError(
           'offlineMode requires bootstrap data or cached flags, but none are available'
@@ -343,7 +344,7 @@ export class FeaturesClient implements VariationProvider {
    * Create a FlagProxy for a given flag name.
    * FlagProxy is a convenience shell - delegates all variation logic back to this client.
    * Only used by watch*Flag*() where returning a proxy object is needed.
-   * Always reads from realtimeFlags — watch callbacks must reflect
+   * Always reads from realtimeFlags ? watch callbacks must reflect
    * the latest server state regardless of explicitSyncMode.
    */
   private createProxy(flagName: string): FlagProxy {
@@ -444,7 +445,7 @@ export class FeaturesClient implements VariationProvider {
   }
 
   // ==================== Metadata Access Internal Methods ====================
-  // No metrics tracking — read-only metadata access for FlagProxy property delegation.
+  // No metrics tracking ? read-only metadata access for FlagProxy property delegation.
 
   hasFlagInternal(flagName: string, forceRealtime: boolean = false): boolean {
     return this.lookupFlag(flagName, forceRealtime) !== undefined;
@@ -889,7 +890,7 @@ export class FeaturesClient implements VariationProvider {
    * Check if offline mode is enabled
    */
   public isOfflineMode(): boolean {
-    return !!this.config.offlineMode;
+    return !!this.featuresConfig.offlineMode;
   }
 
   /**
@@ -939,7 +940,7 @@ export class FeaturesClient implements VariationProvider {
     }
     this.watchCallbacks.get(flagName)!.add(callback);
 
-    // Emit initial state — always use realtimeFlags for realtime watchers
+    // Emit initial state ? always use realtimeFlags for realtime watchers
     if (this.readyEventEmitted) {
       callback(new FlagProxy(this, flagName, true));
     } else {
@@ -987,7 +988,7 @@ export class FeaturesClient implements VariationProvider {
     }
     this.syncedWatchCallbacks.get(flagName)!.add(callback);
 
-    // Emit initial state — respect explicitSyncMode for synced watchers
+    // Emit initial state ? respect explicitSyncMode for synced watchers
     if (this.readyEventEmitted) {
       callback(new FlagProxy(this, flagName));
     } else {
@@ -1023,7 +1024,7 @@ export class FeaturesClient implements VariationProvider {
     caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange' | 'gap_recovery' | 'pending_invalidation'
   ): Promise<void> {
     // Offline mode: no network requests allowed
-    if (this.config.offlineMode) {
+    if (this.featuresConfig.offlineMode) {
       this.logger.warn('fetchFlags called but client is in offline mode, ignoring');
       return;
     }
@@ -2027,11 +2028,11 @@ export class FeaturesClient implements VariationProvider {
 
   /**
    * Fetch only specific flag keys from the server (partial fetch).
-   * Does NOT send or update ETag — the existing ETag remains intact
+   * Does NOT send or update ETag ? the existing ETag remains intact
    * for the next full polling cycle.
    */
   private async fetchPartialFlagsInternal(flagKeys: Set<string>): Promise<void> {
-    if (this.config.offlineMode || flagKeys.size === 0) {
+    if (this.featuresConfig.offlineMode || flagKeys.size === 0) {
       return;
     }
 

@@ -23,7 +23,7 @@ def validate_config(config: GatrixClientConfig) -> None:
     _no_whitespace(config.api_token, "apiToken")
 
     # cacheKeyPrefix length
-    if len(config.cache_key_prefix) > 100:
+    if len(config.features.cache_key_prefix) > 100:
         raise GatrixConfigError("cacheKeyPrefix must be <= 100 characters")
 
     # customHeaders

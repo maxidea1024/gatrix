@@ -270,44 +270,44 @@ interface GatrixClientConfig {
   appName: string; // Application name
   environment: string; // Environment name (required)
 
-  // Optional - Polling
+  // Optional - Global
+  customHeaders?: Record<string, string>;
+  enableDevMode?: boolean; // Enable detailed debug logging (default: false)
+
+  // Feature flags configuration
+  features?: FeaturesConfig;
+}
+
+interface FeaturesConfig {
+  // Context
+  context?: GatrixContext; // Initial evaluation context
+
+  // Offline / Storage
+  offlineMode?: boolean; // Start in offline mode (no network requests)
+  cacheKeyPrefix?: string; // Prefix for cache storage keys (default: "gatrix_cache")
+  storageProvider?: IStorageProvider; // Custom storage provider
+
+  // Polling
   refreshInterval?: number; // Seconds between polls (default: 30)
   disableRefresh?: boolean; // Disable automatic polling
 
-  // Optional - Context
-  context?: GatrixContext; // Initial context
-
-  // Optional - Storage
-  storageProvider?: IStorageProvider; // Custom storage provider
-
-  // Optional - Sync Mode
+  // Sync Mode
   explicitSyncMode?: boolean; // Enable explicit sync mode (default: true)
 
-  // Optional - Offline Mode
-  offlineMode?: boolean; // Start in offline mode (no network requests)
-  // Requires bootstrap or cached flags, throws error if none available
-
-  // Optional - Bootstrap
+  // Bootstrap
   bootstrap?: EvaluatedFlag[]; // Initial flags for instant availability
-  bootstrapOverride?: boolean; // Override stored flags with bootstrap
+  bootstrapOverride?: boolean; // Override stored flags with bootstrap (default: true)
 
-  // Optional - Advanced
-  customHeaders?: Record<string, string>;
+  // Metrics
   disableMetrics?: boolean; // Disable server-side metrics collection
   disableStats?: boolean; // Disable local statistics tracking (default: false)
   impressionDataAll?: boolean; // Track impressions for all flags
 
-  // Optional - Debug
-  enableDevMode?: boolean; // Enable detailed debug logging (default: false)
-
-  // Optional - Storage
-  cacheKeyPrefix?: string; // Prefix for cache storage keys (default: "gatrix_cache")
-
-  // Optional - Fetch Retry Options
-  fetchRetryOptions?: FetchRetryOptions; // Configure retry/backoff behavior
-
-  // Optional - Request Method
+  // Request
   usePOSTRequests?: boolean; // Use POST instead of GET for flag evaluation (default: false)
+
+  // Retry
+  fetchRetryOptions?: FetchRetryOptions; // Configure retry/backoff behavior
 }
 
 interface FetchRetryOptions {

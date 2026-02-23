@@ -8,28 +8,18 @@ class GatrixClientConfig {
   final String apiToken;
   final String appName;
   final String environment;
-  final bool offlineMode;
-  final bool explicitSyncMode;
-  final int refreshIntervalSeconds;
-  final int metricsIntervalSeconds;
-  final GatrixContext? initialContext;
-  final List<EvaluatedFlag>? bootstrap;
   final Map<String, String>? customHeaders;
-  final StreamingConfig? streaming;
+  final bool enableDevMode;
+  final FeaturesConfig features;
 
   GatrixClientConfig({
     required this.apiUrl,
     required this.apiToken,
     required this.appName,
     required this.environment,
-    this.offlineMode = false,
-    this.explicitSyncMode = true,
-    this.refreshIntervalSeconds = 60,
-    this.metricsIntervalSeconds = 30,
-    this.initialContext,
-    this.bootstrap,
     this.customHeaders,
-    this.streaming,
+    this.enableDevMode = false,
+    this.features = const FeaturesConfig(),
   });
 }
 
@@ -49,9 +39,9 @@ class GatrixClient {
       apiToken: config.apiToken,
       appName: config.appName,
       environment: config.environment,
-      context: config.initialContext ?? GatrixContext(),
+      context: config.features.context ?? GatrixContext(),
       events: _events,
-      explicitSyncMode: config.explicitSyncMode,
+      explicitSyncMode: config.features.explicitSyncMode,
       customHeaders: config.customHeaders,
     );
   }
@@ -86,9 +76,9 @@ class GatrixClient {
       throw ArgumentError('Config validation failed: apiToken must not have leading or trailing whitespace');
     }
 
-    // Numeric ranges
-    _validateRange(config.refreshIntervalSeconds, 'refreshIntervalSeconds', 1, 86400);
-    _validateRange(config.metricsIntervalSeconds, 'metricsIntervalSeconds', 1, 86400);
+    // Numeric ranges  
+    _validateRange(config.features.refreshInterval.toInt(), 'refreshInterval', 1, 86400);
+    _validateRange(config.features.metricsInterval.toInt(), 'metricsInterval', 1, 86400);
   }
 
   static void _validateRange(int value, String name, int min, int max) {
@@ -105,17 +95,17 @@ class GatrixClient {
     await features.initFromStorage();
 
     // 2. Start Services
-    if (!config.offlineMode) {
+    if (!config.features.offlineMode) {
       // Immediate fetch
       await features.fetchFlags();
       
       // Setup periodic tasks
-      features.startPolling(config.refreshIntervalSeconds);
-      features.startMetricsReporting(config.metricsIntervalSeconds);
+      features.startPolling(config.features.refreshInterval.toInt());
+      features.startMetricsReporting(config.features.metricsInterval.toInt());
 
       // Start streaming if configured
-      if (config.streaming != null && config.streaming!.enabled) {
-        features.connectStreaming(config.streaming!);
+      if (config.features.streaming != null && config.features.streaming!.enabled) {
+        features.connectStreaming(config.features.streaming!);
       }
     }
 

@@ -185,9 +185,9 @@ class FeaturesClient:
         self._app_name = config.app_name
         self._environment = config.environment
         self._custom_headers = config.custom_headers or {}
-        self._offline_mode = config.offline_mode
+        self._offline_mode = feat.offline_mode
         self._dev_mode = config.enable_dev_mode
-        self._cache_prefix = config.cache_key_prefix
+        self._cache_prefix = feat.cache_key_prefix
         self._use_post = feat.use_post_requests
 
         # Polling
@@ -214,7 +214,7 @@ class FeaturesClient:
 
         # Internal state
         self._connection_id = str(uuid.uuid4())
-        self._context = config.context or GatrixContext()
+        self._context = feat.context or GatrixContext()
         self._flags: Dict[str, EvaluatedFlag] = {}
         self._pending_flags: Optional[Dict[str, EvaluatedFlag]] = None
         self._pending_sync = False

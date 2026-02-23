@@ -157,9 +157,9 @@ Config.AppName = TEXT("MyGame");
 Config.Environment = TEXT("production");
 
 // 컨텍스트 설정 (선택)
-Config.Context.UserId = TEXT("player-123");
-Config.Context.SessionId = TEXT("session-abc");
-Config.Context.Properties.Add(TEXT("level"), TEXT("5"));
+Config.Features.Context.UserId = TEXT("player-123");
+Config.Features.Context.SessionId = TEXT("session-abc");
+Config.Features.Context.Properties.Add(TEXT("level"), TEXT("5"));
 
 // 시작
 UGatrixClient* Client = UGatrixClient::Get();
@@ -297,8 +297,8 @@ Features->UnwatchFlag(WatchHandle);
 
 ```cpp
 // 초기 설정 (Init 시)
-Config.Context.UserId = TEXT("player-123");
-Config.Context.Properties.Add(TEXT("level"), TEXT("5"));
+Config.Features.Context.UserId = TEXT("player-123");
+Config.Features.Context.Properties.Add(TEXT("level"), TEXT("5"));
 
 // 런타임 업데이트
 FGatrixContext NewContext;
@@ -474,7 +474,7 @@ UGatrixClient (싱글톤)
 | `ApiToken` | FString | - | 클라이언트 API 토큰 (필수) |
 | `AppName` | FString | - | 애플리케이션 이름 (필수) |
 | `Environment` | FString | - | 환경 이름 (필수) |
-| `bOfflineMode` | bool | false | 오프라인 모드로 시작 |
+| `Features.bOfflineMode` | bool | false | 오프라인 모드로 시작 |
 | `bEnableDevMode` | bool | false | 개발 모드 활성화 |
 | `Features.RefreshInterval` | float | 30.0 | 폴링 간격 (초) |
 | `Features.bDisableRefresh` | bool | false | 자동 폴링 비활성화 |

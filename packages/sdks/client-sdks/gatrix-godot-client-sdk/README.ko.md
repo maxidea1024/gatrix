@@ -19,9 +19,9 @@ func _ready() -> void:
     config.environment = "development"
 
     # 선택: 사용자 컨텍스트 설정
-    config.context.user_id = "player-123"
-    config.context.session_id = "session-abc"
-    config.context.properties = { "platform": "windows", "version": "1.0.0" }
+    config.features.context.user_id = "player-123"
+    config.features.context.session_id = "session-abc"
+    config.features.context.properties = { "platform": "windows", "version": "1.0.0" }
 
     GatrixClient.start(config, null, func(success: bool, error_msg: String):
         print("SDK 시작! success=", success)
@@ -132,7 +132,7 @@ features.update_context(ctx)
 ```gdscript
 # 게임플레이 중 플래그 변경 방지
 var config := GatrixTypes.GatrixClientConfig.new()
-config.explicit_sync_mode = true
+config.features.explicit_sync_mode = true
 # ... 기타 설정 ...
 
 GatrixClient.start(config)
@@ -213,16 +213,18 @@ GatrixClient.start(config, storage)
 | `api_token` | String | **필수** | 클라이언트 API 토큰 |
 | `app_name` | String | **필수** | 애플리케이션 이름 |
 | `environment` | String | **필수** | 환경 (예: "production") |
-| `refresh_interval` | float | `30.0` | 폴링 간격 (초) |
-| `disable_refresh` | bool | `false` | 자동 폴링 비활성화 |
-| `explicit_sync_mode` | bool | `true` | 명시적 동기화 모드 |
-| `offline_mode` | bool | `false` | 오프라인 모드 시작 |
-| `bootstrap` | Array | `[]` | 즉시 사용을 위한 초기 플래그 |
-| `bootstrap_override` | bool | `true` | 저장된 플래그를 부트스트랩으로 덮어쓰기 |
-| `disable_metrics` | bool | `false` | 메트릭 수집 비활성화 |
-| `disable_stats` | bool | `false` | 로컬 통계 추적 비활성화 |
-| `impression_data_all` | bool | `false` | 모든 플래그 임프레션 추적 |
 | `custom_headers` | Dictionary | `{}` | 커스텀 HTTP 헤더 |
+| `features.context` | GatrixContext | `null` | 초기 평가 컨텍스트 |
+| `features.offline_mode` | bool | `false` | 오프라인 모드 시작 |
+| `features.cache_key_prefix` | String | `gatrix_cache` | 캐시 키 접두사 |
+| `features.refresh_interval` | float | `30.0` | 폴링 간격 (초) |
+| `features.disable_refresh` | bool | `false` | 자동 폴링 비활성화 |
+| `features.explicit_sync_mode` | bool | `true` | 명시적 동기화 모드 |
+| `features.bootstrap` | Array | `[]` | 즉시 사용을 위한 초기 플래그 |
+| `features.bootstrap_override` | bool | `true` | 저장된 플래그를 부트스트랩으로 덮어쓰기 |
+| `features.disable_metrics` | bool | `false` | 메트릭 수집 비활성화 |
+| `features.disable_stats` | bool | `false` | 로컬 통계 추적 비활성화 |
+| `features.impression_data_all` | bool | `false` | 모든 플래그 임프레션 추적 |
 
 ## 요구 사항
 

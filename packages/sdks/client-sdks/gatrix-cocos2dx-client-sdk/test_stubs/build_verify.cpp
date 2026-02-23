@@ -19,13 +19,13 @@ int main() {
   config.apiToken = "test-token";
   config.appName = "test-app";
   config.environment = "production";
-  config.refreshInterval = 30;
-  config.disableRefresh = false;
-  config.explicitSyncMode = false;
-  config.offlineMode = true;
-  config.disableMetrics = false;
-  config.disableStats = false;
-  config.impressionDataAll = false;
+  config.features.refreshInterval = 30;
+  config.features.disableRefresh = false;
+  config.features.explicitSyncMode = false;
+  config.features.offlineMode = true;
+  config.features.disableMetrics = false;
+  config.features.disableStats = false;
+  config.features.impressionDataAll = false;
   config.customHeaders["X-Custom"] = "value";
 
   // 2. Bootstrap
@@ -39,7 +39,7 @@ int main() {
   bootstrapFlag.version = 1;
   bootstrapFlag.impressionData = true;
   bootstrapFlag.reason = "targeting_match";
-  config.bootstrap.push_back(bootstrapFlag);
+  config.features.bootstrap.push_back(bootstrapFlag);
 
   // 3. GatrixClient singleton
   auto* client = GatrixClient::getInstance();

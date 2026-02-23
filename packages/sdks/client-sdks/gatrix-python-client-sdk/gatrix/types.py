@@ -82,18 +82,34 @@ class FetchRetryOptions:
 @dataclass
 class FeaturesConfig:
     """Feature-flag specific settings."""
+    # Context
+    context: Optional[GatrixContext] = None
+
+    # Offline / Storage
+    offline_mode: bool = False
+    cache_key_prefix: str = "gatrix_cache"
+
+    # Polling
     refresh_interval: float = 30.0
     disable_refresh: bool = False
     explicit_sync_mode: bool = True
+
+    # Bootstrap
     bootstrap: Optional[List[EvaluatedFlag]] = None
     bootstrap_override: bool = True
+
+    # Metrics
     disable_metrics: bool = False
     disable_stats: bool = False
     impression_data_all: bool = False
     metrics_interval_initial: float = 2.0
     metrics_interval: float = 60.0
-    fetch_retry_options: FetchRetryOptions = field(default_factory=FetchRetryOptions)
+
+    # Request
     use_post_requests: bool = False
+
+    # Retry
+    fetch_retry_options: FetchRetryOptions = field(default_factory=FetchRetryOptions)
 
 
 @dataclass
@@ -105,14 +121,9 @@ class GatrixClientConfig:
     app_name: str = ""
     environment: str = ""
 
-    # Optional – Context
-    context: Optional[GatrixContext] = None
-
-    # Optional – Advanced
+    # Optional
     custom_headers: Optional[Dict[str, str]] = None
-    offline_mode: bool = False
     enable_dev_mode: bool = False
-    cache_key_prefix: str = "gatrix_cache"
 
     # Optional – Features
     features: FeaturesConfig = field(default_factory=FeaturesConfig)

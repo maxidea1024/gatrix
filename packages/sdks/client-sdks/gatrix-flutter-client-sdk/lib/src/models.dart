@@ -258,6 +258,42 @@ class GatrixContext {
   }
 }
 
+class FeaturesConfig {
+  final GatrixContext? context;
+  final bool offlineMode;
+  final String cacheKeyPrefix;
+  final double refreshInterval;
+  final bool disableRefresh;
+  final bool explicitSyncMode;
+  final List<EvaluatedFlag>? bootstrap;
+  final bool bootstrapOverride;
+  final bool disableMetrics;
+  final bool disableStats;
+  final bool impressionDataAll;
+  final double metricsIntervalInitial;
+  final double metricsInterval;
+  final bool usePOSTRequests;
+  final StreamingConfig? streaming;
+
+  const FeaturesConfig({
+    this.context,
+    this.offlineMode = false,
+    this.cacheKeyPrefix = 'gatrix_cache',
+    this.refreshInterval = 30.0,
+    this.disableRefresh = false,
+    this.explicitSyncMode = true,
+    this.bootstrap,
+    this.bootstrapOverride = true,
+    this.disableMetrics = false,
+    this.disableStats = false,
+    this.impressionDataAll = false,
+    this.metricsIntervalInitial = 2.0,
+    this.metricsInterval = 60.0,
+    this.usePOSTRequests = false,
+    this.streaming,
+  });
+}
+
 class GatrixException implements Exception {
   final String message;
   final String? code;

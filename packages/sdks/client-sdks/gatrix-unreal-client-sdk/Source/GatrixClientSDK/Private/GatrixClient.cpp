@@ -115,7 +115,8 @@ bool UGatrixClient::InitInternal(const FGatrixClientConfig& InConfig) {
   ClientConnectionId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
 
   // Create file-based storage provider (persists flags across sessions)
-  StorageProvider = MakeShareable(new FGatrixFileStorageProvider(StoredConfig.CacheKeyPrefix));
+  StorageProvider =
+      MakeShareable(new FGatrixFileStorageProvider(StoredConfig.Features.CacheKeyPrefix));
 
   // Create features client
   FeaturesClient = NewObject<UGatrixFeaturesClient>(this);
@@ -228,7 +229,7 @@ void UGatrixClient::Track(const FString& EventName) {
 FGatrixSdkStats UGatrixClient::GetStats() const {
   FGatrixSdkStats Stats;
   Stats.ConnectionId = ClientConnectionId;
-  Stats.bOfflineMode = StoredConfig.bOfflineMode;
+  Stats.bOfflineMode = StoredConfig.Features.bOfflineMode;
 
   if (FeaturesClient) {
     Stats.Features = FeaturesClient->GetStats();

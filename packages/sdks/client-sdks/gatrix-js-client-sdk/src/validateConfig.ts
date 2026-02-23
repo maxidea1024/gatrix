@@ -181,11 +181,11 @@ export function validateConfig(config: GatrixClientConfig): void {
   }
 
   // cacheKeyPrefix: string, no special chars
-  if (config.cacheKeyPrefix !== undefined) {
-    if (typeof config.cacheKeyPrefix !== 'string') {
+  if (config.features?.cacheKeyPrefix !== undefined) {
+    if (typeof config.features.cacheKeyPrefix !== 'string') {
       throw new GatrixError('Invalid config: cacheKeyPrefix must be a string');
     }
-    if (config.cacheKeyPrefix.length > 100) {
+    if (config.features.cacheKeyPrefix.length > 100) {
       throw new GatrixError('Invalid config: cacheKeyPrefix must be <= 100 characters');
     }
   }

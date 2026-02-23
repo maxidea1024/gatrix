@@ -36,12 +36,12 @@ bool GatrixClient::initInternal(const GatrixClientConfig& config) {
         "Config validation failed: apiUrl must start with http:// or https://");
 
   // Validate numeric ranges
-  if (config.refreshInterval < 1 || config.refreshInterval > 86400)
+  if (config.features.refreshInterval < 1 || config.features.refreshInterval > 86400)
     throw GatrixFeatureError("Config validation failed: refreshInterval must "
                              "be between 1 and 86400");
 
   // Validate fetch retry options
-  const auto& retry = config.fetchRetryOptions;
+  const auto& retry = config.features.fetchRetryOptions;
   if (retry.initialBackoff < 0.1f || retry.initialBackoff > 60.0f)
     throw GatrixFeatureError("Config validation failed: initialBackoff must "
                              "be between 0.1 and 60 seconds");
@@ -56,7 +56,7 @@ bool GatrixClient::initInternal(const GatrixClientConfig& config) {
   }
 
   // Validate cacheKeyPrefix
-  if (config.cacheKeyPrefix.length() > 100)
+  if (config.features.cacheKeyPrefix.length() > 100)
     throw GatrixFeatureError("Config validation failed: cacheKeyPrefix must be <= 100 characters");
 
   _config = config;

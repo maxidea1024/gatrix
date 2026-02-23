@@ -438,7 +438,10 @@ describe('FeaturesClient', () => {
     it('should get initial context from config', () => {
       const configWithContext: GatrixClientConfig = {
         ...defaultConfig,
-        context: { userId: 'user-123', properties: { region: 'us-west' } },
+        features: {
+          ...defaultConfig.features,
+          context: { userId: 'user-123', properties: { region: 'us-west' } },
+        },
       };
       const clientWithContext = new FeaturesClient(emitter, configWithContext);
 
@@ -520,9 +523,9 @@ describe('FeaturesClient', () => {
     it('should start successfully with bootstrap data in offline mode', async () => {
       const offlineClient = new FeaturesClient(emitter, {
         ...defaultConfig,
-        offlineMode: true,
         features: {
           bootstrap: bootstrapFlags,
+          offlineMode: true,
         },
       });
 
@@ -536,9 +539,9 @@ describe('FeaturesClient', () => {
     it('should throw error when offline mode has no data', async () => {
       const offlineClient = new FeaturesClient(emitter, {
         ...defaultConfig,
-        offlineMode: true,
         features: {
           bootstrap: [], // Empty bootstrap
+          offlineMode: true,
         },
       });
 
@@ -558,10 +561,10 @@ describe('FeaturesClient', () => {
       };
       const offlineClient = new FeaturesClient(emitter, {
         ...defaultConfig,
-        offlineMode: true,
         logger: mockLogger,
         features: {
           bootstrap: bootstrapFlags,
+          offlineMode: true,
         },
       });
 
@@ -577,9 +580,9 @@ describe('FeaturesClient', () => {
     it('should not start polling in offline mode', async () => {
       const offlineClient = new FeaturesClient(emitter, {
         ...defaultConfig,
-        offlineMode: true,
         features: {
           bootstrap: bootstrapFlags,
+          offlineMode: true,
           refreshInterval: 1, // 1 second
         },
       });

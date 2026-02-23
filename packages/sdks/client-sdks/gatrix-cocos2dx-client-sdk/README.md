@@ -76,7 +76,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     config.apiToken = "your-client-token";
     config.appName = "my-game";
     config.environment = "production";
-    config.refreshInterval = 30;
+    config.features.refreshInterval = 30;
 
     auto* client = gatrix::GatrixClient::getInstance();
     client->init(config);
@@ -208,7 +208,7 @@ client->offAny();
 
 ```cpp
 gatrix::GatrixClientConfig config;
-config.explicitSyncMode = true;
+config.features.explicitSyncMode = true;
 // ...
 
 auto* features = client->features();

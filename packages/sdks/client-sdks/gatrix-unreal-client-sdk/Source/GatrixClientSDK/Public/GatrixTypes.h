@@ -283,6 +283,18 @@ USTRUCT(BlueprintType)
 struct GATRIXCLIENTSDK_API FGatrixFeaturesConfig {
   GENERATED_BODY()
 
+  /** Initial evaluation context */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FGatrixContext Context;
+
+  /** Start in offline mode */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  bool bOfflineMode = false;
+
+  /** Cache key prefix for storage keys (default: "gatrix_cache") */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  FString CacheKeyPrefix = TEXT("gatrix_cache");
+
   /** Seconds between polls (default: 30) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   float RefreshInterval = 30.0f;
@@ -355,27 +367,13 @@ struct GATRIXCLIENTSDK_API FGatrixClientConfig {
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Required")
   FString Environment;
 
-  // ==================== Optional ====================
-
-  /** Initial context */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
-  FGatrixContext Context;
-
   /** Custom HTTP headers */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
   TMap<FString, FString> CustomHeaders;
 
-  /** Start in offline mode */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
-  bool bOfflineMode = false;
-
   /** Enable dev mode for detailed debug logging */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
   bool bEnableDevMode = false;
-
-  /** Cache key prefix for storage keys (default: "gatrix_cache") */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")
-  FString CacheKeyPrefix = TEXT("gatrix_cache");
 
   /** Feature flags configuration */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix|Optional")

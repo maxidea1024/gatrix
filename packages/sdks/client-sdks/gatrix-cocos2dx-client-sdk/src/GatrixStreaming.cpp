@@ -101,7 +101,7 @@ void StreamingManager::connect() {
   _state = StreamingConnectionState::CONNECTING;
   _stopRequested = false;
 
-  if (_config.streaming.transport == StreamingTransport::WEBSOCKET) {
+  if (_config.features.streaming.transport == StreamingTransport::WEBSOCKET) {
     connectWebSocket();
   } else {
     connectSse();
@@ -144,7 +144,7 @@ void StreamingManager::disconnect() {
 // ==================== SSE ====================
 
 std::string StreamingManager::buildSseUrl() const {
-  std::string baseUrl = _config.streaming.sse.url;
+  std::string baseUrl = _config.features.streaming.sse.url;
   if (baseUrl.empty()) {
     baseUrl = _config.apiUrl + "/client/features/" + _config.environment + "/stream/sse";
   }
@@ -160,7 +160,7 @@ std::string StreamingManager::buildSseUrl() const {
 }
 
 std::string StreamingManager::buildWsUrl() const {
-  std::string baseUrl = _config.streaming.ws.url;
+  std::string baseUrl = _config.features.streaming.ws.url;
   if (baseUrl.empty()) {
     // Convert http(s):// to ws(s)://
     baseUrl = _config.apiUrl;
@@ -378,7 +378,7 @@ void StreamingManager::connectWebSocket() {
     if (_pingThread.joinable())
       _pingThread.join();
     _pingThread = std::thread([this]() {
-      int pingIntervalMs = _config.streaming.ws.pingInterval * 1000;
+      int pingIntervalMs = _config.features.streaming.ws.pingInterval * 1000;
       while (!_pingStopRequested) {
         std::this_thread::sleep_for(std::chrono::milliseconds(pingIntervalMs));
         if (_pingStopRequested)
@@ -552,12 +552,12 @@ void StreamingManager::processStreamingEvent(const std::string& eventType,
 
 int StreamingManager::calculateReconnectDelay() {
   int baseMs, maxMs;
-  if (_config.streaming.transport == StreamingTransport::WEBSOCKET) {
-    baseMs = _config.streaming.ws.reconnectBase * 1000;
-    maxMs = _config.streaming.ws.reconnectMax * 1000;
+  if (_config.features.streaming.transport == StreamingTransport::WEBSOCKET) {
+    baseMs = _config.features.streaming.ws.reconnectBase * 1000;
+    maxMs = _config.features.streaming.ws.reconnectMax * 1000;
   } else {
-    baseMs = _config.streaming.sse.reconnectBase * 1000;
-    maxMs = _config.streaming.sse.reconnectMax * 1000;
+    baseMs = _config.features.streaming.sse.reconnectBase * 1000;
+    maxMs = _config.features.streaming.sse.reconnectMax * 1000;
   }
 
   // Exponential backoff: base * 2^(attempt-1), capped at max
@@ -646,7 +646,7 @@ std::string StreamingManager::getLastRecoveryTime() const {
 }
 
 std::string StreamingManager::getTransportName() const {
-  return _config.streaming.transport == StreamingTransport::WEBSOCKET ? "websocket" : "sse";
+  return _config.features.streaming.transport == StreamingTransport::WEBSOCKET ? "websocket" : "sse";
 }
 
 std::string StreamingManager::getStateName() const {

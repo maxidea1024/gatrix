@@ -122,7 +122,10 @@ public class GameManager : MonoBehaviour
             ApiToken    = "your-client-api-token",
             AppName     = "MyGame",
             Environment = "production",
-            Context     = new GatrixContext { UserId = "player-123" }
+            Features    = new FeaturesConfig
+            {
+                Context = new GatrixContext { UserId = "player-123" },
+            },
         };
 
         await GatrixBehaviour.Client.StartAsync();
@@ -353,7 +356,7 @@ config.Features.DisableRefresh     = false;
 ### Mode 3: Offline
 
 ```csharp
-config.OfflineMode = true;
+config.Features.OfflineMode = true;
 // Use with bootstrap data for fully offline operation
 ```
 
@@ -496,7 +499,7 @@ group.Destroy();
 | Polling interval too long | Reduce `RefreshInterval` (default: 30s) |
 | `ExplicitSyncMode` is on | Call `SyncFlags()` at a safe point |
 | Using `WatchSyncedFlag` without sync | Switch to `WatchRealtimeFlag` or call `SyncFlags()` |
-| `OfflineMode` is enabled | Set `OfflineMode = false` |
+| `OfflineMode` is enabled | Set `Features.OfflineMode = false` |
 | Wrong `AppName` or `Environment` | Double-check config |
 
 ### 2. `WatchSyncedFlag` callback never fires

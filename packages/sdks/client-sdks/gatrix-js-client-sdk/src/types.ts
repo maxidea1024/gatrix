@@ -80,6 +80,18 @@ export interface ImpressionEvent {
  * Features configuration (feature flag specific settings)
  */
 export interface FeaturesConfig {
+  /** Initial evaluation context */
+  context?: GatrixContext;
+
+  /** Custom storage provider */
+  storageProvider?: StorageProvider;
+
+  /** Start in offline mode (no network requests, use cached/bootstrap flags) */
+  offlineMode?: boolean;
+
+  /** Cache key prefix for storage keys (default: 'gatrix_cache') */
+  cacheKeyPrefix?: string;
+
   /** Seconds between polls (default: 30) */
   refreshInterval?: number;
 
@@ -219,30 +231,14 @@ export interface GatrixClientConfig {
   /** Environment name (required, e.g., 'development', 'production') */
   environment: string;
 
-  // ==================== Common Settings ====================
-
-  /** Initial context */
-  context?: GatrixContext;
-
-  /** Custom storage provider */
-  storageProvider?: StorageProvider;
-
   /** Custom HTTP headers */
   customHeaders?: Record<string, string>;
 
   /** Custom logger implementation */
   logger?: Logger;
 
-  // ==================== Feature-specific Settings ====================
-
-  /** Start in offline mode (no network requests, use cached/bootstrap flags) */
-  offlineMode?: boolean;
-
   /** Enable dev mode for detailed debug logging (default: false) */
   enableDevMode?: boolean;
-
-  /** Cache key prefix for storage keys (default: 'gatrix_cache') */
-  cacheKeyPrefix?: string;
 
   /** Feature flags configuration */
   features?: FeaturesConfig;

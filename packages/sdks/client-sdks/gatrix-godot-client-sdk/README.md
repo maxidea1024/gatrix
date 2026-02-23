@@ -20,9 +20,9 @@ func _ready() -> void:
     config.environment = "development"
 
     # Optional: set user context
-    config.context.user_id = "player-123"
-    config.context.session_id = "session-abc"
-    config.context.properties = { "platform": "windows", "version": "1.0.0" }
+    config.features.context.user_id = "player-123"
+    config.features.context.session_id = "session-abc"
+    config.features.context.properties = { "platform": "windows", "version": "1.0.0" }
 
     GatrixClient.start(config, null, func(success: bool, error_msg: String):
         print("SDK started! success=", success)
@@ -133,7 +133,7 @@ features.update_context(ctx)
 ```gdscript
 # Prevent mid-gameplay flag changes
 var config := GatrixTypes.GatrixClientConfig.new()
-config.explicit_sync_mode = true
+config.features.explicit_sync_mode = true
 # ... other config ...
 
 GatrixClient.start(config)
@@ -215,16 +215,18 @@ GatrixClient.start(config, storage)
 | `api_token` | String | **required** | Client API token |
 | `app_name` | String | **required** | Application name |
 | `environment` | String | **required** | Environment (e.g., "production") |
-| `refresh_interval` | float | `30.0` | Polling interval in seconds |
-| `disable_refresh` | bool | `false` | Disable automatic polling |
-| `explicit_sync_mode` | bool | `true` | Enable explicit sync mode |
-| `offline_mode` | bool | `false` | Start in offline mode |
-| `bootstrap` | Array | `[]` | Initial flags for instant availability |
-| `bootstrap_override` | bool | `true` | Override stored flags with bootstrap |
-| `disable_metrics` | bool | `false` | Disable metrics collection |
-| `disable_stats` | bool | `false` | Disable local stats tracking |
-| `impression_data_all` | bool | `false` | Track impressions for all flags |
 | `custom_headers` | Dictionary | `{}` | Custom HTTP headers |
+| `features.context` | GatrixContext | `null` | Initial evaluation context |
+| `features.offline_mode` | bool | `false` | Start in offline mode |
+| `features.cache_key_prefix` | String | `gatrix_cache` | Cache key prefix |
+| `features.refresh_interval` | float | `30.0` | Polling interval in seconds |
+| `features.disable_refresh` | bool | `false` | Disable automatic polling |
+| `features.explicit_sync_mode` | bool | `true` | Enable explicit sync mode |
+| `features.bootstrap` | Array | `[]` | Initial flags for instant availability |
+| `features.bootstrap_override` | bool | `true` | Override stored flags with bootstrap |
+| `features.disable_metrics` | bool | `false` | Disable metrics collection |
+| `features.disable_stats` | bool | `false` | Disable local stats tracking |
+| `features.impression_data_all` | bool | `false` | Track impressions for all flags |
 
 ## Requirements
 

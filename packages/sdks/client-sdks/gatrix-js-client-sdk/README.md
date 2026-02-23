@@ -20,10 +20,10 @@ const client = new GatrixClient({
   apiToken: 'your-api-token', // Client API token (required)
   appName: 'my-app', // Application name (required)
   environment: 'production', // Environment name (required)
-  context: {
-    userId: 'user-123',
-  },
   features: {
+    context: {
+      userId: 'user-123',
+    },
     refreshInterval: 30, // seconds (default: 30)
   },
 });
@@ -59,15 +59,24 @@ client.stop();
 
 ### Optional Fields
 
-| Field                      | Type              | Default | Description                        |
-| -------------------------- | ----------------- | ------- | ---------------------------------- |
-| `context`                  | `object`          | `{}`    | Initial evaluation context.        |
-| `enableDevMode`            | `boolean`         | `false` | Enable detailed debug logging.     |
-| `logger`                   | `Logger`          | Console | Custom logger implementation.      |
-| `features.refreshInterval` | `number`          | `30`    | Polling interval in seconds.       |
-| `features.disableRefresh`  | `boolean`         | `false` | Disable automatic polling.         |
-| `features.bootstrap`       | `EvaluatedFlag[]` | -       | Initial flag data for offline/SSR. |
-| `features.offlineMode`     | `boolean`         | `false` | Use only cached/bootstrap data.    |
+| Field                          | Type              | Default         | Description                        |
+| ------------------------------ | ----------------- | --------------- | ---------------------------------- |
+| `customHeaders`                | `object`          | -               | Custom HTTP headers.               |
+| `enableDevMode`                | `boolean`         | `false`         | Enable detailed debug logging.     |
+| `logger`                       | `Logger`          | Console         | Custom logger implementation.      |
+| `features.context`             | `object`          | `{}`            | Initial evaluation context.        |
+| `features.storageProvider`     | `StorageProvider` | Auto            | Custom storage provider.           |
+| `features.offlineMode`         | `boolean`         | `false`         | Use only cached/bootstrap data.    |
+| `features.cacheKeyPrefix`      | `string`          | `gatrix_cache`  | Cache key prefix for storage.      |
+| `features.refreshInterval`     | `number`          | `30`            | Polling interval in seconds.       |
+| `features.disableRefresh`      | `boolean`         | `false`         | Disable automatic polling.         |
+| `features.explicitSyncMode`    | `boolean`         | `true`          | Enable explicit sync mode.         |
+| `features.bootstrap`           | `EvaluatedFlag[]` | -               | Initial flag data for offline/SSR. |
+| `features.bootstrapOverride`   | `boolean`         | `true`          | Override stored flags with bootstrap. |
+| `features.disableMetrics`      | `boolean`         | `false`         | Disable metrics collection.        |
+| `features.impressionDataAll`   | `boolean`         | `false`         | Track impressions for all flags.   |
+| `features.usePOSTRequests`     | `boolean`         | `false`         | Use POST instead of GET requests.  |
+| `features.streaming`           | `StreamingConfig` | -               | Streaming configuration.           |
 
 ## Logging & Debug Mode
 

@@ -60,28 +60,28 @@ func start(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvide
 		"GatrixSDK: api_token must not have leading or trailing whitespace")
 
 	# Validate numeric ranges
-	assert(config.refresh_interval >= 1.0 and config.refresh_interval <= 86400.0,
-		"GatrixSDK: refresh_interval must be between 1 and 86400, got %f" % config.refresh_interval)
-	assert(config.metrics_interval >= 1.0 and config.metrics_interval <= 86400.0,
-		"GatrixSDK: metrics_interval must be between 1 and 86400, got %f" % config.metrics_interval)
-	assert(config.metrics_interval_initial >= 0.0 and config.metrics_interval_initial <= 3600.0,
-		"GatrixSDK: metrics_interval_initial must be between 0 and 3600, got %f" % config.metrics_interval_initial)
+	assert(config.features.refresh_interval >= 1.0 and config.features.refresh_interval <= 86400.0,
+		"GatrixSDK: refresh_interval must be between 1 and 86400, got %f" % config.features.refresh_interval)
+	assert(config.features.metrics_interval >= 1.0 and config.features.metrics_interval <= 86400.0,
+		"GatrixSDK: metrics_interval must be between 1 and 86400, got %f" % config.features.metrics_interval)
+	assert(config.features.metrics_interval_initial >= 0.0 and config.features.metrics_interval_initial <= 3600.0,
+		"GatrixSDK: metrics_interval_initial must be between 0 and 3600, got %f" % config.features.metrics_interval_initial)
 
 	# Validate backoff settings
-	assert(config.initial_backoff >= 0.1 and config.initial_backoff <= 60.0,
-		"GatrixSDK: initial_backoff must be between 0.1 and 60 seconds, got %f" % config.initial_backoff)
-	assert(config.max_backoff >= 1.0 and config.max_backoff <= 600.0,
-		"GatrixSDK: max_backoff must be between 1 and 600 seconds, got %f" % config.max_backoff)
-	assert(config.initial_backoff <= config.max_backoff,
-		"GatrixSDK: initial_backoff (%f) must be <= max_backoff (%f)" % [config.initial_backoff, config.max_backoff])
+	assert(config.features.initial_backoff >= 0.1 and config.features.initial_backoff <= 60.0,
+		"GatrixSDK: initial_backoff must be between 0.1 and 60 seconds, got %f" % config.features.initial_backoff)
+	assert(config.features.max_backoff >= 1.0 and config.features.max_backoff <= 600.0,
+		"GatrixSDK: max_backoff must be between 1 and 600 seconds, got %f" % config.features.max_backoff)
+	assert(config.features.initial_backoff <= config.features.max_backoff,
+		"GatrixSDK: initial_backoff (%f) must be <= max_backoff (%f)" % [config.features.initial_backoff, config.features.max_backoff])
 
 	# Validate non-retryable status codes
-	for code in config.non_retryable_status_codes:
+	for code in config.features.non_retryable_status_codes:
 		assert(code >= 400 and code <= 599,
 			"GatrixSDK: non_retryable_status_codes must be 400-599, got %d" % code)
 
 	# Validate cache key prefix
-	assert(config.cache_key_prefix.length() <= 100,
+	assert(config.features.cache_key_prefix.length() <= 100,
 		"GatrixSDK: cache_key_prefix must be <= 100 characters")
 
 	# Set up storage
@@ -91,8 +91,8 @@ func start(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvide
 		_storage = GatrixStorageProvider.InMemoryStorageProvider.new()
 
 	# Auto-generate sessionId if not set
-	if config.context.session_id == "":
-		config.context.session_id = GatrixTypes.generate_uuid()
+	if config.features.context.session_id == "":
+		config.features.context.session_id = GatrixTypes.generate_uuid()
 
 	# Create features client
 	_features = GatrixFeaturesClient.new()

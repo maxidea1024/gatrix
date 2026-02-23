@@ -40,8 +40,8 @@ Config.AppName = TEXT("MyGame");
 Config.Environment = TEXT("production");
 
 // Optional context
-Config.Context.UserId = TEXT("player-123");
-Config.Context.SessionId = TEXT("session-abc");
+Config.Features.Context.UserId = TEXT("player-123");
+Config.Features.Context.SessionId = TEXT("session-abc");
 
 UGatrixClient* Client = UGatrixClient::Get();
 Client->Start(Config);
@@ -212,7 +212,7 @@ All events use the `flags.` prefix namespace:
 | `ApiToken` | FString | - | Client API token (required) |
 | `AppName` | FString | - | Application name (required) |
 | `Environment` | FString | - | Environment name (required) |
-| `bOfflineMode` | bool | false | Start in offline mode |
+| `Features.bOfflineMode` | bool | false | Start in offline mode |
 | `Features.RefreshInterval` | float | 30.0 | Seconds between polls |
 | `Features.bDisableRefresh` | bool | false | Disable automatic polling |
 | `Features.bExplicitSyncMode` | bool | true | Manual flag sync |

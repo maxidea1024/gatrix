@@ -183,6 +183,42 @@ class ErrorEvent:
 	var code: int = 0
 
 
+# Feature flags configuration
+class FeaturesConfig:
+	# Context
+	var context: GatrixContext = GatrixContext.new()
+
+	# Offline / Storage
+	var offline_mode: bool = false
+	var cache_key_prefix: String = "gatrix_cache"
+
+	# Polling
+	var refresh_interval: float = 30.0
+	var disable_refresh: bool = false
+
+	# Sync Mode
+	var explicit_sync_mode: bool = true
+
+	# Bootstrap
+	var bootstrap: Array = []  # Array[EvaluatedFlag]
+	var bootstrap_override: bool = true
+
+	# Metrics
+	var disable_metrics: bool = false
+	var disable_stats: bool = false
+	var impression_data_all: bool = false
+	var metrics_interval_initial: float = 2.0
+	var metrics_interval: float = 60.0
+
+	# Request
+	var use_post_requests: bool = false
+
+	# Fetch retry options
+	var non_retryable_status_codes: Array[int] = [401, 403]
+	var initial_backoff: float = 1.0
+	var max_backoff: float = 60.0
+
+
 # SDK Configuration
 class GatrixClientConfig:
 	# Required
@@ -191,42 +227,12 @@ class GatrixClientConfig:
 	var app_name: String = ""
 	var environment: String = ""
 
-	# Optional - Polling
-	var refresh_interval: float = 30.0
-	var disable_refresh: bool = false
-
-	# Optional - Context
-	var context: GatrixContext = GatrixContext.new()
-
-	# Optional - Sync Mode
-	var explicit_sync_mode: bool = true
-
-	# Optional - Offline Mode
-	var offline_mode: bool = false
-
-	# Optional - Bootstrap
-	var bootstrap: Array = []  # Array[EvaluatedFlag]
-	var bootstrap_override: bool = true
-
-	# Optional - Advanced
+	# Optional
 	var custom_headers: Dictionary = {}
-	var disable_metrics: bool = false
-	var disable_stats: bool = false
-	var impression_data_all: bool = false
-	var use_post_requests: bool = false
-
-	# Metrics intervals
-	var metrics_interval_initial: float = 2.0
-	var metrics_interval: float = 60.0
-
-	# Fetch retry options
-	var non_retryable_status_codes: Array[int] = [401, 403]
-	var initial_backoff: float = 1.0
-	var max_backoff: float = 60.0
-
-	# Debug / Storage
 	var enable_dev_mode: bool = false
-	var cache_key_prefix: String = "gatrix_cache"
+
+	# Feature flags configuration
+	var features: FeaturesConfig = FeaturesConfig.new()
 
 
 # Feature flag statistics

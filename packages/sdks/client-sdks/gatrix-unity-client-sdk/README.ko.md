@@ -122,7 +122,10 @@ public class GameManager : MonoBehaviour
             ApiToken    = "your-client-api-token",
             AppName     = "MyGame",
             Environment = "production",
-            Context     = new GatrixContext { UserId = "player-123" }
+            Features    = new FeaturesConfig
+            {
+                Context = new GatrixContext { UserId = "player-123" },
+            },
         };
 
         await GatrixBehaviour.Client.StartAsync();
@@ -351,7 +354,7 @@ config.Features.RefreshInterval   = 30f; // 초
 ### Mode 3: 오프라인
 
 ```csharp
-config.OfflineMode = true;
+config.Features.OfflineMode = true;
 // 부트스트랩 데이터와 함께 사용하면 완전 오프라인 동작 가능
 ```
 
@@ -490,7 +493,7 @@ group.Destroy(); // 정리
 | 폴링 간격이 너무 김 | `RefreshInterval` 감소 (기본값: 30초) |
 | `ExplicitSyncMode` 활성화됨 | `SyncFlags()` 호출 |
 | `WatchSyncedFlag` 사용 중 | `WatchRealtimeFlag`로 변경하거나 `SyncFlags()` 호출 |
-| `OfflineMode` 활성화됨 | `OfflineMode = false` 설정 |
+| `OfflineMode` 활성화됨 | `Features.OfflineMode = false` 설정 |
 | 잘못된 `AppName`/`Environment` | 대시보드 설정과 일치 확인 |
 
 ### 2. `WatchSyncedFlag` 콜백이 실행되지 않음

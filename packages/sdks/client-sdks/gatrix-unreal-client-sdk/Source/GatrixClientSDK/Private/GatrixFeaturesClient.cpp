@@ -40,8 +40,8 @@ void UGatrixFeaturesClient::Initialize(const FGatrixClientConfig& Config,
   SdkState = EGatrixSdkState::Initializing;
 
   // Ensure context has system fields
-  ClientConfig.Context.AppName = ClientConfig.AppName;
-  ClientConfig.Context.Environment = ClientConfig.Environment;
+  ClientConfig.Features.Context.AppName = ClientConfig.AppName;
+  ClientConfig.Features.Context.Environment = ClientConfig.Environment;
 
   // Load cached data from storage
   LoadFromStorage();
@@ -66,12 +66,12 @@ void UGatrixFeaturesClient::Start() {
     UE_LOG(LogGatrix, Log,
            TEXT("[DEV] Start() called. offlineMode=%s, "
                 "refreshInterval=%.1f, disableRefresh=%s"),
-           ClientConfig.bOfflineMode ? TEXT("True") : TEXT("False"),
+           ClientConfig.Features.bOfflineMode ? TEXT("True") : TEXT("False"),
            ClientConfig.Features.RefreshInterval,
            ClientConfig.Features.bDisableRefresh ? TEXT("True") : TEXT("False"));
   }
 
-  if (ClientConfig.bOfflineMode) {
+  if (ClientConfig.Features.bOfflineMode) {
     if (RealtimeFlags.Num() == 0) {
       SdkState = EGatrixSdkState::Error;
       FGatrixErrorEvent ErrorEvent;
@@ -96,7 +96,7 @@ void UGatrixFeaturesClient::Start() {
   }
 
   // Start streaming if enabled
-  if (ClientConfig.Features.Streaming.bEnabled && !ClientConfig.bOfflineMode) {
+  if (ClientConfig.Features.Streaming.bEnabled && !ClientConfig.Features.bOfflineMode) {
     ConnectStreaming();
   }
 }
@@ -346,12 +346,12 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
     return;
   }
 
-  ClientConfig.Context = MergedContext;
+  ClientConfig.Features.Context = MergedContext;
   LastContextHash = NewHash;
   ContextChangeCount.Increment();
 
   // If not running or offline, no fetch will happen — notify immediately
-  if (!bStarted || ClientConfig.bOfflineMode) {
+  if (!bStarted || ClientConfig.Features.bOfflineMode) {
     if (OnComplete) {
       OnComplete(true, TEXT(""));
     }
@@ -368,7 +368,7 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
 }
 
 FGatrixContext UGatrixFeaturesClient::GetContext() const {
-  return ClientConfig.Context;
+  return ClientConfig.Features.Context;
 }
 
 // ==================== Explicit Sync ====================
@@ -1039,7 +1039,7 @@ void UGatrixFeaturesClient::TrackImpression(const FString& FlagName, bool bEnabl
   FGatrixImpressionEvent Event;
   Event.EventType = EventType;
   Event.EventId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
-  Event.Context = ClientConfig.Context;
+  Event.Context = ClientConfig.Features.Context;
   Event.bEnabled = bEnabled;
   Event.FeatureName = FlagName;
   Event.bImpressionData = true;
@@ -1258,7 +1258,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
 // ==================== Polling ====================
 
 void UGatrixFeaturesClient::ScheduleNextPoll() {
-  if (!bStarted || ClientConfig.Features.bDisableRefresh || ClientConfig.bOfflineMode ||
+  if (!bStarted || ClientConfig.Features.bDisableRefresh || ClientConfig.Features.bOfflineMode ||
       bPollingStopped) {
     return;
   }
@@ -1557,14 +1557,14 @@ FString UGatrixFeaturesClient::BuildContextQueryString() const {
   Params.Add(FString::Printf(TEXT("environment=%s"),
                              *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment)));
 
-  if (!ClientConfig.Context.UserId.IsEmpty())
-    Params.Add(FString::Printf(TEXT("userId=%s"),
-                               *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.UserId)));
-  if (!ClientConfig.Context.SessionId.IsEmpty())
-    Params.Add(FString::Printf(TEXT("sessionId=%s"),
-                               *FGenericPlatformHttp::UrlEncode(ClientConfig.Context.SessionId)));
+  if (!ClientConfig.Features.Context.UserId.IsEmpty())
+    Params.Add(FString::Printf(
+        TEXT("userId=%s"), *FGenericPlatformHttp::UrlEncode(ClientConfig.Features.Context.UserId)));
+  if (!ClientConfig.Features.Context.SessionId.IsEmpty())
+    Params.Add(FString::Printf(TEXT("sessionId=%s"), *FGenericPlatformHttp::UrlEncode(
+                                                         ClientConfig.Features.Context.SessionId)));
 
-  for (const auto& Prop : ClientConfig.Context.Properties) {
+  for (const auto& Prop : ClientConfig.Features.Context.Properties) {
     Params.Add(FString::Printf(TEXT("properties[%s]=%s"),
                                *FGenericPlatformHttp::UrlEncode(Prop.Key),
                                *FGenericPlatformHttp::UrlEncode(Prop.Value)));
@@ -1582,14 +1582,14 @@ FString UGatrixFeaturesClient::ContextToJson() const {
   Writer->WriteValue(TEXT("appName"), ClientConfig.AppName);
   Writer->WriteValue(TEXT("environment"), ClientConfig.Environment);
 
-  if (!ClientConfig.Context.UserId.IsEmpty())
-    Writer->WriteValue(TEXT("userId"), ClientConfig.Context.UserId);
-  if (!ClientConfig.Context.SessionId.IsEmpty())
-    Writer->WriteValue(TEXT("sessionId"), ClientConfig.Context.SessionId);
+  if (!ClientConfig.Features.Context.UserId.IsEmpty())
+    Writer->WriteValue(TEXT("userId"), ClientConfig.Features.Context.UserId);
+  if (!ClientConfig.Features.Context.SessionId.IsEmpty())
+    Writer->WriteValue(TEXT("sessionId"), ClientConfig.Features.Context.SessionId);
 
-  if (ClientConfig.Context.Properties.Num() > 0) {
+  if (ClientConfig.Features.Context.Properties.Num() > 0) {
     Writer->WriteObjectStart(TEXT("properties"));
-    for (const auto& Prop : ClientConfig.Context.Properties) {
+    for (const auto& Prop : ClientConfig.Features.Context.Properties) {
       Writer->WriteValue(Prop.Key, Prop.Value);
     }
     Writer->WriteObjectEnd();
@@ -1914,7 +1914,7 @@ void UGatrixFeaturesClient::ConnectStreaming() {
 
   const FGatrixStreamingConfig& StreamConfig = ClientConfig.Features.Streaming;
 
-  if (!StreamConfig.bEnabled || ClientConfig.bOfflineMode) {
+  if (!StreamConfig.bEnabled || ClientConfig.Features.bOfflineMode) {
     return;
   }
 

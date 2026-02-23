@@ -83,25 +83,25 @@ func start() -> void:
 	if _started:
 		return
 	_started = true
-	_dev_log("start() called. offlineMode=%s, refreshInterval=%.1f" % [_config.offline_mode, _config.refresh_interval])
+	_dev_log("start() called. offlineMode=%s, refreshInterval=%.1f" % [_config.features.offline_mode, _config.features.refresh_interval])
 
 	# Load from storage
 	_load_from_storage()
 
 	# Apply bootstrap if provided
-	if _config.bootstrap.size() > 0:
+	if _config.features.bootstrap.size() > 0:
 		_apply_bootstrap()
 
-	if not _config.offline_mode:
+	if not _config.features.offline_mode:
 		# Initial fetch
 		_do_fetch_flags()
 
 		# Start polling
-		if not _config.disable_refresh:
+		if not _config.features.disable_refresh:
 			_schedule_next_poll()
 
 		# Start metrics
-		if not _config.disable_metrics:
+		if not _config.features.disable_metrics:
 			_start_metrics()
 
 
@@ -115,7 +115,7 @@ func stop() -> void:
 	_stop_polling()
 
 	# Send final metrics
-	if not _config.disable_metrics:
+	if not _config.features.disable_metrics:
 		_send_metrics()
 		_stop_metrics()
 
@@ -569,11 +569,11 @@ func update_context(new_context: GatrixTypes.GatrixContext, on_complete: Callabl
 			on_complete.call(true, "")
 		return
 
-	_config.context = new_context
+	_config.features.context = new_context
 	_last_context_hash = new_hash
 	_stats.context_change_count += 1
 
-	if not _started or _config.offline_mode:
+	if not _started or _config.features.offline_mode:
 		if on_complete.is_valid():
 			on_complete.call(true, "")
 		return
@@ -598,23 +598,23 @@ func _compute_context_hash(ctx: GatrixTypes.GatrixContext) -> String:
 
 
 func get_context() -> GatrixTypes.GatrixContext:
-	return _config.context
+	return _config.features.context
 
 
 # ==================== Explicit Sync ====================
 
 func is_explicit_sync() -> bool:
-	return _config.explicit_sync_mode
+	return _config.features.explicit_sync_mode
 
 
 func has_pending_sync_flags() -> bool:
-	return _config.explicit_sync_mode and _has_pending_sync
+	return _config.features.explicit_sync_mode and _has_pending_sync
 
 
 func set_explicit_sync_mode(enabled: bool) -> void:
-	if _config.explicit_sync_mode == enabled:
+	if _config.features.explicit_sync_mode == enabled:
 		return
-	_config.explicit_sync_mode = enabled
+	_config.features.explicit_sync_mode = enabled
 	if enabled:
 		_mutex.lock()
 		_synchronized_flags = _realtime_flags.duplicate(true)
@@ -625,12 +625,12 @@ func set_explicit_sync_mode(enabled: bool) -> void:
 
 
 func sync_flags(fetch_now := true) -> void:
-	if not _config.explicit_sync_mode:
+	if not _config.features.explicit_sync_mode:
 		return
 
 	_stats.sync_flags_count += 1
 
-	if fetch_now and not _config.offline_mode:
+	if fetch_now and not _config.features.offline_mode:
 		_do_fetch_flags()
 
 	_mutex.lock()
@@ -689,7 +689,7 @@ func watch_synced_flag_with_initial_state(flag_name: String, callback: Callable,
 # ==================== Fetch ====================
 
 func fetch_flags() -> void:
-	if not _config.offline_mode:
+	if not _config.features.offline_mode:
 		_do_fetch_flags()
 
 
@@ -700,7 +700,7 @@ func get_stats() -> GatrixTypes.FeaturesStats:
 	_stats.total_flag_count = _get_active_flags().size()
 	_stats.sdk_state = _sdk_state
 	_stats.etag = _etag
-	_stats.offline_mode = _config.offline_mode
+	_stats.offline_mode = _config.features.offline_mode
 	_stats.missing_flags = _stats.missing_flags.duplicate()
 	_stats.flag_enabled_counts = _stats.flag_enabled_counts.duplicate(true)
 	_stats.flag_variant_counts = _stats.flag_variant_counts.duplicate(true)
@@ -717,7 +717,7 @@ func is_ready() -> bool:
 # ==================== Internal Methods ====================
 
 func _get_active_flags(force_realtime: bool = false) -> Dictionary:
-	if force_realtime or not _config.explicit_sync_mode:
+	if force_realtime or not _config.features.explicit_sync_mode:
 		return _realtime_flags
 	return _synchronized_flags
 
@@ -742,9 +742,9 @@ func _load_from_storage() -> void:
 
 
 func _apply_bootstrap() -> void:
-	if _config.bootstrap_override or _realtime_flags.is_empty():
+	if _config.features.bootstrap_override or _realtime_flags.is_empty():
 		_mutex.lock()
-		for flag in _config.bootstrap:
+		for flag in _config.features.bootstrap:
 			_realtime_flags[flag.name] = flag
 			_synchronized_flags[flag.name] = flag
 		_mutex.unlock()
@@ -797,8 +797,8 @@ func _do_fetch_flags() -> void:
 	_http_request.request_completed.connect(_on_fetch_completed)
 
 	# Make request
-	if _config.use_post_requests:
-		var body := JSON.stringify({ "context": _config.context.to_dict() })
+	if _config.features.use_post_requests:
+		var body := JSON.stringify({ "context": _config.features.context.to_dict() })
 		headers.append("Content-Type: application/json")
 		_http_request.request(url, headers, HTTPClient.METHOD_POST, body)
 	else:
@@ -949,7 +949,7 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 		_stats.update_count += 1
 		_stats.last_update_time = Time.get_unix_time_from_system()
 
-		if _config.explicit_sync_mode:
+		if _config.features.explicit_sync_mode:
 			var was_pending := _has_pending_sync
 			_has_pending_sync = true
 			if not was_pending:
@@ -972,7 +972,7 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 		_emit_flag_changes(old_flags, _realtime_flags)
 		# Always invoke realtime watch callbacks
 		_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags, true)
-		if not _config.explicit_sync_mode:
+		if not _config.features.explicit_sync_mode:
 			# In non-explicit mode, also invoke synced callbacks
 			_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags, false)
 			_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
@@ -1054,8 +1054,8 @@ func _build_fetch_url() -> String:
 	var base := _config.api_url.rstrip("/")
 	var url := "%s/client/features/%s" % [base, _config.environment.uri_encode()]
 
-	if not _config.use_post_requests:
-		var ctx_qs := _config.context.to_query_string()
+	if not _config.features.use_post_requests:
+		var ctx_qs := _config.features.context.to_query_string()
 		if ctx_qs != "":
 			url += "?" + ctx_qs
 
@@ -1065,7 +1065,7 @@ func _build_fetch_url() -> String:
 # ==================== Polling ====================
 
 func _schedule_next_poll() -> void:
-	if not _started or _config.disable_refresh:
+	if not _started or _config.features.disable_refresh:
 		return
 
 	if _poll_timer == null:
@@ -1074,12 +1074,12 @@ func _schedule_next_poll() -> void:
 		_poll_timer.timeout.connect(_on_poll_timeout)
 		_scene_tree.root.call_deferred("add_child", _poll_timer)
 
-	_poll_timer.wait_time = _config.refresh_interval
+	_poll_timer.wait_time = _config.features.refresh_interval
 	_poll_timer.call_deferred("start")
 
 
 func _on_poll_timeout() -> void:
-	if _started and not _config.disable_refresh:
+	if _started and not _config.features.disable_refresh:
 		_do_fetch_flags()
 		_schedule_next_poll()
 
@@ -1099,7 +1099,7 @@ func _track_flag_access(flag_name: String, flag, event_type: String, variant_nam
 	var is_enabled: bool = flag.enabled
 
 	# Metrics
-	if not _config.disable_metrics:
+	if not _config.features.disable_metrics:
 		_metrics_mutex.lock()
 		if not _metrics_flag_access.has(flag_name):
 			_metrics_flag_access[flag_name] = { "yes": 0, "no": 0, "variants": {} }
@@ -1117,7 +1117,7 @@ func _track_flag_access(flag_name: String, flag, event_type: String, variant_nam
 		_metrics_mutex.unlock()
 
 	# Stats
-	if not _config.disable_stats:
+	if not _config.features.disable_stats:
 		if not _stats.flag_enabled_counts.has(flag_name):
 			_stats.flag_enabled_counts[flag_name] = { "yes": 0, "no": 0 }
 		if is_enabled:
@@ -1133,12 +1133,12 @@ func _track_flag_access(flag_name: String, flag, event_type: String, variant_nam
 			_stats.flag_variant_counts[flag_name][variant_name] += 1
 
 	# Impression
-	if flag.impression_data or _config.impression_data_all:
+	if flag.impression_data or _config.features.impression_data_all:
 		_track_impression(flag_name, is_enabled, variant_name, flag)
 
 
 func _track_missing(flag_name: String) -> void:
-	if _config.disable_metrics:
+	if _config.features.disable_metrics:
 		return
 
 	_metrics_mutex.lock()
@@ -1146,7 +1146,7 @@ func _track_missing(flag_name: String) -> void:
 		_metrics_missing[flag_name] = 0
 	_metrics_missing[flag_name] += 1
 
-	if not _config.disable_stats:
+	if not _config.features.disable_stats:
 		if not _stats.missing_flags.has(flag_name):
 			_stats.missing_flags[flag_name] = 0
 		_stats.missing_flags[flag_name] += 1
@@ -1155,7 +1155,7 @@ func _track_missing(flag_name: String) -> void:
 
 func _track_impression(flag_name: String, enabled: bool, variant_name: String,
 		flag: GatrixTypes.EvaluatedFlag) -> void:
-	if not flag.impression_data and not _config.impression_data_all:
+	if not flag.impression_data and not _config.features.impression_data_all:
 		return
 
 	_stats.impression_count += 1
@@ -1163,7 +1163,7 @@ func _track_impression(flag_name: String, enabled: bool, variant_name: String,
 	var event := GatrixTypes.ImpressionEvent.new()
 	event.event_type = "isEnabled"
 	event.event_id = GatrixTypes.generate_uuid()
-	event.context = _config.context
+	event.context = _config.features.context
 	event.enabled = enabled
 	event.feature_name = flag_name
 	event.impression_data = flag.impression_data
@@ -1178,7 +1178,7 @@ func _start_metrics() -> void:
 	# Initial delay
 	_metrics_initial_timer = Timer.new()
 	_metrics_initial_timer.one_shot = true
-	_metrics_initial_timer.wait_time = _config.metrics_interval_initial
+	_metrics_initial_timer.wait_time = _config.features.metrics_interval_initial
 	_metrics_initial_timer.timeout.connect(_on_metrics_initial_timeout)
 	_scene_tree.root.call_deferred("add_child", _metrics_initial_timer)
 	_metrics_initial_timer.call_deferred("start")
@@ -1189,7 +1189,7 @@ func _on_metrics_initial_timeout() -> void:
 
 	# Start periodic timer
 	_metrics_timer = Timer.new()
-	_metrics_timer.wait_time = _config.metrics_interval
+	_metrics_timer.wait_time = _config.features.metrics_interval
 	_metrics_timer.timeout.connect(_on_metrics_timeout)
 	_scene_tree.root.call_deferred("add_child", _metrics_timer)
 	_metrics_timer.call_deferred("start")
