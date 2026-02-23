@@ -19,10 +19,7 @@ GatrixClient::~GatrixClient() {
   _features = nullptr;
 }
 
-void GatrixClient::init(const GatrixClientConfig& config) {
-  if (_initialized)
-    return;
-
+bool GatrixClient::initInternal(const GatrixClientConfig& config) {
   // Validate required fields
   if (config.apiUrl.empty())
     throw GatrixFeatureError("Config validation failed: apiUrl is required");
@@ -65,20 +62,35 @@ void GatrixClient::init(const GatrixClientConfig& config) {
   _config = config;
   _features = new FeaturesClient(_config, _emitter);
   _initialized = true;
+  return true;
 }
 
-void GatrixClient::start() {
-  if (!_initialized)
+void GatrixClient::start(const GatrixClientConfig& config) {
+  if (_started)
     return;
+
+  initInternal(config);
+  _started = true;
   _features->start();
 }
 
-void GatrixClient::start(std::function<void(bool, const std::string&)> onComplete) {
-  if (!_initialized) {
+void GatrixClient::start(const GatrixClientConfig& config,
+                         std::function<void(bool, const std::string&)> onComplete) {
+  if (_started) {
     if (onComplete)
-      onComplete(false, "Not initialized. Call init() first.");
+      onComplete(true, "");
     return;
   }
+
+  try {
+    initInternal(config);
+  } catch (const std::exception& e) {
+    if (onComplete)
+      onComplete(false, e.what());
+    return;
+  }
+
+  _started = true;
   _features->start(std::move(onComplete));
 }
 
@@ -86,6 +98,8 @@ void GatrixClient::stop() {
   if (_features) {
     _features->stop();
   }
+  _started = false;
+  _initialized = false;
 }
 
 bool GatrixClient::isReady() const {
@@ -116,6 +130,13 @@ void GatrixClient::onAny(GatrixAnyCallback callback, const std::string& name) {
 
 void GatrixClient::offAny() {
   _emitter.offAny();
+}
+
+void GatrixClient::track(const std::string& eventName,
+                         const std::unordered_map<std::string, std::string>& properties) {
+  // Not yet implemented — reserved for the upcoming Gatrix Analytics service.
+  (void)eventName;
+  (void)properties;
 }
 
 } // namespace gatrix

@@ -125,7 +125,6 @@ public class GameManager : MonoBehaviour
             Context     = new GatrixContext { UserId = "player-123" }
         };
 
-        GatrixBehaviour.Client.Init(config);
         await GatrixBehaviour.Client.StartAsync();
 
         float speed = GatrixBehaviour.Client.Features.FloatVariation("game-speed", 1.0f);
@@ -413,8 +412,7 @@ GatrixBehaviour.Client.Stop();
 
 | Method | Description |
 |---|---|
-| `Init(config)` | Initialize SDK |
-| `StartAsync()` | Start fetching |
+| `StartAsync()` | Initialize and start fetching |
 | `Stop()` | Stop and clean up |
 | `UpdateContextAsync(ctx)` | Update full context |
 

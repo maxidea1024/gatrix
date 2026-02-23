@@ -161,10 +161,9 @@ Config.Context.UserId = TEXT("player-123");
 Config.Context.SessionId = TEXT("session-abc");
 Config.Context.Properties.Add(TEXT("level"), TEXT("5"));
 
-// 초기화 & 시작
+// 시작
 UGatrixClient* Client = UGatrixClient::Get();
-Client->Init(Config);
-Client->Start();
+Client->Start(Config);
 
 // Ready 이벤트 구독
 Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)

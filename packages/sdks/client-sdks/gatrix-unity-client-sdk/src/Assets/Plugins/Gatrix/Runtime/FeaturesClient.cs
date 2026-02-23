@@ -207,9 +207,17 @@ namespace Gatrix.Unity.SDK
         /// <summary>Get client connection ID</summary>
         public string GetConnectionId() => _connectionId;
 
-        /// <summary>Initialize the features client</summary>
-        public async UniTask InitAsync()
+        /// <summary>Initialize and start polling for flag updates</summary>
+        public async UniTask StartAsync()
         {
+            if (_started) return;
+            _started = true;
+            _startTime = DateTime.UtcNow;
+            _consecutiveFailures = 0;
+            _pollingStopped = false;
+
+            // --- Initialization phase (formerly InitAsync) ---
+
             // Resolve session ID
             var sessionId = await ResolveSessionIdAsync();
             _context.SessionId = sessionId;
@@ -253,16 +261,8 @@ namespace Gatrix.Unity.SDK
                 SetFlags(bootstrap, forceSync: true);
                 SetReady();
             }
-        }
 
-        /// <summary>Start polling for flag updates</summary>
-        public async UniTask StartAsync()
-        {
-            if (_started) return;
-            _started = true;
-            _startTime = DateTime.UtcNow;
-            _consecutiveFailures = 0;
-            _pollingStopped = false;
+            // --- Start phase (formerly StartAsync) ---
 
             _devLog.Log($"start() called. offlineMode={_config.OfflineMode}, refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={FeaturesConfig.ExplicitSyncMode}");
 

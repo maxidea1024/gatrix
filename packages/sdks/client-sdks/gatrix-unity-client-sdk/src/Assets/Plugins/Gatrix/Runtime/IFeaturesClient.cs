@@ -16,7 +16,7 @@ namespace Gatrix.Unity.SDK
     /// and never perform network I/O, making them safe to call from any thread or hot path.
     /// </para>
     /// <para>
-    /// Async methods (InitAsync, StartAsync, FetchFlagsAsync, etc.) handle network
+    /// Async methods (StartAsync, FetchFlagsAsync, etc.) handle network
     /// communication and return <see cref="UniTask"/> for efficient async operations
     /// optimized for Unity's PlayerLoop.
     /// </para>
@@ -26,18 +26,8 @@ namespace Gatrix.Unity.SDK
         // ==================== Lifecycle ====================
 
         /// <summary>
-        /// Initialize the features client. Loads cached flags from storage,
-        /// resolves the session ID, and prepares the client for flag access.
-        /// <para>
-        /// This must be called before <see cref="StartAsync"/>. After initialization,
-        /// cached flags (if any) are available immediately via flag access methods.
-        /// </para>
-        /// </summary>
-        /// <returns>A <see cref="UniTask"/> that completes when initialization is done.</returns>
-        UniTask InitAsync();
-
-        /// <summary>
-        /// Start the features client. Performs the initial flag fetch from the server,
+        /// Initialize and start the features client. Loads cached flags from storage,
+        /// resolves the session ID, performs the initial flag fetch from the server,
         /// begins the polling loop for periodic refreshes, and starts the metrics sender.
         /// <para>
         /// After this method completes, the SDK transitions to the Ready state
@@ -45,7 +35,7 @@ namespace Gatrix.Unity.SDK
         /// by <see cref="FeaturesConfig.RefreshInterval"/>.
         /// </para>
         /// </summary>
-        /// <returns>A <see cref="UniTask"/> that completes when the initial fetch is done.</returns>
+        /// <returns>A <see cref="UniTask"/> that completes when initialization and the initial fetch are done.</returns>
         UniTask StartAsync();
 
         /// <summary>

@@ -199,9 +199,20 @@ export class FeaturesClient implements VariationProvider {
   }
 
   /**
-   * Initialize the features client
+   * Initialize and start polling for flag updates.
+   * This method combines the former init() and start() into a single call.
    */
-  async init(): Promise<void> {
+  async start(): Promise<void> {
+    if (this.started) {
+      return;
+    }
+    this.started = true;
+    this.startTime = new Date();
+    this.consecutiveFailures = 0;
+    this.pollingStopped = false;
+
+    // --- Initialization phase (formerly init) ---
+
     // Resolve session ID
     const sessionId = await this.resolveSessionId();
     this.context.sessionId = sessionId;
@@ -235,19 +246,8 @@ export class FeaturesClient implements VariationProvider {
       this.setFlags(bootstrap, true); // Force sync for bootstrap
       this.setReady();
     }
-  }
 
-  /**
-   * Start polling for flag updates
-   */
-  async start(): Promise<void> {
-    if (this.started) {
-      return;
-    }
-    this.started = true;
-    this.startTime = new Date();
-    this.consecutiveFailures = 0;
-    this.pollingStopped = false;
+    // --- Start phase (formerly start) ---
 
     this.devLog(
       `start() called. offlineMode=${this.config.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`

@@ -28,6 +28,8 @@ static const struct luaL_Reg GatrixRootFunctions[] = {
     {"Init", FGatrixLuaBindings::Lua_Init},
     {"Start", FGatrixLuaBindings::Lua_Start},
     {"Stop", FGatrixLuaBindings::Lua_Stop},
+    // Tracking
+    {"Track", FGatrixLuaBindings::Lua_Track},
     // Context
     {"UpdateContext", FGatrixLuaBindings::Lua_UpdateContext},
     {"GetContext", FGatrixLuaBindings::Lua_GetContext},
@@ -494,94 +496,143 @@ static void RejectDeferred(lua_State* L, int DeferredRef, const char* ErrorMsg =
 
 // ==================== Lifecycle ====================
 
-int FGatrixLuaBindings::Lua_Init(lua_State* L) {
-  luaL_checktype(L, 1, LUA_TTABLE);
-
+// Parse Lua config table into FGatrixClientConfig
+static FGatrixClientConfig ParseConfigFromLuaTable(lua_State* L, int TableIndex) {
   FGatrixClientConfig Config;
 
   // Required fields
-  lua_getfield(L, 1, "ApiUrl");
+  lua_getfield(L, TableIndex, "ApiUrl");
   Config.ApiUrl = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "ApiToken");
+  lua_getfield(L, TableIndex, "ApiToken");
   Config.ApiToken = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "AppName");
+  lua_getfield(L, TableIndex, "AppName");
   Config.AppName = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "Environment");
+  lua_getfield(L, TableIndex, "Environment");
   Config.Environment = UTF8_TO_TCHAR(luaL_checkstring(L, -1));
   lua_pop(L, 1);
 
   // Optional fields
-  lua_getfield(L, 1, "RefreshInterval");
+  lua_getfield(L, TableIndex, "RefreshInterval");
   if (lua_isnumber(L, -1)) {
     Config.Features.RefreshInterval = static_cast<float>(lua_tonumber(L, -1));
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "DisableRefresh");
+  lua_getfield(L, TableIndex, "DisableRefresh");
   if (lua_isboolean(L, -1)) {
     Config.Features.bDisableRefresh = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "EnableDevMode");
+  lua_getfield(L, TableIndex, "EnableDevMode");
   if (lua_isboolean(L, -1)) {
     Config.bEnableDevMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "ExplicitSyncMode");
+  lua_getfield(L, TableIndex, "ExplicitSyncMode");
   if (lua_isboolean(L, -1)) {
     Config.Features.bExplicitSyncMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "DisableMetrics");
+  lua_getfield(L, TableIndex, "DisableMetrics");
   if (lua_isboolean(L, -1)) {
     Config.Features.bDisableMetrics = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "ImpressionDataAll");
+  lua_getfield(L, TableIndex, "ImpressionDataAll");
   if (lua_isboolean(L, -1)) {
     Config.Features.bImpressionDataAll = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  lua_getfield(L, 1, "OfflineMode");
+  lua_getfield(L, TableIndex, "OfflineMode");
   if (lua_isboolean(L, -1)) {
     Config.bOfflineMode = (lua_toboolean(L, -1) != 0);
   }
   lua_pop(L, 1);
 
-  UGatrixClient::Get()->Init(Config);
+  return Config;
+}
+
+int FGatrixLuaBindings::Lua_Init(lua_State* L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  // Parse config and start SDK in one call
+  FGatrixClientConfig Config = ParseConfigFromLuaTable(L, 1);
+  UGatrixClient::Get()->Start(Config);
   return 0;
 }
 
 int FGatrixLuaBindings::Lua_Start(lua_State* L) {
   UGatrixClient* Client = UGatrixClient::Get();
 
+  // If config table is provided, parse and start with it
+  if (lua_gettop(L) >= 1 && lua_istable(L, 1)) {
+    FGatrixClientConfig Config = ParseConfigFromLuaTable(L, 1);
+
+    // Create deferred promise
+    int DeferredRef = CreateDeferred(L);
+
+    if (DeferredRef == LUA_NOREF) {
+      Client->Start(Config);
+      lua_pushnil(L);
+      return 1;
+    }
+
+    // Register one-shot listener for "flags.ready" to resolve
+    TSharedPtr<bool> AliveFlag = GetAliveFlag(L);
+    lua_State* CapturedL = L;
+    int CapturedDeferredRef = DeferredRef;
+    TSharedPtr<bool> CapturedAlive = AliveFlag;
+
+    auto HandlePtr = MakeShared<int32>(0);
+
+    int32 GatrixHandle =
+        Client->Once(TEXT("flags.ready"), [CapturedL, CapturedDeferredRef, CapturedAlive,
+                                           HandlePtr](const TArray<FString>& Args) {
+          if (!CapturedAlive.IsValid() || !(*CapturedAlive))
+            return;
+          ResolveDeferred(CapturedL, CapturedDeferredRef);
+          RemoveCallback(CapturedL, *HandlePtr);
+        });
+
+    *HandlePtr = GatrixHandle;
+
+    FLuaSession* Session = SessionRegistry.Find(L);
+    if (Session) {
+      Session->Callbacks.Add({GatrixHandle, LUA_NOREF, false, false});
+    }
+
+    Client->Start(Config);
+
+    // Return the deferred table (already on stack)
+    return 1;
+  }
+
+  // No config provided — SDK must already be initialized via Init()
+  // This is kept for backward compatibility but logs a deprecation warning
+  UE_LOG(LogGatrixLua, Warning,
+         TEXT("gatrix.Start() without config is deprecated. Use gatrix.Start(config) instead."));
+
   // Create deferred promise
   int DeferredRef = CreateDeferred(L);
-  // Deferred table is on top of stack (will be returned)
 
   if (DeferredRef == LUA_NOREF) {
-    // No deferred available, fallback to synchronous
-    Client->Start();
     lua_pushnil(L);
     return 1;
   }
 
-  // If already ready, resolve immediately after Start
+  // If already ready, resolve immediately
   if (Client->IsReady()) {
-    Client->Start();
     ResolveDeferred(L, DeferredRef);
-    // Return the deferred (still on stack from CreateDeferred)
     return 1;
   }
 
@@ -608,8 +659,6 @@ int FGatrixLuaBindings::Lua_Start(lua_State* L) {
   if (Session) {
     Session->Callbacks.Add({GatrixHandle, LUA_NOREF, false, false});
   }
-
-  Client->Start();
 
   // Return the deferred table (already on stack)
   return 1;
@@ -826,7 +875,7 @@ int FGatrixLuaBindings::Lua_UpdateContext(lua_State* L) {
   int DeferredRef = CreateDeferred(L);
   if (DeferredRef == LUA_NOREF) {
     // 'deferred' module unavailable — fire and forget
-    UGatrixClient::Get()->UpdateContext(Ctx);
+    UGatrixClient::Get()->GetFeatures()->UpdateContext(Ctx);
     lua_pushnil(L);
     return 1;
   }
@@ -840,7 +889,7 @@ int FGatrixLuaBindings::Lua_UpdateContext(lua_State* L) {
   // The callback is guaranteed to be called on the game thread once the
   // resulting FetchFlags completes (or immediately when offline/not started).
   // We do NOT touch any lock here — all paths are game-thread-only.
-  UGatrixClient::Get()->UpdateContext(
+  UGatrixClient::Get()->GetFeatures()->UpdateContext(
       Ctx, [CapturedL, CapturedRef, CapturedAlive](bool bSuccess, const FString& ErrorMsg) {
         // Safety: check that the Lua state is still alive
         if (!CapturedAlive.IsValid() || !(*CapturedAlive)) {
@@ -859,7 +908,7 @@ int FGatrixLuaBindings::Lua_UpdateContext(lua_State* L) {
 }
 
 int FGatrixLuaBindings::Lua_GetContext(lua_State* L) {
-  FGatrixContext Ctx = UGatrixClient::Get()->GetContext();
+  FGatrixContext Ctx = UGatrixClient::Get()->GetFeatures()->GetContext();
   PushContextTable(L, Ctx);
   return 1;
 }
@@ -1236,6 +1285,19 @@ int FGatrixLuaBindings::Lua_UnwatchFlag(lua_State* L) {
 int FGatrixLuaBindings::Lua_IsReady(lua_State* L) {
   lua_pushboolean(L, UGatrixClient::Get()->IsReady());
   return 1;
+}
+
+// ==================== Tracking ====================
+
+int FGatrixLuaBindings::Lua_Track(lua_State* L) {
+  // gatrix.Track(eventName [, propertiesTable])
+  // Not yet implemented — reserved for the upcoming Gatrix Analytics service.
+  const char* EventName = luaL_checkstring(L, 1);
+  UE_LOG(LogGatrix, Log,
+         TEXT("[Gatrix] Track() called from Lua: eventName=\"%hs\" "
+              "— tracking is not yet supported but will be available soon."),
+         EventName);
+  return 0;
 }
 
 int FGatrixLuaBindings::Lua_IsInitialized(lua_State* L) {

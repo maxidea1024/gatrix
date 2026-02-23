@@ -24,30 +24,36 @@ func _ready() -> void:
     config.context.session_id = "session-abc"
     config.context.properties = { "platform": "windows", "version": "1.0.0" }
 
-    GatrixClient.init_sdk(config)
-    GatrixClient.start()
+    GatrixClient.start(config, null, func(success: bool, error_msg: String):
+        print("SDK started! success=", success)
+    )
 
-    # Wait for ready (optional)
+    # Or: wait for ready via event
     GatrixClient.once_event(GatrixEvents.FLAGS_READY, func():
+        var features = GatrixClient.get_features()
         print("SDK is ready!")
-        print("Feature enabled: ", GatrixClient.is_enabled("my-feature"))
+        print("Feature enabled: ", features.is_enabled("my-feature"))
     )
 ```
 
 ## Flag Access
 
+All flag operations go through `GatrixClient.get_features()`:
+
 ```gdscript
+var features = GatrixClient.get_features()
+
 # Boolean check
-if GatrixClient.is_enabled("dark-mode"):
+if features.is_enabled("dark-mode"):
     apply_dark_mode()
 
 # Typed variations (with required default values)
-var speed := GatrixClient.float_variation("game-speed", 1.0)
-var welcome := GatrixClient.string_variation("welcome-message", "Hello!")
-var ui_config = GatrixClient.json_variation("ui-config", { "theme": "default" })
+var speed := features.float_variation("game-speed", 1.0)
+var welcome := features.string_variation("welcome-message", "Hello!")
+var ui_config = features.json_variation("ui-config", { "theme": "default" })
 
 # FlagProxy for rich access
-var flag := GatrixClient.get_flag("my-feature")
+var flag := features.get_flag("my-feature")
 if flag.exists and flag.enabled:
     print("Variant: ", flag.variant.name)
     print("Value: ", flag.string_variation("fallback"))
@@ -56,7 +62,8 @@ if flag.exists and flag.enabled:
 ## Variation Details
 
 ```gdscript
-var result := GatrixClient.bool_variation_details("my-flag", false)
+var features = GatrixClient.get_features()
+var result := features.bool_variation_details("my-flag", false)
 print("Value: ", result.value)
 print("Reason: ", result.reason)      # e.g., "targeting_match"
 print("Exists: ", result.flag_exists)
@@ -66,21 +73,24 @@ print("Enabled: ", result.enabled)
 ## Strict Variations (OrThrow)
 
 ```gdscript
+var features = GatrixClient.get_features()
 # These will assert/error if flag not found or disabled
-var speed := GatrixClient.float_variation_or_throw("game-speed")
-var config = GatrixClient.json_variation_or_throw("game-config")
+var speed := features.float_variation_or_throw("game-speed")
+var cfg = features.json_variation_or_throw("game-config")
 ```
 
 ## Watch Pattern
 
 ```gdscript
+var features = GatrixClient.get_features()
+
 # Watch for flag changes
-var unwatch := GatrixClient.watch_flag("my-feature", func(flag: GatrixFlagProxy):
+var unwatch := features.watch_realtime_flag("my-feature", func(flag: GatrixFlagProxy):
     print("Flag changed! Enabled: ", flag.enabled)
 )
 
 # Watch with immediate initial state
-var unwatch2 := GatrixClient.watch_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
+var unwatch2 := features.watch_realtime_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
     player.speed = flag.float_variation(5.0)
 )
 
@@ -91,8 +101,10 @@ unwatch.call()
 ## Watch Groups
 
 ```gdscript
+var features = GatrixClient.get_features()
+
 # Batch management for multiple watchers
-var group := GatrixWatchFlagGroup.new(GatrixClient.get_features(), "gameplay")
+var group := GatrixWatchFlagGroup.new(features, "gameplay")
 
 group.watch_flag("speed", func(flag: GatrixFlagProxy):
     player.speed = flag.float_variation(5.0)
@@ -107,11 +119,13 @@ group.unwatch_all()
 ## Context Management
 
 ```gdscript
+var features = GatrixClient.get_features()
+
 # Update context (triggers re-fetch from server)
 var ctx := GatrixTypes.GatrixContext.new()
 ctx.user_id = "new-player-456"
 ctx.properties = { "level": 10, "region": "us-west" }
-GatrixClient.update_context(ctx)
+features.update_context(ctx)
 ```
 
 ## Explicit Sync Mode
@@ -122,12 +136,13 @@ var config := GatrixTypes.GatrixClientConfig.new()
 config.explicit_sync_mode = true
 # ... other config ...
 
-GatrixClient.init_sdk(config)
-GatrixClient.start()
+GatrixClient.start(config)
+
+var features = GatrixClient.get_features()
 
 # Flags are fetched in background but not applied until:
-if GatrixClient.has_pending_sync_flags():
-    GatrixClient.sync_flags()  # Apply pending changes at safe points
+if features.has_pending_sync_flags():
+    features.sync_flags()  # Apply pending changes at safe points
 ```
 
 ## Events
@@ -185,11 +200,11 @@ print("Missing: ", stats.missing_flags)
 
 ```gdscript
 # Default: InMemoryStorageProvider (no persistence)
-GatrixClient.init_sdk(config)
+GatrixClient.start(config)
 
 # File-based persistence (recommended for games)
 var storage := GatrixStorageProvider.FileStorageProvider.new("user://gatrix/")
-GatrixClient.init_sdk(config, storage)
+GatrixClient.start(config, storage)
 ```
 
 ## Configuration Options

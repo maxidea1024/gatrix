@@ -1,5 +1,11 @@
 # Gatrix SDK Client (Autoload Singleton)
 # Main entry point for the Gatrix SDK in Godot Engine
+#
+# Usage:
+#   GatrixClient.start(config)
+#   var features = GatrixClient.get_features()
+#   features.is_enabled("my-feature")
+#   features.float_variation("game-speed", 1.0)
 extends Node
 
 const SDK_VERSION := "1.0.0"
@@ -17,11 +23,20 @@ var _started := false
 
 # ==================== Lifecycle ====================
 
-## Initialize the SDK with configuration.
-## Must be called before start().
-func init_sdk(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvider = null) -> void:
-	if _initialized:
-		push_warning("[GatrixSDK] Already initialized")
+## Start the SDK with configuration.
+## Initializes and begins fetching, polling, and metrics.
+## @param config  Configuration object (required)
+## @param storage Optional storage provider (default: InMemoryStorageProvider)
+## @param on_complete Optional callback(success: bool, error_msg: String) invoked
+##                    once when the first fetch completes (or immediately if already ready / offline).
+func start(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProvider = null, on_complete: Callable = Callable()) -> void:
+	if _started:
+		push_warning("[GatrixSDK] Already started")
+		if on_complete.is_valid():
+			if _features != null and _features.is_ready():
+				on_complete.call(true, "")
+			else:
+				_features._pending_start_callbacks.append(on_complete)
 		return
 
 	_config = config
@@ -84,17 +99,16 @@ func init_sdk(config: GatrixTypes.GatrixClientConfig, storage: GatrixStorageProv
 	_features.initialize(config, _emitter, _storage, get_tree())
 
 	_initialized = true
-	print("[GatrixSDK] Initialized (app=%s, env=%s)" % [config.app_name, config.environment])
-
-
-## Start the SDK (begins fetching, polling, metrics).
-func start() -> void:
-	assert(_initialized, "GatrixSDK: Must call init_sdk() before start()")
-	if _started:
-		return
 	_started = true
+
+	# Register on_complete callback before start
+	if on_complete.is_valid():
+		_features._pending_start_callbacks.append(on_complete)
+
+	# Start fetching, polling, metrics
 	_features.start()
-	print("[GatrixSDK] Started")
+
+	print("[GatrixSDK] Started (app=%s, env=%s)" % [config.app_name, config.environment])
 
 
 ## Stop the SDK (stops polling, cleans up).
@@ -118,172 +132,12 @@ func is_ready() -> bool:
 
 # ==================== Features Client Access ====================
 
-## Get the features client for direct access.
+## Get the features client for flag access.
+## All flag operations should be performed through this client:
+##   GatrixClient.get_features().is_enabled("flag")
+##   GatrixClient.get_features().float_variation("speed", 1.0)
 func get_features() -> GatrixFeaturesClient:
 	return _features
-
-
-# ==================== Convenience Methods (delegates to FeaturesClient) ====================
-
-## Check if a flag is enabled.
-func is_enabled(flag_name: String) -> bool:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.is_enabled(flag_name)
-
-
-## Get boolean variation.
-func bool_variation(flag_name: String, default_value: bool) -> bool:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.bool_variation(flag_name, default_value)
-
-
-## Get string variation.
-func string_variation(flag_name: String, default_value: String) -> String:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.string_variation(flag_name, default_value)
-
-
-## Get int variation.
-func int_variation(flag_name: String, missing_value: int) -> int:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.int_variation(flag_name, missing_value)
-
-
-## Get float variation.
-func float_variation(flag_name: String, missing_value: float) -> float:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.float_variation(flag_name, missing_value)
-
-
-## Get JSON variation (returns Dictionary or Array).
-func json_variation(flag_name: String, default_value = null):
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.json_variation(flag_name, default_value)
-
-
-## Get variant name.
-func variation(flag_name: String, default_value: String) -> String:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.variation(flag_name, default_value)
-
-
-## Get the variant object for a flag.
-func get_variant(flag_name: String) -> GatrixTypes.Variant:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.get_variant(flag_name)
-
-
-## Get all evaluated flags.
-func get_all_flags() -> Array:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.get_all_flags()
-
-
-# ==================== Variation Details ====================
-
-func bool_variation_details(flag_name: String, default_value: bool) -> GatrixTypes.VariationResult:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.bool_variation_details(flag_name, default_value)
-
-
-func string_variation_details(flag_name: String, default_value: String) -> GatrixTypes.VariationResult:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.string_variation_details(flag_name, default_value)
-
-
-func int_variation_details(flag_name: String, missing_value: int) -> GatrixTypes.VariationResult:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.int_variation_details(flag_name, missing_value)
-
-
-func float_variation_details(flag_name: String, missing_value: float) -> GatrixTypes.VariationResult:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.float_variation_details(flag_name, missing_value)
-
-
-func json_variation_details(flag_name: String, default_value = null) -> GatrixTypes.VariationResult:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.json_variation_details(flag_name, default_value)
-
-
-# ==================== Strict Variations ====================
-
-func bool_variation_or_throw(flag_name: String) -> bool:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.bool_variation_or_throw(flag_name)
-
-
-func string_variation_or_throw(flag_name: String) -> String:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.string_variation_or_throw(flag_name)
-
-
-func int_variation_or_throw(flag_name: String) -> int:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.int_variation_or_throw(flag_name)
-
-
-func float_variation_or_throw(flag_name: String) -> float:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.float_variation_or_throw(flag_name)
-
-
-func json_variation_or_throw(flag_name: String):
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.json_variation_or_throw(flag_name)
-
-
-# ==================== Context ====================
-
-## Update the evaluation context. Triggers a re-fetch.
-func update_context(new_context: GatrixTypes.GatrixContext, on_complete: Callable = Callable()) -> void:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	_features.update_context(new_context, on_complete)
-
-
-## Get the current evaluation context.
-func get_context() -> GatrixTypes.GatrixContext:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.get_context()
-
-
-# ==================== Explicit Sync ====================
-
-func is_explicit_sync() -> bool:
-	return _features.is_explicit_sync() if _features else false
-
-func has_pending_sync_flags() -> bool:
-	return _features.has_pending_sync_flags() if _features else false
-
-func sync_flags(fetch_now := true) -> void:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	_features.sync_flags(fetch_now)
-
-
-# ==================== Watch ====================
-
-## Watch a flag for realtime changes. Returns an unwatch Callable.
-func watch_realtime_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.watch_realtime_flag(flag_name, callback, watcher_name)
-
-
-## Watch a flag for realtime changes with initial state. Returns an unwatch Callable.
-func watch_realtime_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.watch_realtime_flag_with_initial_state(flag_name, callback, watcher_name)
-
-
-## Watch a flag for synced changes. Returns an unwatch Callable.
-func watch_synced_flag(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.watch_synced_flag(flag_name, callback, watcher_name)
-
-
-## Watch a flag for synced changes with initial state. Returns an unwatch Callable.
-func watch_synced_flag_with_initial_state(flag_name: String, callback: Callable, watcher_name := "") -> Callable:
-	assert(_initialized, "GatrixSDK: Not initialized")
-	return _features.watch_synced_flag_with_initial_state(flag_name, callback, watcher_name)
 
 
 # ==================== Event Subscription ====================
@@ -316,6 +170,18 @@ func on_any(callback: Callable, listener_name := "") -> int:
 ## Unsubscribe any-event listener.
 func off_any(handle: int) -> void:
 	_emitter.off_any(handle)
+
+
+# ==================== Tracking ====================
+
+## Track a custom user event.
+## NOTE: Not yet implemented. This API is reserved for the upcoming
+## Gatrix Analytics service and will be fully supported in a future release.
+## @param event_name  Name of the event to track
+## @param properties  Optional dictionary of event properties
+func track(event_name: String, properties: Dictionary = {}) -> void:
+	if _config != null and _config.enable_dev_mode:
+		print("[Gatrix] track() called: eventName=\"%s\", properties=%s — tracking is not yet supported but will be available soon." % [event_name, str(properties)])
 
 
 # ==================== Stats ====================

@@ -161,6 +161,52 @@ Based on unleash-proxy-lua's pattern:
 - Prevents mid-session flag changes that could cause inconsistent UX
 - `syncFlags()` applies pending flag changes
 
+### 5. Service-Namespaced Access (No Convenience Methods on Client)
+
+> [!IMPORTANT]
+> The Gatrix SDK is designed as a **multi-service platform** (see [Scope and Future Expansion](#scope-and-future-expansion)).
+> To maintain a clean, scalable, and consistent API across all services,
+> **all service-specific operations MUST be accessed through their dedicated sub-client** — never directly on the main `GatrixClient` object.
+
+**Rule:** Feature flag operations MUST be accessed via `client.features.*` (or the platform equivalent).
+The main `GatrixClient` class MUST NOT expose convenience wrappers such as `client.isEnabled()`, `client.floatVariation()`, etc.
+
+| ❌ Wrong | ✅ Correct |
+|----------|-----------|
+| `client.isEnabled("flag")` | `client.features.isEnabled("flag")` |
+| `client.floatVariation("speed", 1.0)` | `client.features.floatVariation("speed", 1.0)` |
+| `GatrixClient.is_enabled("flag")` | `GatrixClient.get_features().is_enabled("flag")` |
+
+**Rationale:**
+- Future services (Surveys, Maintenance, Messaging) will each have their own sub-client with their own methods.
+- Putting everything on the root client creates namespace collisions and an unmanageable API surface.
+- Explicit sub-client access makes it clear which service is being used.
+
+**`GatrixClient` should only expose:**
+- Lifecycle: `start(config)`, `stop()`
+- Events: `on()`, `once()`, `off()`, `onAny()`
+- Sub-client accessors: `features` (property or getter)
+- Utility: `getVersion()`, `getStats()`
+
+### 6. Unified Lifecycle: Single `Start(config)`
+
+> [!IMPORTANT]
+> All SDKs MUST use a **single `start(config)` method** for initialization and startup.
+> There MUST NOT be separate `init()` and `start()` methods.
+
+`start(config)` combines configuration, initialization, and background task startup into a single call:
+
+```
+client = GatrixClient()        // or equivalent static singleton
+client.start(config)            // one call to rule them all
+```
+
+**Completion callback:** All SDKs SHOULD support an optional completion callback on `start()` that is invoked once when the first fetch completes (or immediately in offline mode). The callback signature is:
+- **C++/C#/GDScript**: `void onComplete(bool success, string errorMessage)`
+- **Python**: `Callable[[bool, str], None]`
+- **JS/TS**: Not required (Promise-based `start()` already provides this)
+- **Dart/Flutter**: Not required (Future-based `start()` already provides this)
+
 ## API Response Format
 
 The Edge API returns evaluated flags in this format:
@@ -698,7 +744,9 @@ class GatrixClient {
   // Access to FeaturesClient
   get features(): FeaturesClient;
 
-  // Lifecycle
+  // Lifecycle — see "Unified Lifecycle: Single Start(config)"
+  // For JS/TS: config is passed to constructor, start() initiates network activity.
+  // For other languages (C++, C#, GDScript, Python): config is passed to start(config).
   start(): Promise<void>;
   stop(): void;
   isReady(): boolean;
@@ -710,6 +758,13 @@ class GatrixClient {
   off(event: string, callback?: (...args: any[]) => void | Promise<void>): this;
   onAny(callback: (event: string, ...args: any[]) => void, name?: string): this; // Subscribe to ALL events
   offAny(callback?: (event: string, ...args: any[]) => void): this; // Unsubscribe from ALL events
+
+  // Tracking (reserved — not yet implemented)
+  // Track a custom user event for the upcoming Gatrix Analytics service.
+  // All SDKs MUST expose this method on the GatrixClient (NOT on FeaturesClient).
+  // Until the Analytics service is available, implementations should be no-op stubs
+  // that optionally log a debug message when devMode is enabled.
+  track(eventName: string, properties?: Record<string, unknown>): void;
 
   // Static
   static get version(): string;

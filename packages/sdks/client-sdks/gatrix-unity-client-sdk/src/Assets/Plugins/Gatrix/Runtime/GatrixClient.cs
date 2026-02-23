@@ -67,7 +67,6 @@ namespace Gatrix.Unity.SDK
             if (_started) return;
             _started = true;
 
-            await _featuresClient.InitAsync();
             await _featuresClient.StartAsync();
         }
 
@@ -76,6 +75,26 @@ namespace Gatrix.Unity.SDK
         {
             _featuresClient?.Stop();
             _started = false;
+        }
+
+        // ==================== Tracking ====================
+
+        /// <summary>
+        /// Track a custom user event.
+        /// NOTE: Not yet implemented. This API is reserved for the upcoming
+        /// Gatrix Analytics service and will be fully supported in a future release.
+        /// </summary>
+        /// <param name="eventName">Name of the event to track</param>
+        /// <param name="properties">Optional event properties</param>
+        public void Track(string eventName, Dictionary<string, object> properties = null)
+        {
+            if (_config.EnableDevMode)
+            {
+                UnityEngine.Debug.Log(
+                    $"[Gatrix] Track() called: eventName=\"{eventName}\", " +
+                    $"properties={properties?.Count ?? 0} entries " +
+                    "— tracking is not yet supported but will be available soon.");
+            }
         }
 
         // ==================== Event Subscription ====================

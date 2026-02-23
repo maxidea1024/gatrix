@@ -57,7 +57,6 @@ export class GatrixClient {
 
     this.startPromise = (async () => {
       try {
-        await this.featuresClient.init();
         await this.featuresClient.start();
         this.initialized = true;
       } finally {
@@ -153,6 +152,23 @@ export class GatrixClient {
   offAny(callback?: (event: string, ...args: any[]) => void): this {
     this.emitter.offAny(callback);
     return this;
+  }
+
+  // ==================== Tracking ====================
+
+  /**
+   * Track a custom user event.
+   * NOTE: Not yet implemented. This API is reserved for the upcoming
+   * Gatrix Analytics service and will be fully supported in a future release.
+   */
+  track(eventName: string, properties?: Record<string, unknown>): void {
+    if (this.config.enableDevMode) {
+      console.log(
+        `[Gatrix] track() called: eventName="${eventName}", properties=`,
+        properties ?? {},
+        '— tracking is not yet supported but will be available soon.',
+      );
+    }
   }
 
   // ==================== Static Helpers ====================

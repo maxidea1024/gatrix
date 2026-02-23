@@ -8,6 +8,7 @@
 #include "GatrixVersion.h"
 #include <functional>
 #include <string>
+#include <unordered_map>
 
 namespace gatrix {
 
@@ -21,15 +22,16 @@ public:
   static const char* sdkVersion() { return SDK_VERSION; }
   static const char* version() { return SDK_VERSION; }
 
-  void init(const GatrixClientConfig& config);
-  void start();
+  /** Start the SDK with configuration */
+  void start(const GatrixClientConfig& config);
 
   /**
-   * Start the SDK (C++ only).
+   * Start the SDK with configuration (with completion callback).
    * onComplete(bSuccess, errorMessage) is called when the SDK first becomes
    * ready, or immediately if already ready.
    */
-  void start(std::function<void(bool, const std::string&)> onComplete);
+  void start(const GatrixClientConfig& config,
+             std::function<void(bool, const std::string&)> onComplete);
 
   void stop();
   bool isReady() const;
@@ -48,9 +50,25 @@ public:
   // Direct emitter access (for advanced usage)
   GatrixEventEmitter& emitter() { return _emitter; }
 
+  // ==================== Tracking ====================
+
+  /**
+   * Track a custom user event.
+   * NOTE: Not yet implemented. This API is reserved for the upcoming
+   * Gatrix Analytics service and will be fully supported in a future release.
+   *
+   * @param eventName  Name of the event to track
+   * @param properties Optional key-value properties
+   */
+  void track(const std::string& eventName,
+             const std::unordered_map<std::string, std::string>& properties = {});
+
 private:
   GatrixClient();
   ~GatrixClient();
+
+  /** Internal initialization logic (validates config, creates FeaturesClient) */
+  bool initInternal(const GatrixClientConfig& config);
 
   static GatrixClient* _instance;
 
@@ -58,6 +76,7 @@ private:
   GatrixEventEmitter _emitter;
   FeaturesClient* _features = nullptr;
   bool _initialized = false;
+  bool _started = false;
 };
 
 } // namespace gatrix

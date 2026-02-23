@@ -22,11 +22,10 @@
  *   Config.ApiToken = TEXT("your-token");
  *   Config.AppName = TEXT("MyGame");
  *   Config.Environment = TEXT("production");
- *   UGatrixClient::Get()->Init(Config);
- *   UGatrixClient::Get()->Start();
+ *   UGatrixClient::Get()->Start(Config);
  *
  * Usage (Blueprint):
- *   Use the "Get Gatrix Client" node, then call Init and Start.
+ *   Use the "Get Gatrix Client" node, then call Start with config.
  */
 UCLASS(BlueprintType)
 class GATRIXCLIENTSDK_API UGatrixClient : public UObject {
@@ -38,26 +37,22 @@ public:
             meta = (DisplayName = "Get Gatrix Client"))
   static UGatrixClient* Get();
 
-  /** Initialize the SDK with configuration */
+  /** Start the SDK with configuration (Blueprint) */
   UFUNCTION(BlueprintCallable, Category = "Gatrix")
-  void Init(const FGatrixClientConfig& Config);
-
-  /** Start the SDK (Blueprint) */
-  UFUNCTION(BlueprintCallable, Category = "Gatrix")
-  void Start();
+  void Start(const FGatrixClientConfig& Config);
 
   /**
-   * Start the SDK (C++ only).
+   * Start the SDK with configuration (C++ only).
    * OnComplete(bSuccess, ErrorMessage) is called when the SDK first becomes
    * ready, or immediately if already ready.
    */
-  void Start(TFunction<void(bool, const FString&)> OnComplete);
+  void Start(const FGatrixClientConfig& Config, TFunction<void(bool, const FString&)> OnComplete);
 
   /** Stop the SDK (stops polling, cleans up) */
   UFUNCTION(BlueprintCallable, Category = "Gatrix")
   void Stop();
 
-  /** Check if the SDK has been initialized */
+  /** Check if the SDK has been initialized and started */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix")
   bool IsInitialized() const { return bInitialized; }
 
@@ -94,6 +89,20 @@ public:
   /** Unsubscribe any-event listener */
   void OffAny(int32 Handle);
 
+  // ==================== Tracking ====================
+
+  /**
+   * Track a custom user event.
+   * NOTE: Not yet implemented. This API is reserved for the upcoming
+   * Gatrix Analytics service and will be fully supported in a future release.
+   *
+   * @param EventName  Name of the event to track
+   * @param Properties Optional key-value properties
+   */
+  UFUNCTION(BlueprintCallable, Category = "Gatrix|Tracking")
+  void Track(const FString& EventName,
+             const TMap<FString, FString>& Properties = TMap<FString, FString>());
+
   // ==================== Stats ====================
 
   /** Get SDK statistics */
@@ -113,6 +122,9 @@ public:
   static const FString SdkName;
 
 private:
+  /** Internal initialization logic (validates config, creates FeaturesClient) */
+  bool InitInternal(const FGatrixClientConfig& InConfig);
+
   static UGatrixClient* Singleton;
 
   UPROPERTY()
@@ -121,7 +133,7 @@ private:
   FGatrixEventEmitter EventEmitter;
   TSharedPtr<IGatrixStorageProvider> StorageProvider;
 
-  FGatrixClientConfig Config;
+  FGatrixClientConfig StoredConfig;
   bool bInitialized = false;
   bool bStarted = false;
   FString ClientConnectionId;

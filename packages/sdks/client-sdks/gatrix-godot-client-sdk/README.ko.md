@@ -23,30 +23,36 @@ func _ready() -> void:
     config.context.session_id = "session-abc"
     config.context.properties = { "platform": "windows", "version": "1.0.0" }
 
-    GatrixClient.init_sdk(config)
-    GatrixClient.start()
+    GatrixClient.start(config, null, func(success: bool, error_msg: String):
+        print("SDK 시작! success=", success)
+    )
 
-    # 준비 대기 (선택)
+    # 또는: 이벤트로 준비 대기
     GatrixClient.once_event(GatrixEvents.FLAGS_READY, func():
+        var features = GatrixClient.get_features()
         print("SDK 준비 완료!")
-        print("기능 활성화: ", GatrixClient.is_enabled("my-feature"))
+        print("기능 활성화: ", features.is_enabled("my-feature"))
     )
 ```
 
 ## 플래그 접근
 
+모든 플래그 작업은 `GatrixClient.get_features()`를 통해 수행합니다:
+
 ```gdscript
+var features = GatrixClient.get_features()
+
 # 불리언 확인
-if GatrixClient.is_enabled("dark-mode"):
+if features.is_enabled("dark-mode"):
     apply_dark_mode()
 
 # 타입별 배리언트 (기본값 필수)
-var speed := GatrixClient.float_variation("game-speed", 1.0)
-var welcome := GatrixClient.string_variation("welcome-message", "Hello!")
-var ui_config = GatrixClient.json_variation("ui-config", { "theme": "default" })
+var speed := features.float_variation("game-speed", 1.0)
+var welcome := features.string_variation("welcome-message", "Hello!")
+var ui_config = features.json_variation("ui-config", { "theme": "default" })
 
 # FlagProxy로 상세 접근
-var flag := GatrixClient.get_flag("my-feature")
+var flag := features.get_flag("my-feature")
 if flag.exists and flag.enabled:
     print("배리언트: ", flag.variant.name)
     print("값: ", flag.string_variation("fallback"))
@@ -55,7 +61,8 @@ if flag.exists and flag.enabled:
 ## 배리언트 상세
 
 ```gdscript
-var result := GatrixClient.bool_variation_details("my-flag", false)
+var features = GatrixClient.get_features()
+var result := features.bool_variation_details("my-flag", false)
 print("값: ", result.value)
 print("이유: ", result.reason)      # 예: "targeting_match"
 print("존재: ", result.flag_exists)
@@ -65,21 +72,24 @@ print("활성: ", result.enabled)
 ## 엄격 배리언트 (OrThrow)
 
 ```gdscript
+var features = GatrixClient.get_features()
 # 플래그 없거나 비활성화이면 assert/에러 발생
-var speed := GatrixClient.float_variation_or_throw("game-speed")
-var config = GatrixClient.json_variation_or_throw("game-config")
+var speed := features.float_variation_or_throw("game-speed")
+var cfg = features.json_variation_or_throw("game-config")
 ```
 
 ## Watch 패턴
 
 ```gdscript
+var features = GatrixClient.get_features()
+
 # 플래그 변경 감시
-var unwatch := GatrixClient.watch_flag("my-feature", func(flag: GatrixFlagProxy):
+var unwatch := features.watch_realtime_flag("my-feature", func(flag: GatrixFlagProxy):
     print("플래그 변경! 활성: ", flag.enabled)
 )
 
 # 초기 상태 포함 즉시 감시
-var unwatch2 := GatrixClient.watch_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
+var unwatch2 := features.watch_realtime_flag_with_initial_state("speed", func(flag: GatrixFlagProxy):
     player.speed = flag.float_variation(5.0)
 )
 
@@ -90,8 +100,10 @@ unwatch.call()
 ## Watch 그룹
 
 ```gdscript
+var features = GatrixClient.get_features()
+
 # 여러 워처 일괄 관리
-var group := GatrixWatchFlagGroup.new(GatrixClient.get_features(), "gameplay")
+var group := GatrixWatchFlagGroup.new(features, "gameplay")
 
 group.watch_flag("speed", func(flag: GatrixFlagProxy):
     player.speed = flag.float_variation(5.0)
@@ -106,11 +118,13 @@ group.unwatch_all()
 ## 컨텍스트 관리
 
 ```gdscript
+var features = GatrixClient.get_features()
+
 # 컨텍스트 업데이트 (서버에서 리페치 트리거)
 var ctx := GatrixTypes.GatrixContext.new()
 ctx.user_id = "new-player-456"
 ctx.properties = { "level": 10, "region": "us-west" }
-GatrixClient.update_context(ctx)
+features.update_context(ctx)
 ```
 
 ## 명시적 동기화 모드
@@ -121,12 +135,13 @@ var config := GatrixTypes.GatrixClientConfig.new()
 config.explicit_sync_mode = true
 # ... 기타 설정 ...
 
-GatrixClient.init_sdk(config)
-GatrixClient.start()
+GatrixClient.start(config)
+
+var features = GatrixClient.get_features()
 
 # 플래그는 백그라운드에서 페치되지만 아래 호출까지 적용 안 됨:
-if GatrixClient.has_pending_sync_flags():
-    GatrixClient.sync_flags()  # 안전한 시점에 보류 변경 적용
+if features.has_pending_sync_flags():
+    features.sync_flags()  # 안전한 시점에 보류 변경 적용
 ```
 
 ## 이벤트
@@ -183,11 +198,11 @@ print("누락: ", stats.missing_flags)
 
 ```gdscript
 # 기본: InMemoryStorageProvider (영속성 없음)
-GatrixClient.init_sdk(config)
+GatrixClient.start(config)
 
 # 파일 기반 영속성 (게임에 권장)
 var storage := GatrixStorageProvider.FileStorageProvider.new("user://gatrix/")
-GatrixClient.init_sdk(config, storage)
+GatrixClient.start(config, storage)
 ```
 
 ## 설정 옵션

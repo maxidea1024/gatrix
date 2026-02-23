@@ -61,8 +61,8 @@ namespace Gatrix.Unity.SDK.Editor
 
             _client = new GatrixClient(config);
 
-            // InitAsync only reads from local storage (PlayerPrefs) — effectively synchronous
-            _client.Features.InitAsync().Forget();
+            // StartAsync loads from local storage and skips network in offline mode — effectively synchronous
+            _client.Features.StartAsync().Forget();
         }
 
         /// <summary>Re-initializes the editor client (e.g. after Play Mode changes cached data).</summary>

@@ -44,8 +44,7 @@ Config.Context.UserId = TEXT("player-123");
 Config.Context.SessionId = TEXT("session-abc");
 
 UGatrixClient* Client = UGatrixClient::Get();
-Client->Init(Config);
-Client->Start();
+Client->Start(Config);
 
 // Subscribe to events (C++)
 Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)

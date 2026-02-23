@@ -20,28 +20,23 @@ UGatrixClient* UGatrixClient::Get() {
   return Singleton;
 }
 
-void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
-  if (bInitialized) {
-    UE_LOG(LogGatrix, Log, TEXT("Already initialized. Skipping duplicate Init() call."));
-    return;
-  }
-
+bool UGatrixClient::InitInternal(const FGatrixClientConfig& InConfig) {
   // Validate required fields
   if (InConfig.ApiUrl.IsEmpty()) {
     UE_LOG(LogGatrix, Error, TEXT("Config validation failed: apiUrl is required"));
-    return;
+    return false;
   }
   if (InConfig.ApiToken.IsEmpty()) {
     UE_LOG(LogGatrix, Error, TEXT("Config validation failed: apiToken is required"));
-    return;
+    return false;
   }
   if (InConfig.AppName.IsEmpty()) {
     UE_LOG(LogGatrix, Error, TEXT("Config validation failed: appName is required"));
-    return;
+    return false;
   }
   if (InConfig.Environment.IsEmpty()) {
     UE_LOG(LogGatrix, Error, TEXT("Config validation failed: environment is required"));
-    return;
+    return false;
   }
 
   // Validate URL format
@@ -51,7 +46,7 @@ void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
            TEXT("Config validation failed: apiUrl must start with http:// or "
                 "https://. Got: %s"),
            *InConfig.ApiUrl);
-    return;
+    return false;
   }
 
   // Validate numeric ranges
@@ -61,21 +56,21 @@ void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
            TEXT("Config validation failed: RefreshInterval must be between 1 "
                 "and 86400, got %f"),
            Feat.RefreshInterval);
-    return;
+    return false;
   }
   if (Feat.MetricsInterval < 1.0f || Feat.MetricsInterval > 86400.0f) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: MetricsInterval must be between 1 "
                 "and 86400, got %f"),
            Feat.MetricsInterval);
-    return;
+    return false;
   }
   if (Feat.MetricsIntervalInitial < 0.0f || Feat.MetricsIntervalInitial > 3600.0f) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: MetricsIntervalInitial must be "
                 "between 0 and 3600, got %f"),
            Feat.MetricsIntervalInitial);
-    return;
+    return false;
   }
 
   // Validate fetch retry options
@@ -85,61 +80,61 @@ void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
            TEXT("Config validation failed: FetchRetryOptions.Limit must be "
                 "between 0 and 10, got %d"),
            Retry.Limit);
-    return;
+    return false;
   }
   if (Retry.TimeoutMs < 1000 || Retry.TimeoutMs > 120000) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: FetchRetryOptions.TimeoutMs must be "
                 "between 1000 and 120000, got %d"),
            Retry.TimeoutMs);
-    return;
+    return false;
   }
   if (Retry.InitialBackoffMs < 100 || Retry.InitialBackoffMs > 60000) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: InitialBackoffMs must be between "
                 "100 and 60000, got %d"),
            Retry.InitialBackoffMs);
-    return;
+    return false;
   }
   if (Retry.MaxBackoffMs < 1000 || Retry.MaxBackoffMs > 600000) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: MaxBackoffMs must be between 1000 "
                 "and 600000, got %d"),
            Retry.MaxBackoffMs);
-    return;
+    return false;
   }
   if (Retry.InitialBackoffMs > Retry.MaxBackoffMs) {
     UE_LOG(LogGatrix, Error,
            TEXT("Config validation failed: InitialBackoffMs (%d) must be <= "
                 "MaxBackoffMs (%d)"),
            Retry.InitialBackoffMs, Retry.MaxBackoffMs);
-    return;
+    return false;
   }
 
-  Config = InConfig;
+  StoredConfig = InConfig;
   ClientConnectionId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
 
   // Create file-based storage provider (persists flags across sessions)
-  StorageProvider = MakeShareable(new FGatrixFileStorageProvider(Config.CacheKeyPrefix));
+  StorageProvider = MakeShareable(new FGatrixFileStorageProvider(StoredConfig.CacheKeyPrefix));
 
   // Create features client
   FeaturesClient = NewObject<UGatrixFeaturesClient>(this);
-  FeaturesClient->Initialize(Config, &EventEmitter, StorageProvider, ClientConnectionId);
+  FeaturesClient->Initialize(StoredConfig, &EventEmitter, StorageProvider, ClientConnectionId);
 
   bInitialized = true;
 
-  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"), *Config.AppName,
-         *Config.Environment, *ClientConnectionId);
+  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"), *StoredConfig.AppName,
+         *StoredConfig.Environment, *ClientConnectionId);
+  return true;
 }
 
-void UGatrixClient::Start() {
-  if (!bInitialized) {
-    UE_LOG(LogGatrix, Error, TEXT("Cannot start - not initialized. Call Init() first."));
+void UGatrixClient::Start(const FGatrixClientConfig& InConfig) {
+  if (bStarted) {
+    UE_LOG(LogGatrix, Warning, TEXT("Already started."));
     return;
   }
 
-  if (bStarted) {
-    UE_LOG(LogGatrix, Warning, TEXT("Already started."));
+  if (!InitInternal(InConfig)) {
     return;
   }
 
@@ -149,12 +144,20 @@ void UGatrixClient::Start() {
   UE_LOG(LogGatrix, Log, TEXT("Started."));
 }
 
-void UGatrixClient::Start(TFunction<void(bool, const FString&)> OnComplete) {
-  if (!bInitialized) {
+void UGatrixClient::Start(const FGatrixClientConfig& InConfig,
+                          TFunction<void(bool, const FString&)> OnComplete) {
+  if (bStarted) {
     if (OnComplete)
-      OnComplete(false, TEXT("Not initialized. Call Init() first."));
+      OnComplete(true, TEXT(""));
     return;
   }
+
+  if (!InitInternal(InConfig)) {
+    if (OnComplete)
+      OnComplete(false, TEXT("Config validation failed"));
+    return;
+  }
+
   bStarted = true;
   FeaturesClient->Start(MoveTemp(OnComplete));
   UE_LOG(LogGatrix, Log, TEXT("Started."));
@@ -208,10 +211,20 @@ void UGatrixClient::OffAny(int32 Handle) {
   EventEmitter.OffAny(Handle);
 }
 
+void UGatrixClient::Track(const FString& EventName, const TMap<FString, FString>& Properties) {
+  // Not yet implemented — reserved for the upcoming Gatrix Analytics service.
+  if (StoredConfig.bEnableDevMode) {
+    UE_LOG(LogGatrix, Log,
+           TEXT("[Gatrix] Track() called: eventName=\"%s\", properties=%d entries "
+                "— tracking is not yet supported but will be available soon."),
+           *EventName, Properties.Num());
+  }
+}
+
 FGatrixSdkStats UGatrixClient::GetStats() const {
   FGatrixSdkStats Stats;
   Stats.ConnectionId = ClientConnectionId;
-  Stats.bOfflineMode = Config.bOfflineMode;
+  Stats.bOfflineMode = StoredConfig.bOfflineMode;
 
   if (FeaturesClient) {
     Stats.Features = FeaturesClient->GetStats();

@@ -307,14 +307,31 @@ class FeaturesClient:
             self._emitter.emit(EVENTS.FLAGS_INIT)
 
     # ============================================================= Lifecycle
-    def start(self) -> None:
-        """Start polling and metrics."""
+    def start(
+        self,
+        on_complete: Optional[Callable[[bool, str], None]] = None,
+    ) -> None:
+        """Start polling and metrics.
+
+        Args:
+            on_complete: Optional callback ``(success: bool, error_msg: str) -> None``
+                invoked once when the first fetch completes (or immediately if
+                already ready / offline).
+        """
         if self._started:
+            if on_complete:
+                if self._ready:
+                    on_complete(True, "")
+                else:
+                    self._pending_start_callbacks.append(on_complete)
             return
         self._started = True
         self._start_time = datetime.now(timezone.utc)
         self._consecutive_failures = 0
         self._polling_stopped = False
+
+        if on_complete:
+            self._pending_start_callbacks.append(on_complete)
 
         if self._dev_mode:
             logger.debug(
@@ -326,7 +343,10 @@ class FeaturesClient:
                 self._disable_refresh,
             )
 
-        if not self._offline_mode:
+        if self._offline_mode:
+            # Resolve immediately for offline mode
+            self._drain_pending_callbacks(True, "")
+        else:
             self.fetch_flags()
             if not self._disable_refresh:
                 self._schedule_next_refresh()

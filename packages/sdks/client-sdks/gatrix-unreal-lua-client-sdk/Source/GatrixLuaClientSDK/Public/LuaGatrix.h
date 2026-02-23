@@ -83,6 +83,9 @@ public:
   static int Lua_Start(lua_State* L);
   static int Lua_Stop(lua_State* L);
 
+  // Tracking
+  static int Lua_Track(lua_State* L);
+
   // Flag access
   static int Lua_IsEnabled(lua_State* L);
   static int Lua_GetFlag(lua_State* L);

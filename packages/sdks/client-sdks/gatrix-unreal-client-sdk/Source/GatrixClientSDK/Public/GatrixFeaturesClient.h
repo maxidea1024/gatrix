@@ -38,7 +38,7 @@ public:
 
   /**
    * Initialize the client with config, emitter, and storage.
-   * Called by UGatrixClient::Init() before Start().
+   * Called by UGatrixClient::Start() during initialization.
    */
   void Initialize(const FGatrixClientConfig& Config, FGatrixEventEmitter* Emitter,
                   TSharedPtr<IGatrixStorageProvider> Storage, const FString& InConnectionId);

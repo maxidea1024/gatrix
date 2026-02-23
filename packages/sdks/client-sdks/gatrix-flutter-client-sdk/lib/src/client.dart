@@ -135,6 +135,18 @@ class GatrixClient {
   void off(String event, [GatrixEventHandler? callback]) => _events.off(event, callback);
   void once(String event, GatrixEventHandler callback, {String? name}) => _events.once(event, callback, name: name);
 
+  // ==================== Tracking ====================
+
+  /// Track a custom user event.
+  /// NOTE: Not yet implemented. This API is reserved for the upcoming
+  /// Gatrix Analytics service and will be fully supported in a future release.
+  ///
+  /// [eventName] Name of the event to track.
+  /// [properties] Optional map of event properties.
+  void track(String eventName, {Map<String, dynamic>? properties}) {
+    // Stub — tracking will be available in a future release.
+  }
+
   Map<String, dynamic> getStats() {
     return {
       'state': _state.toString(),

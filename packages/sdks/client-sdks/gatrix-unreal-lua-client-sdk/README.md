@@ -253,9 +253,10 @@ FGatrixLuaBindings::Unregister(YourLuaState);
 ### Lifecycle
 
 ```lua
---- Initialize the SDK (required before Start)
+--- Start the SDK with configuration (begins fetching, polling, metrics)
 --- @param Config table  -- Configuration table
-gatrix.Init({
+--- @return deferred?  Resolves when flags.ready fires (requires `deferred` module)
+gatrix.Start({
     ApiUrl          = "http://host/api/v1",  -- string   Edge API URL
     ApiToken        = "your-client-token",   -- string   Client API token
     AppName         = "my-game",             -- string   Application name
@@ -269,25 +270,31 @@ gatrix.Init({
     OfflineMode      = false,  -- boolean? Start without network requests
 })
 
---- Start the SDK (begins fetching, polling, metrics)
---- @return deferred?  Resolves when flags.ready fires (requires `deferred` module)
-gatrix.Start()
-
 --- Stop the SDK (stops polling, cleans up)
 gatrix.Stop()
 ```
 
 ### Promise (Deferred) Chaining
 
-`gatrix.Start()` and `gatrix.Features.FetchFlags()` return **deferred (promise) objects** when the `deferred` Lua module is available. This enables clean asynchronous chaining:
+`gatrix.Start(config)` and `gatrix.Features.FetchFlags()` return **deferred (promise) objects** when the `deferred` Lua module is available. This enables clean asynchronous chaining:
 
 ```lua
 -- Start returns a deferred that resolves when flags are ready
-gatrix.Start()
+gatrix.Start({
+    ApiUrl = "http://host/api/v1",
+    ApiToken = "your-client-token",
+    AppName = "my-game",
+    Environment = "production",
+})
     :next(function()
         print("SDK ready — flags loaded!")
         local speed = gatrix.Features.FloatVariation("game-speed", 1.0)
         print("Game speed:", speed)
+
+        -- Set up watchers
+        gatrix.Features.WatchRealtimeFlagWithInitialState("difficulty", function(Proxy)
+            SetDifficulty(Proxy.Variant.Value)
+        end)
     end)
     :catch(function(err)
         print("SDK start failed:", err)
@@ -300,20 +307,6 @@ gatrix.Features.FetchFlags()
     end)
     :catch(function(err)
         print("Fetch failed:", err)
-    end)
-```
-
-**Chaining multiple operations:**
-
-```lua
-gatrix.Init({ --[[ config ]] })
-
-gatrix.Start()
-    :next(function()
-        -- SDK is ready, set up watchers
-        gatrix.Features.WatchRealtimeFlagWithInitialState("difficulty", function(Proxy)
-            SetDifficulty(Proxy.Variant.Value)
-        end)
     end)
 ```
 

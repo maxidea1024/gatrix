@@ -39,9 +39,17 @@ class GatrixClient:
         return EVENTS
 
     # =========================================================== Lifecycle
-    def start(self) -> None:
-        """Start the SDK (polling + metrics)."""
-        self._features.start()
+    def start(
+        self,
+        on_complete: Optional[Callable[[bool, str], None]] = None,
+    ) -> None:
+        """Start the SDK (polling + metrics).
+
+        Args:
+            on_complete: Optional callback ``(success, error_msg)`` invoked once
+                when the first fetch completes.
+        """
+        self._features.start(on_complete=on_complete)
 
     def stop(self) -> None:
         """Stop the SDK."""
@@ -52,6 +60,30 @@ class GatrixClient:
 
     def get_error(self) -> Optional[Exception]:
         return self._features._last_error
+
+    # =========================================================== Tracking
+    def track(
+        self,
+        event_name: str,
+        properties: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Track a custom user event.
+
+        NOTE: Not yet implemented. This API is reserved for the upcoming
+        Gatrix Analytics service and will be fully supported in a future release.
+
+        Args:
+            event_name: Name of the event to track.
+            properties: Optional dictionary of event properties.
+        """
+        if self._config.enable_dev_mode:
+            import logging
+            logging.getLogger("gatrix").debug(
+                "[Gatrix] track() called: eventName=%r, properties=%r "
+                "— tracking is not yet supported but will be available soon.",
+                event_name,
+                properties or {},
+            )
 
     # =========================================================== Events
     def on(self, event: str, callback: Callable,
