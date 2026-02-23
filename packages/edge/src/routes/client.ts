@@ -1225,6 +1225,9 @@ async function performEvaluation(req: Request, res: Response, clientContext: any
           } else {
             variant.value = resolvedValue;
           }
+        } else if (valueType === 'string') {
+          // Ensure string type returns a string value
+          variant.value = typeof resolvedValue === 'string' ? resolvedValue : String(resolvedValue);
         } else {
           variant.value = resolvedValue;
         }

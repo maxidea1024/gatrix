@@ -2,6 +2,7 @@ import db from '../config/knex';
 import logger from '../config/logger';
 import { ulid } from 'ulid';
 import { Constraint, StrategyParameters } from './FeatureFlag';
+import { parseJsonField } from '../utils/dbUtils';
 
 // ==================== Types ====================
 
@@ -64,18 +65,6 @@ export interface ReleaseFlowStrategyAttributes {
 }
 
 // ==================== Helper Functions ====================
-
-function parseJsonField<T>(value: any): T | undefined {
-  if (value === null || value === undefined || value === 'null') return undefined;
-  if (typeof value === 'object') return value as T;
-  try {
-    const parsed = JSON.parse(value);
-    if (parsed === null) return undefined;
-    return parsed as T;
-  } catch {
-    return value as T;
-  }
-}
 
 // ==================== Release Flow Model ====================
 

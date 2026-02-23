@@ -121,7 +121,8 @@ describe('Variant Source Naming', () => {
         it('should return actual variant name when variant is selected', () => {
             const flag = createFlag({
                 isEnabled: true,
-                enabledValue: true,
+                valueType: 'string',
+                enabledValue: 'default',
                 strategies: [
                     {
                         name: 'test-strategy',
@@ -190,6 +191,7 @@ describe('Variant Source Naming', () => {
         it('should return $env-default-enabled when valueSource is environment', () => {
             const flag = createFlag({
                 isEnabled: true,
+                valueType: 'string',
                 enabledValue: 'env-value',
                 valueSource: 'environment',
             });
@@ -202,6 +204,7 @@ describe('Variant Source Naming', () => {
         it('should return $env-default-disabled when disabled with valueSource environment', () => {
             const flag = createFlag({
                 isEnabled: false,
+                valueType: 'string',
                 disabledValue: 'env-off',
                 valueSource: 'environment',
             });

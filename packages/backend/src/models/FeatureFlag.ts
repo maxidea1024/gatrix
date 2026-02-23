@@ -1,6 +1,7 @@
 import db from '../config/knex';
 import logger from '../config/logger';
 import { ulid } from 'ulid';
+import { parseJsonField } from '../utils/dbUtils';
 
 // ==================== Types ====================
 
@@ -232,42 +233,35 @@ export interface FeatureMetricsAttributes {
 
 // ==================== Helper Functions ====================
 
-function parseJsonField<T>(value: any): T | undefined {
-  if (value === null || value === undefined || value === 'null') return undefined;
-  if (typeof value === 'object') return value as T;
-  try {
-    const parsed = JSON.parse(value);
-    if (parsed === null) return undefined;
-    return parsed as T;
-  } catch {
-    // mysql2 auto-parses JSON columns, so string values are already unwrapped.
-    // JSON.parse("hello") fails but the value is the correct parsed result.
-    return value as T;
-  }
-}
-
-// Coerce a flag value to its proper JS type based on valueType
+/**
+ * Coerce a value to match the declared valueType.
+ * Used on the WRITE path to ensure stored values have the correct type,
+ * and on the READ path as defense-in-depth.
+ */
 function coerceValueByType(value: any, valueType: string | undefined): any {
   if (value === null || value === undefined) return value;
   switch (valueType) {
+    case 'string':
+      return typeof value === 'string' ? value : String(value);
+    case 'number': {
+      if (typeof value === 'number') return value;
+      const num = Number(value);
+      return Number.isNaN(num) ? 0 : num;
+    }
     case 'boolean':
       if (typeof value === 'boolean') return value;
-      if (value === 'true') return true;
-      if (value === 'false') return false;
+      if (value === 'true' || value === 1) return true;
+      if (value === 'false' || value === 0) return false;
       return Boolean(value);
-    case 'number':
-      if (typeof value === 'number') return value;
-      return Number(value) || 0;
     case 'json':
       if (typeof value === 'object') return value;
       try {
-        return JSON.parse(value);
+        return JSON.parse(String(value));
       } catch {
         return {};
       }
     default:
-      if (typeof value === 'string') return value;
-      return String(value);
+      return value;
   }
 }
 
@@ -502,16 +496,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                enabledValue: parseJsonField(envSettings.enabledValue),
-                disabledValue: parseJsonField(envSettings.disabledValue),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              enabledValue: parseJsonField(envSettings.enabledValue),
+              disabledValue: parseJsonField(envSettings.disabledValue),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {

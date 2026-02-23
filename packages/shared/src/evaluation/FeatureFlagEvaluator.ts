@@ -338,23 +338,43 @@ export class FeatureFlagEvaluator {
   }
 
   /**
-   * Get a fallback value for a given type if the primary value is null/undefined.
+   * Ensure a value matches the declared valueType.
+   * If the value is null/undefined, returns a type-appropriate default.
+   * If the value exists but has wrong JS type, coerces it to match.
    */
   public static getFallbackValue(value: any, valueType?: string): any {
-    if (value !== undefined && value !== null) {
-      return value;
+    if (value === undefined || value === null) {
+      switch (valueType) {
+        case 'boolean':
+          return false;
+        case 'number':
+          return 0;
+        case 'json':
+          return {};
+        case 'string':
+        default:
+          return '';
+      }
     }
 
+    // Coerce to match declared valueType (defense-in-depth)
     switch (valueType) {
-      case 'boolean':
-        return false;
-      case 'number':
-        return 0;
-      case 'json':
-        return {};
       case 'string':
+        return typeof value === 'string' ? value : String(value);
+      case 'number':
+        if (typeof value === 'number') return value;
+        const num = Number(value);
+        return Number.isNaN(num) ? 0 : num;
+      case 'boolean':
+        if (typeof value === 'boolean') return value;
+        if (value === 'true' || value === 1) return true;
+        if (value === 'false' || value === 0) return false;
+        return Boolean(value);
+      case 'json':
+        if (typeof value === 'object') return value;
+        try { return JSON.parse(String(value)); } catch { return {}; }
       default:
-        return '';
+        return value;
     }
   }
 
