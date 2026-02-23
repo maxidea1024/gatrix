@@ -62,6 +62,12 @@ export const DEFAULT_FUNCTION_PATTERNS: FunctionPattern[] = [
 // ============================================================
 
 export const DEFAULT_SDK_PACKAGES: string[] = [
+  // JavaScript / Web
+  '@gatrix/gatrix-js-client-sdk',
+  '@gatrix/gatrix-react-client-sdk',
+  '@gatrix/gatrix-vue-client-sdk',
+  '@gatrix/gatrix-svelte-client-sdk',
+  // Legacy / short-form (kept for backward compat)
   '@gatrix/sdk',
   '@gatrix/client',
   '@gatrix/react',
@@ -70,10 +76,15 @@ export const DEFAULT_SDK_PACKAGES: string[] = [
   '@gatrix/js-client-sdk',
   'gatrix-sdk',
   'gatrix-js-client-sdk',
-  'gatrix-react-sdk',
-  'gatrix-vue-sdk',
-  'gatrix-svelte-sdk',
-  'com.gatrix.sdk',
+  'gatrix-react-client-sdk',
+  'gatrix-vue-client-sdk',
+  'gatrix-svelte-client-sdk',
+  // Flutter
+  'gatrix_flutter_client_sdk',
+  // Python
+  'gatrix-python-client-sdk',
+  // Unity
+  'com.gatrix.unity.client.sdk',
   'Gatrix.Feature',
 ];
 

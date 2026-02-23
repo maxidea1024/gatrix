@@ -1,10 +1,10 @@
 {
-  "name": "gatrix-flag-code-refs",
+  "name": "@gatrix/gatrix-coderef-collector",
   "version": "1.0.0",
-  "description": "Enterprise-Grade Multi-Language Feature Flag Static Analysis and Governance Platform",
+  "description": "Feature flag code reference collector for Gatrix SDKs",
   "main": "dist/cli.js",
   "bin": {
-    "gatrix-flag-code-refs": "dist/cli.js"
+    "gatrix-coderef-collector": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
