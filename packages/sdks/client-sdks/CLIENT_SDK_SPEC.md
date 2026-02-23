@@ -61,7 +61,36 @@ Pattern: `gatrix-{platform}-client-sdk`
 > [!IMPORTANT]
 > The `@gatrix/` npm scope uses `@gatrix/gatrix-{platform}-client-sdk` format (not `@gatrix/{platform}-sdk`). Both `gatrix` and `client` MUST appear in every SDK identifier.
 
+
+## Code Style
+
+### C/C++ SDKs (Cocos2d-x, Unreal, Unreal Lua)
+
+> [!IMPORTANT]
+> All C/C++ SDK source files **MUST** be formatted with `clang-format` using the project's `.clang-format` file before committing.
+> A `.clang-format` file **MUST** exist in the root of every C/C++ SDK directory.
+
+Key style rules enforced by `.clang-format`:
+
+| Rule | Value |
+|------|-------|
+| Base style | LLVM |
+| Indent width | 2 spaces |
+| Column limit | 100 |
+| Pointer alignment | **Left** (`lua_State* L`, `const FString& Ref`) |
+| Reference alignment | **Left** |
+| Short functions | Inline only |
+
+To apply formatting:
+
+```bash
+clang-format -i Source/**/*.cpp Source/**/*.h
+# or via npx:
+npx clang-format -i Source/**/*.cpp Source/**/*.h
+```
+
 ## Metrics Payload Format
+
 
 When sending metrics to the backend, the payload MUST follow this structure:
 
