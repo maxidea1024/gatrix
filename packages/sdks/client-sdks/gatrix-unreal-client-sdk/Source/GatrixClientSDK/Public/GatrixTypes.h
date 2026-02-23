@@ -293,7 +293,7 @@ struct GATRIXCLIENTSDK_API FGatrixFeaturesConfig {
 
   /** Enable explicit sync mode */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
-  bool bExplicitSyncMode = false;
+  bool bExplicitSyncMode = true;
 
   /** Override stored flags with bootstrap (default: true) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")

@@ -18,7 +18,7 @@
 //     -- Optional:
 //     -- RefreshInterval = 30,
 //     -- EnableDevMode   = true,
-//     -- ExplicitSyncMode = false,
+//     -- ExplicitSyncMode = true, -- (default)
 //   })
 //   gatrix.Start()
 //   gatrix.Stop()

@@ -23,7 +23,7 @@ class GatrixClientConfig {
     required this.appName,
     required this.environment,
     this.offlineMode = false,
-    this.explicitSyncMode = false,
+    this.explicitSyncMode = true,
     this.refreshIntervalSeconds = 60,
     this.metricsIntervalSeconds = 30,
     this.initialContext,

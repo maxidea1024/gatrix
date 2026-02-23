@@ -40,7 +40,7 @@ class FeaturesClient implements VariationProvider {
   final Map<String, Map<String, dynamic>> _flagBucket = {};
   DateTime _bucketStart = DateTime.now().toUtc();
 
-  bool _explicitSyncMode = false;
+  bool _explicitSyncMode = true;
   bool _pendingSync = false;
   Timer? _pollTimer;
   Timer? _metricsTimer;
@@ -92,7 +92,7 @@ class FeaturesClient implements VariationProvider {
     required String environment,
     required GatrixContext context,
     required EventEmitter events,
-    bool explicitSyncMode = false,
+    bool explicitSyncMode = true,
     int refreshIntervalSeconds = 30,
     List<int>? nonRetryableStatusCodes,
     int initialBackoffMs = 1000,

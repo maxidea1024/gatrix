@@ -84,7 +84,7 @@ class FeaturesConfig:
     """Feature-flag specific settings."""
     refresh_interval: float = 30.0
     disable_refresh: bool = False
-    explicit_sync_mode: bool = False
+    explicit_sync_mode: bool = True
     bootstrap: Optional[List[EvaluatedFlag]] = None
     bootstrap_override: bool = True
     disable_metrics: bool = False

@@ -131,8 +131,8 @@ namespace Gatrix.Unity.SDK
         /// <summary>Disable automatic polling</summary>
         public bool DisableRefresh { get; set; }
 
-        /// <summary>Enable explicit sync mode</summary>
-        public bool ExplicitSyncMode { get; set; }
+        /// <summary>Enable explicit sync mode (default: true)</summary>
+        public bool ExplicitSyncMode { get; set; } = true;
 
         /// <summary>Initial flags for instant availability</summary>
         public List<EvaluatedFlag> Bootstrap { get; set; }

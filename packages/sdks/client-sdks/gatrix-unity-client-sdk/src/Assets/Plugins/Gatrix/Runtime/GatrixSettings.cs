@@ -112,7 +112,7 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private bool _disableRefresh;
 
         [Tooltip("Enable explicit sync mode")]
-        [SerializeField] private bool _explicitSyncMode;
+        [SerializeField] private bool _explicitSyncMode = true;
 
         // ==================== Metrics Settings ====================
 

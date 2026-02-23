@@ -220,7 +220,7 @@ private:
   bool _readyEventEmitted = false;
   bool _hasPendingChanges = false;
   bool _pendingSync = false;
-  bool _explicitSyncMode = false; // Mutable copy for runtime switching
+  bool _explicitSyncMode = true; // Mutable copy for runtime switching
   std::string _etag;
   std::string _connectionId;
   std::string _lastError;

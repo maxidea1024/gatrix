@@ -199,7 +199,7 @@ class GatrixClientConfig:
 	var context: GatrixContext = GatrixContext.new()
 
 	# Optional - Sync Mode
-	var explicit_sync_mode: bool = false
+	var explicit_sync_mode: bool = true
 
 	# Optional - Offline Mode
 	var offline_mode: bool = false

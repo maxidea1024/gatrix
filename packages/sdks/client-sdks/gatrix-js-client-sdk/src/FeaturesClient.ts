@@ -121,7 +121,8 @@ export class FeaturesClient implements VariationProvider {
 
   // Feature-specific config shortcuts
   private get featuresConfig() {
-    return this.config.features ?? {};
+    const fc = this.config.features ?? {};
+    return { explicitSyncMode: true, ...fc };
   }
 
   constructor(emitter: EventEmitter, config: GatrixClientConfig) {

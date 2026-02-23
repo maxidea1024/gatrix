@@ -171,7 +171,7 @@ struct GatrixClientConfig {
   GatrixContext context;
 
   // Optional - Sync Mode
-  bool explicitSyncMode = false;
+  bool explicitSyncMode = true;
 
   // Optional - Offline
   bool offlineMode = false;
