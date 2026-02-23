@@ -3,7 +3,6 @@ import pytest
 
 from gatrix.events import EVENTS, EventEmitter
 from gatrix.features_client import FeaturesClient
-from gatrix.flag_proxy import FlagProxy
 from gatrix.storage import InMemoryStorageProvider
 from gatrix.types import (
     DISABLED_VARIANT,
@@ -35,9 +34,9 @@ def _config(
         api_token="test-token",
         app_name="test-app",
         environment="development",
-        offline_mode=offline,
         features=FeaturesConfig(
             bootstrap=bootstrap,
+            offline_mode=offline,
             explicit_sync_mode=explicit_sync,
             impression_data_all=impression_all,
             disable_metrics=disable_metrics,
@@ -385,8 +384,14 @@ class TestWatchFlag:
         changes = []
         fc.watch_realtime_flag("feature-on", lambda *args: changes.append(args))
 
-        # Simulate change
-        emitter.emit("flags.feature-on.change", FlagProxy(make_flag("feature-on")), None, "updated")
+        # Simulate change via _apply_flags + _invoke_watch_callbacks
+        old_flags = dict(fc._flags)
+        new_flags = {
+            "feature-on": make_flag("feature-on", enabled=False, version=2),
+            "feature-off": make_flag("feature-off", enabled=False),
+        }
+        fc._apply_flags(new_flags)
+        fc._invoke_watch_callbacks(fc._watch_callbacks, old_flags, fc._flags, force_realtime=True)
         assert len(changes) == 1
 
     def test_unwatch(self):
@@ -398,7 +403,14 @@ class TestWatchFlag:
         unwatch = fc.watch_realtime_flag("feature-on", lambda *args: changes.append(args))
         unwatch()
 
-        emitter.emit("flags.feature-on.change", FlagProxy(make_flag("feature-on")), None, "updated")
+        # Simulate change — callback should NOT fire after unwatch
+        old_flags = dict(fc._flags)
+        new_flags = {
+            "feature-on": make_flag("feature-on", enabled=False, version=2),
+            "feature-off": make_flag("feature-off", enabled=False),
+        }
+        fc._apply_flags(new_flags)
+        fc._invoke_watch_callbacks(fc._watch_callbacks, old_flags, fc._flags, force_realtime=True)
         assert len(changes) == 0
 
     def test_watch_with_initial_state(self):
@@ -428,11 +440,24 @@ class TestWatchFlagGroup:
         assert group.size == 2
         assert group.name == "test-group"
 
-        emitter.emit("flags.feature-on.change", None, None, "updated")
+        # Simulate change
+        old_flags = dict(fc._flags)
+        new_flags = {
+            "feature-on": make_flag("feature-on", enabled=False, version=2),
+            "feature-off": make_flag("feature-off", enabled=False),
+        }
+        fc._apply_flags(new_flags)
+        fc._invoke_watch_callbacks(fc._watch_callbacks, old_flags, fc._flags, force_realtime=True)
         assert len(changes) == 1
 
         group.unwatch_all()
-        emitter.emit("flags.feature-on.change", None, None, "updated")
+        old_flags2 = dict(fc._flags)
+        new_flags2 = {
+            "feature-on": make_flag("feature-on", enabled=True, version=3),
+            "feature-off": make_flag("feature-off", enabled=False),
+        }
+        fc._apply_flags(new_flags2)
+        fc._invoke_watch_callbacks(fc._watch_callbacks, old_flags2, fc._flags, force_realtime=True)
         assert len(changes) == 1  # No more events
 
     def test_group_destroy(self):

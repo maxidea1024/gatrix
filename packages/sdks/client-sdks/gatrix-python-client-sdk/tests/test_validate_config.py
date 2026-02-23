@@ -71,10 +71,10 @@ class TestWhitespace:
 class TestCacheKeyPrefix:
     def test_too_long(self):
         with pytest.raises(GatrixConfigError, match="cacheKeyPrefix must be <= 100"):
-            validate_config(_valid_config(cache_key_prefix="x" * 101))
+            validate_config(_valid_config(features=FeaturesConfig(cache_key_prefix="x" * 101)))
 
     def test_valid_prefix(self):
-        validate_config(_valid_config(cache_key_prefix="my_prefix"))
+        validate_config(_valid_config(features=FeaturesConfig(cache_key_prefix="my_prefix")))
 
 
 class TestCustomHeaders:

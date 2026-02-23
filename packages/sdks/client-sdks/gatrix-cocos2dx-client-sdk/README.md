@@ -9,7 +9,7 @@ Fully implements the [CLIENT_SDK_SPEC.md](../CLIENT_SDK_SPEC.md).
 - **Typed Variations**: `boolVariation`, `stringVariation`, `intVariation`, `floatVariation`, `doubleVariation`, `jsonVariation` (default value REQUIRED)
 - **Variation Details**: `boolVariationDetails`, `stringVariationDetails`, `intVariationDetails`, `floatVariationDetails`, `doubleVariationDetails`, `jsonVariationDetails` with reason, flagExists, enabled
 - **OrThrow Variations**: `boolVariationOrThrow`, `stringVariationOrThrow`, `intVariationOrThrow`, `floatVariationOrThrow`, `doubleVariationOrThrow`, `jsonVariationOrThrow`
-- **FlagProxy**: Full property access (exists, enabled, name, variant, variantType, version, reason, impressionData, raw)
+- **FlagProxy**: Full property access (exists, enabled, name, variant, valueType, version, reason, impressionData, raw)
 - **Watch Pattern**: `watchFlag`, `watchFlagWithInitialState`, `WatchFlagGroup` with chain API
 - **Explicit Sync Mode**: `isExplicitSync`, `hasPendingSyncFlags`, `syncFlags`
 - **Event System**: `on`, `once`, `off`, `onAny`, `offAny` with handler stats tracking
@@ -128,7 +128,7 @@ features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
   flag.enabled();         // bool
   flag.name();            // const string&
   flag.variant();         // Variant (never null - returns fallback)
-  flag.variantType();     // VariantType enum
+  flag.valueType();      // ValueType enum
   flag.version();         // int
   flag.reason();          // const string&
   flag.impressionData();  // bool

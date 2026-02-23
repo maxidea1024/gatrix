@@ -29,6 +29,10 @@ class MockVariationProvider:
     def _get_flag(self, name):
         return self._flags.get(name)
 
+    def has_flag_internal(self, flag_name, force_realtime=False):
+        self._record("has_flag_internal", flag_name)
+        return flag_name in self._flags
+
     def is_enabled_internal(self, flag_name, force_realtime=False):
         self._record("is_enabled_internal", flag_name)
         f = self._get_flag(flag_name)
@@ -88,6 +92,30 @@ class MockVariationProvider:
         if f and f.value_type == "json":
             return f.variant.value
         return fallback_value
+
+    def get_value_type_internal(self, flag_name, force_realtime=False):
+        self._record("get_value_type_internal", flag_name)
+        f = self._get_flag(flag_name)
+        return f.value_type if f else "none"
+
+    def get_version_internal(self, flag_name, force_realtime=False):
+        self._record("get_version_internal", flag_name)
+        f = self._get_flag(flag_name)
+        return f.version if f else 0
+
+    def get_reason_internal(self, flag_name, force_realtime=False):
+        self._record("get_reason_internal", flag_name)
+        f = self._get_flag(flag_name)
+        return f.reason if f else None
+
+    def get_impression_data_internal(self, flag_name, force_realtime=False):
+        self._record("get_impression_data_internal", flag_name)
+        f = self._get_flag(flag_name)
+        return f.impression_data if f else False
+
+    def get_raw_flag_internal(self, flag_name, force_realtime=False):
+        self._record("get_raw_flag_internal", flag_name)
+        return self._get_flag(flag_name)
 
     def bool_variation_details_internal(self, flag_name, fallback_value, force_realtime=False):
         self._record("bool_variation_details_internal", flag_name)
@@ -175,7 +203,7 @@ def _make_proxy(flag, flags=None, flag_name=None):
         all_flags.append(flag)
     mock = MockVariationProvider(all_flags)
     name = flag_name or (flag.name if flag else "")
-    return FlagProxy(flag, mock, name), mock
+    return FlagProxy(mock, name), mock
 
 
 class TestFlagProxyExists:

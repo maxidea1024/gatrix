@@ -116,7 +116,7 @@ describe('FeaturesClient', () => {
     environment: 'test',
     features: {
       bootstrap: bootstrapFlags,
-      disableRefresh: true, // Disable polling for tests
+      offlineMode: true, // Use offline mode for tests (no network requests)
     },
   };
 
@@ -126,9 +126,9 @@ describe('FeaturesClient', () => {
     mockFetch.mockReset();
   });
 
-  describe('initialization with bootstrap', () => {
+  describe('start with bootstrap', () => {
     it('should be ready immediately with bootstrap data', async () => {
-      await client.init();
+      await client.start();
 
       expect(client.isReady()).toBe(true);
     });
@@ -137,13 +137,13 @@ describe('FeaturesClient', () => {
       const readyCallback = jest.fn();
       emitter.on(EVENTS.FLAGS_READY, readyCallback);
 
-      await client.init();
+      await client.start();
 
       expect(readyCallback).toHaveBeenCalled();
     });
 
     it('should have all bootstrap flags', async () => {
-      await client.init();
+      await client.start();
 
       const allFlags = client.getAllFlags();
       expect(allFlags.length).toBe(bootstrapFlags.length);
@@ -152,7 +152,7 @@ describe('FeaturesClient', () => {
 
   describe('isEnabled', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return true for enabled flag', () => {
@@ -170,7 +170,7 @@ describe('FeaturesClient', () => {
 
   describe('boolVariation', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return true for enabled flag', () => {
@@ -189,7 +189,7 @@ describe('FeaturesClient', () => {
 
   describe('stringVariation', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return value for enabled string flag', () => {
@@ -207,7 +207,7 @@ describe('FeaturesClient', () => {
 
   describe('numberVariation', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return parsed number for number flag', () => {
@@ -225,7 +225,7 @@ describe('FeaturesClient', () => {
 
   describe('jsonVariation', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return parsed JSON for json flag', () => {
@@ -250,7 +250,7 @@ describe('FeaturesClient', () => {
 
   describe('variationDetails', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     describe('boolVariationDetails', () => {
@@ -262,6 +262,7 @@ describe('FeaturesClient', () => {
           reason: 'targeting_match',
           flagExists: true,
           enabled: true,
+          variantName: 'default',
         });
       });
 
@@ -273,6 +274,7 @@ describe('FeaturesClient', () => {
           reason: 'flag_not_found',
           flagExists: false,
           enabled: false,
+          variantName: '$missing',
         });
       });
     });
@@ -286,6 +288,7 @@ describe('FeaturesClient', () => {
           reason: 'percentage_rollout',
           flagExists: true,
           enabled: true,
+          variantName: 'variantA',
         });
       });
 
@@ -307,6 +310,7 @@ describe('FeaturesClient', () => {
           reason: 'evaluated',
           flagExists: true,
           enabled: true,
+          variantName: 'numVariant',
         });
       });
 
@@ -327,6 +331,7 @@ describe('FeaturesClient', () => {
           reason: 'evaluated',
           flagExists: true,
           enabled: true,
+          variantName: 'jsonVariant',
         });
       });
 
@@ -340,7 +345,7 @@ describe('FeaturesClient', () => {
 
   describe('variationOrThrow', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     describe('boolVariationOrThrow', () => {
@@ -393,7 +398,7 @@ describe('FeaturesClient', () => {
 
   describe('getVariant', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return variant for existing flag', () => {
@@ -420,7 +425,7 @@ describe('FeaturesClient', () => {
     let consoleErrorSpy: jest.SpyInstance;
 
     beforeEach(async () => {
-      await client.init();
+      await client.start();
       // Mock console.error to suppress expected error output during context changes
       consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
       // Mock fetch to return empty flags response
@@ -495,7 +500,7 @@ describe('FeaturesClient', () => {
         features: { disableRefresh: true },
       });
 
-      await errorClient.init();
+      await errorClient.start();
       // Try to fetch which will fail
       await errorClient.fetchFlags();
 
@@ -506,7 +511,7 @@ describe('FeaturesClient', () => {
 
   describe('getAllFlags', () => {
     beforeEach(async () => {
-      await client.init();
+      await client.start();
     });
 
     it('should return all flags', () => {
@@ -529,7 +534,6 @@ describe('FeaturesClient', () => {
         },
       });
 
-      await offlineClient.init();
       await offlineClient.start();
 
       expect(offlineClient.isReady()).toBe(true);
@@ -544,8 +548,6 @@ describe('FeaturesClient', () => {
           offlineMode: true,
         },
       });
-
-      await offlineClient.init();
 
       await expect(offlineClient.start()).rejects.toThrow(
         'offlineMode requires bootstrap data or cached flags'
@@ -568,7 +570,6 @@ describe('FeaturesClient', () => {
         },
       });
 
-      await offlineClient.init();
       await offlineClient.start();
 
       // Try to fetch - should warn and do nothing
@@ -587,7 +588,6 @@ describe('FeaturesClient', () => {
         },
       });
 
-      await offlineClient.init();
       await offlineClient.start();
 
       // Mock should not be called even after waiting

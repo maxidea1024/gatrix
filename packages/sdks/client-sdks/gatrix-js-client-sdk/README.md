@@ -111,13 +111,15 @@ const client = new GatrixClient({
 
 When `fetchFlags` is called, the SDK logs identify the caller:
 
-| Caller           | Description                                              |
-| ---------------- | -------------------------------------------------------- |
-| `init`           | Initial fetch during `start()`                           |
-| `polling`        | Automatic periodic polling (via `refreshInterval`)       |
-| `manual`         | External call via `client.features.fetchFlags()`         |
-| `syncFlags`      | Explicit sync via `client.features.syncFlags()`          |
-| `contextChange`  | Triggered by `updateContext()`                           |
+| Caller                  | Description                                              |
+| ----------------------- | -------------------------------------------------------- |
+| `init`                  | Initial fetch during `start()`                           |
+| `polling`               | Automatic periodic polling (via `refreshInterval`)       |
+| `manual`                | External call via `client.features.fetchFlags()`         |
+| `syncFlags`             | Explicit sync via `client.features.syncFlags()`          |
+| `contextChange`         | Triggered by `updateContext()`                           |
+| `gap_recovery`          | Streaming reconnection gap recovery (full re-fetch)      |
+| `pending_invalidation`  | Re-fetch after streaming invalidation signal             |
 
 Log format: `fetchFlags [caller]: starting fetch. etag=...`
 
@@ -144,7 +146,7 @@ interface EvaluatedFlag {
     enabled: boolean; // Whether variant is enabled
     value?: any; // Variant value (optional)
   };
-  variantType?: string; // Expected type: 'string' | 'number' | 'json' | 'none'
+  valueType?: string; // Expected type: 'string' | 'number' | 'json' | 'none'
   reason?: string; // Evaluation reason
   version: number; // Flag version
 }

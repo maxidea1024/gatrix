@@ -109,7 +109,7 @@ interface EvaluatedFlag {
     enabled: boolean;  // 배리언트 활성화 여부
     value?: any;       // 배리언트 값 (선택)
   };
-  variantType?: string;  // 예상 타입: 'string' | 'number' | 'json' | 'none'
+  valueType?: string;  // 예상 타입: 'string' | 'number' | 'json' | 'none'
   reason?: string;       // 평가 이유
   version: number;       // 플래그 버전
 }

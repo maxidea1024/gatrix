@@ -15,9 +15,9 @@ def _config(bootstrap=None, offline=True) -> GatrixClientConfig:
         api_token="test-token",
         app_name="test-app",
         environment="development",
-        offline_mode=offline,
         features=FeaturesConfig(
             bootstrap=bootstrap,
+            offline_mode=offline,
             disable_metrics=True,
         ),
     )
@@ -59,7 +59,9 @@ class TestLifecycle:
                 api_token="test-token",
                 app_name="test-app",
                 environment="development",
-                offline_mode=True,
+                features=FeaturesConfig(
+                    offline_mode=True,
+                ),
             )
         )
         assert client.is_ready() is False

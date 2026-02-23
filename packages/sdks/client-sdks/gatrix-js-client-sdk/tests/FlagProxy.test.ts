@@ -106,10 +106,10 @@ describe('FlagProxy', () => {
       environment: 'test',
       features: {
         bootstrap: bootstrapFlags,
-        disableRefresh: true,
+        offlineMode: true, // Use offline mode for tests (no network requests)
       },
     });
-    await client.init();
+    await client.start();
   });
 
   describe('undefined flag', () => {

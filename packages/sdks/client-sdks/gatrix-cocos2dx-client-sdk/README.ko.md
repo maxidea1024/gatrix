@@ -124,7 +124,7 @@ features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
   flag.enabled();         // bool
   flag.name();            // const string&
   flag.variant();         // Variant (null이 아님 - 폴백 반환)
-  flag.variantType();     // VariantType enum
+  flag.valueType();      // ValueType enum
   flag.version();         // int
   flag.reason();          // const string&
   flag.impressionData();  // bool
