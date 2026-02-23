@@ -154,20 +154,20 @@ Config.Features.bUsePOSTRequests = true;
 
 ```
 UGatrixClient (Singleton)
-?��??� FGatrixEventEmitter (thread-safe on/once/off/onAny)
-?��??� IGatrixStorageProvider (pluggable storage)
-?��??� UGatrixFeaturesClient
-    ?��??� HTTP Fetching (FHttpModule + ETag)
-    ?��??� Flag Storage (FCriticalSection protected)
-    ?��??� Polling (UWorld TimerManager + jitter)
-    ?��??� Streaming
-    ??  ?��??� FGatrixSseConnection (SSE via FHttpModule progress)
-    ??  ?��??� FGatrixWebSocketConnection (IWebSocket + ping/pong)
-    ??  ?��??� Gap Recovery (globalRevision tracking)
-    ??  ?��??� Auto-Reconnect (exponential backoff + jitter)
-    ?��??� Metrics (batched POST with retry)
-    ?��??� Watch Pattern (per-flag events)
-    ?��??� Blueprint Delegates
+├── FGatrixEventEmitter (thread-safe on/once/off/onAny)
+├── IGatrixStorageProvider (pluggable storage)
+└── UGatrixFeaturesClient
+    ├── HTTP Fetching (FHttpModule + ETag)
+    ├── Flag Storage (FCriticalSection protected)
+    ├── Polling (UWorld TimerManager + jitter)
+    ├── Streaming
+    │   ├── FGatrixSseConnection (SSE via FHttpModule progress)
+    │   ├── FGatrixWebSocketConnection (IWebSocket + ping/pong)
+    │   ├── Gap Recovery (globalRevision tracking)
+    │   └── Auto-Reconnect (exponential backoff + jitter)
+    ├── Metrics (batched POST with retry)
+    ├── Watch Pattern (per-flag events)
+    └── Blueprint Delegates
 ```
 
 ## Thread Safety

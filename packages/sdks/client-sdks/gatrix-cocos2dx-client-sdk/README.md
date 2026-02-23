@@ -26,20 +26,20 @@ Fully implements the [CLIENT_SDK_SPEC.md](../CLIENT_SDK_SPEC.md).
 
 ```
 gatrix-cocos2dx-client-sdk/
-?��??� include/
-??  ?��??� GatrixClient.h          # Main entry point (singleton)
-??  ?��??� GatrixFeaturesClient.h  # Feature flags client + WatchFlagGroup
-??  ?��??� GatrixFlagProxy.h       # Flag access wrapper
-??  ?��??� GatrixEventEmitter.h    # Event system with handler stats
-??  ?��??� GatrixEvents.h          # Event name constants (EVENTS struct)
-??  ?��??� GatrixTypes.h           # All data types, config, errors, storage
-?��??� src/
-??  ?��??� GatrixClient.cpp        # GatrixClient implementation
-??  ?��??� GatrixFeaturesClient.cpp # FeaturesClient + WatchFlagGroup implementation
-?��??� test_stubs/                 # Stub headers for build testing without Cocos2d-x
-??  ?��??� build_verify.cpp        # Comprehensive API surface verification test
-?��??� CMakeLists.txt
-?��??� README.md
+├── include/
+│   ├── GatrixClient.h          # Main entry point (singleton)
+│   ├── GatrixFeaturesClient.h  # Feature flags client + WatchFlagGroup
+│   ├── GatrixFlagProxy.h       # Flag access wrapper
+│   ├── GatrixEventEmitter.h    # Event system with handler stats
+│   ├── GatrixEvents.h          # Event name constants (EVENTS struct)
+│   └── GatrixTypes.h           # All data types, config, errors, storage
+├── src/
+│   ├── GatrixClient.cpp        # GatrixClient implementation
+│   └── GatrixFeaturesClient.cpp # FeaturesClient + WatchFlagGroup implementation
+├── test_stubs/                 # Stub headers for build testing without Cocos2d-x
+│   └── build_verify.cpp        # Comprehensive API surface verification test
+├── CMakeLists.txt
+└── README.md
 ```
 
 ## Installation

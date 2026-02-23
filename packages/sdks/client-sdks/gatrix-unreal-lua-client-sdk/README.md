@@ -1,10 +1,10 @@
-# Gatrix Lua SDK for Unreal Engine
+ÔªøÔªø# Gatrix Lua SDK for Unreal Engine
 
-> **Feature flags, A/B testing, and remote configuration ??official Gatrix Lua binding for Unreal Engine.**
+> **Feature flags, A/B testing, and remote configuration ‚Äî official Gatrix Lua binding for Unreal Engine.**
 
 Lua binding plugin for Gatrix Unreal SDK. Exposes feature flags, variations, context, events, and watch to Lua scripts via the **pure Lua C API** (`lua_State*`).
 
-### ??Quick Examples
+### üí° Quick Examples
 
 #### 1. Feature Toggle (`IsEnabled`)
 
@@ -12,7 +12,7 @@ Turn a feature on or off instantly without code deployment.
 
 ```lua
 if gatrix.Features.IsEnabled("new-shop") then
-    -- Feature is ON ??Show the new shop UI
+    -- Feature is ON ‚Üí Show the new shop UI
     ShowNewShop()
 end
 ```
@@ -42,11 +42,11 @@ gatrix.Features.WatchSyncedFlagWithInitialState("difficulty", function(Proxy)
 end)
 ```
 
-> No build, no deploy ??change these values from the Gatrix Dashboard and they go live instantly.
+> No build, no deploy ‚Äî change these values from the Gatrix Dashboard and they go live instantly.
 
 ---
 
-## ??Why Gatrix?
+## ü§î Why Gatrix?
 
 | Without Gatrix | With Gatrix |
 |---|---|
@@ -55,42 +55,42 @@ end)
 | Hard-coded feature flags | Real-time remote configuration |
 | Risky big-bang releases | Gradual rollouts with instant rollback |
 
-### ?éØ Key Scenarios
+### üîë Key Scenarios
 
-- **?ì± Mobile App Store Review** ??Submit with features disabled, enable after approval. No second review needed.
-- **?ñÔ∏è Regulatory Compliance** ??Disable features by region instantly when laws change (GDPR, COPPA, etc.).
-- **?ö® Emergency Kill Switch** ??Disable a crashing feature in seconds, not hours. No hotfix build needed.
-- **?ß™ A/B Testing** ??Show different variants to different groups and measure impact.
-- **?§∑ Uncertain Timing** ??Code is always ready; business decides when to launch.
+- **üì± Mobile App Store Review** ‚Äî Submit with features disabled, enable after approval. No second review needed.
+- **‚öñÔ∏è Regulatory Compliance** ‚Äî Disable features by region instantly when laws change (GDPR, COPPA, etc.).
+- **üö® Emergency Kill Switch** ‚Äî Disable a crashing feature in seconds, not hours. No hotfix build needed.
+- **üî¨ A/B Testing** ‚Äî Show different variants to different groups and measure impact.
+- **üìÖ Uncertain Timing** ‚Äî Code is always ready; business decides when to launch.
 
 ---
 
-## ?èóÔ∏?Evaluation Model: Remote Evaluation Only
+## üìê Evaluation Model: Remote Evaluation Only
 
 Gatrix client SDKs use **remote evaluation** exclusively:
 
 1. The SDK sends **context** (userId, environment, properties) to the Gatrix server.
 2. The server evaluates all targeting rules **remotely**.
-3. The SDK receives only the **final evaluated flag values** ??no rules are exposed to the client.
+3. The SDK receives only the **final evaluated flag values** ‚Äî no rules are exposed to the client.
 
 | | Remote Evaluation (Gatrix) | Local Evaluation |
 |---|---|---|
-| **Security** | ??Rules never leave the server | ?†Ô∏è Rules visible to client |
-| **Consistency** | ??Identical results across all SDKs | ?†Ô∏è Each SDK must reimplement logic |
-| **Payload** | ??Only final values (small) | ?†Ô∏è Full rule set (large) |
-| **Offline** | ?†Ô∏è Cached values or bootstrap | ??Full offline after download |
+| **Security** | ‚úÖ Rules never leave the server | ‚ö†Ô∏è Rules visible to client |
+| **Consistency** | ‚úÖ Identical results across all SDKs | ‚ö†Ô∏è Each SDK must reimplement logic |
+| **Payload** | ‚úÖ Only final values (small) | ‚ö†Ô∏è Full rule set (large) |
+| **Offline** | ‚ö†Ô∏è Cached values or bootstrap | ‚úÖ Full offline after download |
 
-> ?í° The SDK caches last known values locally. Your game never crashes due to network issues ??it falls back to cached or bootstrap values.
+> üõ°Ô∏è The SDK caches last known values locally. Your game never crashes due to network issues ‚Äî it falls back to cached or bootstrap values.
 
 ---
 
-## ?îç Flag Value Resolution Flow
+## üîÄ Flag Value Resolution Flow
 
 ### Value Source Priority (Remote)
 
 ```mermaid
 flowchart TD
-    subgraph SERVER ["?ñ•Ô∏?Gatrix Server"]
+    subgraph SERVER ["üñ•Ô∏è Gatrix Server"]
         S1{"Is flag enabled<br/>in this environment?"}
         S1 -->|No| S2{"Value from<br/>env override?"}
         S2 -->|Yes| S2A["variant.name = $env-default-disabled<br/>value = env.disabledValue"]
@@ -106,7 +106,7 @@ flowchart TD
         S7 -->|No| S7B["variant.name = $flag-default-disabled<br/>value = flag.disabledValue"]
     end
 
-    S2A --> NET["?ì° Network"]
+    S2A --> NET["üåê Network"]
     S2B --> NET
     S4A --> NET
     S4B --> NET
@@ -114,7 +114,7 @@ flowchart TD
     S7A --> NET
     S7B --> NET
 
-    subgraph SDK ["?éÆ Lua SDK (Client)"]
+    subgraph SDK ["üéÆ Lua SDK (Client)"]
         NET --> CACHE["SDK Cache<br/>(realtimeFlags / synchronizedFlags)"]
         CACHE --> ACCESS["Your Lua Code<br/>BoolVariation, StringVariation, etc."]
     end
@@ -149,22 +149,22 @@ flowchart TD
 
 ### Why FallbackValue Is Required
 
-The `FallbackValue` parameter is **mandatory** by design ??your game **always** receives a usable value:
+The `FallbackValue` parameter is **mandatory** by design ‚Äî your game **always** receives a usable value:
 
-1. **SDK not initialized** ??still connecting ??fallback keeps the game running
-2. **Flag doesn't exist** ??typo or deleted flag ??no crash
-3. **Network failure** ??no server, no cache ??still works
-4. **Type mismatch** ??called `BoolVariation` on a string flag ??safe default
-5. **Flag disabled** ??flag is off ??returns fallback, not the variant value
+1. **SDK not initialized** ‚Äî still connecting ‚Äî fallback keeps the game running
+2. **Flag doesn't exist** ‚Äî typo or deleted flag ‚Äî no crash
+3. **Network failure** ‚Äî no server, no cache ‚Äî still works
+4. **Type mismatch** ‚Äî called `BoolVariation` on a string flag ‚Äî safe default
+5. **Flag disabled** ‚Äî flag is off ‚Äî returns fallback, not the variant value
 
 ```lua
--- ?†Ô∏è There is no default-less overload. You MUST always specify what happens when things go wrong.
+-- ‚ö†Ô∏è There is no default-less overload. You MUST always specify what happens when things go wrong.
 local Speed = gatrix.Features.FloatVariation("game-speed", 1.0)  -- 1.0 if anything goes wrong
 ```
 
 ### IsEnabled vs BoolVariation
 
-These serve **different purposes** ??don't confuse them:
+These serve **different purposes** ‚Äî don't confuse them:
 
 | Function | Returns | Purpose |
 |---|---|---|
@@ -173,7 +173,7 @@ These serve **different purposes** ??don't confuse them:
 
 ```lua
 -- A flag can be enabled but return false as its boolean value!
--- enabled=true, variant.value=false ??"Feature is ON, but the bool config says false"
+-- enabled=true, variant.value=false ‚Üí "Feature is ON, but the bool config says false"
 local IsOn = gatrix.Features.IsEnabled("my-flag")             -- true (flag is on)
 local Value = gatrix.Features.BoolVariation("my-flag", true)   -- false (the configured value)
 ```
@@ -182,26 +182,26 @@ local Value = gatrix.Features.BoolVariation("my-flag", true)   -- false (the con
 
 ## Features
 
-- **Pure Lua C API** ??no dependency on game-specific Lua wrappers
-- **Memory-safe callbacks** ??`TSharedPtr<bool>` alive flag prevents dangling pointer access
-- **Full SDK coverage** ??init, flags, variations, context, events, watch, watch groups, sync
-- **Automatic cleanup** ??`Unregister()` releases all refs and invalidates callbacks
+- **Pure Lua C API** ‚Äî no dependency on game-specific Lua wrappers
+- **Memory-safe callbacks** ‚Äî `TSharedPtr<bool>` alive flag prevents dangling pointer access
+- **Full SDK coverage** ‚Äî init, flags, variations, context, events, watch, watch groups, sync
+- **Automatic cleanup** ‚Äî `Unregister()` releases all refs and invalidates callbacks
 
 ## Plugin Structure
 
 ```
 gatrix-unreal-lua-client-sdk/
-?ú‚??Ä GatrixLuaClientSDK.uplugin
-?ú‚??Ä README.md
-?ú‚??Ä README.ko.md
-?î‚??Ä Source/GatrixLuaClientSDK/
-    ?ú‚??Ä GatrixLuaClientSDK.Build.cs
-    ?ú‚??Ä Public/
-    ??  ?ú‚??Ä GatrixLuaClientSDKModule.h
-    ??  ?î‚??Ä LuaGatrix.h
-    ?î‚??Ä Private/
-        ?ú‚??Ä GatrixLuaClientSDKModule.cpp
-        ?î‚??Ä LuaGatrix.cpp
+‚îú‚îÄ‚îÄ GatrixLuaClientSDK.uplugin
+‚îú‚îÄ‚îÄ README.md
+‚îú‚îÄ‚îÄ README.ko.md
+‚îî‚îÄ‚îÄ Source/GatrixLuaClientSDK/
+    ‚îú‚îÄ‚îÄ GatrixLuaClientSDK.Build.cs
+    ‚îú‚îÄ‚îÄ Public/
+    ‚îÇ   ‚îú‚îÄ‚îÄ GatrixLuaClientSDKModule.h
+    ‚îÇ   ‚îî‚îÄ‚îÄ LuaGatrix.h
+    ‚îî‚îÄ‚îÄ Private/
+        ‚îú‚îÄ‚îÄ GatrixLuaClientSDKModule.cpp
+        ‚îî‚îÄ‚îÄ LuaGatrix.cpp
 ```
 
 ## Integration
@@ -245,8 +245,8 @@ FGatrixLuaBindings::Unregister(YourLuaState);
 ## Lua API Reference
 
 > **API Structure:**
-> - `gatrix.*` ??Lifecycle, context, events (SDK-level)
-> - `gatrix.Features.*` ??Feature flags, variations, watch, sync
+> - `gatrix.*` ‚Äî Lifecycle, context, events (SDK-level)
+> - `gatrix.Features.*` ‚Äî Feature flags, variations, watch, sync
 >
 > Both `gatrix.Features.IsEnabled(...)` and `local Gatrix = require("gatrix")` work.
 
@@ -285,7 +285,7 @@ gatrix.Stop()
 -- Start returns a deferred that resolves when flags are ready
 gatrix.Start()
     :next(function()
-        print("SDK ready ??flags loaded!")
+        print("SDK ready ‚Äî flags loaded!")
         local speed = gatrix.Features.FloatVariation("game-speed", 1.0)
         print("Game speed:", speed)
     end)
@@ -317,7 +317,7 @@ gatrix.Start()
     end)
 ```
 
-> ?í° **Fallback behavior:** If the `deferred` module is not available in your Lua environment, `Start()` and `FetchFlags()` return `nil`. Use `gatrix.Once("flags.ready", ...)` as the event-based fallback:
+> üí° **Fallback behavior:** If the `deferred` module is not available in your Lua environment, `Start()` and `FetchFlags()` return `nil`. Use `gatrix.Once("flags.ready", ...)` as the event-based fallback:
 >
 > ```lua
 > local result = gatrix.Start()
@@ -398,7 +398,7 @@ local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag")
 ### Returned Table Shapes
 
 > **`Variant.Value` is automatically converted to the native Lua type** based on `ValueType`.
-> No manual parsing is needed ??you receive `boolean`, `number`, or `string` directly.
+> No manual parsing is needed ‚Äî you receive `boolean`, `number`, or `string` directly.
 
 **ValueType Enum:**
 
@@ -418,14 +418,14 @@ local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag")
 | `Value` | `boolean` / `number` / `string` | Variant value, automatically typed based on `ValueType` |
 
 ```lua
--- Example: boolean flag ??Value is a Lua boolean
+-- Example: boolean flag ‚Üí Value is a Lua boolean
 {
     Name    = "dark-theme",
     Enabled = true,
     Value   = true,       -- boolean (not the string "true")
 }
 
--- Example: number flag ??Value is a Lua number
+-- Example: number flag ‚Üí Value is a Lua number
 {
     Name    = "$flag-default-enabled",
     Enabled = true,
@@ -494,7 +494,7 @@ end)
 ### Reserved Variant Names
 
 The SDK uses `$`-prefixed variant names to indicate **where a value came from**.
-These are system-generated ??not user-defined variant names.
+These are system-generated ‚Äî not user-defined variant names.
 
 | Variant Name | Meaning | `Enabled` | When It Happens |
 |:---|---|:---:|---|
@@ -641,7 +641,7 @@ end)
 gatrix.Features.UnwatchFlag(Handle)
 ```
 
-#### Realtime vs Synced ??When to Use Which?
+#### Realtime vs Synced ‚Äî When to Use Which?
 
 | | Realtime | Synced |
 |---|---|---|
@@ -650,7 +650,7 @@ gatrix.Features.UnwatchFlag(Handle)
 | **ExplicitSyncMode off** | Fires on change | Fires on change (same as realtime) |
 | **ExplicitSyncMode on** | Fires on change | Fires **only** after `SyncFlags()` |
 
-#### ?†Ô∏è ExplicitSyncMode ??Why It Matters
+#### ‚è±Ô∏è ExplicitSyncMode ‚Äî Why It Matters
 
 Realtime mode is simple, but applying flag changes **instantly** can cause problems in games:
 
@@ -685,12 +685,12 @@ end)
 
 -- Apply synced changes at a safe moment (e.g., loading screen, between rounds)
 gatrix.Features.SyncFlags()
--- ??Synced watchers fire here with the latest values
+-- ‚úÖ Synced watchers fire here with the latest values
 ```
 
-> ?í° **Rule of thumb:** If a flag change could disrupt the player experience, use **Synced** mode and call `SyncFlags()` at natural transition points (loading screens, between rounds, menu transitions).
+> üí° **Rule of thumb:** If a flag change could disrupt the player experience, use **Synced** mode and call `SyncFlags()` at natural transition points (loading screens, between rounds, menu transitions).
 
-> ?†Ô∏è When `ExplicitSyncMode` is **disabled** (default), `WatchSyncedFlag` and `WatchRealtimeFlag` behave **identically**. There is no buffering ??all reads and callbacks operate on a single realtime store.
+> ‚ö†Ô∏è When `ExplicitSyncMode` is **disabled** (default), `WatchSyncedFlag` and `WatchRealtimeFlag` behave **identically**. There is no buffering ‚Äî all reads and callbacks operate on a single realtime store.
 
 ### Watch Group (`gatrix.Features`)
 
@@ -765,7 +765,7 @@ This prevents both dangling pointer access and memory leaks.
 
 ---
 
-## ?éØ Common Recipes
+## üç≥ Common Recipes
 
 ### Game Speed Tuning
 
@@ -832,7 +832,7 @@ Group
 
 ---
 
-## ??FAQ & Troubleshooting
+## ‚ùì FAQ & Troubleshooting
 
 ### 1. Flag changes are not detected in real time
 
@@ -843,8 +843,8 @@ Group
 | Cause | Solution |
 |-------|----------|
 | Polling interval too long | Reduce `RefreshInterval` (default: 30s) |
-| `ExplicitSyncMode` is on | Flag is updated but buffered ??call `SyncFlags()` to apply |
-| Using `WatchSyncedFlag` | Synced watchers don't fire until `SyncFlags()` ??use `WatchRealtimeFlag` instead |
+| `ExplicitSyncMode` is on | Flag is updated but buffered ‚Äî call `SyncFlags()` to apply |
+| Using `WatchSyncedFlag` | Synced watchers don't fire until `SyncFlags()` ‚Äî use `WatchRealtimeFlag` instead |
 | `OfflineMode` is enabled | Set `OfflineMode = false` for live connections |
 | Wrong `AppName` or `Environment` | Double-check config matches dashboard settings |
 
@@ -945,8 +945,8 @@ end)
 **Symptom:** Calling `SyncFlags()` doesn't change any flag values.
 
 **Possible causes:**
-- `ExplicitSyncMode` is not enabled ??sync is only meaningful with it on
-- No pending changes ??the synced store is already up to date
+- `ExplicitSyncMode` is not enabled ‚Äî sync is only meaningful with it on
+- No pending changes ‚Äî the synced store is already up to date
 
 ---
 

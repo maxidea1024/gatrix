@@ -5,15 +5,15 @@ Client-side JavaScript SDK for the Gatrix platform.
 ## Installation
 
 ```bash
-npm install @gatrix/gatrix-js-client-sdk
+npm install @gatrix/js-client-sdk
 # or
-yarn add @gatrix/gatrix-js-client-sdk
+yarn add @gatrix/js-client-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { GatrixClient } from '@gatrix/gatrix-js-client-sdk';
+import { GatrixClient } from '@gatrix/js-client-sdk';
 
 const client = new GatrixClient({
   apiUrl: 'https://your-api.com/api/v1', // Base URL only (required)
@@ -135,7 +135,7 @@ interface EvaluatedFlag {
     enabled: boolean; // Whether variant is enabled
     value?: any; // Variant value (optional)
   };
-  valueType?: string; // Expected type: 'string' | 'number' | 'json' | 'none'
+  variantType?: string; // Expected type: 'string' | 'number' | 'json' | 'none'
   reason?: string; // Evaluation reason
   version: number; // Flag version
 }
@@ -146,16 +146,16 @@ interface EvaluatedFlag {
 All variation methods require an explicit default value:
 
 ```typescript
-// ??Correct: explicit default value
+// ✓ Correct: explicit default value
 const value = client.features.stringVariation('my-flag', 'fallback');
 
-// ??Not supported: no default value
+// ✗ Not supported: no default value
 const value = client.features.stringVariation('my-flag');
 ```
 
 **Rationale:**
 
-1. **Prevents Ambiguity:** When a flag doesn't exist or has no value, the SDK returns your specified default?�not `undefined` or `null`.
+1. **Prevents Ambiguity:** When a flag doesn't exist or has no value, the SDK returns your specified default—not `undefined` or `null`.
 2. **Type Safety:** The default value establishes the expected return type.
 3. **Fail-Safe Behavior:** Your application always receives a usable value, even during network failures or SDK initialization.
 4. **Explicit Intent:** Forces developers to consider the fallback scenario, reducing bugs.
@@ -234,7 +234,7 @@ console.log(result);
 Throws `GatrixFeatureError` if evaluation fails:
 
 ```typescript
-import { GatrixFeatureError } from '@gatrix/gatrix-js-client-sdk';
+import { GatrixFeatureError } from '@gatrix/js-client-sdk';
 
 try {
   const value = client.features.stringVariationOrThrow('my-flag');
@@ -287,7 +287,7 @@ group.destroy();
 ## Events
 
 ```typescript
-import { GatrixClient, EVENTS } from '@gatrix/gatrix-js-client-sdk';
+import { GatrixClient, EVENTS } from '@gatrix/js-client-sdk';
 
 client.on(EVENTS.READY, () => {
   console.log('SDK is ready');
@@ -396,6 +396,7 @@ await client.features.syncFlags();
 | `createWatchFlagGroup(name)`                    | Create a watch group        |
 | `isFetching()`                                  | Check if currently fetching |
 | `isExplicitSync()`                              | Check if explicit mode      |
+| `canSyncFlags()`                                | Check if sync can be called |
 | `syncFlags(fetchNow?)`                          | Manual sync (explicit mode) |
 | `updateContext(context)`                        | Update evaluation context   |
 | `getContext()`                                  | Get current context         |
