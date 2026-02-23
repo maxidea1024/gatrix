@@ -87,6 +87,8 @@ void FGatrixSseConnection::HandleRequestProgress(FHttpRequestPtr Request, int32 
   ProcessedBytes = Content.Num();
 
   // Append to buffer and parse SSE events
+  UE_LOG(LogGatrix, Log, TEXT("SSE: Received %d new bytes (total processed=%d)"), NewBytes,
+         ProcessedBytes);
   ReceiveBuffer += NewData;
   ParseSseBuffer();
 }
@@ -140,6 +142,8 @@ void FGatrixSseConnection::ParseSseBuffer() {
       // Empty line = dispatch event
       if (!CurrentEventType.IsEmpty() || !CurrentEventData.IsEmpty()) {
         FString EventType = CurrentEventType.IsEmpty() ? TEXT("message") : CurrentEventType;
+        UE_LOG(LogGatrix, Log, TEXT("SSE: Dispatching event type='%s' data='%s'"), *EventType,
+               *CurrentEventData.Left(200));
         OnEvent.ExecuteIfBound(EventType, CurrentEventData);
         CurrentEventType.Empty();
         CurrentEventData.Empty();

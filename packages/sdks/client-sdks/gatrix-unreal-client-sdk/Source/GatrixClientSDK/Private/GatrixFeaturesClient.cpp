@@ -178,15 +178,15 @@ UGatrixFlagProxy* UGatrixFeaturesClient::CreateProxy(const FString& FlagName, bo
   return Proxy;
 }
 
-TArray<FGatrixEvaluatedFlag> UGatrixFeaturesClient::GetAllFlags() const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+TArray<FGatrixEvaluatedFlag> UGatrixFeaturesClient::GetAllFlags(bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
   TArray<FGatrixEvaluatedFlag> Result;
   Flags.GenerateValueArray(Result);
   return Result;
 }
 
-bool UGatrixFeaturesClient::HasFlag(const FString& FlagName) const {
-  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags();
+bool UGatrixFeaturesClient::HasFlag(const FString& FlagName, bool bForceRealtime) const {
+  TMap<FString, FGatrixEvaluatedFlag> Flags = SelectFlags(bForceRealtime);
   return Flags.Contains(FlagName);
 }
 
@@ -936,19 +936,30 @@ void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFl
     StorageProvider->Save(StorageKeyFlags, FlagsJson);
   }
 
-  // Emit flag changes
   if (!bIsInitialFetch) {
-    TMap<FString, FGatrixEvaluatedFlag> CurrentFlags = SelectFlags();
-    EmitFlagChanges(OldFlags, CurrentFlags);
+    // Log detected changes
+    for (const auto& Pair : RealtimeFlags) {
+      const FGatrixEvaluatedFlag* Old = OldFlags.Find(Pair.Key);
+      if (!Old) {
+        UE_LOG(LogGatrix, Verbose, TEXT("StoreFlags: ADDED '%s' enabled=%d value='%s'"), *Pair.Key,
+               (int)Pair.Value.bEnabled, *Pair.Value.Variant.Value);
+      } else if (Old->Version != Pair.Value.Version) {
+        UE_LOG(
+            LogGatrix, Log,
+            TEXT("StoreFlags: CHANGED '%s' version %lld->%lld, enabled %d->%d, value '%s'->'%s'"),
+            *Pair.Key, Old->Version, Pair.Value.Version, (int)Old->bEnabled,
+            (int)Pair.Value.bEnabled, *Old->Variant.Value, *Pair.Value.Variant.Value);
+      }
+    }
 
-    // Always invoke realtime watch callbacks
-    InvokeWatchCallbacks(WatchCallbacks, OldFlags, CurrentFlags,
-                         /*bForceRealtime=*/true);
+    // Always invoke realtime flag changes (events) and watch callbacks
+    EmitFlagChanges(OldFlags, RealtimeFlags);
+    InvokeWatchCallbacks(WatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/true);
 
     if (!ClientConfig.Features.bExplicitSyncMode) {
-      // In non-explicit mode, also invoke synced callbacks
-      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, CurrentFlags,
-                           /*bForceRealtime=*/false);
+      // In non-explicit mode, also invoke synced callbacks and global change events
+      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/false);
+
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsChange);
       }
@@ -1057,9 +1068,7 @@ void UGatrixFeaturesClient::EmitFlagChanges(const TMap<FString, FGatrixEvaluated
   // Detect changed/created flags
   for (const auto& Pair : NewFlags) {
     const FGatrixEvaluatedFlag* OldFlag = OldFlags.Find(Pair.Key);
-    if (!OldFlag || OldFlag->bEnabled != Pair.Value.bEnabled ||
-        OldFlag->Variant.Name != Pair.Value.Variant.Name ||
-        OldFlag->Variant.Value != Pair.Value.Variant.Value) {
+    if (!OldFlag || OldFlag->Version != Pair.Value.Version) {
       FString ChangeType = OldFlag ? TEXT("updated") : TEXT("created");
       EventEmitter->Emit(GatrixEvents::FlagChange(Pair.Key),
                          Pair.Value.Variant.Name + TEXT("|") + ChangeType);
@@ -1275,11 +1284,12 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
   // Check for changed/new flags
   for (const auto& Pair : NewFlags) {
     const FGatrixEvaluatedFlag* OldFlag = OldFlags.Find(Pair.Key);
-    if (!OldFlag || OldFlag->bEnabled != Pair.Value.bEnabled ||
-        OldFlag->Variant.Name != Pair.Value.Variant.Name ||
-        OldFlag->Variant.Value != Pair.Value.Variant.Value) {
+    if (!OldFlag || OldFlag->Version != Pair.Value.Version) {
       // Invoke watch callbacks for this flag
       for (const auto& Entry : CallbackList) {
+        UE_LOG(LogGatrix, Verbose,
+               TEXT("InvokeWatchCallbacks: changed='%s', watching='%s', match=%d"), *Pair.Key,
+               *Entry.FlagName, (int)(Entry.FlagName == Pair.Key));
         if (Entry.FlagName == Pair.Key) {
           UGatrixFlagProxy* Proxy = CreateProxy(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
@@ -2098,6 +2108,7 @@ void UGatrixFeaturesClient::DisconnectStreaming() {
 void UGatrixFeaturesClient::ProcessStreamingEvent(const FString& EventType,
                                                   const FString& EventData) {
   StreamingEventCount++;
+  UE_LOG(LogGatrix, Log, TEXT("Streaming: ProcessStreamingEvent type='%s'"), *EventType);
 
   if (EventType == TEXT("connected")) {
     // Server acknowledged connection, extract connectionId if present
@@ -2116,17 +2127,13 @@ void UGatrixFeaturesClient::ProcessStreamingEvent(const FString& EventType,
     if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid()) {
       TArray<FString> ChangedKeys;
 
-      // Check for globalRevision for gap detection
+      // Only process if server revision is ahead (skip stale/duplicate events)
       int64 ServerRevision = 0;
       if (JsonObject->TryGetNumberField(TEXT("globalRevision"), ServerRevision)) {
-        if (LocalGlobalRevision > 0 && ServerRevision > LocalGlobalRevision + 1) {
-          UE_LOG(LogGatrix, Warning,
-                 TEXT("Streaming: Gap detected (local=%lld, server=%lld), "
-                      "doing full fetch"),
+        if (ServerRevision <= LocalGlobalRevision) {
+          UE_LOG(LogGatrix, Verbose,
+                 TEXT("Streaming: Ignoring stale event (local=%lld, server=%lld)"),
                  LocalGlobalRevision, ServerRevision);
-          StreamingRecoveryCount++;
-          FetchFlags();
-          LocalGlobalRevision = ServerRevision;
           return;
         }
         LocalGlobalRevision = ServerRevision;
@@ -2134,7 +2141,7 @@ void UGatrixFeaturesClient::ProcessStreamingEvent(const FString& EventType,
 
       // Get changed keys
       const TArray<TSharedPtr<FJsonValue>>* KeysArray;
-      if (JsonObject->TryGetArrayField(TEXT("keys"), KeysArray)) {
+      if (JsonObject->TryGetArrayField(TEXT("changedKeys"), KeysArray)) {
         for (const auto& KeyVal : *KeysArray) {
           FString Key;
           if (KeyVal->TryGetString(Key)) {
@@ -2143,12 +2150,10 @@ void UGatrixFeaturesClient::ProcessStreamingEvent(const FString& EventType,
         }
       }
 
-      if (ChangedKeys.Num() > 0) {
-        HandleStreamingInvalidation(ChangedKeys);
-      } else {
-        // No specific keys, do a full fetch
-        FetchFlags();
-      }
+      // Delegate to HandleStreamingInvalidation:
+      // - changedKeys present → partial fetch
+      // - changedKeys absent  → full fetch (clears ETag internally)
+      HandleStreamingInvalidation(ChangedKeys);
     }
   } else if (EventType == TEXT("heartbeat") || EventType == TEXT("ping")) {
     // Heartbeat received, connection is alive
@@ -2161,8 +2166,19 @@ void UGatrixFeaturesClient::ProcessStreamingEvent(const FString& EventType,
 }
 
 void UGatrixFeaturesClient::HandleStreamingInvalidation(const TArray<FString>& ChangedKeys) {
+  UE_LOG(LogGatrix, Log,
+         TEXT("HandleStreamingInvalidation: keys=%d, bStreamingFetching=%d, bIsFetching=%d"),
+         ChangedKeys.Num(), (int)bStreamingFetching, (int)bIsFetching);
+
   if (ChangedKeys.Num() == 0) {
-    FetchFlags();
+    // No specific keys: clear ETag and do full fetch
+    Etag = TEXT("");
+    if (!bIsFetching) {
+      FetchFlags();
+    } else {
+      // Full fetch pending
+      PendingInvalidationKeys.Add(TEXT("*"));
+    }
     return;
   }
 
@@ -2171,10 +2187,12 @@ void UGatrixFeaturesClient::HandleStreamingInvalidation(const TArray<FString>& C
     for (const FString& Key : ChangedKeys) {
       PendingInvalidationKeys.Add(Key);
     }
+    UE_LOG(LogGatrix, Log, TEXT("HandleStreamingInvalidation: queued (bStreamingFetching=true)"));
     return;
   }
 
   // Do partial fetch for affected keys
+  UE_LOG(LogGatrix, Log, TEXT("HandleStreamingInvalidation: calling FetchPartialFlags"));
   FetchPartialFlags(ChangedKeys);
 }
 
@@ -2197,6 +2215,8 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
   }
   BaseUrl += FString::Printf(TEXT("&flagKeys=%s"), *KeysParam);
 
+  UE_LOG(LogGatrix, Log, TEXT("FetchPartialFlags: url=%s"), *BaseUrl);
+
   TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
   HttpRequest->SetURL(BaseUrl);
   HttpRequest->SetVerb(TEXT("GET"));
@@ -2208,24 +2228,40 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
       TEXT("X-SDK-Version"),
       FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName, *UGatrixClient::SdkVersion));
 
-  if (!Etag.IsEmpty()) {
-    HttpRequest->SetHeader(TEXT("If-None-Match"), Etag);
-  }
+  // Intentionally skip If-None-Match: partial fetch must always return fresh data
 
   for (const auto& Header : ClientConfig.CustomHeaders) {
     HttpRequest->SetHeader(Header.Key, Header.Value);
   }
 
+  // Capture requested keys for merge
+  TSet<FString> RequestedKeys;
+  for (const FString& Key : FlagKeys) {
+    RequestedKeys.Add(Key);
+  }
+
   HttpRequest->OnProcessRequestComplete().BindLambda(
-      [this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+      [this, RequestedKeys](FHttpRequestPtr Request, FHttpResponsePtr Response,
+                            bool bWasSuccessful) {
         bStreamingFetching = false;
 
-        if (bWasSuccessful && Response.IsValid() && Response->GetResponseCode() == 200) {
-          HandleFetchResponse(Response->GetContentAsString(), Response->GetResponseCode(),
-                              Response->GetHeader(TEXT("ETag")));
+        int32 StatusCode = Response.IsValid() ? Response->GetResponseCode() : -1;
+        UE_LOG(LogGatrix, Log, TEXT("FetchPartialFlags: response code=%d, bWasSuccessful=%d"),
+               StatusCode, (int)bWasSuccessful);
+
+        if (bWasSuccessful && Response.IsValid() && StatusCode == 200) {
+          FString Body = Response->GetContentAsString();
+          // Update flags via normal path (StoreFlags handles Version-based change detection)
+          HandleFetchResponse(Body, 200, TEXT(""));
+        } else {
+          // On failure, fall back to full fetch with cleared ETag
+          UE_LOG(LogGatrix, Warning,
+                 TEXT("Partial fetch failed (code=%d), falling back to full fetch"), StatusCode);
+          Etag = TEXT("");
+          FetchFlags();
         }
 
-        // Check for pending invalidation keys
+        // Process accumulated pending invalidation keys
         if (PendingInvalidationKeys.Num() > 0) {
           TArray<FString> PendingKeys = PendingInvalidationKeys.Array();
           PendingInvalidationKeys.Empty();
@@ -2234,6 +2270,178 @@ void UGatrixFeaturesClient::FetchPartialFlags(const TArray<FString>& FlagKeys) {
       });
 
   HttpRequest->ProcessRequest();
+}
+
+void UGatrixFeaturesClient::MergePartialResponse(const FString& ResponseBody,
+                                                 const TSet<FString>& RequestedKeys) {
+  UE_LOG(LogGatrix, Log, TEXT("MergePartialResponse: called, body length=%d"), ResponseBody.Len());
+
+  // Parse response JSON (same structure as full fetch)
+  TSharedPtr<FJsonObject> JsonObject;
+  TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
+  if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid()) {
+    UE_LOG(LogGatrix, Warning, TEXT("MergePartialResponse: JSON parse failed, falling back"));
+    Etag = TEXT("");
+    FetchFlags();
+    return;
+  }
+
+  bool bSuccess = false;
+  JsonObject->TryGetBoolField(TEXT("success"), bSuccess);
+  if (!bSuccess) {
+    UE_LOG(LogGatrix, Warning, TEXT("MergePartialResponse: success=false, falling back"));
+    Etag = TEXT("");
+    FetchFlags();
+    return;
+  }
+
+  const TSharedPtr<FJsonObject>* DataObj = nullptr;
+  if (!JsonObject->TryGetObjectField(TEXT("data"), DataObj)) {
+    return;
+  }
+
+  const TArray<TSharedPtr<FJsonValue>>* FlagsArray = nullptr;
+  if (!(*DataObj)->TryGetArrayField(TEXT("flags"), FlagsArray)) {
+    return;
+  }
+
+  // Parse the partial flags using the same inline logic as HandleFetchResponse
+  TArray<FGatrixEvaluatedFlag> PartialFlags;
+  for (const auto& FlagValue : *FlagsArray) {
+    const TSharedPtr<FJsonObject>* FlagObj = nullptr;
+    if (!FlagValue->TryGetObject(FlagObj))
+      continue;
+
+    FGatrixEvaluatedFlag Flag;
+    (*FlagObj)->TryGetStringField(TEXT("name"), Flag.Name);
+    (*FlagObj)->TryGetBoolField(TEXT("enabled"), Flag.bEnabled);
+    (*FlagObj)->TryGetNumberField(TEXT("version"), Flag.Version);
+    (*FlagObj)->TryGetStringField(TEXT("reason"), Flag.Reason);
+    (*FlagObj)->TryGetBoolField(TEXT("impressionData"), Flag.bImpressionData);
+
+    FString TypeStr;
+    if ((*FlagObj)->TryGetStringField(TEXT("valueType"), TypeStr)) {
+      if (TypeStr == TEXT("string"))
+        Flag.ValueType = EGatrixValueType::String;
+      else if (TypeStr == TEXT("number"))
+        Flag.ValueType = EGatrixValueType::Number;
+      else if (TypeStr == TEXT("boolean"))
+        Flag.ValueType = EGatrixValueType::Boolean;
+      else if (TypeStr == TEXT("json"))
+        Flag.ValueType = EGatrixValueType::Json;
+      else
+        Flag.ValueType = EGatrixValueType::None;
+    }
+
+    const TSharedPtr<FJsonObject>* VariantObj = nullptr;
+    if ((*FlagObj)->TryGetObjectField(TEXT("variant"), VariantObj)) {
+      (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
+      (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
+
+      const TSharedPtr<FJsonValue> PayloadValue = (*VariantObj)->TryGetField(TEXT("value"));
+      if (PayloadValue.IsValid()) {
+        switch (Flag.ValueType) {
+        case EGatrixValueType::String:
+          if (PayloadValue->Type == EJson::String) {
+            PayloadValue->TryGetString(Flag.Variant.Value);
+          } else if (PayloadValue->Type == EJson::Number) {
+            double N = 0;
+            PayloadValue->TryGetNumber(N);
+            Flag.Variant.Value = FMath::IsNearlyEqual(N, FMath::RoundToDouble(N))
+                                     ? FString::Printf(TEXT("%lld"), static_cast<int64>(N))
+                                     : FString::SanitizeFloat(N);
+          } else if (PayloadValue->Type == EJson::Boolean) {
+            bool B = false;
+            PayloadValue->TryGetBool(B);
+            Flag.Variant.Value = B ? TEXT("true") : TEXT("false");
+          } else {
+            Flag.Variant.Value = PayloadValue->AsString();
+          }
+          break;
+        case EGatrixValueType::Number: {
+          double N = 0;
+          if (PayloadValue->Type == EJson::Number)
+            PayloadValue->TryGetNumber(N);
+          else if (PayloadValue->Type == EJson::String) {
+            FString S;
+            PayloadValue->TryGetString(S);
+            N = FCString::Atod(*S);
+          }
+          Flag.Variant.Value = FString::SanitizeFloat(N);
+          break;
+        }
+        case EGatrixValueType::Boolean: {
+          bool B = false;
+          if (PayloadValue->Type == EJson::Boolean)
+            PayloadValue->TryGetBool(B);
+          else if (PayloadValue->Type == EJson::String) {
+            FString S;
+            PayloadValue->TryGetString(S);
+            B = S.Equals(TEXT("true"), ESearchCase::IgnoreCase);
+          }
+          Flag.Variant.Value = B ? TEXT("true") : TEXT("false");
+          break;
+        }
+        case EGatrixValueType::Json: {
+          FString JsonStr;
+          TSharedRef<TJsonWriter<>> W = TJsonWriterFactory<>::Create(&JsonStr);
+          if (FJsonSerializer::Serialize(PayloadValue.ToSharedRef(), TEXT(""), W)) {
+            W->Close();
+            Flag.Variant.Value = JsonStr;
+          } else {
+            Flag.Variant.Value = PayloadValue->AsString();
+          }
+          break;
+        }
+        default:
+          break;
+        }
+      }
+    }
+    PartialFlags.Add(MoveTemp(Flag));
+  }
+
+  UE_LOG(LogGatrix, Log, TEXT("MergePartialResponse: parsed %d flags"), PartialFlags.Num());
+  for (const auto& F : PartialFlags) {
+    UE_LOG(LogGatrix, Log, TEXT("  -> flag='%s' enabled=%d variantValue='%s'"), *F.Name,
+           (int)F.bEnabled, *F.Variant.Value);
+  }
+
+  // Merge into existing cache (update/add returned; remove requested-but-absent)
+  TMap<FString, FGatrixEvaluatedFlag> OldFlags;
+  {
+    FScopeLock Lock(&FlagsCriticalSection);
+    OldFlags = RealtimeFlags;
+
+    for (const auto& Flag : PartialFlags) {
+      RealtimeFlags.Add(Flag.Name, Flag);
+    }
+
+    TSet<FString> ReturnedNames;
+    for (const auto& Flag : PartialFlags)
+      ReturnedNames.Add(Flag.Name);
+    for (const FString& Key : RequestedKeys) {
+      if (!ReturnedNames.Contains(Key))
+        RealtimeFlags.Remove(Key);
+    }
+
+    if (!ClientConfig.Features.bExplicitSyncMode) {
+      SynchronizedFlags = RealtimeFlags;
+    }
+  }
+
+  // Emit watch callbacks for changed flags using RealtimeFlags directly
+  TMap<FString, FGatrixEvaluatedFlag> NewRealtime = RealtimeFlags;
+
+  EmitFlagChanges(OldFlags, NewRealtime);
+  InvokeWatchCallbacks(WatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/true);
+
+  if (!ClientConfig.Features.bExplicitSyncMode) {
+    InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/false);
+    if (EventEmitter)
+      EventEmitter->Emit(GatrixEvents::FlagsChange);
+    OnChange.Broadcast();
+  }
 }
 
 void UGatrixFeaturesClient::ScheduleStreamingReconnect() {
@@ -2299,6 +2507,22 @@ void UGatrixFeaturesClient::SetStreamingState(EGatrixStreamingConnectionState Ne
                                           TEXT("Degraded")};
       UE_LOG(LogGatrix, Log, TEXT("[DEV] Streaming state: %s"),
              StateNames[static_cast<int32>(NewState)]);
+    }
+
+    // Manage polling based on streaming state:
+    // - Connected: streaming delivers real-time updates, stop polling to avoid race conditions
+    // - Disconnected/Degraded: fall back to polling as the only update mechanism
+    if (NewState == EGatrixStreamingConnectionState::Connected) {
+      bPollingStopped = true;
+      StopPolling();
+      UE_LOG(LogGatrix, Log, TEXT("Polling stopped: streaming connected"));
+    } else if (NewState == EGatrixStreamingConnectionState::Disconnected ||
+               NewState == EGatrixStreamingConnectionState::Degraded) {
+      bPollingStopped = false;
+      ScheduleNextPoll();
+      UE_LOG(LogGatrix, Log, TEXT("Polling resumed: streaming %s"),
+             NewState == EGatrixStreamingConnectionState::Degraded ? TEXT("degraded")
+                                                                   : TEXT("disconnected"));
     }
   }
 }

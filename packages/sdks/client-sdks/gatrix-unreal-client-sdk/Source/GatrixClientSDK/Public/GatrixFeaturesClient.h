@@ -80,11 +80,11 @@ public:
 
   /** Get all evaluated flags */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  TArray<FGatrixEvaluatedFlag> GetAllFlags() const;
+  TArray<FGatrixEvaluatedFlag> GetAllFlags(bool bForceRealtime = false) const;
 
   /** Check if a flag is registered in the cache */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  bool HasFlag(const FString& FlagName) const;
+  bool HasFlag(const FString& FlagName, bool bForceRealtime = false) const;
 
   // ==================== Flag Access - Typed Variations ====================
 
@@ -392,7 +392,7 @@ private:
   void HandleFetchResponse(const FString& ResponseBody, int32 HttpStatus,
                            const FString& EtagHeader);
   void StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFlags, bool bIsInitialFetch);
-  TMap<FString, FGatrixEvaluatedFlag> SelectFlags(bool bForceRealtime = false) const;
+  TMap<FString, FGatrixEvaluatedFlag> SelectFlags(bool bForceRealtime) const;
   void SetReady();
   void EmitFlagChanges(const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
                        const TMap<FString, FGatrixEvaluatedFlag>& NewFlags);
@@ -424,6 +424,7 @@ private:
   void HandleStreamingInvalidation(const TArray<FString>& ChangedKeys);
   void ScheduleStreamingReconnect();
   void FetchPartialFlags(const TArray<FString>& FlagKeys);
+  void MergePartialResponse(const FString& ResponseBody, const TSet<FString>& RequestedKeys);
   void SetStreamingState(EGatrixStreamingConnectionState NewState);
   FString BuildStreamingUrl() const;
 
@@ -505,7 +506,7 @@ private:
   // Watch callback storage
   TArray<FWatchCallbackEntry> WatchCallbacks;
   TArray<FWatchCallbackEntry> SyncedWatchCallbacks;
-  int32 NextWatchHandle = 1;
+  int32 NextWatchHandle = 100000; // Start high to avoid collision with EventEmitter handles
 
   // Streaming state
   TUniquePtr<FGatrixSseConnection> SseConnection;
