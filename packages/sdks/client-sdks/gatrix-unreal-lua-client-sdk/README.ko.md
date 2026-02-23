@@ -178,8 +178,8 @@ gatrix.Init({
     AppName         = "my-game",
     Environment     = "production",
     EnableDevMode    = false,  -- 상세 디버그 로깅
-    OfflineMode      = false,  -- 네트워크 요청 없이 시작
     Features        = {        -- 피처 플래그 설정
+        OfflineMode      = false,  -- 네트워크 요청 없이 시작
         RefreshInterval  = 30,     -- 폴링 간격 (초, 기본값: 30)
         DisableRefresh   = false,  -- 자동 폴링 비활성화
         ExplicitSyncMode = true,   -- 명시적 동기화 모드 (기본값: true)
@@ -512,7 +512,7 @@ Group
 | 폴링 간격이 너무 김 | `RefreshInterval` 감소 (기본값: 30초) |
 | `ExplicitSyncMode` 활성화됨 | `SyncFlags()` 호출 |
 | `WatchSyncedFlag` 사용 중 | `WatchRealtimeFlag`로 변경 |
-| `OfflineMode` 활성화됨 | `OfflineMode = false` 설정 |
+| `OfflineMode` 활성화됨 | `Features.OfflineMode = false` 설정 |
 
 ### 2. `WatchSyncedFlag` 콜백이 실행되지 않음
 

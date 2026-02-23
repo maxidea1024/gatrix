@@ -303,7 +303,7 @@ Config.Features.RefreshInterval = 30.0f; // seconds
 ### Mode 3: Offline
 
 ```cpp
-Config.bOfflineMode = true;
+Config.Features.bOfflineMode = true;
 // Use with bootstrap data for fully offline operation
 ```
 

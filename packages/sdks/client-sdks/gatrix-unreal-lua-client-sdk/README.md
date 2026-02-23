@@ -281,13 +281,13 @@ gatrix.Start({
     AppName         = "my-game",             -- string   Application name
     Environment     = "production",          -- string   Environment name
     EnableDevMode   = false,                 -- boolean? Enable detailed debug logging
-    OfflineMode     = false,                 -- boolean? Start without network requests
     Features        = {                      -- table?   Feature flag configurations
         RefreshInterval  = 30,               -- number?  Seconds between polls (default: 30)
         DisableRefresh   = false,            -- boolean? Disable automatic polling
         ExplicitSyncMode = true,             -- boolean? Enable explicit sync mode (default: true)
         DisableMetrics   = false,            -- boolean? Disable server-side metrics
         ImpressionDataAll = false,           -- boolean? Track impressions for all flags
+        OfflineMode      = false,            -- boolean? Start without network requests
     }
 })
 
@@ -859,7 +859,7 @@ Group
 | Polling interval too long | Reduce `RefreshInterval` (default: 30s) |
 | `ExplicitSyncMode` is on | Flag is updated but buffered — call `SyncFlags()` to apply |
 | Using `WatchSyncedFlag` | Synced watchers don't fire until `SyncFlags()` — use `WatchRealtimeFlag` instead |
-| `OfflineMode` is enabled | Set `OfflineMode = false` for live connections |
+| `OfflineMode` is enabled | Set `Features = { OfflineMode = false }` for live connections |
 | Wrong `AppName` or `Environment` | Double-check config matches dashboard settings |
 
 ---

@@ -302,7 +302,7 @@ Config.Features.RefreshInterval = 30.0f; // 30초 주기로 다시 받음
 ### 모드 3: 완전 오프라인
 
 ```cpp
-Config.bOfflineMode = true;
+Config.Features.bOfflineMode = true;
 // 서버와 통신하지 않고 순수 폴백값으로 구동됩니다.
 ```
 
