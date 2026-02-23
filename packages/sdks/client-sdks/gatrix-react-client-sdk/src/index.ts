@@ -45,6 +45,7 @@ export { useGatrixClient } from './useGatrixClient';
 export { useFlagsStatus, type FlagsStatus } from './useFlagsStatus';
 export { useUpdateContext, type UpdateContextFunction } from './useUpdateContext';
 export { useGatrixContext } from './useGatrixContext';
+export { useTrack } from './useTrack';
 
 // Flag Access Hooks
 export { useFlag } from './useFlag';

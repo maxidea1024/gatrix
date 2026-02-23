@@ -268,20 +268,10 @@ namespace Gatrix.Unity.SDK
         /// <returns>The payload as string, or <paramref name="fallbackValue"/>.</returns>
         string StringVariation(string flagName, string fallbackValue, bool forceRealtime = false);
 
-        /// <summary>
-        /// Get a numeric variation from the variant's payload as <c>double</c>.
-        /// <para>
-        /// Parses the payload as a number. Supports int, long, float, double, and
-        /// string representations. If parsing fails, returns <paramref name="missingValue"/>.
-        /// </para>
-        /// </summary>
-        /// <param name="flagName">The feature flag key.</param>
-        /// <param name="fallbackValue">Default value if flag not found or not a valid number.</param>
-        /// <returns>The payload as double, or <paramref name="fallbackValue"/>.</returns>
-        double NumberVariation(string flagName, double fallbackValue, bool forceRealtime = false);
+
 
         /// <summary>
-        /// Get an integer variation (convenience wrapper around <see cref="NumberVariation"/>).
+        /// Get an integer variation.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
         /// <param name="fallbackValue">Default value if flag not found.</param>
@@ -289,7 +279,7 @@ namespace Gatrix.Unity.SDK
         int IntVariation(string flagName, int fallbackValue, bool forceRealtime = false);
 
         /// <summary>
-        /// Get a float variation (convenience wrapper around <see cref="NumberVariation"/>).
+        /// Get a float variation.
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
         /// <param name="fallbackValue">Default value if flag not found.</param>
@@ -335,13 +325,7 @@ namespace Gatrix.Unity.SDK
         /// <exception cref="GatrixFeatureException">Thrown if the flag does not exist.</exception>
         string StringVariationOrThrow(string flagName, bool forceRealtime = false);
 
-        /// <summary>
-        /// Get a numeric variation, throwing if the flag is not found.
-        /// </summary>
-        /// <param name="flagName">The feature flag key.</param>
-        /// <returns>The payload as double.</returns>
-        /// <exception cref="GatrixFeatureException">Thrown if the flag does not exist or payload is not numeric.</exception>
-        double NumberVariationOrThrow(string flagName, bool forceRealtime = false);
+
 
         /// <summary>
         /// Get a JSON variation, throwing if the flag is not found.
@@ -374,13 +358,7 @@ namespace Gatrix.Unity.SDK
         /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
         VariationResult<string> StringVariationDetails(string flagName, string fallbackValue, bool forceRealtime = false);
 
-        /// <summary>
-        /// Get a numeric variation with detailed evaluation metadata.
-        /// </summary>
-        /// <param name="flagName">The feature flag key.</param>
-        /// <param name="fallbackValue">Default value if flag not found.</param>
-        /// <returns>A <see cref="VariationResult{T}"/> with value and metadata.</returns>
-        VariationResult<double> NumberVariationDetails(string flagName, double fallbackValue, bool forceRealtime = false);
+
 
         /// <summary>
         /// Get a JSON variation with detailed evaluation metadata.

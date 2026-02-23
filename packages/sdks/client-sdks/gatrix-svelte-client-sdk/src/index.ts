@@ -7,6 +7,7 @@ export {
 } from './context';
 export { initGatrix, type GatrixInitOptions } from './provider';
 export { getGatrixClient } from './stores/getGatrixClient';
+export { getTrack } from './stores/getTrack';
 export { flag, flagState, type FlagState } from './stores/flag';
 export { allFlags } from './stores/flags';
 export {

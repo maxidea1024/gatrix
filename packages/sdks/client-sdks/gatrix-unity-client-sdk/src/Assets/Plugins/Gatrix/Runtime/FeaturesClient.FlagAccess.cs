@@ -398,8 +398,7 @@ namespace Gatrix.Unity.SDK
         public double DoubleVariation(string flagName, double fallbackValue, bool forceRealtime = false)
             => DoubleVariationInternal(flagName, fallbackValue, forceRealtime);
 
-        public double NumberVariation(string flagName, double fallbackValue, bool forceRealtime = false)
-            => DoubleVariationInternal(flagName, fallbackValue, forceRealtime);
+
 
         public Dictionary<string, object> JsonVariation(
             string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false)
@@ -412,8 +411,7 @@ namespace Gatrix.Unity.SDK
         public string StringVariationOrThrow(string flagName, bool forceRealtime = false)
             => StringVariationOrThrowInternal(flagName, forceRealtime);
 
-        public double NumberVariationOrThrow(string flagName, bool forceRealtime = false)
-            => DoubleVariationOrThrowInternal(flagName, forceRealtime);
+
 
         public Dictionary<string, object> JsonVariationOrThrow(string flagName, bool forceRealtime = false)
             => JsonVariationOrThrowInternal(flagName, forceRealtime);
@@ -425,8 +423,7 @@ namespace Gatrix.Unity.SDK
         public VariationResult<string> StringVariationDetails(string flagName, string fallbackValue, bool forceRealtime = false)
             => StringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<double> NumberVariationDetails(string flagName, double fallbackValue, bool forceRealtime = false)
-            => DoubleVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
+
 
         public VariationResult<Dictionary<string, object>> JsonVariationDetails(
             string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false)

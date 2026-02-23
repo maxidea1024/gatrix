@@ -10,3 +10,4 @@ export * from './composables/useJsonVariation';
 export * from './composables/useFlagsStatus';
 export * from './composables/useFlags';
 export * from './composables/useActions';
+export * from './composables/useTrack';

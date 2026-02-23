@@ -86,6 +86,18 @@ void FGatrixLuaBindings::Register(lua_State* L) {
     return;
   }
 
+  // Create state cleaner userdata with __gc to automatically Unregister on lua_close
+  lua_newuserdata(L, 1);
+  if (luaL_newmetatable(L, "GatrixStateCleaner")) {
+    lua_pushcfunction(L, [](lua_State* GC_L) -> int {
+      FGatrixLuaBindings::Unregister(GC_L);
+      return 0;
+    });
+    lua_setfield(L, -2, "__gc");
+  }
+  lua_setmetatable(L, -2);
+  lua_setfield(L, LUA_REGISTRYINDEX, "GatrixStateCleaner");
+
   // Create session with alive flag
   FLuaSession& Session = SessionRegistry.FindOrAdd(L);
   Session.bAlive = MakeShared<bool>(true);
@@ -385,7 +397,9 @@ void FGatrixLuaBindings::RemoveAllCallbacks(lua_State* L) {
   for (const FCallbackEntry& Entry : Session->Callbacks) {
     if (Client) {
       if (Entry.bIsWatch) {
-        Client->GetFeatures()->UnwatchFlag(Entry.Handle);
+        if (UGatrixFeaturesClient* Features = Client->GetFeatures()) {
+          Features->UnwatchFlag(Entry.Handle);
+        }
       } else if (Entry.bIsAny) {
         Client->OffAny(Entry.Handle);
       } else {
