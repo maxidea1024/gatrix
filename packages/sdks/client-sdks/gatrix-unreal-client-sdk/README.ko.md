@@ -2,7 +2,7 @@
 
 > **피처 플래그, A/B 테스트, 원격 구성을 위한 Unreal Engine 공식 Gatrix SDK입니다.**
 
-Gatrix Unreal SDK를 사용하면 새 빌드를 배포하지 않고도 게임의 동작을 실시간으로 바꿀 수 있습니다. 기능 전환, A/B 실험, 게임 파라미터 튜닝, 점진적 롤아웃 — 모든 것을 Gatrix 대시보드에서 실행할 수 있습니다.
+새 빌드를 배포하지 않고도 게임의 동작을 실시간으로 바꿀 수 있습니다. 피처 토글, A/B 실험, 게임 파라미터 튜닝, 점진적 롤아웃 — 모든 것을 Gatrix 대시보드에서 실행할 수 있습니다.
 
 ## 🚩 피처 플래그란?
 
@@ -11,26 +11,13 @@ Gatrix Unreal SDK를 사용하면 새 빌드를 배포하지 않고도 게임의
 | 요소 | 타입 | 설명 |
 |---|---|---|
 | **상태** (`enabled`) | `bool` | 기능이 켜져 있는가, 꺼져 있는가 — `IsEnabled()`로 확인 |
-| **값** (`variant`) | `boolean` `string` `number` `json` | 세부적인 구성 값 — `BoolVariation()`, `StringVariation()`, `FloatVariation()`으로 읽음 |
+| **값** (`variant`) | `boolean` `string` `number` `json` | 세부적인 구성 값 — `BoolVariation()`, `StringVariation()`, `FloatVariation()` 등으로 확인 |
 
-플래그는 **켜져 있으면서도** 특정 값을 가질 수 있습니다 (예: `difficulty = "hard"`). 상태와 값은 독립적이므로 두 가지 모두 처리해야 합니다.
+플래그는 **활성화 상태임과 동시에 특정 값을 가질 수 있습니다** (예: `difficulty = "hard"`). 상태와 값은 독립적이므로 두 가지 모두 처리해야 합니다.
 
----
+### 💡 퀵 스타트 예시
 
-## 💡 Quick Examples
-
-### 1. 피처 전환 (`IsEnabled`)
-코드 배포 없이 기능을 즉시 켜거나 끌 수 있습니다.
-
-```mermaid
-flowchart LR
-    DASHBOARD["🎛️ 대시보드\nToggle: ON"]:::dash ==> GAME["🎮 게임 클라이언트\nif (IsEnabled)"]:::game
-    GAME --> FEATURE("✨ 신규 상점 UI 표시"):::feature
-
-    classDef dash fill:#2d3436,stroke:#00b894,stroke-width:2px,color:white;
-    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
-    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
-```
+#### 1. 기능 전환 (`IsEnabled`)
 
 ```cpp
 UGatrixClient* Client = UGatrixClient::Get();
@@ -42,67 +29,31 @@ if (Client->GetFeatures()->IsEnabled(TEXT("new-shop")))
 }
 else
 {
-    // 기능이 OFF 상태 (또는 플래그 없음) -> 기존 상점으로 폴백
+    // 기능이 OFF 상태 (또는 플래그 없음) -> 기존 상점 사용
     ShowLegacyShop();
 }
 ```
 
-### 2. 원격 구성 (`Variation`)
-게임 밸런스, 텍스트 등을 원격에서 조정합니다.
-
-```mermaid
-flowchart LR
-    DASHBOARD["🎛️ 대시보드\ngame-speed: 2.0\nwelcome-msg: '안녕!'"]:::dash ==> GAME["🎮 게임 클라이언트\nFloatVariation / StringVariation"]:::game
-    GAME --> VALUE1("🏃 속도 = 2.0"):::feature
-    GAME --> VALUE2("👋 메시지 = '안녕!'"):::feature
-
-    classDef dash fill:#2d3436,stroke:#00b894,stroke-width:2px,color:white;
-    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
-    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
-```
+#### 2. 원격 구성 (`Variation`)
 
 ```cpp
-// float 값 가져오기 (서버에 없으면 기본값 1.0f 사용)
-float Speed = Client->GetFeatures()->FloatVariation(TEXT("game-speed"), 1.0f);
+// float 값 가져오기 (매칭이 없으면 1.0 반환)
+float speed = Client->GetFeatures()->FloatVariation(TEXT("game-speed"), 1.0f);
 
 // string 값 가져오기
-FString Message = Client->GetFeatures()->StringVariation(TEXT("welcome-msg"), TEXT("환영합니다"));
+FString theme = Client->GetFeatures()->StringVariation(TEXT("app-theme"), TEXT("dark"));
+
+// int 값 가져오기
+int32 maxLevel = Client->GetFeatures()->IntVariation(TEXT("max-level"), 50);
 ```
 
-### 3. 조건부 타겟팅
-특정 사용자 그룹(레벨, 국가, 앱 버전 등)에게 다른 값을 제공합니다.
-
-```mermaid
-flowchart LR
-    RULE["🎛️ 규칙:\nIF 레벨 >= 10\nTHEN 'difficulty' = 'Hard'"]:::dash ==> GAME["🎮 게임 클라이언트\nContext: { Level: 15 }"]:::game
-    GAME --> RESULT("🔥 난이도: Hard"):::feature
-
-    classDef dash fill:#2d3436,stroke:#d63031,stroke-width:2px,color:white;
-    classDef game fill:#2d3436,stroke:#0984e3,stroke-width:2px,color:white;
-    classDef feature fill:#2d3436,stroke:#fdcb6e,stroke-width:2px,color:white,stroke-dasharray: 5 5;
-```
+#### 3. 조건부 타겟팅
 
 ```cpp
-// 대시보드의 규칙이 사용자 컨텍스트(예: Level 15)를 기반으로 값을 결정합니다.
-// 클라이언트는 단순히 값을 읽기만 하면 됩니다. 분기 로직은 서버에 있습니다!
-FString Difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), TEXT("Normal"));
+// 클라이언트는 값을 읽기만 합니다!
+// 스크립트 분기 처리(Region별/Level별)는 서버의 원격 타겟팅 규칙이 대신 해줍니다.
+FString difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), TEXT("Normal"));
 ```
-
----
-
-## ✨ 주요 기능
-
-- **피처 플래그** — 실시간 플래그 평가 (폴링 + 스트리밍)
-- **스트리밍** — SSE / WebSocket 실시간 플래그 갱신 + 자동 재연결
-- **Variations** — Bool, String, Float, Int, Double, JSON 배리언트
-- **컨텍스트** — 커스텀 속성을 포함한 동적 평가 컨텍스트
-- **ETag 캐싱** — 조건부 요청으로 대역폭 최소화
-- **명시적 동기화** — 플래그 변경 적용 시점 제어
-- **Watch 패턴** — 플래그별 변경 구독
-- **메트릭** — 자동 사용 통계 보고
-- **임프레션** — 플래그 접근 이벤트 추적
-- **블루프린트 지원** — UCLASS/USTRUCT/UFUNCTION 기반 완전 통합
-- **스레드 안전** — Lock-free 카운터, atomic boolean, FCriticalSection
 
 ---
 
@@ -110,31 +61,42 @@ FString Difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), 
 
 | Gatrix 없이 | Gatrix와 함께 |
 |---|---|
-| 뭔가 바꾸면 새 빌드 배포 | 대시보드에서 실시간 변경 |
+| 값을 하나 바꾸려면 새 빌드가 필요 | 대시보드에서 실시간 변경 |
 | 모든 플레이어가 같은 경험 | A/B 테스트로 다양한 경험 제공 |
-| 하드코딩된 피처 플래그 | 실시간 원격 구성 |
-| 실험의 빅뱅 릴리즈 | 즉시 롤백 가능한 점진적 배포 |
+| 하드코딩된 피처 플래그 관리의 어려움 | 실시간 원격 구성 관리 |
+| 버그 발생 시 핫픽스 빌드로 롤백 | 버그 기능만 원격에서 즉시 끄기 |
 
-### 🔑 전형적인 사용 시나리오
+### 🔑 주요 사용 시나리오
 
-#### 📱 모바일/콘솔 심사 대응
-새 기능의 코드가 **이미 포함되어 있지만 비활성화된 상태**로 빌드를 제출하고, 심사가 통과되면 대시보드에서 즉시 활성화할 수 있습니다.
+- **📱 모바일 앱 스토어 심사** — 새 기능을 비활성화한 채로 제출하고, 앱스토어 승인 직후 라이브로 즉시 활성화하세요. 추가 심사가 필요 없습니다.
+- **⚖️ 규제 및 법규 준수** — GDPR 등 특정 국가의 법률 변경에 맞춰 특정 지역에서만 기능을 즉시 비활성화할 수 있습니다.
+- **🚨 긴급 킬 스위치** — 프로덕션 크래시를 유발하는 기능을 핫픽스 빌드 없이 단 몇 초 만에 차단합니다.
+- **🔬 A/B 테스트** — 무기 대미지, 재화 드랍률 등을 그룹별로 나눠 적용하고 사용자 경험에 미치는 영향을 측정합니다.
+- **📅 기능 출시 동기화** — 코드는 미리 배포해두고, 마케팅/비즈니스 팀이 원하는 시점에 정확히 기능을 오픈할 수 있습니다.
 
-#### ⚖️ 규제 및 법규 준수 (GDPR 등)
-새 업데이트 없이 **특정 지역에서 기능을 비활성화**하고, 규제 명령에 **수분 이내에 대응**할 수 있습니다.
+---
 
-#### 🚨 긴급 위기 대응
-프로덕션에서 문제가 발생했을 때 — 버그를 유발하는 기능, 스크립트, 예상하지 못한 서버 부하 — **수초 이내에 비활성화**할 수 있습니다, 핫픽스 빌드 없이.
+## 📐 평가 모델: 원격 평가 방식
 
-#### 🔬 A/B 테스트
-피처 플래그를 이용하여 그룹별로 다른 경험을 제공하고 결과를 측정하세요. 아이템 가격 튜닝, 수익성 실험, 점진적 롤아웃 등.
+1. SDK가 **컨텍스트**(userId, environment, properties)를 서버로 전송합니다.
+2. 서버가 모든 규칙을 평가하고 **최종 플래그 값만** 반환합니다.
+3. 규칙은 클라이언트로 노출되지 않습니다.
+
+| | 원격 평가 (Gatrix) | 로컬 평가 |
+|---|---|---|
+| **보안** | ✅ 규칙이 서버 밖으로 나가지 않음 | ⚠️ 클라이언트에 규칙 노출 (데이터마이닝 위험) |
+| **일관성** | ✅ 모든 SDK에서 정확히 동일 | ⚠️ 각 플랫폼 SDK마다 규칙 엔진 중복 구현 |
+| **페이로드** | ✅ 소규모 (최종 평가 결과 맵핑) | ⚠️ 대규모 (전체 규칙 세트) |
+| **오프라인** | ⚠️ 최소 1회 연결 혹은 Bootstrap 필요 | ✅ 처음부터 오프라인 동작 가능 |
+
+> 🛡️ SDK는 마지막으로 수신한 값을 로컬에 캐시합니다. 네트워크 단절로 인해 게임이 중단되는 일은 발생하지 않으며, 이 경우 오프라인 fallback 값이 안전하게 사용됩니다.
 
 ---
 
 ## 📦 설치
 
 1. `GatrixClientSDK` 폴더를 프로젝트의 `Plugins/` 디렉토리에 복사합니다.
-2. 프로젝트 파일을 재생성합니다.
+2. 언리얼 엔진 프로젝트 파일을 재생성합니다.
 3. 게임 모듈의 `.Build.cs`에 추가합니다.
 
 ```csharp
@@ -143,72 +105,47 @@ PublicDependencyModuleNames.AddRange(new string[] { "GatrixClientSDK" });
 
 ---
 
-## 🚀 빠른 시작 (C++)
+## 🚀 빠른 시작
+
+### 옵션 A: C++ 설정
 
 ```cpp
 #include "GatrixClient.h"
 #include "GatrixEvents.h"
 
-// 설정
+// 초기 설정
 FGatrixClientConfig Config;
 Config.ApiUrl = TEXT("https://your-api.example.com/api/v1");
 Config.ApiToken = TEXT("your-client-api-token");
 Config.AppName = TEXT("MyGame");
 Config.Environment = TEXT("production");
 
-// 컨텍스트 설정 (선택)
+// 컨텍스트(사용자 정보) 설정 (선택 사항)
 Config.Features.Context.UserId = TEXT("player-123");
 Config.Features.Context.SessionId = TEXT("session-abc");
-Config.Features.Context.Properties.Add(TEXT("level"), TEXT("5"));
 
-// 시작
+// SDK 시작
 UGatrixClient* Client = UGatrixClient::Get();
 Client->Start(Config);
 
-// Ready 이벤트 구독
+// 이벤트 구독
 Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
 {
     UE_LOG(LogTemp, Log, TEXT("Gatrix SDK 준비 완료!"));
 });
 
-// 플래그 변경 감지
 Client->On(GatrixEvents::FlagsChange, [Client](const TArray<FString>& Args)
 {
     float GameSpeed = Client->GetFeatures()->FloatVariation(TEXT("game-speed"), 1.0f);
-    int32 Difficulty = Client->GetFeatures()->IntVariation(TEXT("difficulty"), 1);
 });
-
-// 직접 플래그 접근
-bool bFeatureOn = Client->GetFeatures()->IsEnabled(TEXT("new-feature"));
-bool bBool = Client->GetFeatures()->BoolVariation(TEXT("my-flag"), false);
-FString Str = Client->GetFeatures()->StringVariation(TEXT("theme"), TEXT("default"));
-float Num = Client->GetFeatures()->FloatVariation(TEXT("speed"), 1.0f);
-int32 Level = Client->GetFeatures()->IntVariation(TEXT("level"), 1);
-
-// 종료
-Client->Stop();
 ```
 
----
+### 옵션 B: 블루프린트 설정
 
-## 🎨 빠른 시작 (블루프린트)
-
-1. **"Get Gatrix Client"** 노드로 싱글톤을 가져옵니다.
-2. **Init** 노드에 `GatrixClientConfig` 구조체를 전달합니다.
-3. **Start** 노드로 페칭을 시작합니다.
-4. **Bool Variation**, **String Variation** 등으로 플래그 값을 읽습니다.
-5. **OnReady**, **OnChange**, **OnError** 이벤트에 바인딩합니다.
-
-### 블루프린트 이벤트
-
-| 이벤트 | 설명 |
-|-------|------|
-| `OnReady` | 첫 번째 성공적 페치 완료 |
-| `OnChange` | 서버에서 플래그 변경됨 |
-| `OnSync` | 플래그 동기화됨 (명시적 동기화 모드) |
-| `OnRecovered` | SDK가 에러 상태에서 복구됨 |
-| `OnError` | SDK 에러 발생 |
-| `OnImpression` | 플래그 임프레션 기록 |
+1. **"Get Gatrix Client"** 노드로 싱글톤 인스턴스를 가져옵니다.
+2. **Init** 또는 **Start** 노드로 `GatrixClientConfig` 구조체를 전달하여 시작합니다.
+3. 이벤트 그래프에서 **OnReady**, **OnChange**, **OnError** 등의 이벤트에 바인딩합니다.
+4. 이후 런타임에 **Bool Variation**, **String Variation** 등을 활용합니다.
 
 ---
 
@@ -220,23 +157,19 @@ auto* Features = Client->GetFeatures();
 // Boolean 체크
 bool bNewUI = Features->IsEnabled(TEXT("new-ui"));
 
-// 타입별 안전한 기본값 (예외 발생 없음)
+// 타입별 안전한 배리언트 읽기 (예외 발생 없음. 항상 폴백 제공)
 bool bShowBanner = Features->BoolVariation(TEXT("show-banner"), false);
 FString Theme = Features->StringVariation(TEXT("app-theme"), TEXT("dark"));
 int32 MaxRetries = Features->IntVariation(TEXT("max-retries"), 3);
 float GameSpeed = Features->FloatVariation(TEXT("game-speed"), 1.0f);
-double DropRate = Client->DoubleVariation(TEXT("item-drop-rate"), 0.05);
+double DropRate = Client->GetFeatures()->DoubleVariation(TEXT("item-drop-rate"), 0.05);
 
-// 전체 배리언트 정보 (이름 + 값)
-FGatrixVariant Variant = Features->GetVariant(TEXT("experiment-a"));
-UE_LOG(LogTemp, Log, TEXT("Variant: %s, Value: %s"), *Variant.Name, *Variant.Value);
-
-// 플래그 프록시 (세부 정보)
+// 상세 프록시 확인
 UGatrixFlagProxy* Proxy = Features->GetFlag(TEXT("feature-x"));
 if (Proxy)
 {
-    UE_LOG(LogTemp, Log, TEXT("Enabled: %s, Reason: %s"),
-        Proxy->IsEnabled() ? TEXT("true") : TEXT("false"),
+    UE_LOG(LogTemp, Log, TEXT("Enabled: %s, Reason: %s"), 
+        Proxy->IsEnabled() ? TEXT("true") : TEXT("false"), 
         *Proxy->GetReason());
 }
 ```
@@ -245,33 +178,31 @@ if (Proxy)
 
 ## 🔁 변경 감지 (Watch)
 
-Gatrix는 두 가지 Watch 방식을 제공합니다.
+Gatrix는 환경에 맞춘 두 가지 Watch 옵션을 제공합니다.
 
 | 메서드 | 콜백 발생 시점 |
 |---|---|
-| `WatchRealtimeFlag` | 서버 페치 후 즉시 |
-| `WatchSyncedFlag` | `SyncFlags()` 호출 후 (`ExplicitSyncMode = true`일 때) |
+| `WatchRealtimeFlag` | 서버 페치 시 **즉시** 변동사항 적용 (디버그/비게임 UI) |
+| `WatchSyncedFlag` | `SyncFlags()` 호출 후 동기적으로 발생 (게임플레이에 안전) |
 
 ```cpp
 auto* Features = Client->GetFeatures();
 
-// 리얼타임 — 변경 즉시 발생  (서버 UI, 비게임플레이)
+// 리얼타임 감지 — 수신 즉시 변경됨 (디버그 UI 등에 유리)
 FGatrixFlagWatchDelegate RealtimeCallback;
 RealtimeCallback.BindLambda([](UGatrixFlagProxy* Proxy)
 {
-    UE_LOG(LogTemp, Log, TEXT("Flag changed: %s = %s"),
-        *Proxy->GetName(), Proxy->IsEnabled() ? TEXT("ON") : TEXT("OFF"));
+    ApplyDarkMode(Proxy->IsEnabled());
 });
 int32 WatchHandle = Features->WatchRealtimeFlag(TEXT("dark-mode"), RealtimeCallback);
 
-// 초기 상태 포함 (등록 즉시 현재 값으로도 콜백)
-int32 WatchHandle2 = Features->WatchRealtimeFlagWithInitialState(
-    TEXT("difficulty"), RealtimeCallback);
+// 초기 상태 발생 기능 (등록 즉시 1회 실행 후 이후 변동사항만 수신)
+Features->WatchRealtimeFlagWithInitialState(TEXT("game-speed"), SpeedCallback);
 
-// 동기화 — SyncFlags() 호출 후 발생 (게임플레이 안전)
-int32 SyncHandle = Features->WatchSyncedFlag(TEXT("difficulty"), SyncedCallback);
+// 동기식 감지 — SyncFlags() 호출 이후에만 발생되므로 보스전 도중 데이터가 변하지 않음
+Features->WatchSyncedFlagWithInitialState(TEXT("difficulty"), DiffCallback);
 
-// Watch 해제
+// 리스너 해제 (메모리 릭 방지)
 Features->UnwatchFlag(WatchHandle);
 ```
 
@@ -279,28 +210,23 @@ Features->UnwatchFlag(WatchHandle);
 
 ## 🌍 컨텍스트 관리
 
-### 컨텍스트란?
-
-**컨텍스트**는 **현재 사용자와 게임 환경**을 설명하는 속성들의 집합입니다. Gatrix 서버는 컨텍스트를 이용하여 각 플래그에 대해 어떤 배리언트를 반환할지 결정합니다.
+### 컨텍스트란 무엇인가요?
+**컨텍스트(Context)**는 현재 사용자의 속성과 실행 환경을 의미합니다. Gatrix 서버는 전달된 컨텍스트 정보를 읽어 각 플래그의 배리언트를 평가합니다.
 
 ### 컨텍스트 필드
 
 | 필드 | 타입 | 설명 |
-|------|------|------|
-| `AppName` | `FString` | 앱 이름 (초기화 시 설정, 변경 불가) |
-| `Environment` | `FString` | 환경 이름 (초기화 시 설정, 변경 불가) |
-| `UserId` | `FString` | 고유 사용자 식별자 — 타겟팅에 가장 중요 |
-| `SessionId` | `FString` | 세션 범위 실험을 위한 세션 식별자 |
-| `Properties` | `TMap<FString, FString>` | 커스텀 키-값 쌍 |
+|---|---|---|
+| `AppName` | `FString` | 앱 이름 (초기화 시 결정, 변경 불가) |
+| `Environment` | `FString` | 환경 이름 (초기화 시 결정, 변경 불가) |
+| `UserId` | `FString` | 고유 식별자 — 타겟팅에서 가장 중요한 ID |
+| `SessionId` | `FString` | 세션 범위 스코핑을 위한 임시 ID |
+| `Properties` | `TMap<FString, FString>` | 자유롭게 전달할 게임 내 변수 (Level 등) |
 
-### 컨텍스트 업데이트
+### 컨텍스트 업데이트 방법
 
 ```cpp
-// 초기 설정 (Init 시)
-Config.Features.Context.UserId = TEXT("player-123");
-Config.Features.Context.Properties.Add(TEXT("level"), TEXT("5"));
-
-// 런타임 업데이트
+// 풀 컨텍스트 업데이트 (호출 즉시 플래그를 자동으로 다시 fetch 시작함)
 FGatrixContext NewContext;
 NewContext.UserId = TEXT("player-456");
 NewContext.Properties.Add(TEXT("level"), TEXT("42"));
@@ -308,218 +234,225 @@ NewContext.Properties.Add(TEXT("country"), TEXT("KR"));
 Client->UpdateContext(NewContext);
 ```
 
-> ⚠️ **모든 컨텍스트 변경은 자동 리페치를 트리거합니다.** 반복 루프 안에서 컨텍스트를 업데이트하지 마세요. 여러 필드를 동시에 변경하려면 `UpdateContext`를 사용하세요.
+> ⚠️ **주의:** 컨텍스트의 모든 업데이트는 네트워크 Re-fetch 통신을 유발합니다. Tick과 같은 빠른 루프에서 호출하지 않도록 주의하시고, 여러 개를 업데이트할 때는 배열/구조체를 통해 한 번에 갱신하세요.
 
 ---
 
 ## ⏱️ 명시적 동기화 모드 (Explicit Sync Mode)
 
-플래그 변경이 게임에 적용되는 시점을 확실히 알아야 한다면 — **타이밍이 중요한 게임을 위한 가장 중요한 기능**입니다.
+게임플레이에서 플래그 변경사항이 유저 화면에 **적용되는 시점을 안전할 때로 강제**합니다. 타이밍에 민감한 실시간/경쟁 게임에 가장 중요한 모드입니다.
 
 ```cpp
-// 설정
+// 설정에서 키기 (기본적으로 켜져있음)
 Config.Features.bExplicitSyncMode = true;
 
-// 동기화 Watch: SyncFlags() 호출 이후에만 콜백 발생
-Features->WatchSyncedFlagWithInitialState(TEXT("difficulty"), SyncCallback);
+// Synced watcher는 플래그를 변경 대기 상태(pending)로만 바꿔둡니다.
+Features->WatchSyncedFlagWithInitialState(TEXT("difficulty"), DiffCallback);
 
-// 안전한 시점에 변경 적용 (로딩 화면, 다운타임)
+// 로딩 화면이나 매치 종료 화면 등 가장 "안전한 전환점"에서 Sync() 호출
 if (Features->HasPendingSyncFlags())
 {
-    Features->SyncFlags(false); // fetchNow = false
+    // 여기서 대기 중이던 Watch 콜백들이 일제히 최신값으로 업데이트됨
+    Features->SyncFlags(false);
 }
 ```
 
-### 권장 동기화 시점
+### 권장되는 동기화 지점
 
-| 동기화 시점 | 예시 |
+| 동기화 지점 | 예시 |
 |---|---|
-| **로딩 화면** | 씬 전환, 레벨 로딩 |
-| **다운타임** | 매치 종료 후, 다음 라운드 시작 전 |
-| **메뉴/대기실** | 설정이나 이벤트 로비 진입 시 |
-| **리스폰** | 플레이어 사망 후, 다음 리스폰 전 |
-| **로비** | 매치 시작 전 캐릭터 선택 화면 |
+| **로딩 화면** | 씬 전환 시나 비동기 레벨 로딩 중 |
+| **타임아웃 / 다운타임** | 매치가 종료된 후, 다음 라운드 진입 전 |
+| **로비 및 UI** | 로비 인벤토리 화면 등으로 나오는 시점 |
+| **리스폰** | 사망 후 대기 상태 |
 
 ---
 
-## 📡 스트리밍 설정
+## 📡 운영 모드 비교
 
-SSE 또는 WebSocket 스트리밍으로 거의 즉각적인 플래그 업데이트를 받습니다.
+### 모드 비교표
+
+| 모드 | 레이턴시 | 트래픽 소모량 | 용도 |
+|---|---|---|---|
+| 스트리밍 + 폴링 | 근실시간 | 적음 | 대부분의 프로덕션 단계 게임 (PC/Mobile/Console) |
+| 폴링 전용 | 약 30초 내외 | 소형 | 오진단 테스트, WebGL 빌드용 |
+| 오프라인 | N/A | 없음 | CI/CD 테스트, 보안 특수환경 |
+
+### 모드 1: 스트리밍 + 폴링 (기본/권장)
 
 ```cpp
-// SSE 스트리밍 (기본)
+// SSE 스트리밍
 Config.Features.Streaming.bEnabled = true;
 Config.Features.Streaming.Transport = EGatrixStreamingTransport::Sse;
-Config.Features.Streaming.Sse.ReconnectBase = 1;  // 초
-Config.Features.Streaming.Sse.ReconnectMax = 30;   // 초
+Config.Features.Streaming.Sse.ReconnectBase = 1;
+Config.Features.Streaming.Sse.ReconnectMax = 30;
 
-// 또는 WebSocket 스트리밍
+// 혹은 WebSocket
 Config.Features.Streaming.Transport = EGatrixStreamingTransport::WebSocket;
-Config.Features.Streaming.WebSocket.PingInterval = 30;   // 초
-Config.Features.Streaming.WebSocket.ReconnectBase = 1;
-Config.Features.Streaming.WebSocket.ReconnectMax = 30;
+Config.Features.Streaming.WebSocket.PingInterval = 30;
+```
 
-// 스트리밍 이벤트 리스닝
-Client->On(GatrixEvents::FlagsStreamingConnected, [](const TArray<FString>& Args)
-{
-    UE_LOG(LogTemp, Log, TEXT("스트리밍 연결됨"));
-});
+### 모드 2: 폴링 전용 모드
 
-Client->On(GatrixEvents::FlagsStreamingError, [](const TArray<FString>& Args)
-{
-    UE_LOG(LogTemp, Warning, TEXT("스트리밍 에러: %s"),
-        Args.Num() > 0 ? *Args[0] : TEXT("unknown"));
-});
+```cpp
+Config.Features.Streaming.bEnabled = false;
+Config.Features.RefreshInterval = 30.0f; // 30초 주기로 다시 받음
+```
+
+### 모드 3: 완전 오프라인
+
+```cpp
+Config.bOfflineMode = true;
+// 서버와 통신하지 않고 순수 폴백값으로 구동됩니다.
 ```
 
 ---
 
-## 🔔 이벤트
+## 🔔 이벤트 시스템
 
 ```cpp
-// 이벤트 구독
 Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
 {
-    UE_LOG(LogTemp, Log, TEXT("SDK 준비 완료"));
+    UE_LOG(LogTemp, Log, TEXT("SDK Initialized and Connected!"));
 });
 
 Client->On(GatrixEvents::FlagsChange, [](const TArray<FString>& Args)
 {
-    UE_LOG(LogTemp, Log, TEXT("플래그 업데이트됨"));
+    UE_LOG(LogTemp, Log, TEXT("플래그 업데이트 발생"));
 });
 
-Client->On(GatrixEvents::SdkError, [](const TArray<FString>& Args)
-{
-    UE_LOG(LogTemp, Error, TEXT("SDK 에러"));
-});
-
-// 한 번만 구독
+// 한 번만 체크 (Once)
 Client->Once(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
 {
     ShowWelcomeScreen();
 });
+```
 
-// 모든 이벤트 구독 (디버깅에 유용)
-Client->OnAny([](const FString& EventName, const TArray<FString>& Args)
+**제공되는 이벤트 상수:**
+
+| 이벤트 이름 | 설명 |
+|---|---|
+| `flags.init` | SDK 초기화됨 |
+| `flags.ready` | 첫 번째 성공적인 Fetch 성공 |
+| `flags.fetch_start` / `fetch_success` / `fetch_error` | 페치 처리 상태별 주기 |
+| `flags.change` | 플래그 변경 발생 |
+| `flags.error` | SDK 에러 발생 시 |
+| `flags.sync` | Explicit 모드에서 동기화가 반영될 때 |
+| `flags.recovered` | 오류 상태에서 복구됨 |
+| `flags.streaming_connected` / `disconnected` / `error` | 스트리밍 소켓 상태 로그 |
+
+---
+
+## 🔒 성능 제어 & 스레드 처리 (Thread Safety)
+
+- 플래그 읽기 작업은 모두 `FCriticalSection` 없이 락-프리(Lock-Free) 원자성을 보장합니다. **가장 빠른 읽기 성능**을 제공합니다.
+- 게임 엔진과의 충돌을 피하기 위해 모든 HTTP는 백그라운드 스레드에서 수행되고, 최종 콜백 수신만 메인(GameThread)에 Dispatch 됩니다.
+- 이벤트 Emission 시스템은 교착 상태(Dead-lock)를 회피하기 위해 콜백들을 락 내부에서 배열로 취합한 후 순수 외부로 벗어나 수행합니다.
+- 통계 카운터 역시 `FThreadSafeCounter`가 사용되어 락 경합 리스크를 제거했습니다.
+
+---
+
+## 🧹 메모리 수집 및 정리
+
+```cpp
+// 게임 인스턴스가 닫힐 시
+UGatrixClient::Get()->Stop();
+```
+
+---
+
+## 📖 API 레퍼런스 가이드
+
+### FeaturesClient (`UGatrixClient::Get()->GetFeatures()`)
+
+| 메서드 | 설명 |
+|---|---|
+| `IsEnabled(flagName)` | `flag.enabled` 검증 |
+| `BoolVariation(flagName, fallback)` | Boolean 배리언트 읽기 |
+| `StringVariation(flagName, fallback)` | String 배리언트 읽기 |
+| `IntVariation(flagName, fallback)` | Integer 배리언트 읽기 |
+| `FloatVariation(flagName, fallback)` | Float 배리언트 읽기 |
+| `GetVariant(flagName)` | 전체 Variant 구조체 가져들이기 |
+| `GetFlag(flagName)` | `UGatrixFlagProxy` 객체로 접근 |
+| `GetAllFlags()` | 모든 평가된 플래그 목록 쿼리 |
+| `HasFlag(flagName)` | 특정 플래그가 캐시 상에 존재하는가 |
+| `WatchRealtimeFlag...` | 실시간 변경 콜백 주입 |
+| `WatchSyncedFlag...` | 동기화 후 안전한 콜백 주입 |
+| `UnwatchFlag(handle)` | 핸들을 입력해 리스너 파기 |
+| `CreateWatchGroup(name)` | 여러 개의 Watch를 동시에 관리 제어 |
+| `SyncFlags(fetchNow)` | 대기 중인 모든 Pending 싱크 한 번에 반영 |
+| `FetchFlags()` | 명시적 서버 Re-Fetch 지시 |
+
+---
+
+## 🍳 자주 쓰는 패턴
+
+### 게임 속도 실시간 조작
+```cpp
+Features->WatchRealtimeFlagWithInitialState(TEXT("game-speed"), 
+    FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
 {
-    UE_LOG(LogTemp, Log, TEXT("[Gatrix] %s"), *EventName);
-});
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), Proxy->GetFloatValue(1.0f));
+}));
 ```
 
-### 이벤트 상수
-
-| 상수 | 값 | 설명 |
-|------|-----|------|
-| `GatrixEvents::FlagsInit` | `flags.init` | SDK 초기화됨 (스토리지/부트스트랩) |
-| `GatrixEvents::FlagsReady` | `flags.ready` | 첫 성공적 페치 완료 |
-| `GatrixEvents::FlagsFetchStart` | `flags.fetch_start` | 페치 시작 |
-| `GatrixEvents::FlagsFetchSuccess` | `flags.fetch_success` | 페치 성공 |
-| `GatrixEvents::FlagsFetchError` | `flags.fetch_error` | 페치 에러 |
-| `GatrixEvents::FlagsFetchEnd` | `flags.fetch_end` | 페치 완료 (성공/에러) |
-| `GatrixEvents::FlagsChange` | `flags.change` | 서버에서 플래그 변경 |
-| `GatrixEvents::SdkError` | `flags.error` | SDK 에러 |
-| `GatrixEvents::FlagsImpression` | `flags.impression` | 플래그 임프레션 |
-| `GatrixEvents::FlagsSync` | `flags.sync` | 플래그 동기화됨 |
-| `GatrixEvents::FlagsRecovered` | `flags.recovered` | 에러 상태에서 복구 |
-| `GatrixEvents::FlagsMetricsSent` | `flags.metrics_sent` | 메트릭 전송 완료 |
-| `GatrixEvents::FlagsMetricsError` | `flags.metrics_error` | 메트릭 전송 에러 |
-| `GatrixEvents::FlagsStreamingConnected` | `flags.streaming_connected` | 스트리밍 연결 |
-| `GatrixEvents::FlagsStreamingDisconnected` | `flags.streaming_disconnected` | 스트리밍 연결 해제 |
-| `GatrixEvents::FlagsStreamingError` | `flags.streaming_error` | 스트리밍 에러 |
-| `GatrixEvents::FlagsStreamingReconnecting` | `flags.streaming_reconnecting` | 스트리밍 재연결 중 |
-| `GatrixEvents::FlagsInvalidated` | `flags.invalidated` | 스트리밍에 의한 플래그 무효화 |
-| `GatrixEvents::FlagsRemoved` | `flags.removed` | 서버에서 플래그 제거됨 |
-
----
-
-## 🏗️ 아키텍처
-
+### 로그인 흐름과 결합된 속성 변경 (Properties)
+```cpp
+void OnLoginComplete(FString UserId, int32 Level)
+{
+    FGatrixContext Ctx;
+    Ctx.UserId = UserId;
+    Ctx.Properties.Add(TEXT("level"), FString::FromInt(Level));
+    
+    UGatrixClient::Get()->GetFeatures()->UpdateContext(Ctx);
+    // UserId와 Properties가 갱신되어, 변경된 규칙의 플래그들을 가져옵니다.
+}
 ```
-UGatrixClient (싱글톤)
-├── FGatrixEventEmitter (스레드 안전: on/once/off/onAny)
-├── IGatrixStorageProvider (플러그인 스토리지)
-└── UGatrixFeaturesClient
-    ├── HTTP Fetching (FHttpModule + ETag)
-    ├── Flag Storage (FCriticalSection 보호)
-    ├── Polling (UWorld TimerManager + 지터)
-    ├── Streaming
-    │   ├── FGatrixSseConnection (SSE via FHttpModule progress)
-    │   ├── FGatrixWebSocketConnection (IWebSocket + ping/pong)
-    │   ├── Gap Recovery (globalRevision 추적)
-    │   └── Auto-Reconnect (지수 백오프 + 지터)
-    ├── Metrics (배치 POST + 재시도)
-    ├── Watch Pattern (플래그별 이벤트)
-    └── Blueprint Delegates
+
+### 다중 플래그 간 의존성 그룹 묶기 (Watch Group)
+```cpp
+UGatrixWatchFlagGroup* Group = Features->CreateWatchGroup(TEXT("shop-system"));
+
+FGatrixFlagWatchDelegate ShopCb;
+ShopCb.BindLambda([](UGatrixFlagProxy* P){ SetShopEnabled(P->IsEnabled()); });
+Group->WatchSyncedFlagWithInitialState(TEXT("new-shop-enabled"), ShopCb);
+
+FGatrixFlagWatchDelegate DiscountCb;
+DiscountCb.BindLambda([](UGatrixFlagProxy* P){ SetDiscount(P->GetFloatValue(0)); });
+Group->WatchSyncedFlagWithInitialState(TEXT("shop-discount"), DiscountCb);
+
+// 모두 반영 준비 완료! -> 로딩 지점과 같은 곳에서 Sync
+Features->SyncFlags(false);
+
+// 사용 완료된 그룹 통째로 파괴
+Group->DestroyGroup();
 ```
 
 ---
 
-## 🔒 스레드 안전성
+## ❓ FAQ 및 트러블슈팅
 
-- 플래그 읽기/쓰기는 `FCriticalSection`으로 보호
-- 통계 카운터는 Lock-free `FThreadSafeCounter` 사용 (락 경합 없음)
-- Boolean 상태 플래그는 `std::atomic<bool>`로 Lock-free 접근
-- HTTP 콜백은 게임 스레드에서 처리 (UE FHttpModule 동작)
-- 스트리밍 콜백은 `AsyncTask`를 통해 게임 스레드로 디스패치
-- 이벤트 발행: 락 아래에서 콜백 집합 후 락 밖에서 호출 (데드락 방지)
-- 스토리지 프로바이더(InMemory)는 자체 `FCriticalSection` 사용
+### 1. 플래그가 변경되었지만 반영되지 않습니다.
+- 혹시 `ExplicitSyncMode` 가 켜져있다면, 변경사항만 다운로드 된 채 `SyncFlags()` 메서드의 호출을 기다립니다. 반영 지점에서 호출해주세요!
+- RefreshInterval(폴링) 주기가 길게 설정되어있다면 스트리밍을 켜거나, 폴링 주기를 줄이세요.
 
----
+### 2. 콜백 메서드가 절대 동작하지 않습니다.
+- `WatchSyncedFlag`를 사용했다면 (질문 1처럼) `Features->SyncFlags(false)` 를 호출해야 발동합니다.
 
-## ⚙️ 설정 레퍼런스
+### 3. 언리얼 에디터에 메모리 릭(Memory Leak)이 출력됩니다.
+- 엑터가 파괴(Destroy)되는 시점에 반드시 `UnwatchFlag`나 그룹 해제(`DestroyGroup()`)를 사용해서 해당 리스너를 파기해주어야 메모리 누수가 발생하지 않습니다.
+```cpp
+void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (UGatrixClient* Client = UGatrixClient::Get())
+        Client->GetFeatures()->UnwatchFlag(WatchHandle);
 
-| 필드 | 타입 | 기본값 | 설명 |
-|------|------|--------|------|
-| `ApiUrl` | FString | - | 베이스 API URL (필수) |
-| `ApiToken` | FString | - | 클라이언트 API 토큰 (필수) |
-| `AppName` | FString | - | 애플리케이션 이름 (필수) |
-| `Environment` | FString | - | 환경 이름 (필수) |
-| `Features.bOfflineMode` | bool | false | 오프라인 모드로 시작 |
-| `bEnableDevMode` | bool | false | 개발 모드 활성화 |
-| `Features.RefreshInterval` | float | 30.0 | 폴링 간격 (초) |
-| `Features.bDisableRefresh` | bool | false | 자동 폴링 비활성화 |
-| `Features.bExplicitSyncMode` | bool | true | 수동 플래그 동기화 |
-| `Features.bDisableMetrics` | bool | false | 메트릭 비활성화 |
-| `Features.bImpressionDataAll` | bool | false | 모든 플래그 임프레션 추적 |
-| `Features.bUsePOSTRequests` | bool | false | 페칭에 POST 요청 사용 |
-| `Features.Streaming.bEnabled` | bool | false | 스트리밍 활성화 |
-| `Features.Streaming.Transport` | enum | Sse | SSE 또는 WebSocket |
-| `Features.Streaming.Sse.Url` | FString | auto | 커스텀 SSE 엔드포인트 |
-| `Features.Streaming.Sse.ReconnectBase` | int32 | 1 | 기본 재연결 딜레이 (초) |
-| `Features.Streaming.Sse.ReconnectMax` | int32 | 30 | 최대 재연결 딜레이 (초) |
-| `Features.Streaming.WebSocket.Url` | FString | auto | 커스텀 WS 엔드포인트 |
-| `Features.Streaming.WebSocket.PingInterval` | int32 | 30 | 핑 간격 (초) |
-| `Features.Streaming.WebSocket.ReconnectBase` | int32 | 1 | 기본 재연결 딜레이 (초) |
-| `Features.Streaming.WebSocket.ReconnectMax` | int32 | 30 | 최대 재연결 딜레이 (초) |
+    Super::EndPlay(EndPlayReason);
+}
+```
 
 ---
 
-## 📐 평가 모델: 원격 평가 방식
+## License
 
-Gatrix는 **원격 평가** 방식만을 사용합니다 — 타겟팅 규칙과 롤아웃 로직은 절대 서버 밖으로 나가지 않습니다.
-
-1. SDK가 **컨텍스트**(userId, env, properties)를 서버로 전송
-2. 서버가 모든 규칙을 평가하고 **최종 플래그 값만** 반환
-3. SDK가 결과를 캐시하고 동기적으로 제공
-
-| | 원격 평가 (Gatrix) | 로컬 평가 |
-|---|---|---|
-| **보안** | ✅ 규칙이 서버 밖으로 나가지 않음 | ⚠️ 클라이언트에 규칙 노출 |
-| **일관성** | ✅ 모든 SDK에서 동일한 결과 | ⚠️ 각 SDK가 규칙을 구현해야 함 |
-| **페이로드** | ✅ 소규모 (최종 값만) | ⚠️ 대규모 (전체 규칙 세트) |
-| **오프라인** | ⚠️ 최소 1회 연결 필요 | ✅ 규칙이 빌드 시점에 번들로 가짐 |
-
-> 🛡️ **오프라인 & 가용성:** SDK는 서버에 연결할 수 없을 때 로컬 캐시에서 값을 제공합니다. fallbackValue를 설정하면 네트워크 문제로 인한 게임 중단은 절대 발생하지 않습니다.
-
----
-
-## 📋 요구 사항
-
-- Unreal Engine 4.27+
-- C++ 프로젝트 (Blueprint 전용 프로젝트도 지원)
-
----
-
-## 📜 라이선스
-
-Copyright Gatrix. All Rights Reserved.
+이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.

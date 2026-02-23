@@ -552,3 +552,7 @@ lua_close(YourLuaState);
 ```lua
 Group:Destroy()  -- 명시적 정리 (권장, GC 의존 금지)
 ```
+
+## License
+
+이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.

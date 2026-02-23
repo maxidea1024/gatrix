@@ -1,22 +1,99 @@
 # Gatrix Unreal SDK
 
-Client SDK for the Gatrix platform in Unreal Engine 4.27+.
+> **Feature flags, A/B testing, and remote configuration — official Gatrix SDK for Unreal Engine.**
 
-## Features
+Change your game's behavior in real time without shipping a new build. Feature toggles, A/B experiments, game parameter tuning, gradual rollouts — all from the Gatrix Dashboard.
 
-- **Feature Flags**: Real-time flag evaluation with polling and streaming
-- **Streaming**: SSE and WebSocket real-time flag invalidation with auto-reconnect
-- **Variations**: Bool, String, Float, Int, Double, JSON variation methods
-- **Context**: Dynamic evaluation context with custom properties
-- **ETag Caching**: Conditional requests to minimize bandwidth
-- **Explicit Sync Mode**: Control when flag changes are applied
-- **Watch Pattern**: Subscribe to per-flag changes
-- **Metrics**: Automatic usage statistics reporting
-- **Impressions**: Track flag access events
-- **Blueprint Support**: Full Blueprint integration via UCLASS/USTRUCT/UFUNCTION
-- **Thread Safe**: Lock-free counters, atomic booleans, FCriticalSection on shared maps
+## 🚩 What is a Feature Flag?
 
-## Installation
+A feature flag has two parts:
+
+| Part | Type | Description |
+|---|---|---|
+| **State** (`enabled`) | `bool` | Is the feature on or off? — check with `IsEnabled()` |
+| **Value** (`variant`) | `bool` `string` `number` `json` | A specific configuration value — read with `BoolVariation()`, `StringVariation()`, `FloatVariation()` |
+
+A flag can be **enabled while also having a specific value** (e.g. `difficulty = "hard"`). State and value are independent — handle both.
+
+### 💡 Quick Examples
+
+#### 1. Feature Toggle (`IsEnabled`)
+
+```cpp
+UGatrixClient* Client = UGatrixClient::Get();
+
+if (Client->GetFeatures()->IsEnabled(TEXT("new-shop")))
+{
+    // Feature is ON -> Show the new shop UI
+    ShowNewShop();
+}
+else
+{
+    // Feature is OFF (or flag missing) -> Fallback to legacy shop
+    ShowLegacyShop();
+}
+```
+
+#### 2. Remote Configuration (`Variation`)
+
+```cpp
+// Get a float value (defaulting to 1.0 if not set)
+float speed = Client->GetFeatures()->FloatVariation(TEXT("game-speed"), 1.0f);
+
+// Get a string value
+FString theme = Client->GetFeatures()->StringVariation(TEXT("app-theme"), TEXT("dark"));
+
+// Get an integer value
+int32 maxLevel = Client->GetFeatures()->IntVariation(TEXT("max-level"), 50);
+```
+
+#### 3. Conditional Targeting
+
+```cpp
+// The server evaluates context (level, region, tier...) and returns the right value.
+// Your client just reads it — no branching logic needed here!
+FString difficulty = Client->GetFeatures()->StringVariation(TEXT("difficulty"), TEXT("Normal"));
+```
+
+---
+
+## 🤔 Why Gatrix?
+
+| Without Gatrix | With Gatrix |
+|---|---|
+| Ship a new build to change a value | Change it live from the dashboard |
+| All players get the same experience | A/B test different experiences |
+| Hard-coded feature flags | Real-time remote configuration |
+| Risky big-bang releases | Gradual rollouts with instant rollback |
+
+### 🔑 Real-World Scenarios
+
+- **📱 Mobile App Store Review** — Submit with features disabled, enable right after approval. No second review needed.
+- **⚖️ Regulatory Compliance** — Disable features by region instantly when laws change (GDPR, COPPA, etc.).
+- **🚨 Emergency Kill Switch** — Disable a crashing feature in seconds, not hours.
+- **🔬 A/B Testing** — Show different variants to different groups and measure impact.
+- **📅 Uncertain Timing** — Code is always ready; business decides when to launch.
+
+---
+
+## 📐 Evaluation Model: Remote Evaluation Only
+
+1. The SDK sends **context** (userId, environment, properties) to the Gatrix server.
+2. The server evaluates all targeting rules remotely.
+3. The SDK receives only the **final evaluated flag values** — no rules exposed to the client.
+
+| | Remote Evaluation (Gatrix) | Local Evaluation |
+|---|---|---|
+| **Security** | ✅ Rules never leave the server | ⚠️ Rules visible to client |
+| **Consistency** | ✅ Identical results across all SDKs | ⚠️ Each SDK must reimplement logic |
+| **Payload** | ✅ Only final values (small) | ⚠️ Full rule set (large) |
+| **Offline** | ⚠️ Cached values or bootstrap | ✅ Full offline after download |
+
+> 🛡️ The SDK caches last known values locally. `fallbackValue` ensures your game never crashes due to network issues.
+
+---
+
+## 📦 Installation
 
 1. Copy the `GatrixClientSDK` folder to your project's `Plugins/` directory
 2. Regenerate project files
@@ -26,15 +103,19 @@ Client SDK for the Gatrix platform in Unreal Engine 4.27+.
 PublicDependencyModuleNames.AddRange(new string[] { "GatrixClientSDK" });
 ```
 
-## Quick Start (C++)
+---
+
+## 🚀 Quick Start
+
+### Option A: C++ Setup
 
 ```cpp
 #include "GatrixClient.h"
 #include "GatrixEvents.h"
 
-// Initialize
+// Initialize configuration
 FGatrixClientConfig Config;
-Config.ApiUrl = TEXT("http://localhost:45000/api/v1");
+Config.ApiUrl = TEXT("https://your-api.example.com/api/v1");
 Config.ApiToken = TEXT("your-client-api-token");
 Config.AppName = TEXT("MyGame");
 Config.Environment = TEXT("production");
@@ -43,10 +124,11 @@ Config.Environment = TEXT("production");
 Config.Features.Context.UserId = TEXT("player-123");
 Config.Features.Context.SessionId = TEXT("session-abc");
 
+// Start the SDK
 UGatrixClient* Client = UGatrixClient::Get();
 Client->Start(Config);
 
-// Subscribe to events (C++)
+// Subscribe to events
 Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
 {
     UE_LOG(LogTemp, Log, TEXT("Gatrix SDK ready!"));
@@ -56,178 +138,380 @@ Client->On(GatrixEvents::FlagsChange, [Client](const TArray<FString>& Args)
 {
     float GameSpeed = Client->GetFeatures()->FloatVariation(TEXT("game-speed"), 1.0f);
     int32 Difficulty = Client->GetFeatures()->IntVariation(TEXT("difficulty"), 1);
-    double Gravity = Client->DoubleVariation(TEXT("gravity"), 9.8);
 });
-
-// Direct flag access
-bool bFeatureOn = Client->GetFeatures()->IsEnabled(TEXT("new-feature"));
-bool bBool = Client->GetFeatures()->BoolVariation(TEXT("my-flag"), false);
-FString Str = Client->GetFeatures()->StringVariation(TEXT("theme"), TEXT("default"));
-float Num = Client->GetFeatures()->FloatVariation(TEXT("speed"), 1.0f);
-int32 Level = Client->GetFeatures()->IntVariation(TEXT("level"), 1);
-
-// Watch a specific flag
-UGatrixFeaturesClient* Features = Client->GetFeatures();
-FGatrixFlagWatchDelegate WatchCallback;
-WatchCallback.BindLambda([](UGatrixFlagProxy* Proxy)
-{
-    UE_LOG(LogTemp, Log, TEXT("Flag changed: %s = %s"),
-           *Proxy->GetName(), Proxy->IsEnabled() ? TEXT("ON") : TEXT("OFF"));
-});
-int32 WatchHandle = Features->WatchFlag(TEXT("my-flag"), WatchCallback);
-
-// Later: unsubscribe
-Features->UnwatchFlag(WatchHandle);
-
-// Update context
-FGatrixContext NewContext;
-NewContext.UserId = TEXT("player-456");
-NewContext.Properties.Add(TEXT("level"), TEXT("5"));
-Client->UpdateContext(NewContext);
-
-// Stop when done
-Client->Stop();
 ```
 
-### Streaming Configuration
+### Option B: Blueprint Setup
 
-Enable SSE or WebSocket streaming for near-instant flag updates:
+1. Use **"Get Gatrix Client"** node to get the singleton
+2. Call **Init** or **Start** with a `GatrixClientConfig` struct
+3. Use **Bool Variation**, **String Variation**, etc. for flag values
+4. Bind to **OnReady**, **OnChange**, **OnError** events in your Event Graph
+
+---
+
+## 🏁 Reading Feature Flags
 
 ```cpp
-// SSE streaming (default)
+auto* Features = Client->GetFeatures();
+
+// Check enabled state
+bool bNewUI = Features->IsEnabled(TEXT("new-ui"));
+
+// Typed variations (never throw — always returns fallback on error)
+bool bShowBanner = Features->BoolVariation(TEXT("show-banner"), false);
+FString Theme = Features->StringVariation(TEXT("app-theme"), TEXT("dark"));
+int32 MaxRetries = Features->IntVariation(TEXT("max-retries"), 3);
+float GameSpeed = Features->FloatVariation(TEXT("game-speed"), 1.0f);
+double DropRate = Client->GetFeatures()->DoubleVariation(TEXT("item-drop-rate"), 0.05);
+
+// Full flag proxy
+UGatrixFlagProxy* Proxy = Features->GetFlag(TEXT("feature-x"));
+if (Proxy)
+{
+    UE_LOG(LogTemp, Log, TEXT("Enabled: %s, Reason: %s"), 
+        Proxy->IsEnabled() ? TEXT("true") : TEXT("false"), 
+        *Proxy->GetReason());
+}
+```
+
+---
+
+## 🔁 Watching for Changes
+
+Two watch modes available:
+
+| Method | Callback timing |
+|---|---|
+| `WatchRealtimeFlag` | Immediately when a fetch brings new data |
+| `WatchSyncedFlag` | After `SyncFlags()` (when `ExplicitSyncMode = true`) |
+
+```cpp
+auto* Features = Client->GetFeatures();
+
+// Realtime watch — fires immediately on change
+FGatrixFlagWatchDelegate RealtimeCallback;
+RealtimeCallback.BindLambda([](UGatrixFlagProxy* Proxy)
+{
+    ApplyDarkMode(Proxy->IsEnabled());
+});
+int32 WatchHandle = Features->WatchRealtimeFlag(TEXT("dark-mode"), RealtimeCallback);
+
+// With initial state (fires immediately with current value, then on changes)
+Features->WatchRealtimeFlagWithInitialState(TEXT("game-speed"), SpeedCallback);
+
+// Synced watch — fires only after SyncFlags()
+Features->WatchSyncedFlagWithInitialState(TEXT("difficulty"), DiffCallback);
+
+// Unwatch
+Features->UnwatchFlag(WatchHandle);
+```
+
+---
+
+## 🌍 Context Management
+
+### What Is Context?
+
+**Context** is the set of properties describing the current user and environment. The Gatrix server uses context to decide which variant to return for each flag.
+
+### Context Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `AppName` | `FString` | App name (set at init, immutable) |
+| `Environment` | `FString` | Environment name (set at init, immutable) |
+| `UserId` | `FString` | Unique user identifier — most important for targeting |
+| `SessionId` | `FString` | Session identifier for session-scoped experiments |
+| `Properties` | `TMap<FString, FString>` | Custom key-value pairs |
+
+### Updating Context
+
+```cpp
+// Full context update (triggers re-fetch)
+FGatrixContext NewContext;
+NewContext.UserId = TEXT("player-456");
+NewContext.Properties.Add(TEXT("level"), TEXT("42"));
+NewContext.Properties.Add(TEXT("country"), TEXT("KR"));
+Client->UpdateContext(NewContext);
+```
+
+> ⚠️ All context updates trigger an automatic re-fetch. Do not update context inside rapid loops. Use a single context object to bulk update fields.
+
+---
+
+## ⏱️ Explicit Sync Mode
+
+Control exactly when flag changes are applied to gameplay — the most important feature for timing-sensitive games.
+
+```cpp
+// Enable in config
+Config.Features.bExplicitSyncMode = true;
+
+// Synced watch: callback fires only after SyncFlags()
+Features->WatchSyncedFlagWithInitialState(TEXT("difficulty"), DiffCallback);
+
+// Apply at a safe moment (loading screen, between rounds)
+if (Features->HasPendingSyncFlags())
+{
+    Features->SyncFlags(false); // fetchNow = false
+}
+```
+
+### Typical Sync Points
+
+| Sync Point | Example |
+|---|---|
+| **Loading screen** | Scene transition, level loading |
+| **Downtime** | After match ends, before next round starts |
+| **Menu / Lobby** | Settings screen, event lobby |
+| **Respawn** | After player death, before next spawn |
+
+---
+
+## 📡 Operating Modes
+
+### Mode Comparison
+
+| Mode | Latency | Bandwidth | Use Case |
+|---|---|---|---|
+| Streaming + Polling | Near-instant | Low | Production (online games) |
+| Polling Only | ~30s | Low | Simple apps, or lacking WebSocket |
+| Offline | N/A | None | Testing, CI, air-gapped |
+
+### Mode 1: Streaming + Polling (Default)
+
+```cpp
+// SSE streaming
 Config.Features.Streaming.bEnabled = true;
 Config.Features.Streaming.Transport = EGatrixStreamingTransport::Sse;
-Config.Features.Streaming.Sse.ReconnectBase = 1;  // seconds
-Config.Features.Streaming.Sse.ReconnectMax = 30;   // seconds
+Config.Features.Streaming.Sse.ReconnectBase = 1;
+Config.Features.Streaming.Sse.ReconnectMax = 30;
 
 // Or WebSocket streaming
 Config.Features.Streaming.Transport = EGatrixStreamingTransport::WebSocket;
-Config.Features.Streaming.WebSocket.PingInterval = 30;   // seconds
-Config.Features.Streaming.WebSocket.ReconnectBase = 1;
-Config.Features.Streaming.WebSocket.ReconnectMax = 30;
-
-// Custom streaming URL (optional, auto-derived from ApiUrl by default)
-Config.Features.Streaming.Sse.Url = TEXT("https://example.com/streaming/sse");
-
-// Listen for streaming events
-Client->On(GatrixEvents::FlagsStreamingConnected, [](const TArray<FString>& Args)
-{
-    UE_LOG(LogTemp, Log, TEXT("Streaming connected!"));
-});
-
-Client->On(GatrixEvents::FlagsStreamingError, [](const TArray<FString>& Args)
-{
-    UE_LOG(LogTemp, Warning, TEXT("Streaming error: %s"),
-           Args.Num() > 0 ? *Args[0] : TEXT("unknown"));
-});
+Config.Features.Streaming.WebSocket.PingInterval = 30;
 ```
 
-### POST Method for Flag Fetching
-
-Use POST requests to send context in the request body (for large contexts):
+### Mode 2: Polling Only
 
 ```cpp
-Config.Features.bUsePOSTRequests = true;
+Config.Features.Streaming.bEnabled = false;
+Config.Features.RefreshInterval = 30.0f; // seconds
 ```
 
-## Quick Start (Blueprint)
+### Mode 3: Offline
 
-1. Use **"Get Gatrix Client"** node to get the singleton
-2. Call **Init** with a `GatrixClientConfig` struct
-3. Call **Start** to begin fetching
-4. Use **Bool Variation**, **String Variation**, etc. for flag values
-5. Bind to **OnReady**, **OnChange**, **OnError** events
+```cpp
+Config.bOfflineMode = true;
+// Use with bootstrap data for fully offline operation
+```
 
-### Blueprint Events
+---
+
+## 🔔 Events
+
+```cpp
+Client->On(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
+{
+    UE_LOG(LogTemp, Log, TEXT("SDK ready!"));
+});
+
+Client->On(GatrixEvents::FlagsChange, [](const TArray<FString>& Args)
+{
+    UE_LOG(LogTemp, Log, TEXT("Flags updated"));
+});
+
+Client->Once(GatrixEvents::FlagsReady, [](const TArray<FString>& Args)
+{
+    ShowWelcomeScreen();
+});
+```
+
+**Available Events:**
 
 | Event | Description |
-|-------|-------------|
-| `OnReady` | First successful fetch completed |
-| `OnChange` | Flags changed from server |
-| `OnSync` | Flags synchronized (explicit sync mode) |
-| `OnRecovered` | SDK recovered from error state |
-| `OnError` | SDK error occurred |
-| `OnImpression` | Flag impression recorded |
+|---|---|
+| `flags.init` | SDK initialized |
+| `flags.ready` | First successful fetch completed |
+| `flags.fetch_start` / `fetch_success` / `fetch_error` / `fetch_end` | Fetch lifecycle |
+| `flags.change` | Flags changed from server |
+| `flags.error` | SDK error |
+| `flags.sync` | Flags synchronized (explicit sync mode) |
+| `flags.recovered` | SDK recovered from error |
+| `flags.streaming_connected` / `disconnected` / `error` | Streaming state |
 
-## Architecture
+---
 
+## 🔒 Performance & Threading
+
+- Flag reads are **synchronous and lock-free** (atomic snapshot).
+- All network I/O runs on background threads via `FHttpModule` and `IWebSocket`.
+- Callbacks are dispatched to the game thread automatically.
+- Event emission collects callbacks under lock, then invokes outside lock to prevent deadlocks.
+- Metric counters use `FThreadSafeCounter` (no lock contention).
+
+---
+
+## 🧹 Cleanup
+
+```cpp
+UGatrixClient::Get()->Stop();
 ```
-UGatrixClient (Singleton)
-├── FGatrixEventEmitter (thread-safe on/once/off/onAny)
-├── IGatrixStorageProvider (pluggable storage)
-└── UGatrixFeaturesClient
-    ├── HTTP Fetching (FHttpModule + ETag)
-    ├── Flag Storage (FCriticalSection protected)
-    ├── Polling (UWorld TimerManager + jitter)
-    ├── Streaming
-    │   ├── FGatrixSseConnection (SSE via FHttpModule progress)
-    │   ├── FGatrixWebSocketConnection (IWebSocket + ping/pong)
-    │   ├── Gap Recovery (globalRevision tracking)
-    │   └── Auto-Reconnect (exponential backoff + jitter)
-    ├── Metrics (batched POST with retry)
-    ├── Watch Pattern (per-flag events)
-    └── Blueprint Delegates
+
+---
+
+## 📖 API Reference
+
+### FeaturesClient (`UGatrixClient::Get()->GetFeatures()`)
+
+| Method | Description |
+|---|---|
+| `IsEnabled(flagName)` | Returns `flag.enabled` |
+| `BoolVariation(flagName, fallback)` | Boolean variant value |
+| `StringVariation(flagName, fallback)` | String variant value |
+| `IntVariation(flagName, fallback)` | Integer variant value |
+| `FloatVariation(flagName, fallback)` | Float variant value |
+| `DoubleVariation(flagName, fallback)` | Double variant value |
+| `GetVariant(flagName)` | Full variant object |
+| `GetFlag(flagName)` | Full flag proxy (`UGatrixFlagProxy`) |
+| `GetAllFlags()` | All evaluated flags |
+| `HasFlag(flagName)` | Check cache existence |
+| `WatchRealtimeFlag(name, cb)` | Realtime watch |
+| `WatchRealtimeFlagWithInitialState(name, cb)` | Realtime watch + immediate callback |
+| `WatchSyncedFlag(name, cb)` | Synced watch |
+| `WatchSyncedFlagWithInitialState(name, cb)` | Synced watch + immediate callback |
+| `UnwatchFlag(handle)` | Remove a watcher |
+| `CreateWatchGroup(name)` | Batch watcher management |
+| `SyncFlags(fetchNow)` | Apply pending changes (explicit sync mode) |
+| `HasPendingSyncFlags()` | Check if pending changes exist |
+| `FetchFlags()` | Force server fetch |
+
+### GatrixClient (`UGatrixClient::Get()`)
+
+| Method | Description |
+|---|---|
+| `Start(config)` | Initialize and start fetching |
+| `Stop()` | Stop and clean up |
+| `UpdateContext(ctx)` | Update full context |
+| `On/Once/Off/OnAny` | Event subscriptions |
+
+---
+
+## 🍳 Common Recipes
+
+### Game Speed Tuning
+
+```cpp
+Features->WatchRealtimeFlagWithInitialState(TEXT("game-speed"), 
+    FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
+{
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), Proxy->GetFloatValue(1.0f));
+}));
 ```
 
-## Thread Safety
+### Seasonal Event
 
-- Flag read/write operations are protected by `FCriticalSection`
-- Statistics counters use lock-free `FThreadSafeCounter` (no lock contention)
-- Boolean state flags use `std::atomic<bool>` for lock-free access
-- HTTP callbacks are handled on the game thread (UE4 FHttpModule behavior)
-- Streaming callbacks are dispatched to game thread via `AsyncTask`
-- Event emission collects callbacks under lock, then invokes outside lock to prevent deadlocks
-- Storage provider (InMemory) uses its own `FCriticalSection`
+```cpp
+Features->WatchRealtimeFlagWithInitialState(TEXT("winter-event"), 
+    FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
+{
+    SetWinterEvent(Proxy->IsEnabled());
+}));
+```
 
-## Event Constants
+### A/B Test UI Text
 
-All events use the `flags.` prefix namespace:
+```cpp
+Features->WatchRealtimeFlagWithInitialState(TEXT("cta-button-text"), 
+    FGatrixFlagWatchDelegate::CreateLambda([](UGatrixFlagProxy* Proxy)
+{
+    if (CtaTextWidget) CtaTextWidget->SetText(FText::FromString(Proxy->GetStringValue(TEXT("Play Now"))));
+}));
+```
 
-| Constant | Value |
-|----------|-------|
-| `GatrixEvents::FlagsInit` | `flags.init` |
-| `GatrixEvents::FlagsReady` | `flags.ready` |
-| `GatrixEvents::FlagsFetchStart` | `flags.fetch_start` |
-| `GatrixEvents::FlagsFetchSuccess` | `flags.fetch_success` |
-| `GatrixEvents::FlagsFetchError` | `flags.fetch_error` |
-| `GatrixEvents::FlagsFetchEnd` | `flags.fetch_end` |
-| `GatrixEvents::FlagsChange` | `flags.change` |
-| `GatrixEvents::SdkError` | `flags.error` |
-| `GatrixEvents::FlagsImpression` | `flags.impression` |
-| `GatrixEvents::FlagsSync` | `flags.sync` |
-| `GatrixEvents::FlagsRecovered` | `flags.recovered` |
-| `GatrixEvents::FlagsMetricsSent` | `flags.metrics_sent` |
-| `GatrixEvents::FlagsMetricsError` | `flags.metrics_error` |
-| `GatrixEvents::FlagsStreamingConnected` | `flags.streaming_connected` |
-| `GatrixEvents::FlagsStreamingDisconnected` | `flags.streaming_disconnected` |
-| `GatrixEvents::FlagsStreamingError` | `flags.streaming_error` |
-| `GatrixEvents::FlagsStreamingReconnecting` | `flags.streaming_reconnecting` |
-| `GatrixEvents::FlagsInvalidated` | `flags.invalidated` |
+### Login Flow with Context Update
 
-## Configuration
+```cpp
+void OnLogin(FString UserId, int32 Level)
+{
+    FGatrixContext Ctx;
+    Ctx.UserId = UserId;
+    Ctx.Properties.Add(TEXT("level"), FString::FromInt(Level));
+    
+    UGatrixClient::Get()->GetFeatures()->UpdateContext(Ctx);
+    // Flags now reflect the logged-in user natively
+}
+```
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `ApiUrl` | FString | - | Base API URL (required) |
-| `ApiToken` | FString | - | Client API token (required) |
-| `AppName` | FString | - | Application name (required) |
-| `Environment` | FString | - | Environment name (required) |
-| `Features.bOfflineMode` | bool | false | Start in offline mode |
-| `Features.RefreshInterval` | float | 30.0 | Seconds between polls |
-| `Features.bDisableRefresh` | bool | false | Disable automatic polling |
-| `Features.bExplicitSyncMode` | bool | true | Manual flag sync |
-| `Features.bDisableMetrics` | bool | false | Disable metrics |
-| `Features.bUsePOSTRequests` | bool | false | Use POST for fetching |
-| `Features.Streaming.bEnabled` | bool | false | Enable streaming |
-| `Features.Streaming.Transport` | enum | Sse | SSE or WebSocket |
-| `Features.Streaming.Sse.Url` | FString | auto | Custom SSE endpoint |
-| `Features.Streaming.Sse.ReconnectBase` | int32 | 1 | Base reconnect delay (s) |
-| `Features.Streaming.Sse.ReconnectMax` | int32 | 30 | Max reconnect delay (s) |
-| `Features.Streaming.WebSocket.Url` | FString | auto | Custom WS endpoint |
-| `Features.Streaming.WebSocket.PingInterval` | int32 | 30 | Ping interval (s) |
-| `Features.Streaming.WebSocket.ReconnectBase` | int32 | 1 | Base reconnect delay (s) |
-| `Features.Streaming.WebSocket.ReconnectMax` | int32 | 30 | Max reconnect delay (s) |
+### Multi-Flag Dependency with Watch Group
+
+```cpp
+UGatrixWatchFlagGroup* Group = Features->CreateWatchGroup(TEXT("shop-system"));
+
+FGatrixFlagWatchDelegate ShopEnabledCb;
+ShopEnabledCb.BindLambda([](UGatrixFlagProxy* P){ SetShopEnabled(P->IsEnabled()); });
+
+FGatrixFlagWatchDelegate DiscountCb;
+DiscountCb.BindLambda([](UGatrixFlagProxy* P){ SetDiscount(P->GetFloatValue(0.0f)); });
+
+Group->WatchSyncedFlagWithInitialState(TEXT("new-shop-enabled"), ShopEnabledCb);
+Group->WatchSyncedFlagWithInitialState(TEXT("discount-rate"), DiscountCb);
+
+// Both applied together at sync time — no partial state
+Features->SyncFlags(false);
+
+// Cleanup
+Group->DestroyGroup();
+```
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+### 1. Flag changes are not detected in real time
+
+| Cause | Solution |
+|---|---|
+| Polling interval too long | Reduce `RefreshInterval` (default: 30s) or enable Streaming |
+| `ExplicitSyncMode` is on | Call `SyncFlags()` at a safe point |
+| Using `WatchSyncedFlag` without sync | Switch to `WatchRealtimeFlag` or call `SyncFlags()` |
+| `OfflineMode` is enabled | Set `OfflineMode = false` |
+| Wrong `AppName` or `Environment` | Double-check config |
+
+### 2. `WatchSyncedFlag` callback never fires
+
+Ensure `ExplicitSyncMode` is true (it is by default) and call `SyncFlags()`:
+```cpp
+auto* Features = Client->GetFeatures();
+Features->SyncFlags(false);
+```
+
+### 3. Flags return fallback values after initialization
+
+| Cause | Solution |
+|---|---|
+| SDK not ready yet | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
+| Wrong config | Match dashboard settings |
+| Flag not assigned to this environment | Verify in dashboard |
+| Network error | Check `flags.fetch_error` event and log output |
+
+### 4. Memory leak warnings from callbacks
+
+Always call `UnwatchFlag()` or `Group->DestroyGroup()` when the listening object is destroyed (e.g., inside `EndPlay` or `BeginDestroy`):
+```cpp
+void AMyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (UGatrixClient* Client = UGatrixClient::Get())
+    {
+        Client->GetFeatures()->UnwatchFlag(WatchHandle);
+    }
+    Super::EndPlay(EndPlayReason);
+}
+```
+
+---
 
 ## License
 
-Copyright Gatrix. All Rights Reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

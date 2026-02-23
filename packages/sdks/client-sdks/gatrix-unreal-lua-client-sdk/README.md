@@ -2,7 +2,18 @@
 
 > **Feature flags, A/B testing, and remote configuration — official Gatrix Lua binding for Unreal Engine.**
 
-Lua binding plugin for Gatrix Unreal SDK. Exposes feature flags, variations, context, events, and watch to Lua scripts via the **pure Lua C API** (`lua_State*`).
+Exposes feature flags, variations, context, events, and watch to Lua scripts via the **pure Lua C API** (`lua_State*`).
+
+## 🚩 What is a Feature Flag?
+
+A feature flag has two parts:
+
+| Part | Type | Description |
+|---|---|---|
+| **State** (`enabled`) | `boolean` | Is the feature on or off? — check with `IsEnabled()` |
+| **Value** (`variant`) | `number` `string` `boolean` `json` | A specific configuration value — read with `BoolVariation()`, `StringVariation()`, `FloatVariation()`, `IntVariation()` |
+
+A flag can be **enabled while also having a specific value** (e.g. `difficulty = "hard"`). State and value are independent — handle both.
 
 ### 💡 Quick Examples
 
@@ -32,7 +43,15 @@ local Message = gatrix.Features.StringVariation("welcome-msg", "Welcome")
 local DarkMode = gatrix.Features.BoolVariation("dark-mode", false)
 ```
 
-#### 3. Watch for Real-Time Changes
+#### 3. Conditional Targeting
+
+```lua
+-- The server evaluates context (level, region, tier...) and returns the right value.
+-- Your Lua script just reads it — no branching logic needed here!
+local Difficulty = gatrix.Features.StringVariation("difficulty", "Normal")
+```
+
+#### 4. Watch for Real-Time Changes
 
 React to flag changes pushed from the server:
 
@@ -993,3 +1012,7 @@ Group:Destroy()
 -- GC will also clean up, but timing is non-deterministic
 -- Don't rely on GC for gameplay-critical cleanup
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
