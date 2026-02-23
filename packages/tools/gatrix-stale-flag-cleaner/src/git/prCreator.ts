@@ -1,0 +1,179 @@
+import { execSync, spawn } from 'child_process';
+import * as path from 'path';
+import * as fs from 'fs';
+import { GitProviderConfig, StaleFlagInfo } from '../types';
+
+// ============================================================
+// PR creator - supports GitHub (gh CLI) and GitLab (glab CLI)
+// ============================================================
+
+export interface CreatePrOptions {
+  flag: StaleFlagInfo;
+  repoPath: string;
+  branchName: string;
+  baseBranch: string;
+  provider: GitProviderConfig;
+  dryRun: boolean;
+}
+
+export interface PrResult {
+  created: boolean;
+  prUrl?: string;
+  message: string;
+}
+
+/**
+ * Commit staged changes and push the branch, then open a draft PR.
+ * Supports both GitHub (gh) and GitLab (glab).
+ */
+export async function createPr(opts: CreatePrOptions): Promise<PrResult> {
+  const { flag, repoPath, branchName, baseBranch, provider, dryRun } = opts;
+
+  const title = `chore: remove stale flag ${flag.key}`;
+  const body = buildPrBody(flag);
+
+  if (dryRun) {
+    return {
+      created: false,
+      message: `[dry-run] Would create PR: "${title}" (${provider.type})`,
+    };
+  }
+
+  // Push the branch
+  execSync(`git push origin ${branchName} --force`, { cwd: repoPath, stdio: 'pipe' });
+
+  if (provider.type === 'github') {
+    return createGithubPr({ repoPath, branchName, baseBranch, title, body });
+  } else {
+    return createGitlabPr({ repoPath, branchName, baseBranch, title, body, host: provider.host });
+  }
+}
+
+// ============================================================
+// GitHub PR via gh CLI
+// ============================================================
+
+interface PrCliOptions {
+  repoPath: string;
+  branchName: string;
+  baseBranch: string;
+  title: string;
+  body: string;
+  host?: string;
+}
+
+async function createGithubPr(opts: PrCliOptions): Promise<PrResult> {
+  const { repoPath, branchName, baseBranch, title, body } = opts;
+
+  checkCliExists('gh', 'GitHub CLI (gh): https://cli.github.com/');
+
+  const args = [
+    'pr',
+    'create',
+    '--draft',
+    '--base',
+    baseBranch,
+    '--head',
+    branchName,
+    '--title',
+    title,
+    '--body',
+    body,
+  ];
+
+  const prUrl = await runCliCommand('gh', args, repoPath);
+  return { created: true, prUrl: prUrl.trim(), message: `GitHub PR created: ${prUrl.trim()}` };
+}
+
+// ============================================================
+// GitLab MR via glab CLI
+// ============================================================
+
+async function createGitlabPr(opts: PrCliOptions): Promise<PrResult> {
+  const { repoPath, branchName, baseBranch, title, body, host } = opts;
+
+  checkCliExists('glab', 'GitLab CLI (glab): https://gitlab.com/gitlab-org/cli');
+
+  const args = [
+    'mr',
+    'create',
+    '--draft',
+    '--source-branch',
+    branchName,
+    '--target-branch',
+    baseBranch,
+    '--title',
+    title,
+    '--description',
+    body,
+    '--yes', // skip interactive prompts
+  ];
+
+  if (host) {
+    // Point glab at a self-hosted instance
+    args.push('--repo', host);
+  }
+
+  const output = await runCliCommand('glab', args, repoPath);
+  // glab outputs the MR URL on the last line
+  const lines = output.trim().split('\n');
+  const mrUrl = lines[lines.length - 1].trim();
+  return { created: true, prUrl: mrUrl, message: `GitLab MR created: ${mrUrl}` };
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+
+function checkCliExists(cliName: string, installHint: string): void {
+  try {
+    execSync(`${cliName} --version`, { stdio: 'pipe' });
+  } catch {
+    throw new Error(`"${cliName}" CLI not found in PATH. Install it first:\n  ${installHint}`);
+  }
+}
+
+function runCliCommand(command: string, args: string[], cwd: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(command, args, { cwd, shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
+
+    let stdout = '';
+    let stderr = '';
+    proc.stdout.on('data', (d: Buffer) => (stdout += d.toString()));
+    proc.stderr.on('data', (d: Buffer) => (stderr += d.toString()));
+
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve(stdout);
+      } else {
+        reject(new Error(`${command} exited with code ${code}\n${stderr}`));
+      }
+    });
+  });
+}
+
+function buildPrBody(flag: StaleFlagInfo): string {
+  return [
+    `## Stale Flag Removal: \`${flag.key}\``,
+    '',
+    `**Reason**: ${flag.reason}`,
+    `**Keep branch**: ${flag.keepBranch}`,
+    `**Last modified**: ${flag.lastModified}`,
+    '',
+    '## Changes',
+    `- Removed all references to feature flag \`${flag.key}\``,
+    `- Kept the **${flag.keepBranch}** code path`,
+    '- Removed now-unused flag-checking code and imports',
+    '',
+    '## Checklist',
+    '- [ ] Reviewed code changes',
+    '- [ ] Tests pass',
+    '- [ ] Remove flag from Gatrix dashboard after merge',
+    '',
+    '_Generated by gatrix-stale-flag-cleaner_',
+  ].join('\n');
+}
+
+// Needed to suppress unused import warning for fs/path
+void fs;
+void path;
