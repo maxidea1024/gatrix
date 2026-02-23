@@ -31,11 +31,12 @@ UGatrixFeaturesClient::UGatrixFeaturesClient() {}
 
 void UGatrixFeaturesClient::Initialize(const FGatrixClientConfig& Config,
                                        FGatrixEventEmitter* Emitter,
-                                       TSharedPtr<IGatrixStorageProvider> Storage) {
+                                       TSharedPtr<IGatrixStorageProvider> Storage,
+                                       const FString& InConnectionId) {
   ClientConfig = Config;
   EventEmitter = Emitter;
   StorageProvider = Storage;
-  ConnectionId = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens).ToLower();
+  ConnectionId = InConnectionId;
   SdkState = EGatrixSdkState::Initializing;
 
   // Ensure context has system fields
@@ -52,9 +53,6 @@ void UGatrixFeaturesClient::Initialize(const FGatrixClientConfig& Config,
   if (EventEmitter) {
     EventEmitter->Emit(GatrixEvents::FlagsInit);
   }
-
-  UE_LOG(LogGatrix, Log, TEXT("Initialized. App=%s Env=%s ConnectionId=%s"), *ClientConfig.AppName,
-         *ClientConfig.Environment, *ConnectionId);
 }
 
 void UGatrixFeaturesClient::Start() {

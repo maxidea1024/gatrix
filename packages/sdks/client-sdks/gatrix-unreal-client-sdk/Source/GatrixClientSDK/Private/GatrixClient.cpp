@@ -22,8 +22,8 @@ UGatrixClient* UGatrixClient::Get() {
 
 void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
   if (bInitialized) {
-    UE_LOG(LogGatrix, Log, TEXT("Already initialized. Auto-stopping before re-init."));
-    Stop();
+    UE_LOG(LogGatrix, Log, TEXT("Already initialized. Skipping duplicate Init() call."));
+    return;
   }
 
   // Validate required fields
@@ -124,7 +124,7 @@ void UGatrixClient::Init(const FGatrixClientConfig& InConfig) {
 
   // Create features client
   FeaturesClient = NewObject<UGatrixFeaturesClient>(this);
-  FeaturesClient->Initialize(Config, &EventEmitter, StorageProvider);
+  FeaturesClient->Initialize(Config, &EventEmitter, StorageProvider, ClientConnectionId);
 
   bInitialized = true;
 

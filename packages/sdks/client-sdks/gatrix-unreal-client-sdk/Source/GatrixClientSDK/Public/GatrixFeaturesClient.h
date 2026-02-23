@@ -41,7 +41,7 @@ public:
    * Called by UGatrixClient::Init() before Start().
    */
   void Initialize(const FGatrixClientConfig& Config, FGatrixEventEmitter* Emitter,
-                  TSharedPtr<IGatrixStorageProvider> Storage);
+                  TSharedPtr<IGatrixStorageProvider> Storage, const FString& InConnectionId);
 
   /**
    * Start the client - initializes storage, bootstrap, and starts polling.
