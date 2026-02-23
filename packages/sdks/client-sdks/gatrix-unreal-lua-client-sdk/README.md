@@ -261,13 +261,15 @@ gatrix.Start({
     ApiToken        = "your-client-token",   -- string   Client API token
     AppName         = "my-game",             -- string   Application name
     Environment     = "production",          -- string   Environment name
-    RefreshInterval  = 30,     -- number?  Seconds between polls (default: 30)
-    DisableRefresh   = false,  -- boolean? Disable automatic polling
-    ExplicitSyncMode = true,   -- boolean? Enable explicit sync mode (default: true)
-    DisableMetrics   = false,  -- boolean? Disable server-side metrics
-    ImpressionDataAll = false, -- boolean? Track impressions for all flags
-    EnableDevMode    = false,  -- boolean? Enable detailed debug logging
-    OfflineMode      = false,  -- boolean? Start without network requests
+    EnableDevMode   = false,                 -- boolean? Enable detailed debug logging
+    OfflineMode     = false,                 -- boolean? Start without network requests
+    Features        = {                      -- table?   Feature flag configurations
+        RefreshInterval  = 30,               -- number?  Seconds between polls (default: 30)
+        DisableRefresh   = false,            -- boolean? Disable automatic polling
+        ExplicitSyncMode = true,             -- boolean? Enable explicit sync mode (default: true)
+        DisableMetrics   = false,            -- boolean? Disable server-side metrics
+        ImpressionDataAll = false,           -- boolean? Track impressions for all flags
+    }
 })
 
 --- Stop the SDK (stops polling, cleans up)

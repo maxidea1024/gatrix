@@ -177,13 +177,15 @@ gatrix.Init({
     ApiToken        = "your-client-token",
     AppName         = "my-game",
     Environment     = "production",
-    RefreshInterval  = 30,     -- 폴링 간격 (초, 기본값: 30)
-    DisableRefresh   = false,  -- 자동 폴링 비활성화
-    ExplicitSyncMode = true,   -- 명시적 동기화 모드 (기본값: true)
-    DisableMetrics   = false,  -- 메트릭 비활성화
-    ImpressionDataAll = false, -- 모든 플래그 임프레션 추적
     EnableDevMode    = false,  -- 상세 디버그 로깅
     OfflineMode      = false,  -- 네트워크 요청 없이 시작
+    Features        = {        -- 피처 플래그 설정
+        RefreshInterval  = 30,     -- 폴링 간격 (초, 기본값: 30)
+        DisableRefresh   = false,  -- 자동 폴링 비활성화
+        ExplicitSyncMode = true,   -- 명시적 동기화 모드 (기본값: true)
+        DisableMetrics   = false,  -- 메트릭 비활성화
+        ImpressionDataAll = false, -- 모든 플래그 임프레션 추적
+    }
 })
 
 gatrix.Start()  -- 페칭, 폴링, 메트릭 시작
