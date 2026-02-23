@@ -55,6 +55,14 @@ var _metrics_start_time: String = ""
 # Scene tree reference for timers
 var _scene_tree: SceneTree = null
 
+# Context hash for change detection
+var _last_context_hash: String = ""
+
+# Pending completion callbacks
+var _pending_context_callbacks: Array[Callable] = []
+var _pending_fetch_callbacks: Array[Callable] = []
+var _pending_start_callbacks: Array[Callable] = []
+
 
 func initialize(config: GatrixTypes.GatrixClientConfig, emitter: GatrixEventEmitter,
 		storage: GatrixStorageProvider, scene_tree: SceneTree) -> void:
@@ -552,11 +560,41 @@ func json_variation_or_throw(flag_name: String, force_realtime: bool = false):
 
 # ==================== Context ====================
 
-func update_context(new_context: GatrixTypes.GatrixContext) -> void:
+func update_context(new_context: GatrixTypes.GatrixContext, on_complete: Callable = Callable()) -> void:
+	# Check if context actually changed using hash
+	var new_hash := _compute_context_hash(new_context)
+	if new_hash == _last_context_hash:
+		# No change — notify immediately without fetching
+		if on_complete.is_valid():
+			on_complete.call(true, "")
+		return
+
 	_config.context = new_context
+	_last_context_hash = new_hash
 	_stats.context_change_count += 1
-	if _started and not _config.offline_mode:
-		_do_fetch_flags()
+
+	if not _started or _config.offline_mode:
+		if on_complete.is_valid():
+			on_complete.call(true, "")
+		return
+
+	if on_complete.is_valid():
+		_pending_context_callbacks.append(on_complete)
+	_do_fetch_flags()
+
+
+func _compute_context_hash(ctx: GatrixTypes.GatrixContext) -> String:
+	# Build a deterministic string from context fields
+	var parts := PackedStringArray()
+	parts.append(ctx.user_id)
+	parts.append(ctx.session_id)
+	parts.append(ctx.current_time)
+	# Sort properties keys for deterministic ordering
+	var keys := ctx.properties.keys()
+	keys.sort()
+	for key in keys:
+		parts.append("%s=%s" % [str(key), str(ctx.properties[key])])
+	return "|".join(parts)
 
 
 func get_context() -> GatrixTypes.GatrixContext:
@@ -857,6 +895,7 @@ func _handle_fetch_response(response_body: String, http_status: int, new_etag: S
 
 	if not _ready_emitted:
 		_set_ready()
+	_drain_pending_callbacks(true, "")
 
 
 func _handle_fetch_error(message: String, status_code: int) -> void:
@@ -878,6 +917,20 @@ func _handle_fetch_error(message: String, status_code: int) -> void:
 	# If first fetch failed but we have stored/bootstrap flags, still become ready
 	if not _ready_emitted and _realtime_flags.size() > 0:
 		_set_ready()
+	_drain_pending_callbacks(false, message)
+
+
+func _drain_pending_callbacks(success: bool, error_msg: String) -> void:
+	var all_cbs: Array[Callable] = []
+	all_cbs.append_array(_pending_context_callbacks)
+	all_cbs.append_array(_pending_fetch_callbacks)
+	all_cbs.append_array(_pending_start_callbacks)
+	_pending_context_callbacks.clear()
+	_pending_fetch_callbacks.clear()
+	_pending_start_callbacks.clear()
+	for cb in all_cbs:
+		if cb.is_valid():
+			cb.call(success, error_msg)
 
 
 func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:

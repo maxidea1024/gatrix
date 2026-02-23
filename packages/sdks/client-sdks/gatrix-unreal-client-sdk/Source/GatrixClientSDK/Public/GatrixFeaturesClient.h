@@ -451,6 +451,10 @@ private:
   // ETag for conditional requests
   FString Etag;
 
+  // Context hash for change detection
+  FString LastContextHash;
+  static FString ComputeContextHash(const FGatrixContext& Context);
+
   // Statistics (lock-free via FThreadSafeCounter)
   FThreadSafeCounter FetchFlagsCount;
   FThreadSafeCounter UpdateCount;

@@ -312,6 +312,23 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext) {
   UpdateContext(NewContext, nullptr);
 }
 
+FString UGatrixFeaturesClient::ComputeContextHash(const FGatrixContext& Context) {
+  // Build a deterministic string from context fields
+  FString HashInput =
+      Context.UserId + TEXT("|") + Context.SessionId + TEXT("|") + Context.CurrentTime;
+
+  // Sort properties for deterministic ordering
+  TArray<FString> Keys;
+  Context.Properties.GetKeys(Keys);
+  Keys.Sort();
+  for (const FString& Key : Keys) {
+    HashInput += TEXT("|") + Key + TEXT("=") + Context.Properties[Key];
+  }
+
+  // Use MD5 for fast hashing
+  return FMD5::HashAnsiString(*HashInput);
+}
+
 void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
                                           TFunction<void(bool, const FString&)> OnComplete) {
   // Preserve system fields
@@ -319,8 +336,18 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext,
   MergedContext.AppName = ClientConfig.AppName;
   MergedContext.Environment = ClientConfig.Environment;
 
-  ClientConfig.Context = MergedContext;
+  // Check if context actually changed using hash
+  FString NewHash = ComputeContextHash(MergedContext);
+  if (NewHash == LastContextHash) {
+    // No change — notify immediately without fetching
+    if (OnComplete) {
+      OnComplete(true, TEXT(""));
+    }
+    return;
+  }
 
+  ClientConfig.Context = MergedContext;
+  LastContextHash = NewHash;
   ContextChangeCount.Increment();
 
   // If not running or offline, no fetch will happen — notify immediately

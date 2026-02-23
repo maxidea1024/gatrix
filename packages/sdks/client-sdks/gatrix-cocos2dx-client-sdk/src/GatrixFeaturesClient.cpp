@@ -124,6 +124,15 @@ void FeaturesClient::updateContext(const GatrixContext& context) {
 
 void FeaturesClient::updateContext(const GatrixContext& context,
                                    std::function<void(bool, const std::string&)> onComplete) {
+  // Compute hash of new context to detect actual changes
+  std::string newHash = computeContextHash(context);
+  if (newHash == _lastContextHash) {
+    // No change — notify immediately without fetching
+    if (onComplete)
+      onComplete(true, "");
+    return;
+  }
+
   _context.userId = context.userId;
   _context.sessionId = context.sessionId;
   if (!context.currentTime.empty())
@@ -133,6 +142,7 @@ void FeaturesClient::updateContext(const GatrixContext& context,
     _context.properties[key] = val;
   }
 
+  _lastContextHash = newHash;
   _stats.contextChangeCount++;
 
   if (!_started || _config.offlineMode) {
@@ -146,6 +156,20 @@ void FeaturesClient::updateContext(const GatrixContext& context,
     _pendingContextCallbacks.push_back(std::move(onComplete));
   }
   fetchFlags();
+}
+
+std::string FeaturesClient::computeContextHash(const GatrixContext& context) {
+  // Build a deterministic string from context fields
+  std::string input = context.userId + "|" + context.sessionId + "|" + context.currentTime;
+
+  // Properties are already in a sorted std::map
+  for (const auto& [key, val] : context.properties) {
+    input += "|" + key + "=" + val;
+  }
+
+  // Simple hash using std::hash (fast, sufficient for change detection)
+  std::hash<std::string> hasher;
+  return std::to_string(hasher(input));
 }
 
 // ==================== Flag Access ====================

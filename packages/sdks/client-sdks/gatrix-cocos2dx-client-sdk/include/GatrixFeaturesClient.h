@@ -226,6 +226,7 @@ private:
   std::string _lastError;
   int _consecutiveFailures = 0;
   bool _pollingStopped = false;
+  std::string _lastContextHash;
 
   // Stats
   GatrixSdkStats _stats;
@@ -267,6 +268,7 @@ private:
                             const std::map<std::string, EvaluatedFlag>& oldFlags,
                             const std::map<std::string, EvaluatedFlag>& newFlags,
                             bool forceRealtime);
+  static std::string computeContextHash(const GatrixContext& context);
 
   // Streaming
   void connectStreaming();

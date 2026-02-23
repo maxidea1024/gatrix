@@ -1099,6 +1099,7 @@ class FeaturesClient implements VariationProvider {
     if (_context == newContext) return;
     _context.userId = newContext.userId;
     _context.sessionId = newContext.sessionId;
+    _context.currentTime = newContext.currentTime;
     _context.properties = newContext.properties;
     _contextChangeCount++;
     await fetchFlags();

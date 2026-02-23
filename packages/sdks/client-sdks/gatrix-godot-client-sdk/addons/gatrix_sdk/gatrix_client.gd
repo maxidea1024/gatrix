@@ -236,9 +236,9 @@ func json_variation_or_throw(flag_name: String):
 # ==================== Context ====================
 
 ## Update the evaluation context. Triggers a re-fetch.
-func update_context(new_context: GatrixTypes.GatrixContext) -> void:
+func update_context(new_context: GatrixTypes.GatrixContext, on_complete: Callable = Callable()) -> void:
 	assert(_initialized, "GatrixSDK: Not initialized")
-	_features.update_context(new_context)
+	_features.update_context(new_context, on_complete)
 
 
 ## Get the current evaluation context.

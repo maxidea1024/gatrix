@@ -255,6 +255,14 @@ class FeaturesClient:
         self._watch_callbacks: Dict[str, List[Callable]] = {}
         self._synced_watch_callbacks: Dict[str, List[Callable]] = {}
 
+        # Context hash for change detection
+        self._last_context_hash: str = ""
+
+        # Pending completion callbacks
+        self._pending_context_callbacks: List[Callable] = []
+        self._pending_fetch_callbacks: List[Callable] = []
+        self._pending_start_callbacks: List[Callable] = []
+
         # Metrics bucket
         self._metrics_bucket: Dict[str, Any] = {}
         self._bucket_start: Optional[datetime] = None
@@ -351,13 +359,58 @@ class FeaturesClient:
     def get_context(self) -> GatrixContext:
         return self._context
 
-    def update_context(self, context: GatrixContext) -> None:
-        """Update context and re-fetch flags."""
+    def update_context(
+        self,
+        context: GatrixContext,
+        on_complete: Optional[Callable[[bool, str], None]] = None,
+    ) -> None:
+        """Update context and re-fetch flags asynchronously.
+
+        The fetch runs in a background thread.  ``on_complete(success,
+        error_message)`` is called when it finishes, or immediately when
+        the context has not changed / offline / not started.
+
+        Args:
+            context: New evaluation context.
+            on_complete: Optional callback ``(success, error_message)``.
+        """
+        new_hash = self._compute_context_hash(context)
+        if new_hash == self._last_context_hash:
+            if on_complete:
+                on_complete(True, "")
+            return
+
         self._context = context
+        self._last_context_hash = new_hash
         self._context_change_count += 1
         self._etag = None  # Force full fetch
-        if self._started and not self._offline_mode:
-            self.fetch_flags()
+
+        if not self._started or self._offline_mode:
+            if on_complete:
+                on_complete(True, "")
+            return
+
+        if on_complete:
+            self._pending_context_callbacks.append(on_complete)
+        self._fetch_flags_async()
+
+    @staticmethod
+    def _compute_context_hash(ctx: GatrixContext) -> str:
+        """Build a deterministic hash string from context fields."""
+        parts = [
+            ctx.user_id or "",
+            ctx.session_id or "",
+            ctx.current_time or "",
+        ]
+        if ctx.properties:
+            for key in sorted(ctx.properties.keys()):
+                parts.append(f"{key}={ctx.properties[key]}")
+        return "|".join(parts)
+
+    def _fetch_flags_async(self) -> None:
+        """Run fetch_flags in a background thread."""
+        t = threading.Thread(target=self.fetch_flags, daemon=True)
+        t.start()
 
     # ============================================================= Flag Access
     def _create_proxy(self, flag_name: str, force_realtime: bool = True) -> FlagProxy:
@@ -982,6 +1035,7 @@ class FeaturesClient:
 
             self._set_ready()
             self._emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS)
+            self._drain_pending_callbacks(True, "")
 
         except HTTPError as e:
             self._handle_fetch_error(e.code, e)
@@ -1017,6 +1071,7 @@ class FeaturesClient:
         self._last_error = error
         self._last_error_time = datetime.now(timezone.utc)
         self._sdk_state = "error"
+        self._drain_pending_callbacks(False, str(error))
 
         self._emitter.emit(
             EVENTS.FLAGS_FETCH_ERROR, {"status": status, "error": error}
@@ -1031,6 +1086,22 @@ class FeaturesClient:
             return
 
         self._consecutive_failures += 1
+
+    def _drain_pending_callbacks(self, success: bool, error_msg: str) -> None:
+        """Drain all pending completion callbacks."""
+        all_cbs = (
+            self._pending_context_callbacks
+            + self._pending_fetch_callbacks
+            + self._pending_start_callbacks
+        )
+        self._pending_context_callbacks.clear()
+        self._pending_fetch_callbacks.clear()
+        self._pending_start_callbacks.clear()
+        for cb in all_cbs:
+            try:
+                cb(success, error_msg)
+            except Exception:
+                logger.exception("Error in pending callback")
 
     # ============================================================ Apply flags
     def _apply_flags(self, new_flags: Dict[str, EvaluatedFlag]) -> None:
