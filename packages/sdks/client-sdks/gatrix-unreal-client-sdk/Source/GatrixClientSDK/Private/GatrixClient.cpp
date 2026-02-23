@@ -222,25 +222,6 @@ FGatrixSdkStats UGatrixClient::GetStats() const {
   return Stats;
 }
 
-void UGatrixClient::UpdateContext(const FGatrixContext& NewContext) {
-  if (FeaturesClient) {
-    FeaturesClient->UpdateContext(NewContext);
-  }
-}
-
-void UGatrixClient::UpdateContext(const FGatrixContext& NewContext,
-                                  TFunction<void(bool, const FString&)> OnComplete) {
-  if (FeaturesClient) {
-    FeaturesClient->UpdateContext(NewContext, MoveTemp(OnComplete));
-  } else if (OnComplete) {
-    OnComplete(false, TEXT("Client not initialized"));
-  }
-}
-
-FGatrixContext UGatrixClient::GetContext() const {
-  return FeaturesClient ? FeaturesClient->GetContext() : FGatrixContext();
-}
-
 FGatrixOnReady& UGatrixClient::GetOnReady() {
   return FeaturesClient->OnReady;
 }

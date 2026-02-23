@@ -100,25 +100,6 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Stats")
   FGatrixSdkStats GetStats() const;
 
-  // ==================== Context ====================
-
-  /** Update evaluation context (Blueprint) */
-  UFUNCTION(BlueprintCallable, Category = "Gatrix|Context")
-  void UpdateContext(const FGatrixContext& NewContext);
-
-  /**
-   * Update evaluation context (C++ only).
-   * OnComplete is called on the game thread with (bSuccess, ErrorMessage)
-   * once the resulting fetch completes, or immediately when offline/not
-   * started.
-   */
-  void UpdateContext(const FGatrixContext& NewContext,
-                     TFunction<void(bool, const FString&)> OnComplete);
-
-  /** Get current context */
-  UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Context")
-  FGatrixContext GetContext() const;
-
   // ==================== Blueprint Events (forwarded from FeaturesClient)
   // ====================
 
