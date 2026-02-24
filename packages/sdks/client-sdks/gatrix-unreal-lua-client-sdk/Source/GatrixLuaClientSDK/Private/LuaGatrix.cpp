@@ -135,6 +135,14 @@ void FGatrixLuaBindings::Unregister(lua_State* L) {
     return;
   }
 
+  // Stop the client first to cancel timers, polling, and streaming connections.
+  // This must happen before RemoveAllCallbacks to prevent dangling callbacks
+  // from firing after the Lua state is invalidated.
+  UGatrixClient* Client = UGatrixClient::Get();
+  if (Client && Client->IsInitialized()) {
+    Client->Stop();
+  }
+
   RemoveAllCallbacks(L);
 
   UE_LOG(LogGatrixLua, Log, TEXT("Unregistered from Lua state %p"), L);
