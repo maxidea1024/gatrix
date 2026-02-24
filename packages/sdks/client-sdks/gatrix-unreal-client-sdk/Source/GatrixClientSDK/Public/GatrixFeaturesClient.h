@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GatrixEventEmitter.h"
+#include "GatrixJson.h"
 #include "GatrixFlagProxy.h"
 #include "GatrixFlagWatchDelegate.h"
 #include "GatrixSseConnection.h"
@@ -392,7 +393,7 @@ private:
   void HandleFetchResponse(const FString& ResponseBody, int32 HttpStatus,
                            const FString& EtagHeader);
   void StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFlags, bool bIsInitialFetch);
-  TMap<FString, FGatrixEvaluatedFlag> SelectFlags(bool bForceRealtime) const;
+  TMap<FString, FGatrixEvaluatedFlag> CopyFlags(bool bForceRealtime) const;
 
   // Return a const reference to the appropriate flag map.
   // Caller MUST hold FlagsCriticalSection before calling.
@@ -420,11 +421,9 @@ private:
   void StartMetrics();
   void StopMetrics();
   void SendMetrics();
-  void BuildMetricsPayload(FString& OutJson) const;
 
   FString BuildFetchUrl() const;
   FString BuildContextQueryString() const;
-  FString ContextToJson() const;
 
   // Streaming
   void ConnectStreaming();
@@ -476,12 +475,8 @@ private:
   FThreadSafeCounter MetricsSentCount;
   FThreadSafeCounter MetricsErrorCount;
 
-  // Metrics tracking
-  struct FFlagMetrics {
-    int32 Yes = 0;
-    int32 No = 0;
-    TMap<FString, int32> Variants;
-  };
+  // Metrics tracking (type defined in GatrixJson.h)
+  using FFlagMetrics = FGatrixJson::FFlagMetrics;
 
   mutable FCriticalSection MetricsCriticalSection;
   mutable TMap<FString, FFlagMetrics> MetricsFlagBucket;

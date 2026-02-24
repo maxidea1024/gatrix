@@ -5,10 +5,10 @@
 #include "GatrixFeaturesClient.h"
 #include "GatrixClient.h"
 #include "GatrixEvents.h"
+#include "GatrixJson.h"
 #include "GatrixClientSDKModule.h"
 
 #include "Async/Async.h"
-#include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
@@ -16,8 +16,6 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Misc/Guid.h"
-#include "Serialization/JsonReader.h"
-#include "Serialization/JsonSerializer.h"
 #include "TimerManager.h"
 
 const FString UGatrixFeaturesClient::StorageKeyFlags = TEXT("gatrix_flags");
@@ -133,7 +131,7 @@ void UGatrixFeaturesClient::Stop() {
 
 // ==================== Flag Access (Thread-Safe) ====================
 
-TMap<FString, FGatrixEvaluatedFlag> UGatrixFeaturesClient::SelectFlags(bool bForceRealtime) const {
+TMap<FString, FGatrixEvaluatedFlag> UGatrixFeaturesClient::CopyFlags(bool bForceRealtime) const {
   FScopeLock Lock(&FlagsCriticalSection);
   return SelectFlagsRef(bForceRealtime);
 }
@@ -510,7 +508,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
 
   // POST body with context
   if (bUsePOST) {
-    HttpRequest->SetContentAsString(ContextToJson());
+    HttpRequest->SetContentAsString(FGatrixJson::SerializeContext(ClientConfig));
   }
 
   // Set timeout
@@ -610,144 +608,14 @@ void UGatrixFeaturesClient::HandleFetchResponse(const FString& ResponseBody, int
       }
     }
 
-    // Parse response JSON
-    TSharedPtr<FJsonObject> JsonObject;
-    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
-    if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid()) {
+    // Parse response JSON via GatrixJson utility
+    TArray<FGatrixEvaluatedFlag> ParsedFlags;
+    if (!FGatrixJson::ParseFlagsResponse(ResponseBody, ParsedFlags)) {
       UE_LOG(LogGatrix, Error, TEXT("Failed to parse flags response JSON"));
       if (EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsFetchError, TEXT("JSON parse error"));
       }
       return;
-    }
-
-    // Check success field
-    bool bSuccess = false;
-    JsonObject->TryGetBoolField(TEXT("success"), bSuccess);
-    if (!bSuccess) {
-      UE_LOG(LogGatrix, Warning, TEXT("Flags response success=false"));
-      return;
-    }
-
-    // Parse flags from data.flags
-    const TSharedPtr<FJsonObject>* DataObj = nullptr;
-    if (!JsonObject->TryGetObjectField(TEXT("data"), DataObj)) {
-      return;
-    }
-
-    const TArray<TSharedPtr<FJsonValue>>* FlagsArray = nullptr;
-    if (!(*DataObj)->TryGetArrayField(TEXT("flags"), FlagsArray)) {
-      return;
-    }
-
-    TArray<FGatrixEvaluatedFlag> ParsedFlags;
-    for (const auto& FlagValue : *FlagsArray) {
-      const TSharedPtr<FJsonObject>* FlagObj = nullptr;
-      if (!FlagValue->TryGetObject(FlagObj))
-        continue;
-
-      FGatrixEvaluatedFlag Flag;
-      (*FlagObj)->TryGetStringField(TEXT("name"), Flag.Name);
-      (*FlagObj)->TryGetBoolField(TEXT("enabled"), Flag.bEnabled);
-      (*FlagObj)->TryGetNumberField(TEXT("version"), Flag.Version);
-      (*FlagObj)->TryGetStringField(TEXT("reason"), Flag.Reason);
-      (*FlagObj)->TryGetBoolField(TEXT("impressionData"), Flag.bImpressionData);
-
-      // Parse variant type
-      FString TypeStr;
-      (*FlagObj)->TryGetStringField(TEXT("valueType"), TypeStr);
-      if (TypeStr == TEXT("string"))
-        Flag.ValueType = EGatrixValueType::String;
-      else if (TypeStr == TEXT("number"))
-        Flag.ValueType = EGatrixValueType::Number;
-      else if (TypeStr == TEXT("boolean"))
-        Flag.ValueType = EGatrixValueType::Boolean;
-      else if (TypeStr == TEXT("json"))
-        Flag.ValueType = EGatrixValueType::Json;
-      else
-        Flag.ValueType = EGatrixValueType::None;
-
-      // Parse variant
-      const TSharedPtr<FJsonObject>* VariantObj = nullptr;
-      if ((*FlagObj)->TryGetObjectField(TEXT("variant"), VariantObj)) {
-        (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
-        (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
-
-        // Parse variant value using the declared valueType, not JSON parse type.
-        // JSON may parse "1234" as a number, but if valueType is "string",
-        // we must store it as the string "1234", not "1234.0".
-        const TSharedPtr<FJsonValue> PayloadValue = (*VariantObj)->TryGetField(TEXT("value"));
-        if (PayloadValue.IsValid()) {
-          switch (Flag.ValueType) {
-          case EGatrixValueType::String:
-            // Always extract as string regardless of JSON type
-            if (PayloadValue->Type == EJson::String) {
-              PayloadValue->TryGetString(Flag.Variant.Value);
-            } else if (PayloadValue->Type == EJson::Number) {
-              // Value was sent as number but type is string — convert without ".0"
-              double NumVal = 0;
-              PayloadValue->TryGetNumber(NumVal);
-              if (FMath::IsNearlyEqual(NumVal, FMath::RoundToDouble(NumVal))) {
-                Flag.Variant.Value = FString::Printf(TEXT("%lld"), static_cast<int64>(NumVal));
-              } else {
-                Flag.Variant.Value = FString::SanitizeFloat(NumVal);
-              }
-            } else if (PayloadValue->Type == EJson::Boolean) {
-              bool BoolVal = false;
-              PayloadValue->TryGetBool(BoolVal);
-              Flag.Variant.Value = BoolVal ? TEXT("true") : TEXT("false");
-            } else {
-              Flag.Variant.Value = PayloadValue->AsString();
-            }
-            break;
-          case EGatrixValueType::Number: {
-            double NumVal = 0;
-            if (PayloadValue->Type == EJson::Number) {
-              PayloadValue->TryGetNumber(NumVal);
-            } else if (PayloadValue->Type == EJson::String) {
-              FString StrVal;
-              PayloadValue->TryGetString(StrVal);
-              NumVal = FCString::Atod(*StrVal);
-            }
-            Flag.Variant.Value = FString::SanitizeFloat(NumVal);
-            break;
-          }
-          case EGatrixValueType::Boolean: {
-            bool BoolVal = false;
-            if (PayloadValue->Type == EJson::Boolean) {
-              PayloadValue->TryGetBool(BoolVal);
-            } else if (PayloadValue->Type == EJson::String) {
-              FString StrVal;
-              PayloadValue->TryGetString(StrVal);
-              BoolVal = StrVal.Equals(TEXT("true"), ESearchCase::IgnoreCase);
-            } else if (PayloadValue->Type == EJson::Number) {
-              double NumVal = 0;
-              PayloadValue->TryGetNumber(NumVal);
-              BoolVal = (NumVal != 0);
-            }
-            Flag.Variant.Value = BoolVal ? TEXT("true") : TEXT("false");
-            break;
-          }
-          case EGatrixValueType::Json:
-          default: {
-            // For JSON or unknown types, serialize back to JSON string
-            if (PayloadValue->Type == EJson::String) {
-              PayloadValue->TryGetString(Flag.Variant.Value);
-            } else if (PayloadValue->Type == EJson::Object || PayloadValue->Type == EJson::Array) {
-              FString JsonStr;
-              TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonStr);
-              FJsonSerializer::Serialize(PayloadValue, TEXT(""), Writer);
-              Flag.Variant.Value = JsonStr;
-            } else {
-              Flag.Variant.Value = PayloadValue->AsString();
-            }
-            break;
-          }
-          }
-        }
-      }
-
-      ParsedFlags.Add(MoveTemp(Flag));
     }
 
     bool bIsInitialFetch = !bFetchedFromServer;
@@ -908,51 +776,9 @@ void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFl
     }
   }
 
-  // Persist to storage
+  // Persist to storage via GatrixJson utility
   if (StorageProvider.IsValid()) {
-    // Serialize flags to JSON for storage
-    FString FlagsJson;
-    TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&FlagsJson);
-    Writer->WriteArrayStart();
-    for (const auto& Flag : NewFlags) {
-      Writer->WriteObjectStart();
-      Writer->WriteValue(TEXT("name"), Flag.Name);
-      Writer->WriteValue(TEXT("enabled"), Flag.bEnabled);
-      Writer->WriteValue(TEXT("version"), Flag.Version);
-      Writer->WriteValue(TEXT("reason"), Flag.Reason);
-      Writer->WriteValue(TEXT("impressionData"), Flag.bImpressionData);
-
-      FString TypeStr;
-      switch (Flag.ValueType) {
-      case EGatrixValueType::String:
-        TypeStr = TEXT("string");
-        break;
-      case EGatrixValueType::Number:
-        TypeStr = TEXT("number");
-        break;
-      case EGatrixValueType::Boolean:
-        TypeStr = TEXT("boolean");
-        break;
-      case EGatrixValueType::Json:
-        TypeStr = TEXT("json");
-        break;
-      default:
-        TypeStr = TEXT("none");
-        break;
-      }
-      Writer->WriteValue(TEXT("valueType"), TypeStr);
-
-      Writer->WriteObjectStart(TEXT("variant"));
-      Writer->WriteValue(TEXT("name"), Flag.Variant.Name);
-      Writer->WriteValue(TEXT("enabled"), Flag.Variant.bEnabled);
-      Writer->WriteValue(TEXT("value"), Flag.Variant.Value);
-      Writer->WriteObjectEnd();
-
-      Writer->WriteObjectEnd();
-    }
-    Writer->WriteArrayEnd();
-    Writer->Close();
-
+    FString FlagsJson = FGatrixJson::SerializeFlags(NewFlags);
     StorageProvider->Save(StorageKeyFlags, FlagsJson);
   }
 
@@ -998,50 +824,17 @@ void UGatrixFeaturesClient::LoadFromStorage() {
     Etag = StoredEtag;
   }
 
-  // Load cached flags
+  // Load cached flags via GatrixJson utility
   FString FlagsJson = StorageProvider->Load(StorageKeyFlags);
   if (FlagsJson.IsEmpty())
     return;
 
-  TSharedPtr<FJsonValue> ParsedValue;
-  TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FlagsJson);
-  if (!FJsonSerializer::Deserialize(Reader, ParsedValue) || !ParsedValue.IsValid())
-    return;
-
-  const TArray<TSharedPtr<FJsonValue>>* FlagsArray = nullptr;
-  if (!ParsedValue->TryGetArray(FlagsArray))
+  TArray<FGatrixEvaluatedFlag> ParsedFlags;
+  if (!FGatrixJson::ParseStoredFlags(FlagsJson, ParsedFlags))
     return;
 
   FScopeLock Lock(&FlagsCriticalSection);
-  for (const auto& FlagValue : *FlagsArray) {
-    const TSharedPtr<FJsonObject>* FlagObj = nullptr;
-    if (!FlagValue->TryGetObject(FlagObj))
-      continue;
-
-    FGatrixEvaluatedFlag Flag;
-    (*FlagObj)->TryGetStringField(TEXT("name"), Flag.Name);
-    (*FlagObj)->TryGetBoolField(TEXT("enabled"), Flag.bEnabled);
-    (*FlagObj)->TryGetNumberField(TEXT("version"), Flag.Version);
-    (*FlagObj)->TryGetStringField(TEXT("reason"), Flag.Reason);
-
-    FString TypeStr;
-    (*FlagObj)->TryGetStringField(TEXT("valueType"), TypeStr);
-    if (TypeStr == TEXT("string"))
-      Flag.ValueType = EGatrixValueType::String;
-    else if (TypeStr == TEXT("number"))
-      Flag.ValueType = EGatrixValueType::Number;
-    else if (TypeStr == TEXT("boolean"))
-      Flag.ValueType = EGatrixValueType::Boolean;
-    else if (TypeStr == TEXT("json"))
-      Flag.ValueType = EGatrixValueType::Json;
-
-    const TSharedPtr<FJsonObject>* VariantObj = nullptr;
-    if ((*FlagObj)->TryGetObjectField(TEXT("variant"), VariantObj)) {
-      (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
-      (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
-      (*VariantObj)->TryGetStringField(TEXT("value"), Flag.Variant.Value);
-    }
-
+  for (const auto& Flag : ParsedFlags) {
     RealtimeFlags.Add(Flag.Name, Flag);
   }
 
@@ -1049,9 +842,35 @@ void UGatrixFeaturesClient::LoadFromStorage() {
 }
 
 void UGatrixFeaturesClient::ApplyBootstrap() {
-  // Bootstrap is applied via config in a real scenario
-  // Here we check if there are bootstrap flags in the features config
-  // (In UE4, bootstrap would typically be loaded from a data asset or config)
+  const TArray<FGatrixEvaluatedFlag>& Bootstrap = ClientConfig.Features.Bootstrap;
+  if (Bootstrap.Num() == 0) {
+    return;
+  }
+
+  const bool bOverride = ClientConfig.Features.bBootstrapOverride;
+
+  // Apply bootstrap if override is enabled or no cached flags exist
+  if (bOverride || RealtimeFlags.Num() == 0) {
+    UE_LOG(LogGatrix, Log, TEXT("ApplyBootstrap: applying %d bootstrap flags (override=%s)"),
+           Bootstrap.Num(), bOverride ? TEXT("true") : TEXT("false"));
+
+    {
+      FScopeLock Lock(&FlagsCriticalSection);
+      for (const auto& Flag : Bootstrap) {
+        RealtimeFlags.Add(Flag.Name, Flag);
+      }
+      SynchronizedFlags = RealtimeFlags;
+    }
+
+    // Persist bootstrap flags to storage
+    if (StorageProvider.IsValid()) {
+      FString FlagsJson = FGatrixJson::SerializeFlags(Bootstrap);
+      StorageProvider->Save(StorageKeyFlags, FlagsJson);
+    }
+
+    // Bootstrap data makes SDK ready immediately
+    SetReady();
+  }
 }
 
 // ==================== Ready ====================
@@ -1461,8 +1280,25 @@ void UGatrixFeaturesClient::StopMetrics() {
 }
 
 void UGatrixFeaturesClient::SendMetrics() {
-  FString PayloadJson;
-  BuildMetricsPayload(PayloadJson);
+  TMap<FString, FFlagMetrics> BucketCopy;
+  TMap<FString, int32> MissingCopy;
+  FDateTime BucketStart;
+
+  {
+    FScopeLock Lock(&MetricsCriticalSection);
+    BucketCopy = MetricsFlagBucket;
+    MissingCopy = MetricsMissingFlags;
+    BucketStart = MetricsBucketStartTime;
+
+    // Clear after reading
+    const_cast<TMap<FString, FFlagMetrics>&>(MetricsFlagBucket).Empty();
+    const_cast<TMap<FString, int32>&>(MetricsMissingFlags).Empty();
+    const_cast<FDateTime&>(MetricsBucketStartTime) = FDateTime::UtcNow();
+  }
+
+  FString PayloadJson = FGatrixJson::SerializeMetrics(
+      ClientConfig.AppName, ClientConfig.Environment, UGatrixClient::SdkName,
+      UGatrixClient::SdkVersion, ConnectionId, BucketStart, BucketCopy, MissingCopy);
 
   if (PayloadJson.IsEmpty())
     return;
@@ -1544,70 +1380,6 @@ void UGatrixFeaturesClient::SendMetrics() {
   HttpRequest->ProcessRequest();
 }
 
-void UGatrixFeaturesClient::BuildMetricsPayload(FString& OutJson) const {
-  TMap<FString, FFlagMetrics> BucketCopy;
-  TMap<FString, int32> MissingCopy;
-
-  {
-    FScopeLock Lock(&MetricsCriticalSection);
-    BucketCopy = MetricsFlagBucket;
-    MissingCopy = MetricsMissingFlags;
-
-    // Clear after reading
-    const_cast<TMap<FString, FFlagMetrics>&>(MetricsFlagBucket).Empty();
-    const_cast<TMap<FString, int32>&>(MetricsMissingFlags).Empty();
-    const_cast<FDateTime&>(MetricsBucketStartTime) = FDateTime::UtcNow();
-  }
-
-  if (BucketCopy.Num() == 0 && MissingCopy.Num() == 0) {
-    OutJson = FString();
-    return;
-  }
-
-  TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutJson);
-  Writer->WriteObjectStart();
-  Writer->WriteValue(TEXT("appName"), ClientConfig.AppName);
-  Writer->WriteValue(TEXT("environment"), ClientConfig.Environment);
-  Writer->WriteValue(TEXT("sdkName"), UGatrixClient::SdkName);
-  Writer->WriteValue(TEXT("sdkVersion"), UGatrixClient::SdkVersion);
-  Writer->WriteValue(TEXT("connectionId"), ConnectionId);
-
-  Writer->WriteObjectStart(TEXT("bucket"));
-
-  Writer->WriteValue(TEXT("start"), MetricsBucketStartTime.ToIso8601());
-  Writer->WriteValue(TEXT("stop"), FDateTime::UtcNow().ToIso8601());
-
-  // Flag access counts
-  Writer->WriteObjectStart(TEXT("flags"));
-  for (const auto& Pair : BucketCopy) {
-    Writer->WriteObjectStart(Pair.Key);
-    Writer->WriteValue(TEXT("yes"), Pair.Value.Yes);
-    Writer->WriteValue(TEXT("no"), Pair.Value.No);
-
-    if (Pair.Value.Variants.Num() > 0) {
-      Writer->WriteObjectStart(TEXT("variants"));
-      for (const auto& VarPair : Pair.Value.Variants) {
-        Writer->WriteValue(VarPair.Key, VarPair.Value);
-      }
-      Writer->WriteObjectEnd();
-    }
-
-    Writer->WriteObjectEnd();
-  }
-  Writer->WriteObjectEnd(); // flags
-
-  // Missing flags
-  Writer->WriteObjectStart(TEXT("missing"));
-  for (const auto& Pair : MissingCopy) {
-    Writer->WriteValue(Pair.Key, Pair.Value);
-  }
-  Writer->WriteObjectEnd(); // missing
-
-  Writer->WriteObjectEnd(); // bucket
-  Writer->WriteObjectEnd();
-  Writer->Close();
-}
-
 // ==================== URL Building ====================
 
 FString UGatrixFeaturesClient::BuildFetchUrl() const {
@@ -1647,35 +1419,6 @@ FString UGatrixFeaturesClient::BuildContextQueryString() const {
   }
 
   return FString::Join(Params, TEXT("&"));
-}
-
-FString UGatrixFeaturesClient::ContextToJson() const {
-  FString Json;
-  TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Json);
-  Writer->WriteObjectStart();
-  Writer->WriteObjectStart(TEXT("context"));
-
-  Writer->WriteValue(TEXT("appName"), ClientConfig.AppName);
-  Writer->WriteValue(TEXT("environment"), ClientConfig.Environment);
-
-  if (!ClientConfig.Features.Context.UserId.IsEmpty())
-    Writer->WriteValue(TEXT("userId"), ClientConfig.Features.Context.UserId);
-  if (!ClientConfig.Features.Context.SessionId.IsEmpty())
-    Writer->WriteValue(TEXT("sessionId"), ClientConfig.Features.Context.SessionId);
-
-  if (ClientConfig.Features.Context.Properties.Num() > 0) {
-    Writer->WriteObjectStart(TEXT("properties"));
-    for (const auto& Prop : ClientConfig.Features.Context.Properties) {
-      Writer->WriteValue(Prop.Key, Prop.Value);
-    }
-    Writer->WriteObjectEnd();
-  }
-
-  Writer->WriteObjectEnd(); // context
-  Writer->WriteObjectEnd();
-  Writer->Close();
-
-  return Json;
 }
 
 // ==================== Statistics ====================
@@ -2296,129 +2039,13 @@ void UGatrixFeaturesClient::MergePartialResponse(const FString& ResponseBody,
                                                  const TSet<FString>& RequestedKeys) {
   UE_LOG(LogGatrix, Log, TEXT("MergePartialResponse: called, body length=%d"), ResponseBody.Len());
 
-  // Parse response JSON (same structure as full fetch)
-  TSharedPtr<FJsonObject> JsonObject;
-  TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
-  if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid()) {
+  // Parse response via GatrixJson utility
+  TArray<FGatrixEvaluatedFlag> PartialFlags;
+  if (!FGatrixJson::ParseFlagsResponse(ResponseBody, PartialFlags)) {
     UE_LOG(LogGatrix, Warning, TEXT("MergePartialResponse: JSON parse failed, falling back"));
     Etag = TEXT("");
     FetchFlags();
     return;
-  }
-
-  bool bSuccess = false;
-  JsonObject->TryGetBoolField(TEXT("success"), bSuccess);
-  if (!bSuccess) {
-    UE_LOG(LogGatrix, Warning, TEXT("MergePartialResponse: success=false, falling back"));
-    Etag = TEXT("");
-    FetchFlags();
-    return;
-  }
-
-  const TSharedPtr<FJsonObject>* DataObj = nullptr;
-  if (!JsonObject->TryGetObjectField(TEXT("data"), DataObj)) {
-    return;
-  }
-
-  const TArray<TSharedPtr<FJsonValue>>* FlagsArray = nullptr;
-  if (!(*DataObj)->TryGetArrayField(TEXT("flags"), FlagsArray)) {
-    return;
-  }
-
-  // Parse the partial flags using the same inline logic as HandleFetchResponse
-  TArray<FGatrixEvaluatedFlag> PartialFlags;
-  for (const auto& FlagValue : *FlagsArray) {
-    const TSharedPtr<FJsonObject>* FlagObj = nullptr;
-    if (!FlagValue->TryGetObject(FlagObj))
-      continue;
-
-    FGatrixEvaluatedFlag Flag;
-    (*FlagObj)->TryGetStringField(TEXT("name"), Flag.Name);
-    (*FlagObj)->TryGetBoolField(TEXT("enabled"), Flag.bEnabled);
-    (*FlagObj)->TryGetNumberField(TEXT("version"), Flag.Version);
-    (*FlagObj)->TryGetStringField(TEXT("reason"), Flag.Reason);
-    (*FlagObj)->TryGetBoolField(TEXT("impressionData"), Flag.bImpressionData);
-
-    FString TypeStr;
-    if ((*FlagObj)->TryGetStringField(TEXT("valueType"), TypeStr)) {
-      if (TypeStr == TEXT("string"))
-        Flag.ValueType = EGatrixValueType::String;
-      else if (TypeStr == TEXT("number"))
-        Flag.ValueType = EGatrixValueType::Number;
-      else if (TypeStr == TEXT("boolean"))
-        Flag.ValueType = EGatrixValueType::Boolean;
-      else if (TypeStr == TEXT("json"))
-        Flag.ValueType = EGatrixValueType::Json;
-      else
-        Flag.ValueType = EGatrixValueType::None;
-    }
-
-    const TSharedPtr<FJsonObject>* VariantObj = nullptr;
-    if ((*FlagObj)->TryGetObjectField(TEXT("variant"), VariantObj)) {
-      (*VariantObj)->TryGetStringField(TEXT("name"), Flag.Variant.Name);
-      (*VariantObj)->TryGetBoolField(TEXT("enabled"), Flag.Variant.bEnabled);
-
-      const TSharedPtr<FJsonValue> PayloadValue = (*VariantObj)->TryGetField(TEXT("value"));
-      if (PayloadValue.IsValid()) {
-        switch (Flag.ValueType) {
-        case EGatrixValueType::String:
-          if (PayloadValue->Type == EJson::String) {
-            PayloadValue->TryGetString(Flag.Variant.Value);
-          } else if (PayloadValue->Type == EJson::Number) {
-            double N = 0;
-            PayloadValue->TryGetNumber(N);
-            Flag.Variant.Value = FMath::IsNearlyEqual(N, FMath::RoundToDouble(N))
-                                     ? FString::Printf(TEXT("%lld"), static_cast<int64>(N))
-                                     : FString::SanitizeFloat(N);
-          } else if (PayloadValue->Type == EJson::Boolean) {
-            bool B = false;
-            PayloadValue->TryGetBool(B);
-            Flag.Variant.Value = B ? TEXT("true") : TEXT("false");
-          } else {
-            Flag.Variant.Value = PayloadValue->AsString();
-          }
-          break;
-        case EGatrixValueType::Number: {
-          double N = 0;
-          if (PayloadValue->Type == EJson::Number)
-            PayloadValue->TryGetNumber(N);
-          else if (PayloadValue->Type == EJson::String) {
-            FString S;
-            PayloadValue->TryGetString(S);
-            N = FCString::Atod(*S);
-          }
-          Flag.Variant.Value = FString::SanitizeFloat(N);
-          break;
-        }
-        case EGatrixValueType::Boolean: {
-          bool B = false;
-          if (PayloadValue->Type == EJson::Boolean)
-            PayloadValue->TryGetBool(B);
-          else if (PayloadValue->Type == EJson::String) {
-            FString S;
-            PayloadValue->TryGetString(S);
-            B = S.Equals(TEXT("true"), ESearchCase::IgnoreCase);
-          }
-          Flag.Variant.Value = B ? TEXT("true") : TEXT("false");
-          break;
-        }
-        case EGatrixValueType::Json: {
-          FString JsonStr;
-          TSharedRef<TJsonWriter<>> W = TJsonWriterFactory<>::Create(&JsonStr);
-          if (FJsonSerializer::Serialize(PayloadValue.ToSharedRef(), TEXT(""), W)) {
-            W->Close();
-            Flag.Variant.Value = JsonStr;
-          } else {
-            Flag.Variant.Value = PayloadValue->AsString();
-          }
-          break;
-        }
-        default:
-          break;
-        }
-      }
-    }
-    PartialFlags.Add(MoveTemp(Flag));
   }
 
   UE_LOG(LogGatrix, Log, TEXT("MergePartialResponse: parsed %d flags"), PartialFlags.Num());

@@ -307,6 +307,10 @@ struct GATRIXCLIENTSDK_API FGatrixFeaturesConfig {
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   bool bExplicitSyncMode = true;
 
+  /** Bootstrap flag data (used before first fetch or in offline mode) */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
+  TArray<FGatrixEvaluatedFlag> Bootstrap;
+
   /** Override stored flags with bootstrap (default: true) */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gatrix")
   bool bBootstrapOverride = true;
