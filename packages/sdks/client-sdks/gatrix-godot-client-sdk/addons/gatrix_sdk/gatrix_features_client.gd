@@ -134,7 +134,7 @@ func has_flag(flag_name: String, force_realtime: bool = false) -> bool:
 	return _lookup_flag(flag_name, force_realtime) != null
 
 
-func _create_proxy(flag_name: String, force_realtime: bool = true) -> GatrixFlagProxy:
+func _create_proxy_for_watch(flag_name: String, force_realtime: bool = true) -> GatrixFlagProxy:
 	var flag = _lookup_flag(flag_name, force_realtime)
 	_track_flag_access(flag_name, flag, "watch", flag.variant.name if flag != null else "")
 	return GatrixFlagProxy.new(self, flag_name, force_realtime)
@@ -661,7 +661,7 @@ func watch_realtime_flag_with_initial_state(flag_name: String, callback: Callabl
 	var unwatch := watch_realtime_flag(flag_name, callback, watcher_name)
 
 	# Fire immediately with current state — always use realtimeFlags
-	var proxy := _create_proxy(flag_name, true)
+	var proxy := _create_proxy_for_watch(flag_name, true)
 	callback.call(proxy)
 
 	return unwatch
@@ -680,7 +680,7 @@ func watch_synced_flag_with_initial_state(flag_name: String, callback: Callable,
 	var unwatch := watch_synced_flag(flag_name, callback, watcher_name)
 
 	# Fire immediately — respect explicitSyncMode for synced watchers
-	var proxy := _create_proxy(flag_name, false)
+	var proxy := _create_proxy_for_watch(flag_name, false)
 	callback.call(proxy)
 
 	return unwatch
@@ -1040,7 +1040,7 @@ func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_fla
 			changed = true  # Flag removed
 
 		if changed:
-			var proxy := GatrixFlagProxy.new(self, flag_name, force_realtime)
+			var proxy := _create_proxy_for_watch(flag_name, force_realtime)
 			watcher.callback.call(proxy)
 
 

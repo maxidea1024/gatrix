@@ -347,11 +347,11 @@ export class FeaturesClient implements VariationProvider {
    * Always reads from realtimeFlags ? watch callbacks must reflect
    * the latest server state regardless of explicitSyncMode.
    */
-  private createProxy(flagName: string): FlagProxy {
-    const flags = this.selectFlags(true); // always realtime for watch/proxy
+  private createProxyForWatch(flagName: string, forceRealtime: boolean = true): FlagProxy {
+    const flags = this.selectFlags(forceRealtime);
     const flag = flags.get(flagName);
     this.trackFlagAccess(flagName, flag, 'watch', flag?.variant.name);
-    return new FlagProxy(this, flagName, true);
+    return new FlagProxy(this, flagName, forceRealtime);
   }
 
   /**
@@ -942,12 +942,12 @@ export class FeaturesClient implements VariationProvider {
 
     // Emit initial state ? always use realtimeFlags for realtime watchers
     if (this.readyEventEmitted) {
-      callback(new FlagProxy(this, flagName, true));
+      callback(this.createProxyForWatch(flagName, true));
     } else {
       this.emitter.once(
         EVENTS.FLAGS_READY,
         () => {
-          callback(new FlagProxy(this, flagName, true));
+          callback(this.createProxyForWatch(flagName, true));
         }
       );
     }
@@ -990,12 +990,12 @@ export class FeaturesClient implements VariationProvider {
 
     // Emit initial state ? respect explicitSyncMode for synced watchers
     if (this.readyEventEmitted) {
-      callback(new FlagProxy(this, flagName));
+      callback(this.createProxyForWatch(flagName, false));
     } else {
       this.emitter.once(
         EVENTS.FLAGS_READY,
         () => {
-          callback(new FlagProxy(this, flagName));
+          callback(this.createProxyForWatch(flagName, false));
         }
       );
     }
@@ -1300,7 +1300,7 @@ export class FeaturesClient implements VariationProvider {
    * Select the active flag set.
    * When forceRealtime=true, always returns realtimeFlags regardless of explicitSyncMode.
    */
-  private selectFlags(forceRealtime: boolean = false): Map<string, EvaluatedFlag> {
+  private selectFlags(forceRealtime: boolean): Map<string, EvaluatedFlag> {
     if (forceRealtime) {
       return this.realtimeFlags;
     }
@@ -1467,7 +1467,7 @@ export class FeaturesClient implements VariationProvider {
 
         const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
-          const proxy = new FlagProxy(this, name, forceRealtime);
+          const proxy = this.createProxyForWatch(name, forceRealtime);
           callbacks.forEach(callback => {
             try {
               callback(proxy);
@@ -1488,7 +1488,7 @@ export class FeaturesClient implements VariationProvider {
 
         const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
-          const proxy = new FlagProxy(this, name, forceRealtime);
+          const proxy = this.createProxyForWatch(name, forceRealtime);
           callbacks.forEach(callback => {
             try {
               callback(proxy);
@@ -2193,7 +2193,7 @@ export class FeaturesClient implements VariationProvider {
    * Get feature flag specific statistics
    */
   getStats(): FeaturesStats {
-    const flags = this.selectFlags();
+    const flags = this.selectFlags(true);
 
     // Convert Map to Record for flagEnabledCounts
     const flagEnabledCounts: Record<string, { yes: number; no: number }> = {};

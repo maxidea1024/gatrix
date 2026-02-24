@@ -38,13 +38,13 @@ namespace Gatrix.Unity.SDK
             // Emit initial state — always use realtimeFlags for realtime watchers
             if (_readyEventEmitted)
             {
-                callback(new FlagProxy(this, flagName, true));
+                callback(CreateProxyForWatch(flagName, true));
             }
             else
             {
                 _emitter.Once(GatrixEvents.FlagsReady, _ =>
                 {
-                    callback(new FlagProxy(this, flagName, true));
+                    callback(CreateProxyForWatch(flagName, true));
                 }, name != null ? $"{name}_initial" : null);
             }
 
@@ -80,13 +80,13 @@ namespace Gatrix.Unity.SDK
             // Emit initial state — respect explicitSyncMode for synced watchers
             if (_readyEventEmitted)
             {
-                callback(new FlagProxy(this, flagName, false));
+                callback(CreateProxyForWatch(flagName, false));
             }
             else
             {
                 _emitter.Once(GatrixEvents.FlagsReady, _ =>
                 {
-                    callback(new FlagProxy(this, flagName, false));
+                    callback(CreateProxyForWatch(flagName, false));
                 }, name != null ? $"{name}_initial" : null);
             }
 
@@ -160,7 +160,7 @@ namespace Gatrix.Unity.SDK
 
                     if (callbackMap.TryGetValue(kvp.Key, out var callbacks) && callbacks.Count > 0)
                     {
-                        var proxy = new FlagProxy(this, kvp.Key, forceRealtime);
+                        var proxy = CreateProxyForWatch(kvp.Key, forceRealtime);
                         foreach (var cb in callbacks.ToArray()) // copy to avoid mutation during iteration
                         {
                             try
@@ -183,7 +183,7 @@ namespace Gatrix.Unity.SDK
                 {
                     if (callbackMap.TryGetValue(kvp.Key, out var callbacks) && callbacks.Count > 0)
                     {
-                        var proxy = new FlagProxy(this, kvp.Key, forceRealtime);
+                        var proxy = CreateProxyForWatch(kvp.Key, forceRealtime);
                         foreach (var cb in callbacks.ToArray())
                         {
                             try

@@ -433,7 +433,7 @@ class FeaturesClient:
         t.start()
 
     # ============================================================= Flag Access
-    def _create_proxy(self, flag_name: str, force_realtime: bool = True) -> FlagProxy:
+    def _create_proxy_for_watch(self, flag_name: str, force_realtime: bool = True) -> FlagProxy:
         """Create a FlagProxy backed by this client as VariationProvider."""
         flag = self._lookup_flag(flag_name, force_realtime=force_realtime)
         self._track_flag_access(flag_name, flag, "watch", flag.variant.name if flag else None)
@@ -891,7 +891,7 @@ class FeaturesClient:
         unwatch = self.watch_realtime_flag(flag_name, callback, name=name)
 
         # Emit initial state — always use realtime flags
-        proxy = FlagProxy(client=self, flag_name=flag_name, force_realtime=True)
+        proxy = self._create_proxy_for_watch(flag_name, force_realtime=True)
         callback(proxy)
 
         return unwatch
@@ -924,7 +924,7 @@ class FeaturesClient:
         unwatch = self.watch_synced_flag(flag_name, callback, name=name)
 
         # Emit initial state — respect explicitSyncMode
-        proxy = FlagProxy(client=self, flag_name=flag_name, force_realtime=False)
+        proxy = self._create_proxy_for_watch(flag_name, force_realtime=False)
         callback(proxy)
 
         return unwatch
@@ -1204,7 +1204,7 @@ class FeaturesClient:
                 self._flag_last_changed[name] = now
                 callbacks = callback_map.get(name)
                 if callbacks:
-                    proxy = FlagProxy(client=self, flag_name=name, force_realtime=force_realtime)
+                    proxy = self._create_proxy_for_watch(name, force_realtime=force_realtime)
                     for cb in list(callbacks):  # copy to avoid mutation during iteration
                         try:
                             cb(proxy)
@@ -1219,7 +1219,7 @@ class FeaturesClient:
             if name not in new_flags:
                 callbacks = callback_map.get(name)
                 if callbacks:
-                    proxy = FlagProxy(client=self, flag_name=name, force_realtime=force_realtime)
+                    proxy = self._create_proxy_for_watch(name, force_realtime=force_realtime)
                     for cb in list(callbacks):
                         try:
                             cb(proxy)

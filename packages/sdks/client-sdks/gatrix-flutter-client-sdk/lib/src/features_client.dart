@@ -135,7 +135,7 @@ class FeaturesClient implements VariationProvider {
 
   /// Always reads from realtimeFlags — watch callbacks must reflect
   /// the latest server state regardless of explicitSyncMode.
-  FlagProxy _createProxy(String flagName, {bool forceRealtime = true}) {
+  FlagProxy _createProxyForWatch(String flagName, {bool forceRealtime = true}) {
     final flag = _selectFlags(forceRealtime: forceRealtime)[flagName];
     _trackFlagAccess(flagName, flag, 'watch', flag?.variant.name);
     return FlagProxy(this, flagName, forceRealtime: forceRealtime);
@@ -143,7 +143,7 @@ class FeaturesClient implements VariationProvider {
 
   /// Create a FlagProxy. Used internally by SDK widgets/composables.
   /// Not intended for direct use — prefer watchFlag or variation methods.
-  FlagProxy createProxy(String flagName) => _createProxy(flagName);
+  FlagProxy createProxyForWatch(String flagName) => _createProxyForWatch(flagName);
 
   EvaluatedFlag? _getFlag(String flagName, {bool forceRealtime = false}) {
     return _selectFlags(forceRealtime: forceRealtime)[flagName];
@@ -669,10 +669,10 @@ class FeaturesClient implements VariationProvider {
       String flagName, GatrixFlagWatchHandler callback) {
     final unsub = watchRealtimeFlag(flagName, callback);
     if (_readyEventEmitted) {
-      callback(_createProxy(flagName, forceRealtime: true));
+      callback(_createProxyForWatch(flagName, forceRealtime: true));
     } else {
       _events.once(GatrixEvents.flagsReady, (_) {
-        callback(_createProxy(flagName, forceRealtime: true));
+        callback(_createProxyForWatch(flagName, forceRealtime: true));
       });
     }
     return unsub;
@@ -692,10 +692,10 @@ class FeaturesClient implements VariationProvider {
       String flagName, GatrixFlagWatchHandler callback) {
     final unsub = watchSyncedFlag(flagName, callback);
     if (_readyEventEmitted) {
-      callback(_createProxy(flagName, forceRealtime: false));
+      callback(_createProxyForWatch(flagName, forceRealtime: false));
     } else {
       _events.once(GatrixEvents.flagsReady, (_) {
-        callback(_createProxy(flagName, forceRealtime: false));
+        callback(_createProxyForWatch(flagName, forceRealtime: false));
       });
     }
     return unsub;
@@ -727,7 +727,7 @@ class FeaturesClient implements VariationProvider {
       if (oldFlag == null || oldFlag.version != entry.value.version) {
         final callbacks = callbackMap[entry.key];
         if (callbacks != null && callbacks.isNotEmpty) {
-          final proxy = FlagProxy(this, entry.key, forceRealtime: forceRealtime);
+          final proxy = _createProxyForWatch(entry.key, forceRealtime: forceRealtime);
           for (final cb in List.of(callbacks)) {
             try {
               cb(proxy);
@@ -743,7 +743,7 @@ class FeaturesClient implements VariationProvider {
       if (!newFlags.containsKey(entry.key)) {
         final callbacks = callbackMap[entry.key];
         if (callbacks != null && callbacks.isNotEmpty) {
-          final proxy = FlagProxy(this, entry.key, forceRealtime: forceRealtime);
+          final proxy = _createProxyForWatch(entry.key, forceRealtime: forceRealtime);
           for (final cb in List.of(callbacks)) {
             try {
               cb(proxy);

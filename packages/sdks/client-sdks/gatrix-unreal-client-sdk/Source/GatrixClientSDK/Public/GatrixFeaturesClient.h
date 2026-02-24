@@ -386,7 +386,7 @@ private:
 
   // ==================== Internal Methods ====================
 
-  UGatrixFlagProxy* CreateProxy(const FString& FlagName, bool bForceRealtime = true);
+  UGatrixFlagProxy* CreateProxyForWatch(const FString& FlagName, bool bForceRealtime = true);
   void LoadFromStorage();
   void ApplyBootstrap();
   void DoFetchFlags();

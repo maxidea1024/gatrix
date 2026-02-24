@@ -23,12 +23,11 @@ namespace Gatrix.Unity.SDK
         /// <summary>Check if a flag exists</summary>
         public bool HasFlag(string flagName) => LookupFlag(flagName) != null;
 
-        /// <summary>Create a FlagProxy. Used internally by WatchFlag.
-        /// Always reads from realtimeFlags ??watch callbacks must reflect
-        /// the latest server state regardless of explicitSyncMode.</summary>
-        internal FlagProxy CreateProxy(string flagName)
+        /// <summary>Create a FlagProxy for watch callbacks.
+        /// Uses the specified forceRealtime to select the appropriate flag set.</summary>
+        internal FlagProxy CreateProxyForWatch(string flagName, bool forceRealtime = true)
         {
-            return new FlagProxy(this, flagName, forceRealtime: true);
+            return new FlagProxy(this, flagName, forceRealtime: forceRealtime);
         }
 
         /// <summary>Get all flags</summary>

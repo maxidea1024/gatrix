@@ -179,7 +179,8 @@ FGatrixVariant UGatrixFeaturesClient::GetVariant(const FString& FlagName,
   return const_cast<UGatrixFeaturesClient*>(this)->GetVariantInternal(FlagName, bForceRealtime);
 }
 
-UGatrixFlagProxy* UGatrixFeaturesClient::CreateProxy(const FString& FlagName, bool bForceRealtime) {
+UGatrixFlagProxy* UGatrixFeaturesClient::CreateProxyForWatch(const FString& FlagName,
+                                                             bool bForceRealtime) {
   FScopeLock Lock(&FlagsCriticalSection);
   const auto& Flags = SelectFlagsRef(bForceRealtime);
   UGatrixFlagProxy* Proxy = NewObject<UGatrixFlagProxy>(this);
@@ -1009,7 +1010,7 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(const FString& Fl
 
   // Emit initial state — always use realtimeFlags for realtime watchers
   if (bReadyEmitted) {
-    UGatrixFlagProxy* Proxy = CreateProxy(FlagName, /*bForceRealtime=*/true);
+    UGatrixFlagProxy* Proxy = CreateProxyForWatch(FlagName, /*bForceRealtime=*/true);
     Callback.ExecuteIfBound(Proxy);
   } else if (EventEmitter) {
     // Capture by value for safe deferred invocation
@@ -1018,7 +1019,7 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlagWithInitialState(const FString& Fl
     EventEmitter->Once(
         GatrixEvents::FlagsReady,
         [this, CapturedFlagName, CapturedCallback](const TArray<FString>&) {
-          UGatrixFlagProxy* Proxy = CreateProxy(CapturedFlagName, /*bForceRealtime=*/true);
+          UGatrixFlagProxy* Proxy = CreateProxyForWatch(CapturedFlagName, /*bForceRealtime=*/true);
           CapturedCallback.ExecuteIfBound(Proxy);
         },
         Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
@@ -1034,7 +1035,7 @@ int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(const FString& Flag
 
   // Emit initial state — respect explicitSyncMode for synced watchers
   if (bReadyEmitted) {
-    UGatrixFlagProxy* Proxy = CreateProxy(FlagName, /*bForceRealtime=*/false);
+    UGatrixFlagProxy* Proxy = CreateProxyForWatch(FlagName, /*bForceRealtime=*/false);
     Callback.ExecuteIfBound(Proxy);
   } else if (EventEmitter) {
     FString CapturedFlagName = FlagName;
@@ -1042,7 +1043,7 @@ int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(const FString& Flag
     EventEmitter->Once(
         GatrixEvents::FlagsReady,
         [this, CapturedFlagName, CapturedCallback](const TArray<FString>&) {
-          UGatrixFlagProxy* Proxy = CreateProxy(CapturedFlagName, /*bForceRealtime=*/false);
+          UGatrixFlagProxy* Proxy = CreateProxyForWatch(CapturedFlagName, /*bForceRealtime=*/false);
           CapturedCallback.ExecuteIfBound(Proxy);
         },
         Name.IsEmpty() ? FString() : Name + TEXT("_initial"));
@@ -1130,7 +1131,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
                TEXT("InvokeWatchCallbacks: changed='%s', watching='%s', match=%d"), *Pair.Key,
                *Entry.FlagName, (int)(Entry.FlagName == Pair.Key));
         if (Entry.FlagName == Pair.Key) {
-          UGatrixFlagProxy* Proxy = CreateProxy(Pair.Key, bForceRealtime);
+          UGatrixFlagProxy* Proxy = CreateProxyForWatch(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
         }
       }
@@ -1142,7 +1143,7 @@ void UGatrixFeaturesClient::InvokeWatchCallbacks(
     if (!NewFlags.Contains(Pair.Key)) {
       for (const auto& Entry : CallbackList) {
         if (Entry.FlagName == Pair.Key) {
-          UGatrixFlagProxy* Proxy = CreateProxy(Pair.Key, bForceRealtime);
+          UGatrixFlagProxy* Proxy = CreateProxyForWatch(Pair.Key, bForceRealtime);
           Entry.Callback.ExecuteIfBound(Proxy);
         }
       }

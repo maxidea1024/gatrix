@@ -704,9 +704,12 @@ The method MUST accept a `forceRealtime` boolean parameter. When creating `FlagP
 // Pseudocode — correct implementation
 invokeWatchCallbacks(callbackMap, oldFlags, newFlags, forceRealtime):
     for each changed flag:
-        proxy = new FlagProxy(client, flagName, forceRealtime)  // ← MUST pass forceRealtime
+        proxy = createProxyForWatch(flagName, forceRealtime)  // ← MUST use createProxyForWatch
         invoke callbacks with proxy
 ```
+
+> [!NOTE]
+> **`createProxyForWatch` naming convention:** The internal method that creates a `FlagProxy` for watch callbacks MUST be named `createProxyForWatch` (or `_create_proxy_for_watch` in snake_case languages). This naming makes it explicit that the method is **only intended for watch/observe contexts** and should not be confused with general flag access. The method always tracks the access as `"watch"` event type for metrics.
 
 > [!CAUTION]
 > **Never hardcode `forceRealtime` inside `invokeWatchCallbacks`.** A common bug is to always pass `true` or always use the default (`false`) when creating `FlagProxy`. This causes:
