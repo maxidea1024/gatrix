@@ -2,35 +2,34 @@
  * FeaturesClient - Feature Flags client for Gatrix SDK
  * Handles feature flag fetching, caching, and access
  */
-import { EventEmitter } from './EventEmitter';
+import { type EventEmitter } from './EventEmitter';
 import { EVENTS } from './events';
 import {
-  GatrixContext,
-  GatrixClientConfig,
-  FeaturesConfig,
-  EvaluatedFlag,
-  Variant,
-  FlagsApiResponse,
-  ImpressionEvent,
-  ErrorEvent,
-  SdkState,
-  FeaturesStats,
-  VariationResult,
-  StreamingConnectionState,
-  FlagsChangedEvent,
+  type GatrixContext,
+  type GatrixClientConfig,
+  type FeaturesConfig,
+  type EvaluatedFlag,
+  type Variant,
+  type ValueType,
+  type FlagsApiResponse,
+  type ImpressionEvent,
+  type ErrorEvent,
+  type SdkState,
+  type FeaturesStats,
+  type FeaturesLightStats,
+  type VariationResult,
+  type StreamingConnectionState,
+  type FlagsChangedEvent,
 } from './types';
-import {
-  fetchEventSource,
-  EventStreamContentType,
-} from '@microsoft/fetch-event-source';
-import { StorageProvider } from './StorageProvider';
+import { fetchEventSource, EventStreamContentType } from '@microsoft/fetch-event-source';
+import { type StorageProvider } from './StorageProvider';
 import { LocalStorageProvider } from './LocalStorageProvider';
 import { InMemoryStorageProvider } from './InMemoryStorageProvider';
 import { uuidv4, resolveAbortController, deepClone, computeContextHash } from './utils';
 import { FlagProxy } from './FlagProxy';
-import { VariationProvider } from './VariationProvider';
+import { type VariationProvider } from './VariationProvider';
 import { WatchFlagGroup } from './WatchFlagGroup';
-import { Logger, ConsoleLogger } from './Logger';
+import { type Logger, ConsoleLogger } from './Logger';
 import { Metrics } from './Metrics';
 import { GatrixError, GatrixFeatureError } from './errors';
 import { SDK_NAME, SDK_VERSION } from './version';
@@ -111,7 +110,8 @@ export class FeaturesClient implements VariationProvider {
   private metricsErrorCount: number = 0;
   private watchGroups: Map<string, WatchFlagGroup> = new Map();
   private watchCallbacks: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>> = new Map();
-  private syncedWatchCallbacks: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>> = new Map();
+  private syncedWatchCallbacks: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>> =
+    new Map();
   private flagEnabledCounts: Map<string, { yes: number; no: number }> = new Map();
   private flagVariantCounts: Map<string, Map<string, number>> = new Map();
   private flagLastChangedTimes: Map<string, Date> = new Map();
@@ -320,7 +320,7 @@ export class FeaturesClient implements VariationProvider {
 
   async updateContext(context: GatrixContext): Promise<void> {
     // Filter out system fields from input
-    const { appName, environment, ...userContext } = context;
+    const { appName: _appName, environment: _environment, ...userContext } = context;
     const newContext = {
       ...this.context,
       ...userContext,
@@ -451,7 +451,7 @@ export class FeaturesClient implements VariationProvider {
     return this.lookupFlag(flagName, forceRealtime) !== undefined;
   }
 
-  getValueTypeInternal(flagName: string, forceRealtime: boolean = false): import('./types').ValueType {
+  getValueTypeInternal(flagName: string, forceRealtime: boolean = false): ValueType {
     const flag = this.lookupFlag(flagName, forceRealtime);
     return flag?.valueType ?? 'none';
   }
@@ -572,7 +572,13 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
+      return {
+        value: fallbackValue,
+        reason: 'flag_not_found',
+        flagExists: false,
+        enabled: false,
+        variantName: VARIANT_SOURCE.MISSING,
+      };
     }
     if (flag.valueType !== 'boolean') {
       this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
@@ -602,7 +608,13 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
+      return {
+        value: fallbackValue,
+        reason: 'flag_not_found',
+        flagExists: false,
+        enabled: false,
+        variantName: VARIANT_SOURCE.MISSING,
+      };
     }
     if (flag.valueType !== 'string') {
       this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
@@ -632,7 +644,13 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
+      return {
+        value: fallbackValue,
+        reason: 'flag_not_found',
+        flagExists: false,
+        enabled: false,
+        variantName: VARIANT_SOURCE.MISSING,
+      };
     }
     if (flag.valueType !== 'number') {
       this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
@@ -663,7 +681,13 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { value: fallbackValue, reason: 'flag_not_found', flagExists: false, enabled: false, variantName: VARIANT_SOURCE.MISSING };
+      return {
+        value: fallbackValue,
+        reason: 'flag_not_found',
+        flagExists: false,
+        enabled: false,
+        variantName: VARIANT_SOURCE.MISSING,
+      };
     }
     if (flag.valueType !== 'json') {
       this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
@@ -844,7 +868,12 @@ export class FeaturesClient implements VariationProvider {
     // Invoke synced watch callbacks for changed flags
     const oldSynchronizedFlags = new Map(this.synchronizedFlags);
     this.synchronizedFlags = new Map(this.realtimeFlags);
-    this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldSynchronizedFlags, this.synchronizedFlags, false);
+    this.invokeWatchCallbacks(
+      this.syncedWatchCallbacks,
+      oldSynchronizedFlags,
+      this.synchronizedFlags,
+      false
+    );
 
     this.pendingSync = false;
     this.syncFlagsCount++;
@@ -942,14 +971,11 @@ export class FeaturesClient implements VariationProvider {
 
     // Emit initial state ? always use realtimeFlags for realtime watchers
     if (this.readyEventEmitted) {
-      callback(this.createProxyForWatch(flagName, true));
+      void callback(this.createProxyForWatch(flagName, true));
     } else {
-      this.emitter.once(
-        EVENTS.FLAGS_READY,
-        () => {
-          callback(this.createProxyForWatch(flagName, true));
-        }
-      );
+      this.emitter.once(EVENTS.FLAGS_READY, () => {
+        void callback(this.createProxyForWatch(flagName, true));
+      });
     }
 
     return () => {
@@ -990,14 +1016,11 @@ export class FeaturesClient implements VariationProvider {
 
     // Emit initial state ? respect explicitSyncMode for synced watchers
     if (this.readyEventEmitted) {
-      callback(this.createProxyForWatch(flagName, false));
+      void callback(this.createProxyForWatch(flagName, false));
     } else {
-      this.emitter.once(
-        EVENTS.FLAGS_READY,
-        () => {
-          callback(this.createProxyForWatch(flagName, false));
-        }
-      );
+      this.emitter.once(EVENTS.FLAGS_READY, () => {
+        void callback(this.createProxyForWatch(flagName, false));
+      });
     }
 
     return () => {
@@ -1021,7 +1044,14 @@ export class FeaturesClient implements VariationProvider {
   }
 
   private async fetchFlagsInternal(
-    caller: 'init' | 'polling' | 'manual' | 'syncFlags' | 'contextChange' | 'gap_recovery' | 'pending_invalidation'
+    caller:
+      | 'init'
+      | 'polling'
+      | 'manual'
+      | 'syncFlags'
+      | 'contextChange'
+      | 'gap_recovery'
+      | 'pending_invalidation'
   ): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.featuresConfig.offlineMode) {
@@ -1164,7 +1194,7 @@ export class FeaturesClient implements VariationProvider {
         this.pollingStopped = true;
         this.logger.error(
           `Polling stopped due to non-retryable status code ${response.status}. ` +
-          `Call fetchFlags() manually to retry.`
+            'Call fetchFlags() manually to retry.'
         );
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
           status: response.status,
@@ -1216,17 +1246,17 @@ export class FeaturesClient implements VariationProvider {
           // Sentinel: full fetch needed
           this.devLog('Processing pending full invalidation after fetch completed');
           this.etag = '';
-          this.fetchFlagsInternal('pending_invalidation');
+          void this.fetchFlagsInternal('pending_invalidation');
         } else {
           // Check threshold: if pending keys >= 50% of total flags, do full fetch
           const totalFlags = this.realtimeFlags.size;
           if (totalFlags === 0 || pendingKeys.size >= totalFlags / 2) {
             this.devLog(`Pending keys (${pendingKeys.size}) exceed threshold, doing full fetch`);
             this.etag = '';
-            this.fetchFlagsInternal('pending_invalidation');
+            void this.fetchFlagsInternal('pending_invalidation');
           } else {
             this.devLog(`Processing ${pendingKeys.size} pending partial invalidation keys`);
-            this.fetchPartialFlagsInternal(pendingKeys);
+            void this.fetchPartialFlagsInternal(pendingKeys);
           }
         }
       }
@@ -1363,7 +1393,7 @@ export class FeaturesClient implements VariationProvider {
     }
 
     // Remove keys that were requested but not returned (deleted on server)
-    const returnedNames = new Set(flags.map(f => f.name));
+    const returnedNames = new Set(flags.map((f) => f.name));
     for (const key of requestedKeys) {
       if (!returnedNames.has(key)) {
         this.realtimeFlags.delete(key);
@@ -1385,7 +1415,10 @@ export class FeaturesClient implements VariationProvider {
   /**
    * Store partial flag updates with merge, persist, and event emission
    */
-  private async storePartialFlags(flags: EvaluatedFlag[], requestedKeys: Set<string>): Promise<void> {
+  private async storePartialFlags(
+    flags: EvaluatedFlag[],
+    requestedKeys: Set<string>
+  ): Promise<void> {
     const oldFlags = new Map(this.realtimeFlags);
     this.mergeFlags(flags, requestedKeys);
 
@@ -1468,9 +1501,9 @@ export class FeaturesClient implements VariationProvider {
         const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
           const proxy = this.createProxyForWatch(name, forceRealtime);
-          callbacks.forEach(callback => {
+          callbacks.forEach((callback) => {
             try {
-              callback(proxy);
+              void callback(proxy);
             } catch (error) {
               this.logger.error(`Error in watch callback for ${name}:`, error);
             }
@@ -1489,9 +1522,9 @@ export class FeaturesClient implements VariationProvider {
         const callbacks = callbackMap.get(name);
         if (callbacks && callbacks.size > 0) {
           const proxy = this.createProxyForWatch(name, forceRealtime);
-          callbacks.forEach(callback => {
+          callbacks.forEach((callback) => {
             try {
-              callback(proxy);
+              void callback(proxy);
             } catch (error) {
               this.logger.error(`Error in watch callback for removed flag ${name}:`, error);
             }
@@ -1629,7 +1662,8 @@ export class FeaturesClient implements VariationProvider {
     // Create abort controller for SSE streaming
     this.streamingAbortController = new AbortController();
 
-    const streamUrl = this.featuresConfig.streaming?.sse?.url ??
+    const streamUrl =
+      this.featuresConfig.streaming?.sse?.url ??
       `${this.config.apiUrl}/client/features/${this.config.environment}/stream/sse`;
 
     const headers = this.buildHeaders();
@@ -1664,14 +1698,16 @@ export class FeaturesClient implements VariationProvider {
             try {
               const data = JSON.parse(event.data) as { globalRevision: number };
               this.devLog(`Streaming 'connected' event: globalRevision=${data.globalRevision}`);
-              this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, { globalRevision: data.globalRevision });
+              this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, {
+                globalRevision: data.globalRevision,
+              });
 
               // Gap recovery: check if we missed any changes
               if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
                 this.devLog(
                   `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
                 );
-                this.fetchFlagsInternal('gap_recovery');
+                void this.fetchFlagsInternal('gap_recovery');
               } else if (this.localGlobalRevision === 0) {
                 // First connection, record initial revision
                 this.localGlobalRevision = data.globalRevision;
@@ -1687,7 +1723,7 @@ export class FeaturesClient implements VariationProvider {
               const data = JSON.parse(event.data) as FlagsChangedEvent;
               this.devLog(
                 `Streaming 'flags_changed': globalRevision=${data.globalRevision}, ` +
-                `changedKeys=[${data.changedKeys.join(',')}]`
+                  `changedKeys=[${data.changedKeys.join(',')}]`
               );
 
               // Only process if server revision is ahead
@@ -1765,7 +1801,8 @@ export class FeaturesClient implements VariationProvider {
     this.devLog('Connecting to WebSocket streaming endpoint...');
 
     // Build WS URL
-    const baseUrl = this.featuresConfig.streaming?.websocket?.url ??
+    const baseUrl =
+      this.featuresConfig.streaming?.websocket?.url ??
       `${this.config.apiUrl}/client/features/${this.config.environment}/stream/ws`;
 
     // Convert http(s) to ws(s)
@@ -1814,14 +1851,16 @@ export class FeaturesClient implements VariationProvider {
           case 'connected': {
             const data = msg.data as { globalRevision: number };
             this.devLog(`WS 'connected' event: globalRevision=${data.globalRevision}`);
-            this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, { globalRevision: data.globalRevision });
+            this.emitter.emit(EVENTS.FLAGS_STREAMING_CONNECTED, {
+              globalRevision: data.globalRevision,
+            });
 
             // Gap recovery
             if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
               this.devLog(
                 `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
               );
-              this.fetchFlagsInternal('gap_recovery');
+              void this.fetchFlagsInternal('gap_recovery');
             } else if (this.localGlobalRevision === 0) {
               this.localGlobalRevision = data.globalRevision;
             }
@@ -1829,10 +1868,14 @@ export class FeaturesClient implements VariationProvider {
           }
 
           case 'flags_changed': {
-            const data = msg.data as { globalRevision: number; changedKeys: string[]; timestamp: number };
+            const data = msg.data as {
+              globalRevision: number;
+              changedKeys: string[];
+              timestamp: number;
+            };
             this.devLog(
               `WS 'flags_changed': globalRevision=${data.globalRevision}, ` +
-              `changedKeys=[${data.changedKeys.join(',')}]`
+                `changedKeys=[${data.changedKeys.join(',')}]`
             );
 
             if (data.globalRevision > this.localGlobalRevision) {
@@ -1944,9 +1987,10 @@ export class FeaturesClient implements VariationProvider {
     this.streamingReconnectCount++;
 
     const transport = this.featuresConfig.streaming?.transport ?? 'sse';
-    const streamConfig = transport === 'websocket'
-      ? this.featuresConfig.streaming?.websocket
-      : this.featuresConfig.streaming?.sse;
+    const streamConfig =
+      transport === 'websocket'
+        ? this.featuresConfig.streaming?.websocket
+        : this.featuresConfig.streaming?.sse;
 
     const baseMs = (streamConfig?.reconnectBase ?? 1) * 1000;
     const maxMs = (streamConfig?.reconnectMax ?? 30) * 1000;
@@ -2005,7 +2049,7 @@ export class FeaturesClient implements VariationProvider {
       // Full fetch: clear ETag so server returns fresh data
       this.etag = '';
       if (!this.isFetchingFlags) {
-        this.fetchFlagsInternal('manual');
+        void this.fetchFlagsInternal('manual');
       } else {
         // Mark sentinel for full fetch
         this.pendingInvalidationKeys.clear();
@@ -2017,12 +2061,14 @@ export class FeaturesClient implements VariationProvider {
 
     // Partial fetch: request only changed keys, keep ETag intact
     if (!this.isFetchingFlags) {
-      this.fetchPartialFlagsInternal(new Set(changedKeys));
+      void this.fetchPartialFlagsInternal(new Set(changedKeys));
     } else {
       for (const key of changedKeys) {
         this.pendingInvalidationKeys.add(key);
       }
-      this.devLog(`Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`);
+      this.devLog(
+        `Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`
+      );
     }
   }
 
@@ -2123,7 +2169,7 @@ export class FeaturesClient implements VariationProvider {
         // On partial fetch failure, fall back to full fetch
         this.etag = '';
         this.isFetchingFlags = false;
-        this.fetchFlagsInternal('manual');
+        void this.fetchFlagsInternal('manual');
         return;
       }
     } catch (e: unknown) {
@@ -2144,14 +2190,14 @@ export class FeaturesClient implements VariationProvider {
 
         if (pendingKeys.has('*')) {
           this.etag = '';
-          this.fetchFlagsInternal('pending_invalidation');
+          void this.fetchFlagsInternal('pending_invalidation');
         } else {
           const totalFlags = this.realtimeFlags.size;
           if (totalFlags === 0 || pendingKeys.size >= totalFlags / 2) {
             this.etag = '';
-            this.fetchFlagsInternal('pending_invalidation');
+            void this.fetchFlagsInternal('pending_invalidation');
           } else {
-            this.fetchPartialFlagsInternal(pendingKeys);
+            void this.fetchPartialFlagsInternal(pendingKeys);
           }
         }
       }
@@ -2243,6 +2289,36 @@ export class FeaturesClient implements VariationProvider {
       flagLastChangedTimes: Object.fromEntries(this.flagLastChangedTimes),
       metricsSentCount: this.metricsSentCount,
       metricsErrorCount: this.metricsErrorCount,
+      streamingState: this.streamingState,
+      streamingReconnectCount: this.streamingReconnectCount,
+      lastStreamingEventTime: this.lastStreamingEventTime,
+    };
+  }
+  /**
+   * Get lightweight feature flag statistics.
+   * Returns only scalar/primitive values — no Map iteration.
+   * Suitable for frequent polling or low-overhead diagnostics.
+   */
+  getLightStats(): FeaturesLightStats {
+    return {
+      sdkState: this.sdkState,
+      lastError: this.lastError,
+      startTime: this.startTime,
+      lastFetchTime: this.lastFetchTime,
+      lastUpdateTime: this.lastUpdateTime,
+      lastRecoveryTime: this.lastRecoveryTime,
+      lastErrorTime: this.lastErrorTime,
+      fetchFlagsCount: this.fetchFlagsCount,
+      updateCount: this.updateCount,
+      notModifiedCount: this.notModifiedCount,
+      recoveryCount: this.recoveryCount,
+      errorCount: this.errorCount,
+      syncFlagsCount: this.syncFlagsCount,
+      impressionCount: this.impressionCount,
+      contextChangeCount: this.contextChangeCount,
+      metricsSentCount: this.metricsSentCount,
+      metricsErrorCount: this.metricsErrorCount,
+      etag: this.etag || null,
       streamingState: this.streamingState,
       streamingReconnectCount: this.streamingReconnectCount,
       lastStreamingEventTime: this.lastStreamingEventTime,

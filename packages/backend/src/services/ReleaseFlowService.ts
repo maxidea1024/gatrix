@@ -394,7 +394,10 @@ export class ReleaseFlowService {
       await ReleaseFlowMilestoneModel.update(milestones[currentIndex].id, {
         progressionExecutedAt: new Date(),
       });
-      await ReleaseFlowModel.update(planId, { status: 'completed', updatedBy: userId ?? undefined });
+      await ReleaseFlowModel.update(planId, {
+        status: 'completed',
+        updatedBy: userId ?? undefined,
+      });
 
       await AuditLogModel.create({
         action: 'release_flow.complete_plan',

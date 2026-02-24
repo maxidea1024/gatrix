@@ -106,7 +106,7 @@ async function main() {
     console.log('');
 
     // Keep the process running
-    await new Promise(() => { }); // Never resolves
+    await new Promise(() => {}); // Never resolves
   } catch (error: any) {
     console.error('Error:', error.message);
     await client.stop();

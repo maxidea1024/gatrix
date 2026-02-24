@@ -12,11 +12,11 @@ import { getGatrixClient } from './getGatrixClient';
  * ```
  */
 export function getTrack() {
-    const client = getGatrixClient();
+  const client = getGatrixClient();
 
-    return (eventName: string, properties?: Record<string, unknown>) => {
-        client.track(eventName, properties);
-    };
+  return (eventName: string, properties?: Record<string, unknown>) => {
+    client.track(eventName, properties);
+  };
 }
 
 export default getTrack;

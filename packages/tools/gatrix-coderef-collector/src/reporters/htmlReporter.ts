@@ -245,28 +245,30 @@ export function reportToHtml(
       </div>
     </div>
 
-    ${usagesWithIssues.length > 0
-      ? `
+    ${
+      usagesWithIssues.length > 0
+        ? `
     <div class="card">
       <h2>${esc(t.issues)} (${usagesWithIssues.length})</h2>
       ${usagesWithIssues.map((u) => renderIssueHtml(u, t)).join('\n')}
     </div>`
-      : `
+        : `
     <div class="card">
       <h2>${esc(t.noIssuesTitle)}</h2>
       <p style="color: var(--text-sub); font-size: 0.85rem;">${esc(t.noIssuesDescription)}</p>
     </div>`
     }
 
-    ${summary.unusedFlags.length > 0
-      ? `
+    ${
+      summary.unusedFlags.length > 0
+        ? `
     <div class="card">
       <h2>${esc(t.unusedFlagsLabel)} (${summary.unusedFlags.length})</h2>
       <div class="tags">
         ${summary.unusedFlags.map((f) => `<span class="tag">${esc(f)}</span>`).join('\n')}
       </div>
     </div>`
-      : ''
+        : ''
     }
   </div>
 </body>
@@ -315,11 +317,7 @@ function renderIssueHtml(usage: FlagUsage, t: ReportStrings): string {
 
 function renderValidationHtml(issue: ValidationIssue): string {
   const badgeClass =
-    issue.severity === 'error'
-      ? 'b-err'
-      : issue.severity === 'warning'
-        ? 'b-warn'
-        : 'b-info';
+    issue.severity === 'error' ? 'b-err' : issue.severity === 'warning' ? 'b-warn' : 'b-info';
   return `
     <div class="vm">
       <span class="b ${badgeClass}">${esc(issue.code)}</span>

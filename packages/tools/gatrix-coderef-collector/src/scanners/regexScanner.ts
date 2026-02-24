@@ -396,7 +396,9 @@ export class RegexScanner implements LanguageScanner {
       return { value: verbatim[1], isDynamic: false };
     }
 
-    const dynamicMatch = remaining.match(/^([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z_$][a-zA-Z0-9_$]*)*)/);
+    const dynamicMatch = remaining.match(
+      /^([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z_$][a-zA-Z0-9_$]*)*)/,
+    );
     const dynamicName = dynamicMatch ? dynamicMatch[1] : '<dynamic>';
     return { value: dynamicName, isDynamic: true };
   }

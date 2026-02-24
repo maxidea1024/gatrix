@@ -58,6 +58,7 @@ const mockFeaturesClient = {
   watchFlag: () => () => {},
   watchFlagWithInitialState: () => () => {},
   getStats: () => ({}),
+  getLightStats: () => ({}),
 } as unknown as FeaturesClient;
 
 // Mock GatrixClient for use outside provider

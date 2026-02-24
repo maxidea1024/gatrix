@@ -160,7 +160,9 @@ async function runScan(rootArg: string, options: Record<string, unknown>): Promi
   } else {
     definitions = { flags: {} };
     console.log('[INFO] No flag definitions provided. Scanning without validation.');
-    console.log('[HINT] Use --definitions <path> or --backend-url + --api-key to enable validation.');
+    console.log(
+      '[HINT] Use --definitions <path> or --backend-url + --api-key to enable validation.',
+    );
   }
   console.log(`[INFO] Detection mode: ${config.detectionMode}`);
   console.log(`[INFO] Scanning root: ${root}`);

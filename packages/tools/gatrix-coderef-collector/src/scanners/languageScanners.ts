@@ -461,4 +461,3 @@ export class GDScriptScanner extends RegexScanner {
     return result;
   }
 }
-

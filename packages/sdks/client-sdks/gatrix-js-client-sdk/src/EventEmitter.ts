@@ -55,7 +55,7 @@ export class EventEmitter {
     const handlerName = name ?? `once_${++EventEmitter.autoNameCount}`;
     const onceCallback: EventCallback = (...args) => {
       this.off(event, onceCallback);
-      callback(...args);
+      void callback(...args);
     };
     if (!this.events[event]) {
       this.events[event] = [];
@@ -124,7 +124,7 @@ export class EventEmitter {
       listeners.slice().forEach((listener) => {
         try {
           listener.callCount++;
-          listener.callback(...args);
+          void listener.callback(...args);
         } catch (e) {
           console.error(`EventEmitter: Error in callback for ${event}`, e);
         }
@@ -135,7 +135,7 @@ export class EventEmitter {
     this.anyListeners.forEach((listener) => {
       try {
         listener.callCount++;
-        listener.callback(event, ...args);
+        void listener.callback(event, ...args);
       } catch (e) {
         console.error(`EventEmitter: Error in onAny callback for ${event}`, e);
       }

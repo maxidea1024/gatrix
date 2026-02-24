@@ -13,14 +13,14 @@ import { useGatrixClient } from './useGatrixClient';
  * ```
  */
 export function useTrack() {
-    const client = useGatrixClient();
+  const client = useGatrixClient();
 
-    return useCallback(
-        (eventName: string, properties?: Record<string, unknown>) => {
-            client.track(eventName, properties);
-        },
-        [client]
-    );
+  return useCallback(
+    (eventName: string, properties?: Record<string, unknown>) => {
+      client.track(eventName, properties);
+    },
+    [client]
+  );
 }
 
 export default useTrack;

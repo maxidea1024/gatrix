@@ -428,6 +428,36 @@ namespace Gatrix.Unity.SDK
     }
 
     /// <summary>
+    /// Lightweight feature flag statistics — scalar values only, no collection copying.
+    /// Use this for frequent polling or low-overhead diagnostics.
+    /// </summary>
+    public class FeaturesLightStats
+    {
+        public SdkState SdkState { get; set; }
+        public Exception LastError { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? LastFetchTime { get; set; }
+        public DateTime? LastUpdateTime { get; set; }
+        public DateTime? LastRecoveryTime { get; set; }
+        public DateTime? LastErrorTime { get; set; }
+        public int FetchFlagsCount { get; set; }
+        public int UpdateCount { get; set; }
+        public int NotModifiedCount { get; set; }
+        public int RecoveryCount { get; set; }
+        public int ErrorCount { get; set; }
+        public int SyncFlagsCount { get; set; }
+        public int ImpressionCount { get; set; }
+        public int ContextChangeCount { get; set; }
+        public int MetricsSentCount { get; set; }
+        public int MetricsErrorCount { get; set; }
+        public string Etag { get; set; }
+        public bool StreamingEnabled { get; set; }
+        public StreamingConnectionState StreamingState { get; set; }
+        public int StreamingReconnectCount { get; set; }
+        public DateTime? LastStreamingEventTime { get; set; }
+    }
+
+    /// <summary>
     /// Enabled/disabled count pair
     /// </summary>
     public class EnabledCount

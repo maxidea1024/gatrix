@@ -32,7 +32,9 @@ export type {
   FlagsApiResponse,
   SdkState,
   GatrixSdkStats,
+  GatrixSdkLightStats,
   FeaturesStats,
+  FeaturesLightStats,
 } from './types';
 
 // Storage Providers

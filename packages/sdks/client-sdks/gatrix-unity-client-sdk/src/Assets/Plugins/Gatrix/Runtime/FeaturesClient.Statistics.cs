@@ -62,6 +62,39 @@ namespace Gatrix.Unity.SDK
             };
         }
 
+        /// <summary>
+        /// Get lightweight statistics — scalar values only, no collection copying.
+        /// Use this for frequent polling or low-overhead diagnostics.
+        /// </summary>
+        public FeaturesLightStats GetLightStats()
+        {
+            return new FeaturesLightStats
+            {
+                SdkState        = _sdkState,
+                LastError       = _lastError,
+                StartTime       = _startTime,
+                LastFetchTime   = _lastFetchTime,
+                LastUpdateTime  = _lastUpdateTime,
+                LastRecoveryTime = _lastRecoveryTime,
+                LastErrorTime   = _lastErrorTime,
+                FetchFlagsCount = _fetchFlagsCount,
+                UpdateCount     = _updateCount,
+                NotModifiedCount = _notModifiedCount,
+                RecoveryCount   = _recoveryCount,
+                ErrorCount      = _errorCount,
+                SyncFlagsCount  = _syncFlagsCount,
+                ImpressionCount = _impressionCount,
+                ContextChangeCount = _contextChangeCount,
+                MetricsSentCount = _metricsSentCount,
+                MetricsErrorCount = _metricsErrorCount,
+                Etag            = string.IsNullOrEmpty(_etag) ? null : _etag,
+                StreamingEnabled = FeaturesConfig?.Streaming?.Enabled ?? false,
+                StreamingState  = _streamingState,
+                StreamingReconnectCount = _streamingReconnectCount,
+                LastStreamingEventTime = _lastStreamingEventTime,
+            };
+        }
+
         /// <summary>Unified flag access tracking - metrics, stats, and impressions.</summary>
         private void TrackFlagAccess(string flagName, EvaluatedFlag flag, string eventType, string variantName = null)
         {

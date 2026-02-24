@@ -202,6 +202,7 @@ public:
 
   // ==================== Statistics ====================
   GatrixSdkStats getStats() const;
+  GatrixLightStats getLightStats() const;
 
 private:
   const GatrixClientConfig& _config;

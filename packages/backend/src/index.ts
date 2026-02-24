@@ -362,7 +362,9 @@ const startServer = async () => {
     server.on('upgrade', async (request, socket, head) => {
       try {
         const url = new URL(request.url || '', `http://${request.headers.host}`);
-        const wsPathMatch = url.pathname.match(/^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/);
+        const wsPathMatch = url.pathname.match(
+          /^\/api\/v1\/client\/features\/([^/]+)\/stream\/ws$/
+        );
 
         if (!wsPathMatch) {
           socket.destroy();
@@ -370,9 +372,10 @@ const startServer = async () => {
         }
 
         const environment = wsPathMatch[1];
-        const apiToken = url.searchParams.get('x-api-token')
-          || url.searchParams.get('apiToken')
-          || url.searchParams.get('token');
+        const apiToken =
+          url.searchParams.get('x-api-token') ||
+          url.searchParams.get('apiToken') ||
+          url.searchParams.get('token');
 
         if (!apiToken) {
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');

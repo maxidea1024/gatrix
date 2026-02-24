@@ -144,4 +144,13 @@ class GatrixClient {
       ...features.getStats(),
     };
   }
+
+  /// Get lightweight statistics — scalar values only, no collection copying.
+  /// Use this for frequent polling or low-overhead diagnostics.
+  Map<String, dynamic> getLightStats() {
+    return {
+      'state': _state.toString(),
+      ...features.getLightStats(),
+    };
+  }
 }

@@ -111,6 +111,12 @@ public:
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Stats")
   FGatrixSdkStats GetStats() const;
 
+  /**
+   * Get lightweight statistics (C++ only) — scalar values only, no TMap/TArray copying.
+   * Use this for frequent polling or low-overhead diagnostics.
+   */
+  FGatrixLightStats GetLightStats() const;
+
   // ==================== Blueprint Events (forwarded from FeaturesClient)
   // ====================
 

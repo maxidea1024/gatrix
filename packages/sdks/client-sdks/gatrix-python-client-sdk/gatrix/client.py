@@ -114,3 +114,10 @@ class GatrixClient:
     def get_stats(self) -> dict:
         """Return comprehensive SDK statistics for debugging."""
         return self._features.get_stats()
+
+    def get_light_stats(self) -> dict:
+        """Return lightweight statistics — scalar values only, no dict/list copying.
+
+        Use this for frequent polling or low-overhead diagnostics.
+        """
+        return self._features.get_light_stats()

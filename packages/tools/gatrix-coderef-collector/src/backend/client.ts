@@ -47,9 +47,7 @@ export async function fetchFlagDefinitions(
     if (axios.isAxiosError(err)) {
       const status = err.response?.status;
       const data = err.response?.data;
-      throw new Error(
-        `Failed to fetch flag definitions (HTTP ${status}): ${JSON.stringify(data)}`,
-      );
+      throw new Error(`Failed to fetch flag definitions (HTTP ${status}): ${JSON.stringify(data)}`);
     }
     throw new Error(
       `Failed to fetch flag definitions: ${err instanceof Error ? err.message : String(err)}`,

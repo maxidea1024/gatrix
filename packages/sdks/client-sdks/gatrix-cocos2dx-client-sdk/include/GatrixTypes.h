@@ -125,6 +125,43 @@ struct GatrixSdkStats {
   std::map<std::string, std::vector<EventHandlerStats>> eventHandlerStats;
 };
 
+/**
+ * Lightweight SDK statistics.
+ * Contains only scalar/primitive values — no map or vector fields.
+ * Use this for frequent polling or low-overhead diagnostics.
+ */
+struct GatrixLightStats {
+  // Counts
+  int fetchFlagsCount = 0;
+  int updateCount = 0;
+  int notModifiedCount = 0;
+  int errorCount = 0;
+  int recoveryCount = 0;
+  int impressionCount = 0;
+  int contextChangeCount = 0;
+  int syncFlagsCount = 0;
+  int metricsSentCount = 0;
+  int metricsErrorCount = 0;
+
+  // Timestamps (empty string means null)
+  std::string startTime;
+  std::string lastFetchTime;
+  std::string lastUpdateTime;
+  std::string lastErrorTime;
+  std::string lastRecoveryTime;
+
+  // State
+  SdkState sdkState = SdkState::INITIALIZING;
+  std::string etag;
+  bool offlineMode = false;
+  std::string lastError;
+
+  // Streaming stats
+  std::string streamingState;
+  int streamingReconnectCount = 0;
+  std::string lastStreamingEventTime;
+};
+
 // ==================== Streaming Config ====================
 
 struct SseStreamingConfig {

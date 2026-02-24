@@ -240,6 +240,16 @@ FGatrixSdkStats UGatrixClient::GetStats() const {
   return Stats;
 }
 
+FGatrixLightStats UGatrixClient::GetLightStats() const {
+  if (FeaturesClient) {
+    return FeaturesClient->GetLightStats();
+  }
+
+  FGatrixLightStats Light;
+  Light.bOfflineMode = StoredConfig.Features.bOfflineMode;
+  return Light;
+}
+
 FGatrixOnReady& UGatrixClient::GetOnReady() {
   return FeaturesClient->OnReady;
 }

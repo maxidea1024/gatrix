@@ -1158,6 +1158,34 @@ class FeaturesClient implements VariationProvider {
     };
   }
 
+  /// Get lightweight statistics — scalar values only, no collection copying.
+  /// Use this for frequent polling or low-overhead diagnostics.
+  Map<String, dynamic> getLightStats() {
+    return {
+      'sdkState': _started ? 'ready' : 'initializing',
+      'lastError': _lastError,
+      'startTime': _startTime?.toIso8601String(),
+      'lastFetchTime': _lastFetchTime?.toIso8601String(),
+      'lastUpdateTime': _lastUpdateTime?.toIso8601String(),
+      'lastRecoveryTime': _lastRecoveryTime?.toIso8601String(),
+      'lastErrorTime': _lastErrorTime?.toIso8601String(),
+      'fetchFlagsCount': _fetchCount,
+      'updateCount': _updateCount,
+      'notModifiedCount': _notModifiedCount,
+      'recoveryCount': _recoveryCount,
+      'errorCount': _errorCount,
+      'syncFlagsCount': _syncFlagsCount,
+      'impressionCount': _impressionCount,
+      'contextChangeCount': _contextChangeCount,
+      'metricsSentCount': _metricsSentCount,
+      'metricsErrorCount': _metricsErrorCount,
+      'etag': _etag,
+      'streamingState': _getStreamingStateName(),
+      'streamingReconnectCount': _getStreamingReconnectCount(),
+      'lastStreamingEventTime': _getStreamingLastEventTime(),
+    };
+  }
+
   /// Build common API headers
   Map<String, String> _buildHeaders() {
     final headers = <String, String>{

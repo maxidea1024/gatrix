@@ -1,0 +1,86 @@
+{
+    "root": true,
+    "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        // Allow explicit any in limited cases (SDK boundary types)
+        "@typescript-eslint/no-explicit-any": "warn",
+        // Unused vars: enforce for variables, allow unused function params prefixed with _
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_"
+            }
+        ],
+        // Prefer type-only imports for type definitions
+        "@typescript-eslint/consistent-type-imports": [
+            "error",
+            {
+                "prefer": "type-imports",
+                "fixStyle": "inline-type-imports"
+            }
+        ],
+        // No floating promises (important for async SDK operations)
+        "@typescript-eslint/no-floating-promises": "error",
+        // Allow non-null assertions where intentional
+        "@typescript-eslint/no-non-null-assertion": "warn",
+        // Require explicit return types on public-facing methods
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        // Disallow console.log in favour of the SDK's Logger
+        "no-console": "warn",
+        // Enforce consistent semicolons
+        "semi": [
+            "error",
+            "always"
+        ],
+        // Prefer single quotes
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ],
+        // Trailing commas for cleaner diffs
+        "comma-dangle": [
+            "error",
+            "always-multiline"
+        ],
+        // No duplicate imports
+        "no-duplicate-imports": "error"
+    },
+    "ignorePatterns": [
+        "dist/",
+        "node_modules/",
+        "examples/",
+        "**/*.js"
+    ],
+    "overrides": [
+        {
+            "files": [
+                "src/Logger.ts",
+                "src/EventEmitter.ts"
+            ],
+            "rules": {
+                "no-console": "off"
+            }
+        }
+    ]
+}

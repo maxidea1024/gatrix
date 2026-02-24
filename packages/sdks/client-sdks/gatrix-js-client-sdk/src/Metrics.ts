@@ -8,8 +8,8 @@
  * - Access to undefined flags
  */
 
-import { Logger } from './Logger';
-import { EventEmitter } from './EventEmitter';
+import { type Logger } from './Logger';
+import { type EventEmitter } from './EventEmitter';
 import { EVENTS } from './events';
 import { SDK_NAME, SDK_VERSION } from './version';
 import ky from 'ky';
@@ -105,7 +105,7 @@ export class Metrics {
       if (this.metricsIntervalInitial > 0) {
         setTimeout(() => {
           this.startTimer();
-          this.sendMetrics();
+          void this.sendMetrics();
         }, this.metricsIntervalInitial);
       } else {
         this.startTimer();
@@ -218,7 +218,7 @@ export class Metrics {
 
   private startTimer(): void {
     this.timer = setInterval(() => {
-      this.sendMetrics();
+      void this.sendMetrics();
     }, this.metricsInterval);
   }
 

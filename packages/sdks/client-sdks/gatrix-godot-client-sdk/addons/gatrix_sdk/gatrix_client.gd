@@ -192,6 +192,13 @@ func get_stats() -> GatrixTypes.FeaturesStats:
 	return _features.get_stats()
 
 
+## Get lightweight statistics — scalar values only, no collection copying.
+## Use this for frequent polling or low-overhead diagnostics.
+func get_light_stats() -> Dictionary:
+	assert(_initialized, "GatrixSDK: Not initialized")
+	return _features.get_light_stats()
+
+
 # ==================== Static ====================
 
 ## Get SDK version string.

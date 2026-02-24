@@ -466,3 +466,39 @@ struct GATRIXCLIENTSDK_API FGatrixSdkStats {
   UPROPERTY(BlueprintReadOnly, Category = "Gatrix")
   FGatrixFeaturesStats Features;
 };
+
+/**
+ * Lightweight SDK statistics (C++ only).
+ * Contains only scalar/primitive values — no TMap or TArray fields.
+ * Use this for frequent polling or low-overhead diagnostics.
+ */
+struct GATRIXCLIENTSDK_API FGatrixLightStats {
+  EGatrixSdkState SdkState = EGatrixSdkState::Initializing;
+  FString Etag;
+  bool bOfflineMode = false;
+  FString LastError;
+
+  // Timestamps (empty string = null)
+  FString StartTime;
+  FString LastFetchTime;
+  FString LastUpdateTime;
+  FString LastErrorTime;
+  FString LastRecoveryTime;
+
+  // Counters
+  int32 FetchFlagsCount = 0;
+  int32 UpdateCount = 0;
+  int32 NotModifiedCount = 0;
+  int32 RecoveryCount = 0;
+  int32 ErrorCount = 0;
+  int32 ImpressionCount = 0;
+  int32 ContextChangeCount = 0;
+  int32 SyncFlagsCount = 0;
+  int32 MetricsSentCount = 0;
+  int32 MetricsErrorCount = 0;
+
+  // Streaming
+  EGatrixStreamingConnectionState StreamingState = EGatrixStreamingConnectionState::Disconnected;
+  int32 StreamingReconnectCount = 0;
+  FString LastStreamingEventTime;
+};

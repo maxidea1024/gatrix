@@ -12,7 +12,7 @@
  * When true, the method reads from realtimeFlags directly, bypassing
  * explicitSyncMode's synchronizedFlags.
  */
-import { EvaluatedFlag, Variant, ValueType, VariationResult } from './types';
+import { type EvaluatedFlag, type Variant, type ValueType, type VariationResult } from './types';
 
 export interface VariationProvider {
   // Core access

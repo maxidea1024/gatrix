@@ -26,7 +26,7 @@ const typo = gatrix.boolVariation('new_shop_u', false);
 /* gatrix.numberVariation('also_ignored', 0); */
 
 function getFlagName(): string {
-    return 'some_flag';
+  return 'some_flag';
 }
 
 console.log(isNewShop, rate, msg, legacy, unknown, wrongType, dynamic, typo);

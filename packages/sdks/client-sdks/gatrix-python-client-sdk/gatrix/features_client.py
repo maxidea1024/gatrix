@@ -1373,6 +1373,33 @@ class FeaturesClient:
             headers.update(self._custom_headers)
         return headers
 
+    def get_light_stats(self) -> dict:
+        """Return lightweight SDK statistics — scalar values only, no dict/list copying.
+
+        Use this for frequent polling or low-overhead diagnostics.
+        """
+        return {
+            "sdk_state": self._sdk_state,
+            "start_time": self._start_time,
+            "error_count": self._error_count,
+            "last_error": self._last_error,
+            "last_error_time": self._last_error_time,
+            "offline_mode": self._offline_mode,
+            "fetch_flags_count": self._fetch_count,
+            "update_count": self._update_count,
+            "not_modified_count": self._not_modified_count,
+            "recovery_count": self._recovery_count,
+            "sync_flags_count": self._sync_count,
+            "impression_count": self._impression_count,
+            "context_change_count": self._context_change_count,
+            "metrics_sent_count": self._metrics_sent_count,
+            "metrics_error_count": self._metrics_error_count,
+            "etag": self._etag,
+            "last_fetch_time": self._last_fetch_time,
+            "last_update_time": self._last_update_time,
+            "last_recovery_time": self._last_recovery_time,
+        }
+
     def _set_ready(self) -> None:
         if not self._ready:
             self._ready = True

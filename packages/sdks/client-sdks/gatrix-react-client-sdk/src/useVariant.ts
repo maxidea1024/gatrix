@@ -38,7 +38,9 @@ export const variantHasChanged = (oldVariant: Variant, newVariant?: Variant): bo
 
 export function useVariant(flagName: string): Variant {
   const { getVariant, client } = useGatrixContext();
-  const [variant, setVariant] = useState<Variant>(() => getVariant(flagName) || { name: VARIANT_SOURCE.MISSING, enabled: false });
+  const [variant, setVariant] = useState<Variant>(
+    () => getVariant(flagName) || { name: VARIANT_SOURCE.MISSING, enabled: false }
+  );
   const variantRef = useRef<Variant>(variant);
   variantRef.current = variant;
 

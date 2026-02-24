@@ -154,9 +154,7 @@ export class ReleaseFlowModel {
    * Returns lightweight summaries (environment + status + current milestone name).
    * For draft plans (no activeMilestoneId), returns the first milestone by sortOrder.
    */
-  static async findPlansByFlag(
-    flagId: string
-  ): Promise<
+  static async findPlansByFlag(flagId: string): Promise<
     Array<{
       environment: string;
       status: string;

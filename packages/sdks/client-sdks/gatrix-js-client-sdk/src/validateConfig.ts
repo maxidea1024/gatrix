@@ -2,7 +2,7 @@
  * Config Validation - Validates SDK configuration options
  * Ensures required fields are present and optional fields have valid values/ranges.
  */
-import { GatrixClientConfig } from './types';
+import { type GatrixClientConfig } from './types';
 import { GatrixError } from './errors';
 
 /**
@@ -82,12 +82,7 @@ export function validateConfig(config: GatrixClientConfig): void {
       }
 
       if (retry.maxBackoff !== undefined) {
-        validatePositiveNumber(
-          retry.maxBackoff,
-          'features.fetchRetryOptions.maxBackoff',
-          1,
-          600
-        );
+        validatePositiveNumber(retry.maxBackoff, 'features.fetchRetryOptions.maxBackoff', 1, 600);
       }
 
       if (
@@ -132,7 +127,7 @@ export function validateConfig(config: GatrixClientConfig): void {
     // SSE config
     if (streaming.sse) {
       if (streaming.sse.url !== undefined && !isValidUrl(streaming.sse.url)) {
-        throw new GatrixError(`Invalid config: streaming.sse.url must be a valid URL`);
+        throw new GatrixError('Invalid config: streaming.sse.url must be a valid URL');
       }
       if (streaming.sse.reconnectBase !== undefined) {
         validatePositiveNumber(streaming.sse.reconnectBase, 'streaming.sse.reconnectBase', 0.5, 60);
@@ -157,16 +152,31 @@ export function validateConfig(config: GatrixClientConfig): void {
     // WebSocket config
     if (streaming.websocket) {
       if (streaming.websocket.url !== undefined && !isValidUrl(streaming.websocket.url)) {
-        throw new GatrixError(`Invalid config: streaming.websocket.url must be a valid URL`);
+        throw new GatrixError('Invalid config: streaming.websocket.url must be a valid URL');
       }
       if (streaming.websocket.reconnectBase !== undefined) {
-        validatePositiveNumber(streaming.websocket.reconnectBase, 'streaming.websocket.reconnectBase', 0.5, 60);
+        validatePositiveNumber(
+          streaming.websocket.reconnectBase,
+          'streaming.websocket.reconnectBase',
+          0.5,
+          60
+        );
       }
       if (streaming.websocket.reconnectMax !== undefined) {
-        validatePositiveNumber(streaming.websocket.reconnectMax, 'streaming.websocket.reconnectMax', 1, 300);
+        validatePositiveNumber(
+          streaming.websocket.reconnectMax,
+          'streaming.websocket.reconnectMax',
+          1,
+          300
+        );
       }
       if (streaming.websocket.pingInterval !== undefined) {
-        validatePositiveNumber(streaming.websocket.pingInterval, 'streaming.websocket.pingInterval', 5, 300);
+        validatePositiveNumber(
+          streaming.websocket.pingInterval,
+          'streaming.websocket.pingInterval',
+          5,
+          300
+        );
       }
       if (
         streaming.websocket.reconnectBase !== undefined &&

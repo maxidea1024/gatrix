@@ -892,9 +892,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : 'rgba(0,0,0,0.015)'
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1135,9 +1135,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                            borderColor: 'primary.main',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          }
+                              borderColor: 'primary.main',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            }
                           : {},
                     }}
                   >

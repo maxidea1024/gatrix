@@ -343,7 +343,7 @@ async function main() {
 
     setInterval(() => render(), 1000);
 
-    await new Promise(() => { });
+    await new Promise(() => {});
   } catch (error: any) {
     process.stdout.write(SHOW_CURSOR);
     console.error('Error:', error.message);

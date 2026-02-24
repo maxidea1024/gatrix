@@ -1089,9 +1089,15 @@ router.post(
             // Determine explicit variant name based on value source
             let variantName: string;
             if (evalResult.enabled) {
-              variantName = valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+              variantName =
+                valueSource === 'environment'
+                  ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+                  : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
             } else {
-              variantName = valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+              variantName =
+                valueSource === 'environment'
+                  ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+                  : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
             }
             (evalResult as any).variant = {
               name: (evalResult as any).variant?.name || variantName,
@@ -1156,14 +1162,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-              const fieldDef = fieldDefMap?.get(name);
-              const rules = fieldDef?.validationRules as any;
-              return {
-                name,
-                isRequired: rules?.isRequired === true,
-                fieldType: (fieldDef?.fieldType as string) || 'string',
-              };
-            })
+                const fieldDef = fieldDefMap?.get(name);
+                const rules = fieldDef?.validationRules as any;
+                return {
+                  name,
+                  isRequired: rules?.isRequired === true,
+                  fieldType: (fieldDef?.fieldType as string) || 'string',
+                };
+              })
             : undefined,
       },
     });
@@ -1225,17 +1231,18 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-    const envDisabledValue = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
+    const envDisabledValue = flag.environments?.find(
+      (e: any) => e.environment === environment
+    )?.disabledValue;
     const isEnvSource = envDisabledValue !== undefined;
     return {
       enabled: false,
       reason: 'FLAG_DISABLED',
       variant: {
-        name: isEnvSource ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
-        value: getFallbackValue(
-          envDisabledValue ?? flag.disabledValue,
-          flag.valueType
-        ),
+        name: isEnvSource
+          ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+          : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+        value: getFallbackValue(envDisabledValue ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
         valueSource: isEnvSource ? 'environment' : 'flag',
       },
@@ -1261,16 +1268,18 @@ function evaluateFlagWithDetails(
         : 'No strategies defined - enabled by default',
     });
     if (contextFailed) {
-      const ctxEnvDisVal = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
+      const ctxEnvDisVal = flag.environments?.find(
+        (e: any) => e.environment === environment
+      )?.disabledValue;
       return {
         enabled: false,
         reason: 'CONTEXT_VALIDATION_FAILED',
         variant: {
-          name: ctxEnvDisVal !== undefined ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
-          value: getFallbackValue(
-            ctxEnvDisVal ?? flag.disabledValue,
-            flag.valueType
-          ),
+          name:
+            ctxEnvDisVal !== undefined
+              ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+              : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+          value: getFallbackValue(ctxEnvDisVal ?? flag.disabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
           valueSource: ctxEnvDisVal !== undefined ? 'environment' : 'flag',
         },
@@ -1443,16 +1452,18 @@ function evaluateFlagWithDetails(
 
   // Context validation failed - return after full evaluation
   if (contextFailed) {
-    const ctxFailEnvDisVal = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
+    const ctxFailEnvDisVal = flag.environments?.find(
+      (e: any) => e.environment === environment
+    )?.disabledValue;
     return {
       enabled: false,
       reason: 'CONTEXT_VALIDATION_FAILED',
       variant: {
-        name: ctxFailEnvDisVal !== undefined ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
-        value: getFallbackValue(
-          ctxFailEnvDisVal ?? flag.disabledValue,
-          flag.valueType
-        ),
+        name:
+          ctxFailEnvDisVal !== undefined
+            ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+            : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+        value: getFallbackValue(ctxFailEnvDisVal ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
         valueSource: ctxFailEnvDisVal !== undefined ? 'environment' : 'flag',
       },
@@ -1480,7 +1491,9 @@ function evaluateFlagWithDetails(
     };
   }
 
-  const noMatchEnvDisVal = flag.environments?.find((e: any) => e.environment === environment)?.disabledValue;
+  const noMatchEnvDisVal = flag.environments?.find(
+    (e: any) => e.environment === environment
+  )?.disabledValue;
   const noMatchIsEnvSource = noMatchEnvDisVal !== undefined;
   return {
     enabled: false,
@@ -1491,7 +1504,9 @@ function evaluateFlagWithDetails(
     },
     evaluationSteps,
     variant: {
-      name: noMatchIsEnvSource ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+      name: noMatchIsEnvSource
+        ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+        : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
       value: noMatchEnvDisVal ?? flag.disabledValue ?? null,
       valueType: flag.valueType || 'string',
       valueSource: noMatchIsEnvSource ? 'environment' : 'flag',
@@ -1785,7 +1800,10 @@ function selectVariantForFlag(
 
   if (variants.length === 0) {
     return {
-      name: valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
+      name:
+        valueSource === 'environment'
+          ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+          : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
       valueSource,
@@ -1795,7 +1813,10 @@ function selectVariantForFlag(
   const totalWeight = variants.reduce((sum: number, v: any) => sum + v.weight, 0);
   if (totalWeight <= 0) {
     return {
-      name: valueSource === 'environment' ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
+      name:
+        valueSource === 'environment'
+          ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+          : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
       valueSource,
@@ -2085,7 +2106,11 @@ function getFallbackValue(value: any, valueType?: string): any {
       return Boolean(value);
     case 'json':
       if (typeof value === 'object') return value;
-      try { return JSON.parse(String(value)); } catch { return {}; }
+      try {
+        return JSON.parse(String(value));
+      } catch {
+        return {};
+      }
     default:
       return value;
   }

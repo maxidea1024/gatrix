@@ -8,8 +8,8 @@
  * - isRealtime property indicates the proxy's operational mode.
  * - Client is always present (never null).
  */
-import { EvaluatedFlag, Variant, ValueType, VariationResult } from './types';
-import { VariationProvider } from './VariationProvider';
+import { type EvaluatedFlag, type Variant, type ValueType, type VariationResult } from './types';
+import { type VariationProvider } from './VariationProvider';
 
 export class FlagProxy {
   private _flagName: string;
@@ -97,19 +97,35 @@ export class FlagProxy {
   // ==================== Variation Details ====================
 
   boolVariationDetails(fallbackValue: boolean): VariationResult<boolean> {
-    return this.client.boolVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.boolVariationDetailsInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   stringVariationDetails(fallbackValue: string): VariationResult<string> {
-    return this.client.stringVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.stringVariationDetailsInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   numberVariationDetails(fallbackValue: number): VariationResult<number> {
-    return this.client.numberVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.numberVariationDetailsInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   jsonVariationDetails<T>(fallbackValue: T): VariationResult<T> {
-    return this.client.jsonVariationDetailsInternal(this._flagName, fallbackValue, this._forceRealtime);
+    return this.client.jsonVariationDetailsInternal(
+      this._flagName,
+      fallbackValue,
+      this._forceRealtime
+    );
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================

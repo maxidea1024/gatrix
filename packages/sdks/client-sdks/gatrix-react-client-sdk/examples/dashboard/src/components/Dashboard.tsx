@@ -240,7 +240,8 @@ function Dashboard({ config }: DashboardProps) {
                   }}
                   title="Clear search"
                 >
-                  ??                </button>
+                  ??{' '}
+                </button>
               )}
             </div>
             {!client.features.isOfflineMode() &&
@@ -289,7 +290,7 @@ function Dashboard({ config }: DashboardProps) {
             <div className="searching-state">
               <div className="searching-icon">
                 <span role="img" aria-label="searching">
-                  ?îç
+                  ?ÔøΩÔøΩ
                 </span>
               </div>
               <p className="searching-text">WHERE ARE MY FLAGS?... COME BACK!</p>

@@ -154,6 +154,15 @@ namespace Gatrix.Unity.SDK
             };
         }
 
+        /// <summary>
+        /// Get lightweight statistics — scalar values only, no collection copying.
+        /// Use this for frequent polling or low-overhead diagnostics.
+        /// </summary>
+        public FeaturesLightStats GetLightStats()
+        {
+            return _featuresClient.GetLightStats();
+        }
+
         // ==================== Dispose ====================
 
         public void Dispose()

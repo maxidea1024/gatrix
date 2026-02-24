@@ -7,11 +7,11 @@
  * - (future) maintenance: Maintenance status
  */
 import { EventEmitter } from './EventEmitter';
-import { GatrixClientConfig, GatrixSdkStats } from './types';
+import { type GatrixClientConfig, type GatrixSdkStats, type GatrixSdkLightStats } from './types';
 import { FeaturesClient } from './FeaturesClient';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
-import { Logger, ConsoleLogger } from './Logger';
+import { type Logger, ConsoleLogger } from './Logger';
 import { validateConfig } from './validateConfig';
 
 export class GatrixClient {
@@ -111,6 +111,26 @@ export class GatrixClient {
     };
   }
 
+  /**
+   * Get lightweight SDK statistics (scalar values only, no Map iteration).
+   * Suitable for frequent polling or low-overhead diagnostics.
+   */
+  getLightStats(): GatrixSdkLightStats {
+    const featStats = this.featuresClient.getLightStats();
+    return {
+      sdkState:
+        featStats.sdkState ||
+        (this.getError() ? 'error' : this.isReady() ? 'healthy' : 'initializing'),
+      startTime: featStats.startTime || null,
+      connectionId: this.featuresClient.getConnectionId(),
+      errorCount: featStats.errorCount ?? 0,
+      lastError: featStats.lastError ?? this.getError(),
+      lastErrorTime: featStats.lastErrorTime || null,
+      offlineMode: this.config.features?.offlineMode ?? false,
+      features: featStats,
+    };
+  }
+
   // ==================== Event Subscription ====================
 
   /**
@@ -163,10 +183,11 @@ export class GatrixClient {
    */
   track(eventName: string, properties?: Record<string, unknown>): void {
     if (this.config.enableDevMode) {
+      // eslint-disable-next-line no-console
       console.log(
         `[Gatrix] track() called: eventName="${eventName}", properties=`,
         properties ?? {},
-        '— tracking is not yet supported but will be available soon.',
+        '— tracking is not yet supported but will be available soon.'
       );
     }
   }

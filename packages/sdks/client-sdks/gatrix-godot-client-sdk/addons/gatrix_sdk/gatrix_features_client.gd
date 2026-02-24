@@ -710,6 +710,32 @@ func get_stats() -> GatrixTypes.FeaturesStats:
 	return result
 
 
+## Get lightweight statistics — scalar values only, no Dictionary/Array copying.
+## Use this for frequent polling or low-overhead diagnostics.
+func get_light_stats() -> Dictionary:
+	return {
+		"sdk_state": _sdk_state,
+		"etag": _etag,
+		"offline_mode": _config.features.offline_mode,
+		"fetch_flags_count": _stats.fetch_flags_count,
+		"update_count": _stats.update_count,
+		"not_modified_count": _stats.not_modified_count,
+		"recovery_count": _stats.recovery_count,
+		"error_count": _stats.error_count,
+		"sync_flags_count": _stats.sync_flags_count,
+		"impression_count": _stats.impression_count,
+		"context_change_count": _stats.context_change_count,
+		"metrics_sent_count": _stats.metrics_sent_count,
+		"metrics_error_count": _stats.metrics_error_count,
+		"last_fetch_time": _stats.last_fetch_time,
+		"last_update_time": _stats.last_update_time,
+		"last_recovery_time": _stats.last_recovery_time,
+		"last_error_time": _stats.last_error_time,
+		"streaming_state": _stats.streaming_state,
+		"streaming_reconnect_count": _stats.streaming_reconnect_count,
+	}
+
+
 func is_ready() -> bool:
 	return _ready_emitted
 

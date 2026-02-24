@@ -1450,6 +1450,25 @@ FGatrixFeaturesStats UGatrixFeaturesClient::GetStats() const {
   return Stats;
 }
 
+FGatrixLightStats UGatrixFeaturesClient::GetLightStats() const {
+  FGatrixLightStats Light;
+  Light.SdkState = SdkState;
+  Light.Etag = Etag;
+  Light.bOfflineMode = ClientConfig.Features.bOfflineMode;
+  Light.FetchFlagsCount = FetchFlagsCount.GetValue();
+  Light.UpdateCount = UpdateCount.GetValue();
+  Light.NotModifiedCount = NotModifiedCount.GetValue();
+  Light.RecoveryCount = RecoveryCount.GetValue();
+  Light.SyncFlagsCount = SyncFlagsCount.GetValue();
+  Light.ImpressionCount = ImpressionCount.GetValue();
+  Light.ContextChangeCount = ContextChangeCount.GetValue();
+  Light.MetricsSentCount = MetricsSentCount.GetValue();
+  Light.MetricsErrorCount = MetricsErrorCount.GetValue();
+  Light.StreamingState = StreamingState;
+  Light.StreamingReconnectCount = StreamingReconnectCount;
+  return Light;
+}
+
 // ==================== IGatrixVariationProvider Implementation
 // ====================
 

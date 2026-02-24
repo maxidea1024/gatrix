@@ -39,9 +39,10 @@ export class FeatureFlagEvaluator {
         for (const strategy of activeStrategies) {
           if (this.evaluateStrategy(strategy, context, flag, segmentsMap)) {
             const variantData = this.selectVariant(flag, context, strategy);
-            const defaultEnabledName = flag.valueSource === 'environment'
-              ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-              : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+            const defaultEnabledName =
+              flag.valueSource === 'environment'
+                ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+                : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
             const variant: Variant = {
               name: variantData?.name || defaultEnabledName,
               weight: variantData?.weight || 100,
@@ -64,9 +65,10 @@ export class FeatureFlagEvaluator {
       } else {
         // No strategies or all disabled - enabled by default
         const variantData = this.selectVariant(flag, context);
-        const defaultEnabledName = flag.valueSource === 'environment'
-          ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-          : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+        const defaultEnabledName =
+          flag.valueSource === 'environment'
+            ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
+            : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
         const variant: Variant = {
           name: variantData?.name || defaultEnabledName,
           weight: variantData?.weight || 100,
@@ -88,9 +90,10 @@ export class FeatureFlagEvaluator {
     }
 
     // Disabled or no strategy matched
-    const defaultDisabledName = flag.valueSource === 'environment'
-      ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-      : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+    const defaultDisabledName =
+      flag.valueSource === 'environment'
+        ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
+        : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
     return {
       id: flag.id || '',
       flagName: flag.name,
@@ -372,7 +375,11 @@ export class FeatureFlagEvaluator {
         return Boolean(value);
       case 'json':
         if (typeof value === 'object') return value;
-        try { return JSON.parse(String(value)); } catch { return {}; }
+        try {
+          return JSON.parse(String(value));
+        } catch {
+          return {};
+        }
       default:
         return value;
     }

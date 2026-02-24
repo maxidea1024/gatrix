@@ -462,5 +462,11 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         /// <returns>An <see cref="SdkStats"/> snapshot, or <c>null</c> if stats are unavailable.</returns>
         FeaturesStats GetStats();
+
+        /// <summary>
+        /// Get lightweight statistics — scalar values only, no collection copying.
+        /// Use this for frequent polling or low-overhead diagnostics.
+        /// </summary>
+        FeaturesLightStats GetLightStats();
     }
 }

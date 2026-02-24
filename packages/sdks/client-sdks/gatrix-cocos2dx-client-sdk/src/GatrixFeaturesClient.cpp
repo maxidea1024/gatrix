@@ -961,6 +961,37 @@ GatrixSdkStats FeaturesClient::getStats() const {
   return stats;
 }
 
+GatrixLightStats FeaturesClient::getLightStats() const {
+  GatrixLightStats light;
+  light.sdkState = _sdkState;
+  light.etag = _etag;
+  light.offlineMode = _config.features.offlineMode;
+  light.lastError = _stats.lastError;
+  light.startTime = _stats.startTime;
+  light.lastFetchTime = _stats.lastFetchTime;
+  light.lastUpdateTime = _stats.lastUpdateTime;
+  light.lastErrorTime = _stats.lastErrorTime;
+  light.lastRecoveryTime = _stats.lastRecoveryTime;
+  light.fetchFlagsCount = _stats.fetchFlagsCount;
+  light.updateCount = _stats.updateCount;
+  light.notModifiedCount = _stats.notModifiedCount;
+  light.recoveryCount = _stats.recoveryCount;
+  light.errorCount = _stats.errorCount;
+  light.impressionCount = _stats.impressionCount;
+  light.contextChangeCount = _stats.contextChangeCount;
+  light.syncFlagsCount = _stats.syncFlagsCount;
+  light.metricsSentCount = _stats.metricsSentCount;
+  light.metricsErrorCount = _stats.metricsErrorCount;
+
+  if (_streaming) {
+    light.streamingState = _streaming->getStateName();
+    light.streamingReconnectCount = _streaming->getReconnectCount();
+    light.lastStreamingEventTime = _streaming->getLastEventTime();
+  }
+
+  return light;
+}
+
 // ==================== WatchFlagGroup ====================
 
 WatchFlagGroup::WatchFlagGroup(FeaturesClient& client, const std::string& name)
