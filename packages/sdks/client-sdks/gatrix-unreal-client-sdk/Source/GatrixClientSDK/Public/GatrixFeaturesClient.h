@@ -393,6 +393,15 @@ private:
                            const FString& EtagHeader);
   void StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFlags, bool bIsInitialFetch);
   TMap<FString, FGatrixEvaluatedFlag> SelectFlags(bool bForceRealtime) const;
+
+  // Return a const reference to the appropriate flag map.
+  // Caller MUST hold FlagsCriticalSection before calling.
+  const TMap<FString, FGatrixEvaluatedFlag>& SelectFlagsRef(bool bForceRealtime) const;
+
+  // Thread-safe single-flag lookup. Returns nullptr if not found.
+  // Copies the flag into OutFlag and returns a pointer to it, or nullptr if not found.
+  const FGatrixEvaluatedFlag* FindFlag(const FString& FlagName, bool bForceRealtime,
+                                       FGatrixEvaluatedFlag& OutFlag) const;
   void SetReady();
   void EmitFlagChanges(const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
                        const TMap<FString, FGatrixEvaluatedFlag>& NewFlags);
