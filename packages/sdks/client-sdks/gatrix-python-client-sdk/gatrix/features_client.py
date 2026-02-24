@@ -215,8 +215,8 @@ class FeaturesClient:
         # Internal state
         self._connection_id = str(uuid.uuid4())
         self._context = feat.context or GatrixContext()
-        self._flags: Dict[str, EvaluatedFlag] = {}
-        self._pending_flags: Optional[Dict[str, EvaluatedFlag]] = None
+        self._synchronized_flags: Dict[str, EvaluatedFlag] = {}
+        self._realtime_flags: Optional[Dict[str, EvaluatedFlag]] = None
         self._pending_sync = False
         self._etag: Optional[str] = None
         self._sdk_state = "initializing"
@@ -281,12 +281,12 @@ class FeaturesClient:
         if cached and isinstance(cached, list):
             for d in cached:
                 flag = _flag_from_dict(d)
-                self._flags[flag.name] = flag
-            if self._flags:
+                self._synchronized_flags[flag.name] = flag
+            if self._synchronized_flags:
                 if self._dev_mode:
                     logger.debug(
                         "[DEV] initFromStorage(): %d cached flags loaded",
-                        len(self._flags),
+                        len(self._synchronized_flags),
                     )
                 self._set_ready()
 
@@ -296,14 +296,14 @@ class FeaturesClient:
 
         # Bootstrap
         if self._bootstrap:
-            if self._bootstrap_override or not self._flags:
-                self._flags.clear()
+            if self._bootstrap_override or not self._synchronized_flags:
+                self._synchronized_flags.clear()
                 for flag in self._bootstrap:
-                    self._flags[flag.name] = flag
-            if self._flags:
+                    self._synchronized_flags[flag.name] = flag
+            if self._synchronized_flags:
                 self._set_ready()
 
-        if self._flags:
+        if self._synchronized_flags:
             self._emitter.emit(EVENTS.FLAGS_INIT)
 
     # ============================================================= Lifecycle
@@ -462,9 +462,9 @@ class FeaturesClient:
 
     def _select_flags(self, force_realtime: bool = False) -> Dict[str, EvaluatedFlag]:
         """Select the appropriate flag source based on sync mode."""
-        if force_realtime and self._pending_flags is not None:
-            return self._pending_flags
-        return self._flags
+        if force_realtime and self._realtime_flags is not None:
+            return self._realtime_flags
+        return self._synchronized_flags
 
     def _lookup_flag(self, flag_name: str, force_realtime: bool = False) -> Optional[EvaluatedFlag]:
         """Look up a flag from the appropriate source."""
@@ -763,10 +763,10 @@ class FeaturesClient:
         return self.get_variant_internal(flag_name, force_realtime)
 
     def get_all_flags(self) -> List[EvaluatedFlag]:
-        return list(self._flags.values())
+        return list(self._synchronized_flags.values())
 
     def has_flag(self, flag_name: str) -> bool:
-        return flag_name in self._flags
+        return flag_name in self._synchronized_flags
 
     # ----------------------------------------------------------- variations
     def variation(self, flag_name: str, fallback_value: str, force_realtime: bool = False) -> str:
@@ -842,9 +842,9 @@ class FeaturesClient:
             return
         self._explicit_sync_mode = enabled
         self._pending_sync = False
-        if not enabled and self._pending_flags is not None:
-            self._apply_flags(self._pending_flags)
-            self._pending_flags = None
+        if not enabled and self._realtime_flags is not None:
+            self._apply_flags(self._realtime_flags)
+            self._realtime_flags = None
 
     def sync_flags(self, fetch_now: bool = False) -> None:
         """Apply pending flag changes (explicit sync mode)."""
@@ -852,11 +852,11 @@ class FeaturesClient:
             return
         if fetch_now and not self._offline_mode:
             self.fetch_flags()
-        if self._pending_flags is not None:
-            old_flags = dict(self._flags)
-            self._apply_flags(self._pending_flags)
-            self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._flags, force_realtime=False)
-            self._pending_flags = None
+        if self._realtime_flags is not None:
+            old_flags = dict(self._synchronized_flags)
+            self._apply_flags(self._realtime_flags)
+            self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._synchronized_flags, force_realtime=False)
+            self._realtime_flags = None
             self._pending_sync = False
             self._sync_count += 1
             self._emitter.emit(EVENTS.FLAGS_SYNC)
@@ -951,7 +951,7 @@ class FeaturesClient:
             "last_error_time": self._last_error_time,
             "offline_mode": self._offline_mode,
             "features": {
-                "total_flag_count": len(self._flags),
+                "total_flag_count": len(self._synchronized_flags),
                 "missing_flags": dict(self._missing_flags),
                 "fetch_flags_count": self._fetch_count,
                 "update_count": self._update_count,
@@ -1031,18 +1031,18 @@ class FeaturesClient:
             self._consecutive_failures = 0
 
             if self._explicit_sync_mode:
-                self._pending_flags = new_flags
+                self._realtime_flags = new_flags
                 if not self._pending_sync:
                     self._pending_sync = True
                     self._emitter.emit(EVENTS.FLAGS_PENDING_SYNC)
             else:
                 self._pending_sync = False
-                old_flags = dict(self._flags)
+                old_flags = dict(self._synchronized_flags)
                 self._apply_flags(new_flags)
                 # Always invoke realtime callbacks
-                self._invoke_watch_callbacks(self._watch_callbacks, old_flags, self._flags, force_realtime=True)
+                self._invoke_watch_callbacks(self._watch_callbacks, old_flags, self._synchronized_flags, force_realtime=True)
                 # In non-explicit mode, also invoke synced callbacks
-                self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._flags, force_realtime=False)
+                self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._synchronized_flags, force_realtime=False)
 
             self._update_count += 1
             self._last_update_time = datetime.now(timezone.utc)
@@ -1130,7 +1130,7 @@ class FeaturesClient:
         Watch callbacks are NOT invoked here directly — they are invoked
         by the caller (storeFlags for non-explicitSync, syncFlags for explicitSync).
         """
-        old_flags = self._flags
+        old_flags = self._synchronized_flags
         now = datetime.now(timezone.utc)
 
         # Detect changes
@@ -1159,7 +1159,7 @@ class FeaturesClient:
         if removed:
             self._emitter.emit(EVENTS.FLAGS_REMOVED, removed)
 
-        self._flags = new_flags
+        self._synchronized_flags = new_flags
 
         if changed:
             self._emitter.emit(
@@ -1380,14 +1380,14 @@ class FeaturesClient:
                 self._sdk_state = "ready"
             if self._dev_mode:
                 logger.debug(
-                    "[DEV] setReady() totalFlags=%d", len(self._flags)
+                    "[DEV] setReady() totalFlags=%d", len(self._synchronized_flags)
                 )
             self._emitter.emit(EVENTS.FLAGS_READY)
         elif self._sdk_state == "ready":
             self._sdk_state = "healthy"
 
     def _get_flag(self, flag_name: str) -> Optional[EvaluatedFlag]:
-        return self._flags.get(flag_name)
+        return self._synchronized_flags.get(flag_name)
 
     def _record_missing(self, flag_name: str) -> None:
         if not self._disable_stats:
@@ -1512,7 +1512,7 @@ class FeaturesClient:
         self, changed_keys: List[str]
     ) -> None:
         """Handle flag invalidation from streaming."""
-        total_flags = len(self._flags)
+        total_flags = len(self._synchronized_flags)
         changed_count = len(changed_keys)
 
         if (
