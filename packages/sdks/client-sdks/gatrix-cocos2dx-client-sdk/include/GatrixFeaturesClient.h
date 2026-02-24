@@ -252,7 +252,7 @@ private:
                                   bool forceRealtime = false);
 
   // Internal
-  FlagProxy createProxy(const std::string& flagName, bool forceRealtime = true);
+  FlagProxy createProxyForWatch(const std::string& flagName, bool forceRealtime = true);
   void initFromStorage();
   void initFromBootstrap();
   void saveToStorage();

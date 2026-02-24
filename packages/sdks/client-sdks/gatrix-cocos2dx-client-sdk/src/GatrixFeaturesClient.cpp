@@ -212,13 +212,13 @@ Variant FeaturesClient::getVariant(const std::string& flagName, bool forceRealti
 
 std::vector<EvaluatedFlag> FeaturesClient::getAllFlags() const {
   std::vector<EvaluatedFlag> result;
-  for (const auto& [name, f] : selectFlags()) {
+  for (const auto& [name, f] : selectFlags(false)) {
     result.push_back(f);
   }
   return result;
 }
 
-FlagProxy FeaturesClient::createProxy(const std::string& flagName, bool forceRealtime) {
+FlagProxy FeaturesClient::createProxyForWatch(const std::string& flagName, bool forceRealtime) {
   // Track access for initial proxy creation
   const auto& flags = selectFlags(forceRealtime);
   auto it = flags.find(flagName);
@@ -236,7 +236,7 @@ FlagProxy FeaturesClient::createProxy(const std::string& flagName, bool forceRea
 }
 
 bool FeaturesClient::hasFlag(const std::string& flagName) const {
-  const auto& flags = selectFlags();
+  const auto& flags = selectFlags(false);
   return flags.find(flagName) != flags.end();
 }
 
@@ -420,7 +420,7 @@ std::function<void()> FeaturesClient::watchRealtimeFlagWithInitialState(const st
 
   // Fire immediately with current state — always use realtimeFlags for realtime
   // watchers
-  callback(FlagProxy(this, flagName, true));
+  callback(createProxyForWatch(flagName, true));
 
   return unwatchFn;
 }
@@ -451,7 +451,7 @@ std::function<void()> FeaturesClient::watchSyncedFlagWithInitialState(const std:
   auto unwatchFn = watchSyncedFlag(flagName, callback, name);
 
   // Fire immediately — respect explicitSyncMode for synced watchers
-  callback(FlagProxy(this, flagName, false));
+  callback(createProxyForWatch(flagName, false));
 
   return unwatchFn;
 }
@@ -1078,7 +1078,7 @@ void FeaturesClient::invokeWatchCallbacks(
 
       auto cbIt = callbackMap.find(name);
       if (cbIt != callbackMap.end() && !cbIt->second.empty()) {
-        FlagProxy proxy(this, name, forceRealtime);
+        auto proxy = createProxyForWatch(name, forceRealtime);
         // Copy to avoid mutation during iteration
         auto callbacks = cbIt->second;
         for (const auto& cb : callbacks) {
@@ -1097,7 +1097,7 @@ void FeaturesClient::invokeWatchCallbacks(
     if (newFlags.find(name) == newFlags.end()) {
       auto cbIt = callbackMap.find(name);
       if (cbIt != callbackMap.end() && !cbIt->second.empty()) {
-        FlagProxy proxy(this, name, forceRealtime);
+        auto proxy = createProxyForWatch(name, forceRealtime);
         auto callbacks = cbIt->second;
         for (const auto& cb : callbacks) {
           try {
