@@ -697,7 +697,7 @@ func fetch_flags() -> void:
 
 func get_stats() -> GatrixTypes.FeaturesStats:
 	_mutex.lock()
-	_stats.total_flag_count = _get_active_flags().size()
+	_stats.total_flag_count = _get_active_flags(false).size()
 	_stats.sdk_state = _sdk_state
 	_stats.etag = _etag
 	_stats.offline_mode = _config.features.offline_mode

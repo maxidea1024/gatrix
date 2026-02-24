@@ -21,7 +21,7 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>Check if a flag exists</summary>
-        public bool HasFlag(string flagName) => LookupFlag(flagName) != null;
+        public bool HasFlag(string flagName) => LookupFlag(flagName, false) != null;
 
         /// <summary>Create a FlagProxy for watch callbacks.
         /// Uses the specified forceRealtime to select the appropriate flag set.</summary>
@@ -226,7 +226,7 @@ namespace Gatrix.Unity.SDK
 
         private VariationResult<T> MakeDetails<T>(string flagName, T value, string expectedType)
         {
-            var flag = LookupFlag(flagName);
+            var flag = LookupFlag(flagName, false);
             var exists = flag != null;
             string reason;
             if (!exists)
@@ -273,7 +273,7 @@ namespace Gatrix.Unity.SDK
 
         private EvaluatedFlag LookupFlagOrThrow(string flagName)
         {
-            var flag = LookupFlag(flagName);
+            var flag = LookupFlag(flagName, false);
             if (flag == null)
             {
                 TrackFlagAccess(flagName, null, "getVariant");

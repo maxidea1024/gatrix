@@ -13,7 +13,7 @@ namespace Gatrix.Unity.SDK
         /// <summary>Get feature flag specific statistics</summary>
         public FeaturesStats GetStats()
         {
-            var flags = SelectFlags();
+            var flags = SelectFlags(false);
 
             // Active watch groups
             var activeWatchGroups = new List<string>();

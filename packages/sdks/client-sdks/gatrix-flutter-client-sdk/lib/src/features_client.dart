@@ -1117,7 +1117,7 @@ class FeaturesClient implements VariationProvider {
 
   Map<String, dynamic> getStats() {
     return {
-      'totalFlagCount': _selectFlags().length,
+      'totalFlagCount': _selectFlags(forceRealtime: false).length,
       'missingFlags': Map<String, int>.from(_missingFlags),
       'fetchFlagsCount': _fetchCount,
       'updateCount': _updateCount,

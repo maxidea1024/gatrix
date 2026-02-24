@@ -926,7 +926,7 @@ void FeaturesClient::unschedulePolling() {
 
 GatrixSdkStats FeaturesClient::getStats() const {
   auto stats = _stats;
-  stats.totalFlagCount = static_cast<int>(selectFlags().size());
+  stats.totalFlagCount = static_cast<int>(selectFlags(false).size());
   stats.sdkState = _sdkState;
   stats.etag = _etag;
   stats.offlineMode = _config.features.offlineMode;
