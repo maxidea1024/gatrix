@@ -25,7 +25,7 @@ import { fetchEventSource, EventStreamContentType } from '@microsoft/fetch-event
 import { type StorageProvider } from './StorageProvider';
 import { LocalStorageProvider } from './LocalStorageProvider';
 import { InMemoryStorageProvider } from './InMemoryStorageProvider';
-import { uuidv4, resolveAbortController, deepClone, computeContextHash, isEqualFlag } from './utils';
+import { uuidv4, resolveAbortController, deepClone, computeContextHash, computeEtag, isEqualFlag } from './utils';
 import { FlagProxy } from './FlagProxy';
 import { type VariationProvider } from './VariationProvider';
 import { WatchFlagGroup } from './WatchFlagGroup';
@@ -1448,8 +1448,16 @@ export class FeaturesClient implements VariationProvider {
     this.mergeFlags(flags, requestedKeys);
     this.flagsContextHash = newContextHash;
 
-    // Persist the full merged flag set
+    // Recalculate ETag after partial update to match full state evaluation
     const allFlags = Array.from(this.realtimeFlags.values());
+    const newEtag = await computeEtag(allFlags, newContextHash);
+    if (newEtag && newEtag !== this.etag) {
+      this.etag = newEtag;
+      await this.storage.save(STORAGE_KEY_ETAG, this.etag);
+      this.devLog(`Recalculated ETag after partial update: ${this.etag}`);
+    }
+
+    // Persist the full merged flag set
     await this.storage.save(STORAGE_KEY_FLAGS, allFlags);
 
     // Emit change events

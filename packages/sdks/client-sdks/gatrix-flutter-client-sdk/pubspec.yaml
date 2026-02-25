@@ -16,6 +16,7 @@ dependencies:
   collection: ^1.17.1
   uuid: ^4.0.0
   web_socket_channel: ^3.0.0
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:

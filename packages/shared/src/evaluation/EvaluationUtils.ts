@@ -98,7 +98,7 @@ export class EvaluationUtils {
           return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
         })
         .join('|');
-    return `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
+    return `"${crypto.createHash('sha256').update(etagSource).digest('hex')}"`;
   }
 
   /**

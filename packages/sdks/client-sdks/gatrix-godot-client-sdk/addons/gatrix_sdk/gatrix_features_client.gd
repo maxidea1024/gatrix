@@ -595,7 +595,9 @@ func _compute_context_hash(ctx: GatrixTypes.GatrixContext) -> String:
 	keys.sort()
 	for key in keys:
 		parts.append("%s=%s" % [str(key), str(ctx.properties[key])])
-	return "|".join(parts)
+	
+	var input := "|".join(parts)
+	return input.sha256_text()
 
 
 func get_context() -> GatrixTypes.GatrixContext:
@@ -1340,5 +1342,148 @@ func _build_metrics_payload() -> String:
 	}
 
 	return JSON.stringify(payload)
+
+
+# ==================== Streaming & Partial Fetch ====================
+
+## Handle streaming invalidation signal
+func handle_streaming_invalidation(changed_keys: Array) -> void:
+	_mutex.lock()
+	var total_flags := _realtime_flags.size()
+	_mutex.unlock()
+	
+	var changed_count := changed_keys.size()
+
+	if changed_count == 0 or total_flags == 0 or changed_count >= total_flags / 2:
+		# Full fetch: clear ETag
+		_etag = ""
+		_do_fetch_flags()
+	else:
+		# Partial fetch: request only changed keys
+		fetch_partial_flags(changed_keys)
+
+
+## Fetch only specific flag keys from the server
+func fetch_partial_flags(flag_keys: Array) -> void:
+	if flag_keys.is_empty():
+		return
+	
+	var keys_str := ",".join(flag_keys)
+	_dev_log("fetch_partial_flags: starting partial fetch for keys=[%s]" % keys_str)
+	
+	_emitter.emit_event(GatrixEvents.FLAGS_FETCH, [{ "etag": null, "partial": true }])
+	
+	# Create HTTP request node
+	var partial_http = HTTPRequest.new()
+	_scene_tree.root.call_deferred("add_child", partial_http)
+	await _scene_tree.process_frame
+	
+	var base := _config.api_url.rstrip("/")
+	var url := "%s/client/features/%s/eval" % [base, _config.environment.uri_encode()]
+	var params := _config.features.context.to_dict()
+	params["flagNames"] = keys_str
+	
+	var query_parts: PackedStringArray = []
+	for key in params:
+		query_parts.append("%s=%s" % [key.uri_encode(), str(params[key]).uri_encode()])
+	url += "?" + "&".join(query_parts)
+	
+	var headers: PackedStringArray = [
+		"X-API-Token: %s" % _config.api_token,
+		"Accept: application/json",
+		"X-Application-Name: %s" % _config.app_name,
+		"X-Environment: %s" % _config.environment,
+		"X-Connection-Id: %s" % _connection_id,
+		"X-SDK-Version: %s/%s" % [SDK_NAME, SDK_VERSION],
+		"X-Gatrix-Context-Hash: %s" % _last_context_hash,
+	]
+	
+	partial_http.request_completed.connect(func(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
+		if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
+			var json := JSON.new()
+			if json.parse(body.get_string_from_utf8()) == OK:
+				var data = json.data
+				if data is Dictionary and data.get("success") == true:
+					var flags_data = data.get("data", {}).get("flags", [])
+					var received_flags: Array[GatrixTypes.EvaluatedFlag] = []
+					for flag_dict in flags_data:
+						received_flags.append(GatrixTypes.EvaluatedFlag.from_dict(flag_dict))
+					_store_partial_flags(received_flags, flag_keys)
+					_emitter.emit_event(GatrixEvents.FLAGS_FETCH_SUCCESS)
+				else:
+					_etag = ""
+					_do_fetch_flags()
+			else:
+				_etag = ""
+				_do_fetch_flags()
+		else:
+			_etag = ""
+			_do_fetch_flags()
+		
+		_emitter.emit_event(GatrixEvents.FLAGS_FETCH_END)
+		partial_http.queue_free()
+	)
+	
+	partial_http.request(url, headers, HTTPClient.METHOD_GET)
+
+
+func _store_partial_flags(flags: Array, requested_keys: Array) -> void:
+	_mutex.lock()
+	var old_flags := _realtime_flags.duplicate()
+	
+	# Update or add
+	for flag in flags:
+		_realtime_flags[flag.name] = flag
+		
+	# Remove deleted
+	var returned_names := {}
+	for flag in flags:
+		returned_names[flag.name] = true
+	
+	for key in requested_keys:
+		if not returned_names.has(key):
+			_realtime_flags.erase(key)
+			
+	# Recalculate ETag
+	_etag = _compute_etag(_realtime_flags.values(), _last_context_hash)
+	_dev_log("Recalculated ETag after partial update: %s" % _etag)
+	
+	_mutex.unlock()
+	
+	# Save to storage
+	var flags_array: Array = []
+	for flag in _realtime_flags.values():
+		flags_array.append(flag.to_dict())
+	_storage.save_value(STORAGE_KEY_FLAGS, flags_array)
+	_storage.save_value(STORAGE_KEY_ETAG, _etag)
+	
+	# Invoke watch callbacks
+	_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags, true, _flags_context_hash, _last_context_hash)
+	_flags_context_hash = _last_context_hash
+
+	if not _config.features.explicit_sync_mode:
+		_synchronized_flags = _realtime_flags.duplicate(true)
+		_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags, false, _flags_context_hash, _last_context_hash)
+		_emitter.emit_event(GatrixEvents.FLAGS_CHANGE)
+	else:
+		_has_pending_sync = true
+		_emitter.emit_event(GatrixEvents.FLAGS_PENDING_SYNC)
+
+
+func _compute_etag(flags: Array, context_hash: String) -> String:
+	var sorted_flags := flags.duplicate()
+	sorted_flags.sort_custom(func(a, b): return a.name < b.name)
+	
+	var parts := PackedStringArray()
+	parts.append(context_hash)
+	for f in sorted_flags:
+		var variant_part := "no-variant"
+		if f.variant.name != "":
+			variant_part = "%s:%s" % [f.variant.name, str(f.variant.enabled).to_lower()]
+		parts.append("%s:%d:%s:%s" % [f.name, f.version, str(f.enabled).to_lower(), variant_part])
+	
+	var input := "|".join(parts)
+	return "\"%s\"" % input.sha256_text()
+
 
 

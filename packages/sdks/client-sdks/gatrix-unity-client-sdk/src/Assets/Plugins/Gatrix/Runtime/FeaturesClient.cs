@@ -404,6 +404,13 @@ namespace Gatrix.Unity.SDK
                 }
             }
 
+            // Recalculate ETag after partial update
+            _etag = ComputeEtag(new List<EvaluatedFlag>(_realtimeFlags.Values), _lastContextHash);
+            _devLog.Log($"Recalculated ETag after partial update: {_etag}");
+
+            // Persist ETag
+            _storage.SaveAsync(StorageKeyEtag, _etag).Forget();
+
             if (!FeaturesConfig.ExplicitSyncMode)
             {
                 _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
@@ -481,11 +488,43 @@ namespace Gatrix.Unity.SDK
             }
 
             var raw = sb.ToString();
-            using (var md5 = System.Security.Cryptography.MD5.Create())
+            using (var sha = System.Security.Cryptography.SHA256.Create())
             {
                 var bytes = Encoding.UTF8.GetBytes(raw);
-                var hash = md5.ComputeHash(bytes);
+                var hash = sha.ComputeHash(bytes);
                 return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            }
+        }
+
+        private static string ComputeEtag(List<EvaluatedFlag> flags, string contextHash)
+        {
+            // Sort flags by name ascending
+            var sortedFlags = new List<EvaluatedFlag>(flags);
+            sortedFlags.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+
+            var sb = new StringBuilder(contextHash, 1024);
+            foreach (var f in sortedFlags)
+            {
+                var variantPart = string.IsNullOrEmpty(f.Variant.Name)
+                    ? "no-variant"
+                    : $"{f.Variant.Name}:{f.Variant.Enabled.ToString().ToLower()}";
+
+                sb.Append('|');
+                sb.Append(f.Name);
+                sb.Append(':');
+                sb.Append(f.Version);
+                sb.Append(':');
+                sb.Append(f.Enabled.ToString().ToLower());
+                sb.Append(':');
+                sb.Append(variantPart);
+            }
+
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+                var hash = sha.ComputeHash(bytes);
+                var hex = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                return $"\"{hex}\"";
             }
         }
 

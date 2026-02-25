@@ -130,6 +130,36 @@ export async function computeContextHash(context: Record<string, any>): Promise<
     return value;
   }
 }
+
+/**
+ * Compute ETag for a set of evaluated flags.
+ * Replicates server-side logic in EvaluationUtils.generateETag.
+ */
+export async function computeEtag(
+  flags: any[],
+  contextHash: string
+): Promise<string> {
+  // Sort flags by name ascending to match server-side sorting
+  const sortedFlags = [...flags].sort((a, b) => a.name.localeCompare(b.name));
+
+  const etagSource =
+    contextHash +
+    '|' +
+    sortedFlags
+      .map((f) => {
+        const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+        return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
+      })
+      .join('|');
+
+  try {
+    const hash = await sha256(etagSource);
+    return `"${hash}"`;
+  } catch {
+    // If hashing fails, return empty string (server will then provide fresh data on next poll)
+    return '';
+  }
+}
 /**
  * Deep compare two evaluated flags to detect actual value changes.
  * Optimized to use ContextHash and Version to avoid unnecessary serialization.

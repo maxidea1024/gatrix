@@ -471,6 +471,8 @@ private:
   FString LastContextHash;
   FString FlagsContextHash;
   static FString ComputeContextHash(const FGatrixContext& Context);
+  static FString ComputeEtag(const TMap<FString, FGatrixEvaluatedFlag>& Flags,
+                             const FString& ContextHash);
 
   // Statistics (lock-free via FThreadSafeCounter)
   FThreadSafeCounter FetchFlagsCount;

@@ -114,7 +114,7 @@ EvaluatedFlag createMissingFlag(String flagName) {
     name: flagName,
     enabled: false,
     variant: Variant(name: VariantSource.missing, enabled: false),
-    valueType: ValueType.none,
+    value_type: ValueType.none,
     version: 0,
   );
 }

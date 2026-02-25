@@ -10,15 +10,27 @@ Client SDKs frequently poll for feature flag updates. Even with server-side cach
 
 ### 1. Consistent ETag Generation
 An ETag is generated based on the evaluated flag set. To ensure the ETag is consistent for the same set of flags, the following rules are applied:
-- **Sorting**: Evaluation results are sorted by their Unique Identifier (ULID/ID) in descending order.
+- **Sorting**: Evaluation results are sorted by their **Name in ascending order**. This provides a stable, easy-to-replicate order across all platforms.
 - **Content Hashing**: The ETag source string is constructed using:
+    - Context Hash
     - Flag Name
     - Flag Version
     - Enabled State
-    - Variant Name (and variant's enabled state)
-- **Context Pinning**: The `contextHash` is included in the ETag source to ensure that if the same flags are evaluated under a different context (which might matter for future audit logs or reason tracking), they are treated distinctly, although usually, same flags + same version = same result.
+    - Variant Name
+    - Variant Enabled State
+- **Algorithm**: **SHA-256** is used for hashing to ensure broad compatibility across modern browser environments and various client SDK platforms without requiring legacy MD5 dependencies.
+- **Context Pinning**: The `contextHash` is included in the ETag source.
 
-### 2. Early Exit (304 Not Modified)
+### 2. Client-Side ETag Recalculation (Partial Fetch Optimization)
+When a client receives a partial flag update (via streaming or partial fetch), it merges these changes into its local cache. To ensure that the next full polling request can benefit from `304 Not Modified`, the client **MUST** recalculate the ETag locally:
+1. Merge partial flag changes into the local cache.
+2. Sort the entire merged flag set by Name (ascending).
+3. Construct the ETag source string following the same rules as the server.
+4. Compute the SHA-256 hash and update the local ETag storage.
+
+This allows the SDK to resume conditional polling with a valid ETag even after multiple partial real-time updates.
+
+### 3. Early Exit (304 Not Modified)
 The server performs the 304 check at two stages for maximum efficiency:
 
 #### Phase A: Cache Hit (Zero Evaluation)

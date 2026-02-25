@@ -77,7 +77,7 @@ export async function performEvaluation(req: Request, res: Response, clientConte
         }
 
         const flagsArray = Object.values(results).sort((a, b) =>
-            (b.id || '').localeCompare(a.id || '')
+            a.name.localeCompare(b.name)
         );
 
         const responseData = {

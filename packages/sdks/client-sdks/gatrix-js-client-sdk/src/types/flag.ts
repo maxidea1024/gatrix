@@ -21,6 +21,7 @@ export type ValueType = 'none' | 'string' | 'number' | 'boolean' | 'json';
  * Evaluated flag from Edge API
  */
 export interface EvaluatedFlag {
+  id: string;
   name: string;
   enabled: boolean;
   variant: Variant;

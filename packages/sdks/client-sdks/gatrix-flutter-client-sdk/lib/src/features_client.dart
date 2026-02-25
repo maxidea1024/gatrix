@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:crypto/crypto.dart';
 import 'models.dart';
 import 'events.dart';
 import 'flag_proxy.dart';
@@ -1323,14 +1324,137 @@ class FeaturesClient implements VariationProvider {
     final totalFlags = _realtimeFlags.length;
     final changedCount = changedKeys.length;
 
-    if (changedCount == 0 || totalFlags == 0 || changedCount >= totalFlags ~/ 2) {
+    if (changedCount == 0 ||
+        totalFlags == 0 ||
+        changedCount >= totalFlags ~/ 2) {
       // Full fetch: clear ETag
       _etag = null;
       fetchFlags();
     } else {
-      // Partial invalidation - for now do full fetch
-      fetchFlags();
+      // Partial fetch: request only changed keys
+      fetchPartialFlags(Set.from(changedKeys));
     }
+  }
+
+  /// Fetch only specific flag keys from the server
+  Future<void> fetchPartialFlags(Set<String> flagKeys) async {
+    if (flagKeys.isEmpty) return;
+
+    final keysStr = flagKeys.join(',');
+    _devLog('fetchPartialFlags: starting partial fetch for keys=[$keysStr]');
+
+    _events.emit(GatrixEvents.flagsFetch, [
+      {'etag': null, 'partial': true}
+    ]);
+
+    try {
+      final url = Uri.parse('$_apiUrl/client/features/$_environment/eval');
+      final queryParams = _context.toJson().map((k, v) => MapEntry(k, v.toString()));
+      queryParams['flagNames'] = keysStr;
+
+      final response = await http.get(
+        url.replace(queryParameters: queryParams),
+        headers: _buildHeaders(),
+      );
+
+      _devLog('fetchPartialFlags: response received. status=${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        if (data['success'] == true && data['data'] != null) {
+          final flagsJson = data['data']['flags'] as List<dynamic>;
+          final List<EvaluatedFlag> flags =
+              flagsJson.map((f) => EvaluatedFlag.fromJson(f)).toList();
+          await _storePartialFlags(flags, flagKeys);
+        }
+        _consecutiveFailures = 0;
+        _events.emit(GatrixEvents.flagsFetchSuccess);
+      } else {
+        _devLog('fetchPartialFlags: error ${response.statusCode}, falling back to full fetch');
+        _etag = null;
+        fetchFlags();
+      }
+    } catch (e) {
+      _devLog('fetchPartialFlags: exception $e, falling back to full fetch');
+      _etag = null;
+      fetchFlags();
+    } finally {
+      _events.emit(GatrixEvents.flagsFetchEnd);
+    }
+  }
+
+  /// Store partial flag updates with merge, persist, and ETag recalculation
+  Future<void> _storePartialFlags(
+      List<EvaluatedFlag> flags, Set<String> requestedKeys) async {
+    final oldFlags = Map<String, EvaluatedFlag>.from(_realtimeFlags);
+
+    // Update or add returned flags
+    for (final flag in flags) {
+      _realtimeFlags[flag.name] = flag;
+    }
+
+    // Remove keys that were requested but not returned (deleted)
+    final returnedNames = Set.from(flags.map((f) => f.name));
+    for (final key in requestedKeys) {
+      if (!returnedNames.contains(key)) {
+        _realtimeFlags.remove(key);
+      }
+    }
+
+    // Recalculate ETag after partial update
+    _etag = _computeEtag(_realtimeFlags.values.toList(), _lastContextHash);
+    _devLog('Recalculated ETag after partial update: $_etag');
+
+    await _saveToStorage();
+
+    // Always invoke realtime watch callbacks
+    _invokeWatchCallbacks(
+      _watchCallbacks,
+      oldFlags,
+      _realtimeFlags,
+      forceRealtime: true,
+      oldContextHash: _flagsContextHash,
+      newContextHash: _lastContextHash,
+    );
+    _flagsContextHash = _lastContextHash;
+
+    if (!_explicitSyncMode) {
+      _synchronizedFlags = Map.from(_realtimeFlags);
+      _invokeWatchCallbacks(
+        _syncedWatchCallbacks,
+        oldFlags,
+        _realtimeFlags,
+        forceRealtime: false,
+        oldContextHash: _flagsContextHash,
+        newContextHash: _lastContextHash,
+      );
+      _events.emit(GatrixEvents.flagsChange);
+    } else {
+      final wasPending = _pendingSync;
+      _pendingSync = true;
+      if (!wasPending) {
+        _events.emit(GatrixEvents.flagsPendingSync);
+      }
+    }
+  }
+
+  /// Compute ETag for a set of flags (matching server logic)
+  String _computeEtag(List<EvaluatedFlag> flags, String contextHash) {
+    // Sort flags by name ascending
+    final sortedFlags = List<EvaluatedFlag>.from(flags)
+      ..sort((a, b) => a.name.compareTo(b.name));
+
+    final buffer = StringBuffer(contextHash);
+    for (final f in sortedFlags) {
+      final variantPart = f.variant.name.isEmpty
+          ? 'no-variant'
+          : '${f.variant.name}:${f.variant.enabled}';
+      buffer.write('|${f.name}:${f.version}:${f.enabled}:$variantPart');
+    }
+
+    final bytes = utf8.encode(buffer.toString());
+    final hash = sha256.convert(bytes).toString();
+    return '"$hash"';
   }
 
   // Streaming stats helpers

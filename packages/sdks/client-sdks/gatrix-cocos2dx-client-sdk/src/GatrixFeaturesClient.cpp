@@ -7,12 +7,109 @@
 #include "json/writer.h"
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 #include <sstream>
 
 using namespace cocos2d;
 using namespace cocos2d::network;
 
 namespace gatrix {
+
+namespace {
+// SHA-256 implementation (simple public domain version)
+typedef unsigned int uint32;
+typedef unsigned char uint8;
+
+class SHA256 {
+public:
+  void update(const uint8* data, size_t len) {
+    for (size_t i = 0; i < len; ++i) {
+      m_buffer[m_bufferLen++] = data[i];
+      if (m_bufferLen == 64) {
+        processBlock(m_buffer);
+        m_totalLen += 64;
+        m_bufferLen = 0;
+      }
+    }
+  }
+
+  std::string final() {
+    uint64 totalLen = (m_totalLen + m_bufferLen) * 8;
+    update((const uint8*)"\x80", 1);
+    while (m_bufferLen != 56)
+      update((const uint8*)"\x00", 1);
+    for (int i = 7; i >= 0; --i) {
+      uint8 b = (uint8)(totalLen >> (i * 8));
+      update(&b, 1);
+    }
+
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0');
+    for (int i = 0; i < 8; ++i)
+      ss << std::setw(8) << m_state[i];
+    return ss.str();
+  }
+
+  SHA256() {
+    m_state[0] = 0x6a09e667; m_state[1] = 0xbb67ae85; m_state[2] = 0x3c6ef372; m_state[3] = 0xa54ff53a;
+    m_state[4] = 0x510e527f; m_state[5] = 0x9b05688c; m_state[6] = 0x1f83d9ab; m_state[7] = 0x5be0cd19;
+    m_bufferLen = 0; m_totalLen = 0;
+  }
+
+private:
+  typedef unsigned long long uint64;
+  uint32 m_state[8];
+  uint8 m_buffer[64];
+  size_t m_bufferLen;
+  uint64 m_totalLen;
+
+  static uint32 rotr(uint32 x, uint32 n) { return (x >> n) | (x << (32 - n)); }
+  static uint32 ch(uint32 x, uint32 y, uint32 z) { return (x & y) ^ (~x & z); }
+  static uint32 maj(uint32 x, uint32 y, uint32 z) { return (x & y) ^ (x & z) ^ (y & z); }
+  static uint32 ep0(uint32 x) { return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22); }
+  static uint32 ep1(uint32 x) { return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25); }
+  static uint32 sig0(uint32 x) { return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3); }
+  static uint32 sig1(uint32 x) { return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10); }
+
+  void processBlock(const uint8* data) {
+    uint32 w[64];
+    for (int i = 0; i < 16; i++)
+      w[i] = (data[i * 4] << 24) | (data[i * 4 + 1] << 16) | (data[i * 4 + 2] << 8) | (data[i * 4 + 3]);
+    for (int i = 16; i < 64; i++)
+      w[i] = sig1(w[i - 2]) + w[i - 7] + sig0(w[i - 15]) + w[i - 16];
+    uint32 a = m_state[0], b = m_state[1], c = m_state[2], d = m_state[3],
+           e = m_state[4], f = m_state[5], g = m_state[6], h = m_state[7];
+    static const uint32 k[] = {
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
+    for (int i = 0; i < 64; i++) {
+      uint32 t1 = h + ep1(e) + ch(e, f, g) + k[i] + w[i];
+      uint32 t2 = ep0(a) + maj(a, b, c);
+      h = g; g = f; f = e; e = d + t1; d = c; c = b; b = a; a = t1 + t2;
+    }
+    m_state[0] += a; m_state[1] += b; m_state[2] += c; m_state[3] += d;
+    m_state[4] += e; m_state[5] += f; m_state[6] += g; m_state[7] += h;
+  }
+};
+} // namespace
+
+std::string FeaturesClient::computeContextHash(const GatrixContext& context) {
+  std::stringstream ss;
+  ss << "u:" << context.userId << ",s:" << context.sessionId << ",t:" << context.currentTime << ",p:";
+  for (auto const& [key, val] : context.properties) {
+    ss << key << "=" << val << ";";
+  }
+  std::string input = ss.str();
+  SHA256 sha;
+  sha.update((const uint8*)input.c_str(), input.length());
+  return sha.final();
+}
 
 // ==================== FeaturesClient ====================
 
@@ -1215,10 +1312,184 @@ void FeaturesClient::handleStreamingInvalidation(const std::vector<std::string>&
     _etag.clear();
     fetchFlags();
   } else {
-    // For now, do a full fetch for partial invalidation too
-    // (partial fetch support can be added later)
-    fetchFlags();
+    // Partial fetch: request only changed keys
+    fetchPartialFlags(changedKeys);
   }
+}
+
+void FeaturesClient::fetchPartialFlags(const std::vector<std::string>& changedKeys) {
+  if (changedKeys.empty())
+    return;
+
+  std::string keysStr;
+  for (size_t i = 0; i < changedKeys.size(); ++i) {
+    keysStr += changedKeys[i] + (i == changedKeys.size() - 1 ? "" : ",");
+  }
+
+  if (_config.enableDevMode) {
+    CCLOG("[GatrixSDK][DEV] fetchPartialFlags: starting partial fetch for keys=[%s]",
+          keysStr.c_str());
+  }
+
+  _emitter.emit(EVENTS::FLAGS_FETCH_START, {std::string("")});
+
+  auto* request = new HttpRequest();
+  request->setRequestType(HttpRequest::Type::GET);
+
+  // URL: apiUrl/client/features/environment/eval?flagNames=...
+  std::string url = _config.apiUrl + "/client/features/" + _config.environment + "/eval";
+
+  // Build query params
+  std::stringstream ss;
+  ss << "?userId=" << _context.userId << "&sessionId=" << _context.sessionId
+     << "&flagNames=" << keysStr;
+  for (auto const& [key, val] : _context.properties) {
+    ss << "&" << key << "=" << val;
+  }
+  request->setUrl(url + ss.str());
+
+  std::vector<std::string> headers;
+  headers.push_back("Content-Type: application/json");
+  headers.push_back("X-API-Token: " + _config.apiToken);
+  headers.push_back("X-Application-Name: " + _config.appName);
+  headers.push_back("X-Environment: " + _config.environment);
+  headers.push_back("X-Connection-Id: " + _connectionId);
+  headers.push_back("X-SDK-Version: " + std::string(GatrixVersion::SDK_NAME) + "/" +
+                    GatrixVersion::SDK_VERSION);
+  headers.push_back("X-Gatrix-Context-Hash: " + _lastContextHash);
+  request->setHeaders(headers);
+
+  request->setResponseCallback([this, changedKeys](HttpClient* client, HttpResponse* response) {
+    if (!response || !response->isSucceed()) {
+      CCLOG("[GatrixSDK] Partial fetch failed, falling back to full fetch");
+      _etag.clear();
+      fetchFlags();
+      return;
+    }
+
+    auto* buffer = response->getResponseData();
+    std::string body(buffer->begin(), buffer->end());
+    int statusCode = static_cast<int>(response->getResponseCode());
+
+    if (statusCode == 200) {
+      rapidjson::Document doc;
+      doc.Parse(body.c_str());
+      if (!doc.HasParseError() && doc.HasMember("data") && doc["data"].HasMember("flags")) {
+        const auto& flagsArray = doc["data"]["flags"];
+        std::vector<EvaluatedFlag> receivedFlags;
+        for (rapidjson::SizeType i = 0; i < flagsArray.Size(); i++) {
+          const auto& fj = flagsArray[i];
+          EvaluatedFlag flag;
+          flag.name = fj["name"].GetString();
+          flag.enabled = fj["enabled"].GetBool();
+          flag.version = fj.HasMember("version") ? fj["version"].GetInt() : 0;
+          flag.impressionData =
+              fj.HasMember("impressionData") ? fj["impressionData"].GetBool() : false;
+          if (fj.HasMember("variant") && fj["variant"].IsObject()) {
+            const auto& vj = fj["variant"];
+            flag.variant.name = vj["name"].GetString();
+            flag.variant.enabled = vj["enabled"].GetBool();
+            if (vj.HasMember("value") && vj["value"].IsString())
+              flag.variant.value = vj["value"].GetString();
+          }
+          if (fj.HasMember("valueType")) {
+            std::string vt = fj["valueType"].GetString();
+            if (vt == "string")
+              flag.valueType = ValueType::STRING;
+            else if (vt == "number")
+              flag.valueType = ValueType::NUMBER;
+            else if (vt == "json")
+              flag.valueType = ValueType::JSON;
+          }
+          receivedFlags.push_back(flag);
+        }
+        storePartialFlags(receivedFlags, changedKeys);
+        _consecutiveFailures = 0;
+        _emitter.emit(EVENTS::FLAGS_FETCH_SUCCESS);
+      } else {
+        _etag.clear();
+        fetchFlags();
+      }
+    } else {
+      _etag.clear();
+      fetchFlags();
+    }
+    _emitter.emit(EVENTS::FLAGS_FETCH_END);
+  });
+
+  HttpClient::getInstance()->sendImmediate(request);
+  request->release();
+}
+
+void FeaturesClient::storePartialFlags(const std::vector<EvaluatedFlag>& flags,
+                                       const std::vector<std::string>& requestedKeys) {
+  auto oldFlags = _realtimeFlags;
+
+  // Update or add
+  for (const auto& flag : flags) {
+    _realtimeFlags[flag.name] = flag;
+  }
+
+  // Remove deleted
+  for (const auto& key : requestedKeys) {
+    bool found = false;
+    for (const auto& f : flags) {
+      if (f.name == key) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      _realtimeFlags.erase(key);
+    }
+  }
+
+  // Recalculate ETag
+  _etag = computeEtag(_realtimeFlags, _lastContextHash);
+  if (_config.enableDevMode) {
+    CCLOG("[GatrixSDK][DEV] Recalculated ETag after partial update: %s", _etag.c_str());
+  }
+
+  saveToStorage();
+
+  invokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, true, _flagsContextHash,
+                       _lastContextHash);
+  _flagsContextHash = _lastContextHash;
+
+  if (!_explicitSyncMode) {
+    _synchronizedFlags = _realtimeFlags;
+    invokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, false, _flagsContextHash,
+                         _lastContextHash);
+    _emitter.emit(EVENTS::FLAGS_CHANGE);
+  } else {
+    _pendingSync = true;
+    _emitter.emit(EVENTS::FLAGS_PENDING_SYNC);
+  }
+}
+
+std::string FeaturesClient::computeEtag(const std::map<std::string, EvaluatedFlag>& flags,
+                                        const std::string& contextHash) {
+  std::vector<EvaluatedFlag> flagArray;
+  for (const auto& pair : flags) {
+    flagArray.push_back(pair.second);
+  }
+
+  // Sort by name ascending
+  std::sort(flagArray.begin(), flagArray.end(),
+            [](const EvaluatedFlag& a, const EvaluatedFlag& b) { return a.name < b.name; });
+
+  std::stringstream ss;
+  ss << contextHash;
+
+  for (const auto& f : flagArray) {
+    std::string variantPart = f.variant.name.empty() ? "no-variant" : f.variant.name + ":" + (f.variant.enabled ? "true" : "false");
+    ss << "|" << f.name << ":" << f.version << ":" << (f.enabled ? "true" : "false") << ":" << variantPart;
+  }
+
+  SHA256 sha;
+  std::string input = ss.str();
+  sha.update((const uint8*)input.c_str(), input.length());
+  return "\"" + sha.final() + "\"";
 }
 
 } // namespace gatrix

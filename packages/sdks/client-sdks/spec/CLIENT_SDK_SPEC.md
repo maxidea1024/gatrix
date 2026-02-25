@@ -1627,7 +1627,13 @@ function fetchPartialFlags(flagKeys):
 ```
 
 > [!IMPORTANT]
-> **Partial fetch ETag handling**: During a partial fetch, the SDK MUST NOT send `If-None-Match` and MUST NOT store the response `ETag`. The existing ETag from the last full fetch is preserved, ensuring the next polling cycle performs correct full-state conditional validation. This provides a natural **self-healing** mechanism: if the partial merge produces an inconsistent state, the next poll will detect the ETag mismatch and get fresh data.
+> **Partial fetch ETag handling**: During a partial fetch, the SDK MUST NOT send `If-None-Match`. After receiving the partial response:
+> 1. **Merge** returned flags into existing cache.
+> 2. **Remove** keys from `changedKeys` not in response (deleted flags).
+> 3. **Recalculate ETag Locally**: The client MUST recalculate the ETag for the *entire* merged flag set following the rules in [ETAG_OPTIMIZATION.md](ETAG_OPTIMIZATION.md).
+> 4. **Update Storage**: Store the newly computed ETag.
+>
+> This ensures the next full polling cycle correctly performs full-state conditional validation (304 Not Modified) against the merged local state. If the local state somehow diverges, the next poll's ETag mismatch will naturally trigger a fresh full-state download (self-healing).
 
 > [!IMPORTANT]
 > **Deleted flag detection**: When a partial fetch is performed for specific keys, any `changedKey` that the server does NOT return in the response is treated as a **deleted flag** and must be removed from the local cache. This prevents "zombie flags" from persisting indefinitely.

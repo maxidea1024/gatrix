@@ -2142,6 +2142,54 @@ void UGatrixFeaturesClient::MergePartialResponse(const FString& ResponseBody,
       EventEmitter->Emit(GatrixEvents::FlagsChange);
     OnChange.Broadcast();
   }
+
+  // Recalculate ETag after partial update to match full state evaluation
+  {
+    FScopeLock Lock(&FlagsCriticalSection);
+    FString NewEtag = ComputeEtag(RealtimeFlags, LastContextHash);
+    if (!NewEtag.IsEmpty() && NewEtag != Etag) {
+      Etag = NewEtag;
+      if (StorageProvider.IsValid()) {
+        StorageProvider->Save(StorageKeyEtag, Etag);
+      }
+      UE_LOG(LogGatrix, Log, TEXT("[DEV] Recalculated ETag after partial update: %s"), *Etag);
+    }
+  }
+}
+
+FString UGatrixFeaturesClient::ComputeEtag(const TMap<FString, FGatrixEvaluatedFlag>& Flags,
+                                           const FString& ContextHash) {
+  TArray<FGatrixEvaluatedFlag> FlagArray;
+  Flags.GenerateValueArray(FlagArray);
+
+  // Sort flags by name ascending to match server-side sorting
+  FlagArray.Sort([](const FGatrixEvaluatedFlag& A, const FGatrixEvaluatedFlag& B) {
+    return A.Name < B.Name;
+  });
+
+  FString EtagSource = ContextHash;
+  for (const auto& F : FlagArray) {
+    FString VariantPart =
+        F.Variant.Name.IsEmpty()
+            ? TEXT("no-variant")
+            : FString::Printf(TEXT("%s:%s"), *F.Variant.Name,
+                              F.Variant.bEnabled ? TEXT("true") : TEXT("false"));
+
+    EtagSource += FString::Printf(TEXT("|%s:%d:%s:%s"), *F.Name, F.Version,
+                                  F.bEnabled ? TEXT("true") : TEXT("false"), *VariantPart);
+  }
+
+  // Use SHA-256 for ETag (standard SHA-256 hex string)
+  FString Result;
+  FSHA256Signature Signature;
+  FTCHARToUTF8 Utf8Source(*EtagSource);
+  FSHA256::HashBuffer(Signature.Signature, (const uint8*)Utf8Source.Get(), Utf8Source.Length());
+
+  for (int32 i = 0; i < 32; i++) {
+    Result += FString::Printf(TEXT("%02x"), Signature.Signature[i]);
+  }
+
+  return FString::Printf(TEXT("\"%s\""), *Result);
 }
 
 void UGatrixFeaturesClient::ScheduleStreamingReconnect() {

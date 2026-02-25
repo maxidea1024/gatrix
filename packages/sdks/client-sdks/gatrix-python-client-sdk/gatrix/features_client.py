@@ -5,6 +5,7 @@ Implements VariationProvider protocol. All variation logic lives in
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import threading
@@ -1587,8 +1588,145 @@ class FeaturesClient:
             self._etag = None
             self.fetch_flags()
         else:
-            # Partial invalidation - for now do full fetch
+            # Partial fetch: request only changed keys
+            self.fetch_partial_flags(changed_keys)
+
+    def fetch_partial_flags(self, changed_keys: List[str]) -> None:
+        """Fetch only specific flag keys from the server."""
+        if not changed_keys:
+            return
+
+        keys_str = ",".join(changed_keys)
+        self._dev_log(f"fetch_partial_flags: starting partial fetch for keys=[{keys_str}]")
+
+        self._emitter.emit(EVENTS.FLAGS_FETCH, [{"etag": None, "partial": True}])
+
+        try:
+            url = f"{self._api_url}/client/features/{self._environment}/eval"
+            params = self._context.__dict__.copy()
+            params["flagNames"] = keys_str
+
+            # Filter out None values and join as query string
+            query_parts = []
+            for k, v in params.items():
+                if v is not None:
+                    if k == "properties" and isinstance(v, dict):
+                        for pk, pv in v.items():
+                            query_parts.append(f"properties[{pk}]={pv}")
+                    else:
+                        query_parts.append(f"{k}={v}")
+            url += "?" + "&".join(query_parts)
+
+            headers = self._build_headers()
+            req = Request(url, headers=headers)
+
+            with urlopen(req, timeout=30) as response:
+                if response.status == 200:
+                    data = json.loads(response.read().decode())
+                    if data.get("success") and "data" in data:
+                        flags_data = data["data"].get("flags", [])
+                        received_flags = [
+                            EvaluatedFlag(
+                                name=f["name"],
+                                enabled=f["enabled"],
+                                variant=Variant(
+                                    name=f["variant"]["name"],
+                                    enabled=f["variant"]["enabled"],
+                                    value=f["variant"].get("value"),
+                                ) if "variant" in f else DISABLED_VARIANT,
+                                value_type=f.get("valueType", "none"),
+                                version=f.get("version", 0),
+                                reason=f.get("reason"),
+                                impression_data=f.get("impressionData", False)
+                            )
+                            for f in flags_data
+                        ]
+                        self._store_partial_flags(received_flags, changed_keys)
+                        self._consecutive_failures = 0
+                        self._emitter.emit(EVENTS.FLAGS_FETCH_SUCCESS)
+                    else:
+                        self._etag = None
+                        self.fetch_flags()
+                else:
+                    self._etag = None
+                    self.fetch_flags()
+
+        except Exception as e:
+            self._dev_log(f"fetch_partial_flags: exception {e}, falling back to full fetch")
+            self._etag = None
             self.fetch_flags()
+        finally:
+            self._emitter.emit(EVENTS.FLAGS_FETCH_END)
+
+    def _store_partial_flags(
+        self, flags: List[EvaluatedFlag], requested_keys: List[str]
+    ) -> None:
+        """Store partial updates with merge, persist, and ETag recalculation."""
+        with self._lock:
+            old_flags = self._realtime_flags.copy()
+
+            # Update or add
+            for flag in flags:
+                self._realtime_flags[flag.name] = flag
+
+            # Remove deleted
+            returned_names = {f.name for f in flags}
+            for key in requested_keys:
+                if key not in returned_names:
+                    self._realtime_flags.pop(key, None)
+
+            # Recalculate ETag
+            self._etag = self._compute_etag(
+                list(self._realtime_flags.values()), self._last_context_hash
+            )
+            self._dev_log(f"Recalculated ETag after partial update: {self._etag}")
+
+            self._save_to_storage()
+
+            self._invoke_watch_callbacks(
+                self._watch_callbacks,
+                old_flags,
+                self._realtime_flags,
+                force_realtime=True,
+                old_context_hash=self._flags_context_hash,
+                new_context_hash=self._last_context_hash,
+            )
+            self._flags_context_hash = self._last_context_hash
+
+            if not self._explicit_sync_mode:
+                self._synchronized_flags = self._realtime_flags.copy()
+                self._invoke_watch_callbacks(
+                    self._synced_watch_callbacks,
+                    old_flags,
+                    self._realtime_flags,
+                    force_realtime=False,
+                    old_context_hash=self._flags_context_hash,
+                    new_context_hash=self._last_context_hash,
+                )
+                self._emitter.emit(EVENTS.FLAGS_CHANGE)
+            else:
+                self._pending_sync = True
+                self._emitter.emit(EVENTS.FLAGS_PENDING_SYNC)
+
+    def _compute_etag(self, flags: List[EvaluatedFlag], context_hash: str) -> str:
+        """Compute ETag for a set of flags (matching server logic)."""
+        # Sort flags by name ascending
+        sorted_flags = sorted(flags, key=lambda f: f.name)
+
+        parts = [context_hash]
+        for f in sorted_flags:
+            variant_part = (
+                "no-variant"
+                if not f.variant.name
+                else f"{f.variant.name}:{str(f.variant.enabled).lower()}"
+            )
+            parts.append(
+                f"{f.name}:{f.version}:{str(f.enabled).lower()}:{variant_part}"
+            )
+
+        etag_source = "|".join(parts)
+        etag_hash = hashlib.sha256(etag_source.encode()).hexdigest()
+        return f'"{etag_hash}"'
 
     def _get_streaming_stats(self) -> dict:
         """Collect streaming statistics."""

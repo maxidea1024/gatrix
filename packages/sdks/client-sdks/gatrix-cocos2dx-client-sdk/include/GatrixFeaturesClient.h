@@ -277,6 +277,11 @@ private:
   void connectStreaming();
   void disconnectStreaming();
   void handleStreamingInvalidation(const std::vector<std::string>& changedKeys);
+  void fetchPartialFlags(const std::vector<std::string>& changedKeys);
+  void storePartialFlags(const std::vector<EvaluatedFlag>& flags,
+                         const std::vector<std::string>& requestedKeys);
+  static std::string computeEtag(const std::map<std::string, EvaluatedFlag>& flags,
+                                 const std::string& contextHash);
   StreamingManager* _streaming = nullptr;
 };
 

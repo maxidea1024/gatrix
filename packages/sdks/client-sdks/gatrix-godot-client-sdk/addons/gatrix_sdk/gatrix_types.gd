@@ -44,7 +44,7 @@ static var DISABLED_VARIANT := Variant.new(GatrixVariantSource.MISSING, false, n
 class EvaluatedFlag:
 	var name: String = ""
 	var enabled: bool = false
-	var variant: Variant = Variant.disabled()
+	var variant: Variant = Variant.new()
 	var value_type: ValueType = ValueType.NONE
 	var version: int = 0
 	var reason: String = ""
