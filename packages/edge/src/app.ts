@@ -9,6 +9,7 @@ import healthRoutes from './routes/health';
 import publicRoutes from './routes/public';
 import { sdkManager } from './services/sdkManager';
 import { requestStats } from './services/requestStats';
+import { ALLOWED_HEADERS } from './constants/headers';
 
 // Create Express application
 const app: Application = express();
@@ -55,21 +56,7 @@ app.use(
   cors({
     origin: '*', // Edge server accepts requests from any origin
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'If-None-Match',
-      'x-api-token',
-      'x-application-name',
-      'x-environment',
-      'x-sdk-version',
-      'x-client-version',
-      'x-platform',
-      'x-connection-id',
-      'x-session-id',
-      'x-gatrix-feature-context',
-      'x-gatrix-context-hash',
-    ],
+    allowedHeaders: ALLOWED_HEADERS,
     exposedHeaders: ['ETag'],
   })
 );
