@@ -17,6 +17,7 @@ public abstract class BaseEnvironmentService<T, TResponse>
     protected readonly GatrixApiClient ApiClient;
     protected readonly ILogger Logger;
     private readonly Dictionary<string, List<T>> _cachedByEnv = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _etagsByEnv = new(StringComparer.OrdinalIgnoreCase);
     private readonly object _lock = new();
 
     protected BaseEnvironmentService(GatrixApiClient apiClient, ILogger logger)
@@ -47,16 +48,41 @@ public abstract class BaseEnvironmentService<T, TResponse>
         var endpoint = GetEndpoint(environment);
         Logger.LogDebug("Fetching {Service} for {Environment}", ServiceName, environment);
 
-        var response = await ApiClient.GetAsync<TResponse>(endpoint, ct);
+        string? etag;
+        lock (_lock)
+        {
+            _etagsByEnv.TryGetValue(environment, out etag);
+        }
 
-        if (!response.Success || response.Data is null)
+        var response = await ApiClient.GetAsync<TResponse>(endpoint, etag, ct);
+
+        if (!response.Success)
         {
             Logger.LogWarning("Failed to fetch {Service} for {Environment}", ServiceName, environment);
             return GetCached(environment);
         }
 
+        if (response.NotModified)
+        {
+            Logger.LogDebug("{Service} for {Environment} not modified (304)", ServiceName, environment);
+            return GetCached(environment);
+        }
+
+        if (response.Data is null)
+        {
+            return GetCached(environment);
+        }
+
         var items = ExtractItems(response.Data);
         UpdateCache(items, environment);
+
+        if (response.Etag != null)
+        {
+            lock (_lock)
+            {
+                _etagsByEnv[environment] = response.Etag;
+            }
+        }
 
         Logger.LogInformation("{Service} cached: {Count} items for {Environment}",
             ServiceName, items.Count, environment);

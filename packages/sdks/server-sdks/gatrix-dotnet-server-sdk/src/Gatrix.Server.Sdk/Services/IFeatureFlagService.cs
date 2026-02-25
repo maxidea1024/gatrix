@@ -42,6 +42,11 @@ public interface IFeatureFlagService
     EvaluationDetail<double> DoubleVariationDetails(string flagName, double fallback, EvaluationContext? context = null, string? environment = null);
     EvaluationDetail<bool> BoolVariationDetails(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null);
 
+    // ── Data Refresh ──────────────────────────────────────────────────
+
+    /// <summary>Fetch flag and segment definitions from API and update local cache.</summary>
+    Task FetchAsync(string environment, CancellationToken ct = default);
+
     // ── *OrThrow — throws FeatureFlagException if not found / no value ─
 
     string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null);

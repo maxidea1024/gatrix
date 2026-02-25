@@ -17,10 +17,11 @@ namespace Gatrix.Server.Sdk.Cache;
 ///   - "manual": no background refresh, call RefreshAsync() explicitly
 /// Also starts the FlagMetricsService flush timer.
 /// </summary>
-public class CacheManager : ICacheManager, IHostedService, IDisposable
+public partial class CacheManager : ICacheManager, IHostedService, IDisposable
 {
     private readonly GatrixApiClient _apiClient;
     private readonly FlagDefinitionCache _flagCache;
+    private readonly IFeatureFlagService _featureFlag;
     private readonly GatrixSdkOptions _options;
     private readonly ILogger<CacheManager> _logger;
     private readonly FlagMetricsService _flagMetrics;
@@ -43,6 +44,7 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
     public CacheManager(
         GatrixApiClient apiClient,
         FlagDefinitionCache flagCache,
+        IFeatureFlagService featureFlag,
         IOptions<GatrixSdkOptions> options,
         ILogger<CacheManager> logger,
         FlagMetricsService flagMetrics,
@@ -59,6 +61,7 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
     {
         _apiClient = apiClient;
         _flagCache = flagCache;
+        _featureFlag = featureFlag;
         _options = options.Value;
         _logger = logger;
         _flagMetrics = flagMetrics;
@@ -147,153 +150,11 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
         }
     }
 
-    /// <summary>Manually trigger a full cache refresh for all target environments.</summary>
-    public async Task RefreshAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            var environments = await GetTargetEnvironmentsAsync(ct);
-
-            if (environments.Count == 0)
-            {
-                _logger.LogWarning("No target environments resolved — skipping cache refresh");
-                return;
-            }
-
-            var tasks = new List<Task>();
-            foreach (var env in environments)
-            {
-                tasks.Add(RefreshForEnvironmentAsync(env, ct));
-            }
-            await Task.WhenAll(tasks);
-
-            _logger.LogDebug("Cache refresh completed for {Count} environment(s)", environments.Count);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Cache refresh failed — serving stale data");
-        }
-    }
-
-    /// <summary>Refresh all enabled services for a single environment.</summary>
-    private async Task RefreshForEnvironmentAsync(string env, CancellationToken ct)
-    {
-        var features = _options.Features;
-        var tasks = new List<Task>();
-
-        if (features.FeatureFlag) tasks.Add(RefreshFeatureFlagsAsync(env, ct));
-        if (features.GameWorld) tasks.Add(_gameWorld.FetchAsync(env, ct));
-        if (features.PopupNotice) tasks.Add(_popupNotice.FetchAsync(env, ct));
-        if (features.Survey) tasks.Add(_survey.FetchAsync(env, ct));
-        if (features.Whitelist) tasks.Add(_whitelist.FetchAsync(env, ct));
-        if (features.ServiceMaintenance) tasks.Add(_serviceMaintenance.FetchAsync(env, ct));
-        if (features.StoreProduct) tasks.Add(_storeProduct.FetchAsync(env, ct));
-        if (features.ClientVersion) tasks.Add(_clientVersion.FetchAsync(env, ct));
-        if (features.ServiceNotice) tasks.Add(_serviceNotice.FetchAsync(env, ct));
-        if (features.Banner) tasks.Add(_banner.FetchAsync(env, ct));
-
-        await Task.WhenAll(tasks);
-    }
-
-    /// <summary>
-    /// Resolve target environments based on configuration.
-    /// Single-env mode: returns [Environment].
-    /// Explicit list: returns the configured list.
-    /// Wildcard ("*"): fetches all active environments from backend.
-    /// </summary>
-    private async Task<List<string>> GetTargetEnvironmentsAsync(CancellationToken ct)
-    {
-        if (!_options.IsMultiEnvironmentMode)
-        {
-            return [_options.Environment];
-        }
-
-        if (_options.IsWildcardMode)
-        {
-            // Fetch all active environments from backend
-            try
-            {
-                var response = await _apiClient.GetAsync<EnvironmentListResponse>(
-                    "/api/v1/server/internal/environments", ct);
-
-                if (response.Success && response.Data?.Environments is { Count: > 0 })
-                {
-                    var envNames = response.Data.Environments
-                        .Select(e => e.Environment)
-                        .ToList();
-                    _logger.LogInformation("Wildcard mode: resolved {Count} environments from backend",
-                        envNames.Count);
-                    return envNames;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to fetch environment list from backend");
-            }
-
-            return [];
-        }
-
-        // Explicit list — filter out the "*" marker
-        return _options.Environments!
-            .Where(e => e != "*")
-            .ToList();
-    }
-
-    /// <summary>Refresh ONLY feature flags (flags + segments) for a specific environment.</summary>
-    public async Task RefreshFeatureFlagsAsync(string? environment = null, CancellationToken ct = default)
-    {
-        var env = environment ?? _options.Environment;
-        try
-        {
-            var response = await _apiClient.GetAsync<FeatureFlagsApiResponse>(
-                $"/api/v1/server/{Uri.EscapeDataString(env)}/features", ct);
-
-            if (!response.Success || response.Data is null)
-            {
-                _logger.LogWarning("Failed to fetch feature flags for {Environment}", env);
-                return;
-            }
-
-            _flagCache.Update(response.Data.Flags, response.Data.Segments, env);
-            _logger.LogInformation("Feature flags cached: {FlagCount} flags, {SegmentCount} segments",
-                response.Data.Flags.Count, response.Data.Segments.Count);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to refresh feature flags for {Environment}", env);
-        }
-    }
-
     private async Task RefreshSafe()
     {
         try { await RefreshAsync(); }
         catch (Exception ex) { _logger.LogError(ex, "Background cache refresh failed"); }
     }
-
-    public object GetCacheSummary()
-    {
-        return new
-        {
-            flags = _flagCache.FlagCount,
-            segments = _flagCache.GetSegments().Count,
-            gameWorlds = _options.IsMultiEnvironmentMode ? -1 : _gameWorld.GetAll(_options.Environment).Count,
-            clientVersions = _options.IsMultiEnvironmentMode ? -1 : _clientVersion.GetAll(_options.Environment).Count,
-            banners = _options.IsMultiEnvironmentMode ? -1 : _banner.GetAll(_options.Environment).Count,
-            serviceNotices = _options.IsMultiEnvironmentMode ? -1 : _serviceNotice.GetAll(_options.Environment).Count,
-            storeProducts = _options.IsMultiEnvironmentMode ? -1 : _storeProduct.GetAll(_options.Environment).Count
-        };
-    }
-
-    public object GetCacheDetail()
-    {
-        return new { summary = GetCacheSummary() }; // Simplified for now
-    }
-
-    public List<Models.ClientVersion> GetClientVersions(string environment) => _clientVersion.GetAll(environment);
-    public List<Models.Banner> GetBanners(string environment) => _banner.GetAll(environment);
-    public List<Models.ServiceNotice> GetServiceNotices(string environment) => _serviceNotice.GetAll(environment);
-    public List<Models.GameWorld> GetGameWorlds(string environment) => _gameWorld.GetAll(environment);
 
     public void Dispose()
     {

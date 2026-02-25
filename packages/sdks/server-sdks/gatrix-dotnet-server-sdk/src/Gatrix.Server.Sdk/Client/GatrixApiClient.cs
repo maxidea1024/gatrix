@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -40,9 +41,9 @@ public class GatrixApiClient
 
     // ── Public API ────────────────────────────────────────────────────
 
-    public async Task<ApiResponse<T>> GetAsync<T>(string path, CancellationToken ct = default)
+    public async Task<ApiResponse<T>> GetAsync<T>(string path, string? etag = null, CancellationToken ct = default)
     {
-        return await ExecuteWithRetryAsync<T>(HttpMethod.Get, path, content: null, ct);
+        return await ExecuteWithRetryAsync<T>(HttpMethod.Get, path, content: null, etag: etag, ct: ct);
     }
 
     public async Task<ApiResponse<T>> PostAsync<T>(string path, object? body = null, CancellationToken ct = default)
@@ -51,13 +52,13 @@ public class GatrixApiClient
             ? JsonContent.Create(body, options: JsonOptions)
             : null;
 
-        return await ExecuteWithRetryAsync<T>(HttpMethod.Post, path, content, ct);
+        return await ExecuteWithRetryAsync<T>(HttpMethod.Post, path, content: content, etag: null, ct: ct);
     }
 
     // ── Internal ──────────────────────────────────────────────────────
 
     private async Task<ApiResponse<T>> ExecuteWithRetryAsync<T>(
-        HttpMethod method, string path, HttpContent? content, CancellationToken ct)
+        HttpMethod method, string path, HttpContent? content, string? etag, CancellationToken ct)
     {
         var retry = _options.Retry;
         var maxAttempts = retry.Enabled ? retry.MaxRetries + 1 : 1;
@@ -74,6 +75,11 @@ public class GatrixApiClient
             request.Headers.Add("X-SDK-Version", SdkInfo.FullName);
             request.Headers.Add("X-Environment", _options.Environment);
 
+            if (!string.IsNullOrEmpty(etag) && method == HttpMethod.Get)
+            {
+                request.Headers.Add("If-None-Match", etag);
+            }
+
             if (content is not null)
             {
                 // Clone content for retry (HttpContent can only be sent once)
@@ -86,10 +92,30 @@ public class GatrixApiClient
                 var response = await client.SendAsync(request, ct);
                 var statusCode = (int)response.StatusCode;
 
+                // Handle 304 Not Modified
+                if (response.StatusCode == HttpStatusCode.NotModified)
+                {
+                    return new ApiResponse<T>
+                    {
+                        Success = true,
+                        NotModified = true,
+                        Etag = etag
+                    };
+                }
+
                 if (response.IsSuccessStatusCode)
                 {
                     var body = await response.Content.ReadFromJsonAsync<ApiResponse<T>>(JsonOptions, ct);
-                    return body ?? new ApiResponse<T> { Success = false, Error = new ApiError { Message = "Empty response body" } };
+                    if (body != null)
+                    {
+                        // Extract ETag from headers
+                        if (response.Headers.TryGetValues("ETag", out var etagValues))
+                        {
+                            body.Etag = etagValues.FirstOrDefault();
+                        }
+                        return body;
+                    }
+                    return new ApiResponse<T> { Success = false, Error = new ApiError { Message = "Empty response body" } };
                 }
 
                 // Non-retryable status codes → fail immediately

@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json;
 using Gatrix.Server.Sdk.Cache;
+using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Context;
 using Gatrix.Server.Sdk.Evaluation;
 using Gatrix.Server.Sdk.Exceptions;
@@ -19,20 +21,25 @@ namespace Gatrix.Server.Sdk.Services;
 public class FeatureFlagService : IFeatureFlagService
 {
     private readonly FlagDefinitionCache _cache;
+    private readonly GatrixApiClient _apiClient;
     private readonly GatrixAmbientContext _ambientContext;
     private readonly GatrixSdkOptions _options;
     private readonly ILogger<FeatureFlagService> _logger;
+
+    private readonly ConcurrentDictionary<string, string> _etagsByEnv = new(StringComparer.OrdinalIgnoreCase);
 
     // Static context merged into every evaluation
     private EvaluationContext _staticContext = new();
 
     public FeatureFlagService(
         FlagDefinitionCache cache,
+        GatrixApiClient apiClient,
         GatrixAmbientContext ambientContext,
         IOptions<GatrixSdkOptions> options,
         ILogger<FeatureFlagService> logger)
     {
         _cache = cache;
+        _apiClient = apiClient;
         _ambientContext = ambientContext;
         _options = options.Value;
         _logger = logger;
@@ -53,6 +60,46 @@ public class FeatureFlagService : IFeatureFlagService
 
     /// <summary>Set static context applied to all evaluations.</summary>
     public void SetStaticContext(EvaluationContext context) => _staticContext = context;
+
+    /// <summary>Fetch flag and segment definitions from API and update local cache.</summary>
+    public async Task FetchAsync(string environment, CancellationToken ct = default)
+    {
+        try
+        {
+            _etagsByEnv.TryGetValue(environment, out var etag);
+
+            var response = await _apiClient.GetAsync<FeatureFlagsApiResponse>(
+                $"/api/v1/server/{Uri.EscapeDataString(environment)}/features", etag, ct);
+
+            if (!response.Success)
+            {
+                _logger.LogWarning("Failed to fetch feature flags for {Environment}", environment);
+                return;
+            }
+
+            if (response.NotModified)
+            {
+                _logger.LogDebug("Feature flags for {Environment} not modified (304)", environment);
+                return;
+            }
+
+            if (response.Data is not null)
+            {
+                _cache.Update(response.Data.Flags, response.Data.Segments, environment);
+                if (response.Etag != null)
+                {
+                    _etagsByEnv[environment] = response.Etag;
+                }
+
+                _logger.LogInformation("Feature flags cached: {FlagCount} flags, {SegmentCount} segments for {Environment}",
+                    response.Data.Flags.Count, response.Data.Segments.Count, environment);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to fetch feature flags for {Environment}", environment);
+        }
+    }
 
     /// <summary>Resolve environment: use explicit value, or fall back to configured default.</summary>
     private string? ResolveEnvironment(string? environment) =>
