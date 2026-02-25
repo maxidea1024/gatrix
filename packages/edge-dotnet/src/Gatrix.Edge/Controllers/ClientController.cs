@@ -567,7 +567,12 @@ public class ClientController : ControllerBase
                 ["id"] = result.Id,
                 ["name"] = key,
                 ["enabled"] = result.Enabled,
-                ["variant"] = new { name = variantName, enabled = variantEnabled, value = variantValue },
+                ["variant"] = new Dictionary<string, object?>
+                {
+                    ["name"] = variantName,
+                    ["enabled"] = variantEnabled,
+                    ["value"] = variantValue
+                },
                 ["valueType"] = valueType,
                 ["version"] = flagDef?.Version ?? 1,
             };
@@ -586,7 +591,18 @@ public class ClientController : ControllerBase
         var etagSource = string.Join("|", results.Select(r =>
         {
             var dict = r as Dictionary<string, object?>;
-            return $"{dict?["name"]}:{dict?["version"]}:{dict?["enabled"]}";
+            if (dict == null) return "";
+            var name = dict["name"];
+            var version = dict["version"];
+            var enabled = dict["enabled"]?.ToString()?.ToLowerInvariant();
+            
+            var variantPart = "no-variant";
+            if (dict["variant"] is Dictionary<string, object?> variantDict)
+            {
+                variantPart = $"{variantDict["name"]}:{variantDict["enabled"]?.ToString()?.ToLowerInvariant()}";
+            }
+            
+            return $"{name}:{version}:{enabled}:{variantPart}";
         }));
         var etagHash = Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(etagSource))).ToLowerInvariant();
         var etag = $"\"{etagHash}\"";
