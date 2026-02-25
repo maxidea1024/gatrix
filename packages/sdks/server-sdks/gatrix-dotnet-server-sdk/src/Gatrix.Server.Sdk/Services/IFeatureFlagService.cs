@@ -44,6 +44,9 @@ public interface IFeatureFlagService
 
     // ── Data Refresh ──────────────────────────────────────────────────
 
+    /// <summary>Initialize the service by loading definitions from local storage.</summary>
+    Task InitializeAsync(string environment, CancellationToken ct = default);
+
     /// <summary>Fetch flag and segment definitions from API and update local cache.</summary>
     Task FetchAsync(string environment, CancellationToken ct = default);
 

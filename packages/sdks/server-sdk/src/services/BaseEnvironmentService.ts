@@ -13,6 +13,7 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 
 /**
  * Configuration for extracting items from API response
@@ -32,6 +33,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
   protected apiClient: ApiClient;
   protected logger: Logger;
   protected envResolver: EnvironmentResolver;
+  protected storage?: CacheStorageProvider;
   protected cachedByEnv: Map<string, T[]> = new Map();
   /**
    * Whether this feature is enabled.
@@ -39,10 +41,16 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   protected featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
+    this.storage = storage;
   }
 
   /**
@@ -87,13 +95,41 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
   // ==================== Common Implementation ====================
 
   /**
-   * Fetch items for a specific environment
+   * Initialize the service by loading data from local storage
+   */
+  async initializeAsync(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    const cacheKey = this.getCacheKey(environment);
+
+    try {
+      const cachedJson = await this.storage.get(cacheKey);
+      if (cachedJson) {
+        const items = JSON.parse(cachedJson) as T[];
+        if (Array.isArray(items)) {
+          this.cachedByEnv.set(environment, items);
+          this.logger.debug(`Loaded ${items.length} ${this.getServiceName()} items from local storage`, {
+            environment,
+          });
+        }
+      }
+    } catch (error: any) {
+      this.logger.warn(`Failed to load ${this.getServiceName()} from local storage`, {
+        environment,
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Fetch items for a specific environment (local + remote)
    */
   async listByEnvironment(environment: string): Promise<T[]> {
     const endpoint = this.getEndpoint(environment);
 
     this.logger.debug(`Fetching ${this.getServiceName()}`, { environment });
 
+    // Note: ApiClient handles ETag/304 internally via its bodyCache
     const response = await this.apiClient.get<TResponse>(endpoint);
 
     if (!response.success || !response.data) {
@@ -103,12 +139,22 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const items = this.extractItems(response.data);
     this.cachedByEnv.set(environment, items);
 
+    // Save to local storage if available
+    if (this.storage) {
+      const json = JSON.stringify(items);
+      await this.storage.save(this.getCacheKey(environment), json);
+    }
+
     this.logger.info(`${this.getServiceName()} fetched`, {
       count: items.length,
       environment,
     });
 
     return items;
+  }
+
+  protected getCacheKey(environment: string): string {
+    return `${this.getServiceName()}_${environment}_data`;
   }
 
   /**

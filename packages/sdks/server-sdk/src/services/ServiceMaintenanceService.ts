@@ -12,21 +12,46 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 import { MaintenanceStatus } from '../types/api';
 
 export class ServiceMaintenanceService {
   private apiClient: ApiClient;
   private logger: Logger;
   private envResolver: EnvironmentResolver;
+  private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), MaintenanceStatus>
   private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
+    this.storage = storage;
+  }
+
+  /**
+   * Initialize service and load data from local storage
+   */
+  async initializeAsync(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    try {
+      const cachedJson = await this.storage.get(`ServiceMaintenance_${environment}`);
+      if (cachedJson) {
+        this.cachedStatusByEnv.set(environment, JSON.parse(cachedJson));
+        this.logger.debug('Loaded service maintenance status from local storage', { environment });
+      }
+    } catch (error: any) {
+      this.logger.warn('Failed to load service maintenance status from local storage', { environment, error: error.message });
+    }
   }
 
   /**
@@ -66,6 +91,11 @@ export class ServiceMaintenanceService {
     };
 
     this.cachedStatusByEnv.set(environment, status);
+
+    // Save to local storage if available
+    if (this.storage) {
+      await this.storage.save(`ServiceMaintenance_${environment}`, JSON.stringify(status));
+    }
 
     this.logger.info('Service maintenance status fetched', {
       environment,

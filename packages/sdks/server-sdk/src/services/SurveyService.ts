@@ -12,12 +12,14 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 import { Survey, SurveyListParams, SurveySettings } from '../types/api';
 
 export class SurveyService {
   private apiClient: ApiClient;
   private logger: Logger;
   private envResolver: EnvironmentResolver;
+  private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), Survey[]>
   private cachedSurveysByEnv: Map<string, Survey[]> = new Map();
   // Multi-environment settings cache: Map<environment (environmentName), SurveySettings>
@@ -25,10 +27,40 @@ export class SurveyService {
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
+    this.storage = storage;
+  }
+
+  /**
+   * Initialize service and load data from local storage
+   */
+  async initializeAsync(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    try {
+      const [surveysJson, settingsJson] = await Promise.all([
+        this.storage.get(`Surveys_${environment}_data`),
+        this.storage.get(`Surveys_${environment}_settings`),
+      ]);
+
+      if (surveysJson) {
+        this.cachedSurveysByEnv.set(environment, JSON.parse(surveysJson));
+      }
+      if (settingsJson) {
+        this.cachedSettingsByEnv.set(environment, JSON.parse(settingsJson));
+      }
+      this.logger.debug('Loaded surveys from local storage', { environment });
+    } catch (error: any) {
+      this.logger.warn('Failed to load surveys from local storage', { environment, error: error.message });
+    }
   }
 
   /**
@@ -73,6 +105,14 @@ export class SurveyService {
     const { surveys, settings } = response.data;
     this.cachedSurveysByEnv.set(environment, surveys);
     this.cachedSettingsByEnv.set(environment, settings);
+
+    // Save to local storage if available
+    if (this.storage) {
+      await Promise.all([
+        this.storage.save(`Surveys_${environment}_data`, JSON.stringify(surveys)),
+        this.storage.save(`Surveys_${environment}_settings`, JSON.stringify(settings)),
+      ]);
+    }
 
     this.logger.info('Surveys fetched', {
       count: surveys.length,

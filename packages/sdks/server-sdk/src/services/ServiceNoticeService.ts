@@ -12,6 +12,7 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 import { ServiceNotice, ServiceNoticeListResponse, ServiceNoticeCategory } from '../types/api';
 
 export interface ServiceNoticeFilters {
@@ -26,15 +27,39 @@ export class ServiceNoticeService {
   private apiClient: ApiClient;
   private logger: Logger;
   private envResolver: EnvironmentResolver;
+  private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), ServiceNotice[]>
   private cachedNoticesByEnv: Map<string, ServiceNotice[]> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
+    this.storage = storage;
+  }
+
+  /**
+   * Initialize service and load data from local storage
+   */
+  async initializeAsync(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    try {
+      const cachedJson = await this.storage.get(`ServiceNotices_${environment}`);
+      if (cachedJson) {
+        this.cachedNoticesByEnv.set(environment, JSON.parse(cachedJson));
+        this.logger.debug('Loaded service notices from local storage', { environment });
+      }
+    } catch (error: any) {
+      this.logger.warn('Failed to load service notices from local storage', { environment, error: error.message });
+    }
   }
 
   /**
@@ -69,6 +94,11 @@ export class ServiceNoticeService {
 
     const notices = response.data.notices;
     this.cachedNoticesByEnv.set(environment, notices);
+
+    // Save to local storage if available
+    if (this.storage) {
+      await this.storage.save(`ServiceNotices_${environment}`, JSON.stringify(notices));
+    }
 
     this.logger.info('Service notices fetched', {
       count: notices.length,

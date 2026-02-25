@@ -5,6 +5,41 @@ namespace Gatrix.Server.Sdk.Cache;
 
 public partial class CacheManager
 {
+    /// <summary>Initialize all services by loading data from local storage.</summary>
+    public async Task InitializeAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var environments = await GetTargetEnvironmentsAsync(ct);
+            var tasks = environments.Select(env => InitializeForEnvironmentAsync(env, ct));
+            await Task.WhenAll(tasks);
+            _logger.LogDebug("Cache initialization completed for {Count} environment(s)", environments.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Cache initialization failed");
+        }
+    }
+
+    private async Task InitializeForEnvironmentAsync(string env, CancellationToken ct)
+    {
+        var features = _options.Features;
+        var tasks = new List<Task>();
+
+        if (features.FeatureFlag) tasks.Add(_featureFlag.InitializeAsync(env, ct));
+        if (features.GameWorld && _gameWorld is BaseEnvironmentService<Models.GameWorld, Models.GameWorldListResponse> gw) tasks.Add(gw.InitializeAsync(env, ct));
+        if (features.PopupNotice && _popupNotice is BaseEnvironmentService<Models.PopupNotice, Models.PopupNoticeListResponse> pn) tasks.Add(pn.InitializeAsync(env, ct));
+        if (features.Survey && _survey is BaseEnvironmentService<Models.Survey, Models.SurveyListResponse> sv) tasks.Add(sv.InitializeAsync(env, ct));
+        if (features.Whitelist && _whitelist is BaseEnvironmentService<Models.Whitelist, Models.WhitelistListResponse> wl) tasks.Add(wl.InitializeAsync(env, ct));
+        if (features.ServiceMaintenance && _serviceMaintenance is BaseEnvironmentService<Models.ServiceMaintenance, Models.ServiceMaintenanceListResponse> sm) tasks.Add(sm.InitializeAsync(env, ct));
+        if (features.StoreProduct && _storeProduct is BaseEnvironmentService<Models.StoreProduct, Models.StoreProductListResponse> sp) tasks.Add(sp.InitializeAsync(env, ct));
+        if (features.ClientVersion && _clientVersion is BaseEnvironmentService<Models.ClientVersion, Models.ClientVersionListResponse> cv) tasks.Add(cv.InitializeAsync(env, ct));
+        if (features.ServiceNotice && _serviceNotice is BaseEnvironmentService<Models.ServiceNotice, Models.ServiceNoticeListResponse> sn) tasks.Add(sn.InitializeAsync(env, ct));
+        if (features.Banner && _banner is BaseEnvironmentService<Models.Banner, Models.BannerListResponse> bn) tasks.Add(bn.InitializeAsync(env, ct));
+
+        await Task.WhenAll(tasks);
+    }
+
     /// <summary>Manually trigger a full cache refresh for all target environments.</summary>
     public async Task RefreshAsync(CancellationToken ct = default)
     {

@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Microsoft.Extensions.Logging;
 
@@ -5,25 +7,22 @@ namespace Gatrix.Server.Sdk.Services;
 
 /// <summary>
 /// Abstract base class for services that handle per-environment data caching.
-/// Reduces code duplication across GameWorld, Banner, PopupNotice, Survey, etc.
-///
-/// DESIGN PRINCIPLES:
-/// - All methods that access cached data receive environment explicitly
-/// - Single-environment mode: environment defaults to config value
-/// - Multi-environment mode: environment MUST always be provided
+/// Supports local persistence and ETag-based 304 optimizations.
 /// </summary>
 public abstract class BaseEnvironmentService<T, TResponse>
 {
     protected readonly GatrixApiClient ApiClient;
     protected readonly ILogger Logger;
+    protected readonly ICacheStorageProvider? Storage;
     private readonly Dictionary<string, List<T>> _cachedByEnv = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _etagsByEnv = new(StringComparer.OrdinalIgnoreCase);
     private readonly object _lock = new();
 
-    protected BaseEnvironmentService(GatrixApiClient apiClient, ILogger logger)
+    protected BaseEnvironmentService(GatrixApiClient apiClient, ILogger logger, ICacheStorageProvider? storage = null)
     {
         ApiClient = apiClient;
         Logger = logger;
+        Storage = storage;
     }
 
     // ── Abstract methods (must be implemented by subclasses) ──────
@@ -42,7 +41,44 @@ public abstract class BaseEnvironmentService<T, TResponse>
 
     // ── Common implementation ─────────────────────────────────────
 
-    /// <summary>Fetch items from API and cache them.</summary>
+    /// <summary>Initialize the service by loading data from local storage.</summary>
+    public virtual async Task InitializeAsync(string environment, CancellationToken ct = default)
+    {
+        if (Storage == null) return;
+
+        var cacheKey = GetCacheKey(environment);
+        var etagKey = GetEtagKey(environment);
+
+        try
+        {
+            var cachedJson = await Storage.GetAsync(cacheKey, ct);
+            if (!string.IsNullOrEmpty(cachedJson))
+            {
+                var items = JsonSerializer.Deserialize<List<T>>(cachedJson);
+                if (items != null)
+                {
+                    UpdateCache(items, environment);
+                    Logger.LogDebug("Loaded {Count} {Service} items from local storage for {Environment}",
+                        items.Count, ServiceName, environment);
+                }
+            }
+
+            var cachedEtag = await Storage.GetAsync(etagKey, ct);
+            if (!string.IsNullOrEmpty(cachedEtag))
+            {
+                lock (_lock)
+                {
+                    _etagsByEnv[environment] = cachedEtag;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Failed to load {Service} from local storage for {Environment}", ServiceName, environment);
+        }
+    }
+
+    /// <summary>Fetch items from API and cache them (local + remote).</summary>
     public async Task<List<T>> FetchByEnvironmentAsync(string environment, CancellationToken ct = default)
     {
         var endpoint = GetEndpoint(environment);
@@ -76,11 +112,21 @@ public abstract class BaseEnvironmentService<T, TResponse>
         var items = ExtractItems(response.Data);
         UpdateCache(items, environment);
 
+        if (Storage != null)
+        {
+            var json = JsonSerializer.Serialize(items);
+            await Storage.SaveAsync(GetCacheKey(environment), json, ct);
+        }
+
         if (response.Etag != null)
         {
             lock (_lock)
             {
                 _etagsByEnv[environment] = response.Etag;
+            }
+            if (Storage != null)
+            {
+                await Storage.SaveAsync(GetEtagKey(environment), response.Etag, ct);
             }
         }
 
@@ -89,6 +135,9 @@ public abstract class BaseEnvironmentService<T, TResponse>
 
         return items;
     }
+
+    protected string GetCacheKey(string environment) => $"{ServiceName}_{environment}_data";
+    protected string GetEtagKey(string environment) => $"{ServiceName}_{environment}_etag";
 
     /// <summary>Get cached items for a specific environment.</summary>
     public List<T> GetCached(string environment)

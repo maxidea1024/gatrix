@@ -8,6 +8,7 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 import { StoreProduct, StoreProductListResponse } from '../types/api';
 import { BaseEnvironmentService } from './BaseEnvironmentService';
 
@@ -16,8 +17,13 @@ export class StoreProductService extends BaseEnvironmentService<
   StoreProductListResponse,
   string
 > {
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
-    super(apiClient, logger, envResolver);
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
+    super(apiClient, logger, envResolver, storage);
   }
 
   // ==================== Abstract Method Implementations ====================

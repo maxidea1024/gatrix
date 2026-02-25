@@ -12,6 +12,7 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 
 export interface IpWhitelistEntry {
   id: number;
@@ -40,15 +41,39 @@ export class WhitelistService {
   private apiClient: ApiClient;
   private logger: Logger;
   private envResolver: EnvironmentResolver;
+  private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), WhitelistData>
   private cachedWhitelistByEnv: Map<string, WhitelistData> = new Map();
   // Whether this feature is enabled
   private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
+    this.storage = storage;
+  }
+
+  /**
+   * Initialize service and load data from local storage
+   */
+  async initializeAsync(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    try {
+      const cachedJson = await this.storage.get(`Whitelist_${environment}`);
+      if (cachedJson) {
+        this.cachedWhitelistByEnv.set(environment, JSON.parse(cachedJson));
+        this.logger.debug('Loaded whitelist from local storage', { environment });
+      }
+    } catch (error: any) {
+      this.logger.warn('Failed to load whitelist from local storage', { environment, error: error.message });
+    }
   }
 
   /**
@@ -82,6 +107,12 @@ export class WhitelistService {
     }
 
     this.cachedWhitelistByEnv.set(environment, response.data);
+
+    // Save to local storage if available
+    if (this.storage) {
+      await this.storage.save(`Whitelist_${environment}`, JSON.stringify(response.data));
+    }
+
     this.logger.info('Whitelists fetched', {
       environment,
       ipCount: response.data.ipWhitelist.length,

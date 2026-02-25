@@ -8,6 +8,7 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 import { GameWorld, GameWorldListResponse } from '../types/api';
 import { BaseEnvironmentService } from './BaseEnvironmentService';
 
@@ -16,8 +17,13 @@ export class GameWorldService extends BaseEnvironmentService<
   GameWorldListResponse,
   number
 > {
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
-    super(apiClient, logger, envResolver);
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
+    super(apiClient, logger, envResolver, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -59,6 +65,12 @@ export class GameWorldService extends BaseEnvironmentService<
     // Sort by displayOrder (ascending)
     const sortedWorlds = worlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     this.cachedByEnv.set(environment, sortedWorlds);
+
+    // Save to local storage if available
+    if (this.storage) {
+      const json = JSON.stringify(sortedWorlds);
+      await this.storage.save(this.getCacheKey(environment), json);
+    }
 
     this.logger.info('Game worlds fetched', {
       count: sortedWorlds.length,

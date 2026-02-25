@@ -14,6 +14,7 @@
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { EnvironmentResolver } from '../utils/EnvironmentResolver';
+import { CacheStorageProvider } from '../cache/StorageProvider';
 import {
   FeatureFlag,
   FeatureSegment,
@@ -30,6 +31,7 @@ export class FeatureFlagService {
   private apiClient: ApiClient;
   private logger: Logger;
   private envResolver: EnvironmentResolver;
+  private storage?: CacheStorageProvider;
   // Multi-environment flag cache: Map<environment, Map<flagName, FeatureFlag>>
   // Using nested Map for O(1) flag lookup by name
   private cachedFlagsByEnv: Map<string, Map<string, FeatureFlag>> = new Map();
@@ -52,10 +54,16 @@ export class FeatureFlagService {
     maxRetryBufferSize: 10000, // Max buffer size to prevent memory issues
   };
 
-  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+  constructor(
+    apiClient: ApiClient,
+    logger: Logger,
+    envResolver: EnvironmentResolver,
+    storage?: CacheStorageProvider
+  ) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.envResolver = envResolver;
+    this.storage = storage;
   }
 
   /**
@@ -161,6 +169,46 @@ export class FeatureFlagService {
     this.flushMetrics();
   }
 
+  /**
+   * Initialize the service by loading definitions from local storage
+   */
+  async initializeAsync(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    const flagsKey = `FeatureFlags_${environment}_flags`;
+    const segmentsKey = `FeatureFlags_${environment}_segments`;
+
+    try {
+      const [flagsJson, segmentsJson] = await Promise.all([
+        this.storage.get(flagsKey),
+        this.storage.get(segmentsKey),
+      ]);
+
+      if (flagsJson) {
+        const flags = JSON.parse(flagsJson) as FeatureFlag[];
+        const flagMap = new Map<string, FeatureFlag>();
+        for (const flag of flags) {
+          flagMap.set(flag.name, flag);
+        }
+        this.cachedFlagsByEnv.set(environment, flagMap);
+        this.logger.debug(`Loaded ${flags.length} flags from local storage`, { environment });
+      }
+
+      if (segmentsJson) {
+        const segments = JSON.parse(segmentsJson) as FeatureSegment[];
+        for (const segment of segments) {
+          this.cachedSegments.set(segment.name, segment);
+        }
+        this.logger.debug(`Loaded ${segments.length} segments from local storage`, { environment });
+      }
+    } catch (error: any) {
+      this.logger.warn('Failed to load feature flags from local storage', {
+        environment,
+        error: error.message,
+      });
+    }
+  }
+
   // ==================== API Methods ====================
 
   /**
@@ -197,6 +245,14 @@ export class FeatureFlagService {
         this.cachedSegments.set(segment.name, segment);
       }
       this.logger.info('Feature segments cached', { count: segments.length });
+    }
+
+    // Save to local storage if available
+    if (this.storage) {
+      await Promise.all([
+        this.storage.save(`FeatureFlags_${environment}_flags`, JSON.stringify(flags)),
+        this.storage.save(`FeatureFlags_${environment}_segments`, JSON.stringify(segments || [])),
+      ]);
     }
 
     this.logger.info('Feature flags fetched', {
@@ -358,6 +414,11 @@ export class FeatureFlagService {
     this.cachedSegments.clear();
     for (const segment of segments) {
       this.cachedSegments.set(segment.name, segment);
+    }
+
+    // Save to local storage if available (global segments)
+    if (this.storage) {
+      await this.storage.save('FeatureFlags_global_segments', JSON.stringify(segments));
     }
 
     this.logger.info('Feature segments fetched', { count: segments.length });

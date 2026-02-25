@@ -91,7 +91,10 @@ public partial class CacheManager : ICacheManager, IHostedService, IDisposable
         // Wire EventListener → CacheManager reference (breaks circular DI)
         _eventListener.SetCacheManager(this);
 
-        // Initial fetch
+        // Initial load from storage
+        await InitializeAsync(cancellationToken);
+
+        // Initial fetch from remote
         await RefreshAsync(cancellationToken);
 
         // Start refresh strategy

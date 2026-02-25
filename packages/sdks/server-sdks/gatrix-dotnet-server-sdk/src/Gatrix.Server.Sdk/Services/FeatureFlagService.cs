@@ -25,6 +25,7 @@ public class FeatureFlagService : IFeatureFlagService
     private readonly GatrixAmbientContext _ambientContext;
     private readonly GatrixSdkOptions _options;
     private readonly ILogger<FeatureFlagService> _logger;
+    private readonly ICacheStorageProvider? _storage;
 
     private readonly ConcurrentDictionary<string, string> _etagsByEnv = new(StringComparer.OrdinalIgnoreCase);
 
@@ -36,13 +37,15 @@ public class FeatureFlagService : IFeatureFlagService
         GatrixApiClient apiClient,
         GatrixAmbientContext ambientContext,
         IOptions<GatrixSdkOptions> options,
-        ILogger<FeatureFlagService> logger)
+        ILogger<FeatureFlagService> logger,
+        ICacheStorageProvider? storage = null)
     {
         _cache = cache;
         _apiClient = apiClient;
         _ambientContext = ambientContext;
         _options = options.Value;
         _logger = logger;
+        _storage = storage;
 
         // Initialize static context from options if configured
         if (_options.Features.StaticContext is { Count: > 0 })
@@ -61,7 +64,48 @@ public class FeatureFlagService : IFeatureFlagService
     /// <summary>Set static context applied to all evaluations.</summary>
     public void SetStaticContext(EvaluationContext context) => _staticContext = context;
 
-    /// <summary>Fetch flag and segment definitions from API and update local cache.</summary>
+    /// <summary>Initialize the service by loading definitions from local storage.</summary>
+    public async Task InitializeAsync(string environment, CancellationToken ct = default)
+    {
+        if (_storage == null) return;
+
+        var flagsKey = $"FeatureFlags_{environment}_flags";
+        var segmentsKey = $"FeatureFlags_{environment}_segments";
+        var etagKey = $"FeatureFlags_{environment}_etag";
+
+        try
+        {
+            var flagsJson = await _storage.GetAsync(flagsKey, ct);
+            var segmentsJson = await _storage.GetAsync(segmentsKey, ct);
+
+            if (!string.IsNullOrEmpty(flagsJson))
+            {
+                var flags = JsonSerializer.Deserialize<List<FeatureFlag>>(flagsJson);
+                var segments = !string.IsNullOrEmpty(segmentsJson)
+                    ? JsonSerializer.Deserialize<List<FeatureSegment>>(segmentsJson)
+                    : [];
+
+                if (flags != null)
+                {
+                    _cache.Update(flags, segments ?? [], environment);
+                    _logger.LogDebug("Loaded {FlagCount} flags from local storage for {Environment}",
+                        flags.Count, environment);
+                }
+            }
+
+            var cachedEtag = await _storage.GetAsync(etagKey, ct);
+            if (!string.IsNullOrEmpty(cachedEtag))
+            {
+                _etagsByEnv[environment] = cachedEtag;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load feature flags from local storage for {Environment}", environment);
+        }
+    }
+
+    /// <summary>Fetch flag and segment definitions from API and update local cache (remote + local).</summary>
     public async Task FetchAsync(string environment, CancellationToken ct = default)
     {
         try
@@ -86,9 +130,20 @@ public class FeatureFlagService : IFeatureFlagService
             if (response.Data is not null)
             {
                 _cache.Update(response.Data.Flags, response.Data.Segments, environment);
+
+                if (_storage != null)
+                {
+                    await _storage.SaveAsync($"FeatureFlags_{environment}_flags", JsonSerializer.Serialize(response.Data.Flags), ct);
+                    await _storage.SaveAsync($"FeatureFlags_{environment}_segments", JsonSerializer.Serialize(response.Data.Segments), ct);
+                }
+
                 if (response.Etag != null)
                 {
                     _etagsByEnv[environment] = response.Etag;
+                    if (_storage != null)
+                    {
+                        await _storage.SaveAsync($"FeatureFlags_{environment}_etag", response.Etag, ct);
+                    }
                 }
 
                 _logger.LogInformation("Feature flags cached: {FlagCount} flags, {SegmentCount} segments for {Environment}",

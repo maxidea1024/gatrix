@@ -28,11 +28,13 @@ import {
 } from '../types/api';
 import { sleep } from '../utils/time';
 import { MaintenanceWatcher, MaintenanceEventCallback } from './MaintenanceWatcher';
+import { CacheStorageProvider, FileCacheStorageProvider } from './StorageProvider';
 
 export class CacheManager {
   private logger: Logger;
   private config: CacheConfig;
   private features: FeaturesConfig;
+  private storage: CacheStorageProvider;
   // Environment resolver for all services
   private envResolver: EnvironmentResolver;
   // All services are optional - controlled by feature flags
@@ -83,6 +85,7 @@ export class CacheManager {
     this.logger = logger;
     this.metrics = metrics;
     this.maintenanceWatcher = new MaintenanceWatcher(logger, configWorldId);
+    this.storage = new FileCacheStorageProvider(logger);
 
     // Store environments for multi-environment mode
     this.environments = environments;
@@ -107,47 +110,78 @@ export class CacheManager {
     // Default features (gameWorld, popupNotice, survey, whitelist, serviceMaintenance) use !== false for backward compatibility
     // New features (clientVersion, serviceNotice, banner, storeProduct) require explicit === true
     if (this.features.gameWorld !== false) {
-      this.gameWorldService = new GameWorldService(apiClient, logger, this.envResolver);
+      this.gameWorldService = new GameWorldService(apiClient, logger, this.envResolver, this.storage);
       this.gameWorldService.setFeatureEnabled(true);
     }
     if (this.features.popupNotice !== false) {
-      this.popupNoticeService = new PopupNoticeService(apiClient, logger, this.envResolver);
+      this.popupNoticeService = new PopupNoticeService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.popupNoticeService.setFeatureEnabled(true);
     }
     if (this.features.survey !== false) {
-      this.surveyService = new SurveyService(apiClient, logger, this.envResolver);
+      this.surveyService = new SurveyService(apiClient, logger, this.envResolver, this.storage);
       this.surveyService.setFeatureEnabled(true);
     }
     if (this.features.whitelist !== false) {
-      this.whitelistService = new WhitelistService(apiClient, logger, this.envResolver);
+      this.whitelistService = new WhitelistService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.whitelistService.setFeatureEnabled(true);
     }
     if (this.features.serviceMaintenance !== false) {
       this.serviceMaintenanceService = new ServiceMaintenanceService(
         apiClient,
         logger,
-        this.envResolver
+        this.envResolver,
+        this.storage
       );
       this.serviceMaintenanceService.setFeatureEnabled(true);
     }
     if (this.features.clientVersion === true) {
-      this.clientVersionService = new ClientVersionService(apiClient, logger, this.envResolver);
+      this.clientVersionService = new ClientVersionService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.clientVersionService.setFeatureEnabled(true);
     }
     if (this.features.serviceNotice === true) {
-      this.serviceNoticeService = new ServiceNoticeService(apiClient, logger, this.envResolver);
+      this.serviceNoticeService = new ServiceNoticeService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.serviceNoticeService.setFeatureEnabled(true);
     }
     if (this.features.banner === true) {
-      this.bannerService = new BannerService(apiClient, logger, this.envResolver);
+      this.bannerService = new BannerService(apiClient, logger, this.envResolver, this.storage);
       this.bannerService.setFeatureEnabled(true);
     }
     if (this.features.storeProduct === true) {
-      this.storeProductService = new StoreProductService(apiClient, logger, this.envResolver);
+      this.storeProductService = new StoreProductService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.storeProductService.setFeatureEnabled(true);
     }
     if (this.features.featureFlag === true) {
-      this.featureFlagService = new FeatureFlagService(apiClient, logger, this.envResolver);
+      this.featureFlagService = new FeatureFlagService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.featureFlagService.setFeatureEnabled(true);
     }
   }
@@ -230,12 +264,30 @@ export class CacheManager {
         });
       }
 
-      // Build list of promises based on enabled features
+      // 1. Initial load from local storage
+      const initPromises: Promise<void>[] = [];
+      const envList = this.getTargetEnvironments();
+
+      for (const env of envList) {
+        if (this.gameWorldService) initPromises.push(this.gameWorldService.initializeAsync(env));
+        if (this.popupNoticeService) initPromises.push(this.popupNoticeService.initializeAsync(env));
+        if (this.surveyService) initPromises.push(this.surveyService.initializeAsync(env));
+        if (this.whitelistService) initPromises.push(this.whitelistService.initializeAsync(env));
+        if (this.serviceMaintenanceService) initPromises.push(this.serviceMaintenanceService.initializeAsync(env));
+        if (this.clientVersionService) initPromises.push(this.clientVersionService.initializeAsync(env));
+        if (this.serviceNoticeService) initPromises.push(this.serviceNoticeService.initializeAsync(env));
+        if (this.bannerService) initPromises.push(this.bannerService.initializeAsync(env));
+        if (this.storeProductService) initPromises.push(this.storeProductService.initializeAsync(env));
+        if (this.featureFlagService) initPromises.push(this.featureFlagService.initializeAsync(env));
+      }
+      await Promise.all(initPromises);
+      this.logger.debug('Local cache initialization completed');
+
+      // 2. Build list of promises based on enabled features for remote sync
       const promises: Promise<any>[] = [];
       const featureTypes: string[] = [];
 
       // Get target environments for multi-environment mode
-      const envList = this.getTargetEnvironments();
       const isMultiEnvMode =
         this.environments === '*' ||
         (Array.isArray(this.environments) && this.environments.length > 0);
