@@ -25,7 +25,6 @@ export class ClientVersionService extends BaseEnvironmentService<
   ) {
     super(apiClient, logger, envResolver, storage);
   }
-  }
 
   // ==================== Abstract Method Implementations ====================
 
@@ -43,18 +42,6 @@ export class ClientVersionService extends BaseEnvironmentService<
 
   protected getItemId(item: ClientVersion): number {
     return item.id;
-  }
-
-  // ==================== Override for ETag Invalidation ====================
-
-  /**
-   * Refresh cached client versions for a specific environment
-   */
-  async refreshByEnvironment(environment: string): Promise<ClientVersion[]> {
-    this.logger.info('Refreshing client versions cache', { environment });
-    // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache(this.getEndpoint(environment));
-    return await this.listByEnvironment(environment);
   }
 
   /**

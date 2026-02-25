@@ -52,7 +52,7 @@ public class ServiceDiscoveryService : IServiceDiscoveryService
     {
         var query = BuildQuery(filter);
         var response = await _apiClient.GetAsync<List<ServiceInstance>>(
-            $"/api/v1/service-discovery/services{query}", ct);
+            $"/api/v1/service-discovery/services{query}", ct: ct);
         return response.Data ?? [];
     }
 

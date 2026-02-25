@@ -21,6 +21,7 @@ import ServerEnvironmentController from '../../controllers/ServerEnvironmentCont
 import InternalApiTokensController from '../../controllers/InternalApiTokensController';
 import { PlanningDataController } from '../../controllers/PlanningDataController';
 import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagController';
+import { VarsController } from '../../controllers/VarsController';
 
 const router = express.Router();
 
@@ -150,6 +151,9 @@ router.get('/:env/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyB
 
 // Whitelist routes
 router.get('/:env/whitelists', serverSDKAuth, getWhitelistsHandler);
+
+// Vars (KV) routes
+router.get('/:env/vars', serverSDKAuth, VarsController.getServerVars as any);
 
 // Maintenance routes
 router.get('/:env/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);

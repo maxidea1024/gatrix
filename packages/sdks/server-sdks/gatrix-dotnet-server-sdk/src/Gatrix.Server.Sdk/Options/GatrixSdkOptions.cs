@@ -109,6 +109,7 @@ public class FeaturesOptions
     public bool Banner { get; set; } = false;
     public bool StoreProduct { get; set; } = false;
     public bool FeatureFlag { get; set; } = false;
+    public bool Vars { get; set; } = false;
 
     /// <summary>
     /// Static evaluation context applied to all feature flag evaluations.

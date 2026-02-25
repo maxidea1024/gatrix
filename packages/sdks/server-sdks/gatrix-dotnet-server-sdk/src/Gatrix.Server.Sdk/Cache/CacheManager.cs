@@ -26,6 +26,7 @@ public partial class CacheManager : ICacheManager, IHostedService, IDisposable
     private readonly ILogger<CacheManager> _logger;
     private readonly FlagMetricsService _flagMetrics;
     private readonly EventListener _eventListener;
+    private readonly ICacheStorageProvider? _storage;
 
     // Domain services for cache refresh
     private readonly IGameWorldService _gameWorld;
@@ -37,6 +38,7 @@ public partial class CacheManager : ICacheManager, IHostedService, IDisposable
     private readonly IClientVersionService _clientVersion;
     private readonly IServiceNoticeService _serviceNotice;
     private readonly IBannerService _banner;
+    private readonly IVarsService _vars;
 
     private Timer? _pollingTimer;
     private bool _disposed;
@@ -57,7 +59,9 @@ public partial class CacheManager : ICacheManager, IHostedService, IDisposable
         IStoreProductService storeProduct,
         IClientVersionService clientVersion,
         IServiceNoticeService serviceNotice,
-        IBannerService banner)
+        IBannerService banner,
+        IVarsService vars,
+        ICacheStorageProvider? storage = null)
     {
         _apiClient = apiClient;
         _flagCache = flagCache;
@@ -75,6 +79,8 @@ public partial class CacheManager : ICacheManager, IHostedService, IDisposable
         _clientVersion = clientVersion;
         _serviceNotice = serviceNotice;
         _banner = banner;
+        _vars = vars;
+        _storage = storage;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

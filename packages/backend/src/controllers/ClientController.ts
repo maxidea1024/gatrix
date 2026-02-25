@@ -10,6 +10,7 @@ import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cache
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
+import { VarsService } from '../services/VarsService';
 import { sendBadRequest, sendSuccessResponse, ErrorCodes } from '../utils/apiResponse';
 import { IpWhitelistService } from '../services/IpWhitelistService';
 import { SDKRequest } from '../middleware/apiTokenAuth';
@@ -52,11 +53,13 @@ export class ClientController {
    * - lang (optional): Language code for localized maintenance messages
    */
   static getClientVersion = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const { platform, version, status, lang } = req.query as {
+    const { platform, version, status, lang, channel, subChannel } = req.query as {
       platform?: string;
       version?: string;
       status?: string;
       lang?: string;
+      channel?: string;
+      subChannel?: string;
     };
 
     // Validate required query params - platform is always required
@@ -90,7 +93,9 @@ export class ClientController {
     // Create cache key (use 'latest' for latest requests)
     const versionKey = isLatestRequest ? 'latest' : version;
     const statusKey = statusFilter ? `:${statusFilter}` : '';
-    const baseCacheKey = `client_version:${platform}:${versionKey}${statusKey}${lang ? `:${lang}` : ''}`;
+    const channelKey = channel ? `:${channel}` : '';
+    const subChannelKey = subChannel ? `:${subChannel}` : '';
+    const baseCacheKey = `client_version:${platform}:${versionKey}${statusKey}${channelKey}${subChannelKey}${lang ? `:${lang}` : ''}`;
 
     // Scoping cache by environment
     const cacheKey = environment ? withEnvironment(environment, baseCacheKey) : baseCacheKey;
@@ -130,7 +135,7 @@ export class ClientController {
     // Get clientVersionPassiveData from KV settings for the specific environment and resolve by version
     let passiveData = {};
     try {
-      const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
+      const passiveDataStr = await VarsService.get('$clientVersionPassiveData', environment);
       passiveData = resolvePassiveData(passiveDataStr, record.clientVersion);
     } catch (error) {
       logger.warn(
@@ -167,6 +172,60 @@ export class ClientController {
 
     // Merge meta: passiveData first, then customPayload (customPayload overwrites)
     const meta = { ...passiveData, ...customPayload };
+
+    // Handle channel/subChannel appUpdateUrl for forced/recommended updates
+    if (
+      channel &&
+      (record.clientStatus === ClientStatus.FORCED_UPDATE ||
+        record.clientStatus === ClientStatus.RECOMMENDED_UPDATE)
+    ) {
+      try {
+        const channelsStr = await VarsService.get('$channels', environment);
+        if (channelsStr) {
+          const channels = JSON.parse(channelsStr);
+          if (Array.isArray(channels)) {
+            const channelData = channels.find((c: any) => c.value === channel);
+            if (channelData) {
+              const targetSubChannel = subChannel;
+              if (targetSubChannel && Array.isArray(channelData.subChannels)) {
+                const subChannelData = channelData.subChannels.find(
+                  (sc: any) => sc.value === targetSubChannel
+                );
+                if (subChannelData && subChannelData.appUpdateUrl) {
+                  (meta as any).appUpdateUrl = subChannelData.appUpdateUrl;
+                } else {
+                  logger.debug('Backend: subChannelData not found or appUpdateUrl missing', {
+                    subChannel,
+                    availableSubChannels: channelData.subChannels.map((sc: any) => sc.value),
+                  });
+                }
+              } else {
+                logger.debug('Backend: targetSubChannel not provided or subChannels missing', {
+                  subChannel,
+                  hasSubChannels: !!channelData.subChannels,
+                });
+              }
+            } else {
+              logger.debug('Backend: channelData not found in $channels', {
+                channel,
+                availableChannels: channels.map((c: any) => c.value),
+              });
+            }
+          } else {
+            logger.debug('Backend: $channels KV is not an array', { environment });
+          }
+        } else {
+          logger.debug('Backend: $channels KV not found', { environment });
+        }
+      } catch (e) {
+        logger.warn('Failed to process $channel KV for appUpdateUrl in backend', {
+          error: e,
+          environment,
+          channel,
+          subChannel,
+        });
+      }
+    }
 
     // Get client IP and check whitelist
     const clientIp = this.getClientIp(req);

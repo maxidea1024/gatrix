@@ -6,7 +6,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IServiceMaintenanceService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task FetchAsync(string environment, CancellationToken ct = default);
+    List<MaintenanceStatus> GetCached(string environment);
     MaintenanceStatus? GetStatus(string environment);
     bool IsActive(string environment);
     string? GetMessage(string environment, string lang = "en");

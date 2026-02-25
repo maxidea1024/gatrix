@@ -6,7 +6,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IGameWorldService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<List<GameWorld>> FetchAsync(string environment, CancellationToken ct = default);
+    List<GameWorld> GetCached(string environment);
     List<GameWorld> GetAll(string environment);
     GameWorld? GetByWorldId(string worldId, string environment);
     bool IsWorldMaintenanceActive(string worldId, string environment);
@@ -64,7 +66,7 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
 
             // Fetch single item from API
             var response = await ApiClient.GetAsync<GameWorld>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/game-worlds/{id}", ct);
+                $"/api/v1/server/{Uri.EscapeDataString(environment)}/game-worlds/{id}", ct: ct);
 
             if (!response.Success || response.Data is null)
             {

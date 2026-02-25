@@ -43,10 +43,12 @@ export type StandardEventType =
   | 'feature_flag.deleted'
   | 'segment.created'
   | 'segment.updated'
-  | 'segment.deleted';
+  | 'segment.deleted'
+  | 'vars.updated';
 
 export interface StandardEventData {
   id?: number | string; // Optional for bulk events that don't have a single id
+  key?: string; // For vars.updated events
   timestamp: number;
   /**
    * Environment identifier (environmentName value).

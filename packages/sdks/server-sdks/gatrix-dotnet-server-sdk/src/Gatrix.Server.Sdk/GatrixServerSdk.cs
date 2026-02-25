@@ -17,6 +17,7 @@ public class GatrixServerSdk : IGatrixServerSdk
     public IStoreProductService StoreProduct { get; }
     public IServiceDiscoveryService ServiceDiscovery { get; }
     public ICouponService Coupon { get; }
+    public IVarsService Vars { get; }
 
     public GatrixServerSdk(
         IFeatureFlagService featureFlag,
@@ -27,7 +28,8 @@ public class GatrixServerSdk : IGatrixServerSdk
         IServiceMaintenanceService serviceMaintenance,
         IStoreProductService storeProduct,
         IServiceDiscoveryService serviceDiscovery,
-        ICouponService coupon)
+        ICouponService coupon,
+        IVarsService vars)
     {
         FeatureFlag = featureFlag;
         GameWorld = gameWorld;
@@ -38,5 +40,6 @@ public class GatrixServerSdk : IGatrixServerSdk
         StoreProduct = storeProduct;
         ServiceDiscovery = serviceDiscovery;
         Coupon = coupon;
+        Vars = vars;
     }
 }

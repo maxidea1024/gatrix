@@ -93,7 +93,8 @@ builder.Services.AddGatrixServerSdk(options =>
         StoreProduct = true,
         ClientVersion = true,
         ServiceNotice = true,
-        Banner = true
+        Banner = true,
+        Vars = true
     };
 });
 
@@ -102,6 +103,11 @@ builder.Services.AddHttpClient("GatrixBackend", client =>
 {
     client.BaseAddress = new Uri(edgeOptions.GatrixUrl);
     client.Timeout = TimeSpan.FromSeconds(10);
+    
+    // Add default headers for authentication and environment
+    client.DefaultRequestHeaders.Add("X-API-Token", edgeOptions.ApiToken);
+    client.DefaultRequestHeaders.Add("X-Application-Name", edgeOptions.ApplicationName);
+    client.DefaultRequestHeaders.Add("X-Environment", edgeOptions.Environment);
 });
 
 // Add Edge-specific Services

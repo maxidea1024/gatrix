@@ -104,19 +104,14 @@ public class TokenUsageTracker : IHostedService, IDisposable
         try
         {
             var client = _httpClientFactory.CreateClient("GatrixBackend");
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/server/internal/token-usage-report")
+            var content = JsonContent.Create(new
             {
-                Content = JsonContent.Create(new
-                {
-                    edgeInstanceId = _edgeInstanceId,
-                    usageData,
-                    reportedAt = DateTime.UtcNow.ToString("o"),
-                })
-            };
-            request.Headers.Add("x-api-token", _options.ApiToken);
-            request.Headers.Add("x-application-name", _options.ApplicationName);
+                edgeInstanceId = _edgeInstanceId,
+                usageData,
+                reportedAt = DateTime.UtcNow.ToString("o"),
+            });
 
-            var response = await client.SendAsync(request);
+            var response = await client.PostAsync("/api/v1/server/internal/token-usage-report", content);
             response.EnsureSuccessStatusCode();
 
             _logger.LogInformation("[TokenUsageTracker] Usage reported: {Count} tokens, {Total} total",

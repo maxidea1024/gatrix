@@ -6,7 +6,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IClientVersionService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<List<ClientVersion>> FetchAsync(string environment, CancellationToken ct = default);
+    List<ClientVersion> GetCached(string environment);
     List<ClientVersion> GetAll(string environment);
 }
 

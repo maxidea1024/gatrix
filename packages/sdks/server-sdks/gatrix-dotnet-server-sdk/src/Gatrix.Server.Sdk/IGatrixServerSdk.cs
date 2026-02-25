@@ -34,4 +34,7 @@ public interface IGatrixServerSdk
 
     /// <summary>Coupon redemption.</summary>
     ICouponService Coupon { get; }
+
+    /// <summary>KV settings (Vars) retrieval and caching.</summary>
+    IVarsService Vars { get; }
 }

@@ -13,7 +13,9 @@ public class SurveyListResponse
 
 public interface ISurveyService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<SurveyListResponse> FetchAsync(string environment, CancellationToken ct = default);
+    List<Survey> GetCached(string environment);
     List<Survey> GetAll(string environment);
     SurveySettings? GetSettings(string environment);
     Task UpdateSingleSurveyAsync(string id, string environment, bool? isActive = null, CancellationToken ct = default);
@@ -36,7 +38,7 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
     public async Task<SurveyListResponse> FetchAsync(string environment, CancellationToken ct = default)
     {
         var endpoint = GetEndpoint(environment);
-        var response = await ApiClient.GetAsync<SurveyListResponse>(endpoint, ct);
+        var response = await ApiClient.GetAsync<SurveyListResponse>(endpoint, ct: ct);
         if (response.Success && response.Data is not null)
         {
             UpdateCache(response.Data.Surveys, environment);
@@ -66,7 +68,7 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
             await Task.Delay(100, ct);
 
             var response = await ApiClient.GetAsync<Survey>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/surveys/{Uri.EscapeDataString(id)}", ct);
+                $"/api/v1/server/{Uri.EscapeDataString(environment)}/surveys/{Uri.EscapeDataString(id)}", ct: ct);
 
             if (!response.Success || response.Data is null)
             {

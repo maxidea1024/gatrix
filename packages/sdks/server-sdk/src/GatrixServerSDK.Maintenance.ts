@@ -39,7 +39,7 @@ export class GatrixMaintenanceHelper {
         if (world.maintenanceLocales) {
           for (const locale of world.maintenanceLocales) {
             if (locale.lang === 'ko' || locale.lang === 'en' || locale.lang === 'zh') {
-              localeMessages[locale.lang] = locale.message;
+              localeMessages[locale.lang as 'ko' | 'en' | 'zh'] = locale.message;
             }
           }
         }

@@ -16,6 +16,7 @@ public class SdkEvent
 public class SdkEventData
 {
     [JsonPropertyName("id")] public JsonElement? Id { get; set; }
+    [JsonPropertyName("key")] public string? Key { get; set; }
     [JsonPropertyName("environment")] public string? Environment { get; set; }
     [JsonPropertyName("isVisible")] public JsonElement? IsVisible { get; set; }
     [JsonPropertyName("isActive")] public JsonElement? IsActive { get; set; }

@@ -6,7 +6,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IServiceNoticeService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<List<ServiceNotice>> FetchAsync(string environment, CancellationToken ct = default);
+    List<ServiceNotice> GetCached(string environment);
     List<ServiceNotice> GetAll(string environment);
 }
 

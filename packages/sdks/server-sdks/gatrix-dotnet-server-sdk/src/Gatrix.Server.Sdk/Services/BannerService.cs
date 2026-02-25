@@ -6,7 +6,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IBannerService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<List<Banner>> FetchAsync(string environment, CancellationToken ct = default);
+    List<Banner> GetCached(string environment);
     List<Banner> GetAll(string environment);
 }
 

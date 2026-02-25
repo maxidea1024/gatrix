@@ -110,6 +110,17 @@ public abstract class BaseEnvironmentService<T, TResponse>
         }
 
         var items = ExtractItems(response.Data);
+        
+        // Safety check: if backend returns empty but we already have local data,
+        // be careful about overwriting it during the initial sync or temporary backend issues.
+        var currentItems = GetCached(environment);
+        if (items.Count == 0 && currentItems.Count > 0)
+        {
+            Logger.LogWarning("{Service} received empty list from backend for {Environment}, but local cache has data. Keeping local data for now to avoid outage.", 
+                ServiceName, environment);
+            return currentItems;
+        }
+
         UpdateCache(items, environment);
 
         if (Storage != null)
@@ -157,6 +168,7 @@ public abstract class BaseEnvironmentService<T, TResponse>
         {
             _cachedByEnv[environment] = new List<T>(items);
         }
+        _ = PersistCacheAsync(environment);
     }
 
     /// <summary>Update a single item in cache (upsert).</summary>
@@ -166,17 +178,20 @@ public abstract class BaseEnvironmentService<T, TResponse>
         {
             if (!_cachedByEnv.TryGetValue(environment, out var items))
             {
-                _cachedByEnv[environment] = [item];
-                return;
+                items = [item];
+                _cachedByEnv[environment] = items;
             }
-
-            var itemId = GetItemId(item);
-            var index = items.FindIndex(i => GetItemId(i)?.Equals(itemId) == true);
-            if (index >= 0)
-                items[index] = item;
             else
-                items.Add(item);
+            {
+                var itemId = GetItemId(item);
+                var index = items.FindIndex(i => GetItemId(i)?.Equals(itemId) == true);
+                if (index >= 0)
+                    items[index] = item;
+                else
+                    items.Add(item);
+            }
         }
+        _ = PersistCacheAsync(environment);
     }
 
     /// <summary>Remove an item from cache by ID.</summary>
@@ -186,6 +201,25 @@ public abstract class BaseEnvironmentService<T, TResponse>
         {
             if (!_cachedByEnv.TryGetValue(environment, out var items)) return;
             items.RemoveAll(i => GetItemId(i)?.Equals(id) == true);
+        }
+        _ = PersistCacheAsync(environment);
+    }
+
+    /// <summary>Persist current cache for an environment to local storage.</summary>
+    protected async Task PersistCacheAsync(string environment, CancellationToken ct = default)
+    {
+        if (Storage == null) return;
+
+        try
+        {
+            var items = GetCached(environment);
+            var cacheKey = GetCacheKey(environment);
+            var json = JsonSerializer.Serialize(items);
+            await Storage.SaveAsync(cacheKey, json, ct);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to persist {Service} to local storage for {Environment}", ServiceName, environment);
         }
     }
 

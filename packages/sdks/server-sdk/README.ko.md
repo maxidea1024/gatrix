@@ -230,6 +230,31 @@ console.log('보상:', result.reward);
 console.log('사용 횟수:', result.userUsedCount);
 ```
 
+### Vars (KV)
+
+#### 캐시된 모든 변수 가져오기
+
+```typescript
+const vars = sdk.getVars();
+console.log('모든 변수:', vars);
+```
+
+#### 변수 값 가져오기
+
+```typescript
+const value = sdk.getVarValue('$channels');
+console.log('채널 설정:', value);
+```
+
+#### JSON 파싱된 값 가져오기
+
+```typescript
+const channels = sdk.getVarParsedValue<any[]>('$channels');
+if (Array.isArray(channels)) {
+  console.log('파싱된 채널 목록:', channels);
+}
+```
+
 ### 게임 월드
 
 ```typescript

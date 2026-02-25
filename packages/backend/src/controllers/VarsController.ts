@@ -1,8 +1,11 @@
 import { Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
+import { VarsService } from '../services/VarsService';
 import { pubSubService } from '../services/PubSubService';
-import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { SERVER_SDK_ETAG, DEFAULT_CONFIG } from '../constants/cacheKeys';
 import { AuthenticatedRequest } from '../types/auth';
+import { SDKRequest } from '../middleware/apiTokenAuth';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 
 export class VarsController {
   static async getVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -31,6 +34,18 @@ export class VarsController {
       }
       const userId = req.user?.userId || (req as any).user?.id || 1;
       await VarsModel.set(key, toStore, userId, environment);
+      
+      // Clear cache
+      await VarsService.clearCache(key, environment);
+
+      // Publish update event for SDKs
+      await pubSubService.publishSDKEvent({
+        type: 'vars.updated',
+        data: {
+          key: key,
+          environment: environment,
+        },
+      });
 
       // Invalidate related caches when specific KV items are updated via setVar
       if (key === '$clientVersionPassiveData' || key === 'kv:clientVersionPassiveData') {
@@ -79,8 +94,30 @@ export class VarsController {
   static async getAllKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const environment = req.environment || 'development';
-      const items = await VarsModel.getAllKV(environment);
+      const items = await VarsService.getAllKV(environment);
       res.json({ success: true, data: items });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  /**
+   * Get all KV items for Server SDK
+   * GET /api/v1/server/:env/vars
+   */
+  static async getServerVars(req: SDKRequest, res: Response, next: NextFunction) {
+    try {
+      const environment = req.params.env || req.environment || 'development';
+
+      await respondWithEtagCache(res, {
+        cacheKey: `${SERVER_SDK_ETAG.VARS}:${environment}`,
+        ttlMs: DEFAULT_CONFIG.VARS_TTL,
+        requestEtag: req.headers['if-none-match'],
+        buildPayload: async () => {
+          const items = await VarsService.getAllKV(environment);
+          return { success: true, data: items };
+        },
+      });
     } catch (e) {
       next(e);
     }
@@ -137,6 +174,18 @@ export class VarsController {
         environment
       );
 
+      // Clear cache
+      await VarsService.clearCache(item.varKey, environment);
+
+      // Publish update event for SDKs
+      await pubSubService.publishSDKEvent({
+        type: 'vars.updated',
+        data: {
+          key: item.varKey,
+          environment: environment,
+        },
+      });
+
       res.status(201).json({
         success: true,
         message: 'KV item created successfully',
@@ -172,6 +221,18 @@ export class VarsController {
         userId,
         environment
       );
+
+      // Clear cache
+      await VarsService.clearCache(fullKey, environment);
+
+      // Publish update event for SDKs
+      await pubSubService.publishSDKEvent({
+        type: 'vars.updated',
+        data: {
+          key: fullKey,
+          environment: environment,
+        },
+      });
 
       // Invalidate related caches when specific KV items are updated
       if (fullKey === '$clientVersionPassiveData' || fullKey === 'kv:clientVersionPassiveData') {
@@ -254,9 +315,21 @@ export class VarsController {
     try {
       const key = req.params.key;
       const environment = req.environment || 'development';
-      const fullKey = key.startsWith('kv:') ? key : `kv:${key}`;
+      const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
       await VarsModel.deleteKV(fullKey, environment);
+
+      // Clear cache
+      await VarsService.clearCache(fullKey, environment);
+
+      // Publish update event for SDKs
+      await pubSubService.publishSDKEvent({
+        type: 'vars.updated',
+        data: {
+          key: fullKey,
+          environment: environment,
+        },
+      });
 
       res.json({
         success: true,

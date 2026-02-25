@@ -336,6 +336,31 @@ console.log('Reward:', result.reward);
 console.log('User used count:', result.userUsedCount);
 ```
 
+### Vars (KV)
+
+#### Get all cached vars
+
+```typescript
+const vars = sdk.getVars();
+console.log('All variables:', vars);
+```
+
+#### Get variable value
+
+```typescript
+const value = sdk.getVarValue('$channels');
+console.log('Channel config:', value);
+```
+
+#### Get parsed JSON value
+
+```typescript
+const channels = sdk.getVarParsedValue<any[]>('$channels');
+if (Array.isArray(channels)) {
+  console.log('Parsed channels:', channels);
+}
+```
+
 ### Game Worlds
 
 #### Get All Game Worlds

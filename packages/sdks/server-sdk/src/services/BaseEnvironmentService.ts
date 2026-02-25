@@ -132,23 +132,40 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     // Note: ApiClient handles ETag/304 internally via its bodyCache
     const response = await this.apiClient.get<TResponse>(endpoint);
 
+    // Safety check: if backend returns failure or empty list but we already have local data,
+    // be careful about overwriting it during the initial sync or temporary backend issues.
+    const currentItems = this.cachedByEnv.get(environment) || [];
+    
     if (!response.success || !response.data) {
+      if (currentItems.length > 0) {
+        this.logger.warn(`Failed to fetch ${this.getServiceName()} from backend, but local cache has data. Keeping local data for now to avoid outage.`, {
+          environment,
+          error: response.error?.message
+        });
+        return currentItems;
+      }
       throw new Error(response.error?.message || `Failed to fetch ${this.getServiceName()}`);
     }
 
     const items = this.extractItems(response.data);
-    this.cachedByEnv.set(environment, items);
-
-    // Save to local storage if available
-    if (this.storage) {
-      const json = JSON.stringify(items);
-      await this.storage.save(this.getCacheKey(environment), json);
+    
+    if (items.length === 0 && currentItems.length > 0) {
+      this.logger.warn(`${this.getServiceName()} received empty list from backend, but local cache has data. Keeping local data for now to avoid outage.`, {
+        environment,
+        localCount: currentItems.length
+      });
+      return currentItems;
     }
 
-    this.logger.info(`${this.getServiceName()} fetched`, {
-      count: items.length,
+    this.logger.info(`${this.getServiceName()} received from backend`, {
       environment,
+      itemCount: items.length,
     });
+
+    this.cachedByEnv.set(environment, items);
+
+    // Persist to local storage
+    await this.persistCache(environment);
 
     return items;
   }
@@ -276,6 +293,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   updateCache(items: T[], environment: string): void {
     this.cachedByEnv.set(environment, items);
+    this.persistCache(environment).catch(() => {});
     this.logger.debug(`${this.getServiceName()} cache updated`, {
       environment,
       count: items.length,
@@ -292,22 +310,24 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const itemId = this.getItemId(item);
 
     const existsInCache = currentItems.some((i) => this.getItemId(i) === itemId);
+    let newItems: T[];
 
     if (existsInCache) {
-      const newItems = currentItems.map((i) => (this.getItemId(i) === itemId ? item : i));
-      this.cachedByEnv.set(environment, newItems);
-      this.logger.debug(`Single ${this.getServiceName()} updated in cache`, {
-        id: itemId,
-        environment,
-      });
+      newItems = currentItems.map((i) => (this.getItemId(i) === itemId ? item : i));
     } else {
-      const newItems = [...currentItems, item];
-      this.cachedByEnv.set(environment, newItems);
-      this.logger.debug(`Single ${this.getServiceName()} added to cache`, {
+      newItems = [...currentItems, item];
+    }
+
+    this.cachedByEnv.set(environment, newItems);
+    this.persistCache(environment).catch(() => {});
+
+    this.logger.debug(
+      `Single ${this.getServiceName()} ${existsInCache ? 'updated' : 'added'} in cache`,
+      {
         id: itemId,
         environment,
-      });
-    }
+      }
+    );
   }
 
   /**
@@ -319,10 +339,30 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const currentItems = this.cachedByEnv.get(environment) || [];
     const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByEnv.set(environment, newItems);
+    this.persistCache(environment).catch(() => {});
+
     this.logger.debug(`${this.getServiceName()} removed from cache`, {
       id,
       environment,
     });
+  }
+
+  /**
+   * Persist current cache for an environment to local storage
+   */
+  protected async persistCache(environment: string): Promise<void> {
+    if (!this.storage) return;
+
+    try {
+      const items = this.cachedByEnv.get(environment) || [];
+      const cacheKey = this.getCacheKey(environment);
+      await this.storage.save(cacheKey, JSON.stringify(items));
+    } catch (error: any) {
+      this.logger.error(`Failed to persist ${this.getServiceName()} to local storage`, {
+        environment,
+        error: error.message,
+      });
+    }
   }
 
   /**

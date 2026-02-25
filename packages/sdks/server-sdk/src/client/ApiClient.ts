@@ -51,14 +51,14 @@ export class ApiClient {
     this.etagStore = new Map();
     this.bodyCache = new Map();
 
-    // Build headers with optional environment
+    // Build headers with essential auth info
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-API-Token': config.apiToken,
       'X-Application-Name': config.applicationName,
     };
 
-    // Add environment header for single-environment mode
+    // Add environment header if provided
     if (config.environment) {
       headers['X-Environment'] = config.environment;
     }
@@ -364,20 +364,17 @@ export class ApiClient {
     return error.message || 'Unknown error';
   }
 
-  /**
-   * GET request (with retry)
-   */
   async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const requestConfig: AxiosRequestConfig = { ...(config || {}) };
-    const headers: Record<string, any> = { ...(requestConfig.headers || {}) };
-
     const cacheKey = this.buildCacheKey(url, requestConfig);
     const cachedEtag = this.etagStore.get(cacheKey);
-    if (cachedEtag) {
-      headers['If-None-Match'] = cachedEtag;
-    }
 
-    requestConfig.headers = headers;
+    if (cachedEtag) {
+      requestConfig.headers = {
+        ...(requestConfig.headers || {}),
+        'If-None-Match': cachedEtag,
+      };
+    }
 
     return this.executeWithRetry(
       async () => {
@@ -397,7 +394,7 @@ export class ApiClient {
           // No cached body but got 304: fall back to a fresh request without conditional header
           const retryConfig: AxiosRequestConfig = {
             ...requestConfig,
-            headers: { ...headers },
+            headers: { ...(requestConfig.headers || {}) },
           };
           delete (retryConfig.headers as any)['If-None-Match'];
           delete (retryConfig.headers as any)['if-none-match'];
@@ -434,16 +431,11 @@ export class ApiClient {
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided in headers
-    const requestConfig = config || {};
-    const headers = requestConfig.headers || {};
+    const requestConfig: AxiosRequestConfig = { ...(config || {}) };
+    const headers = { ...(requestConfig.headers || {}) };
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', {
-        requestId: headers['x-request-id'],
-        url,
-      });
+    if (!(headers as any)['x-request-id']) {
+      (headers as any)['x-request-id'] = ulid();
     }
 
     requestConfig.headers = headers;
@@ -462,16 +454,11 @@ export class ApiClient {
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided in headers
-    const requestConfig = config || {};
-    const headers = requestConfig.headers || {};
+    const requestConfig: AxiosRequestConfig = { ...(config || {}) };
+    const headers = { ...(requestConfig.headers || {}) };
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', {
-        requestId: headers['x-request-id'],
-        url,
-      });
+    if (!(headers as any)['x-request-id']) {
+      (headers as any)['x-request-id'] = ulid();
     }
 
     requestConfig.headers = headers;
@@ -493,16 +480,11 @@ export class ApiClient {
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided in headers
-    const requestConfig = config || {};
-    const headers = requestConfig.headers || {};
+    const requestConfig: AxiosRequestConfig = { ...(config || {}) };
+    const headers = { ...(requestConfig.headers || {}) };
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', {
-        requestId: headers['x-request-id'],
-        url,
-      });
+    if (!(headers as any)['x-request-id']) {
+      (headers as any)['x-request-id'] = ulid();
     }
 
     requestConfig.headers = headers;
@@ -521,16 +503,11 @@ export class ApiClient {
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided in headers
-    const requestConfig = config || {};
-    const headers = requestConfig.headers || {};
+    const requestConfig: AxiosRequestConfig = { ...(config || {}) };
+    const headers = { ...(requestConfig.headers || {}) };
 
-    if (!headers['x-request-id']) {
-      headers['x-request-id'] = ulid();
-      this.logger.debug('Auto-generated requestId', {
-        requestId: headers['x-request-id'],
-        url,
-      });
+    if (!(headers as any)['x-request-id']) {
+      (headers as any)['x-request-id'] = ulid();
     }
 
     requestConfig.headers = headers;
@@ -549,6 +526,20 @@ export class ApiClient {
       method: 'DELETE',
       url,
     });
+  }
+
+  /**
+   * Manually set ETag and body cache for a URL
+   * Used during initialization to restore cache from local storage
+   */
+  setCache(url: string, etag: string, data: any, config?: AxiosRequestConfig): void {
+    const cacheKey = this.buildCacheKey(url, config);
+    this.etagStore.set(cacheKey, etag);
+    this.bodyCache.set(cacheKey, {
+      success: true,
+      data,
+    });
+    this.logger.debug('Manually populated API cache', { url, etag });
   }
 
   /**

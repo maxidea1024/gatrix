@@ -6,7 +6,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IWhitelistService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task FetchAsync(string environment, CancellationToken ct = default);
+    List<WhitelistData> GetCached(string environment);
     WhitelistData? Get(string environment);
     bool IsIpWhitelisted(string ip, string environment);
     bool IsAccountWhitelisted(string accountId, string environment);

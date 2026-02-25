@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gatrix.Edge.Controllers;
 
-public partial class ClientController : ControllerBase
+public partial class ClientController : GatrixControllerBase
 {
     // =============================
     // Crash Reporting Routes

@@ -102,7 +102,7 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
         const durationSeconds = duration[0] + duration[1] / 1e9;
 
         // Priority: req.route.path (Express route) > req.path (literal path)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+         
         const route = req.route ? (req.route.path as string) : req.path || '/unknown';
 
         const labels = {
@@ -119,10 +119,10 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
           typeof (safeDuration as any).observe === 'function' &&
           typeof (safeDuration as any).labels !== 'function'
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+           
           (safeDuration as any).observe(labels, durationSeconds);
         } else if (typeof (safeDuration as any).labels === 'function') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+           
           (safeDuration as any)
             .labels(labels.method, labels.handler, labels.status, labels.scope)
             .observe(durationSeconds);
@@ -132,10 +132,10 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
           typeof (safeCounter as any).inc === 'function' &&
           typeof (safeCounter as any).labels !== 'function'
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+           
           (safeCounter as any).inc(labels);
         } else if (typeof (safeCounter as any).labels === 'function') {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+           
           (safeCounter as any)
             .labels(labels.method, labels.handler, labels.status, labels.scope)
             .inc();

@@ -349,6 +349,18 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
+            // ── Vars (KV) ───────────────────────────────────────
+            case "vars.updated":
+            {
+                if (!features.Vars) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                _logger.LogInformation("Vars update event received, refreshing vars cache for {Env}", env);
+                if (_cacheManager != null)
+                    await _cacheManager.RefreshVarsAsync(env);
+                break;
+            }
+
             // ── Segment (global — refresh flags for ALL environments) ─
             case "segment.created":
             case "segment.updated":

@@ -64,6 +64,7 @@ class SDKManager {
         banner: true,
         storeProduct: true,
         featureFlag: true,
+        vars: true,
       },
 
       // Enable metrics

@@ -147,6 +147,14 @@ setTimeout(() => {
  *         schema: { type: string, enum: [ONLINE, OFFLINE, MAINTENANCE, UPDATE_REQUIRED], example: 'ONLINE' }
  *         description: Filter by status
  *       - in: query
+ *         name: channel
+ *         schema: { type: string, example: 'pc' }
+ *         description: Channel identifier
+ *       - in: query
+ *         name: subChannel
+ *         schema: { type: string, example: 'pc' }
+ *         description: Sub-channel identifier
+ *       - in: query
  *         name: lang
  *         schema: { type: string, enum: [ko, en, zh], example: 'ko' }
  *         description: Language code for localized maintenance messages
@@ -189,11 +197,13 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     if (!sdk) return;
 
     const environment = req.params.environment;
-    const { platform, version, status, lang } = req.query as {
+    const { platform, version, status, lang, channel, subChannel } = req.query as {
       platform?: string;
       version?: string;
       status?: string;
       lang?: string;
+      channel?: string;
+      subChannel?: string;
     };
 
     // Validate required query params
@@ -216,7 +226,14 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     }
 
     // Validate status parameter if provided
-    const validStatuses = ['ONLINE', 'OFFLINE', 'MAINTENANCE', 'UPDATE_REQUIRED'];
+    const validStatuses = [
+      'ONLINE',
+      'OFFLINE',
+      'MAINTENANCE',
+      'UPDATE_REQUIRED',
+      'RECOMMENDED_UPDATE',
+      'FORCED_UPDATE',
+    ];
     let statusFilter: string | undefined;
     if (status) {
       const upperStatus = status.toUpperCase();
@@ -292,6 +309,64 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     }
 
     // Transform data for client consumption (same format as Backend)
+    const meta = { ...(record.customPayload || {}) };
+
+    // Handle channel/subChannel appUpdateUrl for forced/recommended updates
+    if (
+      channel &&
+      (record.clientStatus === 'FORCED_UPDATE' || record.clientStatus === 'RECOMMENDED_UPDATE')
+    ) {
+      try {
+        const channels = sdk.getVarParsedValue<any[]>('$channels', environment);
+        if (Array.isArray(channels)) {
+          const channelData = channels.find((c) => c.value === channel);
+          if (channelData) {
+            let targetSubChannel = subChannel;
+            if (targetSubChannel && Array.isArray(channelData.subChannels)) {
+              const subChannelData = channelData.subChannels.find(
+                (sc: any) => sc.value === targetSubChannel
+              );
+              if (subChannelData && subChannelData.appUpdateUrl) {
+                (meta as any).appUpdateUrl = subChannelData.appUpdateUrl;
+                logger.info('appUpdateUrl successfully merged', {
+                  channel,
+                  subChannel,
+                  url: subChannelData.appUpdateUrl,
+                });
+              } else {
+                logger.warn('subChannelData not found or appUpdateUrl missing', {
+                  subChannel,
+                  availableSubChannels: channelData.subChannels.map((sc: any) => sc.value),
+                });
+              }
+            } else {
+              logger.warn('targetSubChannel not provided or subChannels array missing', {
+                subChannel,
+                hasSubChannels: !!channelData.subChannels,
+              });
+            }
+          } else {
+            logger.warn('channelData not found in $channels', {
+              channel,
+              availableChannels: channels.map((c) => c.value),
+            });
+          }
+        } else {
+          logger.warn('$channels KV not found or not an array', {
+            environment,
+            found: !!channels,
+          });
+        }
+      } catch (e) {
+        logger.warn('Failed to process $channel KV for appUpdateUrl', {
+          error: e,
+          environment,
+          channel,
+          subChannel,
+        });
+      }
+    }
+
     const clientData: Record<string, unknown> = {
       platform: record.platform,
       clientVersion: record.clientVersion,
@@ -301,7 +376,7 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
       guestModeAllowed:
         record.clientStatus === 'MAINTENANCE' ? false : Boolean(record.guestModeAllowed),
       externalClickLink: record.externalClickLink,
-      meta: record.customPayload || {},
+      meta,
     };
 
     // Add maintenance message if status is MAINTENANCE

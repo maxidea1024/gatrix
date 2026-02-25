@@ -12,6 +12,9 @@ public interface ICacheManager
     /// <summary>Refresh ONLY feature flags (flags + segments) for a specific environment.</summary>
     Task RefreshFeatureFlagsAsync(string? environment = null, CancellationToken ct = default);
 
+    /// <summary>Refresh ONLY vars for a specific environment.</summary>
+    Task RefreshVarsAsync(string environment, CancellationToken ct = default);
+
     object GetCacheSummary();
     object GetCacheDetail();
 
@@ -19,4 +22,7 @@ public interface ICacheManager
     List<Models.Banner> GetBanners(string environment);
     List<Models.ServiceNotice> GetServiceNotices(string environment);
     List<Models.GameWorld> GetGameWorlds(string environment);
+    List<Models.VarItem> GetVars(string environment);
+    string? GetVarValue(string key, string environment);
+    T? GetVarParsedValue<T>(string key, string environment, System.Text.Json.JsonSerializerOptions? options = null);
 }

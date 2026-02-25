@@ -54,11 +54,37 @@ export async function respondWithEtagCache<TPayload>(
     return;
   }
 
-  await CacheService.set<EtagCacheEntry<TPayload>>(
-    cacheKey,
-    { etag, payload },
-    ttlSeconds || undefined
-  );
+  // Defensive: If payload looks empty (empty array or object with empty array),
+  // consider not caching it or using a very short TTL to avoid persistent "no data" state
+  const isEmpty = (p: any): boolean => {
+    if (!p) return true;
+    if (Array.isArray(p) && p.length === 0) return true;
+    if (typeof p === 'object') {
+      // Check for common response structures like { items: [], total: 0 } or { clientVersions: [], total: 0 }
+      const keys = Object.keys(p);
+      for (const key of keys) {
+        if (Array.isArray(p[key]) && p[key].length > 0) return false;
+      }
+      if (keys.some((k) => Array.isArray(p[k]))) return true; // Found empty array(s)
+    }
+    return false;
+  };
+
+  if (!isEmpty(payload)) {
+    await CacheService.set<EtagCacheEntry<TPayload>>(
+      cacheKey,
+      { etag, payload },
+      ttlSeconds || undefined
+    );
+  } else {
+    // If empty, we might still want to cache for a very short duration (e.g. 5s) 
+    // to prevent hammering the DB if there really is no data
+    await CacheService.set<EtagCacheEntry<TPayload>>(
+      cacheKey,
+      { etag, payload },
+      5 // 5 seconds instead of full TTL
+    );
+  }
 
   res.set('ETag', etag);
   if (ttlSeconds > 0) {

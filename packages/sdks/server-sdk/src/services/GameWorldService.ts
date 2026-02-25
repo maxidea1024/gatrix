@@ -33,7 +33,9 @@ export class GameWorldService extends BaseEnvironmentService<
   }
 
   protected extractItems(response: GameWorldListResponse): GameWorld[] {
-    return response.worlds;
+    const worlds = response.worlds || [];
+    // Sort by displayOrder (ascending)
+    return [...worlds].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   }
 
   protected getServiceName(): string {
@@ -42,42 +44,6 @@ export class GameWorldService extends BaseEnvironmentService<
 
   protected getItemId(item: GameWorld): number {
     return item.id;
-  }
-
-  // ==================== Override for Custom Sorting ====================
-
-  /**
-   * Get game worlds for a specific environment
-   * Overridden to add sorting by displayOrder
-   */
-  async listByEnvironment(environment: string): Promise<GameWorld[]> {
-    const endpoint = this.getEndpoint(environment);
-
-    this.logger.debug('Fetching game worlds', { environment });
-
-    const response = await this.apiClient.get<GameWorldListResponse>(endpoint);
-
-    if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch game worlds');
-    }
-
-    const worlds = this.extractItems(response.data);
-    // Sort by displayOrder (ascending)
-    const sortedWorlds = worlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-    this.cachedByEnv.set(environment, sortedWorlds);
-
-    // Save to local storage if available
-    if (this.storage) {
-      const json = JSON.stringify(sortedWorlds);
-      await this.storage.save(this.getCacheKey(environment), json);
-    }
-
-    this.logger.info('Game worlds fetched', {
-      count: sortedWorlds.length,
-      environment,
-    });
-
-    return sortedWorlds;
   }
 
   // ==================== Domain-specific Methods ====================

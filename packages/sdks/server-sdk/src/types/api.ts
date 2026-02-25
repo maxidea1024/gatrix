@@ -598,3 +598,23 @@ export interface CurrentMaintenanceStatus {
   /** Whether the client is whitelisted (IP or account) - only present when whitelist check was performed */
   isWhitelisted?: boolean;
 }
+
+// ============================================================================
+// Vars (KV) Types
+// ============================================================================
+
+export interface VarItem {
+  id: number;
+  varKey: string;
+  varValue: string;
+  valueType: 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
+  description?: string;
+  isSystemDefined: boolean;
+  isCopyable: boolean;
+  updatedAt?: string;
+}
+
+export interface VarListResponse {
+  success: boolean;
+  data: VarItem[];
+}

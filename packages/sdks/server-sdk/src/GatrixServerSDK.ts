@@ -17,6 +17,7 @@ import { ServiceMaintenanceService } from './services/ServiceMaintenanceService'
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { StoreProductService } from './services/StoreProductService';
 import { FeatureFlagService } from './services/FeatureFlagService';
+import { VarsService } from './services/VarsService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { EventCallback, SdkEvent } from './types/events';
@@ -45,7 +46,6 @@ import {
   Banner,
   StoreProduct,
 } from './types/api';
-import { EvaluationContext, EvaluationResult, Variant } from './types/featureFlags';
 import { detectCloudMetadata, CloudMetadata, CloudProvider } from './utils/cloudMetadata';
 
 /**
@@ -776,6 +776,20 @@ export class GatrixServerSDK {
     if (!service) {
       throw new Error(
         'FeatureFlagService is not available. SDK may not be initialized or featureFlag feature is disabled.'
+      );
+    }
+    return service;
+  }
+
+  /**
+   * Get VarsService instance
+   * @throws Error if SDK is not initialized or feature is disabled
+   */
+  get vars(): VarsService {
+    const service = this.cacheManager?.getVarsService();
+    if (!service) {
+      throw new Error(
+        'VarsService is not available. SDK may not be initialized or vars feature is disabled.'
       );
     }
     return service;
@@ -2097,6 +2111,57 @@ export class GatrixServerSDK {
    */
   getBannerService() {
     return this.cacheManager?.getBannerService();
+  }
+
+  // ============================================================================
+  // Vars (KV) Methods
+  // ============================================================================
+
+  /**
+   * Get all cached vars
+   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   */
+  getVars(environment?: string): any[] {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return [];
+    }
+    const env = this.resolveEnvironment(environment, 'getVars');
+    return this.cacheManager.getVars(env);
+  }
+
+  /**
+   * Get a variable value by key from cache
+   * @param key Variable key (e.g., '$channel', 'kv:some-setting')
+   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   */
+  getVarValue(key: string, environment?: string): string | null {
+    if (!this.cacheManager) return null;
+    const env = this.resolveEnvironment(environment, 'getVarValue');
+    return this.vars.getValue(key, env);
+  }
+
+  /**
+   * Get a variable value parsed as JSON if it's an object or array
+   * @param key Variable key
+   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   */
+  getVarParsedValue<T = any>(key: string, environment?: string): T | null {
+    if (!this.cacheManager) return null;
+    const env = this.resolveEnvironment(environment, 'getVarParsedValue');
+    return this.vars.getParsedValue<T>(key, env);
+  }
+
+  /**
+   * Refresh vars cache
+   * @param environment Optional in single-env mode, required in multi-env mode
+   */
+  async refreshVarsCache(environment?: string): Promise<void> {
+    if (!this.cacheManager) {
+      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+    }
+    const env = this.resolveEnvironment(environment, 'refreshVarsCache');
+    await this.vars.refreshByEnvironment(env);
   }
 
   /**

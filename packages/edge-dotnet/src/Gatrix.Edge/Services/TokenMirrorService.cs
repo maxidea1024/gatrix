@@ -23,6 +23,7 @@ public class TokenMirrorService : IHostedService, IDisposable
     private IConnectionMultiplexer? _redis;
     private bool _initialized;
     private const string ChannelName = "gatrix-sdk-events";
+    private readonly string _cacheFilePath;
 
     public TokenMirrorService(
         IOptions<EdgeOptions> options,
@@ -32,17 +33,75 @@ public class TokenMirrorService : IHostedService, IDisposable
         _options = options.Value;
         _httpClientFactory = httpClientFactory;
         _logger = logger;
+        
+        // Setup cache file path (matches SDK convention)
+        var cacheDir = Path.Combine(Directory.GetCurrentDirectory(), ".gatrix_cache");
+        if (!Directory.Exists(cacheDir)) Directory.CreateDirectory(cacheDir);
+        _cacheFilePath = Path.Combine(cacheDir, "edge_tokens.json");
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("[TokenMirror] Initializing token mirror service...");
 
-        await FetchAllTokensAsync(cancellationToken);
+        // 1. Try to load from local cache first
+        await LoadFromCacheAsync(cancellationToken);
+
+        // 2. Fetch from backend in background
+        _ = FetchAllTokensAsync(cancellationToken);
+
         await SubscribeToEventsAsync();
 
         _initialized = true;
-        _logger.LogInformation("[TokenMirror] Initialized with {Count} tokens", _tokensByValue.Count);
+        _logger.LogInformation("[TokenMirror] Initialized (local count: {Count})", _tokensByValue.Count);
+    }
+
+    private async Task LoadFromCacheAsync(CancellationToken ct)
+    {
+        try
+        {
+            if (File.Exists(_cacheFilePath))
+            {
+                var json = await File.ReadAllTextAsync(_cacheFilePath, ct);
+                var tokens = JsonSerializer.Deserialize<List<MirroredToken>>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (tokens != null)
+                {
+                    UpdateInternalMaps(tokens);
+                    _logger.LogInformation("[TokenMirror] Loaded {Count} tokens from local cache", tokens.Count);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "[TokenMirror] Failed to load tokens from local cache");
+        }
+    }
+
+    private async Task SaveToCacheAsync(List<MirroredToken> tokens, CancellationToken ct)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(tokens, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(_cacheFilePath, json, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[TokenMirror] Failed to save tokens to local cache");
+        }
+    }
+
+    private void UpdateInternalMaps(List<MirroredToken> tokens)
+    {
+        _tokensByValue.Clear();
+        _tokensById.Clear();
+
+        foreach (var token in tokens)
+        {
+            _tokensByValue[token.TokenValue] = token;
+            _tokensById[token.Id] = token;
+        }
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
@@ -62,19 +121,12 @@ public class TokenMirrorService : IHostedService, IDisposable
         _logger.LogInformation("[TokenMirror] Shutdown complete");
     }
 
-    /// <summary>
-    /// Fetch all tokens from backend.
-    /// </summary>
     public async Task FetchAllTokensAsync(CancellationToken ct = default)
     {
         try
         {
             var client = _httpClientFactory.CreateClient("GatrixBackend");
-            var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/server/internal/tokens");
-            request.Headers.Add("x-api-token", _options.ApiToken);
-            request.Headers.Add("x-application-name", _options.ApplicationName);
-
-            var response = await client.SendAsync(request, ct);
+            var response = await client.GetAsync("/api/v1/server/internal/tokens", ct);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync(ct);
@@ -91,16 +143,11 @@ public class TokenMirrorService : IHostedService, IDisposable
 
                 if (tokens != null)
                 {
-                    _tokensByValue.Clear();
-                    _tokensById.Clear();
-
-                    foreach (var token in tokens)
-                    {
-                        _tokensByValue[token.TokenValue] = token;
-                        _tokensById[token.Id] = token;
-                    }
-
+                    UpdateInternalMaps(tokens);
                     _logger.LogInformation("[TokenMirror] Fetched {Count} tokens from backend", tokens.Count);
+
+                    // Persist to local cache
+                    await SaveToCacheAsync(tokens, ct);
                 }
             }
             else
@@ -110,8 +157,8 @@ public class TokenMirrorService : IHostedService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[TokenMirror] Failed to fetch tokens");
-            throw;
+            _logger.LogError(ex, "[TokenMirror] Failed to fetch tokens from backend. Using current cache (if any).");
+            // Non-critical if we already have local cache
         }
     }
 

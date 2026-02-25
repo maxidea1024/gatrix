@@ -49,6 +49,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<IClientVersionService, ClientVersionService>();
         services.TryAddSingleton<IServiceNoticeService, ServiceNoticeService>();
         services.TryAddSingleton<IBannerService, BannerService>();
+        services.TryAddSingleton<IVarsService, VarsService>();
 
         // Flag metrics (singleton — accumulates across requests)
         services.TryAddSingleton<FlagMetricsService>();

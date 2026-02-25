@@ -7,7 +7,9 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IPopupNoticeService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<List<PopupNotice>> FetchAsync(string environment, CancellationToken ct = default);
+    List<PopupNotice> GetCached(string environment);
     List<PopupNotice> GetAll(string environment);
     List<PopupNotice> GetForWorld(string worldId, string environment);
     List<PopupNotice> GetActive(string environment, string? platform = null,
@@ -52,7 +54,7 @@ public class PopupNoticeService : BaseEnvironmentService<PopupNotice, List<Popup
             await Task.Delay(100, ct);
 
             var response = await ApiClient.GetAsync<PopupNoticeByIdResponse>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/ingame-popup-notices/{id}", ct);
+                $"/api/v1/server/{Uri.EscapeDataString(environment)}/ingame-popup-notices/{id}", ct: ct);
 
             if (!response.Success || response.Data?.Notice is null)
             {

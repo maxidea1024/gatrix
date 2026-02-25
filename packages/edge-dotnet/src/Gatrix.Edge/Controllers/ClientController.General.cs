@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gatrix.Edge.Controllers;
 
-public partial class ClientController : ControllerBase
+public partial class ClientController : GatrixControllerBase
 {
     // =============================
     // General Public & Meta Routes
@@ -16,7 +16,8 @@ public partial class ClientController : ControllerBase
     [HttpGet("{environment}/client-version")]
     public IActionResult GetClientVersion(string environment,
         [FromQuery] string? platform, [FromQuery] string? version,
-        [FromQuery] string? status, [FromQuery] string? lang)
+        [FromQuery] string? status, [FromQuery] string? lang,
+        [FromQuery] string? channel, [FromQuery] string? subChannel)
     {
         if (string.IsNullOrEmpty(platform))
             return BadRequest(new { success = false, message = "platform is a required query parameter" });
@@ -71,6 +72,50 @@ public partial class ClientController : ControllerBase
         }
 
         // Build response
+        var meta = new Dictionary<string, object?>();
+        if (record.CustomPayload != null)
+        {
+            foreach (var kvp in record.CustomPayload)
+            {
+                meta[kvp.Key] = kvp.Value;
+            }
+        }
+
+        // Handle channel/subChannel appUpdateUrl for forced/recommended updates
+        if (!string.IsNullOrEmpty(channel) && 
+            (record.ClientStatus == "FORCED_UPDATE" || record.ClientStatus == "RECOMMENDED_UPDATE"))
+        {
+            try
+            {
+                var channels = _cacheManager.GetVarParsedValue<List<JsonElement>>("$channels", environment);
+                if (channels != null)
+                {
+                    var channelData = channels.FirstOrDefault(c => 
+                        c.TryGetProperty("value", out var val) && val.GetString() == channel);
+                    
+                    if (channelData.ValueKind != JsonValueKind.Undefined && 
+                        !string.IsNullOrEmpty(subChannel) && 
+                        channelData.TryGetProperty("subChannels", out var subChannelsProp) && 
+                        subChannelsProp.ValueKind == JsonValueKind.Array)
+                    {
+                        var subChannelData = subChannelsProp.EnumerateArray().FirstOrDefault(sc => 
+                            sc.TryGetProperty("value", out var val) && val.GetString() == subChannel);
+                            
+                        if (subChannelData.ValueKind != JsonValueKind.Undefined && 
+                            subChannelData.TryGetProperty("appUpdateUrl", out var urlProp) && 
+                            urlProp.ValueKind == JsonValueKind.String)
+                        {
+                            meta["appUpdateUrl"] = urlProp.GetString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to process $channel KV for appUpdateUrl in edge-dotnet");
+            }
+        }
+
         var clientData = new Dictionary<string, object?>
         {
             ["platform"] = record.Platform,
@@ -80,7 +125,7 @@ public partial class ClientController : ControllerBase
             ["patchAddress"] = record.PatchAddress,
             ["guestModeAllowed"] = record.ClientStatus == "MAINTENANCE" ? false : record.GuestModeAllowed,
             ["externalClickLink"] = record.ExternalClickLink,
-            ["meta"] = record.CustomPayload ?? new Dictionary<string, object>(),
+            ["meta"] = meta,
         };
 
         if (record.ClientStatus == "MAINTENANCE")

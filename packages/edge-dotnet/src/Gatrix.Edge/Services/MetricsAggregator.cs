@@ -191,8 +191,8 @@ public class MetricsAggregator : IHostedService, IDisposable
                     },
                 })
             };
-            request.Headers.Add("x-api-token", _options.ApiToken);
-            request.Headers.Add("x-application-name", _options.ApplicationName);
+            
+            // Note: x-api-token, x-application-name, x-environment are added by HttpClient defaults
             if (buffer.SdkVersion != null)
                 request.Headers.Add("x-sdk-version", buffer.SdkVersion);
 
@@ -225,8 +225,12 @@ public class MetricsAggregator : IHostedService, IDisposable
                     timestamp = DateTime.UtcNow.ToString("o"),
                 })
             };
-            request.Headers.Add("x-api-token", _options.ApiToken);
-            request.Headers.Add("x-application-name", appName);
+            
+            // Note: x-api-token, x-environment are added by HttpClient defaults
+            // Override application name with the specific one from metrics
+            request.Headers.Remove("X-Application-Name");
+            request.Headers.Add("X-Application-Name", appName);
+            
             if (buffer.SdkVersion != null)
                 request.Headers.Add("x-sdk-version", buffer.SdkVersion);
 
@@ -249,8 +253,12 @@ public class MetricsAggregator : IHostedService, IDisposable
             {
                 Content = JsonContent.Create(new { flagName, count, sdkVersion })
             };
-            request.Headers.Add("x-api-token", _options.ApiToken);
-            request.Headers.Add("x-application-name", appName);
+            
+            // Note: x-api-token, x-environment are added by HttpClient defaults
+            // Override application name with the specific one
+            request.Headers.Remove("X-Application-Name");
+            request.Headers.Add("X-Application-Name", appName);
+            
             if (sdkVersion != null)
                 request.Headers.Add("x-sdk-version", sdkVersion);
 

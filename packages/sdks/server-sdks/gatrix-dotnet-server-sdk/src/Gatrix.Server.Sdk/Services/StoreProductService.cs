@@ -17,7 +17,9 @@ internal class StoreProductByIdResponse
 
 public interface IStoreProductService
 {
+    Task InitializeAsync(string environment, CancellationToken ct = default);
     Task<List<StoreProduct>> FetchAsync(string environment, CancellationToken ct = default);
+    List<StoreProduct> GetCached(string environment);
     List<StoreProduct> GetAll(string environment);
     Task UpdateSingleProductAsync(string id, string environment, bool? isActive = null, CancellationToken ct = default);
     void RemoveProduct(string id, string environment);
@@ -54,7 +56,7 @@ public class StoreProductService : BaseEnvironmentService<StoreProduct, StorePro
             await Task.Delay(100, ct);
 
             var response = await ApiClient.GetAsync<StoreProductByIdResponse>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/store-products/{Uri.EscapeDataString(id)}", ct);
+                $"/api/v1/server/{Uri.EscapeDataString(environment)}/store-products/{Uri.EscapeDataString(id)}", ct: ct);
 
             if (!response.Success || response.Data?.Product is null)
             {

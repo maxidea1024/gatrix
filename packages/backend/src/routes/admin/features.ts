@@ -1046,7 +1046,7 @@ router.post(
           if (!flag) continue;
 
           // Evaluate the flag
-          let evalResult = evaluateFlagWithDetails(
+          const evalResult = evaluateFlagWithDetails(
             flag,
             context || {},
             segmentsMap,

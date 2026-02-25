@@ -300,6 +300,11 @@ export const SERVER_SDK_ETAG = {
    * Feature flags for server SDK
    */
   FEATURE_FLAGS: 'server_sdk:etag:feature_flags',
+
+  /**
+   * Vars (KV) for server SDK
+   */
+  VARS: 'server_sdk:etag:vars',
 } as const;
 
 /**
@@ -573,4 +578,9 @@ export const DEFAULT_CONFIG = {
    * 스토어 상품 TTL (Server SDK용)
    */
   STORE_PRODUCT_TTL: TTL.FIVE_MINUTES,
+
+  /**
+   * Vars (KV) TTL for server SDK
+   */
+  VARS_TTL: TTL.FIVE_MINUTES,
 } as const;

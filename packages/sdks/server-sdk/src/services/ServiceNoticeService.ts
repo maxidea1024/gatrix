@@ -192,10 +192,6 @@ export class ServiceNoticeService {
       );
     }
     this.logger.info('Refreshing service notices cache', { environment });
-    // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache(
-      `/api/v1/server/${encodeURIComponent(environment)}/service-notices`
-    );
     return await this.listByEnvironment(environment);
   }
 
