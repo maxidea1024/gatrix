@@ -16,6 +16,7 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Misc/Guid.h"
+#include "Misc/SecureHash.h"
 #include "TimerManager.h"
 
 const FString UGatrixFeaturesClient::StorageKeyFlags = TEXT("gatrix_flags");
@@ -408,10 +409,15 @@ void UGatrixFeaturesClient::SyncFlags(bool bFetchNow,
   {
     FScopeLock Lock(&FlagsCriticalSection);
     TMap<FString, FGatrixEvaluatedFlag> OldFlags = SynchronizedFlags;
+    FString OldHash = FlagsContextHash;
+    FString NewHash = LastContextHash;
+
     SynchronizedFlags = RealtimeFlags;
+    FlagsContextHash = NewHash;
+
     EmitFlagChanges(OldFlags, SynchronizedFlags);
     InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, SynchronizedFlags,
-                         /*bForceRealtime=*/false);
+                         /*bForceRealtime=*/false, OldHash, NewHash);
   }
 
   SyncFlagsCount.Increment();
@@ -481,6 +487,7 @@ void UGatrixFeaturesClient::FetchFlags(TFunction<void(bool, const FString&)> OnC
 
 void UGatrixFeaturesClient::DoFetchFlags() {
   FetchFlagsCount.Increment();
+  LastContextHash = ComputeContextHash(ClientConfig.Features.Context);
 
   FString Url = BuildFetchUrl();
   bool bUsePOST = ClientConfig.Features.bUsePOSTRequests;
@@ -493,6 +500,7 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
   HttpRequest->SetHeader(TEXT("X-Environment"), ClientConfig.Environment);
   HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
+  HttpRequest->SetHeader(TEXT("X-Gatrix-Context-Hash"), LastContextHash);
   HttpRequest->SetHeader(
       TEXT("X-SDK-Version"),
       FString::Printf(TEXT("%s/%s"), *UGatrixClient::SdkName, *UGatrixClient::SdkVersion));
@@ -759,11 +767,14 @@ void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFl
   {
     FScopeLock Lock(&FlagsCriticalSection);
     OldFlags = RealtimeFlags;
+    FString OldHash = FlagsContextHash;
+    FString NewHash = LastContextHash;
 
     RealtimeFlags.Empty();
     for (const auto& Flag : NewFlags) {
       RealtimeFlags.Add(Flag.Name, Flag);
     }
+    FlagsContextHash = NewHash;
 
     // In non-explicit-sync mode, also update synchronized flags
     if (!ClientConfig.Features.bExplicitSyncMode) {
@@ -774,6 +785,22 @@ void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFl
       if (!bWasPending && EventEmitter) {
         EventEmitter->Emit(GatrixEvents::FlagsPendingSync);
       }
+    }
+
+    // Always invoke realtime flag changes (events) and watch callbacks
+    EmitFlagChanges(OldFlags, RealtimeFlags);
+    InvokeWatchCallbacks(WatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/true, OldHash,
+                         NewHash);
+
+    if (!ClientConfig.Features.bExplicitSyncMode) {
+      // In non-explicit mode, also invoke synced callbacks and global change events
+      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/false,
+                           OldHash, NewHash);
+
+      if (EventEmitter) {
+        EventEmitter->Emit(GatrixEvents::FlagsChange);
+      }
+      OnChange.Broadcast();
     }
   }
 
@@ -794,23 +821,9 @@ void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFl
         UE_LOG(
             LogGatrix, Log,
             TEXT("StoreFlags: CHANGED '%s' version %lld->%lld, enabled %d->%d, value '%s'->'%s'"),
-            *Pair.Key, Old->Version, Pair.Value.Version, (int)Old->bEnabled,
+            *Pair.Key, Old->Version, (int64)Pair.Value.Version, (int)Old->bEnabled,
             (int)Pair.Value.bEnabled, *Old->Variant.Value, *Pair.Value.Variant.Value);
       }
-    }
-
-    // Always invoke realtime flag changes (events) and watch callbacks
-    EmitFlagChanges(OldFlags, RealtimeFlags);
-    InvokeWatchCallbacks(WatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/true);
-
-    if (!ClientConfig.Features.bExplicitSyncMode) {
-      // In non-explicit mode, also invoke synced callbacks and global change events
-      InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/false);
-
-      if (EventEmitter) {
-        EventEmitter->Emit(GatrixEvents::FlagsChange);
-      }
-      OnChange.Broadcast();
     }
   }
 }
@@ -1120,11 +1133,31 @@ FGatrixEvaluatedFlag UGatrixFeaturesClient::GetRawFlagInternal(const FString& Fl
 void UGatrixFeaturesClient::InvokeWatchCallbacks(
     const TArray<FWatchCallbackEntry>& CallbackList,
     const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
-    const TMap<FString, FGatrixEvaluatedFlag>& NewFlags, bool bForceRealtime) {
+    const TMap<FString, FGatrixEvaluatedFlag>& NewFlags, bool bForceRealtime,
+    const FString& OldContextHash, const FString& NewContextHash) {
   // Check for changed/new flags
   for (const auto& Pair : NewFlags) {
+    const FGatrixEvaluatedFlag& NewFlag = Pair.Value;
     const FGatrixEvaluatedFlag* OldFlag = OldFlags.Find(Pair.Key);
-    if (!OldFlag || OldFlag->Version != Pair.Value.Version) {
+
+    bool bIsSame = false;
+    if (OldFlag) {
+      // Fast path: same context and version means same outcome
+      if (!OldContextHash.IsEmpty() && !NewContextHash.IsEmpty() &&
+          OldContextHash == NewContextHash && OldFlag->Version == NewFlag.Version) {
+        bIsSame = true;
+      } else {
+        // Detailed comparison
+        if (OldFlag->bEnabled == NewFlag.bEnabled &&
+            OldFlag->Variant.Name == NewFlag.Variant.Name &&
+            OldFlag->Variant.bEnabled == NewFlag.Variant.bEnabled &&
+            OldFlag->Variant.Value == NewFlag.Variant.Value) {
+          bIsSame = true;
+        }
+      }
+    }
+
+    if (!bIsSame) {
       // Invoke watch callbacks for this flag
       for (const auto& Entry : CallbackList) {
         UE_LOG(LogGatrix, Verbose,

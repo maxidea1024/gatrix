@@ -25,7 +25,7 @@ import { fetchEventSource, EventStreamContentType } from '@microsoft/fetch-event
 import { type StorageProvider } from './StorageProvider';
 import { LocalStorageProvider } from './LocalStorageProvider';
 import { InMemoryStorageProvider } from './InMemoryStorageProvider';
-import { uuidv4, resolveAbortController, deepClone, computeContextHash } from './utils';
+import { uuidv4, resolveAbortController, deepClone, computeContextHash, isEqualFlag } from './utils';
 import { FlagProxy } from './FlagProxy';
 import { type VariationProvider } from './VariationProvider';
 import { WatchFlagGroup } from './WatchFlagGroup';
@@ -91,6 +91,7 @@ export class FeaturesClient implements VariationProvider {
   // Metrics
   private metrics: Metrics;
   private lastContextHash: string = '';
+  private flagsContextHash: string = '';
 
   // Statistics tracking
   private fetchFlagsCount: number = 0;
@@ -269,6 +270,9 @@ export class FeaturesClient implements VariationProvider {
       this.metrics.start();
       return;
     }
+
+    // Ensure context hash is computed before first fetch
+    this.lastContextHash = await computeContextHash(this.context);
 
     // Initial fetch (scheduleNextRefresh is called inside fetchFlags on completion)
     await this.fetchFlagsInternal('init');
@@ -1194,7 +1198,7 @@ export class FeaturesClient implements VariationProvider {
         this.pollingStopped = true;
         this.logger.error(
           `Polling stopped due to non-retryable status code ${response.status}. ` +
-            'Call fetchFlags() manually to retry.'
+          'Call fetchFlags() manually to retry.'
         );
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
           status: response.status,
@@ -1362,16 +1366,34 @@ export class FeaturesClient implements VariationProvider {
    */
   private async storeFlags(flags: EvaluatedFlag[], forceSync: boolean = false): Promise<void> {
     const oldFlags = new Map(this.realtimeFlags);
+    const oldContextHash = this.flagsContextHash;
+    const newContextHash = this.lastContextHash;
+
     this.setFlags(flags, forceSync);
+    this.flagsContextHash = newContextHash;
     await this.storage.save(STORAGE_KEY_FLAGS, flags);
 
     // Always invoke realtime watch callbacks when flags change from server
-    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
-    this.invokeWatchCallbacks(this.watchCallbacks, oldFlags, this.realtimeFlags, true);
+    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags, oldContextHash, newContextHash);
+    this.invokeWatchCallbacks(
+      this.watchCallbacks,
+      oldFlags,
+      this.realtimeFlags,
+      true,
+      oldContextHash,
+      newContextHash
+    );
 
     // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
     if (!this.featuresConfig.explicitSyncMode || forceSync) {
-      this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldFlags, this.realtimeFlags, false);
+      this.invokeWatchCallbacks(
+        this.syncedWatchCallbacks,
+        oldFlags,
+        this.realtimeFlags,
+        false,
+        oldContextHash,
+        newContextHash
+      );
     }
 
     this.sdkState = 'healthy';
@@ -1420,18 +1442,36 @@ export class FeaturesClient implements VariationProvider {
     requestedKeys: Set<string>
   ): Promise<void> {
     const oldFlags = new Map(this.realtimeFlags);
+    const oldContextHash = this.flagsContextHash;
+    const newContextHash = this.lastContextHash;
+
     this.mergeFlags(flags, requestedKeys);
+    this.flagsContextHash = newContextHash;
 
     // Persist the full merged flag set
     const allFlags = Array.from(this.realtimeFlags.values());
     await this.storage.save(STORAGE_KEY_FLAGS, allFlags);
 
     // Emit change events
-    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags);
-    this.invokeWatchCallbacks(this.watchCallbacks, oldFlags, this.realtimeFlags, true);
+    this.emitRealtimeFlagChanges(oldFlags, this.realtimeFlags, oldContextHash, newContextHash);
+    this.invokeWatchCallbacks(
+      this.watchCallbacks,
+      oldFlags,
+      this.realtimeFlags,
+      true,
+      oldContextHash,
+      newContextHash
+    );
 
     if (!this.featuresConfig.explicitSyncMode) {
-      this.invokeWatchCallbacks(this.syncedWatchCallbacks, oldFlags, this.realtimeFlags, false);
+      this.invokeWatchCallbacks(
+        this.syncedWatchCallbacks,
+        oldFlags,
+        this.realtimeFlags,
+        false,
+        oldContextHash,
+        newContextHash
+      );
     }
 
     this.sdkState = 'healthy';
@@ -1448,16 +1488,18 @@ export class FeaturesClient implements VariationProvider {
    */
   private emitRealtimeFlagChanges(
     oldFlags: Map<string, EvaluatedFlag>,
-    newFlags: Map<string, EvaluatedFlag>
+    newFlags: Map<string, EvaluatedFlag>,
+    oldContextHash?: string,
+    newContextHash?: string
   ): void {
     // Skip tracking on initial load (oldFlags is empty)
     const isInitialLoad = oldFlags.size === 0;
     const now = new Date();
 
-    // Check for changed/new flags (compare by version)
+    // Check for changed/new flags (compare by value, not version)
     for (const [name, newFlag] of newFlags) {
       const oldFlag = oldFlags.get(name);
-      if (!oldFlag || oldFlag.version !== newFlag.version) {
+      if (!oldFlag || !isEqualFlag(oldFlag, newFlag, oldContextHash, newContextHash)) {
         const changeType = oldFlag ? 'updated' : 'created';
         // Only record change time for actual changes, not initial load
         if (!isInitialLoad) {
@@ -1488,14 +1530,16 @@ export class FeaturesClient implements VariationProvider {
     callbackMap: Map<string, Set<(flag: FlagProxy) => void | Promise<void>>>,
     oldFlags: Map<string, EvaluatedFlag>,
     newFlags: Map<string, EvaluatedFlag>,
-    forceRealtime: boolean
+    forceRealtime: boolean,
+    oldContextHash?: string,
+    newContextHash?: string
   ): void {
     const now = new Date();
 
-    // Check for changed/new flags (compare by version)
+    // Check for changed/new flags (compare by value, not version)
     for (const [name, newFlag] of newFlags) {
       const oldFlag = oldFlags.get(name);
-      if (!oldFlag || oldFlag.version !== newFlag.version) {
+      if (!oldFlag || !isEqualFlag(oldFlag, newFlag, oldContextHash, newContextHash)) {
         this.flagLastChangedTimes.set(name, now);
 
         const callbacks = callbackMap.get(name);
@@ -1603,6 +1647,7 @@ export class FeaturesClient implements VariationProvider {
       'X-Environment': this.config.environment,
       'X-Connection-Id': this.connectionId,
       'X-SDK-Version': `${SDK_NAME}/${SDK_VERSION}`,
+      'X-Gatrix-Context-Hash': this.lastContextHash,
       ...this.config.customHeaders,
     };
   }
@@ -1723,7 +1768,7 @@ export class FeaturesClient implements VariationProvider {
               const data = JSON.parse(event.data) as FlagsChangedEvent;
               this.devLog(
                 `Streaming 'flags_changed': globalRevision=${data.globalRevision}, ` +
-                  `changedKeys=[${data.changedKeys.join(',')}]`
+                `changedKeys=[${data.changedKeys.join(',')}]`
               );
 
               // Only process if server revision is ahead
@@ -1875,7 +1920,7 @@ export class FeaturesClient implements VariationProvider {
             };
             this.devLog(
               `WS 'flags_changed': globalRevision=${data.globalRevision}, ` +
-                `changedKeys=[${data.changedKeys.join(',')}]`
+              `changedKeys=[${data.changedKeys.join(',')}]`
             );
 
             if (data.globalRevision > this.localGlobalRevision) {

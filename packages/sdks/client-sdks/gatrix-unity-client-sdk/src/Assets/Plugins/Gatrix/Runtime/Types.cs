@@ -14,13 +14,17 @@ namespace Gatrix.Unity.SDK
     {
         /// <summary>Application name (system field - cannot be removed)</summary>
         public string AppName { get; set; }
-
         /// <summary>Environment name (system field - cannot be removed)</summary>
         public string Environment { get; set; }
 
+        /// <summary>User ID (optional)</summary>
         public string UserId { get; set; }
+        /// <summary>Session ID (optional)</summary>
         public string SessionId { get; set; }
+        /// <summary>Current time (optional)</summary>
         public string CurrentTime { get; set; }
+
+        /// <summary>Custom properties (optional)</summary>
         public Dictionary<string, object> Properties { get; set; }
 
         public GatrixContext Clone()
@@ -79,6 +83,26 @@ namespace Gatrix.Unity.SDK
         public int Version { get; set; }
         public string Reason { get; set; }
         public bool ImpressionData { get; set; }
+
+        /// <summary>
+        /// Optimized comparison for flag changes.
+        /// </summary>
+        public bool IsSameValue(EvaluatedFlag other, string oldContextHash, string newContextHash)
+        {
+            if (other == null) return false;
+            // Fast path: same context and version means same evaluation result.
+            if (oldContextHash == newContextHash && Version == other.Version) return true;
+
+            if (Enabled != other.Enabled) return false;
+            if (Variant.Name != other.Variant.Name) return false;
+            if (Variant.Enabled != other.Variant.Enabled) return false;
+
+            if (ValueType == ValueType.Json)
+            {
+                return GatrixJson.Serialize(Variant.Value) == GatrixJson.Serialize(other.Variant.Value);
+            }
+            return object.Equals(Variant.Value, other.Variant.Value);
+        }
     }
 
     /// <summary>
@@ -125,14 +149,26 @@ namespace Gatrix.Unity.SDK
     /// </summary>
     public class FeaturesConfig
     {
+        /// <summary>Start in offline mode (no network requests, use cached/bootstrap flags)</summary>
+        public bool OfflineMode { get; set; }
+
+        /// <summary>Initial context</summary>
+        public GatrixContext Context { get; set; }
+
+        /// <summary>Custom storage provider</summary>
+        public IStorageProvider StorageProvider { get; set; }
+
         /// <summary>Seconds between polls (default: 30)</summary>
-        public int RefreshInterval { get; set; } = 30;
+        public float RefreshInterval { get; set; } = 30;
 
         /// <summary>Disable automatic polling</summary>
         public bool DisableRefresh { get; set; }
 
         /// <summary>Enable explicit sync mode (default: true)</summary>
         public bool ExplicitSyncMode { get; set; } = true;
+
+        /// <summary>Cache key prefix for storage keys (default: "gatrix_cache")</summary>
+        public string CacheKeyPrefix { get; set; } = "gatrix_cache";
 
         /// <summary>Initial flags for instant availability</summary>
         public List<EvaluatedFlag> Bootstrap { get; set; }
@@ -150,25 +186,25 @@ namespace Gatrix.Unity.SDK
         public bool DisableStats { get; set; }
 
         /// <summary>Initial delay before first metrics send in seconds (default: 2)</summary>
-        public int MetricsIntervalInitial { get; set; } = 2;
+        public float MetricsIntervalInitial { get; set; } = 2;
 
         /// <summary>Metrics send interval in seconds (default: 60)</summary>
-        public int MetricsInterval { get; set; } = 60;
+        public float MetricsInterval { get; set; } = 60;
 
         /// <summary>Retry limit for fetch requests (default: 3)</summary>
         public int FetchRetryLimit { get; set; } = 3;
 
         /// <summary>Request timeout in seconds (default: 30)</summary>
-        public int FetchTimeout { get; set; } = 30;
+        public float FetchTimeout { get; set; } = 30;
 
         /// <summary>HTTP status codes that should stop polling entirely (default: 401, 403)</summary>
-        public int[] NonRetryableStatusCodes { get; set; } = new int[] { 401, 403 };
+        public int[] NonRetryableStatusCodes { get; set; } = [401, 403];
 
         /// <summary>Initial backoff delay in seconds for retries (default: 1)</summary>
-        public int InitialBackoff { get; set; } = 1;
+        public float InitialBackoff { get; set; } = 1;
 
         /// <summary>Maximum backoff delay in seconds for retries (default: 60)</summary>
-        public int MaxBackoff { get; set; } = 60;
+        public float MaxBackoff { get; set; } = 60;
 
         /// <summary>Use POST requests instead of GET for flag fetching (prevents sensitive context fields from appearing in URL)</summary>
         public bool UsePOSTRequests { get; set; }
@@ -213,13 +249,11 @@ namespace Gatrix.Unity.SDK
         public string Url { get; set; }
 
         /// <summary>Reconnect initial delay in seconds (default: 1)</summary>
-        public int ReconnectBase { get; set; } = 1;
-
+        public float ReconnectBase { get; set; } = 1;
         /// <summary>Reconnect max delay in seconds (default: 30)</summary>
-        public int ReconnectMax { get; set; } = 30;
-
+        public float ReconnectMax { get; set; } = 30;
         /// <summary>Polling jitter range in seconds to prevent thundering herd (default: 5)</summary>
-        public int PollingJitter { get; set; } = 5;
+        public float PollingJitter { get; set; } = 5;
     }
 
     /// <summary>
@@ -231,13 +265,11 @@ namespace Gatrix.Unity.SDK
         public string Url { get; set; }
 
         /// <summary>Reconnect initial delay in seconds (default: 1)</summary>
-        public int ReconnectBase { get; set; } = 1;
-
+        public float ReconnectBase { get; set; } = 1;
         /// <summary>Reconnect max delay in seconds (default: 30)</summary>
-        public int ReconnectMax { get; set; } = 30;
-
+        public float ReconnectMax { get; set; } = 30;
         /// <summary>Client-side ping interval in seconds (default: 30)</summary>
-        public int PingInterval { get; set; } = 30;
+        public float PingInterval { get; set; } = 30;
     }
 
     /// <summary>
@@ -261,12 +293,6 @@ namespace Gatrix.Unity.SDK
 
         // ==================== Common Settings ====================
 
-        /// <summary>Initial context</summary>
-        public GatrixContext Context { get; set; }
-
-        /// <summary>Custom storage provider</summary>
-        public IStorageProvider StorageProvider { get; set; }
-
         /// <summary>Custom HTTP headers</summary>
         public Dictionary<string, string> CustomHeaders { get; set; }
 
@@ -275,14 +301,8 @@ namespace Gatrix.Unity.SDK
 
         // ==================== Feature-specific Settings ====================
 
-        /// <summary>Start in offline mode (no network requests, use cached/bootstrap flags)</summary>
-        public bool OfflineMode { get; set; }
-
         /// <summary>Enable dev mode for detailed debug logging (default: false)</summary>
         public bool EnableDevMode { get; set; }
-
-        /// <summary>Cache key prefix for storage keys (default: "gatrix_cache")</summary>
-        public string CacheKeyPrefix { get; set; } = "gatrix_cache";
 
         /// <summary>Feature flags configuration</summary>
         public FeaturesConfig Features { get; set; }
@@ -474,14 +494,15 @@ namespace Gatrix.Unity.SDK
         public static ValueType Parse(string value)
         {
             if (string.IsNullOrEmpty(value)) return ValueType.None;
-            switch (value.ToLowerInvariant())
+            return value.ToLowerInvariant() switch
             {
-                case "string": return ValueType.String;
-                case "number": return ValueType.Number;
-                case "boolean": return ValueType.Boolean;
-                case "json": return ValueType.Json;
-                default: return ValueType.None;
-            }
+                "string" => ValueType.String,
+                "number" => ValueType.Number,
+                "boolean" => ValueType.Boolean,
+                "json" => ValueType.Json,
+                _ => ValueType.None,
+            };
+
         }
 
         /// <summary>Alias for Parse - converts an API string to ValueType.</summary>
@@ -489,14 +510,15 @@ namespace Gatrix.Unity.SDK
 
         public static string ToApiString(ValueType type)
         {
-            switch (type)
+            return type switch
             {
-                case ValueType.String: return "string";
-                case ValueType.Number: return "number";
-                case ValueType.Boolean: return "boolean";
-                case ValueType.Json: return "json";
-                default: return "none";
-            }
+                ValueType.String => "string",
+                ValueType.Number => "number",
+                ValueType.Boolean => "boolean",
+                ValueType.Json => "json",
+                _ => "none",
+            };
+
         }
     }
 

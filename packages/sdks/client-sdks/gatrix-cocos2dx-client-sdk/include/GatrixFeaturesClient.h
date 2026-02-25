@@ -228,6 +228,7 @@ private:
   int _consecutiveFailures = 0;
   bool _pollingStopped = false;
   std::string _lastContextHash;
+  std::string _flagsContextHash;
 
   // Stats
   GatrixSdkStats _stats;
@@ -268,7 +269,8 @@ private:
   void invokeWatchCallbacks(std::map<std::string, std::vector<WatchCallback>>& callbackMap,
                             const std::map<std::string, EvaluatedFlag>& oldFlags,
                             const std::map<std::string, EvaluatedFlag>& newFlags,
-                            bool forceRealtime);
+                            bool forceRealtime, const std::string& oldContextHash,
+                            const std::string& newContextHash);
   static std::string computeContextHash(const GatrixContext& context);
 
   // Streaming

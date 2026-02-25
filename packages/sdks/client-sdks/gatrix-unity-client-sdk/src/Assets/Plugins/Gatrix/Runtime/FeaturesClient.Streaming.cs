@@ -439,7 +439,7 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         private async UniTask RunWebSocketPingLoopAsync(IGatrixWebSocket ws, CancellationToken ct)
         {
-            var pingIntervalMs = FeaturesConfig.Streaming.WebSocket.PingInterval * 1000;
+            var pingIntervalMs = (int)(FeaturesConfig.Streaming.WebSocket.PingInterval * 1000);
             const string pingMessage = "{\"type\":\"ping\"}";
 
             // Run on thread pool to avoid main thread frame lag
@@ -632,13 +632,13 @@ namespace Gatrix.Unity.SDK
             int baseMs, maxMs;
             if (FeaturesConfig.Streaming.Transport == StreamingTransport.WebSocket)
             {
-                baseMs = FeaturesConfig.Streaming.WebSocket.ReconnectBase * 1000;
-                maxMs = FeaturesConfig.Streaming.WebSocket.ReconnectMax * 1000;
+                baseMs = (int)(FeaturesConfig.Streaming.WebSocket.ReconnectBase * 1000);
+                maxMs = (int)(FeaturesConfig.Streaming.WebSocket.ReconnectMax * 1000);
             }
             else
             {
-                baseMs = FeaturesConfig.Streaming.Sse.ReconnectBase * 1000;
-                maxMs = FeaturesConfig.Streaming.Sse.ReconnectMax * 1000;
+                baseMs = (int)(FeaturesConfig.Streaming.Sse.ReconnectBase * 1000);
+                maxMs = (int)(FeaturesConfig.Streaming.Sse.ReconnectMax * 1000);
             }
 
             // Exponential backoff: base * 2^(attempt-1), capped at max

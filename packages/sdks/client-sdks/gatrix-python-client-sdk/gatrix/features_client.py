@@ -257,6 +257,7 @@ class FeaturesClient:
 
         # Context hash for change detection
         self._last_context_hash: str = ""
+        self._flags_context_hash: str = ""
 
         # Pending completion callbacks
         self._pending_context_callbacks: List[Callable] = []
@@ -854,8 +855,18 @@ class FeaturesClient:
             self.fetch_flags()
         if self._realtime_flags is not None:
             old_flags = dict(self._synchronized_flags)
+            old_hash = self._flags_context_hash
+            new_hash = self._last_context_hash
+            
             self._apply_flags(self._realtime_flags)
-            self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._synchronized_flags, force_realtime=False)
+            self._flags_context_hash = new_hash
+            
+            self._invoke_watch_callbacks(
+                self._synced_watch_callbacks, old_flags, self._synchronized_flags,
+                force_realtime=False,
+                old_context_hash=old_hash,
+                new_context_hash=new_hash
+            )
             self._realtime_flags = None
             self._pending_sync = False
             self._sync_count += 1
@@ -986,6 +997,7 @@ class FeaturesClient:
         if self._offline_mode:
             return
 
+        self._last_context_hash = self._compute_context_hash(self._context)
         self._polling_stopped = False
         self._cancel_poll_timer()
         self._fetch_count += 1
@@ -1030,19 +1042,29 @@ class FeaturesClient:
 
             self._consecutive_failures = 0
 
-            if self._explicit_sync_mode:
-                self._realtime_flags = new_flags
-                if not self._pending_sync:
-                    self._pending_sync = True
-                    self._emitter.emit(EVENTS.FLAGS_PENDING_SYNC)
             else:
                 self._pending_sync = False
                 old_flags = dict(self._synchronized_flags)
+                old_hash = self._flags_context_hash
+                new_hash = self._last_context_hash
+
                 self._apply_flags(new_flags)
+                self._flags_context_hash = new_hash
+
                 # Always invoke realtime callbacks
-                self._invoke_watch_callbacks(self._watch_callbacks, old_flags, self._synchronized_flags, force_realtime=True)
+                self._invoke_watch_callbacks(
+                    self._watch_callbacks, old_flags, self._synchronized_flags,
+                    force_realtime=True,
+                    old_context_hash=old_hash,
+                    new_context_hash=new_hash
+                )
                 # In non-explicit mode, also invoke synced callbacks
-                self._invoke_watch_callbacks(self._synced_watch_callbacks, old_flags, self._synchronized_flags, force_realtime=False)
+                self._invoke_watch_callbacks(
+                    self._synced_watch_callbacks, old_flags, self._synchronized_flags,
+                    force_realtime=False,
+                    old_context_hash=old_hash,
+                    new_context_hash=new_hash
+                )
 
             self._update_count += 1
             self._last_update_time = datetime.now(timezone.utc)
@@ -1193,6 +1215,8 @@ class FeaturesClient:
         old_flags: Dict[str, EvaluatedFlag],
         new_flags: Dict[str, EvaluatedFlag],
         force_realtime: bool = False,
+        old_context_hash: Optional[str] = None,
+        new_context_hash: Optional[str] = None,
     ) -> None:
         """Invoke watch callbacks for changed flags."""
         now = datetime.now(timezone.utc)
@@ -1200,7 +1224,18 @@ class FeaturesClient:
         # Check for changed/new flags
         for name, new_flag in new_flags.items():
             old_flag = old_flags.get(name)
-            if old_flag is None or self._flag_changed(old_flag, new_flag):
+            
+            is_same = False
+            if old_flag is not None:
+                # Fast path: same context and version means same outcome
+                if (old_context_hash and new_context_hash 
+                    and old_context_hash == new_context_hash 
+                    and old_flag.version == new_flag.version):
+                    is_same = True
+                else:
+                    is_same = not self._flag_changed(old_flag, new_flag)
+
+            if not is_same:
                 self._flag_last_changed[name] = now
                 callbacks = callback_map.get(name)
                 if callbacks:
@@ -1368,6 +1403,7 @@ class FeaturesClient:
             "X-Application-Name": self._app_name,
             "X-Connection-Id": self._connection_id,
             "X-SDK-Version": f"{SDK_NAME}/{SDK_VERSION}",
+            "X-Gatrix-Context-Hash": self._last_context_hash,
         }
         if self._custom_headers:
             headers.update(self._custom_headers)

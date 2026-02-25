@@ -49,6 +49,11 @@ export async function respondWithEtagCache<TPayload>(
   const payload = await buildPayload();
   const etag = generateEtag(payload);
 
+  if (clientEtag && clientEtag === etag) {
+    res.status(304).end();
+    return;
+  }
+
   await CacheService.set<EtagCacheEntry<TPayload>>(
     cacheKey,
     { etag, payload },

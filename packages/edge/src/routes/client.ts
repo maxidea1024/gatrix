@@ -95,13 +95,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-        bannersCount +
-        noticesCount +
-        worldsCount +
-        surveysCount +
-        popupNoticesCount +
-        storeProductsCount +
-        whitelistsCount
+      bannersCount +
+      noticesCount +
+      worldsCount +
+      surveysCount +
+      popupNoticesCount +
+      storeProductsCount +
+      whitelistsCount
     );
 }
 
@@ -1263,12 +1263,27 @@ async function performEvaluation(req: Request, res: Response, clientContext: any
 
     // Generate ETag from flags data (hash of stringified flags with versions and variants)
     // We include name, version, enabled state, and variant name for a robust hash
-    const etagSource = flagsArray
-      .map((f: any) => {
-        const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
-        return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
-      })
-      .join('|');
+    // We also include contextHash to ensure evaluation results are pinned to the context
+    let contextHash = req.headers['x-gatrix-context-hash'] as string;
+    if (!contextHash) {
+      const stableContext = Object.keys(context)
+        .sort()
+        .reduce((acc: any, key) => {
+          acc[key] = context[key];
+          return acc;
+        }, {});
+      contextHash = crypto.createHash('md5').update(JSON.stringify(stableContext)).digest('hex');
+    }
+
+    const etagSource =
+      contextHash +
+      '|' +
+      flagsArray
+        .map((f: any) => {
+          const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
+          return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
+        })
+        .join('|');
     const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
 
     // Check If-None-Match header

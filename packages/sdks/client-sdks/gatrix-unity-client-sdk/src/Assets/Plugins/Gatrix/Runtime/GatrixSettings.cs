@@ -105,8 +105,7 @@ namespace Gatrix.Unity.SDK
         [Header("Polling")]
 
         [Tooltip("Seconds between flag refresh polls (1-86400)")]
-        [Range(1, 86400)]
-        [SerializeField] private int _refreshInterval = 30;
+        [SerializeField] private float _refreshInterval = 30;
 
         [Tooltip("Disable automatic polling")]
         [SerializeField] private bool _disableRefresh;
@@ -122,12 +121,10 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private bool _disableMetrics;
 
         [Tooltip("Initial delay before first metrics send in seconds")]
-        [Range(0, 3600)]
-        [SerializeField] private int _metricsIntervalInitial = 2;
+        [SerializeField] private float _metricsIntervalInitial = 2;
 
         [Tooltip("Metrics send interval in seconds")]
-        [Range(1, 86400)]
-        [SerializeField] private int _metricsInterval = 60;
+        [SerializeField] private float _metricsInterval = 60;
 
         // ==================== Network Settings ====================
 
@@ -138,16 +135,13 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private int _fetchRetryLimit = 3;
 
         [Tooltip("Request timeout in seconds (1-120)")]
-        [Range(1, 120)]
-        [SerializeField] private int _fetchTimeout = 30;
+        [SerializeField] private float _fetchTimeout = 30;
 
         [Tooltip("Initial backoff delay in seconds for retries")]
-        [Range(1, 60)]
-        [SerializeField] private int _initialBackoff = 1;
+        [SerializeField] private float _initialBackoff = 1;
 
         [Tooltip("Maximum backoff delay in seconds for retries")]
-        [Range(1, 600)]
-        [SerializeField] private int _maxBackoff = 60;
+        [SerializeField] private float _maxBackoff = 60;
 
         // ==================== Streaming Settings ====================
 
@@ -165,16 +159,13 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private string _sseUrl;
 
         [Tooltip("SSE reconnect initial delay in seconds")]
-        [Range(1, 60)]
-        [SerializeField] private int _sseReconnectBase = 1;
+        [SerializeField] private float _sseReconnectBase = 1;
 
         [Tooltip("SSE reconnect max delay in seconds")]
-        [Range(1, 300)]
-        [SerializeField] private int _sseReconnectMax = 30;
+        [SerializeField] private float _sseReconnectMax = 30;
 
         [Tooltip("SSE polling jitter range in seconds")]
-        [Range(0, 30)]
-        [SerializeField] private int _ssePollingJitter = 5;
+        [SerializeField] private float _ssePollingJitter = 5;
 
         [Header("Streaming - WebSocket")]
 
@@ -182,16 +173,13 @@ namespace Gatrix.Unity.SDK
         [SerializeField] private string _wsUrl;
 
         [Tooltip("WebSocket reconnect initial delay in seconds")]
-        [Range(1, 60)]
-        [SerializeField] private int _wsReconnectBase = 1;
+        [SerializeField] private float _wsReconnectBase = 1;
 
         [Tooltip("WebSocket reconnect max delay in seconds")]
-        [Range(1, 300)]
-        [SerializeField] private int _wsReconnectMax = 30;
+        [SerializeField] private float _wsReconnectMax = 30;
 
         [Tooltip("WebSocket client-side ping interval in seconds")]
-        [Range(5, 300)]
-        [SerializeField] private int _wsPingInterval = 30;
+        [SerializeField] private float _wsPingInterval = 30;
 
         // ==================== Public Properties (Read-Only) ====================
 
@@ -229,7 +217,7 @@ namespace Gatrix.Unity.SDK
         public bool ExplicitSyncMode => _explicitSyncMode;
 
         /// <summary>Refresh interval in seconds</summary>
-        public int RefreshInterval => _refreshInterval;
+        public float RefreshInterval => _refreshInterval;
 
         /// <summary>Disable refresh flag</summary>
         public bool DisableRefresh => _disableRefresh;
@@ -260,12 +248,11 @@ namespace Gatrix.Unity.SDK
                 ApiToken = _apiToken,
                 AppName = _appName,
                 Environment = _environment,
-                OfflineMode = _offlineMode,
-                EnableDevMode = _enableDevMode,
-                CacheKeyPrefix = _cacheKeyPrefix,
-                StorageProvider = new PlayerPrefsStorageProvider(),
                 Features = new FeaturesConfig
                 {
+                    OfflineMode = _offlineMode,
+                    StorageProvider = new PlayerPrefsStorageProvider(),
+                    CacheKeyPrefix = _cacheKeyPrefix,
                     RefreshInterval = _refreshInterval,
                     DisableRefresh = _disableRefresh,
                     ExplicitSyncMode = _explicitSyncMode,
@@ -302,7 +289,7 @@ namespace Gatrix.Unity.SDK
             // Set initial context
             if (!string.IsNullOrEmpty(_userId) || !string.IsNullOrEmpty(_sessionId) || _contextProperties.Count > 0)
             {
-                config.Context = new GatrixContext
+                config.Features.Context = new GatrixContext
                 {
                     UserId = string.IsNullOrEmpty(_userId) ? null : _userId,
                     SessionId = string.IsNullOrEmpty(_sessionId) ? null : _sessionId
@@ -311,7 +298,7 @@ namespace Gatrix.Unity.SDK
                 // Add custom properties
                 if (_contextProperties.Count > 0)
                 {
-                    config.Context.Properties = new Dictionary<string, object>();
+                    config.Features.Context.Properties = new Dictionary<string, object>();
                     foreach (var prop in _contextProperties)
                     {
                         if (string.IsNullOrWhiteSpace(prop.Key)) continue;
@@ -330,7 +317,7 @@ namespace Gatrix.Unity.SDK
                                 value = prop.Value ?? "";
                                 break;
                         }
-                        config.Context.Properties[prop.Key] = value;
+                        config.Features.Context.Properties[prop.Key] = value;
                     }
                 }
             }

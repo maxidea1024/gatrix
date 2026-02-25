@@ -57,6 +57,7 @@ var _scene_tree: SceneTree = null
 
 # Context hash for change detection
 var _last_context_hash: String = ""
+var _flags_context_hash: String = ""
 
 # Pending completion callbacks
 var _pending_context_callbacks: Array[Callable] = []
@@ -640,7 +641,8 @@ func sync_flags(fetch_now := true) -> void:
 	_mutex.unlock()
 
 	# Invoke synced watch callbacks
-	_invoke_watch_callbacks(_synced_watch_handles, old_synced, _synchronized_flags, false)
+	_invoke_watch_callbacks(_synced_watch_handles, old_synced, _synchronized_flags, false, _flags_context_hash, _last_context_hash)
+	_flags_context_hash = _last_context_hash
 
 	_emitter.emit_event(GatrixEvents.FLAGS_SYNC)
 	_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": _synchronized_flags.values() }])
@@ -783,6 +785,8 @@ func _do_fetch_flags() -> void:
 	if _is_fetching:
 		return
 	_is_fetching = true
+	
+	_last_context_hash = _compute_context_hash(_config.features.context)
 	_stats.fetch_flags_count += 1
 	_stats.last_fetch_time = Time.get_unix_time_from_system()
 
@@ -808,6 +812,7 @@ func _do_fetch_flags() -> void:
 		"X-Environment: %s" % _config.environment,
 		"X-Connection-Id: %s" % _connection_id,
 		"X-SDK-Version: %s/%s" % [SDK_NAME, SDK_VERSION],
+		"X-Gatrix-Context-Hash: %s" % _last_context_hash,
 	]
 
 	if _etag != "":
@@ -995,12 +1000,13 @@ func _store_flags(new_flags: Array, is_initial_fetch: bool) -> void:
 
 	# Emit change events
 	if changed and not is_initial_fetch:
-		_emit_flag_changes(old_flags, _realtime_flags)
 		# Always invoke realtime watch callbacks
-		_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags, true)
+		_invoke_watch_callbacks(_watch_handles, old_flags, _realtime_flags, true, _flags_context_hash, _last_context_hash)
+		_flags_context_hash = _last_context_hash
+
 		if not _config.features.explicit_sync_mode:
 			# In non-explicit mode, also invoke synced callbacks
-			_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags, false)
+			_invoke_watch_callbacks(_synced_watch_handles, old_flags, _realtime_flags, false, _flags_context_hash, _last_context_hash)
 			_emitter.emit_event(GatrixEvents.FLAGS_CHANGE, [{ "flags": new_flags }])
 
 
@@ -1049,7 +1055,7 @@ func _emit_flag_changes(old_flags: Dictionary, new_flags: Dictionary) -> void:
 		_emitter.emit_event(GatrixEvents.FLAGS_REMOVED, [removed_names])
 
 
-func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_flags: Dictionary, force_realtime: bool = false) -> void:
+func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_flags: Dictionary, force_realtime: bool = false, old_context_hash := "", new_context_hash := "") -> void:
 	for handle in handles:
 		var watcher = handles[handle]
 		var flag_name: String = watcher.flag_name
@@ -1060,8 +1066,19 @@ func _invoke_watch_callbacks(handles: Dictionary, old_flags: Dictionary, new_fla
 		if new_flag != null and old_flag == null:
 			changed = true
 		elif new_flag != null and old_flag != null:
-			if old_flag.version != new_flag.version:
-				changed = true
+			# Fast path: same context and version means same outcome
+			if old_context_hash != "" and new_context_hash != "" and old_context_hash == new_context_hash and old_flag.version == new_flag.version:
+				changed = false
+			else:
+				# Real implementation:
+				if old_flag.enabled != new_flag.enabled:
+					changed = true
+				elif old_flag.variant.name != new_flag.variant.name:
+					changed = true
+				elif old_flag.variant.enabled != new_flag.variant.enabled:
+					changed = true
+				elif str(old_flag.variant.value) != str(new_flag.variant.value):
+					changed = true
 		elif new_flag == null and old_flag != null:
 			changed = true  # Flag removed
 

@@ -58,6 +58,7 @@ namespace Gatrix.Unity.SDK
         private readonly int _refreshIntervalMs;
         private readonly string _connectionId;
         private string _lastContextHash = "";
+        private string _flagsContextHash = "";
         private int _consecutiveFailures;
         private bool _pollingStopped;
 
@@ -127,13 +128,9 @@ namespace Gatrix.Unity.SDK
                 ApiToken = config.ApiToken,
                 AppName = config.AppName,
                 Environment = config.Environment,
-                Context = config.Context,
-                StorageProvider = config.StorageProvider,
+                EnableDevMode = config.EnableDevMode,
                 CustomHeaders = config.CustomHeaders,
                 Logger = config.Logger,
-                OfflineMode = config.OfflineMode,
-                EnableDevMode = config.EnableDevMode,
-                CacheKeyPrefix = config.CacheKeyPrefix,
                 Features = config.Features
             };
             _httpClient = httpClient;
@@ -144,13 +141,13 @@ namespace Gatrix.Unity.SDK
             _syncContext = SynchronizationContext.Current;
 
             // Initialize storage keys with prefix
-            var prefix = _config.CacheKeyPrefix ?? "gatrix_cache";
+            var prefix = FeaturesConfig.CacheKeyPrefix ?? "gatrix_cache";
             StorageKeyFlags = $"{prefix}_flags";
             StorageKeySession = $"{prefix}_sessionId";
             StorageKeyEtag = $"{prefix}_etag";
 
             // Initialize storage
-            _storage = config.StorageProvider ?? new InMemoryStorageProvider();
+            _storage = FeaturesConfig.StorageProvider ?? new InMemoryStorageProvider();
 
             // Initialize logger
             _logger = config.Logger ?? new UnityGatrixLogger("GatrixFeatureClient");
@@ -158,7 +155,7 @@ namespace Gatrix.Unity.SDK
 
             // Refresh interval
             var featCfg = FeaturesConfig;
-            _refreshIntervalMs = featCfg.DisableRefresh ? 0 : featCfg.RefreshInterval * 1000;
+            _refreshIntervalMs = featCfg.DisableRefresh ? 0 : (int)(featCfg.RefreshInterval * 1000);
 
             // Initial context with system fields
             _context = new GatrixContext
@@ -166,14 +163,14 @@ namespace Gatrix.Unity.SDK
                 AppName = config.AppName,
                 Environment = config.Environment
             };
-            if (config.Context != null)
+            if (featCfg.Context != null)
             {
-                _context.UserId = config.Context.UserId;
-                _context.SessionId = config.Context.SessionId;
-                _context.CurrentTime = config.Context.CurrentTime;
-                if (config.Context.Properties != null)
+                _context.UserId = featCfg.Context.UserId;
+                _context.SessionId = featCfg.Context.SessionId;
+                _context.CurrentTime = featCfg.Context.CurrentTime;
+                if (featCfg.Context.Properties != null)
                 {
-                    _context.Properties = new Dictionary<string, object>(config.Context.Properties);
+                    _context.Properties = new Dictionary<string, object>(featCfg.Context.Properties);
                 }
             }
 
@@ -184,7 +181,7 @@ namespace Gatrix.Unity.SDK
                 config.ApiToken,
                 config.Environment,
                 config.CustomHeaders,
-                featCfg.DisableMetrics || config.OfflineMode,
+                featCfg.DisableMetrics || featCfg.OfflineMode,
                 config.EnableDevMode,
                 _logger,
                 _connectionId,
@@ -264,10 +261,10 @@ namespace Gatrix.Unity.SDK
 
             // --- Start phase (formerly StartAsync) ---
 
-            _devLog.Log($"start() called. offlineMode={_config.OfflineMode}, refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={FeaturesConfig.ExplicitSyncMode}");
+            _devLog.Log($"start() called. offlineMode={featCfg.OfflineMode}, refreshIntervalMs={_refreshIntervalMs}, explicitSyncMode={featCfg.ExplicitSyncMode}");
 
             // Offline mode: use cached/bootstrap flags only
-            if (_config.OfflineMode)
+            if (featCfg.OfflineMode)
             {
                 if (_realtimeFlags.Count == 0)
                 {
@@ -285,6 +282,9 @@ namespace Gatrix.Unity.SDK
                 // No metrics, polling, or streaming in offline mode
                 return;
             }
+
+            // Ensure context hash is computed before first fetch
+            _lastContextHash = ComputeContextHash(_context);
 
             // Initial fetch (ScheduleNextRefresh is called inside FetchFlagsAsync on completion)
             await FetchFlagsAsync();
@@ -345,7 +345,7 @@ namespace Gatrix.Unity.SDK
         private void StartMetrics()
         {
             var featCfg = FeaturesConfig;
-            _metrics.Start(featCfg.MetricsInterval * 1000, featCfg.MetricsIntervalInitial * 1000);
+            _metrics.Start((int)(featCfg.MetricsInterval * 1000), (int)(featCfg.MetricsIntervalInitial * 1000));
         }
 
         private Dictionary<string, EvaluatedFlag> SelectFlags(bool forceRealtime = false)
@@ -365,6 +365,7 @@ namespace Gatrix.Unity.SDK
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
             {
                 _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+                _flagsContextHash = _lastContextHash;
                 _pendingSync = false;
             }
             else
@@ -406,6 +407,7 @@ namespace Gatrix.Unity.SDK
             if (!FeaturesConfig.ExplicitSyncMode)
             {
                 _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+                _flagsContextHash = _lastContextHash;
                 _pendingSync = false;
             }
             else
@@ -478,7 +480,13 @@ namespace Gatrix.Unity.SDK
                 }
             }
 
-            return sb.ToString();
+            var raw = sb.ToString();
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(raw);
+                var hash = md5.ComputeHash(bytes);
+                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            }
         }
 
         private static HttpRequestMessage CloneRequest(HttpRequestMessage original)

@@ -404,9 +404,21 @@ export class ClientController {
         }
       }
 
-      // Default context values from request if not provided
-      if (!context.remoteAddress) context.remoteAddress = ClientController.getClientIp(req);
-      context.environment = environment;
+      // 0. Resolve Context Hash
+      let contextHash = req.headers['x-gatrix-context-hash'] as string;
+      if (!contextHash) {
+        // Compute deterministic hash if not provided by client
+        const keys = Object.keys(context).sort();
+        const stableContext: any = {};
+        for (const key of keys) {
+          stableContext[key] = (context as any)[key];
+        }
+        contextHash = crypto.createHash('md5').update(JSON.stringify(stableContext)).digest('hex');
+      }
+
+      const flagNamesHash = flagNames
+        ? crypto.createHash('md5').update(flagNames.sort().join(',')).digest('hex')
+        : 'all';
 
       // 2. Fetch all flags and segments (with caching)
       // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam
@@ -504,6 +516,22 @@ export class ClientController {
         };
 
         await cacheService.set(definitionsCacheKey, definitions, 5 * 60 * 1000); // 5 minutes cache
+      }
+
+      // Check evaluation cache
+      // We use definitions object properties to build a unique key for this environment's ruleset
+      const definitionsHash = crypto.createHash('md5').update(JSON.stringify(definitions)).digest('hex');
+      const evalCacheKey = `feature_flags:eval_cache:${environment}:${contextHash}:${flagNamesHash}:${definitionsHash}`;
+
+      const cachedResult = await cacheService.get<any>(evalCacheKey);
+      if (cachedResult) {
+        // Verify ETag
+        const requestEtag = req.headers['if-none-match'];
+        if (requestEtag === cachedResult.etag) {
+          return res.status(304).end();
+        }
+        res.set('ETag', cachedResult.etag);
+        return res.json(cachedResult.data);
       }
 
       const flags = definitions?.flags || [];
@@ -694,13 +722,18 @@ export class ClientController {
         .join('|');
       const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
 
-      // Check If-None-Match header
+      // Check If-None-Match header after evaluation (in case cache missed but result is same)
       const requestEtag = req.headers['if-none-match'];
       if (requestEtag === etag) {
         return res.status(304).end();
       }
 
       res.set('ETag', etag);
+
+      // Cache evaluation result for 30 seconds
+      // Using a short TTL since context can be highly dynamic, but covers repeat calls (e.g. 304 checks)
+      await cacheService.set(evalCacheKey, { etag, data: responseData }, 30 * 1000);
+
       res.json(responseData);
     } catch (error) {
       logger.error('Error in evaluateFlags:', error);

@@ -33,6 +33,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 
 // Configure Services
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

@@ -18,7 +18,7 @@ namespace Gatrix.Unity.SDK
         /// <summary>Fetch flags from server</summary>
         public async UniTask FetchFlagsAsync()
         {
-            if (_config.OfflineMode)
+            if (FeaturesConfig.OfflineMode)
             {
                 _logger.Warn("fetchFlags called but client is in offline mode, ignoring");
                 return;
@@ -72,6 +72,10 @@ namespace Gatrix.Unity.SDK
                 request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
                 request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
+                if (!string.IsNullOrEmpty(_lastContextHash))
+                {
+                    request.Headers.TryAddWithoutValidation("X-Gatrix-Context-Hash", _lastContextHash);
+                }
                 if (_config.CustomHeaders != null)
                 {
                     foreach (var kvp in _config.CustomHeaders)
@@ -89,7 +93,7 @@ namespace Gatrix.Unity.SDK
                 // Send request with retry
                 HttpResponseMessage response = null;
                 var retryLimit = FeaturesConfig.FetchRetryLimit;
-                var timeout = FeaturesConfig.FetchTimeout * 1000;
+                var timeout = (int)(FeaturesConfig.FetchTimeout * 1000);
 
                 for (int attempt = 0; attempt <= retryLimit; attempt++)
                 {
@@ -295,8 +299,8 @@ namespace Gatrix.Unity.SDK
             if (_consecutiveFailures > 0)
             {
                 var featCfg = FeaturesConfig;
-                var initialBackoff = featCfg.InitialBackoff * 1000;
-                var maxBackoff = featCfg.MaxBackoff * 1000;
+                var initialBackoff = (int)(featCfg.InitialBackoff * 1000);
+                var maxBackoff = (int)(featCfg.MaxBackoff * 1000);
                 var backoff = (int)Math.Min(
                     initialBackoff * Math.Pow(2, _consecutiveFailures - 1),
                     maxBackoff);
@@ -334,19 +338,22 @@ namespace Gatrix.Unity.SDK
         private async UniTask StoreFlagsAsync(List<EvaluatedFlag> flags, bool forceSync = false)
         {
             var oldFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+            var oldContextHash = _flagsContextHash;
+            var newContextHash = _lastContextHash;
+
             SetFlags(flags, forceSync);
 
             var flagsJson = GatrixJson.SerializeFlags(flags);
             await _storage.SaveAsync(StorageKeyFlags, flagsJson);
 
             // Always invoke realtime watch callbacks when flags change from server
-            EmitRealtimeFlagChanges(oldFlags, _realtimeFlags);
-            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, forceRealtime: true);
+            EmitRealtimeFlagChanges(oldFlags, _realtimeFlags, oldContextHash, newContextHash);
+            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, true, oldContextHash, newContextHash);
 
             // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
             if (!FeaturesConfig.ExplicitSyncMode || forceSync)
             {
-                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, forceRealtime: false);
+                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, false, oldContextHash, newContextHash);
             }
 
             _sdkState = SdkState.Healthy;
@@ -364,7 +371,7 @@ namespace Gatrix.Unity.SDK
         /// </summary>
         private async UniTask FetchPartialFlagsAsync(HashSet<string> flagKeys)
         {
-            if (_config.OfflineMode || flagKeys.Count == 0)
+            if (FeaturesConfig.OfflineMode || flagKeys.Count == 0)
             {
                 return;
             }
@@ -414,6 +421,10 @@ namespace Gatrix.Unity.SDK
                 request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
                 request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
+                if (!string.IsNullOrEmpty(_lastContextHash))
+                {
+                    request.Headers.TryAddWithoutValidation("X-Gatrix-Context-Hash", _lastContextHash);
+                }
                 if (_config.CustomHeaders != null)
                 {
                     foreach (var kvp in _config.CustomHeaders)
@@ -518,6 +529,9 @@ namespace Gatrix.Unity.SDK
         private async UniTask MergePartialFlagsAsync(List<EvaluatedFlag> flags, HashSet<string> requestedKeys)
         {
             var oldFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
+            var oldContextHash = _flagsContextHash;
+            var newContextHash = _lastContextHash;
+
             MergeFlags(flags, requestedKeys);
 
             // Persist the full merged flag set
@@ -530,12 +544,12 @@ namespace Gatrix.Unity.SDK
             await _storage.SaveAsync(StorageKeyFlags, flagsJson);
 
             // Emit change events
-            EmitRealtimeFlagChanges(oldFlags, _realtimeFlags);
-            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, forceRealtime: true);
+            EmitRealtimeFlagChanges(oldFlags, _realtimeFlags, oldContextHash, newContextHash);
+            InvokeWatchCallbacks(_watchCallbacks, oldFlags, _realtimeFlags, true, oldContextHash, newContextHash);
 
             if (!FeaturesConfig.ExplicitSyncMode)
             {
-                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, forceRealtime: false);
+                InvokeWatchCallbacks(_syncedWatchCallbacks, oldFlags, _realtimeFlags, false, oldContextHash, newContextHash);
             }
 
             _sdkState = SdkState.Healthy;

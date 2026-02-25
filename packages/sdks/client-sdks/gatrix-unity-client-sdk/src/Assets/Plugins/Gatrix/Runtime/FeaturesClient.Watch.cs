@@ -104,7 +104,9 @@ namespace Gatrix.Unity.SDK
         /// <summary>Emit per-flag change events and track removed flags.</summary>
         private void EmitRealtimeFlagChanges(
             Dictionary<string, EvaluatedFlag> oldFlags,
-            Dictionary<string, EvaluatedFlag> newFlags)
+            Dictionary<string, EvaluatedFlag> newFlags,
+            string oldContextHash,
+            string newContextHash)
         {
             var isInitialLoad = oldFlags.Count == 0;
             var now = DateTime.UtcNow;
@@ -113,7 +115,7 @@ namespace Gatrix.Unity.SDK
             foreach (var kvp in newFlags)
             {
                 oldFlags.TryGetValue(kvp.Key, out var oldFlag);
-                if (oldFlag == null || oldFlag.Version != kvp.Value.Version)
+                if (oldFlag == null || !oldFlag.IsSameValue(kvp.Value, oldContextHash, newContextHash))
                 {
                     var changeType = oldFlag == null ? "created" : "updated";
                     if (!isInitialLoad)
@@ -146,7 +148,9 @@ namespace Gatrix.Unity.SDK
             Dictionary<string, List<GatrixFlagWatchHandler>> callbackMap,
             Dictionary<string, EvaluatedFlag> oldFlags,
             Dictionary<string, EvaluatedFlag> newFlags,
-            bool forceRealtime)
+            bool forceRealtime,
+            string oldContextHash,
+            string newContextHash)
         {
             var now = DateTime.UtcNow;
 
@@ -154,7 +158,7 @@ namespace Gatrix.Unity.SDK
             foreach (var kvp in newFlags)
             {
                 oldFlags.TryGetValue(kvp.Key, out var oldFlag);
-                if (oldFlag == null || oldFlag.Version != kvp.Value.Version)
+                if (oldFlag == null || !oldFlag.IsSameValue(kvp.Value, oldContextHash, newContextHash))
                 {
                     _flagLastChangedTimes[kvp.Key] = now;
 

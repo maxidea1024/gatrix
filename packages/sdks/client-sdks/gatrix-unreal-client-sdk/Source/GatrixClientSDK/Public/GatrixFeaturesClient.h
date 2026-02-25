@@ -421,7 +421,8 @@ private:
   void InvokeWatchCallbacks(const TArray<FWatchCallbackEntry>& CallbackList,
                             const TMap<FString, FGatrixEvaluatedFlag>& OldFlags,
                             const TMap<FString, FGatrixEvaluatedFlag>& NewFlags,
-                            bool bForceRealtime);
+                            bool bForceRealtime, const FString& OldContextHash,
+                            const FString& NewContextHash);
 
   // Metrics
   void StartMetrics();
@@ -468,6 +469,7 @@ private:
 
   // Context hash for change detection
   FString LastContextHash;
+  FString FlagsContextHash;
   static FString ComputeContextHash(const FGatrixContext& Context);
 
   // Statistics (lock-free via FThreadSafeCounter)

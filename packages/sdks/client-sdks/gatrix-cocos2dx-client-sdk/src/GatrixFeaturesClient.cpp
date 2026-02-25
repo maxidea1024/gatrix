@@ -374,9 +374,14 @@ void FeaturesClient::syncFlags(bool fetchNow,
   }
 
   auto oldSynchronizedFlags = _synchronizedFlags;
+  std::string oldHash = _flagsContextHash;
+  std::string newHash = _lastContextHash;
+
   _synchronizedFlags = _realtimeFlags;
+  _flagsContextHash = newHash;
+
   invokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags, _synchronizedFlags,
-                       /*forceRealtime=*/false);
+                       /*forceRealtime=*/false, oldHash, newHash);
   _pendingSync = false;
   _stats.syncFlagsCount++;
   _emitter.emit(EVENTS::FLAGS_SYNC);
@@ -478,6 +483,7 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
   }
   _emitter.emit(EVENTS::FLAGS_FETCH_START, {_etag});
   _stats.fetchFlagsCount++;
+  _lastContextHash = computeContextHash(_context);
 
   auto request = new HttpRequest();
   request->setUrl((_config.apiUrl + "/evaluate-all").c_str());
@@ -491,6 +497,7 @@ void FeaturesClient::fetchFlags(std::function<void(bool, const std::string&)> on
   headers.push_back("X-Environment: " + _config.environment);
   headers.push_back("X-Connection-Id: " + _connectionId);
   headers.push_back("X-SDK-Version: " + std::string(SDK_NAME) + "/" + std::string(SDK_VERSION));
+  headers.push_back("X-Gatrix-Context-Hash: " + _lastContextHash);
   if (!_etag.empty())
     headers.push_back("If-None-Match: " + _etag);
   for (const auto& [key, val] : _config.customHeaders) {
@@ -682,21 +689,25 @@ void FeaturesClient::onFetchResponse(int statusCode, const std::string& body,
 
   if (changed || _realtimeFlags.size() != newFlags.size()) {
     auto oldRealtimeFlags = _realtimeFlags;
+    std::string oldHash = _flagsContextHash;
+    std::string newHash = _lastContextHash;
+
     _realtimeFlags = newFlags;
+    _flagsContextHash = newHash;
     _stats.updateCount++;
     _stats.lastUpdateTime = "now"; // simplified
     _stats.totalFlagCount = static_cast<int>(_realtimeFlags.size());
 
     // Always invoke realtime watch callbacks
     invokeWatchCallbacks(_watchCallbacks, oldRealtimeFlags, _realtimeFlags,
-                         /*forceRealtime=*/true);
+                         /*forceRealtime=*/true, oldHash, newHash);
 
     if (!_explicitSyncMode) {
       _synchronizedFlags = _realtimeFlags;
       _pendingSync = false;
       // In non-explicit mode, also invoke synced callbacks
       invokeWatchCallbacks(_syncedWatchCallbacks, oldRealtimeFlags, _realtimeFlags,
-                           /*forceRealtime=*/false);
+                           /*forceRealtime=*/false, oldHash, newHash);
       _emitter.emit(EVENTS::FLAGS_CHANGE);
     } else {
       if (!_pendingSync) {
@@ -1100,11 +1111,30 @@ const EvaluatedFlag* FeaturesClient::getRawFlagInternal(const std::string& flagN
 void FeaturesClient::invokeWatchCallbacks(
     std::map<std::string, std::vector<WatchCallback>>& callbackMap,
     const std::map<std::string, EvaluatedFlag>& oldFlags,
-    const std::map<std::string, EvaluatedFlag>& newFlags, bool forceRealtime) {
+    const std::map<std::string, EvaluatedFlag>& newFlags, bool forceRealtime,
+    const std::string& oldContextHash, const std::string& newContextHash) {
   // Check for changed/new flags
   for (const auto& [name, newFlag] : newFlags) {
     auto oldIt = oldFlags.find(name);
-    if (oldIt == oldFlags.end() || oldIt->second.version != newFlag.version) {
+
+    bool isSame = false;
+    if (oldIt != oldFlags.end()) {
+      const auto& oldFlag = oldIt->second;
+      // Fast path: same context and version means same outcome
+      if (!oldContextHash.empty() && !newContextHash.empty() && oldContextHash == newContextHash &&
+          oldFlag.version == newFlag.version) {
+        isSame = true;
+      } else {
+        // Detailed comparison
+        if (oldFlag.enabled == newFlag.enabled && oldFlag.variant.name == newFlag.variant.name &&
+            oldFlag.variant.enabled == newFlag.variant.enabled &&
+            oldFlag.variant.value == newFlag.variant.value) {
+          isSame = true;
+        }
+      }
+    }
+
+    if (!isSame) {
       _stats.flagLastChangedTimes[name] = "now";
 
       auto cbIt = callbackMap.find(name);

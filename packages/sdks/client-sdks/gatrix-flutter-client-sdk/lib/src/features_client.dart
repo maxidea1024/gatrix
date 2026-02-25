@@ -45,6 +45,8 @@ class FeaturesClient implements VariationProvider {
   Timer? _pollTimer;
   Timer? _metricsTimer;
   String? _etag;
+  String _lastContextHash = '';
+  String _flagsContextHash = '';
   bool _started = false;
 
   // Retry/backoff state
@@ -720,11 +722,38 @@ class FeaturesClient implements VariationProvider {
     Map<String, EvaluatedFlag> oldFlags,
     Map<String, EvaluatedFlag> newFlags, {
     required bool forceRealtime,
+    String? oldContextHash,
+    String? newContextHash,
   }) {
     // Changed or new flags
     for (final entry in newFlags.entries) {
       final oldFlag = oldFlags[entry.key];
-      if (oldFlag == null || oldFlag.version != entry.value.version) {
+      final newFlag = entry.value;
+
+      bool isSame = false;
+      if (oldFlag != null) {
+        // Fast path: same context and version means same outcome
+        if (oldContextHash != null &&
+            newContextHash != null &&
+            oldContextHash == newContextHash &&
+            oldFlag.version == newFlag.version) {
+          isSame = true;
+        } else {
+          // Field-by-field comparison
+          if (oldFlag.enabled == newFlag.enabled &&
+              oldFlag.variant.name == newFlag.variant.name &&
+              oldFlag.variant.enabled == newFlag.variant.enabled) {
+            
+            if (newFlag.valueType == ValueType.json) {
+              isSame = jsonEncode(oldFlag.variant.value) == jsonEncode(newFlag.variant.value);
+            } else {
+              isSame = oldFlag.variant.value == newFlag.variant.value;
+            }
+          }
+        }
+      }
+
+      if (!isSame) {
         final callbacks = callbackMap[entry.key];
         if (callbacks != null && callbacks.isNotEmpty) {
           final proxy = _createProxyForWatch(entry.key, forceRealtime: forceRealtime);
@@ -919,7 +948,8 @@ class FeaturesClient implements VariationProvider {
   // ============================================= Fetch Flags
 
   Future<void> fetchFlags() async {
-    _devLog('fetchFlags: starting fetch. etag=$_etag');
+    _lastContextHash = _computeContextHash(_context);
+    _devLog('fetchFlags: starting fetch. etag=$_etag, hash=$_lastContextHash');
     _events.emit(GatrixEvents.flagsFetchStart);
     _fetchCount++;
     _lastFetchTime = DateTime.now();
@@ -988,7 +1018,10 @@ class FeaturesClient implements VariationProvider {
           _invokeWatchCallbacks(
             _watchCallbacks, oldFlags, _realtimeFlags,
             forceRealtime: true,
+            oldContextHash: _flagsContextHash,
+            newContextHash: _lastContextHash,
           );
+          _flagsContextHash = _lastContextHash;
 
           if (!_explicitSyncMode) {
             _synchronizedFlags = Map.from(_realtimeFlags);
@@ -996,6 +1029,8 @@ class FeaturesClient implements VariationProvider {
             _invokeWatchCallbacks(
               _syncedWatchCallbacks, oldFlags, _realtimeFlags,
               forceRealtime: false,
+              oldContextHash: _flagsContextHash,
+              newContextHash: _lastContextHash,
             );
             _events.emit(GatrixEvents.flagsChange);
           } else {
@@ -1090,7 +1125,10 @@ class FeaturesClient implements VariationProvider {
     _invokeWatchCallbacks(
       _syncedWatchCallbacks, oldFlags, _synchronizedFlags,
       forceRealtime: false,
+      oldContextHash: _flagsContextHash,
+      newContextHash: _lastContextHash,
     );
+    _flagsContextHash = _lastContextHash;
     _events.emit(GatrixEvents.flagsSync);
     _events.emit(GatrixEvents.flagsChange);
   }
@@ -1195,11 +1233,23 @@ class FeaturesClient implements VariationProvider {
       'X-Environment': _environment,
       'X-Connection-Id': _connectionId,
       'X-SDK-Version': '${GatrixClient.sdkName}/${GatrixClient.sdkVersion}',
+      'X-Gatrix-Context-Hash': _lastContextHash,
     };
     if (_customHeaders != null) {
       headers.addAll(_customHeaders!);
     }
     return headers;
+  }
+
+  /// Compute hash value for context
+  String _computeContextHash(GatrixContext context) {
+    final Map<String, dynamic> data = context.toJson();
+    final keys = data.keys.toList()..sort();
+    final sortedData = {for (var k in keys) k: data[k]};
+    final json = jsonEncode(sortedData);
+    
+    // Simple stable hash string (or use MD5 if crypto package is ever added)
+    return json; 
   }
 
   /// Allow injecting flags for testing (bootstrap)

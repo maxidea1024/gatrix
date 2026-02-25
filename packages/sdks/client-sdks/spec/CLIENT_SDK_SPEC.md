@@ -1087,6 +1087,30 @@ class FeaturesClient implements VariationProvider {
 }
 ```
 
+## Evaluation & Fetch Optimization
+
+To minimize network traffic and improve evaluation performance, SDKs MUST implement client-side context hashing and version-based change detection.
+
+### Context Hashing
+
+The client-level context hash is a deterministic string derived from the current evaluation context.
+
+1.  **Computation**: Build a stable string by concatenating the sorted fields of the `GatrixContext` (User ID, Session ID, Current Time, and all Properties).
+2.  **Algorithm**: Use a fast, non-cryptographic hash (like MD5 or SHA-256 fallback) to generate a hexadecimal or stable string representation.
+3.  **Header**: The computed hash MUST be sent in the `X-Gatrix-Context-Hash` header for all evaluation requests.
+
+### Change Detection (Fast Path)
+
+When new flags are received (via polling or streaming invalidation), the SDK MUST compare the new flags with the existing cache using an optimized "fast path":
+
+1.  **Fast Path**: If the `contextHash` remains unchanged AND the flag's `version` remains unchanged, the evaluation result is guaranteed to be identical. Skip detailed value comparison.
+2.  **Detailed Comparison**: If the fast path is not met, perform a field-by-field comparison of the enabled state and variant details (name, enabled, and value).
+3.  **Optimization**: Only perform expensive JSON serialization for comparison if the flag's `valueType` is `json` and the fast path fails.
+
+### Change Notification
+
+Invoke `watch` callbacks ONLY when a flag actually changes according to the optimized comparison logic. This prevents UI flickering and redundant re-renders.
+
 ### FlagProxy Class
 
 FlagProxy is a **convenience shell** that delegates all variation logic to `FeaturesClient`.

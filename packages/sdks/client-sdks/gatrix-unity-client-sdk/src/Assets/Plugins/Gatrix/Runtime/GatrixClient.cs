@@ -148,7 +148,7 @@ namespace Gatrix.Unity.SDK
                 ErrorCount = featStats.ErrorCount,
                 LastError = featStats.LastError,
                 LastErrorTime = featStats.LastErrorTime,
-                OfflineMode = _config.OfflineMode,
+                OfflineMode = _config.Features?.OfflineMode ?? false,
                 Features = featStats,
                 EventHandlerStats = _emitter.GetHandlerStats()
             };
@@ -287,7 +287,7 @@ namespace Gatrix.Unity.SDK
             }
         }
 
-        private static void ValidateRange(int value, string name, int min, int max)
+        private static void ValidateRange(float value, string name, float min, float max)
         {
             if (value < min || value > max)
                 throw new ArgumentException(

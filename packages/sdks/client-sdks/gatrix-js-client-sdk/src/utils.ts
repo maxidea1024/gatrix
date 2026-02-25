@@ -130,3 +130,36 @@ export async function computeContextHash(context: Record<string, any>): Promise<
     return value;
   }
 }
+/**
+ * Deep compare two evaluated flags to detect actual value changes.
+ * Optimized to use ContextHash and Version to avoid unnecessary serialization.
+ */
+export function isEqualFlag(
+  a: any,
+  b: any,
+  oldContextHash?: string,
+  newContextHash?: string
+): boolean {
+  if (!a || !b) {
+    return a === b;
+  }
+
+  // Fast path: same context and same version means same outcome
+  if (oldContextHash && newContextHash && oldContextHash === newContextHash &&
+    a.version === b.version) {
+    return true;
+  }
+
+  if (a.enabled !== b.enabled ||
+    a.variant.name !== b.variant.name ||
+    a.variant.enabled !== b.variant.enabled) {
+    return false;
+  }
+
+  if (a.valueType !== 'json') {
+    return a.variant.value === b.variant.value;
+  }
+
+  // Fallback to JSON comparison for complex objects if version/context changed
+  return JSON.stringify(a.variant.value) === JSON.stringify(b.variant.value);
+}
