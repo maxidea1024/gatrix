@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/index.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
