@@ -680,7 +680,13 @@ export class ClientController {
 
       // Generate ETag from flags data (hash of stringified flags with versions and variants)
       // We include name, version, enabled state, and variant name for consistency with Edge
-      const etagSource = flagsArray
+
+      let contextHash = req.headers['x-gatrix-context-hash'] as string;
+      if (!contextHash) {
+        contextHash = crypto.createHash('md5').update(JSON.stringify(context)).digest('hex');
+      }
+
+      const etagSource = contextHash + '|' + flagsArray
         .map((f: any) => {
           const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
           return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;

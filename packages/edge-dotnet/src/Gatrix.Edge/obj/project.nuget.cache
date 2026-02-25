@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dl5OOgtUy5c=",
+  "dgSpecHash": "BMMP3iA+CE8=",
   "success": true,
   "projectFilePath": "C:\\work\\uwo\\gatrix\\packages\\edge-dotnet\\src\\Gatrix.Edge\\Gatrix.Edge.csproj",
   "expectedPackageFiles": [
@@ -21,6 +21,7 @@
     "C:\\Users\\jhseo\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "C:\\Users\\jhseo\\.nuget\\packages\\murmurhash\\1.0.3\\murmurhash.1.0.3.nupkg.sha512",
     "C:\\Users\\jhseo\\.nuget\\packages\\pipelines.sockets.unofficial\\2.2.8\\pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "C:\\Users\\jhseo\\.nuget\\packages\\semver\\3.0.0\\semver.3.0.0.nupkg.sha512",
     "C:\\Users\\jhseo\\.nuget\\packages\\stackexchange.redis\\2.8.16\\stackexchange.redis.2.8.16.nupkg.sha512",
     "C:\\Users\\jhseo\\.nuget\\packages\\system.io.pipelines\\5.0.1\\system.io.pipelines.5.0.1.nupkg.sha512",
     "C:\\Users\\jhseo\\.nuget\\packages\\system.text.json\\8.0.5\\system.text.json.8.0.5.nupkg.sha512"

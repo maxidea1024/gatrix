@@ -45,3 +45,4 @@ C:\work\uwo\gatrix\packages\edge-dotnet\src\Gatrix.Edge\obj\Debug\net8.0\refint\
 C:\work\uwo\gatrix\packages\edge-dotnet\src\Gatrix.Edge\obj\Debug\net8.0\Gatrix.Edge.pdb
 C:\work\uwo\gatrix\packages\edge-dotnet\src\Gatrix.Edge\obj\Debug\net8.0\Gatrix.Edge.genruntimeconfig.cache
 C:\work\uwo\gatrix\packages\edge-dotnet\src\Gatrix.Edge\obj\Debug\net8.0\ref\Gatrix.Edge.dll
+C:\work\uwo\gatrix\packages\edge-dotnet\src\Gatrix.Edge\bin\Debug\net8.0\Semver.dll

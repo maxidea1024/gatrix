@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Gatrix.Server.Sdk.Models;
+using Semver;
 
 namespace Gatrix.Server.Sdk.Evaluation;
 
@@ -27,38 +28,41 @@ public class FeatureFlagEvaluator
 
         if (flag.IsEnabled)
         {
-            var activeStrategies = flag.Strategies.Where(s => s.IsEnabled).ToList();
-
-            if (activeStrategies.Count > 0)
+            bool hasActiveStrategies = false;
+            foreach (var strategy in flag.Strategies)
             {
-                foreach (var strategy in activeStrategies)
+                if (!strategy.IsEnabled) continue;
+                
+                hasActiveStrategies = true;
+                if (EvaluateStrategy(strategy, context, flag, segmentsMap))
                 {
-                    if (EvaluateStrategy(strategy, context, flag, segmentsMap))
+                    var variantData = SelectVariant(flag, context, strategy);
+                    var defaultEnabledName = flag.ValueSource == "environment"
+                        ? VariantSource.EnvDefaultEnabled
+                        : VariantSource.FlagDefaultEnabled;
+
+                    var variant = new Variant
                     {
-                        var variantData = SelectVariant(flag, context, strategy);
-                        var defaultEnabledName = flag.ValueSource == "environment"
-                            ? VariantSource.EnvDefaultEnabled
-                            : VariantSource.FlagDefaultEnabled;
+                        Name = variantData?.Name ?? defaultEnabledName,
+                        Weight = variantData?.Weight ?? 100,
+                        Value = GetFallbackValue(variantData?.Value ?? flag.EnabledValue, flag.ValueType),
+                        ValueType = flag.ValueType ?? "string",
+                        Enabled = true,
+                    };
 
-                        var variant = new Variant
-                        {
-                            Name = variantData?.Name ?? defaultEnabledName,
-                            Weight = variantData?.Weight ?? 100,
-                            Value = GetFallbackValue(variantData?.Value ?? flag.EnabledValue, flag.ValueType),
-                            ValueType = flag.ValueType ?? "string",
-                            Enabled = true,
-                        };
-
-                        return new EvaluationResult
-                        {
-                            Id = flag.Id,
-                            FlagName = flag.Name,
-                            Enabled = true,
-                            Reason = EvaluationReasons.StrategyMatch,
-                            Variant = variant,
-                        };
-                    }
+                    return new EvaluationResult
+                    {
+                        Id = flag.Id,
+                        FlagName = flag.Name,
+                        Enabled = true,
+                        Reason = EvaluationReasons.StrategyMatch,
+                        Variant = variant,
+                    };
                 }
+            }
+
+            if (hasActiveStrategies)
+            {
                 // Strategies exist but none matched
                 reason = EvaluationReasons.Default;
             }
@@ -132,17 +136,27 @@ public class FeatureFlagEvaluator
 
                 if (segment.Constraints.Count > 0)
                 {
-                    var segmentPass = segment.Constraints.All(c => EvaluateConstraint(c, context));
+                    bool segmentPass = true;
+                    foreach (var constraint in segment.Constraints)
+                    {
+                        if (!EvaluateConstraint(constraint, context))
+                        {
+                            segmentPass = false;
+                            break;
+                        }
+                    }
                     if (!segmentPass) return false;
                 }
             }
         }
 
-        // 2. Check strategy constraints
         if (strategy.Constraints is { Count: > 0 })
         {
-            var allConstraintsPass = strategy.Constraints.All(c => EvaluateConstraint(c, context));
-            if (!allConstraintsPass) return false;
+            foreach (var constraint in strategy.Constraints)
+            {
+                if (!EvaluateConstraint(constraint, context))
+                    return false;
+            }
         }
 
         // 3. Check rollout percentage
@@ -192,51 +206,44 @@ public class FeatureFlagEvaluator
         // Array operators
         if (constraint.Operator is "arr_any" or "arr_all")
         {
-            var arr = contextValue switch
+            IEnumerable<string> arr = contextValue switch
             {
                 JsonElement je when je.ValueKind == JsonValueKind.Array =>
-                    je.EnumerateArray().Select(e => e.GetString() ?? "").ToList(),
-                IEnumerable<object> enumerable => enumerable.Select(o => o?.ToString() ?? "").ToList(),
-                _ => new List<string>(),
+                    je.EnumerateArray().Select(e => e.GetString() ?? ""),
+                IEnumerable<object> enumerable => enumerable.Select(o => o?.ToString() ?? ""),
+                _ => Array.Empty<string>(),
             };
 
-            var targetValues = constraint.Values?
-                .Select(v => constraint.CaseInsensitive ? v.ToLowerInvariant() : v)
-                .ToList() ?? [];
-            var compareArr = constraint.CaseInsensitive
-                ? arr.Select(v => v.ToLowerInvariant()).ToList()
-                : arr;
+            IEnumerable<string> targetValues = constraint.Values ?? (IEnumerable<string>)Array.Empty<string>();
+            var comparer = constraint.CaseInsensitive ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
             bool result;
             if (constraint.Operator == "arr_any")
             {
-                result = targetValues.Any(tv => compareArr.Contains(tv));
+                result = targetValues.Any(tv => arr.Contains(tv, comparer));
             }
             else // arr_all
             {
-                result = targetValues.Count > 0 && targetValues.All(tv => compareArr.Contains(tv));
+                result = targetValues.Any() && targetValues.All(tv => arr.Contains(tv, comparer));
             }
             return constraint.Inverted ? !result : result;
         }
 
-        var stringValue = ObjectToString(contextValue);
-        var compareValue = constraint.CaseInsensitive ? stringValue.ToLowerInvariant() : stringValue;
-        var targetValue = constraint.Value is not null
-            ? (constraint.CaseInsensitive ? constraint.Value.ToLowerInvariant() : constraint.Value)
-            : "";
-        var targetVals = constraint.Values?
-            .Select(v => constraint.CaseInsensitive ? v.ToLowerInvariant() : v)
-            .ToList() ?? [];
+        string GetStringValue() => ObjectToString(contextValue);
+        var targetValue = constraint.Value ?? "";
+        IEnumerable<string> targetVals = constraint.Values ?? (IEnumerable<string>)Array.Empty<string>();
+        var comparison = constraint.CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        var stringComparer = constraint.CaseInsensitive ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         bool evalResult = constraint.Operator switch
         {
             // String
-            "str_eq" => compareValue == targetValue,
-            "str_contains" => compareValue.Contains(targetValue),
-            "str_starts_with" => compareValue.StartsWith(targetValue),
-            "str_ends_with" => compareValue.EndsWith(targetValue),
-            "str_in" => targetVals.Contains(compareValue),
-            "str_regex" => EvalRegex(stringValue, constraint.Value, constraint.CaseInsensitive),
+            "str_eq" => string.Equals(GetStringValue(), targetValue, comparison),
+            "str_contains" => GetStringValue().Contains(targetValue, comparison),
+            "str_starts_with" => GetStringValue().StartsWith(targetValue, comparison),
+            "str_ends_with" => GetStringValue().EndsWith(targetValue, comparison),
+            "str_in" => targetVals.Contains(GetStringValue(), stringComparer),
+            "str_regex" => EvalRegex(GetStringValue(), constraint.Value, constraint.CaseInsensitive),
 
             // Number
             "num_eq" => ToDouble(contextValue) == ToDouble(constraint.Value),
@@ -244,25 +251,25 @@ public class FeatureFlagEvaluator
             "num_gte" => ToDouble(contextValue) >= ToDouble(constraint.Value),
             "num_lt" => ToDouble(contextValue) < ToDouble(constraint.Value),
             "num_lte" => ToDouble(contextValue) <= ToDouble(constraint.Value),
-            "num_in" => targetVals.Select(v => ToDouble(v)).Contains(ToDouble(contextValue)),
+            "num_in" => targetVals.Any(v => ToDouble(v) == ToDouble(contextValue)),
 
             // Boolean
             "bool_is" => ToBool(contextValue) == (constraint.Value == "true"),
 
             // Date
-            "date_eq" => ToDateTicks(stringValue) == ToDateTicks(targetValue),
-            "date_gt" => ToDateTicks(stringValue) > ToDateTicks(targetValue),
-            "date_gte" => ToDateTicks(stringValue) >= ToDateTicks(targetValue),
-            "date_lt" => ToDateTicks(stringValue) < ToDateTicks(targetValue),
-            "date_lte" => ToDateTicks(stringValue) <= ToDateTicks(targetValue),
+            "date_eq" => ToDateTicks(GetStringValue()) == ToDateTicks(targetValue),
+            "date_gt" => ToDateTicks(GetStringValue()) > ToDateTicks(targetValue),
+            "date_gte" => ToDateTicks(GetStringValue()) >= ToDateTicks(targetValue),
+            "date_lt" => ToDateTicks(GetStringValue()) < ToDateTicks(targetValue),
+            "date_lte" => ToDateTicks(GetStringValue()) <= ToDateTicks(targetValue),
 
             // Semver
-            "semver_eq" => CompareSemver(stringValue, targetValue) == 0,
-            "semver_gt" => CompareSemver(stringValue, targetValue) > 0,
-            "semver_gte" => CompareSemver(stringValue, targetValue) >= 0,
-            "semver_lt" => CompareSemver(stringValue, targetValue) < 0,
-            "semver_lte" => CompareSemver(stringValue, targetValue) <= 0,
-            "semver_in" => targetVals.Any(v => CompareSemver(stringValue, v) == 0),
+            "semver_eq" => CompareSemver(GetStringValue(), targetValue) == 0,
+            "semver_gt" => CompareSemver(GetStringValue(), targetValue) > 0,
+            "semver_gte" => CompareSemver(GetStringValue(), targetValue) >= 0,
+            "semver_lt" => CompareSemver(GetStringValue(), targetValue) < 0,
+            "semver_lte" => CompareSemver(GetStringValue(), targetValue) <= 0,
+            "semver_in" => targetVals.Any(v => CompareSemver(GetStringValue(), v) == 0),
 
             _ => false,
         };
@@ -287,7 +294,7 @@ public class FeatureFlagEvaluator
 
     // ── Rollout percentage ────────────────────────────────────────────
 
-    private static double CalculatePercentage(EvaluationContext context, string stickiness, string groupId)
+    private static double CalculatePercentage(EvaluationContext context, string stickiness, string groupId, string suffix = "")
     {
         string stickinessValue;
 
@@ -309,9 +316,30 @@ public class FeatureFlagEvaluator
             stickinessValue = val?.ToString() ?? Random.Shared.NextDouble().ToString(CultureInfo.InvariantCulture);
         }
 
-        var seed = $"{groupId}:{stickinessValue}";
-        var hash = MurmurHash3.Hash(seed);
-        return (hash % 10000) / 100.0;
+        int len = groupId.Length + suffix.Length + 1 + stickinessValue.Length;
+        char[]? rented = null;
+        Span<char> seedSpan = len <= 256 
+            ? stackalloc char[len] 
+            : (rented = System.Buffers.ArrayPool<char>.Shared.Rent(len));
+
+        try
+        {
+            groupId.AsSpan().CopyTo(seedSpan);
+            if (suffix.Length > 0)
+            {
+                suffix.AsSpan().CopyTo(seedSpan[groupId.Length..]);
+            }
+            seedSpan[groupId.Length + suffix.Length] = ':';
+            stickinessValue.AsSpan().CopyTo(seedSpan[(groupId.Length + suffix.Length + 1)..]);
+
+            var hash = MurmurHash3.Hash(seedSpan[..len]);
+            return (hash % 10000) / 100.0;
+        }
+        finally
+        {
+            if (rented != null)
+                System.Buffers.ArrayPool<char>.Shared.Return(rented);
+        }
     }
 
     // ── Variant selection (weighted) ──────────────────────────────────
@@ -320,11 +348,13 @@ public class FeatureFlagEvaluator
     {
         if (flag.Variants.Count == 0) return null;
 
-        var totalWeight = flag.Variants.Sum(v => v.Weight);
+        int totalWeight = 0;
+        foreach (var v in flag.Variants) totalWeight += v.Weight;
+        
         if (totalWeight <= 0) return null;
 
         var stickiness = matchedStrategy?.Parameters?.Stickiness ?? "default";
-        var percentage = CalculatePercentage(context, stickiness, $"{flag.Name}-variant");
+        var percentage = CalculatePercentage(context, stickiness, flag.Name, "-variant");
         var targetWeight = (percentage / 100.0) * totalWeight;
 
         double cumulativeWeight = 0;
@@ -379,28 +409,21 @@ public class FeatureFlagEvaluator
         };
     }
 
-    // ── Semver comparison ─────────────────────────────────────────────
-
     private static int CompareSemver(string a, string b)
     {
-        var aParts = ParseSemver(a);
-        var bParts = ParseSemver(b);
-        var maxLen = Math.Max(aParts.Length, bParts.Length);
-
-        for (var i = 0; i < maxLen; i++)
+        try
         {
-            var aVal = i < aParts.Length ? aParts[i] : 0;
-            var bVal = i < bParts.Length ? bParts[i] : 0;
-            if (aVal < bVal) return -1;
-            if (aVal > bVal) return 1;
+            if (SemVersion.TryParse(a, SemVersionStyles.Any, out var semverA) &&
+                SemVersion.TryParse(b, SemVersionStyles.Any, out var semverB))
+            {
+                return semverA.ComparePrecedenceTo(semverB);
+            }
         }
-        return 0;
-    }
-
-    private static int[] ParseSemver(string v)
-    {
-        var cleaned = v.TrimStart('v', 'V');
-        return cleaned.Split('.').Select(n => int.TryParse(n, out var i) ? i : 0).ToArray();
+        catch
+        {
+            // fallback if unexpected error
+        }
+        return 0; // cannot parse as semver
     }
 
     // ── Helpers ───────────────────────────────────────────────────────
