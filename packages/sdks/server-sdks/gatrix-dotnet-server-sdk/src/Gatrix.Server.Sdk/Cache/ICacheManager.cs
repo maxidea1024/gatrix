@@ -11,4 +11,12 @@ public interface ICacheManager
 
     /// <summary>Refresh ONLY feature flags (flags + segments) for a specific environment.</summary>
     Task RefreshFeatureFlagsAsync(string? environment = null, CancellationToken ct = default);
+
+    object GetCacheSummary();
+    object GetCacheDetail();
+
+    List<Models.ClientVersion> GetClientVersions(string environment);
+    List<Models.Banner> GetBanners(string environment);
+    List<Models.ServiceNotice> GetServiceNotices(string environment);
+    List<Models.GameWorld> GetGameWorlds(string environment);
 }

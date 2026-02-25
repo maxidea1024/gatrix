@@ -1,0 +1,80 @@
+commit e0588c69d9e3c83e0b35c509daf7e331f2d3e56a
+Author: jhseo <maxidea1024@gmail.com>
+Date:   Tue Feb 24 22:29:28 2026 +0900
+
+    refactor(.NET SDK): split domain models/services, add multi-env support, centralize version
+    
+    - Add .gitignore for .NET build artifacts (bin, obj, NuGet)
+    - Split DomainModels.cs into individual files per domain
+    - Split DomainServices.cs into individual service files
+    - Refactor IFeatureFlagService API: param order (flagName, fallback, context?, environment?)
+    - Add Variation() method for variant name retrieval
+    - Add BoolVariationOrThrow to OrThrow methods
+    - Fix BoolVariation/BoolVariationDetails to parse variant VALUE (not flag state)
+    - Add multi-environment support to FlagDefinitionCache (per-env storage)
+    - Add FeaturesOptions.StaticContext for config-based static context
+    - Centralize SDK version via version.txt + SdkInfo.cs (no hardcoding)
+    - Update SERVER_SDK_SPEC.md with new API signatures and conventions
+
+ packages/sdks/server-sdks/.gitignore               |  46 +
+ packages/sdks/server-sdks/SERVER_SDK_SPEC.md       | 523 ++++++++++++
+ .../src/Gatrix.Edge/Gatrix.Edge.csproj             |   9 +
+ .../gatrix-dotnet-edge/src/Gatrix.Edge/Program.cs  |   6 +
+ .../src/Gatrix.Edge/Properties/launchSettings.json |  14 +
+ .../src/Gatrix.Edge/appsettings.Development.json   |   8 +
+ .../src/Gatrix.Edge/appsettings.json               |   9 +
+ .../gatrix-dotnet-server-sdk/Gatrix.Server.Sdk.sln |  54 ++
+ .../examples/ConsoleExample/ConsoleExample.csproj  |  18 +
+ .../examples/ConsoleExample/Program.cs             | 182 ++++
+ .../Attributes/FeatureGateAttribute.cs             |  46 +
+ .../Attributes/FeatureMatchAttribute.cs            |  49 ++
+ .../Attributes/FeatureValueAttribute.cs            |  51 ++
+ .../Extensions/ApplicationBuilderExtensions.cs     |  22 +
+ .../Gatrix.Server.Sdk.AspNetCore.csproj            |  19 +
+ .../Middleware/GatrixContextMiddleware.cs          |  41 +
+ .../src/Gatrix.Server.Sdk/Cache/CacheManager.cs    | 269 ++++++
+ .../Gatrix.Server.Sdk/Cache/FlagDefinitionCache.cs | 131 +++
+ .../src/Gatrix.Server.Sdk/Cache/ICacheManager.cs   |  14 +
+ .../Gatrix.Server.Sdk/Client/GatrixApiClient.cs    | 140 +++
+ .../Context/GatrixAmbientContext.cs                |  13 +
+ .../ServiceCollectionExtensions.cs                 |  92 ++
+ .../Evaluation/FeatureFlagEvaluator.cs             | 453 ++++++++++
+ .../Gatrix.Server.Sdk/Evaluation/MurmurHash3.cs    |  24 +
+ .../src/Gatrix.Server.Sdk/Events/EventListener.cs  | 460 ++++++++++
+ .../src/Gatrix.Server.Sdk/Events/SdkEvent.cs       |  63 ++
+ .../src/Gatrix.Server.Sdk/Exceptions/Exceptions.cs |  35 +
+ .../src/Gatrix.Server.Sdk/Gatrix.Server.Sdk.csproj |  23 +
+ .../src/Gatrix.Server.Sdk/GatrixServerSdk.cs       |  42 +
+ .../src/Gatrix.Server.Sdk/IGatrixServerSdk.cs      |  37 +
+ .../src/Gatrix.Server.Sdk/Models/ApiResponse.cs    |  41 +
+ .../src/Gatrix.Server.Sdk/Models/Banner.cs         |  30 +
+ .../src/Gatrix.Server.Sdk/Models/ClientVersion.cs  |  15 +
+ .../src/Gatrix.Server.Sdk/Models/Coupon.cs         |  26 +
+ .../Gatrix.Server.Sdk/Models/EvaluationResult.cs   |  63 ++
+ .../src/Gatrix.Server.Sdk/Models/FeatureFlag.cs    | 214 +++++
+ .../src/Gatrix.Server.Sdk/Models/GameWorld.cs      |  34 +
+ .../src/Gatrix.Server.Sdk/Models/PopupNotice.cs    |  23 +
+ .../Gatrix.Server.Sdk/Models/ServiceDiscovery.cs   |  58 ++
+ .../Gatrix.Server.Sdk/Models/ServiceMaintenance.cs |  22 +
+ .../src/Gatrix.Server.Sdk/Models/ServiceNotice.cs  |  16 +
+ .../src/Gatrix.Server.Sdk/Models/StoreProduct.cs   |  15 +
+ .../src/Gatrix.Server.Sdk/Models/Survey.cs         |  40 +
+ .../src/Gatrix.Server.Sdk/Models/Whitelist.cs      |  21 +
+ .../Gatrix.Server.Sdk/Options/GatrixSdkOptions.cs  | 119 +++
+ .../src/Gatrix.Server.Sdk/SdkInfo.cs               |  31 +
+ .../Services/BaseEnvironmentService.cs             | 128 +++
+ .../Gatrix.Server.Sdk/Services/CouponService.cs    |  27 +
+ .../Services/FeatureFlagService.cs                 | 377 +++++++++
+ .../Services/FlagMetricsService.cs                 | 132 +++
+ .../Gatrix.Server.Sdk/Services/GameWorldService.cs | 124 +++
+ .../Services/IFeatureFlagService.cs                |  54 ++
+ .../Services/PopupNoticeService.cs                 | 110 +++
+ .../Services/ServiceDiscoveryService.cs            |  70 ++
+ .../Services/ServiceMaintenanceService.cs          |  44 +
+ .../Services/StoreProductService.cs                |  81 ++
+ .../Gatrix.Server.Sdk/Services/SurveyService.cs    |  93 ++
+ .../Gatrix.Server.Sdk/Services/WhitelistService.cs |  46 +
+ .../FeatureFlagEvaluatorTests.cs                   | 942 +++++++++++++++++++++
+ .../Gatrix.Server.Sdk.Tests.csproj                 |  21 +
+ .../gatrix-dotnet-server-sdk/version.txt           |   1 +
+ 61 files changed, 5911 insertions(+)

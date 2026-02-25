@@ -1,0 +1,28 @@
+using Gatrix.Server.Sdk.Client;
+using Gatrix.Server.Sdk.Models;
+using Microsoft.Extensions.Logging;
+
+namespace Gatrix.Server.Sdk.Services;
+
+public interface IServiceNoticeService
+{
+    Task<List<ServiceNotice>> FetchAsync(string environment, CancellationToken ct = default);
+    List<ServiceNotice> GetAll(string environment);
+}
+
+public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<ServiceNotice>>, IServiceNoticeService
+{
+    public ServiceNoticeService(GatrixApiClient apiClient, ILogger<ServiceNoticeService> logger)
+        : base(apiClient, logger) { }
+
+    protected override string ServiceName => "ServiceNotice";
+    protected override string GetEndpoint(string environment) =>
+        $"/api/v1/server/{Uri.EscapeDataString(environment)}/service-notices";
+    protected override List<ServiceNotice> ExtractItems(List<ServiceNotice> response) => response;
+    protected override object GetItemId(ServiceNotice item) => item.Id;
+
+    public Task<List<ServiceNotice>> FetchAsync(string environment, CancellationToken ct = default) =>
+        FetchByEnvironmentAsync(environment, ct);
+
+    public List<ServiceNotice> GetAll(string environment) => GetCached(environment);
+}

@@ -11,5 +11,8 @@ public class ClientVersion
     [JsonPropertyName("gameServerAddress")] public string GameServerAddress { get; set; } = string.Empty;
     [JsonPropertyName("patchAddress")] public string PatchAddress { get; set; } = string.Empty;
     [JsonPropertyName("guestModeAllowed")] public bool GuestModeAllowed { get; set; }
+    [JsonPropertyName("externalClickLink")] public string? ExternalClickLink { get; set; }
+    [JsonPropertyName("maintenanceMessage")] public string? MaintenanceMessage { get; set; }
+    [JsonPropertyName("maintenanceLocales")] public List<MaintenanceLocale>? MaintenanceLocales { get; set; }
     [JsonPropertyName("customPayload")] public Dictionary<string, object>? CustomPayload { get; set; }
 }

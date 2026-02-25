@@ -9,6 +9,7 @@ public class GameWorld
     [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
     [JsonPropertyName("isMaintenance")] public bool IsMaintenance { get; set; }
     [JsonPropertyName("maintenanceMessage")] public string? MaintenanceMessage { get; set; }
+    [JsonPropertyName("createdAt")] public string? CreatedAt { get; set; }
     [JsonPropertyName("maintenanceStartDate")] public string? MaintenanceStartDate { get; set; }
     [JsonPropertyName("maintenanceEndDate")] public string? MaintenanceEndDate { get; set; }
     [JsonPropertyName("supportsMultiLanguage")] public bool? SupportsMultiLanguage { get; set; }

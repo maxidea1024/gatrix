@@ -33,6 +33,9 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
     private readonly IWhitelistService _whitelist;
     private readonly IServiceMaintenanceService _serviceMaintenance;
     private readonly IStoreProductService _storeProduct;
+    private readonly IClientVersionService _clientVersion;
+    private readonly IServiceNoticeService _serviceNotice;
+    private readonly IBannerService _banner;
 
     private Timer? _pollingTimer;
     private bool _disposed;
@@ -49,7 +52,10 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
         ISurveyService survey,
         IWhitelistService whitelist,
         IServiceMaintenanceService serviceMaintenance,
-        IStoreProductService storeProduct)
+        IStoreProductService storeProduct,
+        IClientVersionService clientVersion,
+        IServiceNoticeService serviceNotice,
+        IBannerService banner)
     {
         _apiClient = apiClient;
         _flagCache = flagCache;
@@ -63,6 +69,9 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
         _whitelist = whitelist;
         _serviceMaintenance = serviceMaintenance;
         _storeProduct = storeProduct;
+        _clientVersion = clientVersion;
+        _serviceNotice = serviceNotice;
+        _banner = banner;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -179,6 +188,9 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
         if (features.Whitelist) tasks.Add(_whitelist.FetchAsync(env, ct));
         if (features.ServiceMaintenance) tasks.Add(_serviceMaintenance.FetchAsync(env, ct));
         if (features.StoreProduct) tasks.Add(_storeProduct.FetchAsync(env, ct));
+        if (features.ClientVersion) tasks.Add(_clientVersion.FetchAsync(env, ct));
+        if (features.ServiceNotice) tasks.Add(_serviceNotice.FetchAsync(env, ct));
+        if (features.Banner) tasks.Add(_banner.FetchAsync(env, ct));
 
         await Task.WhenAll(tasks);
     }
@@ -258,6 +270,30 @@ public class CacheManager : ICacheManager, IHostedService, IDisposable
         try { await RefreshAsync(); }
         catch (Exception ex) { _logger.LogError(ex, "Background cache refresh failed"); }
     }
+
+    public object GetCacheSummary()
+    {
+        return new
+        {
+            flags = _flagCache.FlagCount,
+            segments = _flagCache.GetSegments().Count,
+            gameWorlds = _options.IsMultiEnvironmentMode ? -1 : _gameWorld.GetAll(_options.Environment).Count,
+            clientVersions = _options.IsMultiEnvironmentMode ? -1 : _clientVersion.GetAll(_options.Environment).Count,
+            banners = _options.IsMultiEnvironmentMode ? -1 : _banner.GetAll(_options.Environment).Count,
+            serviceNotices = _options.IsMultiEnvironmentMode ? -1 : _serviceNotice.GetAll(_options.Environment).Count,
+            storeProducts = _options.IsMultiEnvironmentMode ? -1 : _storeProduct.GetAll(_options.Environment).Count
+        };
+    }
+
+    public object GetCacheDetail()
+    {
+        return new { summary = GetCacheSummary() }; // Simplified for now
+    }
+
+    public List<Models.ClientVersion> GetClientVersions(string environment) => _clientVersion.GetAll(environment);
+    public List<Models.Banner> GetBanners(string environment) => _banner.GetAll(environment);
+    public List<Models.ServiceNotice> GetServiceNotices(string environment) => _serviceNotice.GetAll(environment);
+    public List<Models.GameWorld> GetGameWorlds(string environment) => _gameWorld.GetAll(environment);
 
     public void Dispose()
     {

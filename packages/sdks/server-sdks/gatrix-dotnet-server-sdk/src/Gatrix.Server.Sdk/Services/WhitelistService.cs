@@ -23,7 +23,7 @@ public class WhitelistService : BaseEnvironmentService<WhitelistData, WhitelistD
     protected override List<WhitelistData> ExtractItems(WhitelistData response) => [response];
     protected override object GetItemId(WhitelistData item) => "singleton";
 
-    public new async Task FetchAsync(string environment, CancellationToken ct = default)
+    public async Task FetchAsync(string environment, CancellationToken ct = default)
     {
         await FetchByEnvironmentAsync(environment, ct);
     }

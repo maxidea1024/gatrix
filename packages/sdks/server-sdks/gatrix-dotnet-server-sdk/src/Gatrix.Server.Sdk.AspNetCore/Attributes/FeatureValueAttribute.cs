@@ -33,7 +33,7 @@ public class FeatureValueAttribute : ActionFilterAttribute
         var ambientCtx = context.HttpContext.RequestServices.GetService<GatrixAmbientContext>();
         var evalCtx = ambientCtx?.CurrentContext;
 
-        var value = sdk.FeatureFlag.StringVariation(_flagName, evalCtx);
+        var value = sdk.FeatureFlag.StringVariation(_flagName, fallback: string.Empty, context: evalCtx);
 
         // Find the parameter decorated with this attribute and set its value
         foreach (var param in context.ActionDescriptor.Parameters)

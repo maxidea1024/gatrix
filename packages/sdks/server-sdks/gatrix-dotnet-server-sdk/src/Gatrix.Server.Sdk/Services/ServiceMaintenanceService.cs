@@ -23,7 +23,7 @@ public class ServiceMaintenanceService : BaseEnvironmentService<MaintenanceStatu
     protected override List<MaintenanceStatus> ExtractItems(MaintenanceStatus response) => [response];
     protected override object GetItemId(MaintenanceStatus item) => "singleton";
 
-    public new async Task FetchAsync(string environment, CancellationToken ct = default)
+    public async Task FetchAsync(string environment, CancellationToken ct = default)
     {
         await FetchByEnvironmentAsync(environment, ct);
     }

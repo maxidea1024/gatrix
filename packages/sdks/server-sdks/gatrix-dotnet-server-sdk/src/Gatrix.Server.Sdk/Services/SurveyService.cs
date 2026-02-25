@@ -33,7 +33,7 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
     protected override List<Survey> ExtractItems(SurveyListResponse response) => response.Surveys;
     protected override object GetItemId(Survey item) => item.Id;
 
-    public new async Task<SurveyListResponse> FetchAsync(string environment, CancellationToken ct = default)
+    public async Task<SurveyListResponse> FetchAsync(string environment, CancellationToken ct = default)
     {
         var endpoint = GetEndpoint(environment);
         var response = await ApiClient.GetAsync<SurveyListResponse>(endpoint, ct);

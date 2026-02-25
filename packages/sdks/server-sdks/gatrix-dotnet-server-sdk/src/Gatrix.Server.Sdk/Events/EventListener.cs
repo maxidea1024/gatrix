@@ -115,7 +115,8 @@ public class EventListener : IAsyncDisposable
                 _logger.LogInformation("Redis connection restored — refreshing ALL caches to recover missed events");
                 try
                 {
-                    await _cacheManager.RefreshAsync(ct);
+                    if (_cacheManager != null)
+                        await _cacheManager.RefreshAsync(ct);
                 }
                 catch (Exception ex)
                 {
@@ -343,7 +344,8 @@ public class EventListener : IAsyncDisposable
                 if (env is null) { LogMissingEnv(evt.Type); break; }
 
                 _logger.LogInformation("Feature flag event {Type}, refreshing flags for {Env}", evt.Type, env);
-                await _cacheManager.RefreshFeatureFlagsAsync(env);
+                if (_cacheManager != null)
+                    await _cacheManager.RefreshFeatureFlagsAsync(env);
                 break;
             }
 
@@ -357,7 +359,8 @@ public class EventListener : IAsyncDisposable
                 _logger.LogInformation("Segment changed ({Type}), refreshing feature flags for all environments", evt.Type);
                 // Segments are global, not environment-specific.
                 // Refresh flags with default env (single-env mode).
-                await _cacheManager.RefreshFeatureFlagsAsync();
+                if (_cacheManager != null)
+                    await _cacheManager.RefreshFeatureFlagsAsync();
                 break;
             }
 

@@ -38,7 +38,7 @@ public class FeatureGateAttribute : ActionFilterAttribute
         var ambientCtx = context.HttpContext.RequestServices.GetService<GatrixAmbientContext>();
         var evalCtx = ambientCtx?.CurrentContext;
 
-        if (!sdk.FeatureFlag.IsEnabled(_flagName, evalCtx))
+        if (!sdk.FeatureFlag.IsEnabled(_flagName, fallback: false, context: evalCtx))
         {
             context.Result = new NotFoundResult();
         }

@@ -8,7 +8,9 @@ public class ServiceNotice
     [JsonPropertyName("isActive")] public bool IsActive { get; set; }
     [JsonPropertyName("isPinned")] public bool IsPinned { get; set; }
     [JsonPropertyName("category")] public string Category { get; set; } = string.Empty;
-    [JsonPropertyName("platforms")] public List<string> Platforms { get; set; } = [];
+    [JsonPropertyName("platforms")] public List<string>? Platforms { get; set; }
+    [JsonPropertyName("createdAt")] public string? CreatedAt { get; set; }
+    [JsonPropertyName("updatedAt")] public string? UpdatedAt { get; set; }
     [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
     [JsonPropertyName("content")] public string Content { get; set; } = string.Empty;
     [JsonPropertyName("startDate")] public string? StartDate { get; set; }

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Gatrix.Edge</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\sdks\server-sdks\gatrix-dotnet-server-sdk\src\Gatrix.Server.Sdk\Gatrix.Server.Sdk.csproj" />
+    <ProjectReference Include="..\..\..\sdks\server-sdks\gatrix-dotnet-server-sdk\src\Gatrix.Server.Sdk.AspNetCore\Gatrix.Server.Sdk.AspNetCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+</Project>

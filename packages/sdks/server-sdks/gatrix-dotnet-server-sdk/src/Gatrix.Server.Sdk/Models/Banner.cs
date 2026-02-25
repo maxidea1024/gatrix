@@ -9,6 +9,8 @@ public class Banner
     [JsonPropertyName("description")] public string? Description { get; set; }
     [JsonPropertyName("width")] public int Width { get; set; }
     [JsonPropertyName("height")] public int Height { get; set; }
+    [JsonPropertyName("playbackSpeed")] public int PlaybackSpeed { get; set; }
+    [JsonPropertyName("isActive")] public bool IsActive { get; set; }
     [JsonPropertyName("metadata")] public Dictionary<string, object>? Metadata { get; set; }
     [JsonPropertyName("sequences")] public List<BannerSequence> Sequences { get; set; } = [];
     [JsonPropertyName("version")] public int Version { get; set; }
