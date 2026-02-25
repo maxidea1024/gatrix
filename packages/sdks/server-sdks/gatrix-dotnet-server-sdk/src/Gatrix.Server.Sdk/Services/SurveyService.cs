@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -26,8 +27,8 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
 {
     private readonly Dictionary<string, SurveySettings?> _settingsByEnv = new(StringComparer.OrdinalIgnoreCase);
 
-    public SurveyService(GatrixApiClient apiClient, ILogger<SurveyService> logger)
-        : base(apiClient, logger) { }
+    public SurveyService(GatrixApiClient apiClient, ILogger<SurveyService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "Survey";
     protected override string GetEndpoint(string environment) =>

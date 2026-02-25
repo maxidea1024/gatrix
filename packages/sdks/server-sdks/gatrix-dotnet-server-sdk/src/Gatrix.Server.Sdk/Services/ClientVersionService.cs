@@ -1,3 +1,4 @@
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,8 @@ public interface IClientVersionService
 
 public class ClientVersionService : BaseEnvironmentService<ClientVersion, List<ClientVersion>>, IClientVersionService
 {
-    public ClientVersionService(GatrixApiClient apiClient, ILogger<ClientVersionService> logger)
-        : base(apiClient, logger) { }
+    public ClientVersionService(GatrixApiClient apiClient, ILogger<ClientVersionService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "ClientVersion";
     protected override string GetEndpoint(string environment) =>

@@ -1,3 +1,4 @@
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -16,8 +17,8 @@ public interface IWhitelistService
 
 public class WhitelistService : BaseEnvironmentService<WhitelistData, WhitelistData>, IWhitelistService
 {
-    public WhitelistService(GatrixApiClient apiClient, ILogger<WhitelistService> logger)
-        : base(apiClient, logger) { }
+    public WhitelistService(GatrixApiClient apiClient, ILogger<WhitelistService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "Whitelist";
     protected override string GetEndpoint(string environment) =>

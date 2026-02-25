@@ -1,3 +1,4 @@
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -16,8 +17,8 @@ public interface IServiceMaintenanceService
 
 public class ServiceMaintenanceService : BaseEnvironmentService<MaintenanceStatus, MaintenanceStatus>, IServiceMaintenanceService
 {
-    public ServiceMaintenanceService(GatrixApiClient apiClient, ILogger<ServiceMaintenanceService> logger)
-        : base(apiClient, logger) { }
+    public ServiceMaintenanceService(GatrixApiClient apiClient, ILogger<ServiceMaintenanceService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "ServiceMaintenance";
     protected override string GetEndpoint(string environment) =>

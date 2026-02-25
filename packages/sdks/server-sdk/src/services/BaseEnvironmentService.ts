@@ -101,6 +101,8 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     if (!this.storage) return;
 
     const cacheKey = this.getCacheKey(environment);
+    const etagKey = this.getEtagKey(environment);
+    const responseKey = this.getResponseKey(environment);
 
     try {
       const cachedJson = await this.storage.get(cacheKey);
@@ -111,6 +113,22 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
           this.logger.debug(`Loaded ${items.length} ${this.getServiceName()} items from local storage`, {
             environment,
           });
+        }
+      }
+
+      // Restore ETag + raw response body into ApiClient so 304 optimization works after process restart
+      const cachedEtag = await this.storage.get(etagKey);
+      const cachedResponseJson = this.storage ? await this.storage.get(responseKey) : null;
+      if (cachedEtag && cachedResponseJson) {
+        try {
+          const endpoint = this.getEndpoint(environment);
+          const responseBody = JSON.parse(cachedResponseJson) as TResponse;
+          this.apiClient.setCache(endpoint, cachedEtag, responseBody);
+          this.logger.debug(`Restored ETag for ${this.getServiceName()} from local storage`, {
+            environment,
+          });
+        } catch {
+          // Ignore parse errors; next fetch will repopulate the cache
         }
       }
     } catch (error: any) {
@@ -135,7 +153,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     // Safety check: if backend returns failure or empty list but we already have local data,
     // be careful about overwriting it during the initial sync or temporary backend issues.
     const currentItems = this.cachedByEnv.get(environment) || [];
-    
+
     if (!response.success || !response.data) {
       if (currentItems.length > 0) {
         this.logger.warn(`Failed to fetch ${this.getServiceName()} from backend, but local cache has data. Keeping local data for now to avoid outage.`, {
@@ -148,7 +166,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     }
 
     const items = this.extractItems(response.data);
-    
+
     if (items.length === 0 && currentItems.length > 0) {
       this.logger.warn(`${this.getServiceName()} received empty list from backend, but local cache has data. Keeping local data for now to avoid outage.`, {
         environment,
@@ -164,14 +182,23 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
 
     this.cachedByEnv.set(environment, items);
 
-    // Persist to local storage
+    // Persist data, raw response body, and ETag to local storage
     await this.persistCache(environment);
+    await this.persistEtag(environment, endpoint, response.data);
 
     return items;
   }
 
   protected getCacheKey(environment: string): string {
     return `${this.getServiceName()}_${environment}_data`;
+  }
+
+  protected getEtagKey(environment: string): string {
+    return `${this.getServiceName()}_${environment}_etag`;
+  }
+
+  protected getResponseKey(environment: string): string {
+    return `${this.getServiceName()}_${environment}_response`;
   }
 
   /**
@@ -293,7 +320,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   updateCache(items: T[], environment: string): void {
     this.cachedByEnv.set(environment, items);
-    this.persistCache(environment).catch(() => {});
+    this.persistCache(environment).catch(() => { });
     this.logger.debug(`${this.getServiceName()} cache updated`, {
       environment,
       count: items.length,
@@ -319,7 +346,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     }
 
     this.cachedByEnv.set(environment, newItems);
-    this.persistCache(environment).catch(() => {});
+    this.persistCache(environment).catch(() => { });
 
     this.logger.debug(
       `Single ${this.getServiceName()} ${existsInCache ? 'updated' : 'added'} in cache`,
@@ -339,7 +366,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const currentItems = this.cachedByEnv.get(environment) || [];
     const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByEnv.set(environment, newItems);
-    this.persistCache(environment).catch(() => {});
+    this.persistCache(environment).catch(() => { });
 
     this.logger.debug(`${this.getServiceName()} removed from cache`, {
       id,
@@ -359,6 +386,33 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
       await this.storage.save(cacheKey, JSON.stringify(items));
     } catch (error: any) {
       this.logger.error(`Failed to persist ${this.getServiceName()} to local storage`, {
+        environment,
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Persist the current ETag and raw response body for an environment to local storage.
+   * Called after a successful fetch so the ETag survives process restarts.
+   */
+  protected async persistEtag(environment: string, endpoint: string, responseData?: TResponse): Promise<void> {
+    if (!this.storage) return;
+
+    try {
+      const etag = this.apiClient.getEtag(endpoint);
+      if (!etag) return;
+
+      const etagKey = this.getEtagKey(environment);
+      await this.storage.save(etagKey, etag);
+
+      // Also persist the raw response body so we can restore bodyCache on restart
+      if (responseData !== undefined) {
+        const responseKey = this.getResponseKey(environment);
+        await this.storage.save(responseKey, JSON.stringify(responseData));
+      }
+    } catch (error: any) {
+      this.logger.error(`Failed to persist ETag for ${this.getServiceName()} to local storage`, {
         environment,
         error: error.message,
       });

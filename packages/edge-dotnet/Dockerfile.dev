@@ -1,0 +1,38 @@
+# Development Dockerfile for Gatrix Edge Server (.NET)
+# Hot-reload enabled via dotnet watch
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine
+WORKDIR /src
+
+# Copy solution and project files
+COPY packages/edge-dotnet/Gatrix.Edge.sln ./packages/edge-dotnet/
+
+COPY packages/edge-dotnet/src/Gatrix.Edge/Gatrix.Edge.csproj \
+     ./packages/edge-dotnet/src/Gatrix.Edge/
+
+COPY packages/sdks/server-sdks/gatrix-dotnet-server-sdk/src/Gatrix.Server.Sdk/Gatrix.Server.Sdk.csproj \
+     ./packages/sdks/server-sdks/gatrix-dotnet-server-sdk/src/Gatrix.Server.Sdk/
+
+COPY packages/sdks/server-sdks/gatrix-dotnet-server-sdk/src/Gatrix.Server.Sdk.AspNetCore/Gatrix.Server.Sdk.AspNetCore.csproj \
+     ./packages/sdks/server-sdks/gatrix-dotnet-server-sdk/src/Gatrix.Server.Sdk.AspNetCore/
+
+# Restore dependencies
+RUN dotnet restore packages/edge-dotnet/src/Gatrix.Edge/Gatrix.Edge.csproj
+
+# Copy source code
+COPY packages/edge-dotnet/src/ ./packages/edge-dotnet/src/
+COPY packages/sdks/server-sdks/gatrix-dotnet-server-sdk/src/ \
+     ./packages/sdks/server-sdks/gatrix-dotnet-server-sdk/src/
+
+WORKDIR /src/packages/edge-dotnet/src/Gatrix.Edge
+
+# Main API port
+EXPOSE 1400
+# Internal management port
+EXPOSE 1410
+
+ENV DOTNET_ENVIRONMENT=Development
+ENV Edge__Port=1400
+ENV Edge__InternalPort=1410
+
+# Run with hot reload
+CMD ["dotnet", "watch", "run", "--no-hot-reload"]

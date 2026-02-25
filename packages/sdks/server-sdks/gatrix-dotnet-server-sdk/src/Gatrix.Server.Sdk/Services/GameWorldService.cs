@@ -1,3 +1,4 @@
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -28,8 +29,8 @@ public interface IGameWorldService
 
 public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListResponse>, IGameWorldService
 {
-    public GameWorldService(GatrixApiClient apiClient, ILogger<GameWorldService> logger)
-        : base(apiClient, logger) { }
+    public GameWorldService(GatrixApiClient apiClient, ILogger<GameWorldService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "GameWorld";
     protected override string GetEndpoint(string environment) =>

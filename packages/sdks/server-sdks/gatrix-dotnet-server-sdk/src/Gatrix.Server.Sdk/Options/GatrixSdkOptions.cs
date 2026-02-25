@@ -74,6 +74,13 @@ public class CacheOptions
 
     /// <summary>Skip waiting for backend readiness during initialization.</summary>
     public bool SkipBackendReady { get; set; } = false;
+
+    /// <summary>
+    /// Optional path for local file-based cache persistence (ETag + data).
+    /// When set, the SDK persists cached data to disk so they survive process restarts.
+    /// Defaults to null (no persistence).
+    /// </summary>
+    public string? LocalStoragePath { get; set; }
 }
 
 /// <summary>

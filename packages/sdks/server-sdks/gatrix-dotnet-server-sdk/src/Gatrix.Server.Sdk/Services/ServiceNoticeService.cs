@@ -1,3 +1,4 @@
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,8 @@ public interface IServiceNoticeService
 
 public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<ServiceNotice>>, IServiceNoticeService
 {
-    public ServiceNoticeService(GatrixApiClient apiClient, ILogger<ServiceNoticeService> logger)
-        : base(apiClient, logger) { }
+    public ServiceNoticeService(GatrixApiClient apiClient, ILogger<ServiceNoticeService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "ServiceNotice";
     protected override string GetEndpoint(string environment) =>

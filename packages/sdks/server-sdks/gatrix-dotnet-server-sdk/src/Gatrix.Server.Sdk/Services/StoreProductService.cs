@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -27,8 +28,8 @@ public interface IStoreProductService
 
 public class StoreProductService : BaseEnvironmentService<StoreProduct, StoreProductListResponse>, IStoreProductService
 {
-    public StoreProductService(GatrixApiClient apiClient, ILogger<StoreProductService> logger)
-        : base(apiClient, logger) { }
+    public StoreProductService(GatrixApiClient apiClient, ILogger<StoreProductService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "StoreProduct";
     protected override string GetEndpoint(string environment) =>

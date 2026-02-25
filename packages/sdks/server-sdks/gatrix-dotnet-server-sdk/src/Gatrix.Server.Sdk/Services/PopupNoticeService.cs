@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Gatrix.Server.Sdk.Cache;
 using Gatrix.Server.Sdk.Client;
 using Gatrix.Server.Sdk.Models;
 using Microsoft.Extensions.Logging;
@@ -25,8 +26,8 @@ internal class PopupNoticeByIdResponse
 
 public class PopupNoticeService : BaseEnvironmentService<PopupNotice, List<PopupNotice>>, IPopupNoticeService
 {
-    public PopupNoticeService(GatrixApiClient apiClient, ILogger<PopupNoticeService> logger)
-        : base(apiClient, logger) { }
+    public PopupNoticeService(GatrixApiClient apiClient, ILogger<PopupNoticeService> logger, ICacheStorageProvider? storage = null)
+        : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "PopupNotice";
     protected override string GetEndpoint(string environment) =>

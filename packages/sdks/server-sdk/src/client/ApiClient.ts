@@ -550,6 +550,15 @@ export class ApiClient {
   }
 
   /**
+   * Get the cached ETag for a URL
+   * Used by services to persist ETag to local storage after successful fetch
+   */
+  getEtag(url: string, config?: AxiosRequestConfig): string | undefined {
+    const cacheKey = this.buildCacheKey(url, config);
+    return this.etagStore.get(cacheKey);
+  }
+
+  /**
    * Invalidate ETag cache for a specific URL pattern
    * This forces the next request to fetch fresh data instead of returning cached 304 response
    * @param urlPattern URL or URL pattern (partial match) to invalidate

@@ -6,6 +6,7 @@ using Gatrix.Server.Sdk.Options;
 using Gatrix.Server.Sdk.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Gatrix.Server.Sdk.DependencyInjection;
@@ -36,6 +37,17 @@ public static class ServiceCollectionExtensions
         // Core infrastructure (singletons)
         services.TryAddSingleton<GatrixApiClient>();
         services.TryAddSingleton<FlagDefinitionCache>();
+
+        // Register optional ICacheStorageProvider — resolves to FileCacheStorageProvider
+        // when Cache.LocalStoragePath is set, null otherwise (services degrade gracefully).
+        services.TryAddSingleton<ICacheStorageProvider?>(sp =>
+        {
+            var opts = sp.GetRequiredService<IOptions<GatrixSdkOptions>>().Value;
+            if (string.IsNullOrWhiteSpace(opts.Cache.LocalStoragePath))
+                return null;
+            var logger = sp.GetRequiredService<ILogger<FileCacheStorageProvider>>();
+            return new FileCacheStorageProvider(logger, opts.Cache.LocalStoragePath);
+        });
 
         // Environment-aware services (singletons — they hold their own per-env caches)
         services.TryAddSingleton<IGameWorldService, GameWorldService>();
