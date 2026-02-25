@@ -240,7 +240,7 @@ function Dashboard({ config }: DashboardProps) {
                   }}
                   title="Clear search"
                 >
-                  ??{' '}
+                  X
                 </button>
               )}
             </div>
@@ -290,7 +290,7 @@ function Dashboard({ config }: DashboardProps) {
             <div className="searching-state">
               <div className="searching-icon">
                 <span role="img" aria-label="searching">
-                  ?��
+                  (SCANNING...)
                 </span>
               </div>
               <p className="searching-text">WHERE ARE MY FLAGS?... COME BACK!</p>

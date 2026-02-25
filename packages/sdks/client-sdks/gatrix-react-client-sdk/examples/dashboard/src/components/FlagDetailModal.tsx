@@ -152,7 +152,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                 </>
               ) : (
                 <div className="flag-payload-value no-payload" style={{ padding: '20px' }}>
-                  ??NO PAYLOAD
+                  🚫 NO PAYLOAD
                 </div>
               )}
             </div>

@@ -68,6 +68,7 @@ app.use(
       'x-connection-id',
       'x-session-id',
       'x-gatrix-feature-context',
+      'x-gatrix-context-hash',
     ],
     exposedHeaders: ['ETag'],
   })

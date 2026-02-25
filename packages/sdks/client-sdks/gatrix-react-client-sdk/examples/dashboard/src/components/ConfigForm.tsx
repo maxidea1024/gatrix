@@ -21,6 +21,8 @@ const STORAGE_KEY_OFFLINE_MODE = 'gatrix-dashboard-offline-mode';
 const STORAGE_KEY_REFRESH_INTERVAL = 'gatrix-dashboard-refresh-interval';
 const STORAGE_KEY_EXPLICIT_SYNC = 'gatrix-dashboard-explicit-sync';
 const STORAGE_KEY_MANUAL_POLLING = 'gatrix-dashboard-manual-polling';
+const STORAGE_KEY_STREAMING_ENABLED = 'gatrix-dashboard-streaming-enabled';
+const STORAGE_KEY_STREAMING_MODE = 'gatrix-dashboard-streaming-mode';
 const STORAGE_KEY_USER_ID = 'gatrix-dashboard-user-id';
 
 function generateRandomUserId(): string {
@@ -65,6 +67,8 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
   const [refreshInterval, setRefreshInterval] = useState(1);
   const [manualPolling, setManualPolling] = useState(false);
   const [explicitSyncMode, setExplicitSyncMode] = useState(false);
+  const [streamingEnabled, setStreamingEnabled] = useState(true);
+  const [streamingMode, setStreamingMode] = useState<'sse' | 'websocket'>('sse');
 
   // Load saved preferences on mount
   useEffect(() => {
@@ -102,6 +106,10 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       !savedManualPolling && savedRefreshInterval === 0 ? 1 : savedRefreshInterval
     );
     setExplicitSyncMode(localStorage.getItem(STORAGE_KEY_EXPLICIT_SYNC) === 'true');
+    setStreamingEnabled(localStorage.getItem(STORAGE_KEY_STREAMING_ENABLED) !== 'false');
+    setStreamingMode(
+      (localStorage.getItem(STORAGE_KEY_STREAMING_MODE) as 'sse' | 'websocket') || 'sse'
+    );
   }, []);
 
   // When location or serverType changes, update URL and token
@@ -138,6 +146,8 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
     localStorage.setItem(STORAGE_KEY_REFRESH_INTERVAL, String(manualPolling ? 0 : refreshInterval));
     localStorage.setItem(STORAGE_KEY_MANUAL_POLLING, String(manualPolling));
     localStorage.setItem(STORAGE_KEY_EXPLICIT_SYNC, String(explicitSyncMode));
+    localStorage.setItem(STORAGE_KEY_STREAMING_ENABLED, String(streamingEnabled));
+    localStorage.setItem(STORAGE_KEY_STREAMING_MODE, streamingMode);
 
     if (location === 'remote') {
       localStorage.setItem(STORAGE_KEY_API_URL, apiUrl);
@@ -162,6 +172,10 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       features: {
         refreshInterval: manualPolling ? 0 : refreshInterval,
         explicitSyncMode,
+        streaming: {
+          enabled: streamingEnabled,
+          mode: streamingMode,
+        },
       },
     });
   };
@@ -173,7 +187,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       <div className="login-box">
         <div className="nes-container is-dark with-title">
           <p className="title" style={{ backgroundColor: '#000' }}>
-            <i className="nes-icon coin is-small"></i> CONNECT TO GATRIX
+            CONNECT TO GATRIX
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -275,10 +289,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                       }}
                       title={showToken ? 'Hide Token' : 'Show Token'}
                     >
-                      <i
-                        className={`nes-icon is-small ${showToken ? 'close' : 'eye'}`}
-                        style={{ transform: 'scale(1.2)' }}
-                      ></i>
+                      {showToken ? '[X]' : '[EYE]'}
                     </button>
                   </div>
                 </div>
@@ -342,7 +353,7 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                   title="Generate random User ID"
                   style={{ fontSize: '10px', whiteSpace: 'nowrap' }}
                 >
-                  ?Ž² RANDOM
+                  RANDOM
                 </button>
               </div>
             </div>
@@ -399,6 +410,46 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
                     />
                     <span className="checkbox-label">EXPLICIT SYNC</span>
                   </label>
+                </div>
+
+                <div className="form-group" style={{ marginTop: '20px' }}>
+                  <label className="form-label">STREAMING (REAL-TIME)</label>
+                  <div className="checkbox-group" style={{ marginBottom: '10px' }}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        className="nes-checkbox is-dark"
+                        checked={streamingEnabled}
+                        onChange={(e) => setStreamingEnabled(e.target.checked)}
+                      />
+                      <span className="checkbox-label">ENABLE STREAMING</span>
+                    </label>
+                  </div>
+
+                  {streamingEnabled && (
+                    <div style={{ display: 'flex', gap: '30px', marginLeft: '35px' }}>
+                      <label>
+                        <input
+                          type="radio"
+                          className="nes-radio is-dark"
+                          name="streamingMode"
+                          checked={streamingMode === 'sse'}
+                          onChange={() => setStreamingMode('sse')}
+                        />
+                        <span>SSE</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          className="nes-radio is-dark"
+                          name="streamingMode"
+                          checked={streamingMode === 'websocket'}
+                          onChange={() => setStreamingMode('websocket')}
+                        />
+                        <span>WEBSOCKET</span>
+                      </label>
+                    </div>
+                  )}
                 </div>
               </>
             )}

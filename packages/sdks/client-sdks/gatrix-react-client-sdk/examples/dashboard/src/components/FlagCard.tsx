@@ -218,7 +218,7 @@ function FlagCard({ flag, viewMode, initialVersion, lastChangedTime, onSelect }:
                 <div className="flag-payload-size">{valueSize} BYTES</div>
               </>
             ) : (
-              <div className="flag-payload-value no-payload">??NO VALUE</div>
+              <div className="flag-payload-value no-payload">🚫 NO VALUE</div>
             )}
           </div>
         </div>

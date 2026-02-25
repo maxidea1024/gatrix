@@ -184,7 +184,7 @@ function App() {
                         className="nes-btn is-warning"
                         onClick={() => setShowGame('slot')}
                       >
-                        ?Ž° SLOT SAGA
+                        SLOT SAGA
                       </button>
                       <button
                         type="button"
@@ -224,7 +224,7 @@ function App() {
               onClick={() => setShowLogViewer(true)}
               title="Toggle SDK Logs"
             >
-              ?“‹
+              ðŸ“œ
               {errorLogCount > 0 && (
                 <span className="log-fab-badge">{errorLogCount > 99 ? '99+' : errorLogCount}</span>
               )}

@@ -91,6 +91,26 @@ export const API_HEADERS = {
    * 세션 ID 헤더 (SDK용)
    */
   X_SESSION_ID: 'x-session-id',
+
+  /**
+   * 피처 컨텍스트 헤더 (JSON stringified context)
+   */
+  X_GATRIX_FEATURE_CONTEXT: 'x-gatrix-feature-context',
+
+  /**
+   * 컨텍스트 해시 헤더 (Context optimization)
+   */
+  X_GATRIX_CONTEXT_HASH: 'x-gatrix-context-hash',
+
+  /**
+   * 클라이언트 버전 헤더
+   */
+  X_CLIENT_VERSION: 'x-client-version',
+
+  /**
+   * 플랫폼 헤더
+   */
+  X_PLATFORM: 'x-platform',
 } as const;
 
 /**
@@ -219,6 +239,10 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_SESSION_ID,
   HEADERS.IF_NONE_MATCH,
   HEADERS.X_SDK_VERSION,
+  HEADERS.X_GATRIX_FEATURE_CONTEXT,
+  HEADERS.X_GATRIX_CONTEXT_HASH,
+  HEADERS.X_CLIENT_VERSION,
+  HEADERS.X_PLATFORM,
 ];
 
 export default HEADERS;

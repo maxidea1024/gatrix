@@ -130,7 +130,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
       } else {
         gs.inventory.push(invItem);
       }
-      addLog(`?è™ Bought ${item.icon} ${item.name}!`);
+      addLog(`?ÔøΩÔøΩ Bought ${item.icon} ${item.name}!`);
       syncHud();
     },
     [addLog, syncHud]
@@ -143,7 +143,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
       if (idx < 0) return;
       const item = gs.inventory[idx];
       gs.hero.gold += item.sellPrice * item.quantity;
-      addLog(`?í∞ Sold ${item.icon} ${item.name} for ${item.sellPrice * item.quantity}G`);
+      addLog(`?ÔøΩÔøΩ Sold ${item.icon} ${item.name} for ${item.sellPrice * item.quantity}G`);
       gs.inventory.splice(idx, 1);
       syncHud();
     },
@@ -165,7 +165,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
           gs.hero.maxHp -= item.stat.hp;
           gs.hero.hp = Math.min(gs.hero.hp, gs.hero.maxHp);
         }
-        addLog(`?îΩ Unequipped ${item.icon} ${item.name}`);
+        addLog(`?ÔøΩÔøΩ Unequipped ${item.icon} ${item.name}`);
       } else {
         // Unequip other items of same type first
         for (const other of gs.inventory) {
@@ -186,7 +186,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
           gs.hero.maxHp += item.stat.hp;
           gs.hero.hp = Math.min(gs.hero.hp, gs.hero.maxHp);
         }
-        addLog(`?îº Equipped ${item.icon} ${item.name}`);
+        addLog(`?ÔøΩÔøΩ Equipped ${item.icon} ${item.name}`);
       }
       syncHud();
     },
@@ -208,7 +208,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
           else gs.inventory.push({ ...item });
         }
       }
-      addLog(`?ì¨ Claimed: ${mail.subject}`);
+      addLog(`?ÔøΩÔøΩ Claimed: ${mail.subject}`);
       syncHud();
     },
     [addLog, syncHud]
@@ -230,7 +230,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
         }
       }
     }
-    addLog('?ì¨ Claimed all mail rewards!');
+    addLog('?ÔøΩÔøΩ Claimed all mail rewards!');
     syncHud();
   }, [addLog, syncHud]);
 
@@ -241,7 +241,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
     setTimeout(() => {
       gsRef.current.isPaused = false;
       setGameState('playing');
-      addLog('?îÑ Config synced from server!');
+      addLog('?ÔøΩÔøΩ Config synced from server!');
     }, 1500);
   }, [syncFlags, addLog]);
 
@@ -360,7 +360,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
               onClick={handleSyncFlags}
               style={{ fontSize: '10px', animation: 'pulse 1s infinite' }}
             >
-              ??NEW CONFIG ??SYNC NOW
+              üîÑ NEW CONFIG ‚Üí SYNC NOW
             </button>
           </div>
         )}
@@ -422,7 +422,7 @@ const IdleDefenseGame: React.FC<IdleDefenseGameProps> = ({ onExit }) => {
                 color: i === 0 ? '#fff' : '#ccc',
               }}
             >
-              {i === 0 ? '??' : '  '}
+              {i === 0 ? '‚ñ∂Ô∏è' : '  '}
               {m}
             </div>
           ))}

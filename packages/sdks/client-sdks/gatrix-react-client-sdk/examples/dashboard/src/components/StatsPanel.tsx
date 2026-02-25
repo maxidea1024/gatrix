@@ -156,10 +156,10 @@ function StatsPanel({
     return '';
   };
 
-  const getStatusIcon = (state: string): string => {
-    if (state === 'healthy' || state === 'ready') return '??;
-    if (state === 'error') return '??;
-    return '??;
+  const getStatusIconText = (state: string): string => {
+    if (state === 'healthy' || state === 'ready') return '[OK]';
+    if (state === 'error') return '[ERR]';
+    return '[WAIT]';
   };
 
   // Determine effective SDK state using flagsReady as fallback
@@ -371,8 +371,8 @@ function StatsPanel({
                       className={`stats-value ${client.features.isOfflineMode() ? 'status-offline' : getStatusClass(effectiveSdkState)}`}
                     >
                       {client.features.isOfflineMode()
-                        ? '??OFFLINE'
-                        : `${getStatusIcon(effectiveSdkState)} ${effectiveSdkState}`}
+                        ? 'OFFLINE'
+                        : `${getStatusIconText(effectiveSdkState)} ${effectiveSdkState}`}
                     </td>
                     <td className="stats-label">UP:</td>
                     <td className="stats-value">{formatUptime(stats?.startTime || null)}</td>

@@ -1,5 +1,5 @@
 // Slot Machine Game - React Wrapper Component
-// Title screen ??Login ??Game with SDK Feature Flag showcase panel
+// Title screen -> Login -> Game with SDK Feature Flag showcase panel
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Phaser from 'phaser';
 import { useGatrixClient } from '@gatrix/gatrix-react-client-sdk';
@@ -25,7 +25,7 @@ function TitleScreen({ onStart }: { onStart: () => void }) {
         <h1 className="slot-title-text">GATRIX SLOT SAGA</h1>
         <p className="slot-title-sub">Feature Flag Showcase</p>
         <button className="slot-title-btn" onClick={onStart}>
-          ??PLAY
+          PLAY
         </button>
         <p className="slot-title-credit">Powered by Gatrix SDK</p>
       </div>
@@ -40,7 +40,7 @@ function LoginScreen({ onLogin }: { onLogin: (name: string, vip: number) => void
   return (
     <div className="slot-login-screen">
       <div className="slot-login-card">
-        <h2 className="slot-login-title">?é∞ Enter the Casino</h2>
+        <h2 className="slot-login-title">Enter the Casino</h2>
         <div className="slot-login-field">
           <label>Player Name</label>
           <input
@@ -59,7 +59,7 @@ function LoginScreen({ onLogin }: { onLogin: (name: string, vip: number) => void
                 className={`slot-vip-btn ${vip === v ? 'active' : ''}`}
                 onClick={() => setVip(v)}
               >
-                {'??.repeat(v)}
+                {'*'.repeat(v)}
               </button>
             ))}
           </div>
@@ -70,7 +70,7 @@ function LoginScreen({ onLogin }: { onLogin: (name: string, vip: number) => void
           onClick={() => name.trim() && onLogin(name.trim(), vip)}
           disabled={!name.trim()}
         >
-          ?é≤ START GAME
+          START GAME
         </button>
       </div>
     </div>
@@ -153,13 +153,13 @@ function FlagStatusPanel({
 
   return (
     <div className="slot-flag-panel">
-      <h3 className="slot-panel-title">?ö© Feature Flag Status</h3>
+      <h3 className="slot-panel-title">Feature Flag Status</h3>
 
       {/* Context info */}
       <div className="slot-panel-section">
         <h4>Context (updateContext)</h4>
         <div className="slot-context-info">
-          <span>?ë§ {playerName}</span>
+          <span>Player: {playerName}</span>
           <div className="slot-vip-inline">
             <span>VIP:</span>
             {[1, 2, 3, 4, 5].map((v) => (
@@ -169,7 +169,8 @@ function FlagStatusPanel({
                 onClick={() => onVipChange(v)}
                 title={`VIP ${v}`}
               >
-                ??              </button>
+                *
+              </button>
             ))}
           </div>
         </div>
@@ -177,7 +178,7 @@ function FlagStatusPanel({
 
       {/* Real-time flags */}
       <div className="slot-panel-section">
-        <h4>??Real-time (watchFlag)</h4>
+        <h4>Real-time (watchRealtimeFlag)</h4>
         {realTimeFlags.map((f) => (
           <div key={f.name} className="slot-flag-row">
             <span className="slot-flag-name">{f.name}</span>
@@ -189,7 +190,7 @@ function FlagStatusPanel({
 
       {/* Manual sync flags */}
       <div className="slot-panel-section">
-        <h4>?îÑ Manual Sync (syncFlags)</h4>
+        <h4>Manual Sync (syncFlags)</h4>
         {syncFlags.map((f) => (
           <div key={f.name} className="slot-flag-row">
             <span className="slot-flag-name">{f.name}</span>
@@ -198,14 +199,14 @@ function FlagStatusPanel({
           </div>
         ))}
         <button className={`slot-sync-btn ${hasPending ? 'pending' : ''}`} onClick={onSync}>
-          {hasPending ? '?î¥ Sync Pending ??Click to Apply' : '??Synced'}
+          {hasPending ? 'Sync Pending -> Click to Apply' : 'Synced'}
         </button>
       </div>
 
       {/* Game stats */}
       {bridge && (
         <div className="slot-panel-section">
-          <h4>?ìä Game Stats</h4>
+          <h4>Game Stats</h4>
           <div className="slot-stats-grid">
             <span className="slot-stat-label">Credits:</span>
             <span className="slot-stat-value">{bridge.credits}</span>
@@ -223,13 +224,13 @@ function FlagStatusPanel({
 
       {/* Payout table */}
       <div className="slot-panel-section">
-        <h4>?í∞ Payouts (jsonVariation)</h4>
+        <h4>Payouts (jsonVariation)</h4>
         <div className="slot-payout-table">
           {SYMBOL_CONFIGS.filter((s) => s.key !== 'wild').map((s) => (
             <div key={s.key} className="slot-payout-row">
               <img src={`/assets/slot/${s.imageFile}`} alt={s.label} className="slot-payout-icon" />
               <span>{s.label}</span>
-              <span className="slot-payout-val">√ó{config.payoutTable?.[s.key] ?? s.payout3}</span>
+              <span className="slot-payout-val">x{config.payoutTable?.[s.key] ?? s.payout3}</span>
             </div>
           ))}
         </div>
@@ -237,7 +238,7 @@ function FlagStatusPanel({
 
       {/* Flag change log */}
       <div className="slot-panel-section">
-        <h4>?ìù Flag Changes</h4>
+        <h4>Flag Changes</h4>
         <div className="slot-flag-log">
           {flagLogs.length === 0 ? (
             <p className="slot-log-empty">No changes yet. Modify flags in the admin panel.</p>
@@ -249,7 +250,7 @@ function FlagStatusPanel({
                 <div key={log.id} className="slot-log-entry">
                   <span className="slot-log-flag">{log.flagName}</span>
                   <span className="slot-log-change">
-                    {log.oldValue} ??{log.newValue}
+                    {log.oldValue} {' -> '} {log.newValue}
                   </span>
                 </div>
               ))
@@ -289,7 +290,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     ]);
   }, []);
 
-  // Setup real-time flag watchers (watchFlag via WatchFlagGroup)
+  // Setup real-time flag watchers (watchRealtimeFlag via WatchFlagGroup)
   useEffect(() => {
     if (phase !== 'playing' || !client) return;
     const features: FeaturesClient = client.features;
@@ -297,7 +298,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     watchGroupRef.current = group;
 
     // Real-time: sound
-    group.watchFlagWithInitialState(FLAG_NAMES.SOUND, (flag) => {
+    group.watchRealtimeFlagWithInitialState(FLAG_NAMES.SOUND, (flag) => {
       const val = flag.boolVariation(true);
       const old = config.soundEnabled;
       setConfig((c) => ({ ...c, soundEnabled: val }));
@@ -308,7 +309,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     });
 
     // Real-time: theme
-    group.watchFlagWithInitialState(FLAG_NAMES.THEME, (flag) => {
+    group.watchRealtimeFlagWithInitialState(FLAG_NAMES.THEME, (flag) => {
       const val = flag.stringVariation('classic') as ThemeKey;
       const old = config.theme;
       setConfig((c) => ({ ...c, theme: val }));
@@ -318,7 +319,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     });
 
     // Real-time: wild symbol
-    group.watchFlagWithInitialState(FLAG_NAMES.WILD_SYMBOL, (flag) => {
+    group.watchRealtimeFlagWithInitialState(FLAG_NAMES.WILD_SYMBOL, (flag) => {
       const val = flag.boolVariation(false);
       const old = config.wildSymbolEnabled;
       setConfig((c) => ({ ...c, wildSymbolEnabled: val }));
@@ -326,7 +327,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     });
 
     // Real-time: bonus round
-    group.watchFlagWithInitialState(FLAG_NAMES.BONUS_ROUND, (flag) => {
+    group.watchRealtimeFlagWithInitialState(FLAG_NAMES.BONUS_ROUND, (flag) => {
       const val = flag.boolVariation(false);
       const old = config.bonusRoundEnabled;
       setConfig((c) => ({ ...c, bonusRoundEnabled: val }));
@@ -334,7 +335,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     });
 
     // Real-time: auto spin
-    group.watchFlagWithInitialState(FLAG_NAMES.AUTO_SPIN, (flag) => {
+    group.watchRealtimeFlagWithInitialState(FLAG_NAMES.AUTO_SPIN, (flag) => {
       const val = flag.boolVariation(false);
       const old = config.autoSpinEnabled;
       setConfig((c) => ({ ...c, autoSpinEnabled: val }));
@@ -398,7 +399,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     addFlagLog('syncFlags()', '-', 'Synced all manual flags');
   }, [client, addFlagLog]);
 
-  // VIP level change ??updateContext
+  // VIP level change updateContext
   const handleVipChange = useCallback(
     (newVip: number) => {
       setVipLevel(newVip);
@@ -411,7 +412,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     [client, vipLevel, addFlagLog]
   );
 
-  // Login handler ??sets context and starts game
+  // Login handler sets context and starts game
   const handleLogin = useCallback(
     (name: string, vip: number) => {
       setPlayerName(name);
@@ -521,7 +522,8 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     return (
       <div className="slot-container">
         <button className="slot-exit-btn" onClick={onExit}>
-          ??        </button>
+          X
+        </button>
         <TitleScreen onStart={() => setPhase('login')} />
       </div>
     );
@@ -531,7 +533,8 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
     return (
       <div className="slot-container">
         <button className="slot-exit-btn" onClick={onExit}>
-          ??        </button>
+          X
+        </button>
         <LoginScreen onLogin={handleLogin} />
       </div>
     );
@@ -540,7 +543,8 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
   return (
     <div className="slot-container">
       <button className="slot-exit-btn" onClick={onExit}>
-        ??      </button>
+        X
+      </button>
       <div className="slot-game-layout">
         <div className="slot-game-area" ref={gameContainerRef} />
         <FlagStatusPanel
