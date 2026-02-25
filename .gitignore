@@ -104,9 +104,15 @@ tmp/
 temp/
 /packages/backend/public/crashes
 
+# SDK/Edge Cache
+.gatrix_cache/
+**/.gatrix_cache/
+
 # .NET Build Artifacts
 [Bb]in/
 [Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
 *.user
 *.userosscache
 *.sln.docstates
