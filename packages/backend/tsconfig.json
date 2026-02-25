@@ -26,6 +26,12 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@gatrix/shared": [
+        "../shared/dist/index"
+      ],
+      "@gatrix/shared/*": [
+        "../shared/dist/*"
       ]
     }
   },

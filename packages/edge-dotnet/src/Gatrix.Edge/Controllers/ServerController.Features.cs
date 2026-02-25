@@ -1,11 +1,15 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using Gatrix.Edge.Models;
 using Gatrix.Edge.Services;
 using Gatrix.Server.Sdk.Cache;
+using Gatrix.Server.Sdk.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gatrix.Edge.Controllers;
 
-public partial class ServerController : ControllerBase
+public partial class ServerController : GatrixControllerBase
 {
     private IActionResult? ValidateServerAuth(string? environment = null)
     {
@@ -115,7 +119,6 @@ public partial class ServerController : ControllerBase
 
             var flagName = flagNameEl.GetString() ?? "";
             var count = doc.RootElement.TryGetProperty("count", out var countEl) ? countEl.GetInt32() : 1;
-
             _metricsAggregator.AddServerUnknownReport(env, appName, flagName, count, sdkVersion);
             return Ok(new { success = true, buffered = true });
         }
@@ -124,4 +127,35 @@ public partial class ServerController : ControllerBase
             return BadRequest(new { success = false, error = "Invalid JSON" });
         }
     }
+
+    /// <summary>
+    /// POST /api/v1/server/features/{env}/eval
+    /// </summary>
+    [HttpPost("features/{env}/eval")]
+    public IActionResult EvalFlagsPost(string env)
+    {
+        var authError = ValidateServerAuth(env);
+        if (authError != null) return authError;
+
+        var appName = Request.Headers["x-application-name"].FirstOrDefault() ?? "unknown";
+        var context = new ClientContext { Environment = env, ApplicationName = appName };
+
+        return PerformEvaluation(env, context, isPost: true);
+    }
+
+    /// <summary>
+    /// GET /api/v1/server/features/{env}/eval
+    /// </summary>
+    [HttpGet("features/{env}/eval")]
+    public IActionResult EvalFlagsGet(string env)
+    {
+        var authError = ValidateServerAuth(env);
+        if (authError != null) return authError;
+
+        var appName = Request.Headers["x-application-name"].FirstOrDefault() ?? "unknown";
+        var context = new ClientContext { Environment = env, ApplicationName = appName };
+
+        return PerformEvaluation(env, context, isPost: false);
+    }
+
 }

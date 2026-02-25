@@ -4,6 +4,7 @@
  */
 export { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
 export { VARIANT_SOURCE } from './variantSource';
+export { EvaluationUtils } from './EvaluationUtils';
 export type { VariantSourceName } from './variantSource';
 export type {
   FeatureFlag,

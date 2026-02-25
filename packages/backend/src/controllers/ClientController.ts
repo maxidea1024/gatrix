@@ -21,6 +21,7 @@ import {
   FeatureSegment,
   EvaluationContext,
   VARIANT_SOURCE,
+  EvaluationUtils,
 } from '@gatrix/shared';
 import db from '../config/knex';
 
@@ -342,81 +343,13 @@ export class ClientController {
         return res.status(400).json({ success: false, message: 'Environment is required' });
       }
 
-      let context: EvaluationContext = {};
-
-      let flagNames: string[] | undefined;
-
-      // 1. Extract context and keys
-      if (req.method === 'POST') {
-        context = req.body.context || {};
-        flagNames = req.body.flagNames;
-      } else {
-        // GET: context from parameters (Unleash Proxy style) or header
-
-        // 1. Try X-Gatrix-Feature-Context header (Base64 JSON)
-        const contextHeader = req.headers['x-gatrix-feature-context'] as string;
-        if (contextHeader) {
-          try {
-            const jsonStr = Buffer.from(contextHeader, 'base64').toString('utf-8');
-            context = JSON.parse(jsonStr);
-          } catch (error) {
-            logger.warn('Failed to parse x-gatrix-feature-context header', { error });
-          }
-        }
-
-        // 2. Try 'context' query param (Base64 JSON) - if header didn't populate main fields
-        if (Object.keys(context).length === 0 && req.query.context) {
-          try {
-            const contextStr = req.query.context as string;
-            const jsonStr = Buffer.from(contextStr, 'base64').toString('utf-8');
-            if (jsonStr.trim().startsWith('{')) {
-              context = JSON.parse(jsonStr);
-            } else {
-              context = JSON.parse(contextStr);
-            }
-          } catch (e) {
-            /* ignore */
-          }
-        }
-
-        // 3. Fallback: Parse individual query parameters (Unleash Proxy standard)
-        // Only set if not already present
-        if (!context.userId && req.query.userId) context.userId = req.query.userId as string;
-        if (!context.sessionId && req.query.sessionId)
-          context.sessionId = req.query.sessionId as string;
-        if (!context.remoteAddress && req.query.remoteAddress)
-          context.remoteAddress = req.query.remoteAddress as string;
-        if (!context.appName && req.query.appName) context.appName = req.query.appName as string;
-
-        // Handle properties[key]=value
-        // Cast query to any to bypass strict type checking on ParsedQs
-        const query = req.query as any;
-        if (query.properties) {
-          context.properties = {
-            ...context.properties,
-            ...query.properties,
-          };
-        }
-
-        const flagNamesParam = req.query.flagNames as string;
-        if (flagNamesParam) {
-          flagNames = flagNamesParam.split(',');
-        }
-      }
+      // 1. Extract context and flag names from request using common utility
+      const { context, flagNames } = EvaluationUtils.extractFromRequest(req);
 
       // 0. Resolve Context Hash
-      let contextHash = req.headers['x-gatrix-context-hash'] as string;
-      if (!contextHash) {
-        // Compute deterministic hash if not provided by client
-        const keys = Object.keys(context).sort();
-        const stableContext: any = {};
-        for (const key of keys) {
-          stableContext[key] = (context as any)[key];
-        }
-        contextHash = crypto.createHash('md5').update(JSON.stringify(stableContext)).digest('hex');
-      }
+      const contextHash = EvaluationUtils.getContextHash(req, context);
 
-      const flagNamesHash = flagNames
+      const flagNamesHash = flagNames && flagNames.length > 0
         ? crypto.createHash('md5').update(flagNames.sort().join(',')).digest('hex')
         : 'all';
 
@@ -580,7 +513,7 @@ export class ClientController {
         }
       }
 
-      const evaluableFlags = flagNames
+      const evaluableFlags = flagNames && flagNames.length > 0
         ? flags.filter((f: any) => flagNames!.includes(f.flagName))
         : flags;
 
@@ -619,77 +552,21 @@ export class ClientController {
 
         const result = FeatureFlagEvaluator.evaluate(sdkFlag, context, segmentsMap);
 
-        // Build variant object according to Gatrix client specification
-        // Updated to support separate enabled/disabled values
-        let variant: {
-          name: string;
-          value?: any;
-          enabled: boolean;
-        };
-
-        if (result.enabled && result.variant) {
-          // Active variant from strategy/rollout
-          variant = {
-            name: result.variant.name,
-            enabled: true,
-          };
-          // result.variant from sdk already has the value (we mapped it from db)
-          variant.value = (result.variant as any).value;
-
-          // Override variant name for default variants based on value source
-          if (
-            result.variant.name === VARIANT_SOURCE.FLAG_DEFAULT_ENABLED ||
-            result.variant.name === VARIANT_SOURCE.FLAG_DEFAULT_DISABLED
-          ) {
-            if (envSettings?.enabledValue !== undefined) {
-              variant.name = VARIANT_SOURCE.ENV_DEFAULT_ENABLED;
-            } else {
-              variant.name = VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
-            }
-          }
-        } else {
-          // Determine correct value based on state
-          const rawValue = result.enabled ? resolvedEnabledValue : resolvedDisabledValue;
-          const valueToReturn =
-            rawValue ??
-            (dbFlag.valueType === 'boolean'
-              ? false
-              : dbFlag.valueType === 'number'
-                ? 0
-                : dbFlag.valueType === 'json'
-                  ? {}
-                  : '');
-
-          // Determine explicit variant name based on value source
-          let variantName: string;
-          if (result.enabled) {
-            variantName =
-              envSettings?.enabledValue !== undefined
-                ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-                : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
-          } else {
-            variantName =
-              envSettings?.disabledValue !== undefined
-                ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-                : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
-          }
-
-          variant = {
-            name: variantName,
-            enabled: result.enabled,
-            value: valueToReturn,
-          };
-        }
-
-        results[dbFlag.flagName] = {
-          id: dbFlag.id,
-          name: dbFlag.flagName,
-          enabled: result.enabled,
-          variant,
-          valueType: dbFlag.valueType || 'string', // Rename variantType -> valueType
-          version: dbFlag.version || 1,
-          ...(dbFlag.impressionDataEnabled && { impressionData: true }),
-        };
+        // Build result using common utility
+        results[dbFlag.flagName] = EvaluationUtils.formatResult(
+          dbFlag.flagName,
+          result,
+          {
+            id: dbFlag.id,
+            valueType: dbFlag.valueType,
+            version: dbFlag.version,
+            impressionDataEnabled: dbFlag.impressionDataEnabled,
+            enabledValue: resolvedEnabledValue,
+            disabledValue: resolvedDisabledValue,
+            valueSource: envSettings ? 'environment' : 'flag',
+          },
+          environment
+        );
       }
 
       const flagsArray = Object.values(results).sort((a, b) =>
@@ -706,21 +583,8 @@ export class ClientController {
         },
       };
 
-      // Generate ETag from flags data (hash of stringified flags with versions and variants)
-      // We include name, version, enabled state, and variant name for consistency with Edge
-
-      let contextHash = req.headers['x-gatrix-context-hash'] as string;
-      if (!contextHash) {
-        contextHash = crypto.createHash('md5').update(JSON.stringify(context)).digest('hex');
-      }
-
-      const etagSource = contextHash + '|' + flagsArray
-        .map((f: any) => {
-          const variantPart = f.variant ? `${f.variant.name}:${f.variant.enabled}` : 'no-variant';
-          return `${f.name}:${f.version}:${f.enabled}:${variantPart}`;
-        })
-        .join('|');
-      const etag = `"${crypto.createHash('md5').update(etagSource).digest('hex')}"`;
+      // Generate ETag from flags data using common utility
+      const etag = EvaluationUtils.generateETag(contextHash, flagsArray);
 
       // Check If-None-Match header after evaluation (in case cache missed but result is same)
       const requestEtag = req.headers['if-none-match'];
@@ -731,7 +595,6 @@ export class ClientController {
       res.set('ETag', etag);
 
       // Cache evaluation result for 30 seconds
-      // Using a short TTL since context can be highly dynamic, but covers repeat calls (e.g. 304 checks)
       await cacheService.set(evalCacheKey, { etag, data: responseData }, 30 * 1000);
 
       res.json(responseData);

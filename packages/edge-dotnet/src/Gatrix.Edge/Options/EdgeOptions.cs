@@ -13,7 +13,7 @@ public class EdgeOptions
     public int InternalPort { get; set; } = 3410;
 
     // Backend API configuration
-    public string GatrixUrl { get; set; } = "http://localhost:5000";
+    public string GatrixUrl { get; set; } = "http://localhost:3400";
 
     // Edge bypass token — allows access to all environments and internal APIs
     public string ApiToken { get; set; } = "gatrix-edge-internal-bypass-token";

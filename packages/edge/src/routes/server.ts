@@ -1,10 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import axios from 'axios';
-import { sdkManager } from '../services/sdkManager';
-import { config } from '../config/env';
-import logger from '../config/logger';
 import { tokenMirrorService } from '../services/tokenMirrorService';
 import { metricsAggregator } from '../services/metricsAggregator';
+import { performEvaluation } from '../utils/evaluationHelper';
+import logger from '../config/logger';
 
 const router = Router();
 
@@ -30,23 +28,12 @@ function serverAuth(req: Request, res: Response, next: NextFunction): void {
 }
 
 /**
- * Get SDK instance or return 503 error
- */
-function getSDKOrError(res: Response) {
-  const sdk = sdkManager.getSDK();
-  if (!sdk) {
-    res.status(503).json({ success: false, error: 'SDK not initialized' });
-    return null;
-  }
-  return sdk;
-}
-
-/**
  * GET /api/v1/server/:env/features
  * Returns cached feature flags and segments for the given environment
  */
 router.get('/:env/features', serverAuth, async (req: Request, res: Response) => {
   try {
+    const { getSDKOrError } = await import('../utils/evaluationHelper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
@@ -75,6 +62,7 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
  */
 router.get('/segments', serverAuth, async (req: Request, res: Response) => {
   try {
+    const { getSDKOrError } = await import('../utils/evaluationHelper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
@@ -134,6 +122,22 @@ router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Resp
     logger.error('Error buffering server unknown flag report:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
+});
+
+/**
+ * POST /api/v1/server/:env/features/eval
+ */
+router.post('/:env/features/eval', serverAuth, async (req: Request, res: Response) => {
+  const applicationName = (req.headers['x-application-name'] as string) || 'unknown';
+  await performEvaluation(req, res, { environment: req.params.env, applicationName }, true);
+});
+
+/**
+ * GET /api/v1/server/:env/features/eval
+ */
+router.get('/:env/features/eval', serverAuth, async (req: Request, res: Response) => {
+  const applicationName = (req.headers['x-application-name'] as string) || 'unknown';
+  await performEvaluation(req, res, { environment: req.params.env, applicationName }, false);
 });
 
 export default router;
