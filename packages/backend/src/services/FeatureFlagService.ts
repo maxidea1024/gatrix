@@ -72,6 +72,9 @@ export interface UpdateFlagInput {
   links?: { url: string; title?: string }[];
   isGlobal?: boolean;
   validationRules?: ValidationRules; // Optional: validation rules for flag values
+  useFixedWeightVariants?: boolean;
+  overrideEnabledValue?: boolean;
+  overrideDisabledValue?: boolean;
 }
 
 export interface CreateStrategyInput {
@@ -98,7 +101,6 @@ export interface CreateVariantInput {
   weight: number;
   value?: any;
   valueType?: ValueType;
-  weightLock?: boolean;
 }
 
 export interface CreateSegmentInput {
@@ -268,6 +270,7 @@ class FeatureFlagService {
       validationRules: input.validationRules,
       impressionDataEnabled: input.impressionDataEnabled ?? false,
       staleAfterDays: input.staleAfterDays ?? 30,
+      useFixedWeightVariants: false,
       tags: input.tags,
       links: input.links,
       createdBy: userId,
@@ -350,6 +353,8 @@ class FeatureFlagService {
       isEnabled,
       enabledValue,
       disabledValue,
+      overrideEnabledValue,
+      overrideDisabledValue,
       isGlobal,
       validationRules: inputValidationRules,
       ...globalUpdates
@@ -384,11 +389,13 @@ class FeatureFlagService {
     // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
     // ONLY if not explicitly requested to be a global-only update, or if environment is provided
     if (environment && !isGlobal) {
-      if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined) {
+      if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined || overrideEnabledValue !== undefined || overrideDisabledValue !== undefined) {
         await FeatureFlagEnvironmentModel.update(flag.id, environment, {
           isEnabled,
           enabledValue,
           disabledValue,
+          overrideEnabledValue,
+          overrideDisabledValue,
         });
       }
     }
@@ -466,6 +473,8 @@ class FeatureFlagService {
       isEnabled?: boolean;
       enabledValue?: any;
       disabledValue?: any;
+      overrideEnabledValue?: boolean;
+      overrideDisabledValue?: boolean;
     }
   ): Promise<FeatureFlagEnvironmentAttributes> {
     return FeatureFlagEnvironmentModel.update(flagId, environment, data);
@@ -963,7 +972,6 @@ class FeatureFlagService {
           weight: variant.weight,
           value: variant.value,
           valueType: variant.valueType || 'json',
-          weightLock: variant.weightLock || false,
           createdBy: userId,
         });
         resultVariants.push(created);

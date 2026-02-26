@@ -1162,14 +1162,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-                const fieldDef = fieldDefMap?.get(name);
-                const rules = fieldDef?.validationRules as any;
-                return {
-                  name,
-                  isRequired: rules?.isRequired === true,
-                  fieldType: (fieldDef?.fieldType as string) || 'string',
-                };
-              })
+              const fieldDef = fieldDefMap?.get(name);
+              const rules = fieldDef?.validationRules as any;
+              return {
+                name,
+                isRequired: rules?.isRequired === true,
+                fieldType: (fieldDef?.fieldType as string) || 'string',
+              };
+            })
             : undefined,
       },
     });
@@ -1932,7 +1932,6 @@ router.post(
           weight: v.weight,
           value: v.value,
           valueType: v.valueType,
-          weightLock: v.weightLock ?? false,
           overrides: v.overrides,
         })),
       },
@@ -2040,7 +2039,6 @@ router.post(
               weight: v.weight,
               value: v.value,
               valueType: v.valueType || 'json',
-              weightLock: v.weightLock ?? false,
               overrides: v.overrides,
             })),
           },

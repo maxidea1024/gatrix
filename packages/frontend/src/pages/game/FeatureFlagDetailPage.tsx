@@ -202,7 +202,6 @@ interface Strategy {
 interface Variant {
   name: string;
   weight: number;
-  weightLock?: boolean;
   stickiness?: string;
   value?: any;
   valueType: 'boolean' | 'string' | 'json' | 'number';
@@ -217,6 +216,8 @@ interface FeatureFlagEnvironment {
   flagId: string;
   environment: string;
   isEnabled: boolean;
+  overrideEnabledValue?: boolean;
+  overrideDisabledValue?: boolean;
   enabledValue?: any;
   disabledValue?: any;
   lastSeenAt?: string;
@@ -250,6 +251,7 @@ interface FeatureFlag {
   lastSeenAt?: string;
   archivedAt?: string;
   stale?: boolean;
+  useFixedWeightVariants?: boolean;
 
   createdBy?: number;
   createdByName?: string;
@@ -409,11 +411,11 @@ const FeatureFlagDetailPage: React.FC = () => {
       setFlag((prev) =>
         prev
           ? {
-              ...prev,
-              valueType: originalFlag.valueType,
-              enabledValue: originalFlag.enabledValue,
-              disabledValue: originalFlag.disabledValue,
-            }
+            ...prev,
+            valueType: originalFlag.valueType,
+            enabledValue: originalFlag.enabledValue,
+            disabledValue: originalFlag.disabledValue,
+          }
           : prev
       );
     }
@@ -436,24 +438,24 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [flag, setFlag] = useState<FeatureFlag | null>(
     isCreating
       ? {
-          id: '',
-          environment: '',
-          flagName: generateDefaultFlagName(),
-          displayName: '',
-          description: '',
-          flagType: 'release',
-          isEnabled: false,
-          isArchived: false,
-          impressionDataEnabled: false,
-          staleAfterDays: undefined,
-          tags: [],
-          strategies: [],
-          variants: [],
-          valueType: 'string',
-          enabledValue: '',
-          disabledValue: '',
-          createdAt: new Date().toISOString(),
-        }
+        id: '',
+        environment: '',
+        flagName: generateDefaultFlagName(),
+        displayName: '',
+        description: '',
+        flagType: 'release',
+        isEnabled: false,
+        isArchived: false,
+        impressionDataEnabled: false,
+        staleAfterDays: undefined,
+        tags: [],
+        strategies: [],
+        variants: [],
+        valueType: 'string',
+        enabledValue: '',
+        disabledValue: '',
+        createdAt: new Date().toISOString(),
+      }
       : null
   );
   const [loading, setLoading] = useState(!isCreating);
@@ -745,7 +747,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           value: v.value,
           valueType: v.valueType || 'string',
           stickiness: v.stickiness || 'default',
-          weightLock: v.weightLock || false,
         }));
 
         // Store variants separately for environment-specific management
@@ -1082,34 +1083,17 @@ const FeatureFlagDetailPage: React.FC = () => {
     }
   };
 
-  // Helper function to distribute weights among variants (respecting locked weights)
+  // Helper function to distribute weights equally among variants
   const distributeWeights = (variants: Variant[]): Variant[] => {
     if (variants.length === 0) return variants;
 
-    // Calculate total locked weight
-    const lockedVariants = variants.filter((v) => v.weightLock);
-    const unlockedVariants = variants.filter((v) => !v.weightLock);
-    const totalLockedWeight = lockedVariants.reduce((sum, v) => sum + (v.weight || 0), 0);
+    const baseWeight = Math.floor(100 / variants.length);
+    const remainder = 100 % variants.length;
 
-    // Remaining weight to distribute among unlocked variants
-    const remainingWeight = Math.max(0, 100 - totalLockedWeight);
-
-    if (unlockedVariants.length === 0) {
-      return variants;
-    }
-
-    const baseWeight = Math.floor(remainingWeight / unlockedVariants.length);
-    const remainder = remainingWeight % unlockedVariants.length;
-
-    let unlockedIndex = 0;
-    return variants.map((v) => {
-      if (v.weightLock) {
-        return v;
-      }
-      const weight = baseWeight + (unlockedIndex < remainder ? 1 : 0);
-      unlockedIndex++;
-      return { ...v, weight };
-    });
+    return variants.map((v, i) => ({
+      ...v,
+      weight: baseWeight + (i < remainder ? 1 : 0),
+    }));
   };
 
   // Helper function to add a new variant with auto weight distribution
@@ -1136,7 +1120,6 @@ const FeatureFlagDetailPage: React.FC = () => {
     const newVariant: Variant = {
       name: `variant-${currentVariants.length + 1}`,
       weight: 0, // Will be recalculated
-      weightLock: false,
       stickiness: 'default',
       value: defaultValue,
       valueType: variantType as 'boolean' | 'string' | 'json' | 'number',
@@ -1165,40 +1148,16 @@ const FeatureFlagDetailPage: React.FC = () => {
     });
   };
 
-  // Helper function to update a variant's fixed weight and redistribute
-  const updateVariantWeight = (index: number, weight: number, locked: boolean) => {
+  // Helper function to update a variant's weight
+  const updateVariantWeight = (index: number, weight: number) => {
     const currentVariants = [...(editingStrategy?.variants || [])];
     currentVariants[index] = {
       ...currentVariants[index],
       weight: Math.min(100, Math.max(0, weight)),
-      weightLock: locked,
     };
-    const updatedVariants = distributeWeights(currentVariants);
     setEditingStrategy({
       ...editingStrategy!,
-      variants: updatedVariants,
-    });
-  };
-
-  // Helper function to toggle weight lock for a variant (only one can be locked)
-  const toggleWeightLock = (index: number, locked: boolean) => {
-    const currentVariants = [...(editingStrategy?.variants || [])];
-    // If locking this variant, unlock all others first
-    if (locked) {
-      currentVariants.forEach((v, i) => {
-        if (i !== index) {
-          currentVariants[i] = { ...v, weightLock: false };
-        }
-      });
-    }
-    currentVariants[index] = {
-      ...currentVariants[index],
-      weightLock: locked,
-    };
-    const updatedVariants = distributeWeights(currentVariants);
-    setEditingStrategy({
-      ...editingStrategy!,
-      variants: updatedVariants,
+      variants: currentVariants,
     });
   };
 
@@ -1357,7 +1316,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           value: v.value,
           valueType: v.valueType,
           stickiness: v.stickiness || 'default',
-          weightLock: v.weightLock,
         }));
         await api.put(
           `/admin/features/${flag.flagName}/variants`,
@@ -1385,17 +1343,48 @@ const FeatureFlagDetailPage: React.FC = () => {
     }
   };
 
+  // Handler for toggling useFixedWeightVariants flag-level setting
+  const handleUseFixedWeightVariantsChange = async (value: boolean) => {
+    if (!flag) return;
+
+    try {
+      if (!isCreating) {
+        await api.put(`/admin/features/${flag.flagName}`, {
+          useFixedWeightVariants: value,
+          isGlobal: true,
+        });
+        setFlag((prev) => (prev ? { ...prev, useFixedWeightVariants: value } : prev));
+        setOriginalFlag((prev) => (prev ? { ...prev, useFixedWeightVariants: value } : prev));
+      } else {
+        setFlag((prev) => (prev ? { ...prev, useFixedWeightVariants: value } : prev));
+      }
+    } catch (error: any) {
+      enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
+        variant: 'error',
+      });
+    }
+  };
+
   // Handler for saving environment-specific fallback value (enabledValue/disabledValue)
-  const handleSaveEnvFallbackValue = async (envName: string, value: any, useGlobal: boolean) => {
+  const handleSaveEnvFallbackValue = async (
+    envName: string,
+    enabledValue: any,
+    disabledValue: any,
+    overrideEnabledValue: boolean,
+    overrideDisabledValue: boolean
+  ) => {
     if (!flag || isCreating) return;
 
     try {
-      // Update flag with environment-specific enabledValue/disabledValue
+      // Update flag with environment-specific enabledValue/disabledValue and override flags
       await api.put(
         `/admin/features/${flag.flagName}`,
-        useGlobal
-          ? { enabledValue: null, disabledValue: null }
-          : { enabledValue: value.enabledValue, disabledValue: value.disabledValue },
+        {
+          enabledValue,
+          disabledValue,
+          overrideEnabledValue,
+          overrideDisabledValue,
+        },
         { headers: { 'x-environment': envName } }
       );
       // Reload everything to ensure sync
@@ -1619,7 +1608,6 @@ const FeatureFlagDetailPage: React.FC = () => {
             value: v.value,
             valueType: v.valueType,
             stickiness: v.stickiness || 'default',
-            weightLock: v.weightLock,
           })),
         });
       }
@@ -2484,16 +2472,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       (e) => e.environment === env.environment
                                     )?.disabledValue
                                   }
+                                  overrideEnabledValue={
+                                    flag.environments?.find(
+                                      (e) => e.environment === env.environment
+                                    )?.overrideEnabledValue ?? false
+                                  }
+                                  overrideDisabledValue={
+                                    flag.environments?.find(
+                                      (e) => e.environment === env.environment
+                                    )?.overrideDisabledValue ?? false
+                                  }
                                   canManage={canManage}
                                   isArchived={flag.isArchived}
+                                  useFixedWeightVariants={flag.useFixedWeightVariants}
+                                  onUseFixedWeightVariantsChange={handleUseFixedWeightVariantsChange}
                                   onSave={(variants) =>
                                     handleSaveEnvVariants(env.environment, variants)
                                   }
-                                  onSaveValues={(enabledValue, disabledValue, useGlobal) =>
+                                  onSaveValues={(enabledValue, disabledValue, overrideEnabled, overrideDisabled) =>
                                     handleSaveEnvFallbackValue(
                                       env.environment,
-                                      { enabledValue, disabledValue },
-                                      useGlobal
+                                      enabledValue,
+                                      disabledValue,
+                                      overrideEnabled,
+                                      overrideDisabled
                                     )
                                   }
                                   onGoToPayloadTab={() => setTabValue(1)}
@@ -2582,16 +2584,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       (e) => e.environment === env.environment
                                     )?.disabledValue
                                   }
+                                  overrideEnabledValue={
+                                    flag.environments?.find(
+                                      (e) => e.environment === env.environment
+                                    )?.overrideEnabledValue ?? false
+                                  }
+                                  overrideDisabledValue={
+                                    flag.environments?.find(
+                                      (e) => e.environment === env.environment
+                                    )?.overrideDisabledValue ?? false
+                                  }
                                   canManage={canManage}
                                   isArchived={flag.isArchived}
+                                  useFixedWeightVariants={flag.useFixedWeightVariants}
+                                  onUseFixedWeightVariantsChange={handleUseFixedWeightVariantsChange}
                                   onSave={(variants) =>
                                     handleSaveEnvVariants(env.environment, variants)
                                   }
-                                  onSaveValues={(enabledValue, disabledValue, useGlobal) =>
+                                  onSaveValues={(enabledValue, disabledValue, overrideEnabled, overrideDisabled) =>
                                     handleSaveEnvFallbackValue(
                                       env.environment,
-                                      { enabledValue, disabledValue },
-                                      useGlobal
+                                      enabledValue,
+                                      disabledValue,
+                                      overrideEnabled,
+                                      overrideDisabled
                                     )
                                   }
                                   onGoToPayloadTab={() => setTabValue(1)}
@@ -2773,16 +2789,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       (e) => e.environment === env.environment
                                     )?.disabledValue
                                   }
+                                  overrideEnabledValue={
+                                    flag.environments?.find(
+                                      (e) => e.environment === env.environment
+                                    )?.overrideEnabledValue ?? false
+                                  }
+                                  overrideDisabledValue={
+                                    flag.environments?.find(
+                                      (e) => e.environment === env.environment
+                                    )?.overrideDisabledValue ?? false
+                                  }
                                   canManage={canManage}
                                   isArchived={flag.isArchived}
+                                  useFixedWeightVariants={flag.useFixedWeightVariants}
+                                  onUseFixedWeightVariantsChange={handleUseFixedWeightVariantsChange}
                                   onSave={(variants) =>
                                     handleSaveEnvVariants(env.environment, variants)
                                   }
-                                  onSaveValues={(enabledValue, disabledValue, useGlobal) =>
+                                  onSaveValues={(enabledValue, disabledValue, overrideEnabled, overrideDisabled) =>
                                     handleSaveEnvFallbackValue(
                                       env.environment,
-                                      { enabledValue, disabledValue },
-                                      useGlobal
+                                      enabledValue,
+                                      disabledValue,
+                                      overrideEnabled,
+                                      overrideDisabled
                                     )
                                   }
                                   onGoToPayloadTab={() => setTabValue(1)}
@@ -2985,11 +3015,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                       setFlag((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              enabledValue: originalFlag.enabledValue,
-                              disabledValue: originalFlag.disabledValue,
-                              validationRules: originalFlag.validationRules,
-                            }
+                            ...prev,
+                            enabledValue: originalFlag.enabledValue,
+                            disabledValue: originalFlag.disabledValue,
+                            validationRules: originalFlag.validationRules,
+                          }
                           : prev
                       );
                     }
@@ -2999,9 +3029,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(originalFlag?.disabledValue) &&
                       JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {t('common.cancel')}
@@ -3021,11 +3051,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                       setOriginalFlag((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              enabledValue: flag.enabledValue,
-                              disabledValue: flag.disabledValue,
-                              validationRules: flag.validationRules,
-                            }
+                            ...prev,
+                            enabledValue: flag.enabledValue,
+                            disabledValue: flag.disabledValue,
+                            validationRules: flag.validationRules,
+                          }
                           : prev
                       );
                       enqueueSnackbar(t('common.saveSuccess'), {
@@ -3047,9 +3077,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(originalFlag?.disabledValue) &&
                       JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -3320,7 +3350,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     editingFlagData?.description === (flag?.description || '') &&
                     editingFlagData?.impressionDataEnabled === flag?.impressionDataEnabled &&
                     JSON.stringify(editingFlagData?.tags || []) ===
-                      JSON.stringify(flag?.tags || []))
+                    JSON.stringify(flag?.tags || []))
                 }
               >
                 {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -3359,16 +3389,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                       {(editingStrategy.segments?.length || 0) +
                         (editingStrategy.constraints?.length || 0) >
                         0 && (
-                        <Chip
-                          label={
-                            (editingStrategy.segments?.length || 0) +
-                            (editingStrategy.constraints?.length || 0)
-                          }
-                          size="small"
-                          color="primary"
-                          sx={{ height: 20, fontSize: '0.75rem' }}
-                        />
-                      )}
+                          <Chip
+                            label={
+                              (editingStrategy.segments?.length || 0) +
+                              (editingStrategy.constraints?.length || 0)
+                            }
+                            size="small"
+                            color="primary"
+                            sx={{ height: 20, fontSize: '0.75rem' }}
+                          />
+                        )}
                     </Box>
                   }
                 />
@@ -3452,148 +3482,148 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* Rollout % for flexible rollout */}
                   {(editingStrategy.name === 'flexibleRollout' ||
                     editingStrategy.name?.includes('Rollout')) && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.rollout')}
-                        <Tooltip title={t('featureFlags.rolloutTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ px: 2, pt: 3 }}>
-                        <Slider
-                          value={editingStrategy.parameters?.rollout ?? 100}
-                          onChange={(_, value) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              parameters: {
-                                ...editingStrategy.parameters,
-                                rollout: value as number,
-                              },
-                            })
-                          }
-                          valueLabelDisplay="on"
-                          min={0}
-                          max={100}
-                          marks={[
-                            { value: 0, label: '0%' },
-                            { value: 25, label: '25%' },
-                            { value: 50, label: '50%' },
-                            { value: 75, label: '75%' },
-                            { value: 100, label: '100%' },
-                          ]}
-                        />
-                      </Box>
+                      <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          gutterBottom
+                          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                        >
+                          {t('featureFlags.rollout')}
+                          <Tooltip title={t('featureFlags.rolloutTooltip')}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ px: 2, pt: 3 }}>
+                          <Slider
+                            value={editingStrategy.parameters?.rollout ?? 100}
+                            onChange={(_, value) =>
+                              setEditingStrategy({
+                                ...editingStrategy,
+                                parameters: {
+                                  ...editingStrategy.parameters,
+                                  rollout: value as number,
+                                },
+                              })
+                            }
+                            valueLabelDisplay="on"
+                            min={0}
+                            max={100}
+                            marks={[
+                              { value: 0, label: '0%' },
+                              { value: 25, label: '25%' },
+                              { value: 50, label: '50%' },
+                              { value: 75, label: '75%' },
+                              { value: 100, label: '100%' },
+                            ]}
+                          />
+                        </Box>
 
-                      {/* Stickiness & GroupId */}
-                      <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid size={{ xs: 6 }}>
-                          <FormControl fullWidth size="small">
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
-                            >
-                              {t('featureFlags.stickiness')}
-                              <Tooltip title={t('featureFlags.stickinessHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <Select
-                              value={editingStrategy.parameters?.stickiness || 'default'}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    stickiness: e.target.value,
-                                  },
-                                })
-                              }
-                            >
-                              <MenuItem value="default">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessDefault')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessDefaultDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="userId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessUserId')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessUserIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="sessionId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessSessionId')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessSessionIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="random">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessRandom')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessRandomDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
+                        {/* Stickiness & GroupId */}
+                        <Grid container spacing={2} sx={{ mt: 2 }}>
+                          <Grid size={{ xs: 6 }}>
+                            <FormControl fullWidth size="small">
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              >
+                                {t('featureFlags.stickiness')}
+                                <Tooltip title={t('featureFlags.stickinessHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <Select
+                                value={editingStrategy.parameters?.stickiness || 'default'}
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      stickiness: e.target.value,
+                                    },
+                                  })
+                                }
+                              >
+                                <MenuItem value="default">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessDefault')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessDefaultDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="userId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessUserId')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessUserIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="sessionId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessSessionId')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessSessionIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="random">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessRandom')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessRandomDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid size={{ xs: 6 }}>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              >
+                                {t('featureFlags.groupId')}
+                                <Tooltip title={t('featureFlags.groupIdHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      groupId: e.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                            </Box>
+                          </Grid>
                         </Grid>
-                        <Grid size={{ xs: 6 }}>
-                          <Box>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
-                            >
-                              {t('featureFlags.groupId')}
-                              <Tooltip title={t('featureFlags.groupIdHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    groupId: e.target.value,
-                                  },
-                                })
-                              }
-                            />
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Paper>
-                  )}
+                      </Paper>
+                    )}
 
                   {/* User IDs input for userWithId strategy */}
                   {editingStrategy.name === 'userWithId' && (

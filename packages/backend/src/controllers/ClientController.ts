@@ -577,11 +577,14 @@ export class ClientController {
         : flags;
 
       for (const dbFlag of evaluableFlags) {
-        // Resolve enabled/disabled values (Environment > Global)
+        // Resolve enabled/disabled values using explicit override flags
         const envSettings = dbFlag.environments?.find((e: any) => e.environment === environment);
-
-        const resolvedEnabledValue = envSettings?.enabledValue ?? dbFlag.enabledValue;
-        const resolvedDisabledValue = envSettings?.disabledValue ?? dbFlag.disabledValue;
+        const resolvedEnabledValue = envSettings?.overrideEnabledValue
+          ? envSettings.enabledValue
+          : dbFlag.enabledValue;
+        const resolvedDisabledValue = envSettings?.overrideDisabledValue
+          ? envSettings.disabledValue
+          : dbFlag.disabledValue;
 
         // Map DB flag to SDK FeatureFlag type for evaluation
         const sdkFlag: FeatureFlag = {

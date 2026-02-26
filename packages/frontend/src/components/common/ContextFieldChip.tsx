@@ -78,7 +78,7 @@ const ContextFieldChip: React.FC<ContextFieldChipProps> = ({ fieldName, fieldInf
           variant="outlined"
           onClick={handleClick}
           sx={{
-            height: 26,
+            height: 22,
             fontSize: '0.75rem',
             fontFamily: 'monospace',
             fontWeight: 500,

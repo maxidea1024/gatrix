@@ -122,6 +122,7 @@ export interface FeatureFlagAttributes {
   valueType: ValueType;
   enabledValue: any; // Value when flag evaluates to true
   disabledValue: any; // Value when flag evaluates to false
+  useFixedWeightVariants: boolean; // Whether variants use fixed weight ratios
   validationRules?: ValidationRules; // Type-specific validation rules
   createdBy: number;
   createdByName?: string; // Joined from g_users
@@ -144,6 +145,8 @@ export interface FeatureFlagEnvironmentAttributes {
   flagId: string;
   environment: string;
   isEnabled: boolean;
+  overrideEnabledValue?: boolean;
+  overrideDisabledValue?: boolean;
   enabledValue?: any; // Environment-specific enabled value override
   disabledValue?: any; // Environment-specific disabled value override
   lastSeenAt?: Date;
@@ -181,7 +184,6 @@ export interface FeatureVariantAttributes {
   weight: number;
   value?: any;
   valueType: ValueType;
-  weightLock?: boolean;
   createdBy: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -375,6 +377,7 @@ export class FeatureFlagModel {
           isFavorite: Boolean(f.isFavorite),
           stale: Boolean(f.stale),
           impressionDataEnabled: Boolean(f.impressionDataEnabled),
+          useFixedWeightVariants: Boolean(f.useFixedWeightVariants),
           codeReferenceCount: Number(f.codeReferenceCount || 0),
           tags: parseJsonField<string[]>(f.tags) || [],
           enabledValue: parseJsonField(f.enabledValue),
@@ -385,6 +388,8 @@ export class FeatureFlagModel {
             flagId: e.flagId,
             environment: e.environment,
             isEnabled: Boolean(e.isEnabled),
+            overrideEnabledValue: Boolean(e.overrideEnabledValue),
+            overrideDisabledValue: Boolean(e.overrideDisabledValue),
             enabledValue: parseJsonField(e.enabledValue),
             disabledValue: parseJsonField(e.disabledValue),
             lastSeenAt: e.lastSeenAt,
@@ -437,6 +442,7 @@ export class FeatureFlagModel {
         isFavorite: Boolean(flag.isFavorite),
         stale: Boolean(flag.stale),
         impressionDataEnabled: Boolean(flag.impressionDataEnabled),
+        useFixedWeightVariants: Boolean(flag.useFixedWeightVariants),
         tags: parseJsonField<string[]>(flag.tags) || [],
         links: parseJsonField<{ url: string; title?: string }[]>(flag.links) || [],
         enabledValue: parseJsonField(flag.enabledValue),
@@ -449,6 +455,8 @@ export class FeatureFlagModel {
           flagId: e.flagId,
           environment: e.environment,
           isEnabled: Boolean(e.isEnabled),
+          overrideEnabledValue: Boolean(e.overrideEnabledValue),
+          overrideDisabledValue: Boolean(e.overrideDisabledValue),
           enabledValue: parseJsonField(e.enabledValue),
           disabledValue: parseJsonField(e.disabledValue),
           lastSeenAt: e.lastSeenAt,
@@ -488,6 +496,7 @@ export class FeatureFlagModel {
         isFavorite: Boolean(flag.isFavorite),
         stale: Boolean(flag.stale),
         impressionDataEnabled: Boolean(flag.impressionDataEnabled),
+        useFixedWeightVariants: Boolean(flag.useFixedWeightVariants),
         tags: parseJsonField<string[]>(flag.tags) || [],
         enabledValue: parseJsonField(flag.enabledValue),
         disabledValue: parseJsonField(flag.disabledValue),
@@ -496,16 +505,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                enabledValue: parseJsonField(envSettings.enabledValue),
-                disabledValue: parseJsonField(envSettings.disabledValue),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              enabledValue: parseJsonField(envSettings.enabledValue),
+              disabledValue: parseJsonField(envSettings.disabledValue),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {
@@ -589,6 +598,8 @@ export class FeatureFlagModel {
       if (data.archivedAt !== undefined) updateData.archivedAt = data.archivedAt;
       if (data.impressionDataEnabled !== undefined)
         updateData.impressionDataEnabled = data.impressionDataEnabled;
+      if (data.useFixedWeightVariants !== undefined)
+        updateData.useFixedWeightVariants = data.useFixedWeightVariants;
       if (data.staleAfterDays !== undefined) updateData.staleAfterDays = data.staleAfterDays;
       if (data.stale !== undefined) updateData.stale = data.stale;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
@@ -657,6 +668,8 @@ export class FeatureFlagEnvironmentModel {
       return envs.map((e: any) => ({
         ...e,
         isEnabled: Boolean(e.isEnabled),
+        overrideEnabledValue: Boolean(e.overrideEnabledValue),
+        overrideDisabledValue: Boolean(e.overrideDisabledValue),
         enabledValue: parseJsonField(e.enabledValue),
         disabledValue: parseJsonField(e.disabledValue),
       }));
@@ -679,6 +692,8 @@ export class FeatureFlagEnvironmentModel {
       return {
         ...env,
         isEnabled: Boolean(env.isEnabled),
+        overrideEnabledValue: Boolean(env.overrideEnabledValue),
+        overrideDisabledValue: Boolean(env.overrideDisabledValue),
         enabledValue: parseJsonField(env.enabledValue),
         disabledValue: parseJsonField(env.disabledValue),
       };
@@ -698,6 +713,8 @@ export class FeatureFlagEnvironmentModel {
         flagId: data.flagId,
         environment: data.environment,
         isEnabled: data.isEnabled ?? false,
+        overrideEnabledValue: data.overrideEnabledValue ?? false,
+        overrideDisabledValue: data.overrideDisabledValue ?? false,
         enabledValue: data.enabledValue !== undefined ? JSON.stringify(data.enabledValue) : null,
         disabledValue: data.disabledValue !== undefined ? JSON.stringify(data.disabledValue) : null,
         createdAt: new Date(),
@@ -772,6 +789,10 @@ export class FeatureFlagEnvironmentModel {
 
       const updateData: any = { updatedAt: new Date() };
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
+      if (data.overrideEnabledValue !== undefined)
+        updateData.overrideEnabledValue = data.overrideEnabledValue;
+      if (data.overrideDisabledValue !== undefined)
+        updateData.overrideDisabledValue = data.overrideDisabledValue;
       if (data.enabledValue !== undefined)
         updateData.enabledValue = JSON.stringify(coerceValueByType(data.enabledValue, valueType));
       if (data.disabledValue !== undefined)
@@ -999,7 +1020,6 @@ export class FeatureVariantModel {
         weight: data.weight,
         value: data.value !== null && data.value !== undefined ? JSON.stringify(data.value) : null,
         valueType: data.valueType || 'json',
-        weightLock: data.weightLock || false,
         createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),

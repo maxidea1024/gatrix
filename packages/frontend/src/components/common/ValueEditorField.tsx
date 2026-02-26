@@ -10,6 +10,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Tooltip,
 } from '@mui/material';
 import { OpenInFull as ExpandIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -116,12 +117,8 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
     return new TextEncoder().encode(editingValue).length;
   }, [editingValue]);
 
-  // Helper text combining error and byte length
-  const helperText = error
-    ? `${error} · ${t('featureFlags.payloadSize', { size: byteLength })}`
-    : byteLength > 0
-      ? t('featureFlags.payloadSize', { size: byteLength })
-      : undefined;
+  // Helper text - only show error, byte length is shown via tooltip
+  const helperText = error || undefined;
 
   const handleOpenDialog = () => {
     setEditingValue(getEditorValue());
@@ -200,20 +197,23 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
               : placeholder
           }
           sx={sx}
-          FormHelperTextProps={{
-            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 },
-          }}
           InputProps={{
             sx: showEmptyHint ? { fontStyle: 'italic', ...sx } : sx,
             endAdornment: !disabled && (
               <InputAdornment position="end" sx={{ alignSelf: 'flex-start', mt: 1 }}>
-                <IconButton
-                  size="small"
-                  onClick={handleOpenDialog}
-                  title={t('featureFlags.expandEditor')}
+                <Tooltip
+                  title={t('featureFlags.payloadSize', { size: byteLength })}
+                  placement="top"
+                  arrow
                 >
-                  <ExpandIcon fontSize="small" />
-                </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={handleOpenDialog}
+                    title={t('featureFlags.expandEditor')}
+                  >
+                    <ExpandIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </InputAdornment>
             ),
           }}
@@ -236,25 +236,29 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
           }
           onClick={valueType === 'json' && !disabled ? handleOpenDialog : undefined}
           sx={sx}
-          FormHelperTextProps={{
-            sx: { minHeight: '1.25rem', m: 0, mt: 0.5 },
-          }}
           InputProps={{
             readOnly: valueType === 'json',
             sx: {
+              height: 36,
               ...(valueType === 'json' ? { cursor: 'pointer' } : {}),
               ...(showEmptyHint ? { fontStyle: 'italic' } : {}),
               ...sx,
             },
             endAdornment: !disabled && (
               <InputAdornment position="end">
-                <IconButton
-                  size="small"
-                  onClick={handleOpenDialog}
-                  title={t('featureFlags.expandEditor')}
+                <Tooltip
+                  title={t('featureFlags.payloadSize', { size: byteLength })}
+                  placement="top"
+                  arrow
                 >
-                  <ExpandIcon fontSize="small" />
-                </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={handleOpenDialog}
+                    title={t('featureFlags.expandEditor')}
+                  >
+                    <ExpandIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </InputAdornment>
             ),
           }}
