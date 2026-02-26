@@ -210,7 +210,7 @@ function handleViewModeChange(mode: 'detailed' | 'simple' | 'list') {
             <div class="col-time">LAST</div>
             <div class="col-type">TYPE</div>
             <div class="col-variant">VARIANT</div>
-            <div class="col-payload">PAYLOAD</div>
+            <div class="col-payload">VALUE</div>
           </div>
 
           <div :class="viewMode === 'list' ? 'flag-list' : 'flags-grid'">

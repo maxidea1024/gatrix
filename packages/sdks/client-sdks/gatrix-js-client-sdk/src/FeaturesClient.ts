@@ -220,10 +220,12 @@ export class FeaturesClient implements VariationProvider {
 
     // Resolve session ID
     const sessionId = await this.resolveSessionId();
+    if (!this.started) return; // Aborted by stop()
     this.context.sessionId = sessionId;
 
     // Load cached etag
     const cachedEtag = await this.storage.get(STORAGE_KEY_ETAG);
+    if (!this.started) return; // Aborted by stop()
     if (cachedEtag) {
       this.etag = cachedEtag;
     }
@@ -276,9 +278,11 @@ export class FeaturesClient implements VariationProvider {
 
     // Ensure context hash is computed before first fetch
     this.lastContextHash = await computeContextHash(this.context);
+    if (!this.started) return; // Aborted by stop()
 
     // Initial fetch (scheduleNextRefresh is called inside fetchFlags on completion)
     await this.fetchFlagsInternal('init');
+    if (!this.started) return; // Aborted by stop()
 
     // Start streaming if enabled (default: true)
     if (this.featuresConfig.streaming?.enabled !== false) {

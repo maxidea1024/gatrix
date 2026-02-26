@@ -27,8 +27,8 @@ const offlineConfig: GatrixClientConfig = {
   apiToken: 'not-used',
   appName: 'offline',
   environment: 'offline',
-  offlineMode: true,
   features: {
+    offlineMode: true,
     bootstrap: [],
     disableRefresh: true,
     disableMetrics: true,
@@ -103,7 +103,7 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     client.current!.on(EVENTS.SDK_ERROR, errorCallback);
     client.current!.on(EVENTS.FLAGS_RECOVERED, clearErrorCallback);
 
-    if (startClient && !client.current!.isReady() && !hasStarted.current) {
+    if (startClient && !hasStarted.current) {
       hasStarted.current = true;
       client.current!.start();
     }
@@ -116,6 +116,7 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
         client.current.off(EVENTS.FLAGS_RECOVERED, clearErrorCallback);
         if (stopClient) {
           client.current.stop();
+          hasStarted.current = false;
         }
       }
       if (timeout) {

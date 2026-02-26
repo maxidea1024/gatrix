@@ -294,7 +294,7 @@ export default function SlotMachineGame({ onExit }: { onExit: () => void }) {
   useEffect(() => {
     if (phase !== 'playing' || !client) return;
     const features: FeaturesClient = client.features;
-    const group = features.createWatchGroup('slot-game');
+    const group = features.createWatchFlagGroup('slot-game');
     watchGroupRef.current = group;
 
     // Real-time: sound

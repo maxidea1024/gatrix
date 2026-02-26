@@ -16,6 +16,9 @@ interface Stats {
   connectionId?: string;
   metricsSentCount?: number;
   metricsErrorCount?: number;
+  streamingState?: string;
+  streamingReconnectCount?: number;
+  lastStreamingEventTime?: Date | null;
 }
 
 interface StatsPanelProps {
@@ -338,6 +341,18 @@ function StatsPanel({
                     : 'AUTO'}
                 </span>
               </div>
+              <div
+                className={`mode-item ${config.features?.streaming?.enabled !== false && !client.features.isOfflineMode() ? 'is-success' : 'is-warning'}`}
+              >
+                <span className="mode-label">STREAM</span>
+                <span className="mode-value">
+                  {client.features.isOfflineMode()
+                    ? 'OFF'
+                    : config.features?.streaming?.enabled === false
+                      ? 'OFF'
+                      : (config.features?.streaming?.transport || 'SSE').toUpperCase()}
+                </span>
+              </div>
             </div>
 
             {/* Vertical Separator */}
@@ -402,6 +417,14 @@ function StatsPanel({
                     <td className="stats-value">{stats?.metricsErrorCount || 0}</td>
                     <td className="stats-label">IMP:</td>
                     <td className="stats-value">{stats?.impressionCount || 0}</td>
+                  </tr>
+                  <tr>
+                    <td className="stats-label">STR:</td>
+                    <td className="stats-value">{stats?.streamingState || 'off'}</td>
+                    <td className="stats-label">S-REC:</td>
+                    <td className="stats-value">{stats?.streamingReconnectCount || 0}</td>
+                    <td className="stats-label">S-EVT:</td>
+                    <td className="stats-value">{formatTime(stats?.lastStreamingEventTime || null)}</td>
                   </tr>
                 </tbody>
               </table>

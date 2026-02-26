@@ -149,7 +149,7 @@ function FlagCard({ flag, viewMode, initialVersion, lastChangedTime, onSelect }:
                   fontWeight: 'bold',
                 }}
               >
-                {flag.variant?.name || '-'}
+                {hasValue ? formatValue(value) : '-'}
               </span>
             </div>
           </div>

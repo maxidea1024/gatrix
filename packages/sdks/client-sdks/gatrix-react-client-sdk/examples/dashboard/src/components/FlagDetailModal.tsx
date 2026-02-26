@@ -12,6 +12,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
 
   const formatValue = (v: unknown): string => {
     try {
+      if (v === '') return 'EMPTY STRING';
       if (typeof v === 'object') {
         return JSON.stringify(v, null, 2);
       }
@@ -124,7 +125,7 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
 
             <div className="flag-payload" style={{ marginTop: '12px' }}>
               <div className="flag-payload-label" style={{ marginBottom: '6px' }}>
-                Payload Detail
+                Value
               </div>
               {hasValue ? (
                 <>

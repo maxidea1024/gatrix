@@ -165,16 +165,16 @@ function ConfigForm({ onConnect }: ConfigFormProps) {
       apiToken,
       appName,
       environment,
-      offlineMode,
-      context: {
-        userId,
-      },
       features: {
+        context: {
+          userId,
+        },
+        offlineMode,
         refreshInterval: manualPolling ? 0 : refreshInterval,
         explicitSyncMode,
         streaming: {
           enabled: streamingEnabled,
-          mode: streamingMode,
+          transport: streamingMode,
         },
       },
     });

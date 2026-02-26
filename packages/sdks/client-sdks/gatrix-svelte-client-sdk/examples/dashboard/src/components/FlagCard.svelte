@@ -149,7 +149,7 @@
             class="pixel-chip variant-chip is-mini"
             style="font-size:8px;width:100%;text-align:center;color:#000;font-weight:bold"
           >
-            {flag.variant?.name || '-'}
+            {hasValue ? formatValue(flagValue) : '-'}
           </span>
         </div>
       </div>

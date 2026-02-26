@@ -279,6 +279,20 @@
               {config.features?.explicitSyncMode && !offlineMode ? 'EXPLICIT' : 'AUTO'}
             </span>
           </div>
+          <div
+            class="mode-item {config.features?.streaming?.enabled !== false && !offlineMode
+              ? 'is-success'
+              : 'is-warning'}"
+          >
+            <span class="mode-label">STREAM</span>
+            <span class="mode-value">
+              {offlineMode
+                ? 'OFF'
+                : config.features?.streaming?.enabled === false
+                  ? 'OFF'
+                  : (config.features?.streaming?.transport || 'SSE').toUpperCase()}
+            </span>
+          </div>
         </div>
 
         <div class="stats-separator"></div>
@@ -338,6 +352,14 @@
                 <td class="stats-value">{stats?.metricsErrorCount || 0}</td>
                 <td class="stats-label">IMP:</td>
                 <td class="stats-value">{stats?.impressionCount || 0}</td>
+              </tr>
+              <tr>
+                <td class="stats-label">STR:</td>
+                <td class="stats-value">{stats?.streamingState || 'off'}</td>
+                <td class="stats-label">S-REC:</td>
+                <td class="stats-value">{stats?.streamingReconnectCount || 0}</td>
+                <td class="stats-label">S-EVT:</td>
+                <td class="stats-value">{formatTime(stats?.lastStreamingEventTime || null)}</td>
               </tr>
             </tbody>
           </table>
