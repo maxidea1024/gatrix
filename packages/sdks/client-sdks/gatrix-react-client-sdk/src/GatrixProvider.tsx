@@ -23,7 +23,7 @@ export interface GatrixProviderProps {
 
 // Offline config for when no config is provided
 const offlineConfig: GatrixClientConfig = {
-  apiUrl: 'http://localhost',
+  apiUrl: 'http://localhost/api/v1',
   apiToken: 'not-used',
   appName: 'offline',
   environment: 'offline',
@@ -60,8 +60,8 @@ const GatrixProvider: FC<PropsWithChildren<GatrixProviderProps>> = ({
     Boolean(
       gatrixClient
         ? (customConfig?.features?.bootstrap &&
-            customConfig?.features?.bootstrapOverride !== false) ||
-            gatrixClient.isReady?.()
+          customConfig?.features?.bootstrapOverride !== false) ||
+        gatrixClient.isReady?.()
         : config.features?.bootstrap && config.features?.bootstrapOverride !== false
     )
   );

@@ -23,16 +23,6 @@ import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 import { VARIANT_SOURCE, type Variant } from '@gatrix/gatrix-js-client-sdk';
 
-/** Check if variant has meaningfully changed (used by external consumers) */
-export const variantHasChanged = (oldVariant: Variant, newVariant?: Variant): boolean => {
-  if (!newVariant) return true;
-  return (
-    oldVariant.name !== newVariant.name ||
-    oldVariant.enabled !== newVariant.enabled ||
-    JSON.stringify(oldVariant.value) !== JSON.stringify(newVariant.value)
-  );
-};
-
 export function useVariant(flagName: string, forceRealtime = false): Variant {
   const { features } = useGatrixContext();
   const [variant, setVariant] = useState<Variant>(

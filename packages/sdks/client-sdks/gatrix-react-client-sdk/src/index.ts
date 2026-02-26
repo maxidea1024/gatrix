@@ -50,7 +50,7 @@ export { useTrack } from './useTrack';
 // Flag Access Hooks
 export { useFlag } from './useFlag';
 export { useFlags } from './useFlags';
-export { useVariant, variantHasChanged } from './useVariant';
+export { useVariant } from './useVariant';
 
 // Variation Hooks
 export { useBoolVariation } from './useBoolVariation';
