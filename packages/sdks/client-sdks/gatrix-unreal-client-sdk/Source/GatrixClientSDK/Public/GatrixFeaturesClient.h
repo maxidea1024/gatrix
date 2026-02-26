@@ -267,7 +267,7 @@ public:
    * Create a named watch group for batch management of flag watchers.
    * The caller owns the returned pointer and must delete it when done.
    */
-  FGatrixWatchFlagGroup* CreateWatchGroup(const FString& Name);
+  FGatrixWatchFlagGroup* CreateWatchFlagGroup(const FString& Name);
 
   // ==================== Stats ====================
 
@@ -518,7 +518,7 @@ private:
   TArray<TFunction<void(bool, const FString&)>> PendingStartCallbacks;
 
   // Watch callback storage
-  TArray<FWatchCallbackEntry> WatchCallbacks;
+  TArray<FWatchCallbackEntry> RealtimeWatchCallbacks;
   TArray<FWatchCallbackEntry> SyncedWatchCallbacks;
   int32 NextWatchHandle = 100000; // Start high to avoid collision with EventEmitter handles
 

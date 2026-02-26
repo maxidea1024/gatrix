@@ -1,10 +1,13 @@
 // Gatrix Svelte SDK - Variation stores
 import { readable, type Readable } from 'svelte/store';
 import { getGatrixClient } from './getGatrixClient';
-import { EVENTS, type Variant } from '@gatrix/gatrix-js-client-sdk';
+import type { Variant } from '@gatrix/gatrix-js-client-sdk';
 
 /**
  * Reactive boolean variation store.
+ * @param flagName - Feature flag key
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  * @example
  * ```svelte
  * <script>
@@ -13,99 +16,85 @@ import { EVENTS, type Variant } from '@gatrix/gatrix-js-client-sdk';
  * </script>
  * ```
  */
-export function boolVariation(flagName: string, missingValue: boolean): Readable<boolean> {
+export function boolVariation(flagName: string, fallbackValue: boolean, forceRealtime = false): Readable<boolean> {
   const client = getGatrixClient();
-  return readable<boolean>(client.features.boolVariation(flagName, missingValue), (set) => {
-    const update = () => set(client.features.boolVariation(flagName, missingValue));
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-    const unwatch = client.features.watchFlag(flagName, () => update(), `svelte_bool_${flagName}`);
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<boolean>(client.features.boolVariation(flagName, fallbackValue, forceRealtime), (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, () => {
+      set(client.features.boolVariation(flagName, fallbackValue, forceRealtime));
+    });
   });
 }
 
 /**
  * Reactive string variation store.
+ * @param flagName - Feature flag key
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function stringVariation(flagName: string, missingValue: string): Readable<string> {
+export function stringVariation(flagName: string, fallbackValue: string, forceRealtime = false): Readable<string> {
   const client = getGatrixClient();
-  return readable<string>(client.features.stringVariation(flagName, missingValue), (set) => {
-    const update = () => set(client.features.stringVariation(flagName, missingValue));
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-    const unwatch = client.features.watchFlag(flagName, () => update(), `svelte_str_${flagName}`);
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<string>(client.features.stringVariation(flagName, fallbackValue, forceRealtime), (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, () => {
+      set(client.features.stringVariation(flagName, fallbackValue, forceRealtime));
+    });
   });
 }
 
 /**
  * Reactive number variation store.
+ * @param flagName - Feature flag key
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function numberVariation(flagName: string, missingValue: number): Readable<number> {
+export function numberVariation(flagName: string, fallbackValue: number, forceRealtime = false): Readable<number> {
   const client = getGatrixClient();
-  return readable<number>(client.features.numberVariation(flagName, missingValue), (set) => {
-    const update = () => set(client.features.numberVariation(flagName, missingValue));
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-    const unwatch = client.features.watchFlag(flagName, () => update(), `svelte_num_${flagName}`);
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<number>(client.features.numberVariation(flagName, fallbackValue, forceRealtime), (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, () => {
+      set(client.features.numberVariation(flagName, fallbackValue, forceRealtime));
+    });
   });
 }
 
 /**
  * Reactive JSON variation store.
+ * @param flagName - Feature flag key
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function jsonVariation<T = unknown>(flagName: string, missingValue: T): Readable<T> {
+export function jsonVariation<T = unknown>(flagName: string, fallbackValue: T, forceRealtime = false): Readable<T> {
   const client = getGatrixClient();
-  return readable<T>(client.features.jsonVariation(flagName, missingValue), (set) => {
-    const update = () => set(client.features.jsonVariation(flagName, missingValue));
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-    const unwatch = client.features.watchFlag(flagName, () => update(), `svelte_json_${flagName}`);
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<T>(client.features.jsonVariation(flagName, fallbackValue, forceRealtime), (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, () => {
+      set(client.features.jsonVariation(flagName, fallbackValue, forceRealtime));
+    });
   });
 }
 
 /**
  * Reactive variant store.
+ * @param flagName - Feature flag key
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function variant(flagName: string): Readable<Variant> {
+export function variant(flagName: string, forceRealtime = false): Readable<Variant> {
   const client = getGatrixClient();
-  return readable<Variant>(client.features.getVariant(flagName), (set) => {
-    const update = () => set(client.features.getVariant(flagName));
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-    const unwatch = client.features.watchFlag(flagName, () => update(), `svelte_var_${flagName}`);
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<Variant>(client.features.getVariant(flagName, forceRealtime), (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, (proxy: import('@gatrix/gatrix-js-client-sdk').FlagProxy) => {
+      set(proxy.variant);
+    });
   });
 }

@@ -5,8 +5,9 @@
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
- * @param missingValue - Value to return if flag not found
- * @returns number - The variant value as number or missing value
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
+ * @returns number - The variant value as number or fallback value
  *
  * @example
  * ```tsx
@@ -15,47 +16,22 @@
  * return <List items={items.slice(0, maxItems)} />;
  * ```
  */
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
-export function useNumberVariation(flagName: string, missingValue: number): number {
-  const { features, client } = useGatrixContext();
-
-  const getValue = useCallback(
-    () => features.numberVariation(flagName, missingValue),
-    [features, flagName, missingValue]
-  );
-
-  const [value, setValue] = useState<number>(() => getValue());
-  const valueRef = useRef<number>(value);
-  valueRef.current = value;
+export function useNumberVariation(flagName: string, fallbackValue: number, forceRealtime = false): number {
+  const { features } = useGatrixContext();
+  const [value, setValue] = useState(() => features.numberVariation(flagName, fallbackValue, forceRealtime));
 
   useEffect(() => {
-    if (!client) return;
+    const watchFn = forceRealtime
+      ? features.watchRealtimeFlagWithInitialState.bind(features)
+      : features.watchSyncedFlagWithInitialState.bind(features);
 
-    const updateHandler = () => {
-      const newValue = getValue();
-      if (newValue !== valueRef.current) {
-        valueRef.current = newValue;
-        setValue(newValue);
-      }
-    };
-
-    const readyHandler = () => {
-      const newValue = getValue();
-      valueRef.current = newValue;
-      setValue(newValue);
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, updateHandler);
-    client.on(EVENTS.FLAGS_READY, readyHandler);
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, updateHandler);
-      client.off(EVENTS.FLAGS_READY, readyHandler);
-    };
-  }, [client, getValue]);
+    return watchFn(flagName, () => {
+      setValue(features.numberVariation(flagName, fallbackValue, forceRealtime));
+    });
+  }, [features, flagName, fallbackValue, forceRealtime]);
 
   return value;
 }

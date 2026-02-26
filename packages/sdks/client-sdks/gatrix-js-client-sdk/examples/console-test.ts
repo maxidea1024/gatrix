@@ -26,31 +26,33 @@ async function main() {
     apiToken: config.apiToken,
     appName: config.appName,
     environment: config.environment,
-    storageProvider: new InMemoryStorageProvider(),
-    context: {
-      userId: 'test-user-123',
-      properties: {
-        plan: 'premium',
-        country: 'KR',
+    features: {
+      storageProvider: new InMemoryStorageProvider(),
+      context: {
+        userId: 'test-user-123',
+        properties: {
+          plan: 'premium',
+          country: 'KR',
+        },
       },
     },
   });
 
   // Setup event listeners
-  client.on(EVENTS.INIT, () => {
-    console.log('[Event] INIT - SDK initialized');
+  client.on(EVENTS.FLAGS_INIT, () => {
+    console.log('[Event] FLAGS_INIT - SDK initialized');
   });
 
-  client.on(EVENTS.READY, () => {
-    console.log('[Event] READY - Flags loaded from server');
+  client.on(EVENTS.FLAGS_READY, () => {
+    console.log('[Event] FLAGS_READY - Flags loaded from server');
   });
 
-  client.on(EVENTS.UPDATE, (data) => {
-    console.log('[Event] UPDATE - Flags updated', data);
+  client.on(EVENTS.FLAGS_CHANGE, (data) => {
+    console.log('[Event] FLAGS_CHANGE - Flags updated', data);
   });
 
-  client.on(EVENTS.ERROR, (data) => {
-    console.log('[Event] ERROR -', data);
+  client.on(EVENTS.SDK_ERROR, (data) => {
+    console.log('[Event] SDK_ERROR -', data);
   });
 
   try {

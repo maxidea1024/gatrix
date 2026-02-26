@@ -25,19 +25,19 @@ import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
 
-export function useFlags(): EvaluatedFlag[] {
+export function useFlags(forceRealtime = false): EvaluatedFlag[] {
   const { features, client } = useGatrixContext();
-  const [flags, setFlags] = useState<EvaluatedFlag[]>(() => features.getAllFlags());
+  const [flags, setFlags] = useState<EvaluatedFlag[]>(() => features.getAllFlags(forceRealtime));
 
   useEffect(() => {
     if (!client) return;
 
     const onUpdate = () => {
-      setFlags(features.getAllFlags());
+      setFlags(features.getAllFlags(forceRealtime));
     };
 
     const onReady = () => {
-      setFlags(features.getAllFlags());
+      setFlags(features.getAllFlags(forceRealtime));
     };
 
     client.on(EVENTS.FLAGS_CHANGE, onUpdate);
@@ -49,7 +49,7 @@ export function useFlags(): EvaluatedFlag[] {
       client.off(EVENTS.FLAGS_READY, onReady);
       client.off(EVENTS.FLAGS_SYNC, onUpdate);
     };
-  }, [client, features]);
+  }, [client, features, forceRealtime]);
 
   return flags;
 }

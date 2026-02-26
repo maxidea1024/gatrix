@@ -34,7 +34,7 @@ if client.features.is_enabled("new-dashboard"):
 
 # Get typed variations
 color = client.features.string_variation("theme-color", "blue")
-rate = client.features.number_variation("rate-limit", 100.0)
+rate = client.features.float_variation("rate-limit", 100.0)
 config = client.features.json_variation("ui-config", {"sidebar": True})
 
 client.stop()
@@ -52,8 +52,8 @@ bootstrap_flags = [
     EvaluatedFlag(
         name="my-feature",
         enabled=True,
-        variant=Variant(name="v1", enabled=True, payload="hello"),
-        variant_type="string",
+        variant=Variant(name="v1", enabled=True, value="hello"),
+        value_type="string",
         version=1,
     ),
 ]
@@ -63,28 +63,41 @@ client = GatrixClient(GatrixClientConfig(
     api_token="your-token",
     app_name="my-app",
     environment="production",
-    offline_mode=True,
-    features=FeaturesConfig(bootstrap=bootstrap_flags),
+    features=FeaturesConfig(
+        offline_mode=True,
+        bootstrap=bootstrap_flags,
+    ),
 ))
 
+client.start()
 assert client.features.is_enabled("my-feature") is True
 ```
 
 ## Watch for Changes
 
+Two watch modes are available:
+
+| Method                | Callback timing                                                                           |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| `watch_synced_flag`   | In `explicit_sync_mode`: only after `sync_flags()`. In normal mode: immediately on change |
+| `watch_realtime_flag` | Always immediately when server fetch brings new data                                      |
+
 ```python
 from gatrix import EVENTS
 
-# Watch a specific flag
-unwatch = client.features.watch_flag("my-feature", lambda proxy: print(f"Changed: {proxy.enabled}"))
+# Synced watch - respects explicit_sync_mode (recommended)
+unwatch = client.features.watch_synced_flag("my-feature", lambda proxy: print(f"Changed: {proxy.enabled}"))
 
-# Watch with initial state
-client.features.watch_flag_with_initial_state("my-feature", lambda proxy: print(f"State: {proxy.enabled}"))
+# Synced watch with initial state
+client.features.watch_synced_flag_with_initial_state("my-feature", lambda proxy: print(f"State: {proxy.enabled}"))
+
+# Realtime watch - fires immediately regardless of explicit_sync_mode
+unwatch_rt = client.features.watch_realtime_flag("my-feature", lambda proxy: print(f"Realtime: {proxy.enabled}"))
 
 # Watch groups
-group = client.features.create_watch_flag_group("ui-flags")
-group.watch_flag("sidebar", handler1)
-group.watch_flag("theme", handler2)
+group = client.features.create_watch_group("ui-flags")
+group.watch_realtime_flag("sidebar", handler1)
+group.watch_synced_flag("theme", handler2)
 group.unwatch_all()
 
 # Global events
@@ -130,6 +143,10 @@ stats = client.get_stats()
 print(f"State: {stats['sdk_state']}")
 print(f"Flags: {stats['features']['total_flag_count']}")
 print(f"Missing: {stats['features']['missing_flags']}")
+
+# Light stats (scalar values only)
+light = client.get_light_stats()
+print(f"State: {light['sdk_state']}")
 ```
 
 ## Running Tests

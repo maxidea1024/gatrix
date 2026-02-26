@@ -95,7 +95,7 @@ namespace Gatrix.Unity.SDK.Tests
         }
 
         [Test]
-        public void BoolVariationInternal_TypeMismatch_ReturnsMissingValue()
+        public void BoolVariationInternal_TypeMismatch_ReturnsFallbackValue()
         {
             InjectFlags(new List<EvaluatedFlag> {
                 new EvaluatedFlag { 
@@ -219,7 +219,7 @@ namespace Gatrix.Unity.SDK.Tests
         {
             var details = _client.BoolVariationDetailsInternal("missing", true);
 
-            Assert.IsTrue(details.Value); // missingValue
+            Assert.IsTrue(details.Value); // fallbackValue
             Assert.AreEqual("flag_not_found", details.Reason);
             Assert.IsFalse(details.FlagExists);
         }

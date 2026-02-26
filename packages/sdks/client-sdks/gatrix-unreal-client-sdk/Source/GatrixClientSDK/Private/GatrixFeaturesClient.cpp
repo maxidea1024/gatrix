@@ -789,7 +789,7 @@ void UGatrixFeaturesClient::StoreFlags(const TArray<FGatrixEvaluatedFlag>& NewFl
 
     // Always invoke realtime flag changes (events) and watch callbacks
     EmitFlagChanges(OldFlags, RealtimeFlags);
-    InvokeWatchCallbacks(WatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/true, OldHash,
+    InvokeWatchCallbacks(RealtimeWatchCallbacks, OldFlags, RealtimeFlags, /*bForceRealtime=*/true, OldHash,
                          NewHash);
 
     if (!ClientConfig.Features.bExplicitSyncMode) {
@@ -1001,7 +1001,7 @@ int32 UGatrixFeaturesClient::WatchRealtimeFlag(const FString& FlagName,
   Entry.FlagName = FlagName;
   Entry.Callback = Callback;
   Entry.Handle = NextWatchHandle++;
-  WatchCallbacks.Add(Entry);
+  RealtimeWatchCallbacks.Add(Entry);
   return Entry.Handle;
 }
 
@@ -1066,13 +1066,13 @@ int32 UGatrixFeaturesClient::WatchSyncedFlagWithInitialState(const FString& Flag
 }
 
 void UGatrixFeaturesClient::UnwatchFlag(int32 Handle) {
-  WatchCallbacks.RemoveAll(
+  RealtimeWatchCallbacks.RemoveAll(
       [Handle](const FWatchCallbackEntry& Entry) { return Entry.Handle == Handle; });
   SyncedWatchCallbacks.RemoveAll(
       [Handle](const FWatchCallbackEntry& Entry) { return Entry.Handle == Handle; });
 }
 
-FGatrixWatchFlagGroup* UGatrixFeaturesClient::CreateWatchGroup(const FString& Name) {
+FGatrixWatchFlagGroup* UGatrixFeaturesClient::CreateWatchFlagGroup(const FString& Name) {
   return new FGatrixWatchFlagGroup(this, Name);
 }
 
@@ -2134,7 +2134,7 @@ void UGatrixFeaturesClient::MergePartialResponse(const FString& ResponseBody,
   TMap<FString, FGatrixEvaluatedFlag> NewRealtime = RealtimeFlags;
 
   EmitFlagChanges(OldFlags, NewRealtime);
-  InvokeWatchCallbacks(WatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/true);
+  InvokeWatchCallbacks(RealtimeWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/true);
 
   if (!ClientConfig.Features.bExplicitSyncMode) {
     InvokeWatchCallbacks(SyncedWatchCallbacks, OldFlags, NewRealtime, /*bForceRealtime=*/false);

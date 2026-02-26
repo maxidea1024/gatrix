@@ -137,7 +137,7 @@ export async function computeContextHash(context: Record<string, any>): Promise<
  */
 export async function computeEtag(
   flags: any[],
-  contextHash: string
+  contextHash: string,
 ): Promise<string> {
   // Sort flags by name ascending to match server-side sorting
   const sortedFlags = [...flags].sort((a, b) => a.name.localeCompare(b.name));
@@ -168,7 +168,7 @@ export function isEqualFlag(
   a: any,
   b: any,
   oldContextHash?: string,
-  newContextHash?: string
+  newContextHash?: string,
 ): boolean {
   if (!a || !b) {
     return a === b;

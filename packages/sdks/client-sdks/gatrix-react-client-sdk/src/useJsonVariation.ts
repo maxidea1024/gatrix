@@ -1,74 +1,37 @@
 /**
  * useJsonVariation - Get a JSON flag variation
  *
- * Returns the JSON value for a feature flag.
+ * Returns the parsed JSON value from a feature flag's variant payload.
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
- * @param missingValue - Value to return if flag not found
- * @returns T - The variant value as JSON object or missing value
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
+ * @returns T - The variant value as parsed JSON or fallback value
  *
  * @example
  * ```tsx
- * interface ThemeConfig {
- *   primary: string;
- *   secondary: string;
- *   fontSize: number;
- * }
+ * const config = useJsonVariation<{ timeout: number }>('api-config', { timeout: 30 });
  *
- * const defaultTheme: ThemeConfig = {
- *   primary: '#007bff',
- *   secondary: '#6c757d',
- *   fontSize: 14
- * };
- *
- * const theme = useJsonVariation<ThemeConfig>('theme-config', defaultTheme);
- *
- * return <App style={{ color: theme.primary, fontSize: theme.fontSize }} />;
+ * return <Fetcher timeout={config.timeout} />;
  * ```
  */
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
-export function useJsonVariation<T>(flagName: string, missingValue: T): T {
-  const { features, client } = useGatrixContext();
-
-  const getValue = useCallback(
-    () => features.jsonVariation<T>(flagName, missingValue),
-    [features, flagName, missingValue]
-  );
-
-  const [value, setValue] = useState<T>(() => getValue());
-  const valueRef = useRef<T>(value);
-  valueRef.current = value;
+export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = false): T {
+  const { features } = useGatrixContext();
+  const [value, setValue] = useState<T>(() => features.jsonVariation<T>(flagName, fallbackValue, forceRealtime));
 
   useEffect(() => {
-    if (!client) return;
+    const watchFn = forceRealtime
+      ? features.watchRealtimeFlagWithInitialState.bind(features)
+      : features.watchSyncedFlagWithInitialState.bind(features);
 
-    const updateHandler = () => {
-      const newValue = getValue();
-      // Deep comparison for objects
-      if (JSON.stringify(newValue) !== JSON.stringify(valueRef.current)) {
-        valueRef.current = newValue;
-        setValue(newValue);
-      }
-    };
-
-    const readyHandler = () => {
-      const newValue = getValue();
-      valueRef.current = newValue;
-      setValue(newValue);
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, updateHandler);
-    client.on(EVENTS.FLAGS_READY, readyHandler);
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, updateHandler);
-      client.off(EVENTS.FLAGS_READY, readyHandler);
-    };
-  }, [client, getValue]);
+    return watchFn(flagName, () => {
+      setValue(features.jsonVariation<T>(flagName, fallbackValue, forceRealtime));
+    });
+  }, [features, flagName, fallbackValue, forceRealtime]);
 
   return value;
 }

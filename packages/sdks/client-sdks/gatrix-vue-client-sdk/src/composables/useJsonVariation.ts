@@ -1,26 +1,19 @@
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
-export function useJsonVariation<T>(flagName: string, missingValue: T) {
+export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = false) {
   const client = useGatrixClient();
-  const value = ref(client.features.jsonVariation<T>(flagName, missingValue));
+  const value = ref<T>(client.features.jsonVariation<T>(flagName, fallbackValue, forceRealtime));
 
-  const update = () => {
-    value.value = client.features.jsonVariation<T>(flagName, missingValue) as any;
-  };
+  const watchFn = forceRealtime
+    ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+    : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  onMounted(() => {
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
+  const unwatch = watchFn(flagName, () => {
+    (value as any).value = client.features.jsonVariation<T>(flagName, fallbackValue, forceRealtime);
   });
 
-  onUnmounted(() => {
-    client.off(EVENTS.FLAGS_CHANGE, update);
-    client.off(EVENTS.FLAGS_READY, update);
-    client.off(EVENTS.FLAGS_SYNC, update);
-  });
+  onUnmounted(unwatch);
 
   return computed(() => value.value as T);
 }

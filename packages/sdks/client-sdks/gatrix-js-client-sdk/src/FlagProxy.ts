@@ -100,7 +100,7 @@ export class FlagProxy {
     return this.client.boolVariationDetailsInternal(
       this._flagName,
       fallbackValue,
-      this._forceRealtime
+      this._forceRealtime,
     );
   }
 
@@ -108,7 +108,7 @@ export class FlagProxy {
     return this.client.stringVariationDetailsInternal(
       this._flagName,
       fallbackValue,
-      this._forceRealtime
+      this._forceRealtime,
     );
   }
 
@@ -116,7 +116,7 @@ export class FlagProxy {
     return this.client.numberVariationDetailsInternal(
       this._flagName,
       fallbackValue,
-      this._forceRealtime
+      this._forceRealtime,
     );
   }
 
@@ -124,7 +124,7 @@ export class FlagProxy {
     return this.client.jsonVariationDetailsInternal(
       this._flagName,
       fallbackValue,
-      this._forceRealtime
+      this._forceRealtime,
     );
   }
 

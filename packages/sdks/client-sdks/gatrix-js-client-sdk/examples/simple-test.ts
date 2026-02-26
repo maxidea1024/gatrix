@@ -24,48 +24,50 @@ async function main() {
     apiToken: config.apiToken,
     appName: config.appName,
     environment: config.environment,
-    storageProvider: new InMemoryStorageProvider(),
-    context: {
-      userId: 'user-12345',
-      sessionId: 'session-abcde',
+    features: {
+      storageProvider: new InMemoryStorageProvider(),
+      context: {
+        userId: 'user-12345',
+        sessionId: 'session-abcde',
+      },
     },
   });
 
   // Setup event listeners for ALL SDK events
   console.log('--- Registering Event Listeners ---');
 
-  client.on(EVENTS.INIT, () => {
-    console.log(`[${timestamp()}] EVENT: ${EVENTS.INIT}`);
+  client.on(EVENTS.FLAGS_INIT, () => {
+    console.log(`[${timestamp()}] EVENT: ${EVENTS.FLAGS_INIT}`);
   });
 
-  client.on(EVENTS.READY, () => {
-    console.log(`[${timestamp()}] EVENT: ${EVENTS.READY}`);
+  client.on(EVENTS.FLAGS_READY, () => {
+    console.log(`[${timestamp()}] EVENT: ${EVENTS.FLAGS_READY}`);
   });
 
-  client.on(EVENTS.UPDATE, (data) => {
+  client.on(EVENTS.FLAGS_CHANGE, (data) => {
     console.log(
-      `[${timestamp()}] EVENT: ${EVENTS.UPDATE}`,
+      `[${timestamp()}] EVENT: ${EVENTS.FLAGS_CHANGE}`,
       data?.flags ? `(${data.flags.length} flags)` : ''
     );
   });
 
-  client.on(EVENTS.ERROR, (data) => {
-    console.log(`[${timestamp()}] EVENT: ${EVENTS.ERROR}`, data);
+  client.on(EVENTS.SDK_ERROR, (data) => {
+    console.log(`[${timestamp()}] EVENT: ${EVENTS.SDK_ERROR}`, data);
   });
 
-  client.on(EVENTS.IMPRESSION, (data) => {
+  client.on(EVENTS.FLAGS_IMPRESSION, (data) => {
     console.log(
-      `[${timestamp()}] EVENT: ${EVENTS.IMPRESSION}`,
-      `flag=${data.featureName}, enabled=${data.enabled}`
+      `[${timestamp()}] EVENT: ${EVENTS.FLAGS_IMPRESSION}`,
+      `flag=${data.flagName}, enabled=${data.enabled}`
     );
   });
 
-  client.on(EVENTS.SYNC, () => {
-    console.log(`[${timestamp()}] EVENT: ${EVENTS.SYNC}`);
+  client.on(EVENTS.FLAGS_SYNC, () => {
+    console.log(`[${timestamp()}] EVENT: ${EVENTS.FLAGS_SYNC}`);
   });
 
-  client.on(EVENTS.RECOVERED, () => {
-    console.log(`[${timestamp()}] EVENT: ${EVENTS.RECOVERED}`);
+  client.on(EVENTS.FLAGS_RECOVERED, () => {
+    console.log(`[${timestamp()}] EVENT: ${EVENTS.FLAGS_RECOVERED}`);
   });
 
   try {

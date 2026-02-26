@@ -1,26 +1,19 @@
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
-export function useNumberVariation(flagName: string, missingValue: number) {
+export function useNumberVariation(flagName: string, fallbackValue: number, forceRealtime = false) {
   const client = useGatrixClient();
-  const value = ref(client.features.numberVariation(flagName, missingValue));
+  const value = ref(client.features.numberVariation(flagName, fallbackValue, forceRealtime));
 
-  const update = () => {
-    value.value = client.features.numberVariation(flagName, missingValue);
-  };
+  const watchFn = forceRealtime
+    ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+    : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  onMounted(() => {
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
+  const unwatch = watchFn(flagName, () => {
+    value.value = client.features.numberVariation(flagName, fallbackValue, forceRealtime);
   });
 
-  onUnmounted(() => {
-    client.off(EVENTS.FLAGS_CHANGE, update);
-    client.off(EVENTS.FLAGS_READY, update);
-    client.off(EVENTS.FLAGS_SYNC, update);
-  });
+  onUnmounted(unwatch);
 
   return computed(() => value.value);
 }

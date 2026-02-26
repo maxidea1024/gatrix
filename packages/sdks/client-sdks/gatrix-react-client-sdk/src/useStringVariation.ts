@@ -1,61 +1,37 @@
 /**
  * useStringVariation - Get a string flag variation
  *
- * Returns the string value for a feature flag.
+ * Returns the string value from a feature flag's variant payload.
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
- * @param missingValue - Value to return if flag not found
- * @returns string - The variant value as string or missing value
+ * @param fallbackValue - Value to return if flag not found
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
+ * @returns string - The variant value as string or fallback value
  *
  * @example
  * ```tsx
- * const welcomeMessage = useStringVariation('welcome-message', 'Hello!');
+ * const buttonText = useStringVariation('cta-button-text', 'Get Started');
  *
- * return <h1>{welcomeMessage}</h1>;
+ * return <Button>{buttonText}</Button>;
  * ```
  */
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
-export function useStringVariation(flagName: string, missingValue: string): string {
-  const { features, client } = useGatrixContext();
-
-  const getValue = useCallback(
-    () => features.stringVariation(flagName, missingValue),
-    [features, flagName, missingValue]
-  );
-
-  const [value, setValue] = useState<string>(() => getValue());
-  const valueRef = useRef<string>(value);
-  valueRef.current = value;
+export function useStringVariation(flagName: string, fallbackValue: string, forceRealtime = false): string {
+  const { features } = useGatrixContext();
+  const [value, setValue] = useState(() => features.stringVariation(flagName, fallbackValue, forceRealtime));
 
   useEffect(() => {
-    if (!client) return;
+    const watchFn = forceRealtime
+      ? features.watchRealtimeFlagWithInitialState.bind(features)
+      : features.watchSyncedFlagWithInitialState.bind(features);
 
-    const updateHandler = () => {
-      const newValue = getValue();
-      if (newValue !== valueRef.current) {
-        valueRef.current = newValue;
-        setValue(newValue);
-      }
-    };
-
-    const readyHandler = () => {
-      const newValue = getValue();
-      valueRef.current = newValue;
-      setValue(newValue);
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, updateHandler);
-    client.on(EVENTS.FLAGS_READY, readyHandler);
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, updateHandler);
-      client.off(EVENTS.FLAGS_READY, readyHandler);
-    };
-  }, [client, getValue]);
+    return watchFn(flagName, () => {
+      setValue(features.stringVariation(flagName, fallbackValue, forceRealtime));
+    });
+  }, [features, flagName, fallbackValue, forceRealtime]);
 
   return value;
 }

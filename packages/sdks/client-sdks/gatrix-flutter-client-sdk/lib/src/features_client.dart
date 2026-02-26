@@ -705,7 +705,7 @@ class FeaturesClient implements VariationProvider {
   }
 
   /// Create a named watch group for batch management.
-  WatchFlagGroup createWatchGroup(String name) {
+  WatchFlagGroup createWatchFlagGroup(String name) {
     final group = WatchFlagGroup(
       name: name,
       watchRealtime: watchRealtimeFlag,

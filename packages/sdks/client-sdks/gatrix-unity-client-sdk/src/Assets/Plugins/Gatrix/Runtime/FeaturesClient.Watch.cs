@@ -94,7 +94,7 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>Create a watch group for batch management</summary>
-        public WatchFlagGroup CreateWatchGroup(string name)
+        public WatchFlagGroup CreateWatchFlagGroup(string name)
         {
             var group = new WatchFlagGroup(this, name);
             _watchGroups[name] = group;

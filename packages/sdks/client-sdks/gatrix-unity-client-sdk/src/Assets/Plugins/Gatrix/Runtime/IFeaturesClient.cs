@@ -260,7 +260,7 @@ namespace Gatrix.Unity.SDK
         /// Get a string variation from the variant's payload.
         /// <para>
         /// Reads the <c>Variant.Payload</c> as a string. If the flag has no variant,
-        /// no payload, or the flag doesn't exist, returns <paramref name="missingValue"/>.
+        /// no payload, or the flag doesn't exist, returns <paramref name="fallbackValue"/>.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
@@ -299,7 +299,7 @@ namespace Gatrix.Unity.SDK
         /// <para>
         /// Parses the variant payload as a JSON object. If the payload is already
         /// a Dictionary, returns it directly. If it's a string, parses it as JSON.
-        /// Returns <paramref name="missingValue"/> on parse failure or missing flag.
+        /// Returns <paramref name="fallbackValue"/> on parse failure or missing flag.
         /// </para>
         /// </summary>
         /// <param name="flagName">The feature flag key.</param>
@@ -440,7 +440,7 @@ namespace Gatrix.Unity.SDK
         /// <returns>A new <see cref="WatchFlagGroup"/> instance.</returns>
         /// <example>
         /// <code>
-        /// var group = client.Features.CreateWatchGroup("ui-flags");
+        /// var group = client.Features.CreateWatchFlagGroup("ui-flags");
         /// group.WatchRealtimeFlag("dark-mode", p => { /* ... */ })
         ///      .WatchSyncedFlag("show-ads", p => { /* ... */ });
         ///
@@ -448,7 +448,7 @@ namespace Gatrix.Unity.SDK
         /// group.Destroy();
         /// </code>
         /// </example>
-        WatchFlagGroup CreateWatchGroup(string name);
+        WatchFlagGroup CreateWatchFlagGroup(string name);
 
         // ==================== Statistics ====================
 

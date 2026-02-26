@@ -124,6 +124,12 @@ export interface FeaturesLightStats {
   streamingReconnectCount: number;
   /** Timestamp of last streaming event received */
   lastStreamingEventTime: Date | null;
+  /** Number of 'connected' events received from streaming */
+  streamingConnectedCount: number;
+  /** Number of 'flags_changed' invalidation events received from streaming */
+  streamingFlagsChangedCount: number;
+  /** Number of 'heartbeat' events received from streaming */
+  streamingHeartbeatCount: number;
 }
 
 /**
@@ -184,4 +190,10 @@ export interface FeaturesStats {
   streamingReconnectCount: number;
   /** Timestamp of last streaming event received */
   lastStreamingEventTime: Date | null;
+  /** Number of 'connected' events received from streaming */
+  streamingConnectedCount: number;
+  /** Number of 'flags_changed' invalidation events received from streaming */
+  streamingFlagsChangedCount: number;
+  /** Number of 'heartbeat' events received from streaming */
+  streamingHeartbeatCount: number;
 }

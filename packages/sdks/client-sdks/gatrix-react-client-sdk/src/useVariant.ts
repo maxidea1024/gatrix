@@ -5,6 +5,7 @@
  * Automatically updates when the variant changes.
  *
  * @param flagName - The name of the feature flag
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  * @returns Variant - The variant object
  *
  * @example
@@ -18,59 +19,35 @@
  * );
  * ```
  */
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { EVENTS, VARIANT_SOURCE, type Variant } from '@gatrix/gatrix-js-client-sdk';
+import { VARIANT_SOURCE, type Variant } from '@gatrix/gatrix-js-client-sdk';
 
-/**
- * Check if variant has changed
- */
+/** Check if variant has meaningfully changed (used by external consumers) */
 export const variantHasChanged = (oldVariant: Variant, newVariant?: Variant): boolean => {
   if (!newVariant) return true;
-
-  const variantsAreEqual =
-    oldVariant.name === newVariant.name &&
-    oldVariant.enabled === newVariant.enabled &&
-    JSON.stringify(oldVariant.value) === JSON.stringify(newVariant.value);
-
-  return !variantsAreEqual;
+  return (
+    oldVariant.name !== newVariant.name ||
+    oldVariant.enabled !== newVariant.enabled ||
+    JSON.stringify(oldVariant.value) !== JSON.stringify(newVariant.value)
+  );
 };
 
-export function useVariant(flagName: string): Variant {
-  const { getVariant, client } = useGatrixContext();
+export function useVariant(flagName: string, forceRealtime = false): Variant {
+  const { features } = useGatrixContext();
   const [variant, setVariant] = useState<Variant>(
-    () => getVariant(flagName) || { name: VARIANT_SOURCE.MISSING, enabled: false }
+    () => features.getVariant(flagName, forceRealtime) || { name: VARIANT_SOURCE.MISSING, enabled: false }
   );
-  const variantRef = useRef<Variant>(variant);
-  variantRef.current = variant;
 
   useEffect(() => {
-    if (!client) return;
+    const watchFn = forceRealtime
+      ? features.watchRealtimeFlagWithInitialState.bind(features)
+      : features.watchSyncedFlagWithInitialState.bind(features);
 
-    const updateHandler = () => {
-      const newVariant = getVariant(flagName);
-      if (variantHasChanged(variantRef.current, newVariant)) {
-        variantRef.current = newVariant;
-        setVariant(newVariant);
-      }
-    };
-
-    const readyHandler = () => {
-      const newVariant = getVariant(flagName);
-      variantRef.current = newVariant;
-      setVariant(newVariant);
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, updateHandler);
-    client.on(EVENTS.FLAGS_READY, readyHandler);
-    client.on(EVENTS.FLAGS_SYNC, updateHandler);
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, updateHandler);
-      client.off(EVENTS.FLAGS_READY, readyHandler);
-      client.off(EVENTS.FLAGS_SYNC, updateHandler);
-    };
-  }, [client, flagName]);
+    return watchFn(flagName, (proxy) => {
+      setVariant(proxy.variant);
+    });
+  }, [features, flagName, forceRealtime]);
 
   return variant;
 }

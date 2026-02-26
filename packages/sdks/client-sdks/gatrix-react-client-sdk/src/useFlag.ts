@@ -5,6 +5,7 @@
  * Automatically updates when the flag value changes.
  *
  * @param flagName - The name of the feature flag
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  * @returns boolean - Whether the flag is enabled
  *
  * @example
@@ -17,43 +18,22 @@
  * return <OldUI />;
  * ```
  */
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
 
-export function useFlag(flagName: string): boolean {
-  const { isEnabled, client } = useGatrixContext();
-  const [flag, setFlag] = useState<boolean>(() => !!isEnabled(flagName));
-  const flagRef = useRef<boolean>(flag);
-  flagRef.current = flag;
+export function useFlag(flagName: string, forceRealtime = false): boolean {
+  const { features } = useGatrixContext();
+  const [flag, setFlag] = useState(() => features.isEnabled(flagName, forceRealtime));
 
   useEffect(() => {
-    if (!client) return;
+    const watchFn = forceRealtime
+      ? features.watchRealtimeFlagWithInitialState.bind(features)
+      : features.watchSyncedFlagWithInitialState.bind(features);
 
-    const updateHandler = () => {
-      const enabled = isEnabled(flagName);
-      if (enabled !== flagRef.current) {
-        flagRef.current = enabled;
-        setFlag(enabled);
-      }
-    };
-
-    const readyHandler = () => {
-      const enabled = isEnabled(flagName);
-      flagRef.current = enabled;
-      setFlag(enabled);
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, updateHandler);
-    client.on(EVENTS.FLAGS_READY, readyHandler);
-    client.on(EVENTS.FLAGS_SYNC, updateHandler);
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, updateHandler);
-      client.off(EVENTS.FLAGS_READY, readyHandler);
-      client.off(EVENTS.FLAGS_SYNC, updateHandler);
-    };
-  }, [client, flagName]);
+    return watchFn(flagName, (proxy) => {
+      setFlag(proxy.enabled);
+    });
+  }, [features, flagName, forceRealtime]);
 
   return flag;
 }

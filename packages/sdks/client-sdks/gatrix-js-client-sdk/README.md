@@ -59,24 +59,24 @@ client.stop();
 
 ### Optional Fields
 
-| Field                          | Type              | Default         | Description                        |
-| ------------------------------ | ----------------- | --------------- | ---------------------------------- |
-| `customHeaders`                | `object`          | -               | Custom HTTP headers.               |
-| `enableDevMode`                | `boolean`         | `false`         | Enable detailed debug logging.     |
-| `logger`                       | `Logger`          | Console         | Custom logger implementation.      |
-| `features.context`             | `object`          | `{}`            | Initial evaluation context.        |
-| `features.storageProvider`     | `StorageProvider` | Auto            | Custom storage provider.           |
-| `features.offlineMode`         | `boolean`         | `false`         | Use only cached/bootstrap data.    |
-| `features.cacheKeyPrefix`      | `string`          | `gatrix_cache`  | Cache key prefix for storage.      |
-| `features.refreshInterval`     | `number`          | `30`            | Polling interval in seconds.       |
-| `features.disableRefresh`      | `boolean`         | `false`         | Disable automatic polling.         |
-| `features.explicitSyncMode`    | `boolean`         | `true`          | Enable explicit sync mode.         |
-| `features.bootstrap`           | `EvaluatedFlag[]` | -               | Initial flag data for offline/SSR. |
-| `features.bootstrapOverride`   | `boolean`         | `true`          | Override stored flags with bootstrap. |
-| `features.disableMetrics`      | `boolean`         | `false`         | Disable metrics collection.        |
-| `features.impressionDataAll`   | `boolean`         | `false`         | Track impressions for all flags.   |
-| `features.usePOSTRequests`     | `boolean`         | `false`         | Use POST instead of GET requests.  |
-| `features.streaming`           | `StreamingConfig` | -               | Streaming configuration.           |
+| Field                        | Type              | Default        | Description                           |
+| ---------------------------- | ----------------- | -------------- | ------------------------------------- |
+| `customHeaders`              | `object`          | -              | Custom HTTP headers.                  |
+| `enableDevMode`              | `boolean`         | `false`        | Enable detailed debug logging.        |
+| `logger`                     | `Logger`          | Console        | Custom logger implementation.         |
+| `features.context`           | `object`          | `{}`           | Initial evaluation context.           |
+| `features.storageProvider`   | `StorageProvider` | Auto           | Custom storage provider.              |
+| `features.offlineMode`       | `boolean`         | `false`        | Use only cached/bootstrap data.       |
+| `features.cacheKeyPrefix`    | `string`          | `gatrix_cache` | Cache key prefix for storage.         |
+| `features.refreshInterval`   | `number`          | `30`           | Polling interval in seconds.          |
+| `features.disableRefresh`    | `boolean`         | `false`        | Disable automatic polling.            |
+| `features.explicitSyncMode`  | `boolean`         | `true`         | Enable explicit sync mode.            |
+| `features.bootstrap`         | `EvaluatedFlag[]` | -              | Initial flag data for offline/SSR.    |
+| `features.bootstrapOverride` | `boolean`         | `true`         | Override stored flags with bootstrap. |
+| `features.disableMetrics`    | `boolean`         | `false`        | Disable metrics collection.           |
+| `features.impressionDataAll` | `boolean`         | `false`        | Track impressions for all flags.      |
+| `features.usePOSTRequests`   | `boolean`         | `false`        | Use POST instead of GET requests.     |
+| `features.streaming`         | `StreamingConfig` | -              | Streaming configuration.              |
 
 ## Logging & Debug Mode
 
@@ -111,15 +111,15 @@ const client = new GatrixClient({
 
 When `fetchFlags` is called, the SDK logs identify the caller:
 
-| Caller                  | Description                                              |
-| ----------------------- | -------------------------------------------------------- |
-| `init`                  | Initial fetch during `start()`                           |
-| `polling`               | Automatic periodic polling (via `refreshInterval`)       |
-| `manual`                | External call via `client.features.fetchFlags()`         |
-| `syncFlags`             | Explicit sync via `client.features.syncFlags()`          |
-| `contextChange`         | Triggered by `updateContext()`                           |
-| `gap_recovery`          | Streaming reconnection gap recovery (full re-fetch)      |
-| `pending_invalidation`  | Re-fetch after streaming invalidation signal             |
+| Caller                 | Description                                         |
+| ---------------------- | --------------------------------------------------- |
+| `init`                 | Initial fetch during `start()`                      |
+| `polling`              | Automatic periodic polling (via `refreshInterval`)  |
+| `manual`               | External call via `client.features.fetchFlags()`    |
+| `syncFlags`            | Explicit sync via `client.features.syncFlags()`     |
+| `contextChange`        | Triggered by `updateContext()`                      |
+| `gap_recovery`         | Streaming reconnection gap recovery (full re-fetch) |
+| `pending_invalidation` | Re-fetch after streaming invalidation signal        |
 
 Log format: `fetchFlags [caller]: starting fetch. etag=...`
 
@@ -260,15 +260,27 @@ try {
 
 ### Single Flag
 
+Two watch modes are available:
+
+| Method              | Callback timing                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `watchSyncedFlag`   | In `explicitSyncMode`: only after `syncFlags()`. In normal mode: immediately on change |
+| `watchRealtimeFlag` | Always immediately when server fetch brings new data                                   |
+
 ```typescript
-// Watch for changes (callback on change only)
-const unwatch = client.features.watchFlag('my-feature', (flag) => {
+// Synced watch - respects explicitSyncMode (recommended for game logic / UI)
+const unwatch = client.features.watchSyncedFlag('my-feature', (flag) => {
   console.log('Flag changed:', flag.enabled);
 });
 
-// Watch with immediate initial callback
-const unwatch = client.features.watchFlagWithInitialState('my-feature', (flag) => {
+// Synced watch with immediate initial callback
+const unwatch = client.features.watchSyncedFlagWithInitialState('my-feature', (flag) => {
   console.log('Current state:', flag.enabled);
+});
+
+// Realtime watch - fires immediately regardless of explicitSyncMode
+const unwatch = client.features.watchRealtimeFlag('my-feature', (flag) => {
+  console.log('Realtime change:', flag.enabled);
 });
 
 // Stop watching
@@ -285,9 +297,9 @@ const group = client.features.createWatchFlagGroup('my-component');
 
 // Register multiple watchers (chainable)
 group
-  .watchFlag('feature-a', (flag) => console.log('A:', flag.enabled))
-  .watchFlag('feature-b', (flag) => console.log('B:', flag.enabled))
-  .watchFlagWithInitialState('feature-c', (flag) => console.log('C:', flag.enabled));
+  .watchRealtimeFlag('feature-a', (flag) => console.log('A:', flag.enabled))
+  .watchSyncedFlag('feature-b', (flag) => console.log('B:', flag.enabled))
+  .watchSyncedFlagWithInitialState('feature-c', (flag) => console.log('C:', flag.enabled));
 
 console.log(group.size); // 3
 
@@ -387,41 +399,45 @@ await client.features.syncFlags();
 
 ### FeaturesClient (via `client.features`)
 
-| Method                                          | Description                 |
-| ----------------------------------------------- | --------------------------- |
-| `isEnabled(flagName)`                           | Check if flag is enabled    |
-| `boolVariation(flagName, default)`              | Get boolean (flag.enabled)  |
-| `stringVariation(flagName, default)`            | Get string value            |
-| `numberVariation(flagName, default)`            | Get number value            |
-| `jsonVariation(flagName, default)`              | Get JSON value              |
-| `stringVariationDetails(flagName, default)`     | Get string with details     |
-| `numberVariationDetails(flagName, default)`     | Get number with details     |
-| `jsonVariationDetails(flagName, default)`       | Get JSON with details       |
-| `stringVariationOrThrow(flagName)`              | Get string or throw         |
-| `numberVariationOrThrow(flagName)`              | Get number or throw         |
-| `jsonVariationOrThrow(flagName)`                | Get JSON or throw           |
-| `getVariant(flagName)`                          | Get raw variant             |
-| `getAllFlags()`                                 | Get all flags               |
-| `watchFlag(flagName, callback)`                 | Watch for changes           |
-| `watchFlagWithInitialState(flagName, callback)` | Watch with initial callback |
-| `createWatchFlagGroup(name)`                    | Create a watch group        |
-| `isFetching()`                                  | Check if currently fetching |
-| `isExplicitSync()`                              | Check if explicit mode      |
-| `hasPendingSyncFlags()`                          | Check if pending changes exist |
-| `syncFlags(fetchNow?)`                          | Manual sync (explicit mode) |
-| `updateContext(context)`                        | Update evaluation context   |
-| `getContext()`                                  | Get current context         |
+| Method                                                  | Description                             |
+| ------------------------------------------------------- | --------------------------------------- |
+| `isEnabled(flagName)`                                   | Check if flag is enabled                |
+| `boolVariation(flagName, default)`                      | Get boolean (flag.enabled)              |
+| `stringVariation(flagName, default)`                    | Get string value                        |
+| `numberVariation(flagName, default)`                    | Get number value                        |
+| `jsonVariation(flagName, default)`                      | Get JSON value                          |
+| `stringVariationDetails(flagName, default)`             | Get string with details                 |
+| `numberVariationDetails(flagName, default)`             | Get number with details                 |
+| `jsonVariationDetails(flagName, default)`               | Get JSON with details                   |
+| `stringVariationOrThrow(flagName)`                      | Get string or throw                     |
+| `numberVariationOrThrow(flagName)`                      | Get number or throw                     |
+| `jsonVariationOrThrow(flagName)`                        | Get JSON or throw                       |
+| `getVariant(flagName)`                                  | Get raw variant                         |
+| `getAllFlags()`                                         | Get all flags                           |
+| `watchSyncedFlag(flagName, callback)`                   | Watch (respects explicitSyncMode)       |
+| `watchSyncedFlagWithInitialState(flagName, callback)`   | Watch with initial callback (synced)    |
+| `watchRealtimeFlag(flagName, callback)`                 | Watch immediately on server fetch       |
+| `watchRealtimeFlagWithInitialState(flagName, callback)` | Watch immediately with initial callback |
+| `createWatchFlagGroup(name)`                            | Create a watch group                    |
+| `isFetching()`                                          | Check if currently fetching             |
+| `isExplicitSyncEnabled()`                               | Check if explicit sync mode is on       |
+| `hasPendingSyncFlags()`                                 | Check if pending changes exist          |
+| `syncFlags(fetchNow?)`                                  | Manual sync (explicit mode)             |
+| `updateContext(context)`                                | Update evaluation context               |
+| `getContext()`                                          | Get current context                     |
 
 ### WatchFlagGroup
 
-| Method                                          | Description                                |
-| ----------------------------------------------- | ------------------------------------------ |
-| `watchFlag(flagName, callback)`                 | Add watcher (chainable)                    |
-| `watchFlagWithInitialState(flagName, callback)` | Add watcher with initial state (chainable) |
-| `unwatchAll()`                                  | Remove all watchers                        |
-| `destroy()`                                     | Alias for unwatchAll                       |
-| `size`                                          | Number of active watchers                  |
-| `getName()`                                     | Get group name                             |
+| Method                                                  | Description                             |
+| ------------------------------------------------------- | --------------------------------------- |
+| `watchRealtimeFlag(flagName, callback)`                 | Add realtime watcher (chainable)        |
+| `watchRealtimeFlagWithInitialState(flagName, callback)` | Add realtime watcher with initial state |
+| `watchSyncedFlag(flagName, callback)`                   | Add synced watcher (chainable)          |
+| `watchSyncedFlagWithInitialState(flagName, callback)`   | Add synced watcher with initial state   |
+| `unwatchAll()`                                          | Remove all watchers                     |
+| `destroy()`                                             | Alias for unwatchAll                    |
+| `size`                                                  | Number of active watchers               |
+| `getName()`                                             | Get group name                          |
 
 ## License
 

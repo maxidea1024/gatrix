@@ -1,36 +1,25 @@
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
 import type { FlagProxy } from '@gatrix/gatrix-js-client-sdk';
 
-export function useFlagProxy(flagName: string) {
+export function useFlagProxy(flagName: string, forceRealtime = false) {
   const client = useGatrixClient();
-
-  // Initialize with a lightweight placeholder; watchFlagWithInitialState
-  // will fire immediately with the real proxy.
   const flag = ref<FlagProxy | null>(null);
 
-  let unsubscribe: (() => void) | undefined;
+  const watchFn = forceRealtime
+    ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+    : client.features.watchSyncedFlagWithInitialState.bind(client.features);
 
-  onMounted(() => {
-    unsubscribe = client.features.watchFlagWithInitialState(
-      flagName,
-      (proxy: FlagProxy) => {
-        flag.value = proxy;
-      },
-      `vue_watch_${flagName}`
-    );
+  const unwatch = watchFn(flagName, (proxy: FlagProxy) => {
+    flag.value = proxy;
   });
 
-  onUnmounted(() => {
-    if (unsubscribe) {
-      unsubscribe();
-    }
-  });
+  onUnmounted(unwatch);
 
   return flag;
 }
 
-export function useFlag(flagName: string) {
-  const flagProxy = useFlagProxy(flagName);
+export function useFlag(flagName: string, forceRealtime = false) {
+  const flagProxy = useFlagProxy(flagName, forceRealtime);
   return computed(() => flagProxy.value?.enabled ?? false);
 }

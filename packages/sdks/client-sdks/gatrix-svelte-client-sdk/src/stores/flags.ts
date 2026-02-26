@@ -5,6 +5,7 @@ import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
 
 /**
  * Reactive store for all evaluated flags.
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  *
  * @example
  * ```svelte
@@ -17,12 +18,12 @@ import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
  * {/each}
  * ```
  */
-export function allFlags(): Readable<EvaluatedFlag[]> {
+export function allFlags(forceRealtime = false): Readable<EvaluatedFlag[]> {
   const client = getGatrixClient();
 
-  return readable<EvaluatedFlag[]>(client.features.getAllFlags(), (set) => {
+  return readable<EvaluatedFlag[]>(client.features.getAllFlags(forceRealtime), (set) => {
     const update = () => {
-      set(client.features.getAllFlags());
+      set(client.features.getAllFlags(forceRealtime));
     };
 
     client.on(EVENTS.FLAGS_CHANGE, update);

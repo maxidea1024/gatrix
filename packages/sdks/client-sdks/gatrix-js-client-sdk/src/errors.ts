@@ -59,7 +59,7 @@ export class GatrixFeatureError extends GatrixError {
       flagName?: string;
       details?: Record<string, unknown>;
       cause?: Error;
-    }
+    },
   ) {
     super(message);
 
@@ -86,7 +86,7 @@ export class GatrixFeatureError extends GatrixError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.FLAG_NOT_FOUND,
       `Flag "${flagName}" not found`,
-      { flagName }
+      { flagName },
     );
   }
 
@@ -97,7 +97,7 @@ export class GatrixFeatureError extends GatrixError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.FLAG_DISABLED,
       `Flag "${flagName}" is disabled`,
-      { flagName }
+      { flagName },
     );
   }
 
@@ -108,7 +108,7 @@ export class GatrixFeatureError extends GatrixError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.TYPE_MISMATCH,
       `Flag "${flagName}" type mismatch: expected ${expected}, got ${actual}`,
-      { flagName, details: { expected, actual } }
+      { flagName, details: { expected, actual } },
     );
   }
 
@@ -118,7 +118,7 @@ export class GatrixFeatureError extends GatrixError {
   static noDataAvailable(): GatrixFeatureError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.NO_DATA_AVAILABLE,
-      'No flag data available (offline mode requires bootstrap or cached data)'
+      'No flag data available (offline mode requires bootstrap or cached data)',
     );
   }
 
@@ -129,7 +129,7 @@ export class GatrixFeatureError extends GatrixError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.NO_VALUE,
       `Flag "${flagName}" has no value`,
-      { flagName }
+      { flagName },
     );
   }
 
@@ -140,7 +140,7 @@ export class GatrixFeatureError extends GatrixError {
     return new GatrixFeatureError(
       GatrixFeatureErrorCode.PARSE_ERROR,
       `Failed to parse value for flag "${flagName}"`,
-      { flagName, cause }
+      { flagName, cause },
     );
   }
 }

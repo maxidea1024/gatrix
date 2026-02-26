@@ -70,7 +70,7 @@ async function main() {
     console.log(`\nFound ${flags.length} flag(s). Setting up watchers...\n`);
 
     // Create a watch group for all flags
-    const watchGroup = client.features.createWatchGroup('all-flags');
+    const watchGroup = client.features.createWatchFlagGroup('all-flags');
 
     // Watch each flag for changes
     for (const flag of flags) {
@@ -106,7 +106,7 @@ async function main() {
     console.log('');
 
     // Keep the process running
-    await new Promise(() => {}); // Never resolves
+    await new Promise(() => { }); // Never resolves
   } catch (error: any) {
     console.error('Error:', error.message);
     await client.stop();

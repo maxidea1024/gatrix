@@ -699,14 +699,16 @@ int FGatrixLuaBindings::Lua_Stop(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_IsEnabled(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
-  bool bEnabled = UGatrixClient::Get()->GetFeatures()->IsEnabled(UTF8_TO_TCHAR(FlagName));
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
+  bool bEnabled = UGatrixClient::Get()->GetFeatures()->IsEnabled(UTF8_TO_TCHAR(FlagName), bForceRealtime);
   lua_pushboolean(L, bEnabled);
   return 1;
 }
 
 int FGatrixLuaBindings::Lua_GetFlag(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
-  FGatrixEvaluatedFlag Flag = UGatrixClient::Get()->GetFeatures()->GetFlag(UTF8_TO_TCHAR(FlagName));
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
+  FGatrixEvaluatedFlag Flag = UGatrixClient::Get()->GetFeatures()->GetFlag(UTF8_TO_TCHAR(FlagName), bForceRealtime);
   PushEvaluatedFlagTable(L, Flag);
   return 1;
 }
@@ -714,8 +716,9 @@ int FGatrixLuaBindings::Lua_GetFlag(lua_State* L) {
 int FGatrixLuaBindings::Lua_BoolVariation(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   bool Fallback = (lua_toboolean(L, 2) != 0);
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   bool Value =
-      UGatrixClient::Get()->GetFeatures()->BoolVariation(UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->BoolVariation(UTF8_TO_TCHAR(FlagName), Fallback, bForceRealtime);
   lua_pushboolean(L, Value);
   return 1;
 }
@@ -723,8 +726,9 @@ int FGatrixLuaBindings::Lua_BoolVariation(lua_State* L) {
 int FGatrixLuaBindings::Lua_StringVariation(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   const char* Fallback = luaL_optstring(L, 2, "");
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   FString Value = UGatrixClient::Get()->GetFeatures()->StringVariation(UTF8_TO_TCHAR(FlagName),
-                                                                       UTF8_TO_TCHAR(Fallback));
+                                                                       UTF8_TO_TCHAR(Fallback), bForceRealtime);
   lua_pushstring(L, TCHAR_TO_UTF8(*Value));
   return 1;
 }
@@ -732,8 +736,9 @@ int FGatrixLuaBindings::Lua_StringVariation(lua_State* L) {
 int FGatrixLuaBindings::Lua_IntVariation(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   int32 Fallback = static_cast<int32>(luaL_optinteger(L, 2, 0));
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   int32 Value =
-      UGatrixClient::Get()->GetFeatures()->IntVariation(UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->IntVariation(UTF8_TO_TCHAR(FlagName), Fallback, bForceRealtime);
   lua_pushinteger(L, Value);
   return 1;
 }
@@ -741,8 +746,9 @@ int FGatrixLuaBindings::Lua_IntVariation(lua_State* L) {
 int FGatrixLuaBindings::Lua_FloatVariation(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   float Fallback = static_cast<float>(luaL_optnumber(L, 2, 0.0));
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   float Value =
-      UGatrixClient::Get()->GetFeatures()->FloatVariation(UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->FloatVariation(UTF8_TO_TCHAR(FlagName), Fallback, bForceRealtime);
   lua_pushnumber(L, Value);
   return 1;
 }
@@ -751,8 +757,9 @@ int FGatrixLuaBindings::Lua_FloatVariation(lua_State* L) {
 int FGatrixLuaBindings::Lua_Variation(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   const char* Fallback = luaL_optstring(L, 2, "");
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   FString Value = UGatrixClient::Get()->GetFeatures()->Variation(UTF8_TO_TCHAR(FlagName),
-                                                                 UTF8_TO_TCHAR(Fallback));
+                                                                 UTF8_TO_TCHAR(Fallback), bForceRealtime);
   lua_pushstring(L, TCHAR_TO_UTF8(*Value));
   return 1;
 }
@@ -779,8 +786,9 @@ static void PushVariationResultTable(lua_State* L, const FGatrixVariationResult&
 int FGatrixLuaBindings::Lua_BoolVariationDetails(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   bool Fallback = (lua_toboolean(L, 2) != 0);
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->BoolVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->BoolVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback, bForceRealtime);
   PushVariationResultTable(L, Result);
   return 1;
 }
@@ -788,8 +796,9 @@ int FGatrixLuaBindings::Lua_BoolVariationDetails(lua_State* L) {
 int FGatrixLuaBindings::Lua_StringVariationDetails(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   const char* Fallback = luaL_optstring(L, 2, "");
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   FGatrixVariationResult Result = UGatrixClient::Get()->GetFeatures()->StringVariationDetails(
-      UTF8_TO_TCHAR(FlagName), UTF8_TO_TCHAR(Fallback));
+      UTF8_TO_TCHAR(FlagName), UTF8_TO_TCHAR(Fallback), bForceRealtime);
   PushVariationResultTable(L, Result);
   return 1;
 }
@@ -797,8 +806,9 @@ int FGatrixLuaBindings::Lua_StringVariationDetails(lua_State* L) {
 int FGatrixLuaBindings::Lua_IntVariationDetails(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   int32 Fallback = static_cast<int32>(luaL_optinteger(L, 2, 0));
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->IntVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->IntVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback, bForceRealtime);
   PushVariationResultTable(L, Result);
   return 1;
 }
@@ -806,8 +816,9 @@ int FGatrixLuaBindings::Lua_IntVariationDetails(lua_State* L) {
 int FGatrixLuaBindings::Lua_FloatVariationDetails(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
   float Fallback = static_cast<float>(luaL_optnumber(L, 2, 0.0));
+  bool bForceRealtime = lua_gettop(L) >= 3 && lua_isboolean(L, 3) ? lua_toboolean(L, 3) != 0 : false;
   FGatrixVariationResult Result =
-      UGatrixClient::Get()->GetFeatures()->FloatVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback);
+      UGatrixClient::Get()->GetFeatures()->FloatVariationDetails(UTF8_TO_TCHAR(FlagName), Fallback, bForceRealtime);
   PushVariationResultTable(L, Result);
   return 1;
 }
@@ -816,8 +827,9 @@ int FGatrixLuaBindings::Lua_FloatVariationDetails(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_BoolVariationOrThrow(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
   try {
-    bool Value = UGatrixClient::Get()->GetFeatures()->BoolVariationOrThrow(UTF8_TO_TCHAR(FlagName));
+    bool Value = UGatrixClient::Get()->GetFeatures()->BoolVariationOrThrow(UTF8_TO_TCHAR(FlagName), bForceRealtime);
     lua_pushboolean(L, Value);
     return 1;
   } catch (const std::exception& e) {
@@ -827,9 +839,10 @@ int FGatrixLuaBindings::Lua_BoolVariationOrThrow(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_StringVariationOrThrow(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
   try {
     FString Value =
-        UGatrixClient::Get()->GetFeatures()->StringVariationOrThrow(UTF8_TO_TCHAR(FlagName));
+        UGatrixClient::Get()->GetFeatures()->StringVariationOrThrow(UTF8_TO_TCHAR(FlagName), bForceRealtime);
     lua_pushstring(L, TCHAR_TO_UTF8(*Value));
     return 1;
   } catch (const std::exception& e) {
@@ -839,8 +852,9 @@ int FGatrixLuaBindings::Lua_StringVariationOrThrow(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_IntVariationOrThrow(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
   try {
-    int32 Value = UGatrixClient::Get()->GetFeatures()->IntVariationOrThrow(UTF8_TO_TCHAR(FlagName));
+    int32 Value = UGatrixClient::Get()->GetFeatures()->IntVariationOrThrow(UTF8_TO_TCHAR(FlagName), bForceRealtime);
     lua_pushinteger(L, Value);
     return 1;
   } catch (const std::exception& e) {
@@ -850,9 +864,10 @@ int FGatrixLuaBindings::Lua_IntVariationOrThrow(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_FloatVariationOrThrow(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
   try {
     float Value =
-        UGatrixClient::Get()->GetFeatures()->FloatVariationOrThrow(UTF8_TO_TCHAR(FlagName));
+        UGatrixClient::Get()->GetFeatures()->FloatVariationOrThrow(UTF8_TO_TCHAR(FlagName), bForceRealtime);
     lua_pushnumber(L, Value);
     return 1;
   } catch (const std::exception& e) {
@@ -862,17 +877,19 @@ int FGatrixLuaBindings::Lua_FloatVariationOrThrow(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_GetVariant(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
   FString FlagStr = UTF8_TO_TCHAR(FlagName);
-  FGatrixVariant Variant = UGatrixClient::Get()->GetFeatures()->GetVariant(FlagStr);
+  FGatrixVariant Variant = UGatrixClient::Get()->GetFeatures()->GetVariant(FlagStr, bForceRealtime);
   // Get ValueType from the flag to push Value as native Lua type
   EGatrixValueType ValType =
-      UGatrixClient::Get()->GetFeatures()->GetValueTypeInternal(FlagStr, false);
+      UGatrixClient::Get()->GetFeatures()->GetValueTypeInternal(FlagStr, bForceRealtime);
   PushVariantTable(L, Variant, ValType);
   return 1;
 }
 
 int FGatrixLuaBindings::Lua_GetAllFlags(lua_State* L) {
-  TArray<FGatrixEvaluatedFlag> Flags = UGatrixClient::Get()->GetFeatures()->GetAllFlags();
+  bool bForceRealtime = lua_gettop(L) >= 1 && lua_isboolean(L, 1) ? lua_toboolean(L, 1) != 0 : false;
+  TArray<FGatrixEvaluatedFlag> Flags = UGatrixClient::Get()->GetFeatures()->GetAllFlags(bForceRealtime);
 
   lua_createtable(L, Flags.Num(), 0);
   for (int32 i = 0; i < Flags.Num(); ++i) {
@@ -884,7 +901,8 @@ int FGatrixLuaBindings::Lua_GetAllFlags(lua_State* L) {
 
 int FGatrixLuaBindings::Lua_HasFlag(lua_State* L) {
   const char* FlagName = luaL_checkstring(L, 1);
-  bool bExists = UGatrixClient::Get()->GetFeatures()->HasFlag(UTF8_TO_TCHAR(FlagName));
+  bool bForceRealtime = lua_gettop(L) >= 2 && lua_isboolean(L, 2) ? lua_toboolean(L, 2) != 0 : false;
+  bool bExists = UGatrixClient::Get()->GetFeatures()->HasFlag(UTF8_TO_TCHAR(FlagName), bForceRealtime);
   lua_pushboolean(L, bExists);
   return 1;
 }
@@ -1584,7 +1602,7 @@ int FGatrixLuaBindings::Lua_CreateWatchGroup(lua_State* L) {
   const char* Name = luaL_checkstring(L, 1);
 
   FGatrixWatchFlagGroup* Group =
-      UGatrixClient::Get()->GetFeatures()->CreateWatchGroup(UTF8_TO_TCHAR(Name));
+      UGatrixClient::Get()->GetFeatures()->CreateWatchFlagGroup(UTF8_TO_TCHAR(Name));
 
   // Allocate userdata as a pointer-to-heap-object.
   // lua_newuserdata provides raw memory; we store only a pointer (trivial type)

@@ -10,7 +10,7 @@ Fully implements the [CLIENT_SDK_SPEC.md](../CLIENT_SDK_SPEC.md).
 - **Variation Details**: `boolVariationDetails`, `stringVariationDetails`, `intVariationDetails`, `floatVariationDetails`, `doubleVariationDetails`, `jsonVariationDetails` with reason, flagExists, enabled
 - **OrThrow Variations**: `boolVariationOrThrow`, `stringVariationOrThrow`, `intVariationOrThrow`, `floatVariationOrThrow`, `doubleVariationOrThrow`, `jsonVariationOrThrow`
 - **FlagProxy**: Full property access (exists, enabled, name, variant, valueType, version, reason, impressionData, raw)
-- **Watch Pattern**: `watchFlag`, `watchFlagWithInitialState`, `WatchFlagGroup` with chain API
+- **Watch Pattern**: `watchRealtimeFlag`, `watchRealtimeFlagWithInitialState`, `watchSyncedFlag`, `watchSyncedFlagWithInitialState`, `WatchFlagGroup` with chain API
 - **Explicit Sync Mode**: `isExplicitSync`, `hasPendingSyncFlags`, `syncFlags`
 - **Event System**: `on`, `once`, `off`, `onAny`, `offAny` with handler stats tracking
 - **Storage Provider**: `IStorageProvider` interface + `InMemoryStorageProvider`
@@ -123,7 +123,7 @@ try {
 
 ```cpp
 // Watch a specific flag for changes (recommended pattern)
-features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
+features->watchRealtimeFlagWithInitialState("special-offer", [](FlagProxy flag) {
   flag.exists();          // bool
   flag.enabled();         // bool
   flag.name();            // const string&
@@ -153,26 +153,39 @@ features->watchFlagWithInitialState("special-offer", [](FlagProxy flag) {
 
 ### Watch Pattern
 
+Two watch modes available:
+
+| Method                                                    | Callback timing                                                                     |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `watchSyncedFlag` / `watchSyncedFlagWithInitialState`     | In `explicitSyncMode`: fires after `syncFlags()`. In normal mode: fires immediately |
+| `watchRealtimeFlag` / `watchRealtimeFlagWithInitialState` | Always fires immediately when server fetch brings new data                          |
+
 ```cpp
-// Watch for changes (excludes initial state)
-auto unwatch = features->watchFlag("my-feature", [](gatrix::FlagProxy flag) {
+// Synced watch - respects explicitSyncMode
+auto unwatch = features->watchSyncedFlag("my-feature", [](gatrix::FlagProxy flag) {
     updateUI(flag.enabled());
 });
 
-// Watch with initial state callback
-auto unwatchInit = features->watchFlagWithInitialState("my-feature", [](gatrix::FlagProxy flag) {
+// Synced watch with initial state
+auto unwatchInit = features->watchSyncedFlagWithInitialState("my-feature", [](gatrix::FlagProxy flag) {
     updateUI(flag.enabled());
+});
+
+// Realtime watch - fires immediately regardless of explicitSyncMode
+auto unwatchRt = features->watchRealtimeFlag("realtime-feature", [](gatrix::FlagProxy flag) {
+    updateDebugUI(flag.enabled());
 });
 
 // Stop watching
 unwatch();
 unwatchInit();
+unwatchRt();
 
 // Watch group (batch management)
 auto* group = features->createWatchFlagGroup("scene-flags");
-group->watchFlag("flag-1", handler1)
-     .watchFlag("flag-2", handler2)
-     .watchFlagWithInitialState("flag-3", handler3);
+group->watchRealtimeFlag("flag-1", handler1)
+     .watchSyncedFlag("flag-2", handler2)
+     .watchSyncedFlagWithInitialState("flag-3", handler3);
 
 // Unsubscribe all at once
 group->unwatchAll();
@@ -244,22 +257,22 @@ stats.flagVariantCounts;    // map<string, map<string, int>>
 
 ## Event Constants
 
-| Constant | Value |
-|----------|-------|
-| `EVENTS::FLAGS_INIT` | `"flags.init"` |
-| `EVENTS::FLAGS_READY` | `"flags.ready"` |
-| `EVENTS::FLAGS_FETCH` | `"flags.fetch"` |
-| `EVENTS::FLAGS_FETCH_START` | `"flags.fetch_start"` |
+| Constant                      | Value                   |
+| ----------------------------- | ----------------------- |
+| `EVENTS::FLAGS_INIT`          | `"flags.init"`          |
+| `EVENTS::FLAGS_READY`         | `"flags.ready"`         |
+| `EVENTS::FLAGS_FETCH`         | `"flags.fetch"`         |
+| `EVENTS::FLAGS_FETCH_START`   | `"flags.fetch_start"`   |
 | `EVENTS::FLAGS_FETCH_SUCCESS` | `"flags.fetch_success"` |
-| `EVENTS::FLAGS_FETCH_ERROR` | `"flags.fetch_error"` |
-| `EVENTS::FLAGS_FETCH_END` | `"flags.fetch_end"` |
-| `EVENTS::FLAGS_CHANGE` | `"flags.change"` |
-| `EVENTS::SDK_ERROR` | `"flags.error"` |
-| `EVENTS::FLAGS_RECOVERED` | `"flags.recovered"` |
-| `EVENTS::FLAGS_SYNC` | `"flags.sync"` |
-| `EVENTS::FLAGS_IMPRESSION` | `"flags.impression"` |
-| `EVENTS::FLAGS_METRICS_SENT` | `"flags.metrics.sent"` |
-| `EVENTS::flagChange("name")` | `"flags.name.change"` |
+| `EVENTS::FLAGS_FETCH_ERROR`   | `"flags.fetch_error"`   |
+| `EVENTS::FLAGS_FETCH_END`     | `"flags.fetch_end"`     |
+| `EVENTS::FLAGS_CHANGE`        | `"flags.change"`        |
+| `EVENTS::SDK_ERROR`           | `"flags.error"`         |
+| `EVENTS::FLAGS_RECOVERED`     | `"flags.recovered"`     |
+| `EVENTS::FLAGS_SYNC`          | `"flags.sync"`          |
+| `EVENTS::FLAGS_IMPRESSION`    | `"flags.impression"`    |
+| `EVENTS::FLAGS_METRICS_SENT`  | `"flags.metrics.sent"`  |
+| `EVENTS::flagChange("name")`  | `"flags.name.change"`   |
 
 ## License
 

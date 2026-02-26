@@ -8,9 +8,9 @@ Exposes feature flags, variations, context, events, and watch to Lua scripts via
 
 A feature flag has two parts:
 
-| Part | Type | Description |
-|---|---|---|
-| **State** (`enabled`) | `boolean` | Is the feature on or off? — check with `IsEnabled()` |
+| Part                  | Type                               | Description                                                                                                             |
+| --------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **State** (`enabled`) | `boolean`                          | Is the feature on or off? — check with `IsEnabled()`                                                                    |
 | **Value** (`variant`) | `number` `string` `boolean` `json` | A specific configuration value — read with `BoolVariation()`, `StringVariation()`, `FloatVariation()`, `IntVariation()` |
 
 A flag can be **enabled while also having a specific value** (e.g. `difficulty = "hard"`). State and value are independent — handle both.
@@ -67,12 +67,12 @@ end)
 
 ## 🤔 Why Gatrix?
 
-| Without Gatrix | With Gatrix |
-|---|---|
-| Ship a new build to change a value | Change it live from the dashboard |
-| All players get the same experience | A/B test different experiences |
-| Hard-coded feature flags | Real-time remote configuration |
-| Risky big-bang releases | Gradual rollouts with instant rollback |
+| Without Gatrix                      | With Gatrix                            |
+| ----------------------------------- | -------------------------------------- |
+| Ship a new build to change a value  | Change it live from the dashboard      |
+| All players get the same experience | A/B test different experiences         |
+| Hard-coded feature flags            | Real-time remote configuration         |
+| Risky big-bang releases             | Gradual rollouts with instant rollback |
 
 ### 🔑 Key Scenarios
 
@@ -92,12 +92,12 @@ Gatrix client SDKs use **remote evaluation** exclusively:
 2. The server evaluates all targeting rules **remotely**.
 3. The SDK receives only the **final evaluated flag values** — no rules are exposed to the client.
 
-| | Remote Evaluation (Gatrix) | Local Evaluation |
-|---|---|---|
-| **Security** | ✅ Rules never leave the server | ⚠️ Rules visible to client |
+|                 | Remote Evaluation (Gatrix)          | Local Evaluation                  |
+| --------------- | ----------------------------------- | --------------------------------- |
+| **Security**    | ✅ Rules never leave the server      | ⚠️ Rules visible to client         |
 | **Consistency** | ✅ Identical results across all SDKs | ⚠️ Each SDK must reimplement logic |
-| **Payload** | ✅ Only final values (small) | ⚠️ Full rule set (large) |
-| **Offline** | ⚠️ Cached values or bootstrap | ✅ Full offline after download |
+| **Payload**     | ✅ Only final values (small)         | ⚠️ Full rule set (large)           |
+| **Offline**     | ⚠️ Cached values or bootstrap        | ✅ Full offline after download     |
 
 > 🛡️ The SDK caches last known values locally. Your game never crashes due to network issues — it falls back to cached or bootstrap values.
 
@@ -139,14 +139,14 @@ flowchart TD
     end
 ```
 
-| Priority | Condition | Value Source | `variant.name` |
-|:---:|---|---|:---|
-| 1 | Flag enabled + strategy matched | `variant.value` | Variant name (e.g. `"dark-theme"`) |
-| 2 | Flag enabled + no match + env override | `env.enabledValue` | `$env-default-enabled` |
-| 3 | Flag enabled + no match + no override | `flag.enabledValue` | `$flag-default-enabled` |
-| 4 | Flag disabled + env override | `env.disabledValue` | `$env-default-disabled` |
-| 5 | Flag disabled + no override | `flag.disabledValue` | `$flag-default-disabled` |
-| 6 | Flag not found | Not in response | `$missing` |
+| Priority | Condition                              | Value Source         | `variant.name`                     |
+| :------: | -------------------------------------- | -------------------- | :--------------------------------- |
+|    1     | Flag enabled + strategy matched        | `variant.value`      | Variant name (e.g. `"dark-theme"`) |
+|    2     | Flag enabled + no match + env override | `env.enabledValue`   | `$env-default-enabled`             |
+|    3     | Flag enabled + no match + no override  | `flag.enabledValue`  | `$flag-default-enabled`            |
+|    4     | Flag disabled + env override           | `env.disabledValue`  | `$env-default-disabled`            |
+|    5     | Flag disabled + no override            | `flag.disabledValue` | `$flag-default-disabled`           |
+|    6     | Flag not found                         | Not in response      | `$missing`                         |
 
 ### SDK-Side: How Your Code Receives Values
 
@@ -185,9 +185,9 @@ local Speed = gatrix.Features.FloatVariation("game-speed", 1.0)  -- 1.0 if anyth
 
 These serve **different purposes** — don't confuse them:
 
-| Function | Returns | Purpose |
-|---|---|---|
-| `gatrix.Features.IsEnabled("flag")` | `flag.enabled` | Is the feature flag **turned on**? |
+| Function                                       | Returns                    | Purpose                                          |
+| ---------------------------------------------- | -------------------------- | ------------------------------------------------ |
+| `gatrix.Features.IsEnabled("flag")`            | `flag.enabled`             | Is the feature flag **turned on**?               |
 | `gatrix.Features.BoolVariation("flag", false)` | `variant.value` as boolean | What **boolean value** did the flag evaluate to? |
 
 ```lua
@@ -346,67 +346,159 @@ gatrix.Features.FetchFlags()
 
 ```lua
 --- Check if a flag is enabled
---- @param FlagName string
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return boolean
 local Enabled = gatrix.Features.IsEnabled("my_flag")
-
---- Get variant name (string)
---- @param FlagName string
---- @param Fallback string
---- @return string
-local VariantName = gatrix.Features.Variation("my_flag", "default")
-
+local Enabled = gatrix.Features.IsEnabled("my_flag", true)  -- forceRealtime
 
 --- Get raw flag data as EvaluatedFlag table
---- @param FlagName string
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return EvaluatedFlag
 local Flag = gatrix.Features.GetFlag("my_flag")
+local Flag = gatrix.Features.GetFlag("my_flag", true)
 
---- Get variant for a flag (never nil)
---- @param FlagName string
+--- Get variant for a flag (never nil; returns $missing variant if not found)
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return Variant
 local Variant = gatrix.Features.GetVariant("my_flag")
+local Variant = gatrix.Features.GetVariant("my_flag", true)
 
 --- Get all evaluated flags
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return EvaluatedFlag[]
 local Flags = gatrix.Features.GetAllFlags()
+local Flags = gatrix.Features.GetAllFlags(true)
 
 --- Check if a flag exists in the cache
---- @param FlagName string
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return boolean
 local Exists = gatrix.Features.HasFlag("my_flag")
+local Exists = gatrix.Features.HasFlag("my_flag", true)
 ```
 
 ### Typed Variations (`gatrix.Features`)
 
+> `forceRealtime` (optional, default `false`) — if `true`, reads directly from the **realtime** flag
+> cache, bypassing `ExplicitSyncMode`. Useful in monitoring, debug overlays, or admin UIs that
+> always need the latest server-fetched value regardless of sync state.
+
 ```lua
---- @param FlagName     string
---- @param FallbackValue boolean
+--- Get variant name (string)
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue string   Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return string
+local VariantName = gatrix.Features.Variation("my_flag", "default")
+local VariantName = gatrix.Features.Variation("my_flag", "default", true)
+
+--- Get boolean variation (returns flag.enabled state)
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue boolean  Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return boolean
 local BoolVal = gatrix.Features.BoolVariation("flag", false)
+local BoolVal = gatrix.Features.BoolVariation("flag", false, true)
 
---- @param FlagName     string
---- @param FallbackValue string
+--- Get string variation from variant payload
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue string   Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return string
 local StrVal = gatrix.Features.StringVariation("flag", "default")
+local StrVal = gatrix.Features.StringVariation("flag", "default", true)
 
---- @param FlagName     string
---- @param FallbackValue integer
+--- Get integer variation from variant payload
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue integer  Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return integer
 local IntVal = gatrix.Features.IntVariation("flag", 0)
+local IntVal = gatrix.Features.IntVariation("flag", 0, true)
 
---- @param FlagName     string
---- @param FallbackValue number
+--- Get float variation from variant payload
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue number   Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return number
 local FloatVal = gatrix.Features.FloatVariation("flag", 0.0)
+local FloatVal = gatrix.Features.FloatVariation("flag", 0.0, true)
+```
 
---- Get detailed variation result
---- @return {Value: any, Reason: string, FlagExists: boolean, Enabled: boolean}
+### Variation Details (`gatrix.Features`)
+
+Returns a `VariationResult` table with the value **plus** evaluation metadata.
+
+```lua
+--- Get boolean variation with evaluation details
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue boolean  Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return VariationResult {Value: boolean, Reason: string, FlagExists: boolean, Enabled: boolean}
 local Result = gatrix.Features.BoolVariationDetails("flag", false)
+local Result = gatrix.Features.BoolVariationDetails("flag", false, true)
 
---- Get value or raise Lua error if missing/mismatched
+--- Get string variation with evaluation details
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue string   Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return VariationResult {Value: string, Reason: string, FlagExists: boolean, Enabled: boolean}
+local Result = gatrix.Features.StringVariationDetails("flag", "")
+local Result = gatrix.Features.StringVariationDetails("flag", "", true)
+
+--- Get integer variation with evaluation details
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue integer  Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return VariationResult {Value: integer, Reason: string, FlagExists: boolean, Enabled: boolean}
+local Result = gatrix.Features.IntVariationDetails("flag", 0)
+local Result = gatrix.Features.IntVariationDetails("flag", 0, true)
+
+--- Get float variation with evaluation details
+--- @param FlagName      string   Feature flag key
+--- @param FallbackValue number   Value to return if flag not found or type mismatch
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return VariationResult {Value: number, Reason: string, FlagExists: boolean, Enabled: boolean}
+local Result = gatrix.Features.FloatVariationDetails("flag", 0.0)
+local Result = gatrix.Features.FloatVariationDetails("flag", 0.0, true)
+```
+
+### Strict Variations — OrThrow (`gatrix.Features`)
+
+Raise a **Lua error** if the flag does not exist or the type does not match.
+Use these where a missing flag is a programming error, not a runtime condition.
+
+```lua
+--- Get boolean variation, raises Lua error if flag not found or type mismatch
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
 --- @return boolean
-local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag")
+local Val = gatrix.Features.BoolVariationOrThrow("flag")
+local Val = gatrix.Features.BoolVariationOrThrow("flag", true)
+
+--- Get string variation, raises Lua error if flag not found or type mismatch
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return string
+local Val = gatrix.Features.StringVariationOrThrow("flag")
+local Val = gatrix.Features.StringVariationOrThrow("flag", true)
+
+--- Get integer variation, raises Lua error if flag not found or type mismatch
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return integer
+local Val = gatrix.Features.IntVariationOrThrow("flag")
+local Val = gatrix.Features.IntVariationOrThrow("flag", true)
+
+--- Get float variation, raises Lua error if flag not found or type mismatch
+--- @param FlagName      string   Feature flag key
+--- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @return number
+local Val = gatrix.Features.FloatVariationOrThrow("flag")
+local Val = gatrix.Features.FloatVariationOrThrow("flag", true)
 ```
 
 ### Returned Table Shapes
@@ -416,20 +508,20 @@ local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag")
 
 **ValueType Enum:**
 
-| Value | Type | Lua type of `Value` |
-|---|---|---|
-| `0` | string | `string` |
-| `1` | number | `number` |
-| `2` | boolean | `boolean` |
-| `3` | json | `string` (JSON-encoded, use `json.decode(Value)`) |
+| Value | Type    | Lua type of `Value`                               |
+| ----- | ------- | ------------------------------------------------- |
+| `0`   | string  | `string`                                          |
+| `1`   | number  | `number`                                          |
+| `2`   | boolean | `boolean`                                         |
+| `3`   | json    | `string` (JSON-encoded, use `json.decode(Value)`) |
 
 **Variant:**
 
-| Field | Type | Description |
-|---|---|---|
-| `Name` | `string` | Variant name (e.g. `"dark-theme"`, `"$flag-default-enabled"`) |
-| `Enabled` | `boolean` | Whether this variant is the enabled state |
-| `Value` | `boolean` / `number` / `string` | Variant value, automatically typed based on `ValueType` |
+| Field     | Type                            | Description                                                   |
+| --------- | ------------------------------- | ------------------------------------------------------------- |
+| `Name`    | `string`                        | Variant name (e.g. `"dark-theme"`, `"$flag-default-enabled"`) |
+| `Enabled` | `boolean`                       | Whether this variant is the enabled state                     |
+| `Value`   | `boolean` / `number` / `string` | Variant value, automatically typed based on `ValueType`       |
 
 ```lua
 -- Example: boolean flag → Value is a Lua boolean
@@ -449,15 +541,15 @@ local MustExist = gatrix.Features.BoolVariationOrThrow("critical_flag")
 
 **EvaluatedFlag:**
 
-| Field | Type | Description |
-|---|---|---|
-| `Name` | `string` | Flag name |
-| `Enabled` | `boolean` | Whether the flag is enabled |
-| `Variant` | `Variant` | Variant sub-table (see above) |
-| `ValueType` | `integer` | Value type enum (`0`=string, `1`=number, `2`=boolean, `3`=json) |
-| `Version` | `integer` | Flag version number |
-| `Reason` | `string` | Evaluation reason (e.g. `"evaluated"`, `"default"`, `"not-found"`) |
-| `ImpressionData` | `boolean` | Whether impression tracking is enabled for this flag |
+| Field            | Type      | Description                                                        |
+| ---------------- | --------- | ------------------------------------------------------------------ |
+| `Name`           | `string`  | Flag name                                                          |
+| `Enabled`        | `boolean` | Whether the flag is enabled                                        |
+| `Variant`        | `Variant` | Variant sub-table (see above)                                      |
+| `ValueType`      | `integer` | Value type enum (`0`=string, `1`=number, `2`=boolean, `3`=json)    |
+| `Version`        | `integer` | Flag version number                                                |
+| `Reason`         | `string`  | Evaluation reason (e.g. `"evaluated"`, `"default"`, `"not-found"`) |
+| `ImpressionData` | `boolean` | Whether impression tracking is enabled for this flag               |
 
 ```lua
 -- Example: number type flag
@@ -468,16 +560,16 @@ local MaxRetries = Flag.Variant.Value  -- 3 (number, no tonumber() needed)
 
 **FlagProxy** (from watch callbacks):
 
-| Field | Type | Description |
-|---|---|---|
-| `Name` | `string` | Flag name |
-| `Enabled` | `boolean` | Whether the flag is enabled |
-| `Exists` | `boolean` | Whether the flag exists in cache |
-| `Realtime` | `boolean` | Whether this proxy reads from realtime flags (vs synced) |
-| `Variant` | `Variant` | Variant sub-table (see above) |
+| Field       | Type      | Description                                                     |
+| ----------- | --------- | --------------------------------------------------------------- |
+| `Name`      | `string`  | Flag name                                                       |
+| `Enabled`   | `boolean` | Whether the flag is enabled                                     |
+| `Exists`    | `boolean` | Whether the flag exists in cache                                |
+| `Realtime`  | `boolean` | Whether this proxy reads from realtime flags (vs synced)        |
+| `Variant`   | `Variant` | Variant sub-table (see above)                                   |
 | `ValueType` | `integer` | Value type enum (`0`=string, `1`=number, `2`=boolean, `3`=json) |
-| `Version` | `integer` | Flag version number |
-| `Reason` | `string` | Evaluation reason |
+| `Version`   | `integer` | Flag version number                                             |
+| `Reason`    | `string`  | Evaluation reason                                               |
 
 ```lua
 -- Example: watch callback
@@ -497,12 +589,12 @@ end)
 
 **VariationResult** (from `*Details`):
 
-| Field | Type | Description |
-|---|---|---|
-| `Value` | `any` | Flag value (boolean/string/number) |
-| `Reason` | `string` | Evaluation reason |
-| `FlagExists` | `boolean` | Whether flag exists in cache |
-| `Enabled` | `boolean` | Whether flag is enabled |
+| Field        | Type      | Description                        |
+| ------------ | --------- | ---------------------------------- |
+| `Value`      | `any`     | Flag value (boolean/string/number) |
+| `Reason`     | `string`  | Evaluation reason                  |
+| `FlagExists` | `boolean` | Whether flag exists in cache       |
+| `Enabled`    | `boolean` | Whether flag is enabled            |
 
 
 ### Reserved Variant Names
@@ -510,15 +602,15 @@ end)
 The SDK uses `$`-prefixed variant names to indicate **where a value came from**.
 These are system-generated — not user-defined variant names.
 
-| Variant Name | Meaning | `Enabled` | When It Happens |
-|:---|---|:---:|---|
-| `$missing` | Flag does not exist in SDK cache | `false` | Flag name typo, flag not created yet, or SDK not initialized |
-| `$type-mismatch` | Requested type doesn't match flag's `ValueType` | `false` | Called `BoolVariation` on a `string` flag, etc. |
-| `$env-default-enabled` | Flag enabled, value from **environment-level** `enabledValue` | `true` | No variant matched; environment override is set |
-| `$flag-default-enabled` | Flag enabled, value from **flag-level** (global) `enabledValue` | `true` | No variant matched; no environment override |
-| `$env-default-disabled` | Flag disabled, value from **environment-level** `disabledValue` | `false` | Flag disabled; environment override is set |
-| `$flag-default-disabled` | Flag disabled, value from **flag-level** (global) `disabledValue` | `false` | Flag disabled; no environment override |
-| *(user-defined)* | A specific variant was selected by targeting strategy | `true` | Strategy matched and selected this variant |
+| Variant Name             | Meaning                                                           | `Enabled` | When It Happens                                              |
+| :----------------------- | ----------------------------------------------------------------- | :-------: | ------------------------------------------------------------ |
+| `$missing`               | Flag does not exist in SDK cache                                  |  `false`  | Flag name typo, flag not created yet, or SDK not initialized |
+| `$type-mismatch`         | Requested type doesn't match flag's `ValueType`                   |  `false`  | Called `BoolVariation` on a `string` flag, etc.              |
+| `$env-default-enabled`   | Flag enabled, value from **environment-level** `enabledValue`     |  `true`   | No variant matched; environment override is set              |
+| `$flag-default-enabled`  | Flag enabled, value from **flag-level** (global) `enabledValue`   |  `true`   | No variant matched; no environment override                  |
+| `$env-default-disabled`  | Flag disabled, value from **environment-level** `disabledValue`   |  `false`  | Flag disabled; environment override is set                   |
+| `$flag-default-disabled` | Flag disabled, value from **flag-level** (global) `disabledValue` |  `false`  | Flag disabled; no environment override                       |
+| *(user-defined)*         | A specific variant was selected by targeting strategy             |  `true`   | Strategy matched and selected this variant                   |
 
 ```lua
 -- Example: checking variant name to understand value source
@@ -591,26 +683,26 @@ gatrix.OffAny(AnyHandle)
 
 **Available Events:**
 
-| Event | Description |
-|---|---|
-| `flags.init` | SDK initialized (from storage/bootstrap) |
-| `flags.ready` | First successful fetch completed |
-| `flags.fetch_start` | Started fetching flags |
-| `flags.fetch_success` | Successfully fetched flags |
-| `flags.fetch_error` | Error during fetch |
-| `flags.fetch_end` | Fetch completed (success or error) |
-| `flags.change` | Flags changed from server |
-| `flags.change:<flagName>` | Specific flag changed |
-| `flags.error` | General SDK error |
-| `flags.impression` | Flag accessed (if impressionData enabled) |
-| `flags.sync` | Flags synchronized (explicitSyncMode) |
-| `flags.pending_sync` | Pending sync available |
-| `flags.removed` | Flags removed from server |
-| `flags.recovered` | SDK recovered from error |
-| `flags.streaming_connected` | Streaming connected |
-| `flags.streaming_disconnected` | Streaming disconnected |
-| `flags.streaming_error` | Streaming error |
-| `flags.invalidated` | Flags invalidated by streaming |
+| Event                          | Description                               |
+| ------------------------------ | ----------------------------------------- |
+| `flags.init`                   | SDK initialized (from storage/bootstrap)  |
+| `flags.ready`                  | First successful fetch completed          |
+| `flags.fetch_start`            | Started fetching flags                    |
+| `flags.fetch_success`          | Successfully fetched flags                |
+| `flags.fetch_error`            | Error during fetch                        |
+| `flags.fetch_end`              | Fetch completed (success or error)        |
+| `flags.change`                 | Flags changed from server                 |
+| `flags.change:<flagName>`      | Specific flag changed                     |
+| `flags.error`                  | General SDK error                         |
+| `flags.impression`             | Flag accessed (if impressionData enabled) |
+| `flags.sync`                   | Flags synchronized (explicitSyncMode)     |
+| `flags.pending_sync`           | Pending sync available                    |
+| `flags.removed`                | Flags removed from server                 |
+| `flags.recovered`              | SDK recovered from error                  |
+| `flags.streaming_connected`    | Streaming connected                       |
+| `flags.streaming_disconnected` | Streaming disconnected                    |
+| `flags.streaming_error`        | Streaming error                           |
+| `flags.invalidated`            | Flags invalidated by streaming            |
 
 ### Watch (`gatrix.Features`)
 
@@ -657,23 +749,23 @@ gatrix.Features.UnwatchFlag(Handle)
 
 #### Realtime vs Synced — When to Use Which?
 
-| | Realtime | Synced |
-|---|---|---|
-| **Callback timing** | Immediately on fetch | After `SyncFlags()` (in ExplicitSyncMode) |
-| **Use case** | Debug UI, monitoring, non-disruptive changes | Gameplay values that need controlled timing |
-| **ExplicitSyncMode off** | Fires on change | Fires on change (same as realtime) |
-| **ExplicitSyncMode on** | Fires on change | Fires **only** after `SyncFlags()` |
+|                          | Realtime                                     | Synced                                      |
+| ------------------------ | -------------------------------------------- | ------------------------------------------- |
+| **Callback timing**      | Immediately on fetch                         | After `SyncFlags()` (in ExplicitSyncMode)   |
+| **Use case**             | Debug UI, monitoring, non-disruptive changes | Gameplay values that need controlled timing |
+| **ExplicitSyncMode off** | Fires on change                              | Fires on change (same as realtime)          |
+| **ExplicitSyncMode on**  | Fires on change                              | Fires **only** after `SyncFlags()`          |
 
 #### ⏱️ ExplicitSyncMode — Why It Matters
 
 Realtime mode is simple, but applying flag changes **instantly** can cause problems in games:
 
-| Problem | Example | Impact |
-|---|---|---|
-| **Mid-gameplay disruption** | Enemy HP changes mid-boss fight | Player feels cheated |
-| **Dependency conflicts** | UI layout changes before data loads | Crash or visual corruption |
-| **User trust** | Drop rates change while farming | Players lose trust |
-| **Competitive integrity** | Match params change mid-match | Unfair advantage |
+| Problem                     | Example                             | Impact                     |
+| --------------------------- | ----------------------------------- | -------------------------- |
+| **Mid-gameplay disruption** | Enemy HP changes mid-boss fight     | Player feels cheated       |
+| **Dependency conflicts**    | UI layout changes before data loads | Crash or visual corruption |
+| **User trust**              | Drop rates change while farming     | Players lose trust         |
+| **Competitive integrity**   | Match params change mid-match       | Unfair advantage           |
 
 **ExplicitSyncMode** solves this by **buffering** changes until you apply them at a safe point:
 
@@ -854,13 +946,13 @@ Group
 
 **Possible causes & solutions:**
 
-| Cause | Solution |
-|-------|----------|
-| Polling interval too long | Reduce `RefreshInterval` (default: 30s) |
-| `ExplicitSyncMode` is on | Flag is updated but buffered — call `SyncFlags()` to apply |
-| Using `WatchSyncedFlag` | Synced watchers don't fire until `SyncFlags()` — use `WatchRealtimeFlag` instead |
-| `OfflineMode` is enabled | Set `Features = { OfflineMode = false }` for live connections |
-| Wrong `AppName` or `Environment` | Double-check config matches dashboard settings |
+| Cause                            | Solution                                                                         |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| Polling interval too long        | Reduce `RefreshInterval` (default: 30s)                                          |
+| `ExplicitSyncMode` is on         | Flag is updated but buffered — call `SyncFlags()` to apply                       |
+| Using `WatchSyncedFlag`          | Synced watchers don't fire until `SyncFlags()` — use `WatchRealtimeFlag` instead |
+| `OfflineMode` is enabled         | Set `Features = { OfflineMode = false }` for live connections                    |
+| Wrong `AppName` or `Environment` | Double-check config matches dashboard settings                                   |
 
 ---
 
@@ -937,12 +1029,12 @@ gatrix.Features.SyncFlags()
 
 **Possible causes & solutions:**
 
-| Cause | Solution |
-|-------|----------|
-| SDK not ready yet | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
-| Wrong `AppName` or `Environment` | Double-check config matches dashboard settings |
-| Flag not assigned to this environment | Verify flag is enabled for the target environment in the dashboard |
-| Network error on first fetch | Listen for `flags.fetch_error` event and check logs |
+| Cause                                 | Solution                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| SDK not ready yet                     | Wait for `flags.ready` event or use `WatchRealtimeFlagWithInitialState` |
+| Wrong `AppName` or `Environment`      | Double-check config matches dashboard settings                          |
+| Flag not assigned to this environment | Verify flag is enabled for the target environment in the dashboard      |
+| Network error on first fetch          | Listen for `flags.fetch_error` event and check logs                     |
 
 ```lua
 -- Wait for SDK to be ready before checking flags

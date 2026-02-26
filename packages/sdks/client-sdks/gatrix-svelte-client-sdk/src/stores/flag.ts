@@ -1,7 +1,7 @@
 // Gatrix Svelte SDK - Reactive flag store
 import { readable, type Readable } from 'svelte/store';
 import { getGatrixClient } from './getGatrixClient';
-import { EVENTS } from '@gatrix/gatrix-js-client-sdk';
+import type { FlagProxy } from '@gatrix/gatrix-js-client-sdk';
 
 /**
  * Reactive flag status interface
@@ -13,18 +13,19 @@ export interface FlagState {
   variantValue: string;
 }
 
-function getFlagState(flagName: string, client: ReturnType<typeof getGatrixClient>): FlagState {
-  const variant = client.features.getVariant(flagName);
+function proxyToFlagState(proxy: FlagProxy): FlagState {
   return {
-    enabled: client.features.isEnabled(flagName),
-    variantName: variant.name,
-    variantEnabled: variant.enabled,
-    variantValue: variant.value != null ? String(variant.value) : '',
+    enabled: proxy.enabled,
+    variantName: proxy.variant.name,
+    variantEnabled: proxy.variant.enabled,
+    variantValue: proxy.variant.value != null ? String(proxy.variant.value) : '',
   };
 }
 
 /**
  * Create a reactive store for full flag state (enabled + variant info).
+ * @param flagName - Feature flag key
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  *
  * @example
  * ```svelte
@@ -38,38 +39,32 @@ function getFlagState(flagName: string, client: ReturnType<typeof getGatrixClien
  * {/if}
  * ```
  */
-export function flagState(flagName: string): Readable<FlagState> {
+export function flagState(flagName: string, forceRealtime = false): Readable<FlagState> {
   const client = getGatrixClient();
+  const initial: FlagState = {
+    enabled: client.features.isEnabled(flagName, forceRealtime),
+    variantName: client.features.getVariant(flagName, forceRealtime).name,
+    variantEnabled: client.features.getVariant(flagName, forceRealtime).enabled,
+    variantValue: (() => {
+      const v = client.features.getVariant(flagName, forceRealtime).value;
+      return v != null ? String(v) : '';
+    })(),
+  };
 
-  return readable<FlagState>(getFlagState(flagName, client), (set) => {
-    const update = () => {
-      set(getFlagState(flagName, client));
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-
-    // Watch specific flag
-    const unwatch = client.features.watchFlag(
-      flagName,
-      () => {
-        update();
-      },
-      `svelte_watch_${flagName}`
-    );
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<FlagState>(initial, (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, (proxy) => {
+      set(proxyToFlagState(proxy));
+    });
   });
 }
 
 /**
  * Create a reactive boolean store for a flag's enabled state.
+ * @param flagName - Feature flag key
+ * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  *
  * @example
  * ```svelte
@@ -82,31 +77,14 @@ export function flagState(flagName: string): Readable<FlagState> {
  * {/if}
  * ```
  */
-export function flag(flagName: string): Readable<boolean> {
+export function flag(flagName: string, forceRealtime = false): Readable<boolean> {
   const client = getGatrixClient();
-
-  return readable<boolean>(client.features.isEnabled(flagName), (set) => {
-    const update = () => {
-      set(client.features.isEnabled(flagName));
-    };
-
-    client.on(EVENTS.FLAGS_CHANGE, update);
-    client.on(EVENTS.FLAGS_READY, update);
-    client.on(EVENTS.FLAGS_SYNC, update);
-
-    const unwatch = client.features.watchFlag(
-      flagName,
-      () => {
-        update();
-      },
-      `svelte_flag_${flagName}`
-    );
-
-    return () => {
-      client.off(EVENTS.FLAGS_CHANGE, update);
-      client.off(EVENTS.FLAGS_READY, update);
-      client.off(EVENTS.FLAGS_SYNC, update);
-      unwatch();
-    };
+  return readable<boolean>(client.features.isEnabled(flagName, forceRealtime), (set) => {
+    const watchFn = forceRealtime
+      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+    return watchFn(flagName, (proxy) => {
+      set(proxy.enabled);
+    });
   });
 }

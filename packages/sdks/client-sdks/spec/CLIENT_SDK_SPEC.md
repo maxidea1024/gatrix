@@ -29,34 +29,34 @@ All client SDK names (folder, package, module) **MUST** include both `gatrix` an
 
 Pattern: `gatrix-{platform}-client-sdk`
 
-| Platform | Folder Name |
-|----------|-------------|
-| JavaScript | `gatrix-js-client-sdk` |
-| React | `gatrix-react-client-sdk` |
-| Svelte | `gatrix-svelte-client-sdk` |
-| Vue | `gatrix-vue-client-sdk` |
-| Flutter | `gatrix-flutter-client-sdk` |
-| Python | `gatrix-python-client-sdk` |
-| Unity | `gatrix-unity-client-sdk` |
-| Cocos2d-x | `gatrix-cocos2dx-client-sdk` |
-| Godot | `gatrix-godot-client-sdk` |
-| Unreal | `gatrix-unreal-client-sdk` |
+| Platform     | Folder Name                    |
+| ------------ | ------------------------------ |
+| JavaScript   | `gatrix-js-client-sdk`         |
+| React        | `gatrix-react-client-sdk`      |
+| Svelte       | `gatrix-svelte-client-sdk`     |
+| Vue          | `gatrix-vue-client-sdk`        |
+| Flutter      | `gatrix-flutter-client-sdk`    |
+| Python       | `gatrix-python-client-sdk`     |
+| Unity        | `gatrix-unity-client-sdk`      |
+| Cocos2d-x    | `gatrix-cocos2dx-client-sdk`   |
+| Godot        | `gatrix-godot-client-sdk`      |
+| Unreal       | `gatrix-unreal-client-sdk`     |
 | Unreal (Lua) | `gatrix-unreal-lua-client-sdk` |
 
 ### Package / Module Name
 
-| Platform | Package Name | File |
-|----------|-------------|------|
-| JavaScript | `@gatrix/gatrix-js-client-sdk` | `package.json` |
-| React | `@gatrix/gatrix-react-client-sdk` | `package.json` |
-| Svelte | `@gatrix/gatrix-svelte-client-sdk` | `package.json` |
-| Vue | `@gatrix/gatrix-vue-client-sdk` | `package.json` |
-| Flutter | `gatrix_flutter_client_sdk` | `pubspec.yaml` |
-| Python | `gatrix-python-client-sdk` | `pyproject.toml` |
-| Unity | `com.gatrix.unity.client.sdk` | `package.json` |
-| Cocos2d-x | `gatrix-cocos2dx-client-sdk` | `CMakeLists.txt` |
-| Unreal | `GatrixClientSDK` | `.uplugin` / `Build.cs` |
-| Unreal (Lua) | `GatrixLuaClientSDK` | `.uplugin` / `Build.cs` |
+| Platform     | Package Name                       | File                    |
+| ------------ | ---------------------------------- | ----------------------- |
+| JavaScript   | `@gatrix/gatrix-js-client-sdk`     | `package.json`          |
+| React        | `@gatrix/gatrix-react-client-sdk`  | `package.json`          |
+| Svelte       | `@gatrix/gatrix-svelte-client-sdk` | `package.json`          |
+| Vue          | `@gatrix/gatrix-vue-client-sdk`    | `package.json`          |
+| Flutter      | `gatrix_flutter_client_sdk`        | `pubspec.yaml`          |
+| Python       | `gatrix-python-client-sdk`         | `pyproject.toml`        |
+| Unity        | `com.gatrix.unity.client.sdk`      | `package.json`          |
+| Cocos2d-x    | `gatrix-cocos2dx-client-sdk`       | `CMakeLists.txt`        |
+| Unreal       | `GatrixClientSDK`                  | `.uplugin` / `Build.cs` |
+| Unreal (Lua) | `GatrixLuaClientSDK`               | `.uplugin` / `Build.cs` |
 
 > [!IMPORTANT]
 > The `@gatrix/` npm scope uses `@gatrix/gatrix-{platform}-client-sdk` format (not `@gatrix/{platform}-sdk`). Both `gatrix` and `client` MUST appear in every SDK identifier.
@@ -72,14 +72,14 @@ Pattern: `gatrix-{platform}-client-sdk`
 
 Key style rules enforced by `.clang-format`:
 
-| Rule | Value |
-|------|-------|
-| Base style | LLVM |
-| Indent width | 2 spaces |
-| Column limit | 100 |
-| Pointer alignment | **Left** (`lua_State* L`, `const FString& Ref`) |
-| Reference alignment | **Left** |
-| Short functions | Inline only |
+| Rule                | Value                                           |
+| ------------------- | ----------------------------------------------- |
+| Base style          | LLVM                                            |
+| Indent width        | 2 spaces                                        |
+| Column limit        | 100                                             |
+| Pointer alignment   | **Left** (`lua_State* L`, `const FString& Ref`) |
+| Reference alignment | **Left**                                        |
+| Short functions     | Inline only                                     |
 
 To apply formatting:
 
@@ -171,11 +171,11 @@ Based on unleash-proxy-lua's pattern:
 **Rule:** Feature flag operations MUST be accessed via `client.features.*` (or the platform equivalent).
 The main `GatrixClient` class MUST NOT expose convenience wrappers such as `client.isEnabled()`, `client.floatVariation()`, etc.
 
-| ❌ Wrong | ✅ Correct |
-|----------|-----------|
-| `client.isEnabled("flag")` | `client.features.isEnabled("flag")` |
-| `client.floatVariation("speed", 1.0)` | `client.features.floatVariation("speed", 1.0)` |
-| `GatrixClient.is_enabled("flag")` | `GatrixClient.get_features().is_enabled("flag")` |
+| ❌ Wrong                               | ✅ Correct                                        |
+| ------------------------------------- | ------------------------------------------------ |
+| `client.isEnabled("flag")`            | `client.features.isEnabled("flag")`              |
+| `client.floatVariation("speed", 1.0)` | `client.features.floatVariation("speed", 1.0)`   |
+| `GatrixClient.is_enabled("flag")`     | `GatrixClient.get_features().is_enabled("flag")` |
 
 **Rationale:**
 - Future services (Surveys, Maintenance, Messaging) will each have their own sub-client with their own methods.
@@ -350,10 +350,10 @@ interface StreamingConfig {
 
 #### Endpoints
 
-| Transport | Endpoint |
-|-----------|----------|
-| SSE | `GET /client/features/:environment/stream/sse` |
-| WebSocket | `GET /client/features/:environment/stream/ws` |
+| Transport | Endpoint                                       |
+| --------- | ---------------------------------------------- |
+| SSE       | `GET /client/features/:environment/stream/sse` |
+| WebSocket | `GET /client/features/:environment/stream/ws`  |
 
 #### Authentication
 
@@ -364,11 +364,11 @@ interface StreamingConfig {
 
 Both transports use the same event types with identical payloads:
 
-| Event | Description | Payload |
-|-------|-------------|---------|
-| `connected` | Initial connection established | `{ globalRevision: number }` |
-| `flags_changed` | Flag(s) changed on server | `{ globalRevision: number, changedKeys: string[], timestamp: number }` |
-| `heartbeat` | Server heartbeat (keepalive) | `{ timestamp: number }` |
+| Event           | Description                    | Payload                                                                |
+| --------------- | ------------------------------ | ---------------------------------------------------------------------- |
+| `connected`     | Initial connection established | `{ globalRevision: number }`                                           |
+| `flags_changed` | Flag(s) changed on server      | `{ globalRevision: number, changedKeys: string[], timestamp: number }` |
+| `heartbeat`     | Server heartbeat (keepalive)   | `{ timestamp: number }`                                                |
 
 **SSE format:**
 ```
@@ -399,13 +399,13 @@ disconnected ──► connecting ──► connected
      └── degraded ◄── reconnecting ◄┘
 ```
 
-| State | Description |
-|-------|-------------|
-| `disconnected` | Not connected (initial or intentional disconnect) |
-| `connecting` | Attempting to establish connection |
-| `connected` | Connection active, receiving events |
-| `reconnecting` | Connection lost, attempting reconnection |
-| `degraded` | Multiple reconnection failures (≥5 attempts), polling-only mode |
+| State          | Description                                                     |
+| -------------- | --------------------------------------------------------------- |
+| `disconnected` | Not connected (initial or intentional disconnect)               |
+| `connecting`   | Attempting to establish connection                              |
+| `connected`    | Connection active, receiving events                             |
+| `reconnecting` | Connection lost, attempting reconnection                        |
+| `degraded`     | Multiple reconnection failures (≥5 attempts), polling-only mode |
 
 #### Reconnection Strategy
 
@@ -436,14 +436,14 @@ All client SDKs MUST include the following standard headers on every HTTP reques
 
 #### Common Headers (fetchFlags + sendMetrics)
 
-| Header | Value | Description |
-|--------|-------|-------------|
-| `X-API-Token` | `{apiToken}` | Client API token for authentication |
-| `X-Application-Name` | `{appName}` | Application name from config |
-| `X-Connection-Id` | `{connectionId}` | Unique connection identifier (UUID, generated once per SDK instance) |
-| `X-SDK-Version` | `{sdkName}/{sdkVersion}` | SDK identification string (e.g., `@gatrix/gatrix-js-client-sdk/1.0.0`) |
-| `Content-Type` | `application/json` | Required for POST requests |
-| `...customHeaders` | User-defined | Spread/merged from `config.customHeaders` |
+| Header               | Value                    | Description                                                            |
+| -------------------- | ------------------------ | ---------------------------------------------------------------------- |
+| `X-API-Token`        | `{apiToken}`             | Client API token for authentication                                    |
+| `X-Application-Name` | `{appName}`              | Application name from config                                           |
+| `X-Connection-Id`    | `{connectionId}`         | Unique connection identifier (UUID, generated once per SDK instance)   |
+| `X-SDK-Version`      | `{sdkName}/{sdkVersion}` | SDK identification string (e.g., `@gatrix/gatrix-js-client-sdk/1.0.0`) |
+| `Content-Type`       | `application/json`       | Required for POST requests                                             |
+| `...customHeaders`   | User-defined             | Spread/merged from `config.customHeaders`                              |
 
 ### POST vs GET for Flag Evaluation
 
@@ -484,10 +484,10 @@ By default, SDKs use **GET** requests with context in query parameters for flag 
 
 #### fetchFlags-Only Headers
 
-| Header | Value | Description |
-|--------|-------|-------------|
-| `X-Environment` | `{environment}` | Environment name from config |
-| `If-None-Match` | `{etag}` | ETag from previous response (only when etag exists, enables 304 Not Modified) |
+| Header          | Value           | Description                                                                   |
+| --------------- | --------------- | ----------------------------------------------------------------------------- |
+| `X-Environment` | `{environment}` | Environment name from config                                                  |
+| `If-None-Match` | `{etag}`        | ETag from previous response (only when etag exists, enables 304 Not Modified) |
 
 #### X-SDK-Version Format
 
@@ -526,38 +526,38 @@ All client SDKs MUST validate configuration at initialization time and fail fast
 
 #### Required Fields
 
-| Field | Rule | Error |
-|-------|------|-------|
-| `apiUrl` | Non-empty, trimmed | `"apiUrl is required"` |
-| `apiToken` | Non-empty, trimmed | `"apiToken is required"` |
-| `appName` | Non-empty, trimmed | `"appName is required"` |
+| Field         | Rule               | Error                       |
+| ------------- | ------------------ | --------------------------- |
+| `apiUrl`      | Non-empty, trimmed | `"apiUrl is required"`      |
+| `apiToken`    | Non-empty, trimmed | `"apiToken is required"`    |
+| `appName`     | Non-empty, trimmed | `"appName is required"`     |
 | `environment` | Non-empty, trimmed | `"environment is required"` |
 
 #### Format Validation
 
-| Field | Rule | Error |
-|-------|------|-------|
-| `apiUrl` | Must be valid HTTP/HTTPS URL | `"apiUrl must be a valid HTTP/HTTPS URL"` |
+| Field                | Rule                           | Error                                            |
+| -------------------- | ------------------------------ | ------------------------------------------------ |
+| `apiUrl`             | Must be valid HTTP/HTTPS URL   | `"apiUrl must be a valid HTTP/HTTPS URL"`        |
 | `apiUrl`, `apiToken` | No leading/trailing whitespace | `"must not have leading or trailing whitespace"` |
-| `cacheKeyPrefix` | <= 100 characters | `"cacheKeyPrefix must be <= 100 characters"` |
+| `cacheKeyPrefix`     | <= 100 characters              | `"cacheKeyPrefix must be <= 100 characters"`     |
 
 #### Numeric Range Validation
 
-| Field | Min | Max | Unit |
-|-------|-----|-----|------|
-| `refreshInterval` | 1 | 86400 | seconds |
-| `metricsInterval` | 1 | 86400 | seconds |
-| `metricsIntervalInitial` | 0 | 3600 | seconds |
-| `fetchRetryLimit` | 0 | 10 | count |
-| `fetchTimeout` | 1 | 120 | seconds |
-| `initialBackoff` | 0.1 | 60 | seconds |
-| `maxBackoff` | 1 | 600 | seconds |
-| `streaming.sse.reconnectBase` | 0.5 | 60 | seconds |
-| `streaming.sse.reconnectMax` | 1 | 300 | seconds |
-| `streaming.sse.pollingJitter` | 0 | 30 | seconds |
-| `streaming.websocket.reconnectBase` | 0.5 | 60 | seconds |
-| `streaming.websocket.reconnectMax` | 1 | 300 | seconds |
-| `streaming.websocket.pingInterval` | 5 | 300 | seconds |
+| Field                               | Min | Max   | Unit    |
+| ----------------------------------- | --- | ----- | ------- |
+| `refreshInterval`                   | 1   | 86400 | seconds |
+| `metricsInterval`                   | 1   | 86400 | seconds |
+| `metricsIntervalInitial`            | 0   | 3600  | seconds |
+| `fetchRetryLimit`                   | 0   | 10    | count   |
+| `fetchTimeout`                      | 1   | 120   | seconds |
+| `initialBackoff`                    | 0.1 | 60    | seconds |
+| `maxBackoff`                        | 1   | 600   | seconds |
+| `streaming.sse.reconnectBase`       | 0.5 | 60    | seconds |
+| `streaming.sse.reconnectMax`        | 1   | 300   | seconds |
+| `streaming.sse.pollingJitter`       | 0   | 30    | seconds |
+| `streaming.websocket.reconnectBase` | 0.5 | 60    | seconds |
+| `streaming.websocket.reconnectMax`  | 1   | 300   | seconds |
+| `streaming.websocket.pingInterval`  | 5   | 300   | seconds |
 
 #### Cross-Field Validation
 
@@ -628,23 +628,23 @@ interface GatrixContext {
 
 All events use the `flags.*` prefix for namespacing:
 
-| Event                     | Description                                          | Payload                              |
-| ------------------------- | ---------------------------------------------------- | ------------------------------------ |
-| `flags.init`              | SDK initialized (from storage/bootstrap)             | -                                    |
-| `flags.ready`             | First successful fetch completed                     | -                                    |
-| `flags.fetch`             | Started fetching flags from server                   | `{ etag: string \| null }`           |
-| `flags.fetch_start`       | Started fetching flags from server (alias for fetch) | `{ etag: string \| null }`           |
-| `flags.fetch_success`     | Successfully fetched flags from server               | -                                    |
-| `flags.fetch_error`       | Error occurred during fetching                       | `{ status?: number, error?: Error }` |
-| `flags.fetch_end`         | Completed fetching flags (success or error)          | -                                    |
-| `flags.change`            | Flags changed from server                            | `{ flags: EvaluatedFlag[] }`         |
-| `flags.removed`           | One or more flags removed from server                | `string[]` (removed flag names)      |
-| `flags.error`             | General SDK error occurred                           | `{ type: string, error: Error }`     |
-| `flags.recovered`         | SDK recovered from error state                       | -                                    |
-| `flags.impression`        | Flag accessed (if impressionData enabled)            | `ImpressionEvent`                    |
-| `flags.pending_sync`      | Pending sync flags available (explicitSyncMode)      | -                                    |
+| Event                     | Description                                          | Payload                                                                         |
+| ------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `flags.init`              | SDK initialized (from storage/bootstrap)             | -                                                                               |
+| `flags.ready`             | First successful fetch completed                     | -                                                                               |
+| `flags.fetch`             | Started fetching flags from server                   | `{ etag: string \| null }`                                                      |
+| `flags.fetch_start`       | Started fetching flags from server (alias for fetch) | `{ etag: string \| null }`                                                      |
+| `flags.fetch_success`     | Successfully fetched flags from server               | -                                                                               |
+| `flags.fetch_error`       | Error occurred during fetching                       | `{ status?: number, error?: Error }`                                            |
+| `flags.fetch_end`         | Completed fetching flags (success or error)          | -                                                                               |
+| `flags.change`            | Flags changed from server                            | `{ flags: EvaluatedFlag[] }`                                                    |
+| `flags.removed`           | One or more flags removed from server                | `string[]` (removed flag names)                                                 |
+| `flags.error`             | General SDK error occurred                           | `{ type: string, error: Error }`                                                |
+| `flags.recovered`         | SDK recovered from error state                       | -                                                                               |
+| `flags.impression`        | Flag accessed (if impressionData enabled)            | `ImpressionEvent`                                                               |
+| `flags.pending_sync`      | Pending sync flags available (explicitSyncMode)      | -                                                                               |
 | `flags.{flagName}.change` | Specific flag created or updated                     | `(newFlag, oldFlag, changeType)` where changeType is `'created'` or `'updated'` |
-| `flags.metrics.sent`      | Metrics successfully sent to server                  | `{ count: number }`                  |
+| `flags.metrics.sent`      | Metrics successfully sent to server                  | `{ count: number }`                                                             |
 
 ### Per-Flag Change Events (`flags.{flagName}.change`)
 
@@ -684,10 +684,10 @@ Reacts to flag changes only at **controlled synchronization points**.
 
 **Behavior comparison in `explicitSyncMode=true`:**
 
-| Event | `watchRealtimeFlag` | `watchSyncedFlag` |
-|-------|-------------------|------------------|
-| Server fetch completes | ✅ Fires immediately | ❌ Not fired |
-| `syncFlags()` called | ❌ Not fired | ✅ Fires with synced diff |
+| Event                  | `watchRealtimeFlag` | `watchSyncedFlag`        |
+| ---------------------- | ------------------- | ------------------------ |
+| Server fetch completes | ✅ Fires immediately | ❌ Not fired              |
+| `syncFlags()` called   | ❌ Not fired         | ✅ Fires with synced diff |
 
 #### `invokeWatchCallbacks` Implementation Rules
 
@@ -730,11 +730,11 @@ if not explicitSyncMode:
 
 **3. Call site summary:**
 
-| Call Site | Callback Map | `forceRealtime` |
-|-----------|-------------|-----------------|
-| `storeFlags()` — realtime | `realtimeWatchCallbacks` | `true` |
-| `storeFlags()` — synced (non-explicit mode) | `syncedWatchCallbacks` | `false` |
-| `syncFlags()` — synced | `syncedWatchCallbacks` | `false` |
+| Call Site                                   | Callback Map             | `forceRealtime` |
+| ------------------------------------------- | ------------------------ | --------------- |
+| `storeFlags()` — realtime                   | `realtimeWatchCallbacks` | `true`          |
+| `storeFlags()` — synced (non-explicit mode) | `syncedWatchCallbacks`   | `false`         |
+| `syncFlags()` — synced                      | `syncedWatchCallbacks`   | `false`         |
 
 ## Main Interface
 
@@ -846,6 +846,7 @@ class FeaturesClient implements VariationProvider {
 
   // Statistics (Debugging & Monitoring)
   getStats(): GatrixSdkStats;
+  getLightStats(): GatrixSdkLightStats; // Scalar values only — suitable for frequent polling / low-overhead diagnostics
 }
 ```
 
@@ -927,7 +928,7 @@ These methods read from in-memory cache and are safe to call in render loops, ev
 
 **Moderate Frequency:**
 
-- `watchFlag()`, `watchFlagWithInitialState()` - Register once, no need to call repeatedly
+- `watchRealtimeFlag()`, `watchSyncedFlag()`, `watchRealtimeFlagWithInitialState()`, `watchSyncedFlagWithInitialState()` - Register once, no need to call repeatedly
 
 **Infrequent / Setup Only:**
 
@@ -989,7 +990,9 @@ const client = new GatrixClient({
   apiToken: 'your-token',
   appName: 'my-app',
   environment: 'production',
-  storageProvider: new RedisStorageProvider(redisClient),
+  features: {
+    storageProvider: new RedisStorageProvider(redisClient),
+  },
 });
 ```
 
@@ -1010,15 +1013,15 @@ All variation methods require an explicit default value parameter. This is a del
 3. **Fail-Safe Behavior:** Your application always receives a usable value, even during network failures or SDK initialization.
 4. **Explicit Intent:** Forces developers to consider the fallback scenario, reducing bugs.
 
-| Function           | Return Type | Description                    |
-| ------------------ | ----------- | ------------------------------ |
-| `variation`        | string      | Variant name only              |
-| `boolVariation`    | boolean     | Boolean variant value (`variant.value`). Strict: `valueType` must be `boolean`. |
-| `stringVariation`  | string      | Variant value as string. Strict: `valueType` must be `string`. |
-| `numberVariation`  | number      | Variant value as number (JS/TS only). Strict: `valueType` must be `number`. |
-| `intVariation`     | int         | Variant value as integer (non-JS SDKs). Strict: `valueType` must be `number`. |
-| `floatVariation`   | float/double | Variant value as float (non-JS SDKs). Strict: `valueType` must be `number`. |
-| `jsonVariation<T>` | T           | Variant value parsed as JSON. Strict: `valueType` must be `json`. |
+| Function           | Return Type  | Description                                                                     |
+| ------------------ | ------------ | ------------------------------------------------------------------------------- |
+| `variation`        | string       | Variant name only                                                               |
+| `boolVariation`    | boolean      | Boolean variant value (`variant.value`). Strict: `valueType` must be `boolean`. |
+| `stringVariation`  | string       | Variant value as string. Strict: `valueType` must be `string`.                  |
+| `numberVariation`  | number       | Variant value as number (JS/TS only). Strict: `valueType` must be `number`.     |
+| `intVariation`     | int          | Variant value as integer (non-JS SDKs). Strict: `valueType` must be `number`.   |
+| `floatVariation`   | float/double | Variant value as float (non-JS SDKs). Strict: `valueType` must be `number`.     |
+| `jsonVariation<T>` | T            | Variant value parsed as JSON. Strict: `valueType` must be `json`.               |
 
 ### VariationResult Interface
 
@@ -1035,11 +1038,11 @@ interface VariationResult<T> {
 
 The following variant names are system-reserved and use a `$` prefix:
 
-| Name | Meaning |
-|------|---------|
-| `$missing` | Flag does not exist in cache |
-| `$disabled` | Flag is disabled |
-| `$config` | Flag uses configuration value |
+| Name        | Meaning                       |
+| ----------- | ----------------------------- |
+| `$missing`  | Flag does not exist in cache  |
+| `$disabled` | Flag is disabled              |
+| `$config`   | Flag uses configuration value |
 
 SDKs MUST NOT allow user-defined variant names starting with `$`.
 
@@ -1122,7 +1125,7 @@ FlagProxy is a **convenience shell** that delegates all variation logic to `Feat
 - Read-only property accessors (`variant`, `valueType`, `version`, etc.) access flag data directly from the snapshot.
 - **No `onAccess` callback** — metrics tracking is handled entirely by the internal methods.
 - **Strict type checking**: All variation methods validate `valueType` to prevent misuse.
-- **Not a public API**: `FlagProxy` is created internally by `watchFlag()` and `watchFlagWithInitialState()`. There is no public `getFlag()` method.
+- **Not a public API**: `FlagProxy` is created internally by `watchRealtimeFlag()`, `watchSyncedFlag()`, and their `WithInitialState` variants. There is no public `getFlag()` method.
 
 #### Immutable Snapshot Requirement
 
@@ -1193,16 +1196,16 @@ class FlagProxy {
 
 #### FlagProxy Variation Logic Summary
 
-| Method | valueType Check | Value Source | Fallback |
-|--------|----------------|--------------|----------|
-| `enabled` | none | `flag.enabled` | `false` |
-| `variation` | none | `variant.name` | fallbackValue |
-| `boolVariation` | `boolean` | `Boolean(variant.value)` | fallbackValue |
-| `stringVariation` | `string` | `String(variant.value)` | fallbackValue |
-| `numberVariation` | `number` | `Number(variant.value)` | fallbackValue |
-| `intVariation` | `number` | `int(variant.value)` | fallbackValue |
-| `floatVariation` | `number` | `float(variant.value)` | fallbackValue |
-| `jsonVariation` | `json` + object check | `variant.value` | fallbackValue |
+| Method            | valueType Check       | Value Source             | Fallback      |
+| ----------------- | --------------------- | ------------------------ | ------------- |
+| `enabled`         | none                  | `flag.enabled`           | `false`       |
+| `variation`       | none                  | `variant.name`           | fallbackValue |
+| `boolVariation`   | `boolean`             | `Boolean(variant.value)` | fallbackValue |
+| `stringVariation` | `string`              | `String(variant.value)`  | fallbackValue |
+| `numberVariation` | `number`              | `Number(variant.value)`  | fallbackValue |
+| `intVariation`    | `number`              | `int(variant.value)`     | fallbackValue |
+| `floatVariation`  | `number`              | `float(variant.value)`   | fallbackValue |
+| `jsonVariation`   | `json` + object check | `variant.value`          | fallbackValue |
 
 > [!IMPORTANT]
 > **`boolVariation` ??`isEnabled`**: `isEnabled()` returns `flag.enabled`, while `boolVariation()` returns the boolean *value* from `variant.value`. These serve different purposes:
@@ -1483,11 +1486,11 @@ This section defines the real-time flag synchronization protocol. All Client SDK
 
 The streaming endpoint (`/client/features/{environment}/stream`) emits the following server-sent events:
 
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `connected` | `{ globalRevision: number }` | Initial connection established with current server revision |
+| Event           | Payload                                             | Description                                                         |
+| --------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| `connected`     | `{ globalRevision: number }`                        | Initial connection established with current server revision         |
 | `flags_changed` | `{ globalRevision: number, changedKeys: string[] }` | Invalidation signal: listed flags have evaluation-affecting changes |
-| `heartbeat` | `{ timestamp: number }` | Connection health check (every 30s) |
+| `heartbeat`     | `{ timestamp: number }`                             | Connection health check (every 30s)                                 |
 
 **Rules:**
 - `changedKeys` only includes flags whose **evaluation result** has changed (not metadata-only changes)
@@ -1530,13 +1533,13 @@ interface StreamingConfig {
 
 ### Streaming Events (SDK)
 
-| Event | Constant | Description | Payload |
-|-------|----------|-------------|---------|
-| `flags.streaming_connected` | `FLAGS_STREAMING_CONNECTED` | Streaming connected | `{ globalRevision: number }` |
-| `flags.streaming_disconnected` | `FLAGS_STREAMING_DISCONNECTED` | Streaming disconnected | - |
-| `flags.streaming_reconnecting` | `FLAGS_STREAMING_RECONNECTING` | Reconnection attempt | `{ attempt: number, delayMs: number }` |
-| `flags.streaming_error` | `FLAGS_STREAMING_ERROR` | Streaming error | `{ error: Error }` |
-| `flags.invalidated` | `FLAGS_INVALIDATED` | Server invalidation signal received | `{ globalRevision: number, changedKeys: string[] }` |
+| Event                          | Constant                       | Description                         | Payload                                             |
+| ------------------------------ | ------------------------------ | ----------------------------------- | --------------------------------------------------- |
+| `flags.streaming_connected`    | `FLAGS_STREAMING_CONNECTED`    | Streaming connected                 | `{ globalRevision: number }`                        |
+| `flags.streaming_disconnected` | `FLAGS_STREAMING_DISCONNECTED` | Streaming disconnected              | -                                                   |
+| `flags.streaming_reconnecting` | `FLAGS_STREAMING_RECONNECTING` | Reconnection attempt                | `{ attempt: number, delayMs: number }`              |
+| `flags.streaming_error`        | `FLAGS_STREAMING_ERROR`        | Streaming error                     | `{ error: Error }`                                  |
+| `flags.invalidated`            | `FLAGS_INVALIDATED`            | Server invalidation signal received | `{ globalRevision: number, changedKeys: string[] }` |
 
 ### Connection State Machine
 
