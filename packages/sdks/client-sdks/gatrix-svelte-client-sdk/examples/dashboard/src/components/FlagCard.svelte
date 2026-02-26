@@ -209,9 +209,11 @@
             <div class="flag-payload-value {isEmptyString ? 'empty-string' : 'has-payload'}">
               {formatValue(flagValue)}
             </div>
-            <div class="flag-payload-size">{valueSize} BYTES</div>
+            {#if flag.valueType === 'string' || flag.valueType === 'json'}
+              <div class="flag-payload-size">{valueSize} BYTES</div>
+            {/if}
           {:else}
-            <div class="flag-payload-value no-payload">??NO VALUE</div>
+            <div class="flag-payload-value no-payload">🚫NO VALUE</div>
           {/if}
         </div>
       </div>

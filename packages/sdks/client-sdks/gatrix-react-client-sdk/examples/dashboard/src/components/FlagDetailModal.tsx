@@ -144,12 +144,14 @@ function FlagDetailModal({ flag, onClose }: FlagDetailModalProps) {
                   >
                     {formatValue(value)}
                   </pre>
-                  <div
-                    className="flag-payload-size"
-                    style={{ fontSize: '8px', color: '#888', marginTop: '6px', textAlign: 'right' }}
-                  >
-                    {valueSize} BYTES
-                  </div>
+                  {(flag.valueType === 'string' || flag.valueType === 'json') && (
+                    <div
+                      className="flag-payload-size"
+                      style={{ fontSize: '8px', color: '#888', marginTop: '6px', textAlign: 'right' }}
+                    >
+                      {valueSize} BYTES
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="flag-payload-value no-payload" style={{ padding: '20px' }}>

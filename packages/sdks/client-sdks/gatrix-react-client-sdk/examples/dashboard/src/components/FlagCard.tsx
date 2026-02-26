@@ -215,7 +215,9 @@ function FlagCard({ flag, viewMode, initialVersion, lastChangedTime, onSelect }:
                 >
                   {formatValue(value)}
                 </div>
-                <div className="flag-payload-size">{valueSize} BYTES</div>
+                {(flag.valueType === 'string' || flag.valueType === 'json') && (
+                  <div className="flag-payload-size">{valueSize} BYTES</div>
+                )}
               </>
             ) : (
               <div className="flag-payload-value no-payload">🚫 NO VALUE</div>

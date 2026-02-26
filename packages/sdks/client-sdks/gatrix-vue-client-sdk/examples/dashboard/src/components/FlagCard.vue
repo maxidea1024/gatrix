@@ -193,7 +193,7 @@ watch(() => props.lastChangedTime, (val) => {
             <div :class="`flag-payload-value ${isEmptyString ? 'empty-string' : 'has-payload'}`">
               {{ formatValue(flagValue) }}
             </div>
-            <div class="flag-payload-size">{{ valueSize }} BYTES</div>
+            <div v-if="flag.valueType === 'string' || flag.valueType === 'json'" class="flag-payload-size">{{ valueSize }} BYTES</div>
           </template>
           <div v-else class="flag-payload-value no-payload">??NO VALUE</div>
         </div>

@@ -202,7 +202,7 @@ namespace Gatrix.Unity.SDK
                 throw new ArgumentException("apiToken must not have leading or trailing whitespace", nameof(config));
 
             // CacheKeyPrefix
-            if (config.CacheKeyPrefix != null && config.CacheKeyPrefix.Length > 100)
+            if (config.Features.CacheKeyPrefix != null && config.Features.CacheKeyPrefix.Length > 100)
                 throw new ArgumentException("cacheKeyPrefix must be <= 100 characters", nameof(config));
 
             // Features config

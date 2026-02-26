@@ -198,7 +198,7 @@ namespace Gatrix.Unity.SDK
         public float FetchTimeout { get; set; } = 30;
 
         /// <summary>HTTP status codes that should stop polling entirely (default: 401, 403)</summary>
-        public int[] NonRetryableStatusCodes { get; set; } = [401, 403];
+        public int[] NonRetryableStatusCodes { get; set; } = new { 401, 403 };
 
         /// <summary>Initial backoff delay in seconds for retries (default: 1)</summary>
         public float InitialBackoff { get; set; } = 1;
