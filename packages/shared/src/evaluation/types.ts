@@ -136,6 +136,8 @@ export interface FeatureFlag {
   /** Where enabledValue/disabledValue originate: 'environment' if from env override, 'flag' if from global default */
   valueSource?: 'environment' | 'flag';
   version?: number;
+  /** When true, this flag was returned in compact mode — strategies, variants, and enabledValue were stripped */
+  compact?: boolean;
 }
 
 // ==================== Evaluation Result ====================

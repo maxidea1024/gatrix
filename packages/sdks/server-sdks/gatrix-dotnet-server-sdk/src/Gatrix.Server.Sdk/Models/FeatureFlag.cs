@@ -214,4 +214,8 @@ public class FeatureFlag
 
     [JsonPropertyName("version")]
     public int? Version { get; set; }
+
+    /// <summary>When true, this flag was returned in compact mode — strategies, variants, and enabledValue were stripped.</summary>
+    [JsonPropertyName("compact")]
+    public bool? Compact { get; set; }
 }

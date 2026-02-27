@@ -874,17 +874,24 @@ export class EventListener {
             });
           } else if (changeType === 'enabled_changed') {
             // Only enabled/disabled state changed — re-fetch just the changed flags
-            // Since we need the new isEnabled state, fetch each flag individually
+            // If a flag was previously compacted (compact: true in cache), it needs full data
             await Promise.all(
-              changedKeys.map((flagName) =>
-                featureFlagService.updateSingleFlag(flagName, ffEnv).catch((error: any) => {
+              changedKeys.map((flagName) => {
+                const cached = featureFlagService.getFlagByName(ffEnv, flagName);
+                if (cached?.compact) {
+                  this.logger.info('Compacted flag re-enabled, fetching full data', {
+                    flagName,
+                    environment: ffEnv,
+                  });
+                }
+                return featureFlagService.updateSingleFlag(flagName, ffEnv).catch((error: any) => {
                   this.logger.warn('Failed to update single flag for enabled change', {
                     flagName,
                     environment: ffEnv,
                     error: error.message,
                   });
-                })
-              )
+                });
+              })
             );
             this.logger.info('Flags updated for enabled state change', {
               flags: changedKeys,

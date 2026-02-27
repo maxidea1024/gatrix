@@ -106,6 +106,15 @@ export interface FeaturesConfig {
 }
 
 /**
+ * Feature Flag Configuration
+ * Settings specific to the feature flag evaluation engine
+ */
+export interface FeatureFlagConfig {
+  /** When true, disabled flags are fetched without strategies/variants/enabledValue to reduce bandwidth (default: true) */
+  compact?: boolean;
+}
+
+/**
  * Main SDK Configuration
  */
 export interface GatrixSDKConfig {
@@ -145,6 +154,9 @@ export interface GatrixSDKConfig {
 
   // Optional - Feature toggles (for selective caching)
   features?: FeaturesConfig;
+
+  // Optional - Feature flag specific settings
+  featureFlags?: FeatureFlagConfig;
 
   // Optional - Target environments (for Edge server)
   // When specified, SDK loads data for these environments instead of just the current one
@@ -198,6 +210,7 @@ export interface GatrixSDKInitOptions {
   retry?: Partial<RetryConfig>; // Override retry settings
   metrics?: Partial<MetricsConfig>; // Override metrics settings
   features?: Partial<FeaturesConfig>; // Override feature toggles
+  featureFlags?: Partial<FeatureFlagConfig>; // Override feature flag settings
   environments?: string[] | '*'; // Override target environments
   cloud?: Partial<CloudConfig>; // Override cloud configuration
 }

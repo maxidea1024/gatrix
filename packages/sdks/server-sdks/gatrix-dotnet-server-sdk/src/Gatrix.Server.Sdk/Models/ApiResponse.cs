@@ -28,6 +28,14 @@ public class FeatureFlagsApiResponse
 }
 
 /// <summary>
+/// Response shape for GET /api/v1/server/:env/features/:flagName
+/// </summary>
+public class SingleFlagApiResponse
+{
+    public FeatureFlag? Flag { get; set; }
+}
+
+/// <summary>
 /// Response shape for GET /api/v1/server/internal/environments
 /// </summary>
 public class EnvironmentListResponse

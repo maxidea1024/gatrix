@@ -1089,6 +1089,9 @@ class FeatureFlagService {
       },
     });
 
+    // Propagate change to all flags referencing this segment
+    await this.invalidateReferencingFlagsBySegment(id);
+
     return updated;
   }
 
@@ -1180,10 +1183,15 @@ class FeatureFlagService {
       );
     }
 
-    return FeatureContextFieldModel.update(fieldName, {
+    const updated = await FeatureContextFieldModel.update(fieldName, {
       ...input,
       updatedBy: userId,
     });
+
+    // Propagate change to all flags using this context field in constraints
+    await this.invalidateReferencingFlagsByContextField(fieldName);
+
+    return updated;
   }
 
   /**
@@ -1199,6 +1207,9 @@ class FeatureFlagService {
         ErrorCodes.NOT_FOUND
       );
     }
+
+    // Propagate change to all flags using this context field in constraints before deletion
+    await this.invalidateReferencingFlagsByContextField(fieldName);
 
     await FeatureContextFieldModel.delete(fieldName);
   }
@@ -1275,6 +1286,76 @@ class FeatureFlagService {
         .increment('version', 1);
     } catch (error) {
       logger.error('Error incrementing flag version:', error);
+    }
+  }
+
+  /**
+   * Find all active (non-archived, enabled) flags referencing a segment and propagate changes.
+   * Joins: g_feature_flag_segments → g_feature_strategies → g_feature_flags
+   */
+  private async invalidateReferencingFlagsBySegment(segmentId: string): Promise<void> {
+    try {
+      const rows = await db('g_feature_flag_segments as ffs')
+        .join('g_feature_strategies as fs', 'ffs.strategyId', 'fs.id')
+        .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
+        .where('ffs.segmentId', segmentId)
+        .where('ff.isArchived', false)
+        .select('ff.id as flagId', 'ff.flagName', 'fs.environment')
+        .groupBy('ff.id', 'ff.flagName', 'fs.environment');
+
+      if (rows.length === 0) return;
+
+      // Group by environment for efficient cache invalidation
+      const byEnv = new Map<string, string[]>();
+      for (const row of rows) {
+        // Bump flag version
+        await this.incrementFlagVersion(row.flagId, row.environment);
+        const list = byEnv.get(row.environment) || [];
+        list.push(row.flagName);
+        byEnv.set(row.environment, list);
+      }
+
+      // Invalidate cache per environment
+      for (const [env, flagNames] of byEnv) {
+        await this.invalidateCache(env, flagNames);
+      }
+    } catch (error) {
+      logger.error('Error invalidating flags referencing segment:', error);
+    }
+  }
+
+  /**
+   * Find all active flags using a context field name in strategy constraints and propagate changes.
+   * Searches the JSON constraints column for the given contextName.
+   */
+  private async invalidateReferencingFlagsByContextField(fieldName: string): Promise<void> {
+    try {
+      // Search constraints JSON for the contextName field
+      const rows = await db('g_feature_strategies as fs')
+        .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
+        .where('ff.isArchived', false)
+        .whereRaw(`JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`, [
+          fieldName,
+        ])
+        .select('ff.id as flagId', 'ff.flagName', 'fs.environment')
+        .groupBy('ff.id', 'ff.flagName', 'fs.environment');
+
+      if (rows.length === 0) return;
+
+      // Group by environment for efficient cache invalidation
+      const byEnv = new Map<string, string[]>();
+      for (const row of rows) {
+        await this.incrementFlagVersion(row.flagId, row.environment);
+        const list = byEnv.get(row.environment) || [];
+        list.push(row.flagName);
+        byEnv.set(row.environment, list);
+      }
+
+      for (const [env, flagNames] of byEnv) {
+        await this.invalidateCache(env, flagNames);
+      }
+    } catch (error) {
+      logger.error('Error invalidating flags referencing context field:', error);
     }
   }
 

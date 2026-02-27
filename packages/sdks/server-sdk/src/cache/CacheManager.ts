@@ -4,7 +4,7 @@
  */
 
 import { Logger } from '../utils/logger';
-import { CacheConfig, FeaturesConfig } from '../types/config';
+import { CacheConfig, FeaturesConfig, FeatureFlagConfig } from '../types/config';
 import { GameWorldService } from '../services/GameWorldService';
 import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
@@ -74,7 +74,8 @@ export class CacheManager {
     metrics?: SdkMetrics,
     configWorldId?: string,
     features?: FeaturesConfig,
-    environments?: string[] | '*'
+    environments?: string[] | '*',
+    featureFlagConfig?: FeatureFlagConfig
   ) {
     this.config = {
       enabled: config.enabled !== false,
@@ -190,6 +191,8 @@ export class CacheManager {
         this.storage
       );
       this.featureFlagService.setFeatureEnabled(true);
+      // Apply feature flag specific config (compact defaults to true)
+      this.featureFlagService.setCompactFlags(featureFlagConfig?.compact !== false);
     }
     if (this.features.vars === true) {
       this.varsService = new VarsService(apiClient, logger, this.envResolver, this.storage);
@@ -1178,7 +1181,7 @@ export class CacheManager {
         this.metrics?.incRefresh('all');
         this.metrics?.observeRefresh('all', duration);
         this.metrics?.setLastRefresh('all');
-      } catch (_) {}
+      } catch (_) { }
 
       this.logger.info('All caches refreshed successfully', {
         types: refreshedTypes,
@@ -1202,7 +1205,7 @@ export class CacheManager {
       this.logger.error('Failed to refresh caches', { error: error.message });
       try {
         this.metrics?.incError('cache', 'refreshAll');
-      } catch (_) {}
+      } catch (_) { }
       throw error;
     }
   }
@@ -1221,7 +1224,7 @@ export class CacheManager {
       this.metrics?.incRefresh('gameworlds');
       this.metrics?.observeRefresh('gameworlds', duration);
       this.metrics?.setLastRefresh('gameworlds');
-    } catch (_) {}
+    } catch (_) { }
     // Check maintenance state changes after refresh
     this.checkMaintenanceStateChanges();
   }
@@ -1239,7 +1242,7 @@ export class CacheManager {
       this.metrics?.incRefresh('popups');
       this.metrics?.observeRefresh('popups', duration);
       this.metrics?.setLastRefresh('popups');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**
@@ -1257,7 +1260,7 @@ export class CacheManager {
       this.metrics?.incRefresh('surveys');
       this.metrics?.observeRefresh('surveys', duration);
       this.metrics?.setLastRefresh('surveys');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**
@@ -1409,7 +1412,7 @@ export class CacheManager {
       this.metrics?.incRefresh('whitelists');
       this.metrics?.observeRefresh('whitelists', duration);
       this.metrics?.setLastRefresh('whitelists');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**
@@ -1437,7 +1440,7 @@ export class CacheManager {
         this.metrics?.incRefresh('serviceMaintenance');
         this.metrics?.observeRefresh('serviceMaintenance', duration);
         this.metrics?.setLastRefresh('serviceMaintenance');
-      } catch (_) {}
+      } catch (_) { }
     } catch (error: any) {
       this.logger.warn('Failed to refresh service maintenance status', {
         error: error.message,

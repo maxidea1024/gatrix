@@ -190,9 +190,9 @@ public class EventListener : IAsyncDisposable
 
         switch (evt.Type)
         {
-            // ── Game World ──────────────────────────────────────
-            case "gameworld.created":
-            case "gameworld.updated":
+            // Game World
+            case SdkEventTypes.GameWorldCreated:
+            case SdkEventTypes.GameWorldUpdated:
             {
                 if (!features.GameWorld) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -205,7 +205,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "gameworld.deleted":
+            case SdkEventTypes.GameWorldDeleted:
             {
                 if (!features.GameWorld) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -216,7 +216,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "gameworld.order_changed":
+            case SdkEventTypes.GameWorldOrderChanged:
             {
                 if (!features.GameWorld) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -226,9 +226,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Popup Notice ────────────────────────────────────
-            case "popup.created":
-            case "popup.updated":
+            // Popup Notice
+            case SdkEventTypes.PopupCreated:
+            case SdkEventTypes.PopupUpdated:
             {
                 if (!features.PopupNotice) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -241,7 +241,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "popup.deleted":
+            case SdkEventTypes.PopupDeleted:
             {
                 if (!features.PopupNotice) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -252,9 +252,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Survey ──────────────────────────────────────────
-            case "survey.created":
-            case "survey.updated":
+            // Survey
+            case SdkEventTypes.SurveyCreated:
+            case SdkEventTypes.SurveyUpdated:
             {
                 if (!features.Survey) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -267,7 +267,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "survey.deleted":
+            case SdkEventTypes.SurveyDeleted:
             {
                 if (!features.Survey) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -278,7 +278,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "survey.settings.updated":
+            case SdkEventTypes.SurveySettingsUpdated:
             {
                 if (!features.Survey) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -288,8 +288,8 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Whitelist (singleton — always full refresh) ─────
-            case "whitelist.updated":
+            // Whitelist (singleton — always full refresh)
+            case SdkEventTypes.WhitelistUpdated:
             {
                 if (!features.Whitelist) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -299,8 +299,8 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Service Maintenance (singleton — always full refresh) ──
-            case "maintenance.settings.updated":
+            // Service Maintenance (singleton — always full refresh)
+            case SdkEventTypes.MaintenanceSettingsUpdated:
             {
                 if (!features.ServiceMaintenance) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -310,9 +310,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Store Product ───────────────────────────────────
-            case "store_product.created":
-            case "store_product.updated":
+            // Store Product
+            case SdkEventTypes.StoreProductCreated:
+            case SdkEventTypes.StoreProductUpdated:
             {
                 if (!features.StoreProduct) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -325,7 +325,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "store_product.deleted":
+            case SdkEventTypes.StoreProductDeleted:
             {
                 if (!features.StoreProduct) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -336,7 +336,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "store_product.bulk_updated":
+            case SdkEventTypes.StoreProductBulkUpdated:
             {
                 if (!features.StoreProduct) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -346,15 +346,15 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Feature Flag (Granular) ────────────────────────
+            // Feature Flag (Granular)
             // Backend sends 'feature_flag.changed' with changedKeys[] and changeType
-            case "feature_flag.changed":
+            case SdkEventTypes.FeatureFlagChanged:
             {
                 if (!features.FeatureFlag) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
 
                 var changedKeys = evt.Data.ChangedKeys ?? [];
-                var changeType = evt.Data.ChangeType ?? "definition_changed";
+                var changeType = evt.Data.ChangeType ?? FeatureFlagChangeTypes.DefinitionChanged;
                 var flagService = _featureFlag as FeatureFlagService;
 
                 _logger.LogInformation("Feature flag event: changeType={ChangeType}, keys={Keys}, env={Env}",
@@ -366,7 +366,7 @@ public class EventListener : IAsyncDisposable
                     if (_cacheManager != null)
                         await _cacheManager.RefreshFeatureFlagsAsync(env);
                 }
-                else if (changeType == "deleted")
+                else if (changeType == FeatureFlagChangeTypes.Deleted)
                 {
                     // Remove from cache directly (no API call needed)
                     var cache = flagService?.GetCache();
@@ -378,20 +378,46 @@ public class EventListener : IAsyncDisposable
                     _logger.LogInformation("Flags removed from cache: {Keys} in {Env}",
                         string.Join(",", changedKeys), env);
                 }
+                else if (changeType == FeatureFlagChangeTypes.EnabledChanged)
+                {
+                    // enabled_changed — re-fetch each changed flag individually
+                    // Single-flag endpoint returns full data (no compact), ensuring re-enabled flags get full definition
+                    if (flagService != null)
+                    {
+                        var cache = flagService.GetCache();
+                        foreach (var key in changedKeys)
+                        {
+                            var existing = cache?.GetFlag(key, env);
+                            if (existing?.Compact == true)
+                            {
+                                _logger.LogInformation("Compacted flag re-enabled, fetching full data: {FlagName} in {Env}", key, env);
+                            }
+                            await flagService.FetchSingleFlagAsync(key, env);
+                        }
+                    }
+                    else if (_cacheManager != null)
+                    {
+                        await _cacheManager.RefreshFeatureFlagsAsync(env);
+                    }
+                }
                 else
                 {
-                    // enabled_changed or definition_changed — re-fetch flags
-                    // For now, uses full env refresh as the API lacks single-flag endpoint
+                    // definition_changed — re-fetch each changed flag individually
                     if (flagService != null)
-                        await flagService.FetchSingleFlagAsync(changedKeys[0], env);
+                    {
+                        foreach (var key in changedKeys)
+                            await flagService.FetchSingleFlagAsync(key, env);
+                    }
                     else if (_cacheManager != null)
+                    {
                         await _cacheManager.RefreshFeatureFlagsAsync(env);
+                    }
                 }
                 break;
             }
 
-            // ── Vars (Granular) ──────────────────────────────────
-            case "vars.updated":
+            // Vars (Granular)
+            case SdkEventTypes.VarsUpdated:
             {
                 if (!features.Vars) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -408,10 +434,10 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Segment (Granular) ───────────────────────────────
+            // Segment (Granular)
             // Segments are global — only update the segment cache, NOT all flags
-            case "segment.created":
-            case "segment.updated":
+            case SdkEventTypes.SegmentCreated:
+            case SdkEventTypes.SegmentUpdated:
             {
                 if (!features.FeatureFlag) break;
 
@@ -450,7 +476,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "segment.deleted":
+            case SdkEventTypes.SegmentDeleted:
             {
                 if (!features.FeatureFlag) break;
 
@@ -472,9 +498,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Client Version (Granular) ────────────────────────
-            case "client_version.created":
-            case "client_version.updated":
+            // Client Version (Granular)
+            case SdkEventTypes.ClientVersionCreated:
+            case SdkEventTypes.ClientVersionUpdated:
             {
                 if (!features.ClientVersion) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -504,7 +530,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "client_version.deleted":
+            case SdkEventTypes.ClientVersionDeleted:
             {
                 if (!features.ClientVersion) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -522,9 +548,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Banner (Granular) ────────────────────────────────
-            case "banner.created":
-            case "banner.updated":
+            // Banner (Granular)
+            case SdkEventTypes.BannerCreated:
+            case SdkEventTypes.BannerUpdated:
             {
                 if (!features.Banner) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -548,7 +574,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "banner.deleted":
+            case SdkEventTypes.BannerDeleted:
             {
                 if (!features.Banner) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -566,9 +592,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Service Notice (Granular) ────────────────────────
-            case "service_notice.created":
-            case "service_notice.updated":
+            // Service Notice (Granular)
+            case SdkEventTypes.ServiceNoticeCreated:
+            case SdkEventTypes.ServiceNoticeUpdated:
             {
                 if (!features.ServiceNotice) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -598,7 +624,7 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            case "service_notice.deleted":
+            case SdkEventTypes.ServiceNoticeDeleted:
             {
                 if (!features.ServiceNotice) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
@@ -616,9 +642,9 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Environment (wildcard mode) ───────────────────
-            case "environment.created":
-            case "environment.deleted":
+            // Environment (wildcard mode)
+            case SdkEventTypes.EnvironmentCreated:
+            case SdkEventTypes.EnvironmentDeleted:
             {
                 _logger.LogInformation("Environment change event ({Type}), triggering full refresh", evt.Type);
                 if (_cacheManager != null)

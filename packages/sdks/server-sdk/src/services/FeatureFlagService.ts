@@ -53,6 +53,8 @@ export class FeatureFlagService {
     maxBufferSize: 1000, // Auto-flush threshold
     maxRetryBufferSize: 10000, // Max buffer size to prevent memory issues
   };
+  // Compact mode: strip evaluation data from disabled flags to reduce bandwidth (default: true)
+  private compactFlags: boolean = true;
 
   constructor(
     apiClient: ApiClient,
@@ -131,6 +133,15 @@ export class FeatureFlagService {
    */
   isFeatureEnabled(): boolean {
     return this.featureEnabled;
+  }
+
+  /**
+   * Set compact flags mode
+   * When enabled, disabled flags are fetched without strategies/variants/enabledValue
+   */
+  setCompactFlags(enabled: boolean): void {
+    this.compactFlags = enabled;
+    this.logger.debug('Compact flags mode set', { enabled });
   }
 
   /**
@@ -217,9 +228,14 @@ export class FeatureFlagService {
    * Also caches referenced segments returned by the backend
    */
   async listByEnvironment(environment: string): Promise<FeatureFlag[]> {
-    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/features`;
+    let endpoint = `/api/v1/server/${encodeURIComponent(environment)}/features`;
 
-    this.logger.debug('Fetching feature flags', { environment });
+    // Append compact query param when enabled
+    if (this.compactFlags) {
+      endpoint += '?compact=true';
+    }
+
+    this.logger.debug('Fetching feature flags', { environment, compact: this.compactFlags });
 
     const response = await this.apiClient.get<{
       flags: FeatureFlag[];

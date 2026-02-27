@@ -36,6 +36,7 @@ public class GatrixSdkOptions
     public CacheOptions Cache { get; set; } = new();
     public RetryOptions Retry { get; set; } = new();
     public FeaturesOptions Features { get; set; } = new();
+    public FeatureFlagOptions FeatureFlags { get; set; } = new();
 
     // ── Multi-environment helpers ────────────────────────────────────
 
@@ -124,4 +125,17 @@ public class FeaturesOptions
     /// Can also be set programmatically via FeatureFlagService.SetStaticContext().
     /// </summary>
     public Dictionary<string, string>? StaticContext { get; set; }
+}
+
+/// <summary>
+/// Feature flag specific settings.
+/// Controls how feature flag data is fetched and cached.
+/// </summary>
+public class FeatureFlagOptions
+{
+    /// <summary>
+    /// When true, disabled flags are fetched without strategies/variants/enabledValue to reduce bandwidth.
+    /// Default: true.
+    /// </summary>
+    public bool Compact { get; set; } = true;
 }

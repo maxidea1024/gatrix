@@ -7,7 +7,7 @@ using Semver;
 namespace Gatrix.Server.Sdk.Evaluation;
 
 /// <summary>
-/// Feature Flag Evaluator ??exact port of @gatrix/shared FeatureFlagEvaluator.
+/// Feature Flag Evaluator - exact port of @gatrix/shared FeatureFlagEvaluator.
 /// 
 /// Key design decisions (from original):
 /// - isArchived is NOT checked here. It is a management-only field.
@@ -277,7 +277,7 @@ public class FeatureFlagEvaluator
         return constraint.Inverted ? !evalResult : evalResult;
     }
 
-    // ?�?� Context value extraction ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
+    // Context value extraction
 
     private static object? GetContextValue(string name, EvaluationContext context)
     {
@@ -294,7 +294,7 @@ public class FeatureFlagEvaluator
         };
     }
 
-    // ?�?� Rollout percentage ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
+    // Rollout percentage
 
     private static double CalculatePercentage(EvaluationContext context, string stickiness, string groupId, string suffix = "")
     {
@@ -344,7 +344,7 @@ public class FeatureFlagEvaluator
         }
     }
 
-    // ?�?� Variant selection (weighted) ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
+    // Variant selection (weighted)
 
     private static Variant? SelectVariant(FeatureFlag flag, EvaluationContext context, FeatureStrategy? matchedStrategy = null)
     {
@@ -368,7 +368,7 @@ public class FeatureFlagEvaluator
         return flag.Variants[^1];
     }
 
-    // ?�?� GetFallbackValue ??coerce to declared valueType ?�?�?�?�?�?�?�?�?�?�?�?�?�
+    // GetFallbackValue - coerce to declared valueType
 
     /// <summary>
     /// Ensure a value matches the declared valueType.
@@ -428,7 +428,7 @@ public class FeatureFlagEvaluator
         return 0; // cannot parse as semver
     }
 
-    // ?�?� Helpers ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
+    // Helpers
 
     private static bool EvalRegex(string stringValue, string? pattern, bool caseInsensitive)
     {

@@ -29,12 +29,13 @@ interface EvaluationFlag {
   name: string;
   isEnabled: boolean;
   impressionDataEnabled: boolean;
-  strategies: EvaluationStrategy[];
-  variants: EvaluationVariant[];
+  strategies?: EvaluationStrategy[];
+  variants?: EvaluationVariant[];
   valueType?: string;
   enabledValue?: any;
   disabledValue?: any;
   version?: number;
+  compact?: boolean; // true when evaluation data is stripped (disabled flag in compact mode)
 }
 
 interface EvaluationStrategy {
@@ -85,6 +86,9 @@ export default class ServerFeatureFlagController {
         ? flagNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
         : undefined;
 
+      // Parse compact option: strip strategies/variants/enabledValue from disabled flags
+      const compact = req.query.compact === 'true' || req.query.compact === '1';
+
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
         environment,
@@ -100,6 +104,27 @@ export default class ServerFeatureFlagController {
       // Get strategies and variants for each flag
       const flags: EvaluationFlag[] = await Promise.all(
         rawFlags.map(async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
+          const envOverride = (flag as any).environments?.find(
+            (e: any) => e.environment === environment
+          );
+          const hasEnvOverride =
+            envOverride?.enabledValue !== undefined || envOverride?.disabledValue !== undefined;
+
+          // In compact mode, skip DB queries for disabled flags entirely
+          if (compact && !flag.isEnabled) {
+            return {
+              id: flag.id,
+              name: flag.flagName,
+              isEnabled: false,
+              impressionDataEnabled: flag.impressionDataEnabled,
+              valueType: (flag as any).valueType,
+              disabledValue: envOverride?.disabledValue ?? (flag as any).disabledValue,
+              valueSource: hasEnvOverride ? 'environment' : 'flag',
+              version: flag.version,
+              compact: true,
+            };
+          }
+
           const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
             flag.id,
             environment
@@ -138,12 +163,6 @@ export default class ServerFeatureFlagController {
               valueType: v.valueType,
             })
           );
-
-          const envOverride = (flag as any).environments?.find(
-            (e: any) => e.environment === environment
-          );
-          const hasEnvOverride =
-            envOverride?.enabledValue !== undefined || envOverride?.disabledValue !== undefined;
 
           return {
             id: flag.id,
@@ -199,10 +218,38 @@ export default class ServerFeatureFlagController {
         return;
       }
 
+      // Parse compact option
+      const compact = req.query.compact === 'true' || req.query.compact === '1';
+
       const flag = await FeatureFlagModel.findByName(environment, flagName);
 
       if (!flag || flag.isArchived) {
         res.status(404).json({ success: false, error: 'Flag not found' });
+        return;
+      }
+
+      // In compact mode, skip DB queries for disabled flags entirely
+      if (compact && !flag.isEnabled) {
+        const envOverride = flag.environments?.find((e) => e.environment === environment);
+        const hasEnvOverride =
+          envOverride?.enabledValue !== undefined || envOverride?.disabledValue !== undefined;
+
+        res.json({
+          success: true,
+          data: {
+            flag: {
+              id: flag.id,
+              name: flag.flagName,
+              isEnabled: false,
+              impressionDataEnabled: flag.impressionDataEnabled,
+              valueType: flag.valueType,
+              disabledValue: envOverride?.disabledValue ?? flag.disabledValue,
+              valueSource: hasEnvOverride ? 'environment' : 'flag',
+              version: flag.version,
+              compact: true,
+            },
+          },
+        });
         return;
       }
 

@@ -112,8 +112,14 @@ public class FeatureFlagService : IFeatureFlagService
         {
             _etagsByEnv.TryGetValue(environment, out var etag);
 
+            var endpoint = $"/api/v1/server/{Uri.EscapeDataString(environment)}/features";
+            if (_options.FeatureFlags.Compact)
+            {
+                endpoint += "?compact=true";
+            }
+
             var response = await _apiClient.GetAsync<FeatureFlagsApiResponse>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/features", etag, ct);
+                endpoint, etag, ct);
 
             if (!response.Success)
             {
@@ -161,26 +167,37 @@ public class FeatureFlagService : IFeatureFlagService
         environment ?? (_options.IsMultiEnvironmentMode ? null : _options.Environment);
 
     /// <summary>Fetch a single flag by name from the API and update cache.
-    /// Since the API doesn't support single-flag fetch, does a full environment refresh.</summary>
+    /// Uses the single-flag endpoint which always returns full data (no compact mode).</summary>
     public async Task FetchSingleFlagAsync(string flagName, string environment, CancellationToken ct = default)
     {
         try
         {
-            await FetchAsync(environment, ct);
-            _logger.LogInformation("Updated single flag {FlagName} in {Environment} via full refresh", flagName, environment);
+            var endpoint = $"/api/v1/server/{Uri.EscapeDataString(environment)}/features/{Uri.EscapeDataString(flagName)}";
+            var response = await _apiClient.GetAsync<SingleFlagApiResponse>(endpoint, etag: null, ct);
+
+            if (!response.Success || response.Data?.Flag is null)
+            {
+                _logger.LogDebug("Flag {FlagName} not found in {Environment}, removing from cache", flagName, environment);
+                _cache.RemoveFlag(flagName, environment);
+                return;
+            }
+
+            var flag = response.Data.Flag;
+            _cache.UpsertFlag(flag, environment);
+            _logger.LogInformation("Single flag {FlagName} updated in {Environment}", flagName, environment);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to fetch single flag {FlagName} for {Environment}", flagName, environment);
+            _logger.LogError(ex, "Failed to fetch single flag {FlagName} for {Environment}, falling back to full refresh", flagName, environment);
+            // Fall back to full environment refresh
+            await FetchAsync(environment, ct);
         }
     }
 
     /// <summary>Get the underlying FlagDefinitionCache for direct cache operations.</summary>
     public FlagDefinitionCache GetCache() => _cache;
 
-    // ══════════════════════════════════════════════════════════════
-    //  Core Evaluation
-    // ══════════════════════════════════════════════════════════════
+    // Core Evaluation
 
 
     public EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environment = null)
@@ -234,9 +251,7 @@ public class FeatureFlagService : IFeatureFlagService
         return FeatureFlagEvaluator.Evaluate(flag, merged, segments);
     }
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
-    //  IsEnabled
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // IsEnabled
 
     public bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null)
     {
@@ -244,9 +259,7 @@ public class FeatureFlagService : IFeatureFlagService
         return result.Reason == EvaluationReasons.NotFound ? fallback : result.Enabled;
     }
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
-    //  Variant (name only)
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // Variant (name only)
 
     public string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environment = null)
     {
@@ -255,9 +268,7 @@ public class FeatureFlagService : IFeatureFlagService
         return result.Variant.Name ?? fallback;
     }
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
-    //  Typed Variations
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // Typed Variations
 
     public string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environment = null)
     {
@@ -331,9 +342,7 @@ public class FeatureFlagService : IFeatureFlagService
         }
     }
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
-    //  *Details ??value + evaluation metadata
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // Variation Details — value + evaluation metadata
 
     public EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environment = null)
     {
@@ -395,9 +404,7 @@ public class FeatureFlagService : IFeatureFlagService
         return MakeDetail(result, value);
     }
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
-    //  *OrThrow ??throws FeatureFlagException on failure
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // OrThrow — throws FeatureFlagException on failure
 
     public string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
     {
@@ -478,9 +485,7 @@ public class FeatureFlagService : IFeatureFlagService
         }
     }
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
-    //  Helpers
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // Helpers
 
     private EvaluationContext ResolveContext(EvaluationContext? perCall)
     {

@@ -830,12 +830,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
               <CardContent sx={{ p: 2.5 }}>
                 {milestones.map((milestone, index) => {
                   const status = getMilestoneStatus(index);
-                  const borderColorMap = {
-                    completed: 'success.main',
-                    active: 'primary.main',
-                    paused: 'warning.main',
-                    pending: 'grey.300',
-                  };
                   const bgMap = {
                     completed: 'success.main',
                     active: 'primary.main',
@@ -857,8 +851,6 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       <Paper
                         variant="outlined"
                         sx={{
-                          borderLeft: 4,
-                          borderLeftColor: borderColorMap[status],
                           borderRadius: 2,
                           overflow: 'hidden',
                           transition: 'all 0.2s',
@@ -892,9 +884,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.015)'
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1135,9 +1127,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                              borderColor: 'primary.main',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            }
+                            borderColor: 'primary.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          }
                           : {},
                     }}
                   >

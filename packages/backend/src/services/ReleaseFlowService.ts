@@ -257,6 +257,23 @@ export class ReleaseFlowService {
         newValues: { milestoneId, milestoneName: milestone.name },
       });
 
+      // 4. CRITICAL: Bump flag version and notify SDKs about strategy changes
+      // Without this, SDKs will not detect the new strategies from the milestone
+      const flag = await db('g_feature_flags')
+        .where('id', plan.flagId)
+        .select('flagName')
+        .first();
+      if (flag && plan.environment) {
+        await db('g_feature_flags')
+          .where('id', plan.flagId)
+          .update({
+            version: db.raw('COALESCE(version, 0) + 1'),
+            updatedAt: new Date(),
+          });
+        const { featureFlagService } = await import('./FeatureFlagService');
+        await featureFlagService.invalidateCache(plan.environment, [flag.flagName]);
+      }
+
       return (await ReleaseFlowModel.findById(plan.id))!;
     } catch (error) {
       await trx.rollback();

@@ -65,6 +65,71 @@ const config = await gatrix.featureFlags.getJsonValue('feature_config', context)
 const allFlags = await gatrix.featureFlags.getAllFlags(context);
 ```
 
+## REST API Reference
+
+### GET `/api/v1/server/:env/features`
+
+Fetches all feature flags for a given environment.
+
+#### Query Parameters
+
+| Parameter   | Type    | Default | Description                                                                                                                                                                                |
+| ----------- | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `flagNames` | string  | —       | Comma-separated list of flag names to filter                                                                                                                                               |
+| `compact`   | boolean | `false` | When `true`, disabled flags omit `strategies`, `variants`, and `enabledValue` to reduce payload. Only `disabledValue` is returned for disabled flags. This saves bandwidth and DB queries. |
+
+#### Compact Mode Behavior
+
+When `compact=true`:
+- **Enabled flags** (`isEnabled: true`): Full data returned (no change)
+- **Disabled flags** (`isEnabled: false`): Only essential fields returned:
+  - `id`, `name`, `isEnabled`, `valueType`, `disabledValue`, `valueSource`, `version`
+  - `strategies`, `variants`, `enabledValue` fields are **omitted entirely** (not empty arrays)
+  - `compact: true` — **explicit marker** indicating this flag was returned in compact mode
+
+The `compact` field on each flag allows SDKs to distinguish between:
+- A flag that genuinely has no strategies (`compact` absent or `false`)
+- A flag whose strategies were stripped due to compact mode (`compact: true`)
+
+#### Re-enable Flow
+
+When a disabled flag is re-enabled via the dashboard:
+1. Backend emits `feature_flag.changed` event with `changeType: "enabled_changed"`
+2. SDK detects the event and calls the **single-flag endpoint** (`GET /api/v1/server/:env/features/:flagName`) — which **does not apply compact mode**
+3. The SDK receives full flag data (strategies, variants, enabledValue) and updates its cache
+4. The `compact` field is cleared (not present in the full response)
+
+This ensures that re-enabled flags always have their complete evaluation data.
+
+#### SDK Configuration
+
+**Node.js (server-sdk)**
+
+```typescript
+const sdk = new GatrixServerSDK({
+  // ...
+  featureFlags: {
+    compact: true, // Default: true — strip disabled flag data to reduce bandwidth
+  },
+});
+```
+
+**C# (.NET SDK)**
+
+```csharp
+services.AddGatrixServerSdk(options =>
+{
+    // ...
+    options.FeatureFlags.Compact = true; // Default: true
+});
+```
+
+The `featureFlags.compact` config controls whether the SDK appends `?compact=true` when fetching flags via `GET /api/v1/server/:env/features`. It defaults to `true` since compact mode is safe — the SDK handles re-enable refetch automatically.
+
+### GET `/api/v1/server/:env/features/:flagName`
+
+Fetches a single feature flag by name. This endpoint **always returns full data** regardless of any compact setting, ensuring re-enabled flags always receive complete definitions.
+
 ## Maintenance
 
 ### Check Status
