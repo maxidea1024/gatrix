@@ -160,7 +160,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   } = useReleaseFlowPlan(flagId, selectedEnv);
 
   const [applying, setApplying] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [actionLoadingType, setActionLoadingType] = useState<'pause' | 'resume' | 'jump' | 'delete' | null>(null);
   const [autoControlling, setAutoControlling] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(initialShowTemplates);
 
@@ -279,7 +279,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         }
       }
 
-      mutatePlan();
+      await mutatePlan();
       if (onPlanChange) onPlanChange();
       setShowApplyDialog(false);
     } catch (error: any) {
@@ -292,17 +292,17 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const handleDeletePlan = async () => {
     if (!plan) return;
     try {
-      setActionLoading(true);
+      setActionLoadingType('delete');
       await deletePlan(plan.id);
       enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), { variant: 'success' });
-      mutatePlan();
+      await mutatePlan();
       if (onPlanChange) onPlanChange();
       setDeleteConfirmOpen(false);
       onPlanDeleted?.();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('common.error'), { variant: 'error' });
     } finally {
-      setActionLoading(false);
+      setActionLoadingType(null);
     }
   };
 
@@ -314,7 +314,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const handleConfirmStartMilestone = async () => {
     if (!plan || !targetMilestoneId) return;
     try {
-      setActionLoading(true);
+      setActionLoadingType('jump');
       await startMilestone(plan.id, targetMilestoneId);
 
       // If environment is disabled, immediately pause so it doesn't run
@@ -323,44 +323,44 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       }
 
       enqueueSnackbar(t('releaseFlow.milestoneStartSuccess'), { variant: 'success' });
-      mutatePlan();
+      await mutatePlan();
       if (onPlanChange) onPlanChange();
       setJumpConfirmOpen(false);
       setTargetMilestoneId(null);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.milestoneStartFailed'), { variant: 'error' });
     } finally {
-      setActionLoading(false);
+      setActionLoadingType(null);
     }
   };
 
   const handlePause = async () => {
     if (!plan) return;
     try {
-      setActionLoading(true);
+      setActionLoadingType('pause');
       await pausePlan(plan.id);
       enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'success' });
-      mutatePlan();
+      await mutatePlan();
       if (onPlanChange) onPlanChange();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
     } finally {
-      setActionLoading(false);
+      setActionLoadingType(null);
     }
   };
 
   const handleResume = async () => {
     if (!plan || !envEnabled) return;
     try {
-      setActionLoading(true);
+      setActionLoadingType('resume');
       await resumePlan(plan.id);
       enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'success' });
-      mutatePlan();
+      await mutatePlan();
       if (onPlanChange) onPlanChange();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('releaseFlow.applyFailed'), { variant: 'error' });
     } finally {
-      setActionLoading(false);
+      setActionLoadingType(null);
     }
   };
 
@@ -387,7 +387,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       setTransitionSaving(true);
       const totalMinutes = toMinutes(transitionValue, transitionUnit);
       await setTransitionCondition(editingTransitionId, totalMinutes);
-      mutatePlan();
+      await mutatePlan();
       if (onPlanChange) onPlanChange();
       setEditingTransitionId(null);
     } catch (error: any) {
@@ -402,7 +402,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       try {
         setTransitionSaving(true);
         await removeTransitionCondition(milestoneId);
-        mutatePlan();
+        await mutatePlan();
         if (onPlanChange) onPlanChange();
         setEditingTransitionId(null);
       } catch (error: any) {
@@ -462,14 +462,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       // Suppress during auto-control (including the first render frame before the effect fires)
       const willAutoControl = prevEnvEnabledRef.current !== envEnabled;
       if (isPaused && envEnabled && !autoControlling && !willAutoControl) {
+        const isResuming = actionLoadingType === 'resume';
         return (
           <Button
             variant="outlined"
             color="primary"
             size="small"
             onClick={handleResume}
-            startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <StartIcon />}
-            disabled={actionLoading}
+            startIcon={isResuming ? <CircularProgress size={14} color="inherit" /> : <StartIcon />}
+            disabled={isResuming}
             sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
             {t('releaseFlow.resume')}
@@ -480,14 +481,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       const hasAutomation = !!currentMilestone?.transitionCondition?.intervalMinutes;
       // No pause on last milestone (nothing to transition to), when already paused, or when there's no automation
       if (isPaused || index >= milestones.length - 1 || !hasAutomation) return null;
+      const isPausing = actionLoadingType === 'pause';
       return (
         <Button
           variant="outlined"
           color="warning"
           size="small"
           onClick={handlePause}
-          startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />}
-          disabled={actionLoading}
+          startIcon={isPausing ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />}
+          disabled={isPausing}
           sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {t('releaseFlow.pause')}
@@ -504,14 +506,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         variant="outlined"
         color="primary"
         onClick={() => handleStartMilestoneClick(milestoneId)}
-        startIcon={
-          actionLoading ? (
-            <CircularProgress size={14} color="inherit" />
-          ) : showStartNow ? (
-            <StartIcon />
-          ) : undefined
-        }
-        disabled={actionLoading}
+        startIcon={showStartNow ? <StartIcon /> : undefined}
+        disabled={actionLoadingType === 'jump' || actionLoadingType === 'delete'}
         sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
       >
         {showStartNow ? t('releaseFlow.startNow') : t('releaseFlow.moveToMilestone')}
@@ -824,7 +820,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           setFlowMenuAnchor(null);
                           setDeleteConfirmOpen(true);
                         }}
-                        disabled={envEnabled || actionLoading}
+                        disabled={envEnabled || !!actionLoadingType}
                         sx={{ color: 'error.main' }}
                       >
                         <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
@@ -928,8 +924,26 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           borderRadius: 2,
                           overflow: 'hidden',
                           transition: 'all 0.2s',
+                          position: 'relative',
                           ...(status === 'active' && {
                             boxShadow: '0 0 18px 4px rgba(25, 118, 210, 0.45)',
+                            '&::after': {
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: '-150%',
+                              width: '150%',
+                              height: '100%',
+                              background:
+                                'linear-gradient(120deg, transparent 0%, rgba(25, 118, 210, 0.06) 40%, rgba(25, 118, 210, 0.12) 50%, rgba(25, 118, 210, 0.06) 60%, transparent 100%)',
+                              animation: 'milestoneShimmer 3s ease-in-out infinite',
+                              pointerEvents: 'none',
+                              zIndex: 1,
+                            },
+                            '@keyframes milestoneShimmer': {
+                              '0%': { left: '-150%' },
+                              '100%': { left: '150%' },
+                            },
                           }),
                           ...(status === 'paused' && {
                             boxShadow: '0 0 14px 3px rgba(237, 108, 2, 0.3)',
@@ -1069,11 +1083,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             </Box>
                           </Box>
 
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
 
                             <Box
                               onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                              sx={{ flexShrink: 0 }}
+                              sx={{ flexShrink: 0, minHeight: 32, display: 'flex', alignItems: 'center' }}
                             >
                               {renderMilestoneControls(milestone.id, index, isScheduled)}
                             </Box>
@@ -1433,7 +1447,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         message={t('releaseFlow.jumpConfirmMessage', {
           name: milestones.find((m) => m.id === targetMilestoneId)?.name || '',
         })}
-        confirmLabel={t('common.confirm')}
+        confirmText={t('common.confirm')}
       />
 
       {/* Delete Plan Confirmation */}
@@ -1443,7 +1457,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         onConfirm={handleDeletePlan}
         title={t('releaseFlow.deletePlanTitle')}
         message={t('releaseFlow.deletePlanMessage')}
-        confirmLabel={t('common.delete')}
+        confirmText={t('common.delete')}
         confirmColor="error"
       />
     </Box>
