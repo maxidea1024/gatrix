@@ -17,6 +17,11 @@ import {
 import db from '../config/knex';
 import { featureMetricsService } from '../services/FeatureMetricsService';
 import { networkTrafficService } from '../services/NetworkTrafficService';
+import {
+  ErrorCodes,
+  sendBadRequest,
+  sendInternalError,
+} from '../utils/apiResponse';
 
 // Type for minimal flag data needed for runtime evaluation
 interface EvaluationFlag {
@@ -66,18 +71,25 @@ export default class ServerFeatureFlagController {
       const environment = req.params.env;
 
       if (!environment) {
-        res.status(400).json({ success: false, error: 'Environment is required' });
+        sendBadRequest(res, 'Environment is required');
         return;
       }
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
+
+      // Parse optional flagNames filter (comma-separated query parameter)
+      const flagNamesParam = req.query.flagNames as string | undefined;
+      const flagNamesFilter = flagNamesParam
+        ? flagNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+        : undefined;
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
         environment,
         isArchived: false,
+        flagNames: flagNamesFilter,
       });
 
       const rawFlags = result.flags;
@@ -167,8 +179,7 @@ export default class ServerFeatureFlagController {
         data: { flags, segments },
       });
     } catch (error: any) {
-      console.error('Error fetching feature flags:', error);
-      res.status(500).json({ success: false, error: 'Failed to fetch feature flags' });
+      sendInternalError(res, 'Failed to fetch feature flags', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 
@@ -254,9 +265,17 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
 
-      const rawSegments = await FeatureSegmentModel.findAll();
+      // Parse optional segmentNames filter (comma-separated query parameter)
+      const segmentNamesParam = req.query.segmentNames as string | undefined;
+      const segmentNamesFilter = segmentNamesParam
+        ? segmentNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+        : undefined;
+
+      const rawSegments = segmentNamesFilter
+        ? await FeatureSegmentModel.findByNames(segmentNamesFilter)
+        : await FeatureSegmentModel.findAll();
 
       // Transform to minimal evaluation format
       const segments: EvaluationSegment[] = rawSegments.map((s) => ({
@@ -270,8 +289,7 @@ export default class ServerFeatureFlagController {
         data: { segments },
       });
     } catch (error: any) {
-      console.error('Error fetching segments:', error);
-      res.status(500).json({ success: false, error: 'Failed to fetch segments' });
+      sendInternalError(res, 'Failed to fetch segments', error, ErrorCodes.RESOURCE_FETCH_FAILED);
     }
   }
 

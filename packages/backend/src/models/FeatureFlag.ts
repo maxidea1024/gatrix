@@ -282,6 +282,7 @@ export class FeatureFlagModel {
     isEnabled?: boolean;
     isArchived?: boolean;
     tags?: string[];
+    flagNames?: string[];
     limit?: number;
     offset?: number;
     sortBy?: string;
@@ -299,6 +300,7 @@ export class FeatureFlagModel {
         isEnabled,
         isArchived,
         tags,
+        flagNames,
         limit = 50,
         offset = 0,
         sortBy = 'createdAt',
@@ -343,6 +345,9 @@ export class FeatureFlagModel {
           for (const tag of tags) {
             query.whereRaw('JSON_CONTAINS(f.tags, ?)', [JSON.stringify(tag)]);
           }
+        }
+        if (flagNames && flagNames.length > 0) {
+          query.whereIn('f.flagName', flagNames);
         }
         return query;
       };
@@ -505,16 +510,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environment,
-                isEnabled: Boolean(envSettings.isEnabled),
-                enabledValue: parseJsonField(envSettings.enabledValue),
-                disabledValue: parseJsonField(envSettings.disabledValue),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environment,
+              isEnabled: Boolean(envSettings.isEnabled),
+              enabledValue: parseJsonField(envSettings.enabledValue),
+              disabledValue: parseJsonField(envSettings.disabledValue),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {

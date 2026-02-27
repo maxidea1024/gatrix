@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { tokenMirrorService } from '../services/tokenMirrorService';
 import { metricsAggregator } from '../services/metricsAggregator';
 import { performEvaluation } from '../utils/evaluationHelper';
+import { ErrorCodes, sendUnauthorized, sendBadRequest, sendInternalError } from '../utils/apiResponse';
 import logger from '../config/logger';
 
 const router = Router();
@@ -14,13 +15,13 @@ function serverAuth(req: Request, res: Response, next: NextFunction): void {
   const environment = req.params.env;
 
   if (!apiToken) {
-    res.status(401).json({ success: false, error: 'x-api-token header is required' });
+    sendUnauthorized(res, 'x-api-token header is required', ErrorCodes.AUTH_TOKEN_REQUIRED);
     return;
   }
 
   const validation = tokenMirrorService.validateToken(apiToken, 'server', environment);
   if (!validation.valid) {
-    res.status(401).json({ success: false, error: 'Invalid or unauthorized server API token' });
+    sendUnauthorized(res, 'Invalid or unauthorized server API token', ErrorCodes.AUTH_TOKEN_INVALID);
     return;
   }
 
@@ -38,9 +39,35 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
     if (!sdk) return;
 
     const env = req.params.env;
-    const flags = sdk.featureFlag.getCached(env);
-    // segments are currently global in SDK
-    const segments = Array.from(sdk.featureFlag.getAllSegments().values());
+    let flags = sdk.featureFlag.getCached(env);
+
+    // Filter by flagNames query parameter (comma-separated) if provided
+    const flagNamesParam = req.query.flagNames as string | undefined;
+    if (flagNamesParam) {
+      const flagNamesFilter = new Set(
+        flagNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+      );
+      flags = flags.filter((f: any) => flagNamesFilter.has(f.name));
+    }
+
+    // When flagNames filter is applied, only include segments referenced by the filtered flags
+    let segments: any[];
+    if (flagNamesParam) {
+      const referencedSegmentNames = new Set<string>();
+      for (const flag of flags) {
+        for (const strategy of (flag as any).strategies || []) {
+          for (const segName of strategy.segments || []) {
+            referencedSegmentNames.add(segName);
+          }
+        }
+      }
+      const allSegments = sdk.featureFlag.getAllSegments();
+      segments = Array.from(allSegments.values()).filter(
+        (s: any) => referencedSegmentNames.has(s.name)
+      );
+    } else {
+      segments = Array.from(sdk.featureFlag.getAllSegments().values());
+    }
 
     res.json({
       success: true,
@@ -51,8 +78,7 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
       cached: true,
     });
   } catch (error) {
-    logger.error('Error serving server features from edge:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    sendInternalError(res, 'Failed to serve features from edge', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 });
 
@@ -66,15 +92,24 @@ router.get('/segments', serverAuth, async (req: Request, res: Response) => {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const segments = Array.from(sdk.featureFlag.getAllSegments().values());
+    let segments = Array.from(sdk.featureFlag.getAllSegments().values());
+
+    // Filter by segmentNames query parameter (comma-separated) if provided
+    const segmentNamesParam = req.query.segmentNames as string | undefined;
+    if (segmentNamesParam) {
+      const segmentNamesFilter = new Set(
+        segmentNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+      );
+      segments = segments.filter((s: any) => segmentNamesFilter.has(s.name));
+    }
+
     res.json({
       success: true,
       data: { segments },
       cached: true,
     });
   } catch (error) {
-    logger.error('Error serving segments from edge:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    sendInternalError(res, 'Failed to serve segments from edge', error, ErrorCodes.RESOURCE_FETCH_FAILED);
   }
 });
 
@@ -90,14 +125,13 @@ router.post('/:env/features/metrics', serverAuth, async (req: Request, res: Resp
     const { metrics } = req.body;
 
     if (!Array.isArray(metrics)) {
-      return res.status(400).json({ success: false, error: 'metrics must be an array' });
+      return sendBadRequest(res, 'metrics must be an array');
     }
 
     metricsAggregator.addServerMetrics(env, appName, metrics, sdkVersion);
     res.json({ success: true, buffered: true });
   } catch (error) {
-    logger.error('Error buffering server metrics:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    sendInternalError(res, 'Failed to buffer server metrics', error);
   }
 });
 
@@ -113,14 +147,13 @@ router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Resp
     const { flagName, count = 1 } = req.body;
 
     if (!flagName) {
-      return res.status(400).json({ success: false, error: 'flagName is required' });
+      return sendBadRequest(res, 'flagName is required');
     }
 
     metricsAggregator.addServerUnknownReport(env, appName, flagName, count, sdkVersion);
     res.json({ success: true, buffered: true });
   } catch (error) {
-    logger.error('Error buffering server unknown flag report:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    sendInternalError(res, 'Failed to buffer server unknown flag report', error);
   }
 });
 
