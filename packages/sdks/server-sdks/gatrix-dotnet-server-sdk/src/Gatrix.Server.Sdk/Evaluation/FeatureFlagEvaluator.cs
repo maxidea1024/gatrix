@@ -7,7 +7,7 @@ using Semver;
 namespace Gatrix.Server.Sdk.Evaluation;
 
 /// <summary>
-/// Feature Flag Evaluator — exact port of @gatrix/shared FeatureFlagEvaluator.
+/// Feature Flag Evaluator ??exact port of @gatrix/shared FeatureFlagEvaluator.
 /// 
 /// Key design decisions (from original):
 /// - isArchived is NOT checked here. It is a management-only field.
@@ -38,8 +38,8 @@ public class FeatureFlagEvaluator
                 {
                     var variantData = SelectVariant(flag, context, strategy);
                     var defaultEnabledName = flag.ValueSource == "environment"
-                        ? VariantSource.EnvDefaultEnabled
-                        : VariantSource.FlagDefaultEnabled;
+                        ? ValueSource.EnvDefaultEnabled
+                        : ValueSource.FlagDefaultEnabled;
 
                     var variant = new Variant
                     {
@@ -68,11 +68,11 @@ public class FeatureFlagEvaluator
             }
             else
             {
-                // No strategies or all disabled — enabled by default
+                // No strategies or all disabled ??enabled by default
                 var variantData = SelectVariant(flag, context);
                 var defaultEnabledName = flag.ValueSource == "environment"
-                    ? VariantSource.EnvDefaultEnabled
-                    : VariantSource.FlagDefaultEnabled;
+                    ? ValueSource.EnvDefaultEnabled
+                    : ValueSource.FlagDefaultEnabled;
 
                 var variant = new Variant
                 {
@@ -96,8 +96,8 @@ public class FeatureFlagEvaluator
 
         // Disabled or no strategy matched
         var defaultDisabledName = flag.ValueSource == "environment"
-            ? VariantSource.EnvDefaultDisabled
-            : VariantSource.FlagDefaultDisabled;
+            ? ValueSource.EnvDefaultDisabled
+            : ValueSource.FlagDefaultDisabled;
 
         return new EvaluationResult
         {
@@ -118,7 +118,7 @@ public class FeatureFlagEvaluator
 
     /// <summary>
     /// Evaluate a single strategy.
-    /// Order: segments → constraints → rollout
+    /// Order: segments ??constraints ??rollout
     /// </summary>
     private static bool EvaluateStrategy(
         FeatureStrategy strategy,
@@ -173,7 +173,7 @@ public class FeatureFlagEvaluator
     }
 
     /// <summary>
-    /// Evaluate a single constraint — exact port of all operators.
+    /// Evaluate a single constraint ??exact port of all operators.
     /// </summary>
     private static bool EvaluateConstraint(Constraint constraint, EvaluationContext context)
     {
@@ -277,7 +277,7 @@ public class FeatureFlagEvaluator
         return constraint.Inverted ? !evalResult : evalResult;
     }
 
-    // ── Context value extraction ──────────────────────────────────────
+    // ?�?� Context value extraction ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
 
     private static object? GetContextValue(string name, EvaluationContext context)
     {
@@ -294,7 +294,7 @@ public class FeatureFlagEvaluator
         };
     }
 
-    // ── Rollout percentage ────────────────────────────────────────────
+    // ?�?� Rollout percentage ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
 
     private static double CalculatePercentage(EvaluationContext context, string stickiness, string groupId, string suffix = "")
     {
@@ -344,7 +344,7 @@ public class FeatureFlagEvaluator
         }
     }
 
-    // ── Variant selection (weighted) ──────────────────────────────────
+    // ?�?� Variant selection (weighted) ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
 
     private static Variant? SelectVariant(FeatureFlag flag, EvaluationContext context, FeatureStrategy? matchedStrategy = null)
     {
@@ -368,7 +368,7 @@ public class FeatureFlagEvaluator
         return flag.Variants[^1];
     }
 
-    // ── GetFallbackValue — coerce to declared valueType ─────────────
+    // ?�?� GetFallbackValue ??coerce to declared valueType ?�?�?�?�?�?�?�?�?�?�?�?�?�
 
     /// <summary>
     /// Ensure a value matches the declared valueType.
@@ -428,7 +428,7 @@ public class FeatureFlagEvaluator
         return 0; // cannot parse as semver
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    // ?�?� Helpers ?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�?�
 
     private static bool EvalRegex(string stringValue, string? pattern, bool caseInsensitive)
     {
@@ -463,8 +463,8 @@ public class FeatureFlagEvaluator
 
     private static long ToDateTicks(string value)
     {
-        return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt)
-            ? dt.Ticks : 0;
+        return DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto)
+            ? dto.UtcDateTime.Ticks : 0;
     }
 
     private static string ObjectToString(object value)

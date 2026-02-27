@@ -21,7 +21,7 @@ import {
   FeatureFlag,
   FeatureSegment,
   EvaluationContext,
-  VARIANT_SOURCE,
+  VALUE_SOURCE,
   EvaluationUtils,
 } from '@gatrix/shared';
 import db from '../config/knex';

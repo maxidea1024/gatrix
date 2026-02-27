@@ -63,7 +63,7 @@ namespace Gatrix.Unity.SDK
             if (flag == null)
             {
                 TrackFlagAccess(flagName, null, "getVariant");
-                return new Variant { Name = VariantSource.Missing, Enabled = false };
+                return new Variant { Name = ValueSource.Missing, Enabled = false };
             }
             TrackFlagAccess(flagName, flag, "getVariant", flag.Variant.Name);
             return flag.Variant;

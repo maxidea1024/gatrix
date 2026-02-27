@@ -19,7 +19,7 @@ import {
   FeatureSegment,
   Constraint,
 } from './types';
-import { VARIANT_SOURCE } from './variantSource';
+import { VALUE_SOURCE } from './valueSource';
 
 export class FeatureFlagEvaluator {
   /**
@@ -41,8 +41,8 @@ export class FeatureFlagEvaluator {
             const variantData = this.selectVariant(flag, context, strategy);
             const defaultEnabledName =
               flag.valueSource === 'environment'
-                ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-                : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+                ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
+                : VALUE_SOURCE.FLAG_DEFAULT_ENABLED;
             const variant: Variant = {
               name: variantData?.name || defaultEnabledName,
               weight: variantData?.weight || 100,
@@ -67,8 +67,8 @@ export class FeatureFlagEvaluator {
         const variantData = this.selectVariant(flag, context);
         const defaultEnabledName =
           flag.valueSource === 'environment'
-            ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-            : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+            ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
+            : VALUE_SOURCE.FLAG_DEFAULT_ENABLED;
         const variant: Variant = {
           name: variantData?.name || defaultEnabledName,
           weight: variantData?.weight || 100,
@@ -92,8 +92,8 @@ export class FeatureFlagEvaluator {
     // Disabled or no strategy matched
     const defaultDisabledName =
       flag.valueSource === 'environment'
-        ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-        : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+        ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+        : VALUE_SOURCE.FLAG_DEFAULT_DISABLED;
     return {
       id: flag.id || '',
       flagName: flag.name,

@@ -1,5 +1,5 @@
 /**
- * Unit tests for variant source naming in FeatureFlagEvaluator.
+ * Unit tests for Value Source Naming in FeatureFlagEvaluator.
  * Validates that the evaluator returns the correct variant names:
  * - $flag-default-enabled: when enabled flag uses flag-level enabledValue
  * - $flag-default-disabled: when disabled flag uses flag-level disabledValue
@@ -30,7 +30,7 @@ function createFlag(overrides: Partial<FeatureFlag> = {}): FeatureFlag {
   };
 }
 
-describe('Variant Source Naming', () => {
+describe('Value Source Naming', () => {
   describe('Enabled flag with no variants and no strategies', () => {
     it('should return $flag-default-enabled variant name', () => {
       const flag = createFlag({ isEnabled: true, enabledValue: true });
@@ -254,3 +254,4 @@ describe('Variant Source Naming', () => {
     });
   });
 });
+

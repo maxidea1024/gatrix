@@ -16,7 +16,7 @@ namespace Gatrix.Server.Sdk.Services;
 /// <summary>
 /// Feature flag service implementation.
 /// Evaluates flags locally using cached definitions and the shared evaluator.
-/// All typed variation methods: evaluate → extract → convert → fallback.
+/// All typed variation methods: evaluate ??extract ??convert ??fallback.
 /// </summary>
 public class FeatureFlagService : IFeatureFlagService
 {
@@ -160,9 +160,9 @@ public class FeatureFlagService : IFeatureFlagService
     private string? ResolveEnvironment(string? environment) =>
         environment ?? (_options.IsMultiEnvironmentMode ? null : _options.Environment);
 
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
     //  Core Evaluation
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     public EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environment = null)
     {
@@ -180,7 +180,7 @@ public class FeatureFlagService : IFeatureFlagService
                 Reason = EvaluationReasons.NotFound,
                 Variant = new Variant
                 {
-                    Name = VariantSource.Missing,
+                    Name = ValueSource.Missing,
                     Weight = 100,
                     Enabled = false,
                     Value = null,
@@ -193,9 +193,9 @@ public class FeatureFlagService : IFeatureFlagService
         return FeatureFlagEvaluator.Evaluate(flag, merged, segments);
     }
 
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
     //  IsEnabled
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     public bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null)
     {
@@ -203,9 +203,9 @@ public class FeatureFlagService : IFeatureFlagService
         return result.Reason == EvaluationReasons.NotFound ? fallback : result.Enabled;
     }
 
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
     //  Variant (name only)
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     public string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environment = null)
     {
@@ -214,20 +214,21 @@ public class FeatureFlagService : IFeatureFlagService
         return result.Variant.Name ?? fallback;
     }
 
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
     //  Typed Variations
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     public string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        return result.Reason == EvaluationReasons.NotFound ? fallback : ExtractString(result.Variant) ?? fallback;
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "string")) return fallback;
+        return ExtractString(result.Variant) ?? fallback;
     }
 
     public int IntVariation(string flagName, int fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        if (result.Reason == EvaluationReasons.NotFound) return fallback;
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && int.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
@@ -235,7 +236,7 @@ public class FeatureFlagService : IFeatureFlagService
     public long LongVariation(string flagName, long fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        if (result.Reason == EvaluationReasons.NotFound) return fallback;
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && long.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
@@ -243,7 +244,7 @@ public class FeatureFlagService : IFeatureFlagService
     public float FloatVariation(string flagName, float fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        if (result.Reason == EvaluationReasons.NotFound) return fallback;
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && float.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
@@ -251,7 +252,7 @@ public class FeatureFlagService : IFeatureFlagService
     public double DoubleVariation(string flagName, double fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        if (result.Reason == EvaluationReasons.NotFound) return fallback;
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && double.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
@@ -259,7 +260,7 @@ public class FeatureFlagService : IFeatureFlagService
     public bool BoolVariation(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        if (result.Reason == EvaluationReasons.NotFound) return fallback;
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "boolean")) return fallback;
         var str = ExtractString(result.Variant);
         if (str is null) return fallback;
         if (bool.TryParse(str, out var v)) return v;
@@ -272,7 +273,7 @@ public class FeatureFlagService : IFeatureFlagService
     public T? JsonVariation<T>(string flagName, T? fallback = default, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
-        if (result.Reason == EvaluationReasons.NotFound || result.Variant.Value is null)
+        if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "json") || result.Variant.Value is null)
             return fallback;
 
         try
@@ -289,13 +290,14 @@ public class FeatureFlagService : IFeatureFlagService
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    //  *Details — value + evaluation metadata
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    //  *Details ??value + evaluation metadata
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     public EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
+        if (IsTypeMismatch(result, "string")) return MakeTypeMismatchDetail(result, fallback);
         var value = result.Reason == EvaluationReasons.NotFound ? fallback : ExtractString(result.Variant) ?? fallback;
         return MakeDetail(result, value);
     }
@@ -303,6 +305,7 @@ public class FeatureFlagService : IFeatureFlagService
     public EvaluationDetail<int> IntVariationDetails(string flagName, int fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
+        if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && int.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
@@ -311,6 +314,7 @@ public class FeatureFlagService : IFeatureFlagService
     public EvaluationDetail<long> LongVariationDetails(string flagName, long fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
+        if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && long.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
@@ -319,6 +323,7 @@ public class FeatureFlagService : IFeatureFlagService
     public EvaluationDetail<float> FloatVariationDetails(string flagName, float fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
+        if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && float.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
@@ -327,6 +332,7 @@ public class FeatureFlagService : IFeatureFlagService
     public EvaluationDetail<double> DoubleVariationDetails(string flagName, double fallback, EvaluationContext? context = null, string? environment = null)
     {
         var result = Evaluate(flagName, context, environment);
+        if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && double.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
@@ -336,6 +342,7 @@ public class FeatureFlagService : IFeatureFlagService
     {
         var result = Evaluate(flagName, context, environment);
         if (result.Reason == EvaluationReasons.NotFound) return MakeDetail(result, fallback);
+        if (IsTypeMismatch(result, "boolean")) return MakeTypeMismatchDetail(result, fallback);
         var str = ExtractString(result.Variant);
         bool value = fallback;
         if (str is not null)
@@ -347,9 +354,9 @@ public class FeatureFlagService : IFeatureFlagService
         return MakeDetail(result, value);
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    //  *OrThrow — throws FeatureFlagException on failure
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    //  *OrThrow ??throws FeatureFlagException on failure
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     public string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
     {
@@ -430,9 +437,9 @@ public class FeatureFlagService : IFeatureFlagService
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
     //  Helpers
-    // ══════════════════════════════════════════════════════════════════
+    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
 
     private EvaluationContext ResolveContext(EvaluationContext? perCall)
     {
@@ -466,6 +473,25 @@ public class FeatureFlagService : IFeatureFlagService
             FeatureFlagErrorCode.NoValue, $"Flag '{flagName}' variant value is null", flagName);
     }
 
+    /// <summary>Check if the result variant type matches the expected type.</summary>
+    private static bool IsTypeMismatch(EvaluationResult result, string expectedType)
+    {
+        if (result.Reason == EvaluationReasons.NotFound) return false;
+        var actualType = result.Variant.ValueType?.ToLowerInvariant();
+        if (actualType is null) return false;
+        return actualType != expectedType;
+    }
+
+    private static EvaluationDetail<T> MakeTypeMismatchDetail<T>(EvaluationResult result, T fallback)
+    {
+        return new EvaluationDetail<T>
+        {
+            FlagName = result.FlagName,
+            Value = fallback,
+            Reason = result.Reason,
+            VariantName = ValueSource.TypeMismatch,
+        };
+    }
     private static EvaluationDetail<T> MakeDetail<T>(EvaluationResult result, T value)
     {
         return new EvaluationDetail<T>
@@ -477,3 +503,4 @@ public class FeatureFlagService : IFeatureFlagService
         };
     }
 }
+

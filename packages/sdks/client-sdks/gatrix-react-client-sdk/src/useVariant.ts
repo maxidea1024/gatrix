@@ -21,14 +21,14 @@
  */
 import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
-import { VARIANT_SOURCE, type Variant } from '@gatrix/gatrix-js-client-sdk';
+import { VALUE_SOURCE, type Variant } from '@gatrix/gatrix-js-client-sdk';
 
 export function useVariant(flagName: string, forceRealtime = false): Variant {
   const { features } = useGatrixContext();
   const [variant, setVariant] = useState<Variant>(
     () =>
       features.getVariant(flagName, forceRealtime) || {
-        name: VARIANT_SOURCE.MISSING,
+        name: VALUE_SOURCE.MISSING,
         enabled: false,
       }
   );

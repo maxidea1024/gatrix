@@ -45,5 +45,5 @@ export { InMemoryStorageProvider } from './InMemoryStorageProvider';
 // Version
 export { SDK_VERSION, SDK_NAME } from './version';
 
-// Variant source constants
-export { VARIANT_SOURCE } from './variantSource';
+// Value source constants
+export { VALUE_SOURCE } from './valueSource';

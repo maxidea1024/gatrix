@@ -41,7 +41,7 @@ import { type Logger, ConsoleLogger } from './Logger';
 import { Metrics } from './Metrics';
 import { GatrixError, GatrixFeatureError } from './errors';
 import { SDK_NAME, SDK_VERSION } from './version';
-import { VARIANT_SOURCE } from './variantSource';
+import { VALUE_SOURCE } from './valueSource';
 import ky from 'ky';
 
 const STORAGE_KEY_FLAGS = 'flags';
@@ -348,7 +348,7 @@ export class FeaturesClient implements VariationProvider {
         if (value !== null && value !== undefined) {
           (newContext as any)[key] = value;
         }
-        // null/undefined for system fields → keep existing value
+        // null/undefined for system fields ??keep existing value
       } else if (key === 'properties') {
         // Merge properties individually
         if (value && typeof value === 'object') {
@@ -365,7 +365,7 @@ export class FeaturesClient implements VariationProvider {
           delete newContext.properties;
         }
       } else {
-        // Non-system fields: null/undefined → remove
+        // Non-system fields: null/undefined ??remove
         if (value === null || value === undefined) {
           delete (newContext as any)[key];
         } else {
@@ -486,7 +486,7 @@ export class FeaturesClient implements VariationProvider {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
-      return { name: VARIANT_SOURCE.MISSING, enabled: false };
+      return { name: VALUE_SOURCE.MISSING, enabled: false };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
     return { ...flag.variant };
@@ -548,7 +548,7 @@ export class FeaturesClient implements VariationProvider {
       return fallbackValue;
     }
     if (flag.valueType !== 'boolean') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -566,7 +566,7 @@ export class FeaturesClient implements VariationProvider {
       return fallbackValue;
     }
     if (flag.valueType !== 'string') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -584,7 +584,7 @@ export class FeaturesClient implements VariationProvider {
       return fallbackValue;
     }
     if (flag.valueType !== 'number') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -599,7 +599,7 @@ export class FeaturesClient implements VariationProvider {
       return fallbackValue;
     }
     if (flag.valueType !== 'json') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return fallbackValue;
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -625,17 +625,17 @@ export class FeaturesClient implements VariationProvider {
         reason: 'flag_not_found',
         flagExists: false,
         enabled: false,
-        variantName: VARIANT_SOURCE.MISSING,
+        variantName: VALUE_SOURCE.MISSING,
       };
     }
     if (flag.valueType !== 'boolean') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_boolean_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
-        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
+        variantName: VALUE_SOURCE.TYPE_MISMATCH,
       };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -661,17 +661,17 @@ export class FeaturesClient implements VariationProvider {
         reason: 'flag_not_found',
         flagExists: false,
         enabled: false,
-        variantName: VARIANT_SOURCE.MISSING,
+        variantName: VALUE_SOURCE.MISSING,
       };
     }
     if (flag.valueType !== 'string') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_string_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
-        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
+        variantName: VALUE_SOURCE.TYPE_MISMATCH,
       };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -697,17 +697,17 @@ export class FeaturesClient implements VariationProvider {
         reason: 'flag_not_found',
         flagExists: false,
         enabled: false,
-        variantName: VARIANT_SOURCE.MISSING,
+        variantName: VALUE_SOURCE.MISSING,
       };
     }
     if (flag.valueType !== 'number') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_number_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
-        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
+        variantName: VALUE_SOURCE.TYPE_MISMATCH,
       };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -717,7 +717,7 @@ export class FeaturesClient implements VariationProvider {
       reason: isNaN(value) ? 'type_mismatch:value_not_number' : (flag.reason ?? 'evaluated'),
       flagExists: true,
       enabled: flag.enabled,
-      variantName: isNaN(value) ? VARIANT_SOURCE.TYPE_MISMATCH : flag.variant.name,
+      variantName: isNaN(value) ? VALUE_SOURCE.TYPE_MISMATCH : flag.variant.name,
     };
   }
 
@@ -734,17 +734,17 @@ export class FeaturesClient implements VariationProvider {
         reason: 'flag_not_found',
         flagExists: false,
         enabled: false,
-        variantName: VARIANT_SOURCE.MISSING,
+        variantName: VALUE_SOURCE.MISSING,
       };
     }
     if (flag.valueType !== 'json') {
-      this.trackFlagAccess(flagName, flag, 'getVariant', VARIANT_SOURCE.TYPE_MISMATCH);
+      this.trackFlagAccess(flagName, flag, 'getVariant', VALUE_SOURCE.TYPE_MISMATCH);
       return {
         value: fallbackValue,
         reason: `type_mismatch:expected_json_got_${flag.valueType}`,
         flagExists: true,
         enabled: flag.enabled,
-        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
+        variantName: VALUE_SOURCE.TYPE_MISMATCH,
       };
     }
     this.trackFlagAccess(flagName, flag, 'getVariant', flag.variant.name);
@@ -755,7 +755,7 @@ export class FeaturesClient implements VariationProvider {
         reason: 'type_mismatch:value_not_object',
         flagExists: true,
         enabled: flag.enabled,
-        variantName: VARIANT_SOURCE.TYPE_MISMATCH,
+        variantName: VALUE_SOURCE.TYPE_MISMATCH,
       };
     }
     return {
@@ -2390,7 +2390,7 @@ export class FeaturesClient implements VariationProvider {
   }
   /**
    * Get lightweight feature flag statistics.
-   * Returns only scalar/primitive values — no Map iteration.
+   * Returns only scalar/primitive values ??no Map iteration.
    * Suitable for frequent polling or low-overhead diagnostics.
    */
   getLightStats(): FeaturesLightStats {

@@ -11,7 +11,7 @@ import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
 import { ValidationRules } from '../../models/FeatureFlag';
 import { networkTrafficService } from '../../services/NetworkTrafficService';
 import { validateFlagValue } from '../../utils/validateFlagValue';
-import { VARIANT_SOURCE } from '@gatrix/shared';
+import { VALUE_SOURCE } from '@gatrix/shared';
 
 const router = Router();
 
@@ -801,7 +801,7 @@ router.post(
               contextWarnings.push({
                 field: key,
                 type: 'WHITESPACE',
-                message: `Value has ${parts.join(' and ')} whitespace: "${value}" → trimmed: "${value.trim()}"`,
+                message: `Value has ${parts.join(' and ')} whitespace: "${value}" ??trimmed: "${value.trim()}"`,
                 suggestion: value.trim(),
                 data: { value, trimmed: value.trim(), parts },
                 severity: isReject ? 'error' : 'warning',
@@ -1091,13 +1091,13 @@ router.post(
             if (evalResult.enabled) {
               variantName =
                 valueSource === 'environment'
-                  ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-                  : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+                  ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
+                  : VALUE_SOURCE.FLAG_DEFAULT_ENABLED;
             } else {
               variantName =
                 valueSource === 'environment'
-                  ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-                  : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+                  ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+                  : VALUE_SOURCE.FLAG_DEFAULT_DISABLED;
             }
             (evalResult as any).variant = {
               name: (evalResult as any).variant?.name || variantName,
@@ -1240,8 +1240,8 @@ function evaluateFlagWithDetails(
       reason: 'FLAG_DISABLED',
       variant: {
         name: isEnvSource
-          ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-          : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+          ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+          : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(envDisabledValue ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
         valueSource: isEnvSource ? 'environment' : 'flag',
@@ -1277,8 +1277,8 @@ function evaluateFlagWithDetails(
         variant: {
           name:
             ctxEnvDisVal !== undefined
-              ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-              : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+              ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+              : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
           value: getFallbackValue(ctxEnvDisVal ?? flag.disabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
           valueSource: ctxEnvDisVal !== undefined ? 'environment' : 'flag',
@@ -1461,8 +1461,8 @@ function evaluateFlagWithDetails(
       variant: {
         name:
           ctxFailEnvDisVal !== undefined
-            ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-            : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+            ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+            : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(ctxFailEnvDisVal ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
         valueSource: ctxFailEnvDisVal !== undefined ? 'environment' : 'flag',
@@ -1505,8 +1505,8 @@ function evaluateFlagWithDetails(
     evaluationSteps,
     variant: {
       name: noMatchIsEnvSource
-        ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-        : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED,
+        ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+        : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
       value: noMatchEnvDisVal ?? flag.disabledValue ?? null,
       valueType: flag.valueType || 'string',
       valueSource: noMatchIsEnvSource ? 'environment' : 'flag',
@@ -1802,8 +1802,8 @@ function selectVariantForFlag(
     return {
       name:
         valueSource === 'environment'
-          ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-          : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
+          ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
+          : VALUE_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
       valueSource,
@@ -1815,8 +1815,8 @@ function selectVariantForFlag(
     return {
       name:
         valueSource === 'environment'
-          ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-          : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED,
+          ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
+          : VALUE_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
       valueType: flag.valueType || 'string',
       valueSource,

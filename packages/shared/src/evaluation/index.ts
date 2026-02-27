@@ -3,9 +3,9 @@
  * Exports evaluator and all evaluation-related types
  */
 export { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
-export { VARIANT_SOURCE } from './variantSource';
+export { VALUE_SOURCE } from './valueSource';
 export { EvaluationUtils, truncateToMinute, buildContextQueryParams } from './EvaluationUtils';
-export type { VariantSourceName } from './variantSource';
+export type { ValueSourceName } from './valueSource';
 export type {
   FeatureFlag,
   FeatureStrategy,

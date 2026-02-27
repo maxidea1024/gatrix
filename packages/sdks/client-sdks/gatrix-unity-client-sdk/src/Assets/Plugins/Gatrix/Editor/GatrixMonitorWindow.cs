@@ -166,7 +166,7 @@ namespace Gatrix.Unity.SDK.Editor
             {
                 foreach (var flag in flags)
                 {
-                    if (flag.Reason == Gatrix.Unity.SDK.VariantSource.Missing)
+                    if (flag.Reason == Gatrix.Unity.SDK.ValueSource.Missing)
                         missing++;
                     else if (flag.Enabled)
                         enabled++;
@@ -449,7 +449,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(20);
 
-            // ‚îÄ‚îÄ Play button (centered) ‚îÄ‚îÄ
+            // ?Ä?Ä Play button (centered) ?Ä?Ä
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             EditorGUILayout.BeginVertical(GUILayout.MaxWidth(320));
@@ -485,7 +485,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             EditorGUILayout.Space(16);
 
-            // ‚îÄ‚îÄ Scene configuration summary (full width) ‚îÄ‚îÄ
+            // ?Ä?Ä Scene configuration summary (full width) ?Ä?Ä
 #if UNITY_2023_1_OR_NEWER
             var behaviour = UnityEngine.Object.FindFirstObjectByType<GatrixBehaviour>();
 #else
@@ -494,7 +494,7 @@ namespace Gatrix.Unity.SDK.Editor
 
             if (behaviour != null)
             {
-                // Found GatrixBehaviour in scene ‚Äî show config summary
+                // Found GatrixBehaviour in scene ??show config summary
                 GatrixEditorStyle.DrawSection("Scene Configuration", "Detected GatrixBehaviour in current scene");
                 GatrixEditorStyle.BeginBox();
 
@@ -505,7 +505,7 @@ namespace Gatrix.Unity.SDK.Editor
                 {
                     var s = behaviour.Settings;
 
-                    // ‚îÄ‚îÄ Connection ‚îÄ‚îÄ
+                    // ?Ä?Ä Connection ?Ä?Ä
                     DrawClickableField("Settings Asset", s.name, s);
                     DrawField("App Name", s.AppName ?? "-");
                     DrawField("Environment", s.Environment ?? "-");
@@ -519,7 +519,7 @@ namespace Gatrix.Unity.SDK.Editor
                     // Separator
                     DrawSeparator();
 
-                    // ‚îÄ‚îÄ Behavior ‚îÄ‚îÄ
+                    // ?Ä?Ä Behavior ?Ä?Ä
                     DrawField("Offline Mode", s.OfflineMode
                         ? "<color=#ffcc66>Yes</color>"
                         : "No", true);
@@ -533,7 +533,7 @@ namespace Gatrix.Unity.SDK.Editor
                     // Separator
                     DrawSeparator();
 
-                    // ‚îÄ‚îÄ Data Refresh (strikethrough when offline) ‚îÄ‚îÄ
+                    // ?Ä?Ä Data Refresh (strikethrough when offline) ?Ä?Ä
                     var isOffline = s.OfflineMode;
 
                     string pollingText = s.DisableRefresh
@@ -630,7 +630,7 @@ namespace Gatrix.Unity.SDK.Editor
             GUILayout.FlexibleSpace();
 
             // Auto-refresh toggle
-            var refreshIcon = _autoRefresh ? "‚óè Auto" : "‚óã Auto";
+            var refreshIcon = _autoRefresh ? "??Auto" : "??Auto";
             var refreshColor = _autoRefresh ? new Color(0.4f, 1f, 0.4f) : new Color(0.7f, 0.7f, 0.7f);
             var refreshStyle = new GUIStyle(EditorStyles.toolbarButton)
             {
@@ -777,7 +777,7 @@ namespace Gatrix.Unity.SDK.Editor
             var arg0 = args[0];
             if (arg0 == null) return "";
 
-            // List<EvaluatedFlag> ‚Äî flags.change, flags.ready, etc.
+            // List<EvaluatedFlag> ??flags.change, flags.ready, etc.
             if (arg0 is List<EvaluatedFlag> flagList)
             {
                 if (flagList.Count == 0) return "0 flags";
@@ -789,7 +789,7 @@ namespace Gatrix.Unity.SDK.Editor
                 return $"{flagList.Count} flags: {summary}";
             }
 
-            // ErrorEvent ‚Äî errors
+            // ErrorEvent ??errors
             if (arg0 is ErrorEvent errorEvt)
             {
                 var parts = new List<string>();
@@ -799,7 +799,7 @@ namespace Gatrix.Unity.SDK.Editor
                 return parts.Count > 0 ? string.Join(" | ", parts) : "error";
             }
 
-            // FlagsChangedEvent ‚Äî streaming invalidation
+            // FlagsChangedEvent ??streaming invalidation
             if (arg0 is FlagsChangedEvent changedEvt)
             {
                 var keys = changedEvt.ChangedKeys;
@@ -822,13 +822,13 @@ namespace Gatrix.Unity.SDK.Editor
                 return $"{impEvt.FeatureName} ({impEvt.EventType})";
             }
 
-            // string[] ‚Äî removed flags
+            // string[] ??removed flags
             if (arg0 is string[] strArr)
             {
                 return strArr.Length > 0 ? string.Join(", ", strArr) : "";
             }
 
-            // EvaluatedFlag ‚Äî per-flag change
+            // EvaluatedFlag ??per-flag change
             if (arg0 is EvaluatedFlag singleFlag)
             {
                 var variant = singleFlag.Variant?.Name ?? "-";
@@ -837,7 +837,7 @@ namespace Gatrix.Unity.SDK.Editor
                        (!string.IsNullOrEmpty(changeType) ? $" ({changeType})" : "");
             }
 
-            // int args ‚Äî reconnecting (attempt, delayMs)
+            // int args ??reconnecting (attempt, delayMs)
             if (arg0 is int intVal)
             {
                 if (args.Length >= 2 && args[1] is int delayMs)
@@ -845,7 +845,7 @@ namespace Gatrix.Unity.SDK.Editor
                 return intVal.ToString();
             }
 
-            // string ‚Äî etag, simple messages
+            // string ??etag, simple messages
             if (arg0 is string strVal)
             {
                 return strVal;
@@ -857,7 +857,7 @@ namespace Gatrix.Unity.SDK.Editor
                 return $"{list.Count} items";
             }
 
-            // Last resort ‚Äî use type name only if ToString() returns type name
+            // Last resort ??use type name only if ToString() returns type name
             var str = arg0.ToString();
             var typeName = arg0.GetType().FullName;
             return str == typeName ? arg0.GetType().Name : str;

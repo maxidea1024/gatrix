@@ -1,13 +1,13 @@
-// Reserved variant source names used throughout the SDK.
+// Reserved value source names used throughout the SDK.
 // These constants define how the origin of a variant value
 // is classified when returned from evaluation.
 
 namespace Gatrix.Unity.SDK
 {
     /// <summary>
-    /// Well-known variant source names shared across all Gatrix SDKs.
+    /// Well-known value source names shared across all Gatrix SDKs.
     /// </summary>
-    public static class VariantSource
+    public static class ValueSource
     {
         /// <summary>Flag not found in SDK cache</summary>
         public const string Missing = "$missing";

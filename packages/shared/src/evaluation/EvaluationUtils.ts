@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import { EvaluationContext, FeatureFlag, FeatureSegment, EvaluationResult, Variant } from './types';
-import { VARIANT_SOURCE } from './variantSource';
+import { VALUE_SOURCE } from './valueSource';
 
 /**
  * Truncate an ISO 8601 time string to minute precision.
  * Prevents frequent cache invalidation from sub-minute changes.
- * e.g. "2025-01-15T10:30:45.123Z" → "2025-01-15T10:30:00.000Z"
+ * e.g. "2025-01-15T10:30:45.123Z" ??"2025-01-15T10:30:00.000Z"
  */
 export function truncateToMinute(isoString: string): string {
   const date = new Date(isoString);
@@ -143,8 +143,10 @@ export class EvaluationUtils {
     if (
       enabled &&
       resultVariant &&
-      resultVariant.name !== VARIANT_SOURCE.FLAG_DEFAULT_ENABLED &&
-      resultVariant.name !== VARIANT_SOURCE.FLAG_DEFAULT_DISABLED
+      resultVariant.name !== VALUE_SOURCE.FLAG_DEFAULT_ENABLED &&
+      resultVariant.name !== VALUE_SOURCE.FLAG_DEFAULT_DISABLED &&
+      resultVariant.name !== VALUE_SOURCE.ENV_DEFAULT_ENABLED &&
+      resultVariant.name !== VALUE_SOURCE.ENV_DEFAULT_DISABLED
     ) {
       // Active variant from strategy/rollout (not a default)
       finalVariant = {
@@ -170,13 +172,13 @@ export class EvaluationUtils {
       if (enabled) {
         variantName =
           dbFlag.valueSource === 'environment'
-            ? VARIANT_SOURCE.ENV_DEFAULT_ENABLED
-            : VARIANT_SOURCE.FLAG_DEFAULT_ENABLED;
+            ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
+            : VALUE_SOURCE.FLAG_DEFAULT_ENABLED;
       } else {
         variantName =
           dbFlag.valueSource === 'environment'
-            ? VARIANT_SOURCE.ENV_DEFAULT_DISABLED
-            : VARIANT_SOURCE.FLAG_DEFAULT_DISABLED;
+            ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+            : VALUE_SOURCE.FLAG_DEFAULT_DISABLED;
       }
 
       finalVariant = {
