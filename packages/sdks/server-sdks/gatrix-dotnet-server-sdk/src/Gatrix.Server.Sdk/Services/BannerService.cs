@@ -11,6 +11,8 @@ public interface IBannerService
     Task<List<Banner>> FetchAsync(string environment, CancellationToken ct = default);
     List<Banner> GetCached(string environment);
     List<Banner> GetAll(string environment);
+    void UpsertSingle(Banner item, string environment);
+    void Remove(int id, string environment);
 }
 
 public class BannerService : BaseEnvironmentService<Banner, List<Banner>>, IBannerService
@@ -28,4 +30,6 @@ public class BannerService : BaseEnvironmentService<Banner, List<Banner>>, IBann
         FetchByEnvironmentAsync(environment, ct);
 
     public List<Banner> GetAll(string environment) => GetCached(environment);
+    public void UpsertSingle(Banner item, string environment) => UpsertItemInCache(item, environment);
+    public void Remove(int id, string environment) => RemoveFromCache(id, environment);
 }

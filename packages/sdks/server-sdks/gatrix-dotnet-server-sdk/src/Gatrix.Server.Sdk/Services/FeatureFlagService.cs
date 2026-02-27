@@ -160,13 +160,54 @@ public class FeatureFlagService : IFeatureFlagService
     private string? ResolveEnvironment(string? environment) =>
         environment ?? (_options.IsMultiEnvironmentMode ? null : _options.Environment);
 
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    /// <summary>Fetch a single flag by name from the API and update cache.
+    /// Since the API doesn't support single-flag fetch, does a full environment refresh.</summary>
+    public async Task FetchSingleFlagAsync(string flagName, string environment, CancellationToken ct = default)
+    {
+        try
+        {
+            await FetchAsync(environment, ct);
+            _logger.LogInformation("Updated single flag {FlagName} in {Environment} via full refresh", flagName, environment);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to fetch single flag {FlagName} for {Environment}", flagName, environment);
+        }
+    }
+
+    /// <summary>Get the underlying FlagDefinitionCache for direct cache operations.</summary>
+    public FlagDefinitionCache GetCache() => _cache;
+
+    // ══════════════════════════════════════════════════════════════
     //  Core Evaluation
-    // ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+    // ══════════════════════════════════════════════════════════════
+
 
     public EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environment = null)
     {
         var env = ResolveEnvironment(environment);
+
+        // Multi-environment mode requires explicit environment
+        if (env is null)
+        {
+            _logger.LogWarning("Cannot evaluate flag '{FlagName}': environment is required in multi-environment mode", flagName);
+            return new EvaluationResult
+            {
+                Id = string.Empty,
+                FlagName = flagName,
+                Enabled = false,
+                Reason = EvaluationReasons.NotFound,
+                Variant = new Variant
+                {
+                    Name = ValueSource.Missing,
+                    Weight = 100,
+                    Enabled = false,
+                    Value = null,
+                    ValueType = "string",
+                },
+            };
+        }
+
         var merged = ResolveContext(context);
         var flag = _cache.GetFlag(flagName, env);
 

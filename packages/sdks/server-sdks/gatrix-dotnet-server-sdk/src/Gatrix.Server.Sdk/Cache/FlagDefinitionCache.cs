@@ -5,6 +5,7 @@ namespace Gatrix.Server.Sdk.Cache;
 /// <summary>
 /// Thread-safe in-memory cache for feature flag definitions and segments.
 /// Supports per-environment storage for multi-environment mode.
+/// Environment must always be resolved by the caller (FeatureFlagService.ResolveEnvironment).
 /// </summary>
 public class FlagDefinitionCache
 {
@@ -16,38 +17,25 @@ public class FlagDefinitionCache
     // Segments are global (shared across environments)
     private Dictionary<string, FeatureSegment> _segments = new(StringComparer.OrdinalIgnoreCase);
 
-    // Default environment for single-env mode backward compatibility
-    private const string DefaultEnv = "__default__";
-
     /// <summary>Get a flag definition by name for a specific environment.</summary>
-    public FeatureFlag? GetFlag(string flagName, string? environment = null)
+    public FeatureFlag? GetFlag(string flagName, string environment)
     {
-        var env = environment ?? DefaultEnv;
         lock (_lock)
         {
-            if (_flagsByEnv.TryGetValue(env, out var flags))
+            if (_flagsByEnv.TryGetValue(environment, out var flags))
                 return flags.GetValueOrDefault(flagName);
-
-            // Fallback: search default env if specific env not found
-            if (env != DefaultEnv && _flagsByEnv.TryGetValue(DefaultEnv, out var defaultFlags))
-                return defaultFlags.GetValueOrDefault(flagName);
 
             return null;
         }
     }
 
     /// <summary>Get all cached flags for a specific environment (readonly snapshot).</summary>
-    public List<FeatureFlag> GetCached(string? environment = null)
+    public List<FeatureFlag> GetCached(string environment)
     {
-        var env = environment ?? DefaultEnv;
         lock (_lock)
         {
-            if (_flagsByEnv.TryGetValue(env, out var flags))
+            if (_flagsByEnv.TryGetValue(environment, out var flags))
                 return flags.Values.ToList();
-
-            // Fallback to default env
-            if (env != DefaultEnv && _flagsByEnv.TryGetValue(DefaultEnv, out var defaultFlags))
-                return defaultFlags.Values.ToList();
 
             return [];
         }
@@ -63,9 +51,8 @@ public class FlagDefinitionCache
     }
 
     /// <summary>Replace entire cache atomically with new definitions and segments for a specific environment.</summary>
-    public void Update(IEnumerable<FeatureFlag> flags, IEnumerable<FeatureSegment> segments, string? environment = null)
+    public void Update(IEnumerable<FeatureFlag> flags, IEnumerable<FeatureSegment> segments, string environment)
     {
-        var env = environment ?? DefaultEnv;
         var newFlags = new Dictionary<string, FeatureFlag>(StringComparer.OrdinalIgnoreCase);
         foreach (var flag in flags)
             newFlags[flag.Name] = flag;
@@ -76,7 +63,7 @@ public class FlagDefinitionCache
 
         lock (_lock)
         {
-            _flagsByEnv[env] = newFlags;
+            _flagsByEnv[environment] = newFlags;
             // Segments are merged globally (all environments share segments)
             foreach (var kvp in newSegments)
                 _segments[kvp.Key] = kvp.Value;
@@ -84,28 +71,44 @@ public class FlagDefinitionCache
     }
 
     /// <summary>Upsert a single flag in a specific environment.</summary>
-    public void UpsertFlag(FeatureFlag flag, string? environment = null)
+    public void UpsertFlag(FeatureFlag flag, string environment)
     {
-        var env = environment ?? DefaultEnv;
         lock (_lock)
         {
-            if (!_flagsByEnv.TryGetValue(env, out var flags))
+            if (!_flagsByEnv.TryGetValue(environment, out var flags))
             {
                 flags = new Dictionary<string, FeatureFlag>(StringComparer.OrdinalIgnoreCase);
-                _flagsByEnv[env] = flags;
+                _flagsByEnv[environment] = flags;
             }
             flags[flag.Name] = flag;
         }
     }
 
     /// <summary>Remove a single flag by name from a specific environment.</summary>
-    public void RemoveFlag(string flagName, string? environment = null)
+    public void RemoveFlag(string flagName, string environment)
     {
-        var env = environment ?? DefaultEnv;
         lock (_lock)
         {
-            if (_flagsByEnv.TryGetValue(env, out var flags))
+            if (_flagsByEnv.TryGetValue(environment, out var flags))
                 flags.Remove(flagName);
+        }
+    }
+
+    /// <summary>Upsert a single segment (global, not per-environment).</summary>
+    public void UpsertSegment(FeatureSegment segment)
+    {
+        lock (_lock)
+        {
+            _segments[segment.Name] = segment;
+        }
+    }
+
+    /// <summary>Remove a single segment by name.</summary>
+    public void RemoveSegment(string segmentName)
+    {
+        lock (_lock)
+        {
+            _segments.Remove(segmentName);
         }
     }
 

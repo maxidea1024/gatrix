@@ -39,12 +39,13 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<FlagDefinitionCache>();
 
         // Register optional ICacheStorageProvider — resolves to FileCacheStorageProvider
-        // when Cache.LocalStoragePath is set, null otherwise (services degrade gracefully).
-        services.TryAddSingleton<ICacheStorageProvider?>(sp =>
+        // when Cache.LocalStoragePath is set. When not set, no provider is registered
+        // and services that need it accept ICacheStorageProvider? = null via optional DI.
+        services.TryAddSingleton<ICacheStorageProvider>(sp =>
         {
             var opts = sp.GetRequiredService<IOptions<GatrixSdkOptions>>().Value;
             if (string.IsNullOrWhiteSpace(opts.Cache.LocalStoragePath))
-                return null;
+                return null!;
             var logger = sp.GetRequiredService<ILogger<FileCacheStorageProvider>>();
             return new FileCacheStorageProvider(logger, opts.Cache.LocalStoragePath);
         });

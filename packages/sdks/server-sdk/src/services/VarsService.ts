@@ -83,4 +83,48 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
     const items = this.getCached(environment);
     return items.find((item) => item.varKey === key) || null;
   }
+
+  /**
+   * Update a single var in cache by key
+   * Used for granular event-driven updates (vars.updated event with value data)
+   * @param key Variable key
+   * @param value New variable value (null means deleted)
+   * @param environment Environment name
+   */
+  updateSingleVar(key: string, value: string | null, environment: string): void {
+    const items = this.getCached(environment);
+    const existingIndex = items.findIndex((item) => item.varKey === key);
+
+    if (value === null) {
+      // Remove the var from cache
+      if (existingIndex >= 0) {
+        const newItems = items.filter((item) => item.varKey !== key);
+        this.updateCache(newItems, environment);
+        this.logger.debug('Single var removed from cache', { key, environment });
+      }
+      return;
+    }
+
+    if (existingIndex >= 0) {
+      // Update existing var's value
+      const updatedItems = items.map((item) =>
+        item.varKey === key ? { ...item, varValue: value, updatedAt: new Date().toISOString() } : item
+      );
+      this.updateCache(updatedItems, environment);
+    } else {
+      // Var not in cache yet — fall back to full refresh
+      // We don't have full VarItem structure (valueType, etc.) from event payload
+      this.logger.debug('Var not found in cache for update, will need full refresh', {
+        key,
+        environment,
+      });
+      this.refreshByEnvironment(environment).catch((error: any) => {
+        this.logger.error('Failed to refresh vars after single var update fallback', {
+          error: error.message,
+        });
+      });
+    }
+
+    this.logger.debug('Single var updated in cache', { key, environment });
+  }
 }

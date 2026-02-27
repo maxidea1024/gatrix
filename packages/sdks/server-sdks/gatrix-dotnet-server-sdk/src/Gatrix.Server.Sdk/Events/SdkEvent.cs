@@ -17,11 +17,23 @@ public class SdkEventData
 {
     [JsonPropertyName("id")] public JsonElement? Id { get; set; }
     [JsonPropertyName("key")] public string? Key { get; set; }
+    [JsonPropertyName("value")] public string? Value { get; set; }
     [JsonPropertyName("environment")] public string? Environment { get; set; }
     [JsonPropertyName("isVisible")] public JsonElement? IsVisible { get; set; }
     [JsonPropertyName("isActive")] public JsonElement? IsActive { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
     [JsonPropertyName("segmentName")] public string? SegmentName { get; set; }
+    [JsonPropertyName("segment")] public JsonElement? Segment { get; set; }
+    [JsonPropertyName("changedKeys")] public List<string>? ChangedKeys { get; set; }
+    [JsonPropertyName("changeType")] public string? ChangeType { get; set; }
+    // Full object data for direct cache updates (avoiding list refresh)
+    [JsonPropertyName("clientVersion")] public JsonElement? ClientVersion { get; set; }
+    [JsonPropertyName("serviceNotice")] public JsonElement? ServiceNotice { get; set; }
+    // Maintenance-related fields
+    [JsonPropertyName("isMaintenance")] public JsonElement? IsMaintenance { get; set; }
+    [JsonPropertyName("maintenanceStartDate")] public string? MaintenanceStartDate { get; set; }
+    [JsonPropertyName("maintenanceEndDate")] public string? MaintenanceEndDate { get; set; }
+    [JsonPropertyName("count")] public int? Count { get; set; }
 
     /// <summary>Get id as int, handling JSON number/string.</summary>
     public int? GetIdAsInt()

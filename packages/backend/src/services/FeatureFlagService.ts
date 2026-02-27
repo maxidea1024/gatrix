@@ -455,7 +455,15 @@ class FeatureFlagService {
 
     // Increment version and invalidate cache
     await this.incrementFlagVersion(flag.id, environment);
-    await this.invalidateCache(environment, [flagName]);
+    // Detect if only isEnabled changed (no definition change)
+    const isEnabledOnlyChange =
+      input.isEnabled !== undefined &&
+      Object.keys(input).filter((k) => k !== 'isEnabled').length === 0;
+    await this.invalidateCache(
+      environment,
+      [flagName],
+      isEnabledOnlyChange ? 'enabled_changed' : 'definition_changed'
+    );
 
     return updated!;
   }
@@ -519,8 +527,8 @@ class FeatureFlagService {
       newValues: { isArchived: true },
     });
 
-    // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    // Invalidate cache (archived = removed from SDK's perspective)
+    await this.invalidateCache(environment, [flagName], 'deleted');
 
     return updated;
   }
@@ -695,8 +703,8 @@ class FeatureFlagService {
       oldValues: flag,
     });
 
-    // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    // Invalidate cache (permanently deleted)
+    await this.invalidateCache(environment, [flagName], 'deleted');
   }
 
   // ==================== Strategies ====================
@@ -1038,12 +1046,14 @@ class FeatureFlagService {
       createdBy: userId,
     });
 
-    // Publish segment.created event (segments are global, no environment)
+    // Publish segment.created event with full segment data
+    // SDKs can update their segment cache directly without an API call
     await pubSubService.publishSDKEvent({
       type: 'segment.created',
       data: {
         id: segment.id,
         segmentName: segment.segmentName,
+        segment: segment,
       },
     });
 
@@ -1068,12 +1078,14 @@ class FeatureFlagService {
       updatedBy: userId,
     });
 
-    // Publish segment.updated event (segments are global, no environment)
+    // Publish segment.updated event with full segment data
+    // SDKs can update their segment cache directly without an API call
     await pubSubService.publishSDKEvent({
       type: 'segment.updated',
       data: {
         id: updated.id,
         segmentName: updated.segmentName,
+        segment: updated,
       },
     });
 
@@ -1269,7 +1281,11 @@ class FeatureFlagService {
   /**
    * Invalidate feature flags cache for an environment
    */
-  async invalidateCache(environment: string, changedFlagNames?: string[]): Promise<void> {
+  async invalidateCache(
+    environment: string,
+    changedFlagNames?: string[],
+    changeType: 'definition_changed' | 'enabled_changed' | 'deleted' = 'definition_changed'
+  ): Promise<void> {
     try {
       // Invalidate feature flags cache (environment-scoped)
       await pubSubService.invalidateKey(`${ENV_SCOPED.FEATURE_FLAGS.ALL}:${environment}`);
@@ -1284,11 +1300,16 @@ class FeatureFlagService {
       const revision = await flagStreamingService.incrementGlobalRevision(environment);
 
       // Publish SDK event for real-time updates (revision included in payload)
+      // changeType allows SDKs to optimize:
+      //   - enabled_changed: toggle isEnabled only, no need to re-fetch flag definition
+      //   - deleted: remove from cache, no API call needed
+      //   - definition_changed: re-fetch only the changed flags (not all flags)
       await pubSubService.publishSDKEvent({
         type: 'feature_flag.changed',
         data: {
           environment,
           changedKeys: changedFlagNames ?? [],
+          changeType,
           timestamp: Date.now(),
           revision,
         },

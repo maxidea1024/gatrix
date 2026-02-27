@@ -35,6 +35,10 @@ public class EventListener : IAsyncDisposable
     private readonly IWhitelistService _whitelist;
     private readonly IServiceMaintenanceService _serviceMaintenance;
     private readonly IStoreProductService _storeProduct;
+    private readonly IFeatureFlagService _featureFlag;
+    private readonly IClientVersionService _clientVersion;
+    private readonly IBannerService _banner;
+    private readonly IServiceNoticeService _serviceNotice;
 
     private ConnectionMultiplexer? _redis;
     private ISubscriber? _subscriber;
@@ -55,7 +59,11 @@ public class EventListener : IAsyncDisposable
         ISurveyService survey,
         IWhitelistService whitelist,
         IServiceMaintenanceService serviceMaintenance,
-        IStoreProductService storeProduct)
+        IStoreProductService storeProduct,
+        IFeatureFlagService featureFlag,
+        IClientVersionService clientVersion,
+        IBannerService banner,
+        IServiceNoticeService serviceNotice)
     {
         _options = options.Value;
         _logger = logger;
@@ -65,6 +73,10 @@ public class EventListener : IAsyncDisposable
         _whitelist = whitelist;
         _serviceMaintenance = serviceMaintenance;
         _storeProduct = storeProduct;
+        _featureFlag = featureFlag;
+        _clientVersion = clientVersion;
+        _banner = banner;
+        _serviceNotice = serviceNotice;
     }
 
     /// <summary>Set the cache manager reference (called by CacheManager to break circular dependency).</summary>
@@ -334,45 +346,283 @@ public class EventListener : IAsyncDisposable
                 break;
             }
 
-            // ── Feature Flag (refresh ONLY flags for that env) ──
+            // ── Feature Flag (Granular) ────────────────────────
+            // Backend sends 'feature_flag.changed' with changedKeys[] and changeType
             case "feature_flag.changed":
-            case "feature_flag.created":
-            case "feature_flag.updated":
-            case "feature_flag.deleted":
             {
                 if (!features.FeatureFlag) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
 
-                _logger.LogInformation("Feature flag event {Type}, refreshing flags for {Env}", evt.Type, env);
-                if (_cacheManager != null)
-                    await _cacheManager.RefreshFeatureFlagsAsync(env);
+                var changedKeys = evt.Data.ChangedKeys ?? [];
+                var changeType = evt.Data.ChangeType ?? "definition_changed";
+                var flagService = _featureFlag as FeatureFlagService;
+
+                _logger.LogInformation("Feature flag event: changeType={ChangeType}, keys={Keys}, env={Env}",
+                    changeType, string.Join(",", changedKeys), env);
+
+                if (changedKeys.Count == 0)
+                {
+                    // No specific keys — full environment refresh
+                    if (_cacheManager != null)
+                        await _cacheManager.RefreshFeatureFlagsAsync(env);
+                }
+                else if (changeType == "deleted")
+                {
+                    // Remove from cache directly (no API call needed)
+                    var cache = flagService?.GetCache();
+                    if (cache != null)
+                    {
+                        foreach (var key in changedKeys)
+                            cache.RemoveFlag(key, env);
+                    }
+                    _logger.LogInformation("Flags removed from cache: {Keys} in {Env}",
+                        string.Join(",", changedKeys), env);
+                }
+                else
+                {
+                    // enabled_changed or definition_changed — re-fetch flags
+                    // For now, uses full env refresh as the API lacks single-flag endpoint
+                    if (flagService != null)
+                        await flagService.FetchSingleFlagAsync(changedKeys[0], env);
+                    else if (_cacheManager != null)
+                        await _cacheManager.RefreshFeatureFlagsAsync(env);
+                }
                 break;
             }
 
-            // ── Vars (KV) ───────────────────────────────────────
+            // ── Vars (Granular) ──────────────────────────────────
             case "vars.updated":
             {
                 if (!features.Vars) break;
                 if (env is null) { LogMissingEnv(evt.Type); break; }
 
-                _logger.LogInformation("Vars update event received, refreshing vars cache for {Env}", env);
+                var varKey = evt.Data.Key;
+                var varValue = evt.Data.Value;
+
+                _logger.LogInformation("Vars update event: key={Key}, hasValue={HasValue}, env={Env}",
+                    varKey, varValue != null, env);
+
+                // Always do full refresh since we need the complete VarItem structure
                 if (_cacheManager != null)
                     await _cacheManager.RefreshVarsAsync(env);
                 break;
             }
 
-            // ── Segment (global — refresh flags for ALL environments) ─
+            // ── Segment (Granular) ───────────────────────────────
+            // Segments are global — only update the segment cache, NOT all flags
             case "segment.created":
             case "segment.updated":
+            {
+                if (!features.FeatureFlag) break;
+
+                var segmentData = evt.Data.Segment;
+                var segmentName = evt.Data.SegmentName;
+                var flagServiceSeg = _featureFlag as FeatureFlagService;
+                var cache = flagServiceSeg?.GetCache();
+
+                _logger.LogInformation("Segment event ({Type}): name={Name}, hasData={HasData}",
+                    evt.Type, segmentName, segmentData.HasValue);
+
+                if (segmentData.HasValue && cache != null)
+                {
+                    try
+                    {
+                        var segment = segmentData.Value.Deserialize<Models.FeatureSegment>();
+                        if (segment != null)
+                        {
+                            cache.UpsertSegment(segment);
+                            _logger.LogInformation("Segment updated in cache directly: {Name}", segmentName);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to deserialize segment data, falling back to full refresh");
+                        if (_cacheManager != null)
+                            await _cacheManager.RefreshFeatureFlagsAsync();
+                    }
+                }
+                else
+                {
+                    // No full data — refresh flags (which includes segments)
+                    if (_cacheManager != null)
+                        await _cacheManager.RefreshFeatureFlagsAsync();
+                }
+                break;
+            }
+
             case "segment.deleted":
             {
                 if (!features.FeatureFlag) break;
 
-                _logger.LogInformation("Segment changed ({Type}), refreshing feature flags for all environments", evt.Type);
-                // Segments are global, not environment-specific.
-                // Refresh flags with default env (single-env mode).
+                var deletedSegmentName = evt.Data.SegmentName;
+                var flagServiceSegDel = _featureFlag as FeatureFlagService;
+                var cacheDel = flagServiceSegDel?.GetCache();
+
+                if (deletedSegmentName != null && cacheDel != null)
+                {
+                    cacheDel.RemoveSegment(deletedSegmentName);
+                    _logger.LogInformation("Segment removed from cache: {Name}", deletedSegmentName);
+                }
+                else
+                {
+                    // Fallback: full refresh
+                    if (_cacheManager != null)
+                        await _cacheManager.RefreshFeatureFlagsAsync();
+                }
+                break;
+            }
+
+            // ── Client Version (Granular) ────────────────────────
+            case "client_version.created":
+            case "client_version.updated":
+            {
+                if (!features.ClientVersion) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                var cvData = evt.Data.ClientVersion;
+                if (cvData.HasValue)
+                {
+                    try
+                    {
+                        var cv = cvData.Value.Deserialize<Models.ClientVersion>();
+                        if (cv != null)
+                        {
+                            _clientVersion.UpsertSingle(cv, env);
+                            _logger.LogInformation("Client version updated in cache directly: {Id} in {Env}", evt.Data.GetIdAsInt(), env);
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to deserialize client version data, falling back to refresh");
+                    }
+                }
+
+                // Fallback: full refresh
+                _logger.LogInformation("Client version event ({Type}), refreshing for {Env}", evt.Type, env);
+                await _clientVersion.FetchAsync(env);
+                break;
+            }
+
+            case "client_version.deleted":
+            {
+                if (!features.ClientVersion) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                var cvId = evt.Data.GetIdAsInt();
+                if (cvId != null)
+                {
+                    _clientVersion.Remove(cvId.Value, env);
+                    _logger.LogInformation("Client version removed from cache: {Id} in {Env}", cvId, env);
+                }
+                else
+                {
+                    await _clientVersion.FetchAsync(env);
+                }
+                break;
+            }
+
+            // ── Banner (Granular) ────────────────────────────────
+            case "banner.created":
+            case "banner.updated":
+            {
+                if (!features.Banner) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                // If status is "draft" or "archived", remove from cache (not visible)
+                var bannerStatus = evt.Data.Status;
+                if (bannerStatus is "draft" or "archived")
+                {
+                    var removeId = evt.Data.GetIdAsInt();
+                    if (removeId != null)
+                    {
+                        _banner.Remove(removeId.Value, env);
+                        _logger.LogInformation("Banner removed from cache (status={Status}): {Id} in {Env}", bannerStatus, removeId, env);
+                        break;
+                    }
+                }
+
+                // Fallback: full refresh (banner data not included in event payload)
+                _logger.LogInformation("Banner event ({Type}), refreshing for {Env}", evt.Type, env);
+                await _banner.FetchAsync(env);
+                break;
+            }
+
+            case "banner.deleted":
+            {
+                if (!features.Banner) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                var bannerId = evt.Data.GetIdAsInt();
+                if (bannerId != null)
+                {
+                    _banner.Remove(bannerId.Value, env);
+                    _logger.LogInformation("Banner removed from cache: {Id} in {Env}", bannerId, env);
+                }
+                else
+                {
+                    await _banner.FetchAsync(env);
+                }
+                break;
+            }
+
+            // ── Service Notice (Granular) ────────────────────────
+            case "service_notice.created":
+            case "service_notice.updated":
+            {
+                if (!features.ServiceNotice) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                var noticeData = evt.Data.ServiceNotice;
+                if (noticeData.HasValue)
+                {
+                    try
+                    {
+                        var notice = noticeData.Value.Deserialize<Models.ServiceNotice>();
+                        if (notice != null)
+                        {
+                            _serviceNotice.UpsertSingle(notice, env);
+                            _logger.LogInformation("Service notice updated in cache directly: {Id} in {Env}", evt.Data.GetIdAsInt(), env);
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to deserialize service notice data, falling back to refresh");
+                    }
+                }
+
+                // Fallback: full refresh
+                _logger.LogInformation("Service notice event ({Type}), refreshing for {Env}", evt.Type, env);
+                await _serviceNotice.FetchAsync(env);
+                break;
+            }
+
+            case "service_notice.deleted":
+            {
+                if (!features.ServiceNotice) break;
+                if (env is null) { LogMissingEnv(evt.Type); break; }
+
+                var noticeId = evt.Data.GetIdAsInt();
+                if (noticeId != null)
+                {
+                    _serviceNotice.Remove(noticeId.Value, env);
+                    _logger.LogInformation("Service notice removed from cache: {Id} in {Env}", noticeId, env);
+                }
+                else
+                {
+                    await _serviceNotice.FetchAsync(env);
+                }
+                break;
+            }
+
+            // ── Environment (wildcard mode) ───────────────────
+            case "environment.created":
+            case "environment.deleted":
+            {
+                _logger.LogInformation("Environment change event ({Type}), triggering full refresh", evt.Type);
                 if (_cacheManager != null)
-                    await _cacheManager.RefreshFeatureFlagsAsync();
+                    await _cacheManager.RefreshAsync();
                 break;
             }
 

@@ -11,6 +11,8 @@ public interface IServiceNoticeService
     Task<List<ServiceNotice>> FetchAsync(string environment, CancellationToken ct = default);
     List<ServiceNotice> GetCached(string environment);
     List<ServiceNotice> GetAll(string environment);
+    void UpsertSingle(ServiceNotice item, string environment);
+    void Remove(int id, string environment);
 }
 
 public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<ServiceNotice>>, IServiceNoticeService
@@ -28,4 +30,6 @@ public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<S
         FetchByEnvironmentAsync(environment, ct);
 
     public List<ServiceNotice> GetAll(string environment) => GetCached(environment);
+    public void UpsertSingle(ServiceNotice item, string environment) => UpsertItemInCache(item, environment);
+    public void Remove(int id, string environment) => RemoveFromCache(id, environment);
 }

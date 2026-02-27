@@ -11,6 +11,8 @@ public interface IClientVersionService
     Task<List<ClientVersion>> FetchAsync(string environment, CancellationToken ct = default);
     List<ClientVersion> GetCached(string environment);
     List<ClientVersion> GetAll(string environment);
+    void UpsertSingle(ClientVersion item, string environment);
+    void Remove(int id, string environment);
 }
 
 public class ClientVersionService : BaseEnvironmentService<ClientVersion, List<ClientVersion>>, IClientVersionService
@@ -28,4 +30,6 @@ public class ClientVersionService : BaseEnvironmentService<ClientVersion, List<C
         FetchByEnvironmentAsync(environment, ct);
 
     public List<ClientVersion> GetAll(string environment) => GetCached(environment);
+    public void UpsertSingle(ClientVersion item, string environment) => UpsertItemInCache(item, environment);
+    public void Remove(int id, string environment) => RemoveFromCache(id, environment);
 }

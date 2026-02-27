@@ -74,7 +74,7 @@ export class EventListener {
           this.isConnected = false;
           try {
             this.metrics?.setRedisConnected(false);
-          } catch (_) {}
+          } catch (_) { }
           return;
         }
         // Only log actual connection errors, not retry attempts
@@ -86,7 +86,7 @@ export class EventListener {
         this.isConnected = false;
         try {
           this.metrics?.setRedisConnected(false);
-        } catch (_) {}
+        } catch (_) { }
       });
 
       this.subscriber.on('close', () => {
@@ -95,7 +95,7 @@ export class EventListener {
           this.isConnected = false;
           try {
             this.metrics?.setRedisConnected(false);
-          } catch (_) {}
+          } catch (_) { }
           return;
         }
         this.logger.warn('Subscriber connection closed');
@@ -103,7 +103,7 @@ export class EventListener {
         this.isConnected = false;
         try {
           this.metrics?.setRedisConnected(false);
-        } catch (_) {}
+        } catch (_) { }
       });
 
       // Log reconnection attempts and refresh cache once reconnected
@@ -125,7 +125,7 @@ export class EventListener {
             try {
               this.metrics?.setRedisConnected(true);
               this.metrics?.incRedisReconnect();
-            } catch (_) {}
+            } catch (_) { }
             try {
               await this.reinitializeCache();
             } catch {
@@ -140,7 +140,7 @@ export class EventListener {
       isFirstConnection = false; // Mark first connection complete
       try {
         this.metrics?.setRedisConnected(true);
-      } catch (_) {}
+      } catch (_) { }
 
       // Subscribe to SDK events channel
       await this.subscriber.subscribe(this.CHANNEL_NAME);
@@ -157,7 +157,7 @@ export class EventListener {
             });
             try {
               this.metrics?.incEventReceived(event.type);
-            } catch (_) {}
+            } catch (_) { }
             await this.processEvent(event);
           } catch (error: any) {
             this.logger.error('Failed to parse event message', {
@@ -825,10 +825,10 @@ export class EventListener {
       // Note: maintenance.started and maintenance.ended are NOT handled here
       // They are local events emitted by MaintenanceWatcher based on cache state changes
 
-      case 'feature_flag.changed':
-      case 'feature_flag.created':
-      case 'feature_flag.updated':
-      case 'feature_flag.deleted': {
+      // ==================== Feature Flag Events (Granular) ====================
+      // Backend only sends 'feature_flag.changed' with changedKeys[] and changeType
+      // changeType: 'enabled_changed' | 'definition_changed' | 'deleted'
+      case 'feature_flag.changed': {
         if (features.featureFlag !== true) {
           this.logger.debug('Feature flag event ignored - feature is disabled', {
             event: event.type,
@@ -842,23 +842,123 @@ export class EventListener {
           });
           break;
         }
-        this.logger.info('Feature flag event received, refreshing feature flags cache', {
+
+        const changedKeys = event.data.changedKeys || [];
+        const changeType = event.data.changeType || 'definition_changed';
+        const featureFlagService = this.cacheManager.getFeatureFlagService();
+
+        if (!featureFlagService) {
+          this.logger.warn('FeatureFlagService not available');
+          break;
+        }
+
+        this.logger.info('Feature flag event received', {
           type: event.type,
           environment: ffEnv,
+          changeType,
+          changedKeys,
         });
+
         try {
-          await this.cacheManager.getFeatureFlagService()?.refreshByEnvironment(ffEnv);
-          this.logger.info('Feature flags cache refreshed successfully');
+          if (changedKeys.length === 0) {
+            // No specific keys — fall back to full environment refresh
+            await featureFlagService.refreshByEnvironment(ffEnv);
+          } else if (changeType === 'deleted') {
+            // Flags deleted/archived — remove from cache directly (no API call needed)
+            for (const flagName of changedKeys) {
+              featureFlagService.removeFlag(flagName, ffEnv);
+            }
+            this.logger.info('Flags removed from cache', {
+              flags: changedKeys,
+              environment: ffEnv,
+            });
+          } else if (changeType === 'enabled_changed') {
+            // Only enabled/disabled state changed — re-fetch just the changed flags
+            // Since we need the new isEnabled state, fetch each flag individually
+            await Promise.all(
+              changedKeys.map((flagName) =>
+                featureFlagService.updateSingleFlag(flagName, ffEnv).catch((error: any) => {
+                  this.logger.warn('Failed to update single flag for enabled change', {
+                    flagName,
+                    environment: ffEnv,
+                    error: error.message,
+                  });
+                })
+              )
+            );
+            this.logger.info('Flags updated for enabled state change', {
+              flags: changedKeys,
+              environment: ffEnv,
+            });
+          } else {
+            // definition_changed — fetch updated flag definitions individually
+            await Promise.all(
+              changedKeys.map((flagName) =>
+                featureFlagService.updateSingleFlag(flagName, ffEnv).catch((error: any) => {
+                  this.logger.warn('Failed to update single flag definition', {
+                    flagName,
+                    environment: ffEnv,
+                    error: error.message,
+                  });
+                })
+              )
+            );
+            this.logger.info('Flags updated for definition change', {
+              flags: changedKeys,
+              environment: ffEnv,
+            });
+          }
         } catch (error: any) {
-          this.logger.error('Failed to refresh feature flags cache', {
+          this.logger.error('Failed to handle feature flag event', {
             error: error.message,
           });
         }
         break;
       }
 
+      // ==================== Segment Events (Granular) ====================
+      // Segments are global — only update the segment cache, NOT all flags
       case 'segment.created':
-      case 'segment.updated':
+      case 'segment.updated': {
+        if (features.featureFlag !== true) {
+          this.logger.debug('Segment event ignored - featureFlag feature is disabled', {
+            event: event.type,
+          });
+          break;
+        }
+
+        const featureFlagServiceSeg = this.cacheManager.getFeatureFlagService();
+        if (!featureFlagServiceSeg) break;
+
+        const segmentData = event.data.segment;
+        const segmentName = event.data.segmentName as string;
+
+        this.logger.info('Segment event received', {
+          type: event.type,
+          segmentName,
+          hasFullData: !!segmentData,
+        });
+
+        try {
+          if (segmentData) {
+            // Full segment data available — update cache directly (no API call)
+            featureFlagServiceSeg.updateSegmentInCache(segmentData);
+            this.logger.info('Segment updated in cache directly from event data', {
+              segmentName,
+            });
+          } else {
+            // No full data — refresh segments only (not all flags)
+            await featureFlagServiceSeg.refreshSegments();
+            this.logger.info('Segments refreshed after segment change');
+          }
+        } catch (error: any) {
+          this.logger.error('Failed to handle segment event', {
+            error: error.message,
+          });
+        }
+        break;
+      }
+
       case 'segment.deleted': {
         if (features.featureFlag !== true) {
           this.logger.debug('Segment event ignored - featureFlag feature is disabled', {
@@ -866,26 +966,24 @@ export class EventListener {
           });
           break;
         }
-        // Segments are global (not environment-specific) and can be used by any flag
-        // When a segment changes, refresh feature flags for ALL environments
-        this.logger.info('Segment event received, refreshing feature flags for all environments', {
-          type: event.type,
-          segmentId: event.data.id,
-          segmentName: event.data.segmentName,
-        });
-        try {
-          await this.cacheManager.getFeatureFlagService()?.refreshAll();
-          this.logger.info(
-            'Feature flags cache refreshed for all environments after segment change'
-          );
-        } catch (error: any) {
-          this.logger.error('Failed to refresh feature flags cache after segment change', {
-            error: error.message,
+
+        const featureFlagServiceSegDel = this.cacheManager.getFeatureFlagService();
+        if (!featureFlagServiceSegDel) break;
+
+        const deletedSegmentName = event.data.segmentName as string;
+        if (deletedSegmentName) {
+          featureFlagServiceSegDel.removeSegmentFromCache(deletedSegmentName);
+          this.logger.info('Segment removed from cache', {
+            segmentName: deletedSegmentName,
           });
+        } else {
+          // Fallback: refresh segments if name not provided
+          await featureFlagServiceSegDel.refreshSegments();
         }
         break;
       }
 
+      // ==================== Vars Events (Granular) ====================
       case 'vars.updated': {
         if (features.vars === false) {
           this.logger.debug('Vars event ignored - feature is disabled', {
@@ -900,15 +998,32 @@ export class EventListener {
           });
           break;
         }
-        this.logger.info('Vars update event received, refreshing vars cache', {
-          key: event.data.key,
+
+        const varKey = event.data.key as string;
+        const varValue = event.data.value;
+        const varsService = this.cacheManager.getVarsService();
+
+        this.logger.info('Vars update event received', {
+          key: varKey,
           environment: varsEnv,
+          hasValue: varValue !== undefined,
         });
+
         try {
-          await this.cacheManager.getVarsService()?.refreshByEnvironment(varsEnv);
-          this.logger.info('Vars cache refreshed successfully');
+          if (varKey && varValue !== undefined && varsService) {
+            // Direct cache update for single var (no API call needed)
+            varsService.updateSingleVar(varKey, varValue, varsEnv);
+            this.logger.info('Single var updated in cache directly', {
+              key: varKey,
+              environment: varsEnv,
+            });
+          } else {
+            // Fallback: refresh all vars for environment
+            await varsService?.refreshByEnvironment(varsEnv);
+            this.logger.info('Vars cache refreshed successfully');
+          }
         } catch (error: any) {
-          this.logger.error('Failed to refresh vars cache', {
+          this.logger.error('Failed to handle vars update event', {
             error: error.message,
           });
         }
@@ -1017,7 +1132,7 @@ export class EventListener {
       this.logger.debug('Event published', { type: event.type });
       try {
         this.metrics?.incEventPublished(event.type);
-      } catch (_) {}
+      } catch (_) { }
     } catch (error: any) {
       this.logger.error('Failed to publish event', {
         type: event.type,
@@ -1041,7 +1156,7 @@ export class EventListener {
     this.isConnected = false;
     try {
       this.metrics?.setRedisConnected(false);
-    } catch (_) {}
+    } catch (_) { }
 
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);

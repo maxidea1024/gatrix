@@ -78,10 +78,10 @@ export class VarsService {
     await VarsModel.set(key, value, userId, environment);
     await this.clearCache(key, environment);
 
-    // Publish change event for real-time updates if needed
+    // Publish change event with full data for direct SDK cache update
     await pubSubService.publishSDKEvent({
       type: 'vars.updated',
-      data: { key, environment },
+      data: { key, value, environment },
     });
   }
 }

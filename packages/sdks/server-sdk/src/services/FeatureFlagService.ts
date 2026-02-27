@@ -493,19 +493,19 @@ export class FeatureFlagService {
   /**
    * Check if a feature flag is enabled
    * @param flagName Name of the flag
+   * @param fallbackValue Value to return if flag not found (must be explicit)
    * @param context Evaluation context
    * @param environment Environment name
-   * @param missingValue Value to return if flag not found
    */
   isEnabled(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: boolean = false
+    fallbackValue: boolean,
+    context?: EvaluationContext,
+    environment?: string
   ): boolean {
     const result = this.evaluate(flagName, context, environment);
     if (result.reason === 'not_found') {
-      return missingValue;
+      return fallbackValue;
     }
     return result.enabled;
   }
@@ -518,11 +518,11 @@ export class FeatureFlagService {
    */
   boolVariation(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: boolean = false
+    fallbackValue: boolean,
+    context?: EvaluationContext,
+    environment?: string
   ): boolean {
-    return this.isEnabled(flagName, context, environment, missingValue);
+    return this.isEnabled(flagName, fallbackValue, context, environment);
   }
 
   /**
@@ -530,13 +530,13 @@ export class FeatureFlagService {
    */
   boolVariationDetail(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: boolean = false
+    fallbackValue: boolean,
+    context?: EvaluationContext,
+    environment?: string
   ): { value: boolean; reason: EvaluationResult['reason']; flagName: string } {
     const result = this.evaluate(flagName, context, environment);
     return {
-      value: result.reason === 'not_found' ? missingValue : result.enabled,
+      value: result.reason === 'not_found' ? fallbackValue : result.enabled,
       reason: result.reason,
       flagName: result.flagName,
     };
@@ -547,13 +547,13 @@ export class FeatureFlagService {
    */
   stringVariation(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: string = ''
+    fallbackValue: string,
+    context?: EvaluationContext,
+    environment?: string
   ): string {
     const result = this.evaluate(flagName, context, environment);
     if (result.reason === 'not_found' || result.variant?.value == null) {
-      return missingValue;
+      return fallbackValue;
     }
     return String(result.variant.value);
   }
@@ -563,9 +563,9 @@ export class FeatureFlagService {
    */
   stringVariationDetail(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: string = ''
+    fallbackValue: string,
+    context?: EvaluationContext,
+    environment?: string
   ): {
     value: string;
     reason: EvaluationResult['reason'];
@@ -575,7 +575,7 @@ export class FeatureFlagService {
     const result = this.evaluate(flagName, context, environment);
     const value =
       result.reason === 'not_found' || result.variant?.value == null
-        ? missingValue
+        ? fallbackValue
         : String(result.variant.value);
     return {
       value,
@@ -590,16 +590,16 @@ export class FeatureFlagService {
    */
   numberVariation(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: number = 0
+    fallbackValue: number,
+    context?: EvaluationContext,
+    environment?: string
   ): number {
     const result = this.evaluate(flagName, context, environment);
     if (result.reason === 'not_found' || result.variant?.value == null) {
-      return missingValue;
+      return fallbackValue;
     }
     const num = Number(result.variant.value);
-    return isNaN(num) ? missingValue : num;
+    return isNaN(num) ? fallbackValue : num;
   }
 
   /**
@@ -607,9 +607,9 @@ export class FeatureFlagService {
    */
   numberVariationDetail(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: number = 0
+    fallbackValue: number,
+    context?: EvaluationContext,
+    environment?: string
   ): {
     value: number;
     reason: EvaluationResult['reason'];
@@ -617,10 +617,10 @@ export class FeatureFlagService {
     variantName?: string;
   } {
     const result = this.evaluate(flagName, context, environment);
-    let value = missingValue;
+    let value = fallbackValue;
     if (result.reason !== 'not_found' && result.variant?.value != null) {
       const num = Number(result.variant.value);
-      value = isNaN(num) ? missingValue : num;
+      value = isNaN(num) ? fallbackValue : num;
     }
     return {
       value,
@@ -635,13 +635,13 @@ export class FeatureFlagService {
    */
   jsonVariation<T = any>(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: T
+    fallbackValue: T,
+    context?: EvaluationContext,
+    environment?: string
   ): T {
     const result = this.evaluate(flagName, context, environment);
     if (result.reason === 'not_found' || result.variant?.value == null) {
-      return missingValue;
+      return fallbackValue;
     }
     const rawValue = result.variant.value;
     if (typeof rawValue === 'object') {
@@ -651,10 +651,10 @@ export class FeatureFlagService {
       try {
         return JSON.parse(rawValue) as T;
       } catch {
-        return missingValue;
+        return fallbackValue;
       }
     }
-    return missingValue;
+    return fallbackValue;
   }
 
   /**
@@ -662,9 +662,9 @@ export class FeatureFlagService {
    */
   jsonVariationDetail<T = any>(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    missingValue: T
+    fallbackValue: T,
+    context?: EvaluationContext,
+    environment?: string
   ): {
     value: T;
     reason: EvaluationResult['reason'];
@@ -672,7 +672,7 @@ export class FeatureFlagService {
     variantName?: string;
   } {
     const result = this.evaluate(flagName, context, environment);
-    let value = missingValue;
+    let value = fallbackValue;
     if (result.reason !== 'not_found' && result.variant?.value != null) {
       const rawValue = result.variant.value;
       if (typeof rawValue === 'object') {
@@ -681,7 +681,7 @@ export class FeatureFlagService {
         try {
           value = JSON.parse(rawValue) as T;
         } catch {
-          // Keep missingValue
+          // Keep fallbackValue
         }
       }
     }
@@ -701,8 +701,8 @@ export class FeatureFlagService {
    */
   stringVariationOrThrow(
     flagName: string,
-    context: EvaluationContext,
-    environment: string
+    context?: EvaluationContext,
+    environment?: string
   ): string {
     const result = this.evaluate(flagName, context, environment);
 
@@ -733,8 +733,8 @@ export class FeatureFlagService {
    */
   numberVariationOrThrow(
     flagName: string,
-    context: EvaluationContext,
-    environment: string
+    context?: EvaluationContext,
+    environment?: string
   ): number {
     const result = this.evaluate(flagName, context, environment);
 
@@ -774,8 +774,8 @@ export class FeatureFlagService {
    */
   jsonVariationOrThrow<T = any>(
     flagName: string,
-    context: EvaluationContext,
-    environment: string
+    context?: EvaluationContext,
+    environment?: string
   ): T {
     const result = this.evaluate(flagName, context, environment);
 
@@ -833,9 +833,9 @@ export class FeatureFlagService {
    */
   getVariant(
     flagName: string,
-    context: EvaluationContext,
-    environment: string,
-    defaultVariant?: Variant
+    defaultVariant?: Variant,
+    context?: EvaluationContext,
+    environment?: string
   ): Variant | undefined {
     const result = this.evaluate(flagName, context, environment);
     if (result.reason === 'not_found' || !result.variant) {
@@ -851,12 +851,15 @@ export class FeatureFlagService {
    * @param context Evaluation context (merged with static context)
    * @param environment Environment name
    */
-  evaluate(flagName: string, context: EvaluationContext, environment: string): EvaluationResult {
+  evaluate(flagName: string, context?: EvaluationContext, environment?: string): EvaluationResult {
+    // Resolve environment using the configured resolver
+    const resolvedEnv = environment || this.envResolver.resolve(environment, 'evaluate');
+
     // Merge static context with per-evaluation context
-    const mergedContext = this.mergeContext(context);
+    const mergedContext = this.mergeContext(context || {});
 
     // O(1) lookup from cached Map
-    const flag = this.getFlagByName(environment, flagName);
+    const flag = this.getFlagByName(resolvedEnv, flagName);
 
     if (!flag) {
       return {
@@ -878,7 +881,7 @@ export class FeatureFlagService {
     const result = FeatureFlagEvaluator.evaluate(flag, mergedContext, this.cachedSegments);
 
     // Record metrics
-    this.recordMetric(environment, flagName, result.enabled, result.variant?.name);
+    this.recordMetric(resolvedEnv, flagName, result.enabled, result.variant?.name);
 
     return result;
   }

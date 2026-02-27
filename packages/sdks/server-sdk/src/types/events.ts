@@ -49,6 +49,7 @@ export type StandardEventType =
 export interface StandardEventData {
   id?: number | string; // Optional for bulk events that don't have a single id
   key?: string; // For vars.updated events
+  value?: string | null; // For vars.updated events (direct cache update)
   timestamp: number;
   /**
    * Environment identifier (environmentName value).
@@ -68,6 +69,10 @@ export interface StandardEventData {
   clientVersion?: any; // For client_version.created, client_version.updated events
   serviceNotice?: any; // For service_notice.created, service_notice.updated events
   segmentName?: string; // For segment.created, segment.updated, segment.deleted events
+  segment?: any; // For segment.created, segment.updated events (full segment data for direct cache update)
+  // Feature flag granular event data
+  changedKeys?: string[]; // For feature_flag.changed events (list of changed flag names)
+  changeType?: 'definition_changed' | 'enabled_changed' | 'deleted'; // For feature_flag.changed events
 }
 
 export interface StandardEvent {
