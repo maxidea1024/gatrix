@@ -288,6 +288,8 @@ public class FeatureFlagEvaluator
             "appName" => context.AppName,
             "appVersion" => context.AppVersion,
             "remoteAddress" => context.RemoteAddress,
+            "environment" => context.Environment,
+            "currentTime" => context.CurrentTime?.ToString("o"),
             _ => context.Properties.TryGetValue(name, out var val) ? val : null,
         };
     }

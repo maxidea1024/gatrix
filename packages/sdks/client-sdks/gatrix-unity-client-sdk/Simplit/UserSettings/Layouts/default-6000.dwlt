@@ -67,8 +67,8 @@ MonoBehaviour:
     y: 0
     width: 664
     height: 1000
-  m_MinSize: {x: 480, y: 380}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 480, y: 406}
+  m_MaxSize: {x: 4000, y: 4026}
   m_ActualView: {fileID: 16}
   m_Panes:
   - {fileID: 16}
@@ -118,8 +118,8 @@ MonoBehaviour:
     y: 0
     width: 1136
     height: 656
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 202, y: 226}
+  m_MaxSize: {x: 4002, y: 4026}
   m_ActualView: {fileID: 22}
   m_Panes:
   - {fileID: 22}
@@ -196,8 +196,8 @@ MonoBehaviour:
     y: 0
     width: 177
     height: 656
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 201, y: 226}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 20}
   m_Panes:
   - {fileID: 20}
@@ -222,8 +222,8 @@ MonoBehaviour:
     y: 656
     width: 1469
     height: 397
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 101, y: 126}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 23}
   m_Panes:
   - {fileID: 18}
@@ -401,8 +401,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Gatrix Monitor\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 2233
-    y: 140
+    x: 0
+    y: 26
     width: 664
     height: 974
   m_SerializedDataModeController:
@@ -440,7 +440,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 43
+    y: 0
     width: 1920
     height: 36
   m_SerializedDataModeController:
@@ -871,8 +871,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1469
-    y: 79
+    x: 1470
+    y: 24
     width: 450
     height: 1027
   m_SerializedDataModeController:
@@ -923,7 +923,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 79
+    y: 24
     width: 176
     height: 630
   m_SerializedDataModeController:
@@ -942,10 +942,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs:
-      - m_Data: -6938
+      m_SelectedIDs: []
       m_LastClickedID:
-        m_Data: -6938
+        m_Data: 0
       m_ExpandedIDs:
       - m_Data: -1294
       - m_Data: 46876
@@ -995,8 +994,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 177
-    y: 79
+    x: 178
+    y: 24
     width: 154
     height: 630
   m_SerializedDataModeController:
@@ -1692,8 +1691,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 333
-    y: 79
+    x: 334
+    y: 24
     width: 1134
     height: 630
   m_SerializedDataModeController:
@@ -1796,7 +1795,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 735
+    y: 680
     width: 1468
     height: 371
   m_SerializedDataModeController:

@@ -58,7 +58,10 @@ export class ServiceNoticeService {
         this.logger.debug('Loaded service notices from local storage', { environment });
       }
     } catch (error: any) {
-      this.logger.warn('Failed to load service notices from local storage', { environment, error: error.message });
+      this.logger.warn('Failed to load service notices from local storage', {
+        environment,
+        error: error.message,
+      });
     }
   }
 

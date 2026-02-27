@@ -7,7 +7,7 @@ namespace Gatrix.Unity.SDK
 {
     /// <summary>
     /// Evaluation context (global for client-side).
-    /// appName and environment are system fields - always present and cannot be removed.
+    /// System fields (AppName, Environment) cannot be removed via UpdateContext.
     /// </summary>
     [Serializable]
     public class GatrixContext
@@ -16,6 +16,8 @@ namespace Gatrix.Unity.SDK
         public string AppName { get; set; }
         /// <summary>Environment name (system field - cannot be removed)</summary>
         public string Environment { get; set; }
+        /// <summary>Remote address / client IP</summary>
+        public string RemoteAddress { get; set; }
 
         /// <summary>User ID (optional)</summary>
         public string UserId { get; set; }
@@ -33,6 +35,7 @@ namespace Gatrix.Unity.SDK
             {
                 AppName = AppName,
                 Environment = Environment,
+                RemoteAddress = RemoteAddress,
                 UserId = UserId,
                 SessionId = SessionId,
                 CurrentTime = CurrentTime

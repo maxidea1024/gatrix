@@ -312,6 +312,10 @@ export class FeatureFlagEvaluator {
         return context.appVersion;
       case 'remoteAddress':
         return context.remoteAddress;
+      case 'environment':
+        return context.environment;
+      case 'currentTime':
+        return context.currentTime instanceof Date ? context.currentTime.toISOString() : undefined;
       default:
         // Check properties first, then fallback to root context for compatibility
         // (e.g., playground sends flat context without wrapping in properties)

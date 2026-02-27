@@ -445,6 +445,7 @@ namespace Gatrix.Unity.SDK
             AppendParam("environment", context.Environment);
             AppendParam("userId", context.UserId);
             AppendParam("sessionId", context.SessionId);
+            AppendParam("remoteAddress", context.RemoteAddress);
             AppendParam("currentTime", context.CurrentTime);
 
             if (context.Properties != null)
@@ -470,6 +471,8 @@ namespace Gatrix.Unity.SDK
             sb.Append(context.UserId ?? "");
             sb.Append('|');
             sb.Append(context.SessionId ?? "");
+            sb.Append('|');
+            sb.Append(context.RemoteAddress ?? "");
             sb.Append('|');
             sb.Append(context.CurrentTime ?? "");
 

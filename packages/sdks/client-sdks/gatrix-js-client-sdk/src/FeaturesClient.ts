@@ -25,7 +25,15 @@ import { fetchEventSource, EventStreamContentType } from '@microsoft/fetch-event
 import { type StorageProvider } from './StorageProvider';
 import { LocalStorageProvider } from './LocalStorageProvider';
 import { InMemoryStorageProvider } from './InMemoryStorageProvider';
-import { uuidv4, resolveAbortController, deepClone, computeContextHash, computeEtag, isEqualFlag } from './utils';
+import {
+  uuidv4,
+  resolveAbortController,
+  deepClone,
+  computeContextHash,
+  computeEtag,
+  isEqualFlag,
+} from './utils';
+import { buildContextQueryParams, SYSTEM_CONTEXT_FIELDS } from './contextUtils';
 import { FlagProxy } from './FlagProxy';
 import { type VariationProvider } from './VariationProvider';
 import { WatchFlagGroup } from './WatchFlagGroup';
@@ -257,14 +265,14 @@ export class FeaturesClient implements VariationProvider {
     // --- Start phase (formerly start) ---
 
     this.devLog(
-      `start() called. offlineMode=${this.featuresConfig.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`,
+      `start() called. offlineMode=${this.featuresConfig.offlineMode}, refreshInterval=${this.refreshInterval}ms, explicitSyncMode=${this.featuresConfig.explicitSyncMode}, enableStreaming=${this.featuresConfig.streaming?.enabled !== false}`
     );
 
     // Offline mode: skip all network requests, use cached/bootstrap flags only
     if (this.featuresConfig.offlineMode) {
       if (this.realtimeFlags.size === 0) {
         const error = new GatrixError(
-          'offlineMode requires bootstrap data or cached flags, but none are available',
+          'offlineMode requires bootstrap data or cached flags, but none are available'
         );
         this.sdkState = 'error';
         this.lastError = error;
@@ -330,12 +338,41 @@ export class FeaturesClient implements VariationProvider {
   }
 
   async updateContext(context: GatrixContext): Promise<void> {
-    // Filter out system fields from input
-    const { appName: _appName, environment: _environment, ...userContext } = context;
-    const newContext = {
-      ...this.context,
-      ...userContext,
-    };
+    // Start from current context
+    const newContext: GatrixContext = { ...this.context };
+
+    // Merge incoming fields, handling null/undefined removal
+    for (const [key, value] of Object.entries(context)) {
+      if (SYSTEM_CONTEXT_FIELDS.has(key)) {
+        // System fields: only update if explicitly provided (non-null)
+        if (value !== null && value !== undefined) {
+          (newContext as any)[key] = value;
+        }
+        // null/undefined for system fields → keep existing value
+      } else if (key === 'properties') {
+        // Merge properties individually
+        if (value && typeof value === 'object') {
+          const newProps = { ...(newContext.properties || {}) };
+          for (const [pKey, pValue] of Object.entries(value as Record<string, any>)) {
+            if (pValue === null || pValue === undefined) {
+              delete newProps[pKey];
+            } else {
+              newProps[pKey] = pValue;
+            }
+          }
+          newContext.properties = Object.keys(newProps).length > 0 ? newProps : undefined;
+        } else if (value === null || value === undefined) {
+          delete newContext.properties;
+        }
+      } else {
+        // Non-system fields: null/undefined → remove
+        if (value === null || value === undefined) {
+          delete (newContext as any)[key];
+        } else {
+          (newContext as any)[key] = value;
+        }
+      }
+    }
 
     // Check if context actually changed using hash
     const newHash = await computeContextHash(newContext);
@@ -373,7 +410,7 @@ export class FeaturesClient implements VariationProvider {
     flagName: string,
     flag: EvaluatedFlag | undefined,
     eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch',
-    variantName?: string,
+    variantName?: string
   ): void {
     if (!flag) {
       this.metrics.countMissing(flagName);
@@ -489,7 +526,7 @@ export class FeaturesClient implements VariationProvider {
   variationInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -503,7 +540,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationInternal(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): boolean {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -521,7 +558,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -539,7 +576,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationInternal(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): number {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -578,7 +615,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationDetailsInternal(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<boolean> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -614,7 +651,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationDetailsInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<string> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -650,7 +687,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationDetailsInternal(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<number> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -687,7 +724,7 @@ export class FeaturesClient implements VariationProvider {
   jsonVariationDetailsInternal<T>(
     flagName: string,
     fallbackValue: T,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<T> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -838,7 +875,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationDetails(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<boolean> {
     return this.boolVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -846,7 +883,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationDetails(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<string> {
     return this.stringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -854,7 +891,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationDetails(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<number> {
     return this.numberVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -862,7 +899,7 @@ export class FeaturesClient implements VariationProvider {
   jsonVariationDetails<T>(
     flagName: string,
     fallbackValue: T,
-    forceRealtime: boolean = false,
+    forceRealtime: boolean = false
   ): VariationResult<T> {
     return this.jsonVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -883,7 +920,7 @@ export class FeaturesClient implements VariationProvider {
       this.syncedWatchCallbacks,
       oldSynchronizedFlags,
       this.synchronizedFlags,
-      false,
+      false
     );
 
     this.pendingSync = false;
@@ -955,7 +992,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchRealtimeFlag(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.watchCallbacks.has(flagName)) {
       this.watchCallbacks.set(flagName, new Set());
@@ -973,7 +1010,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchRealtimeFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.watchCallbacks.has(flagName)) {
       this.watchCallbacks.set(flagName, new Set());
@@ -1000,7 +1037,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchSyncedFlag(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.syncedWatchCallbacks.has(flagName)) {
       this.syncedWatchCallbacks.set(flagName, new Set());
@@ -1018,7 +1055,7 @@ export class FeaturesClient implements VariationProvider {
    */
   watchSyncedFlagWithInitialState(
     flagName: string,
-    callback: (flag: FlagProxy) => void | Promise<void>,
+    callback: (flag: FlagProxy) => void | Promise<void>
   ): () => void {
     if (!this.syncedWatchCallbacks.has(flagName)) {
       this.syncedWatchCallbacks.set(flagName, new Set());
@@ -1062,7 +1099,7 @@ export class FeaturesClient implements VariationProvider {
       | 'syncFlags'
       | 'contextChange'
       | 'gap_recovery'
-      | 'pending_invalidation',
+      | 'pending_invalidation'
   ): Promise<void> {
     // Offline mode: no network requests allowed
     if (this.featuresConfig.offlineMode) {
@@ -1127,20 +1164,8 @@ export class FeaturesClient implements VariationProvider {
           throwHttpErrors: false,
         });
       } else {
-        // GET: context goes in query params
-        for (const [key, value] of Object.entries(this.context)) {
-          if (value === undefined || value === null) continue;
-
-          if (key === 'properties' && typeof value === 'object') {
-            for (const [propKey, propValue] of Object.entries(value)) {
-              if (propValue !== undefined && propValue !== null) {
-                url.searchParams.set(`properties[${propKey}]`, String(propValue));
-              }
-            }
-          } else {
-            url.searchParams.set(key, String(value));
-          }
-        }
+        // GET: context goes in query params (with currentTime truncation)
+        buildContextQueryParams(url, this.context);
 
         // SDK manages retry/backoff, so disable ky's built-in retry
         response = await ky.get(url.toString(), {
@@ -1205,7 +1230,7 @@ export class FeaturesClient implements VariationProvider {
         this.pollingStopped = true;
         this.logger.error(
           `Polling stopped due to non-retryable status code ${response.status}. ` +
-          'Call fetchFlags() manually to retry.',
+            'Call fetchFlags() manually to retry.'
         );
         this.emitter.emit(EVENTS.FLAGS_FETCH_ERROR, {
           status: response.status,
@@ -1303,11 +1328,11 @@ export class FeaturesClient implements VariationProvider {
       // Exponential backoff: initialBackoff * 2^(failures-1), capped at maxBackoff (in seconds)
       const backoffDelay = Math.min(
         initialBackoff * Math.pow(2, this.consecutiveFailures - 1),
-        maxBackoff,
+        maxBackoff
       );
       delay = backoffDelay * 1000; // Convert to ms for setTimeout
       this.logger.warn(
-        `Scheduling retry after ${backoffDelay}s (consecutive failures: ${this.consecutiveFailures})`,
+        `Scheduling retry after ${backoffDelay}s (consecutive failures: ${this.consecutiveFailures})`
       );
     }
 
@@ -1320,7 +1345,7 @@ export class FeaturesClient implements VariationProvider {
     }
 
     this.devLog(
-      `scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`,
+      `scheduleNextRefresh: delay=${delay}ms, consecutiveFailures=${this.consecutiveFailures}, pollingStopped=${this.pollingStopped}`
     );
 
     this.timerRef = setTimeout(async () => {
@@ -1388,7 +1413,7 @@ export class FeaturesClient implements VariationProvider {
       this.realtimeFlags,
       true,
       oldContextHash,
-      newContextHash,
+      newContextHash
     );
 
     // Invoke synced watch callbacks only in non-explicit mode (immediate sync)
@@ -1399,7 +1424,7 @@ export class FeaturesClient implements VariationProvider {
         this.realtimeFlags,
         false,
         oldContextHash,
-        newContextHash,
+        newContextHash
       );
     }
 
@@ -1446,7 +1471,7 @@ export class FeaturesClient implements VariationProvider {
    */
   private async storePartialFlags(
     flags: EvaluatedFlag[],
-    requestedKeys: Set<string>,
+    requestedKeys: Set<string>
   ): Promise<void> {
     const oldFlags = new Map(this.realtimeFlags);
     const oldContextHash = this.flagsContextHash;
@@ -1475,7 +1500,7 @@ export class FeaturesClient implements VariationProvider {
       this.realtimeFlags,
       true,
       oldContextHash,
-      newContextHash,
+      newContextHash
     );
 
     if (!this.featuresConfig.explicitSyncMode) {
@@ -1485,7 +1510,7 @@ export class FeaturesClient implements VariationProvider {
         this.realtimeFlags,
         false,
         oldContextHash,
-        newContextHash,
+        newContextHash
       );
     }
 
@@ -1505,7 +1530,7 @@ export class FeaturesClient implements VariationProvider {
     oldFlags: Map<string, EvaluatedFlag>,
     newFlags: Map<string, EvaluatedFlag>,
     oldContextHash?: string,
-    newContextHash?: string,
+    newContextHash?: string
   ): void {
     // Skip tracking on initial load (oldFlags is empty)
     const isInitialLoad = oldFlags.size === 0;
@@ -1547,7 +1572,7 @@ export class FeaturesClient implements VariationProvider {
     newFlags: Map<string, EvaluatedFlag>,
     forceRealtime: boolean,
     oldContextHash?: string,
-    newContextHash?: string,
+    newContextHash?: string
   ): void {
     const now = new Date();
 
@@ -1626,7 +1651,7 @@ export class FeaturesClient implements VariationProvider {
     enabled: boolean,
     flag: EvaluatedFlag | undefined,
     eventType: 'isEnabled' | 'getFlag' | 'getVariant' | 'watch',
-    variantName?: string,
+    variantName?: string
   ): void {
     // Only track if impressionDataAll is enabled or flag has impressionData set
     const shouldTrack = this.featuresConfig.impressionDataAll || flag?.impressionData;
@@ -1765,7 +1790,7 @@ export class FeaturesClient implements VariationProvider {
               // Gap recovery: check if we missed any changes
               if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
                 this.devLog(
-                  `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`,
+                  `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
                 );
                 void this.fetchFlagsInternal('gap_recovery');
               } else if (this.localGlobalRevision === 0) {
@@ -1784,7 +1809,7 @@ export class FeaturesClient implements VariationProvider {
               const data = JSON.parse(event.data) as FlagsChangedEvent;
               this.devLog(
                 `Streaming 'flags_changed': globalRevision=${data.globalRevision}, ` +
-                `changedKeys=[${data.changedKeys.join(',')}]`,
+                  `changedKeys=[${data.changedKeys.join(',')}]`
               );
 
               // Only process if server revision is ahead
@@ -1797,7 +1822,7 @@ export class FeaturesClient implements VariationProvider {
                 this.handleStreamingInvalidation(data.changedKeys);
               } else {
                 this.devLog(
-                  `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`,
+                  `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`
                 );
               }
               this.streamingFlagsChangedCount++;
@@ -1921,7 +1946,7 @@ export class FeaturesClient implements VariationProvider {
             // Gap recovery
             if (data.globalRevision > this.localGlobalRevision && this.localGlobalRevision > 0) {
               this.devLog(
-                `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`,
+                `Gap detected: server=${data.globalRevision}, local=${this.localGlobalRevision}. Triggering recovery.`
               );
               void this.fetchFlagsInternal('gap_recovery');
             } else if (this.localGlobalRevision === 0) {
@@ -1939,7 +1964,7 @@ export class FeaturesClient implements VariationProvider {
             };
             this.devLog(
               `WS 'flags_changed': globalRevision=${data.globalRevision}, ` +
-              `changedKeys=[${data.changedKeys.join(',')}]`,
+                `changedKeys=[${data.changedKeys.join(',')}]`
             );
 
             if (data.globalRevision > this.localGlobalRevision) {
@@ -1951,7 +1976,7 @@ export class FeaturesClient implements VariationProvider {
               this.handleStreamingInvalidation(data.changedKeys);
             } else {
               this.devLog(
-                `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`,
+                `Ignoring stale event: server=${data.globalRevision} <= local=${this.localGlobalRevision}`
               );
             }
             this.streamingFlagsChangedCount++;
@@ -2064,14 +2089,14 @@ export class FeaturesClient implements VariationProvider {
     // Exponential backoff: base * 2^(attempt-1), capped at max
     const exponentialDelay = Math.min(
       baseMs * Math.pow(2, this.streamingReconnectAttempt - 1),
-      maxMs,
+      maxMs
     );
     // Add jitter (0 - 1000ms)
     const jitter = Math.floor(Math.random() * 1000);
     const delayMs = exponentialDelay + jitter;
 
     this.devLog(
-      `Scheduling streaming reconnect: attempt=${this.streamingReconnectAttempt}, delay=${delayMs}ms`,
+      `Scheduling streaming reconnect: attempt=${this.streamingReconnectAttempt}, delay=${delayMs}ms`
     );
 
     this.emitter.emit(EVENTS.FLAGS_STREAMING_RECONNECTING, {
@@ -2133,7 +2158,7 @@ export class FeaturesClient implements VariationProvider {
         this.pendingInvalidationKeys.add(key);
       }
       this.devLog(
-        `Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`,
+        `Fetch in progress, queued ${changedKeys.length} pending keys for re-fetch after completion`
       );
     }
   }

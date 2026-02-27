@@ -408,9 +408,10 @@ export class ClientController {
       // 0. Resolve Context Hash
       const contextHash = EvaluationUtils.getContextHash(req, context);
 
-      const flagNamesHash = flagNames && flagNames.length > 0
-        ? crypto.createHash('md5').update(flagNames.sort().join(',')).digest('hex')
-        : 'all';
+      const flagNamesHash =
+        flagNames && flagNames.length > 0
+          ? crypto.createHash('md5').update(flagNames.sort().join(',')).digest('hex')
+          : 'all';
 
       // 2. Fetch all flags and segments (with caching)
       // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam
@@ -512,7 +513,10 @@ export class ClientController {
 
       // Check evaluation cache
       // We use definitions object properties to build a unique key for this environment's ruleset
-      const definitionsHash = crypto.createHash('md5').update(JSON.stringify(definitions)).digest('hex');
+      const definitionsHash = crypto
+        .createHash('md5')
+        .update(JSON.stringify(definitions))
+        .digest('hex');
       const evalCacheKey = `feature_flags:eval_cache:${environment}:${contextHash}:${flagNamesHash}:${definitionsHash}`;
 
       const cachedResult = await cacheService.get<any>(evalCacheKey);
@@ -572,9 +576,10 @@ export class ClientController {
         }
       }
 
-      const evaluableFlags = flagNames && flagNames.length > 0
-        ? flags.filter((f: any) => flagNames!.includes(f.flagName))
-        : flags;
+      const evaluableFlags =
+        flagNames && flagNames.length > 0
+          ? flags.filter((f: any) => flagNames!.includes(f.flagName))
+          : flags;
 
       for (const dbFlag of evaluableFlags) {
         // Resolve enabled/disabled values using explicit override flags

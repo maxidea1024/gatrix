@@ -16,16 +16,23 @@ import type { Variant } from '@gatrix/gatrix-js-client-sdk';
  * </script>
  * ```
  */
-export function boolVariation(flagName: string, fallbackValue: boolean, forceRealtime = false): Readable<boolean> {
+export function boolVariation(
+  flagName: string,
+  fallbackValue: boolean,
+  forceRealtime = false
+): Readable<boolean> {
   const client = getGatrixClient();
-  return readable<boolean>(client.features.boolVariation(flagName, fallbackValue, forceRealtime), (set) => {
-    const watchFn = forceRealtime
-      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
-      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-    return watchFn(flagName, () => {
-      set(client.features.boolVariation(flagName, fallbackValue, forceRealtime));
-    });
-  });
+  return readable<boolean>(
+    client.features.boolVariation(flagName, fallbackValue, forceRealtime),
+    (set) => {
+      const watchFn = forceRealtime
+        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+      return watchFn(flagName, () => {
+        set(client.features.boolVariation(flagName, fallbackValue, forceRealtime));
+      });
+    }
+  );
 }
 
 /**
@@ -34,16 +41,23 @@ export function boolVariation(flagName: string, fallbackValue: boolean, forceRea
  * @param fallbackValue - Value to return if flag not found
  * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function stringVariation(flagName: string, fallbackValue: string, forceRealtime = false): Readable<string> {
+export function stringVariation(
+  flagName: string,
+  fallbackValue: string,
+  forceRealtime = false
+): Readable<string> {
   const client = getGatrixClient();
-  return readable<string>(client.features.stringVariation(flagName, fallbackValue, forceRealtime), (set) => {
-    const watchFn = forceRealtime
-      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
-      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-    return watchFn(flagName, () => {
-      set(client.features.stringVariation(flagName, fallbackValue, forceRealtime));
-    });
-  });
+  return readable<string>(
+    client.features.stringVariation(flagName, fallbackValue, forceRealtime),
+    (set) => {
+      const watchFn = forceRealtime
+        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+      return watchFn(flagName, () => {
+        set(client.features.stringVariation(flagName, fallbackValue, forceRealtime));
+      });
+    }
+  );
 }
 
 /**
@@ -52,16 +66,23 @@ export function stringVariation(flagName: string, fallbackValue: string, forceRe
  * @param fallbackValue - Value to return if flag not found
  * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function numberVariation(flagName: string, fallbackValue: number, forceRealtime = false): Readable<number> {
+export function numberVariation(
+  flagName: string,
+  fallbackValue: number,
+  forceRealtime = false
+): Readable<number> {
   const client = getGatrixClient();
-  return readable<number>(client.features.numberVariation(flagName, fallbackValue, forceRealtime), (set) => {
-    const watchFn = forceRealtime
-      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
-      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-    return watchFn(flagName, () => {
-      set(client.features.numberVariation(flagName, fallbackValue, forceRealtime));
-    });
-  });
+  return readable<number>(
+    client.features.numberVariation(flagName, fallbackValue, forceRealtime),
+    (set) => {
+      const watchFn = forceRealtime
+        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+      return watchFn(flagName, () => {
+        set(client.features.numberVariation(flagName, fallbackValue, forceRealtime));
+      });
+    }
+  );
 }
 
 /**
@@ -70,16 +91,23 @@ export function numberVariation(flagName: string, fallbackValue: number, forceRe
  * @param fallbackValue - Value to return if flag not found
  * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function jsonVariation<T = unknown>(flagName: string, fallbackValue: T, forceRealtime = false): Readable<T> {
+export function jsonVariation<T = unknown>(
+  flagName: string,
+  fallbackValue: T,
+  forceRealtime = false
+): Readable<T> {
   const client = getGatrixClient();
-  return readable<T>(client.features.jsonVariation(flagName, fallbackValue, forceRealtime), (set) => {
-    const watchFn = forceRealtime
-      ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
-      : client.features.watchSyncedFlagWithInitialState.bind(client.features);
-    return watchFn(flagName, () => {
-      set(client.features.jsonVariation(flagName, fallbackValue, forceRealtime));
-    });
-  });
+  return readable<T>(
+    client.features.jsonVariation(flagName, fallbackValue, forceRealtime),
+    (set) => {
+      const watchFn = forceRealtime
+        ? client.features.watchRealtimeFlagWithInitialState.bind(client.features)
+        : client.features.watchSyncedFlagWithInitialState.bind(client.features);
+      return watchFn(flagName, () => {
+        set(client.features.jsonVariation(flagName, fallbackValue, forceRealtime));
+      });
+    }
+  );
 }
 
 /**

@@ -50,7 +50,10 @@ export class ServiceMaintenanceService {
         this.logger.debug('Loaded service maintenance status from local storage', { environment });
       }
     } catch (error: any) {
-      this.logger.warn('Failed to load service maintenance status from local storage', { environment, error: error.message });
+      this.logger.warn('Failed to load service maintenance status from local storage', {
+        environment,
+        error: error.message,
+      });
     }
   }
 

@@ -79,7 +79,8 @@ struct GATRIXCLIENTSDK_API FGatrixEvaluatedFlag {
   bool bImpressionData = false;
 };
 
-/** Evaluation context (global for client-side) */
+/** Evaluation context (global for client-side).
+ * System fields (AppName, Environment) cannot be removed via UpdateContext. */
 USTRUCT(BlueprintType)
 struct GATRIXCLIENTSDK_API FGatrixContext {
   GENERATED_BODY()
@@ -91,6 +92,10 @@ struct GATRIXCLIENTSDK_API FGatrixContext {
   /** Environment name (system field) */
   UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
   FString Environment;
+
+  /** Remote address / client IP */
+  UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
+  FString RemoteAddress;
 
   UPROPERTY(BlueprintReadWrite, Category = "Gatrix")
   FString UserId;

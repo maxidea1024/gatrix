@@ -19,9 +19,15 @@
 import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 
-export function useBoolVariation(flagName: string, fallbackValue: boolean, forceRealtime = false): boolean {
+export function useBoolVariation(
+  flagName: string,
+  fallbackValue: boolean,
+  forceRealtime = false
+): boolean {
   const { features } = useGatrixContext();
-  const [value, setValue] = useState(() => features.boolVariation(flagName, fallbackValue, forceRealtime));
+  const [value, setValue] = useState(() =>
+    features.boolVariation(flagName, fallbackValue, forceRealtime)
+  );
 
   useEffect(() => {
     const watchFn = forceRealtime

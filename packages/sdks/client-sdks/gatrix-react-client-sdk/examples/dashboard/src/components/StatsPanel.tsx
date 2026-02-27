@@ -424,7 +424,9 @@ function StatsPanel({
                     <td className="stats-label">S-REC:</td>
                     <td className="stats-value">{stats?.streamingReconnectCount || 0}</td>
                     <td className="stats-label">S-EVT:</td>
-                    <td className="stats-value">{formatTime(stats?.lastStreamingEventTime || null)}</td>
+                    <td className="stats-value">
+                      {formatTime(stats?.lastStreamingEventTime || null)}
+                    </td>
                   </tr>
                 </tbody>
               </table>

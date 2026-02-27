@@ -389,7 +389,13 @@ class FeatureFlagService {
     // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
     // ONLY if not explicitly requested to be a global-only update, or if environment is provided
     if (environment && !isGlobal) {
-      if (isEnabled !== undefined || enabledValue !== undefined || disabledValue !== undefined || overrideEnabledValue !== undefined || overrideDisabledValue !== undefined) {
+      if (
+        isEnabled !== undefined ||
+        enabledValue !== undefined ||
+        disabledValue !== undefined ||
+        overrideEnabledValue !== undefined ||
+        overrideDisabledValue !== undefined
+      ) {
         await FeatureFlagEnvironmentModel.update(flag.id, environment, {
           isEnabled,
           enabledValue,

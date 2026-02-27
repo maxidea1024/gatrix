@@ -77,7 +77,7 @@ export async function respondWithEtagCache<TPayload>(
       ttlSeconds || undefined
     );
   } else {
-    // If empty, we might still want to cache for a very short duration (e.g. 5s) 
+    // If empty, we might still want to cache for a very short duration (e.g. 5s)
     // to prevent hammering the DB if there really is no data
     await CacheService.set<EtagCacheEntry<TPayload>>(
       cacheKey,

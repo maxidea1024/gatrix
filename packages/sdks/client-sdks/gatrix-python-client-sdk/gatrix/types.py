@@ -50,7 +50,12 @@ class EvaluatedFlag:
 
 @dataclass
 class GatrixContext:
-    """Evaluation context (global for client-side)."""
+    """Evaluation context (global for client-side).
+    System fields (app_name, environment) cannot be removed via update_context(None).
+    """
+    app_name: Optional[str] = None
+    environment: Optional[str] = None
+    remote_address: Optional[str] = None
     user_id: Optional[str] = None
     session_id: Optional[str] = None
     current_time: Optional[str] = None

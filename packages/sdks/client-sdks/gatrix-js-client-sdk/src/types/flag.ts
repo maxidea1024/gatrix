@@ -41,7 +41,7 @@ export interface FlagsApiResponse {
   data: {
     flags: EvaluatedFlag[];
   };
-  meta: {
+  meta?: {
     environment: string;
     evaluatedAt: string;
   };

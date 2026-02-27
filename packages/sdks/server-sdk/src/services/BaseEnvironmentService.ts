@@ -110,9 +110,12 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
         const items = JSON.parse(cachedJson) as T[];
         if (Array.isArray(items)) {
           this.cachedByEnv.set(environment, items);
-          this.logger.debug(`Loaded ${items.length} ${this.getServiceName()} items from local storage`, {
-            environment,
-          });
+          this.logger.debug(
+            `Loaded ${items.length} ${this.getServiceName()} items from local storage`,
+            {
+              environment,
+            }
+          );
         }
       }
 
@@ -156,10 +159,13 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
 
     if (!response.success || !response.data) {
       if (currentItems.length > 0) {
-        this.logger.warn(`Failed to fetch ${this.getServiceName()} from backend, but local cache has data. Keeping local data for now to avoid outage.`, {
-          environment,
-          error: response.error?.message
-        });
+        this.logger.warn(
+          `Failed to fetch ${this.getServiceName()} from backend, but local cache has data. Keeping local data for now to avoid outage.`,
+          {
+            environment,
+            error: response.error?.message,
+          }
+        );
         return currentItems;
       }
       throw new Error(response.error?.message || `Failed to fetch ${this.getServiceName()}`);
@@ -168,10 +174,13 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const items = this.extractItems(response.data);
 
     if (items.length === 0 && currentItems.length > 0) {
-      this.logger.warn(`${this.getServiceName()} received empty list from backend, but local cache has data. Keeping local data for now to avoid outage.`, {
-        environment,
-        localCount: currentItems.length
-      });
+      this.logger.warn(
+        `${this.getServiceName()} received empty list from backend, but local cache has data. Keeping local data for now to avoid outage.`,
+        {
+          environment,
+          localCount: currentItems.length,
+        }
+      );
       return currentItems;
     }
 
@@ -320,7 +329,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    */
   updateCache(items: T[], environment: string): void {
     this.cachedByEnv.set(environment, items);
-    this.persistCache(environment).catch(() => { });
+    this.persistCache(environment).catch(() => {});
     this.logger.debug(`${this.getServiceName()} cache updated`, {
       environment,
       count: items.length,
@@ -346,7 +355,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     }
 
     this.cachedByEnv.set(environment, newItems);
-    this.persistCache(environment).catch(() => { });
+    this.persistCache(environment).catch(() => {});
 
     this.logger.debug(
       `Single ${this.getServiceName()} ${existsInCache ? 'updated' : 'added'} in cache`,
@@ -366,7 +375,7 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
     const currentItems = this.cachedByEnv.get(environment) || [];
     const newItems = currentItems.filter((item) => this.getItemId(item) !== id);
     this.cachedByEnv.set(environment, newItems);
-    this.persistCache(environment).catch(() => { });
+    this.persistCache(environment).catch(() => {});
 
     this.logger.debug(`${this.getServiceName()} removed from cache`, {
       id,
@@ -396,7 +405,11 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
    * Persist the current ETag and raw response body for an environment to local storage.
    * Called after a successful fetch so the ETag survives process restarts.
    */
-  protected async persistEtag(environment: string, endpoint: string, responseData?: TResponse): Promise<void> {
+  protected async persistEtag(
+    environment: string,
+    endpoint: string,
+    responseData?: TResponse
+  ): Promise<void> {
     if (!this.storage) return;
 
     try {

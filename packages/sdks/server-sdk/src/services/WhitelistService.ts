@@ -72,7 +72,10 @@ export class WhitelistService {
         this.logger.debug('Loaded whitelist from local storage', { environment });
       }
     } catch (error: any) {
-      this.logger.warn('Failed to load whitelist from local storage', { environment, error: error.message });
+      this.logger.warn('Failed to load whitelist from local storage', {
+        environment,
+        error: error.message,
+      });
     }
   }
 

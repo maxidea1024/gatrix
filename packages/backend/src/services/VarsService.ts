@@ -12,7 +12,7 @@ export class VarsService {
    */
   static async get(key: string, environment: string): Promise<string | null> {
     const cacheKey = withEnvironment(environment, `vars:${key}`);
-    
+
     // Try to get from cache first
     const cached = await cacheService.get<string>(cacheKey);
     if (cached !== null) {
@@ -21,10 +21,10 @@ export class VarsService {
 
     // Fetch from database
     const value = await VarsModel.get(key, environment);
-    
+
     // Store in cache (even if null, to avoid cache stampede)
     await cacheService.set(cacheKey, value, CACHE_TTL);
-    
+
     return value;
   }
 
@@ -33,7 +33,7 @@ export class VarsService {
    */
   static async getAllKV(environment: string): Promise<VarItem[]> {
     const cacheKey = withEnvironment(environment, 'vars:all_kv');
-    
+
     const cached = await cacheService.get<VarItem[]>(cacheKey);
     if (cached) {
       return cached;
@@ -41,7 +41,7 @@ export class VarsService {
 
     const items = await VarsModel.getAllKV(environment);
     await cacheService.set(cacheKey, items, CACHE_TTL);
-    
+
     return items;
   }
 
@@ -51,28 +51,33 @@ export class VarsService {
   static async clearCache(key: string, environment: string): Promise<void> {
     const cacheKey = withEnvironment(environment, `vars:${key}`);
     const allKvCacheKey = withEnvironment(environment, 'vars:all_kv');
-    
+
     // Invalidate data caches
     await pubSubService.invalidateKey(cacheKey);
     await pubSubService.invalidateKey(allKvCacheKey);
-    
+
     // Also invalidate Server SDK ETag cache
     // This key must match exactly what is used in VarsController.getServerVars
     const etagKey = `${SERVER_SDK_ETAG.VARS}:${environment}`;
     await pubSubService.invalidateKey(etagKey);
-    
+
     logger.info(`Vars cache cleared for key: ${key}, env: ${environment}`, {
-      etagKey
+      etagKey,
     });
   }
 
   /**
    * Update a KV item and clear cache
    */
-  static async updateKV(key: string, value: string | null, userId: number, environment: string): Promise<void> {
+  static async updateKV(
+    key: string,
+    value: string | null,
+    userId: number,
+    environment: string
+  ): Promise<void> {
     await VarsModel.set(key, value, userId, environment);
     await this.clearCache(key, environment);
-    
+
     // Publish change event for real-time updates if needed
     await pubSubService.publishSDKEvent({
       type: 'vars.updated',

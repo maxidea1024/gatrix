@@ -135,10 +135,7 @@ export async function computeContextHash(context: Record<string, any>): Promise<
  * Compute ETag for a set of evaluated flags.
  * Replicates server-side logic in EvaluationUtils.generateETag.
  */
-export async function computeEtag(
-  flags: any[],
-  contextHash: string,
-): Promise<string> {
+export async function computeEtag(flags: any[], contextHash: string): Promise<string> {
   // Sort flags by name ascending to match server-side sorting
   const sortedFlags = [...flags].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -168,21 +165,27 @@ export function isEqualFlag(
   a: any,
   b: any,
   oldContextHash?: string,
-  newContextHash?: string,
+  newContextHash?: string
 ): boolean {
   if (!a || !b) {
     return a === b;
   }
 
   // Fast path: same context and same version means same outcome
-  if (oldContextHash && newContextHash && oldContextHash === newContextHash &&
-    a.version === b.version) {
+  if (
+    oldContextHash &&
+    newContextHash &&
+    oldContextHash === newContextHash &&
+    a.version === b.version
+  ) {
     return true;
   }
 
-  if (a.enabled !== b.enabled ||
+  if (
+    a.enabled !== b.enabled ||
     a.variant.name !== b.variant.name ||
-    a.variant.enabled !== b.variant.enabled) {
+    a.variant.enabled !== b.variant.enabled
+  ) {
     return false;
   }
 

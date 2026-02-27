@@ -71,6 +71,17 @@ def _flag_to_dict(f: EvaluatedFlag) -> dict:
     }
 
 
+def _truncate_to_minute(iso_string: str) -> str:
+    """Truncate ISO 8601 time string to minute precision."""
+    try:
+        from datetime import datetime as _dt, timezone as _tz
+        dt = _dt.fromisoformat(iso_string.replace("Z", "+00:00"))
+        dt = dt.replace(second=0, microsecond=0)
+        return dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    except (ValueError, AttributeError):
+        return iso_string
+
+
 def _context_to_qs(ctx: Optional[GatrixContext], app_name: str,
                    environment: str) -> str:
     """Build query-string from context for GET requests."""
@@ -86,7 +97,9 @@ def _context_to_qs(ctx: Optional[GatrixContext], app_name: str,
     if ctx:
         add("userId", ctx.user_id)
         add("sessionId", ctx.session_id)
-        add("currentTime", ctx.current_time)
+        add("remoteAddress", ctx.remote_address)
+        if ctx.current_time:
+            add("currentTime", _truncate_to_minute(ctx.current_time))
         if ctx.properties:
             for k, v in ctx.properties.items():
                 add(f"properties[{k}]", str(v))
@@ -102,6 +115,8 @@ def _context_to_body(ctx: Optional[GatrixContext], app_name: str,
             body["userId"] = ctx.user_id
         if ctx.session_id:
             body["sessionId"] = ctx.session_id
+        if ctx.remote_address:
+            body["remoteAddress"] = ctx.remote_address
         if ctx.current_time:
             body["currentTime"] = ctx.current_time
         if ctx.properties:
@@ -422,6 +437,7 @@ class FeaturesClient:
         parts = [
             ctx.user_id or "",
             ctx.session_id or "",
+            ctx.remote_address or "",
             ctx.current_time or "",
         ]
         if ctx.properties:

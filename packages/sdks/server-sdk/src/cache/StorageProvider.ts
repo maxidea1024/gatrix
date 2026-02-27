@@ -18,7 +18,10 @@ export interface CacheStorageProvider {
 export class FileCacheStorageProvider implements CacheStorageProvider {
   private storageDir: string;
 
-  constructor(private logger: Logger, storagePath?: string) {
+  constructor(
+    private logger: Logger,
+    storagePath?: string
+  ) {
     this.storageDir = storagePath || path.join(process.cwd(), '.gatrix_cache');
     this.initDir();
   }

@@ -579,9 +579,7 @@ export class EventListener {
             environment: cvEnvironment,
           });
           try {
-            await this.cacheManager
-              .getClientVersionService()
-              ?.refreshByEnvironment(cvEnvironment);
+            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
             this.logger.info('Client version cache refreshed successfully');
           } catch (error: any) {
             this.logger.error('Failed to refresh client version cache', {

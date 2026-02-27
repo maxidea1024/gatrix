@@ -59,7 +59,10 @@ export class SurveyService {
       }
       this.logger.debug('Loaded surveys from local storage', { environment });
     } catch (error: any) {
-      this.logger.warn('Failed to load surveys from local storage', { environment, error: error.message });
+      this.logger.warn('Failed to load surveys from local storage', {
+        environment,
+        error: error.message,
+      });
     }
   }
 

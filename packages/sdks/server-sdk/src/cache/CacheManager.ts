@@ -112,7 +112,12 @@ export class CacheManager {
     // Default features (gameWorld, popupNotice, survey, whitelist, serviceMaintenance) use !== false for backward compatibility
     // New features (clientVersion, serviceNotice, banner, storeProduct) require explicit === true
     if (this.features.gameWorld !== false) {
-      this.gameWorldService = new GameWorldService(apiClient, logger, this.envResolver, this.storage);
+      this.gameWorldService = new GameWorldService(
+        apiClient,
+        logger,
+        this.envResolver,
+        this.storage
+      );
       this.gameWorldService.setFeatureEnabled(true);
     }
     if (this.features.popupNotice !== false) {
@@ -289,15 +294,21 @@ export class CacheManager {
         this.logger.debug('Loading initial data from local storage for environments', { envList });
         for (const env of envList) {
           if (this.gameWorldService) initPromises.push(this.gameWorldService.initializeAsync(env));
-          if (this.popupNoticeService) initPromises.push(this.popupNoticeService.initializeAsync(env));
+          if (this.popupNoticeService)
+            initPromises.push(this.popupNoticeService.initializeAsync(env));
           if (this.surveyService) initPromises.push(this.surveyService.initializeAsync(env));
           if (this.whitelistService) initPromises.push(this.whitelistService.initializeAsync(env));
-          if (this.serviceMaintenanceService) initPromises.push(this.serviceMaintenanceService.initializeAsync(env));
-          if (this.clientVersionService) initPromises.push(this.clientVersionService.initializeAsync(env));
-          if (this.serviceNoticeService) initPromises.push(this.serviceNoticeService.initializeAsync(env));
+          if (this.serviceMaintenanceService)
+            initPromises.push(this.serviceMaintenanceService.initializeAsync(env));
+          if (this.clientVersionService)
+            initPromises.push(this.clientVersionService.initializeAsync(env));
+          if (this.serviceNoticeService)
+            initPromises.push(this.serviceNoticeService.initializeAsync(env));
           if (this.bannerService) initPromises.push(this.bannerService.initializeAsync(env));
-          if (this.storeProductService) initPromises.push(this.storeProductService.initializeAsync(env));
-          if (this.featureFlagService) initPromises.push(this.featureFlagService.initializeAsync(env));
+          if (this.storeProductService)
+            initPromises.push(this.storeProductService.initializeAsync(env));
+          if (this.featureFlagService)
+            initPromises.push(this.featureFlagService.initializeAsync(env));
           if (this.varsService) initPromises.push(this.varsService.initializeAsync(env));
         }
         await Promise.all(initPromises);
@@ -325,7 +336,6 @@ export class CacheManager {
 
       // Build synchronization promises...
       // (Rest of the method remains similar but wrapped in protective try-catch where needed)
-
 
       // All services use optional chaining since they are controlled by feature flags
       // Use !== false check to maintain backward compatibility
@@ -1715,11 +1725,11 @@ export class CacheManager {
     this.whitelistService?.clearCache();
     this.serviceMaintenanceService?.clearCache();
     this.clientVersionService?.clearCache();
-          this.serviceNoticeService?.clearCache();
-          this.bannerService?.clearCache();
-          this.storeProductService?.clearCache();
-          this.varsService?.clearCache();
-        }
+    this.serviceNoticeService?.clearCache();
+    this.bannerService?.clearCache();
+    this.storeProductService?.clearCache();
+    this.varsService?.clearCache();
+  }
   /**
    * Cleanup resources
    */

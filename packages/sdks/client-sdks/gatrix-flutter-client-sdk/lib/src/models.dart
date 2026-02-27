@@ -205,12 +205,21 @@ class StreamingConfig {
 }
 
 class GatrixContext {
+  /// Application name (system field - cannot be removed)
+  String? appName;
+  /// Environment name (system field - cannot be removed)
+  String? environment;
+  /// Remote address / client IP
+  String? remoteAddress;
   String? userId;
   String? sessionId;
   String? currentTime;
   Map<String, dynamic>? properties;
 
   GatrixContext({
+    this.appName,
+    this.environment,
+    this.remoteAddress,
     this.userId,
     this.sessionId,
     this.currentTime,
@@ -219,12 +228,15 @@ class GatrixContext {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    if (appName != null) data['appName'] = appName;
+    if (environment != null) data['environment'] = environment;
+    if (remoteAddress != null) data['remoteAddress'] = remoteAddress;
     if (userId != null) data['userId'] = userId;
     if (sessionId != null) data['sessionId'] = sessionId;
     if (currentTime != null) data['currentTime'] = currentTime;
     if (properties != null) {
       properties!.forEach((key, value) {
-        data[key] = value;
+        data['properties[$key]'] = value;
       });
     }
     return data;
@@ -234,6 +246,9 @@ class GatrixContext {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GatrixContext &&
+          appName == other.appName &&
+          environment == other.environment &&
+          remoteAddress == other.remoteAddress &&
           userId == other.userId &&
           sessionId == other.sessionId &&
           currentTime == other.currentTime &&
@@ -241,6 +256,9 @@ class GatrixContext {
 
   @override
   int get hashCode =>
+      appName.hashCode ^
+      environment.hashCode ^
+      remoteAddress.hashCode ^
       userId.hashCode ^
       sessionId.hashCode ^
       currentTime.hashCode ^
@@ -248,6 +266,9 @@ class GatrixContext {
 
   GatrixContext clone() {
     return GatrixContext(
+      appName: appName,
+      environment: environment,
+      remoteAddress: remoteAddress,
       userId: userId,
       sessionId: sessionId,
       currentTime: currentTime,

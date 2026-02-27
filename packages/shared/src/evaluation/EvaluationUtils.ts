@@ -3,6 +3,51 @@ import { EvaluationContext, FeatureFlag, FeatureSegment, EvaluationResult, Varia
 import { VARIANT_SOURCE } from './variantSource';
 
 /**
+ * Truncate an ISO 8601 time string to minute precision.
+ * Prevents frequent cache invalidation from sub-minute changes.
+ * e.g. "2025-01-15T10:30:45.123Z" → "2025-01-15T10:30:00.000Z"
+ */
+export function truncateToMinute(isoString: string): string {
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return isoString; // Return as-is if invalid
+  date.setSeconds(0, 0);
+  return date.toISOString();
+}
+
+/**
+ * Build query parameters from an EvaluationContext onto a URL.
+ * Used by client SDKs for GET eval requests.
+ */
+export function buildContextQueryParams(url: URL, context: Record<string, any>): void {
+  const systemAndTopLevel = [
+    'appName',
+    'environment',
+    'userId',
+    'sessionId',
+    'remoteAddress',
+    'currentTime',
+  ];
+
+  for (const key of systemAndTopLevel) {
+    const value = context[key];
+    if (value === undefined || value === null) continue;
+    if (key === 'currentTime') {
+      url.searchParams.set(key, truncateToMinute(String(value)));
+    } else {
+      url.searchParams.set(key, String(value));
+    }
+  }
+
+  if (context.properties && typeof context.properties === 'object') {
+    for (const [propKey, propValue] of Object.entries(context.properties)) {
+      if (propValue !== undefined && propValue !== null) {
+        url.searchParams.set(`properties[${propKey}]`, String(propValue));
+      }
+    }
+  }
+}
+
+/**
  * Common utilities for feature flag evaluation across different packages (Edge, Backend, etc.)
  */
 export class EvaluationUtils {
@@ -17,41 +62,17 @@ export class EvaluationUtils {
       context = req.body?.context || {};
       flagNames = req.body?.flagNames || req.body?.keys || [];
     } else {
-      // GET: context from parameters (Unleash Proxy style) or header
-      const contextHeader = req.headers?.['x-gatrix-feature-context'];
-      if (contextHeader) {
-        try {
-          const jsonStr = Buffer.from(contextHeader, 'base64').toString('utf-8');
-          context = JSON.parse(jsonStr);
-        } catch (error) {
-          // ignore parse error
-        }
-      }
-
-      if (Object.keys(context).length === 0 && req.query?.context) {
-        try {
-          const contextStr = req.query.context as string;
-          const jsonStr = Buffer.from(contextStr, 'base64').toString('utf-8');
-          if (jsonStr.trim().startsWith('{')) {
-            context = JSON.parse(jsonStr);
-          } else {
-            context = JSON.parse(contextStr);
-          }
-        } catch (e) {
-          try {
-            context = JSON.parse(req.query.context as string);
-          } catch (e2) {
-            // ignore
-          }
-        }
-      }
-
-      // Fallback: Parse individual query parameters
+      // GET: context from query parameters only
       const query = req.query || {};
-      if (!context.userId && query.userId) context.userId = query.userId as string;
-      if (!context.sessionId && query.sessionId) context.sessionId = query.sessionId as string;
-      if (!context.remoteAddress && query.remoteAddress) context.remoteAddress = query.remoteAddress as string;
-      if (!context.appName && query.appName) context.appName = query.appName as string;
+      if (query.userId) context.userId = query.userId as string;
+      if (query.sessionId) context.sessionId = query.sessionId as string;
+      if (query.remoteAddress) context.remoteAddress = query.remoteAddress as string;
+      if (query.appName) context.appName = query.appName as string;
+      if (query.appVersion) context.appVersion = query.appVersion as string;
+      if (query.environment) context.environment = query.environment as string;
+      if (query.currentTime) {
+        context.currentTime = new Date(truncateToMinute(query.currentTime as string));
+      }
 
       // Handle properties[key]=value
       if (query.properties && typeof query.properties === 'object') {
@@ -111,7 +132,7 @@ export class EvaluationUtils {
     environment: string
   ): any {
     const { enabled, variant: resultVariant } = evalResult;
-    
+
     // Determine the final variant and value to return
     let finalVariant: {
       name: string;
@@ -119,7 +140,12 @@ export class EvaluationUtils {
       enabled: boolean;
     };
 
-    if (enabled && resultVariant && resultVariant.name !== VARIANT_SOURCE.FLAG_DEFAULT_ENABLED && resultVariant.name !== VARIANT_SOURCE.FLAG_DEFAULT_DISABLED) {
+    if (
+      enabled &&
+      resultVariant &&
+      resultVariant.name !== VARIANT_SOURCE.FLAG_DEFAULT_ENABLED &&
+      resultVariant.name !== VARIANT_SOURCE.FLAG_DEFAULT_DISABLED
+    ) {
       // Active variant from strategy/rollout (not a default)
       finalVariant = {
         name: resultVariant.name,
@@ -134,10 +160,10 @@ export class EvaluationUtils {
         (dbFlag.valueType === 'boolean'
           ? false
           : dbFlag.valueType === 'number'
-          ? 0
-          : dbFlag.valueType === 'json'
-          ? {}
-          : '');
+            ? 0
+            : dbFlag.valueType === 'json'
+              ? {}
+              : '');
 
       // Determine explicit variant name based on value source
       let variantName: string;
@@ -163,10 +189,16 @@ export class EvaluationUtils {
     // Process JSON/Number value types if they are still strings (Edge legacy support)
     if (finalVariant.value !== undefined && finalVariant.value !== null) {
       const valueType = dbFlag.valueType || 'string';
-      if (valueType === 'json' && typeof finalVariant.value === 'string' && finalVariant.value.trim() !== '') {
+      if (
+        valueType === 'json' &&
+        typeof finalVariant.value === 'string' &&
+        finalVariant.value.trim() !== ''
+      ) {
         try {
           finalVariant.value = JSON.parse(finalVariant.value);
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
       } else if (valueType === 'number' && typeof finalVariant.value === 'string') {
         const parsed = Number(finalVariant.value);
         if (!isNaN(parsed)) finalVariant.value = parsed;

@@ -96,13 +96,13 @@ function updateCacheSizeMetrics(): void {
     ?.labels('total')
     .set(
       versionsCount +
-      bannersCount +
-      noticesCount +
-      worldsCount +
-      surveysCount +
-      popupNoticesCount +
-      storeProductsCount +
-      whitelistsCount
+        bannersCount +
+        noticesCount +
+        worldsCount +
+        surveysCount +
+        popupNoticesCount +
+        storeProductsCount +
+        whitelistsCount
     );
 }
 

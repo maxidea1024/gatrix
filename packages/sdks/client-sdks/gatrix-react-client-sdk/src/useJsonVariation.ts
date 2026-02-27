@@ -21,7 +21,9 @@ import { useGatrixContext } from './useGatrixContext';
 
 export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = false): T {
   const { features } = useGatrixContext();
-  const [value, setValue] = useState<T>(() => features.jsonVariation<T>(flagName, fallbackValue, forceRealtime));
+  const [value, setValue] = useState<T>(() =>
+    features.jsonVariation<T>(flagName, fallbackValue, forceRealtime)
+  );
 
   useEffect(() => {
     const watchFn = forceRealtime

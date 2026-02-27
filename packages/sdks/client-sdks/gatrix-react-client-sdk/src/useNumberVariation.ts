@@ -19,9 +19,15 @@
 import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 
-export function useNumberVariation(flagName: string, fallbackValue: number, forceRealtime = false): number {
+export function useNumberVariation(
+  flagName: string,
+  fallbackValue: number,
+  forceRealtime = false
+): number {
   const { features } = useGatrixContext();
-  const [value, setValue] = useState(() => features.numberVariation(flagName, fallbackValue, forceRealtime));
+  const [value, setValue] = useState(() =>
+    features.numberVariation(flagName, fallbackValue, forceRealtime)
+  );
 
   useEffect(() => {
     const watchFn = forceRealtime

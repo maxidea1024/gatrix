@@ -380,8 +380,10 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     // Validate JSON if needed
     if (valueType === 'json') {
-      if ((overrideEnabled && valueJsonErrors.enabledValue) ||
-        (overrideDisabled && valueJsonErrors.disabledValue)) {
+      if (
+        (overrideEnabled && valueJsonErrors.enabledValue) ||
+        (overrideDisabled && valueJsonErrors.disabledValue)
+      ) {
         return;
       }
     }
@@ -405,8 +407,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       };
 
       // Send values with per-field override flags
-      const sendEnabled = overrideEnabled ? ensureNonNull(toApiValue(editingEnabledValue)) : toApiValue(editingEnabledValue);
-      const sendDisabled = overrideDisabled ? ensureNonNull(toApiValue(editingDisabledValue)) : toApiValue(editingDisabledValue);
+      const sendEnabled = overrideEnabled
+        ? ensureNonNull(toApiValue(editingEnabledValue))
+        : toApiValue(editingEnabledValue);
+      const sendDisabled = overrideDisabled
+        ? ensureNonNull(toApiValue(editingDisabledValue))
+        : toApiValue(editingDisabledValue);
       await onSaveValues(sendEnabled, sendDisabled, overrideEnabled, overrideDisabled);
     } catch (error) {
       // Error handled by parent or snackbar
@@ -436,7 +442,14 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       originalOverrideDisabled ? (envDisabledValue ?? disabledValue) : disabledValue
     );
     setValueJsonErrors({});
-  }, [originalOverrideEnabled, originalOverrideDisabled, envEnabledValue, enabledValue, envDisabledValue, disabledValue]);
+  }, [
+    originalOverrideEnabled,
+    originalOverrideDisabled,
+    envEnabledValue,
+    enabledValue,
+    envDisabledValue,
+    disabledValue,
+  ]);
 
   // Unwrap legacy wrapped values like {type: 'string', value: ''} from old clearVariantValues code
   const unwrapValue = useCallback((val: any): any => {
@@ -596,13 +609,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const viewOnlyStyle = !isActuallyEditable
       ? {
-        bgcolor: (theme: any) =>
-          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        borderRadius: 1,
-      }
+          bgcolor: (theme: any) =>
+            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          borderRadius: 1,
+        }
       : {};
 
     if (valueType === 'boolean') {
@@ -815,10 +828,12 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
                       px: 1.5,
                       py: 1,
                       borderRadius: 1.5,
-                      borderColor: flagType === 'remoteConfig' ? 'divider' : alpha(variantColor, 0.4),
-                      boxShadow: flagType === 'remoteConfig'
-                        ? 'none'
-                        : `0 0 8px ${alpha(variantColor, 0.25)}, inset 0 0 0 1px ${alpha(variantColor, 0.1)}`,
+                      borderColor:
+                        flagType === 'remoteConfig' ? 'divider' : alpha(variantColor, 0.4),
+                      boxShadow:
+                        flagType === 'remoteConfig'
+                          ? 'none'
+                          : `0 0 8px ${alpha(variantColor, 0.25)}, inset 0 0 0 1px ${alpha(variantColor, 0.1)}`,
                     }}
                   >
                     <Box

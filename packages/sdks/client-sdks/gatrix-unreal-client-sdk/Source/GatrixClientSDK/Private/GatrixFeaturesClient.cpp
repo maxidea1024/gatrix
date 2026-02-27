@@ -335,7 +335,8 @@ void UGatrixFeaturesClient::UpdateContext(const FGatrixContext& NewContext) {
 FString UGatrixFeaturesClient::ComputeContextHash(const FGatrixContext& Context) {
   // Build a deterministic string from context fields
   FString HashInput =
-      Context.UserId + TEXT("|") + Context.SessionId + TEXT("|") + Context.CurrentTime;
+      Context.UserId + TEXT("|") + Context.SessionId + TEXT("|") +
+      Context.RemoteAddress + TEXT("|") + Context.CurrentTime;
 
   // Sort properties for deterministic ordering
   TArray<FString> Keys;
@@ -1445,6 +1446,12 @@ FString UGatrixFeaturesClient::BuildContextQueryString() const {
   if (!ClientConfig.Features.Context.SessionId.IsEmpty())
     Params.Add(FString::Printf(TEXT("sessionId=%s"), *FGenericPlatformHttp::UrlEncode(
                                                          ClientConfig.Features.Context.SessionId)));
+  if (!ClientConfig.Features.Context.RemoteAddress.IsEmpty())
+    Params.Add(FString::Printf(TEXT("remoteAddress=%s"), *FGenericPlatformHttp::UrlEncode(
+                                                             ClientConfig.Features.Context.RemoteAddress)));
+  if (!ClientConfig.Features.Context.CurrentTime.IsEmpty())
+    Params.Add(FString::Printf(TEXT("currentTime=%s"), *FGenericPlatformHttp::UrlEncode(
+                                                           ClientConfig.Features.Context.CurrentTime)));
 
   for (const auto& Prop : ClientConfig.Features.Context.Properties) {
     Params.Add(FString::Printf(TEXT("properties[%s]=%s"),

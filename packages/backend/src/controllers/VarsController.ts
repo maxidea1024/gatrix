@@ -34,7 +34,7 @@ export class VarsController {
       }
       const userId = req.user?.userId || (req as any).user?.id || 1;
       await VarsModel.set(key, toStore, userId, environment);
-      
+
       // Clear cache
       await VarsService.clearCache(key, environment);
 
