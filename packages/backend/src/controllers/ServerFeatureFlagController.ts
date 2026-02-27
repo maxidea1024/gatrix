@@ -193,9 +193,14 @@ export default class ServerFeatureFlagController {
         }));
       }
 
+      const data: { flags: EvaluationFlag[]; segments?: EvaluationSegment[] } = { flags };
+      if (segments.length > 0) {
+        data.segments = segments;
+      }
+
       res.json({
         success: true,
-        data: { flags, segments },
+        data,
       });
     } catch (error: any) {
       sendInternalError(res, 'Failed to fetch feature flags', error, ErrorCodes.RESOURCE_FETCH_FAILED);
