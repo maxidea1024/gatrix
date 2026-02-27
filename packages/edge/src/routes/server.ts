@@ -69,12 +69,28 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
       segments = Array.from(sdk.featureFlag.getAllSegments().values());
     }
 
+    // Parse compact option
+    const compact = req.query.compact === 'true' || req.query.compact === '1';
+
+    // When compact mode is enabled, strip evaluation data from disabled flags
+    const responseFlags = compact
+      ? flags.map((f: any) => {
+        if (!f.isEnabled) {
+          const { strategies, variants, enabledValue, ...rest } = f;
+          return { ...rest, compact: true };
+        }
+        return f;
+      })
+      : flags;
+
+    const data: { flags: any[]; segments?: any[] } = { flags: responseFlags };
+    if (segments.length > 0) {
+      data.segments = segments;
+    }
+
     res.json({
       success: true,
-      data: {
-        flags,
-        segments,
-      },
+      data,
       cached: true,
     });
   } catch (error) {
