@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -227,6 +227,23 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     handleAutoControl();
   }, [envEnabled, plan?.status, plan?.id, canManage]);
 
+  // SSE event listener for real-time plan updates (e.g. scheduler milestone progression)
+  useEffect(() => {
+    const handleReleaseFlowUpdate = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      // Only refresh if this event is for our current flag/environment
+      if (detail?.flagId === flagId && detail?.environment === selectedEnv) {
+        mutatePlan();
+        if (onPlanChange) onPlanChange();
+      }
+    };
+
+    window.addEventListener('release-flow-updated', handleReleaseFlowUpdate);
+    return () => {
+      window.removeEventListener('release-flow-updated', handleReleaseFlowUpdate);
+    };
+  }, [flagId, selectedEnv, mutatePlan, onPlanChange]);
+
   // ==================== Handlers ====================
 
   const handleApplyTemplate = async (templateId: string) => {
@@ -429,8 +446,24 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     // Draft plans haven't started yet — no jump controls
     if (plan?.status === 'draft') return null;
 
-    // Active milestone: only show pause button when there is an automated transition timer
+    // Active milestone: show pause or resume button
     if (index === currentMilestoneIndex) {
+      // Show Resume button when paused and environment is enabled
+      if (isPaused && envEnabled) {
+        return (
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            onClick={handleResume}
+            startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <StartIcon />}
+            disabled={actionLoading}
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            {t('releaseFlow.resume')}
+          </Button>
+        );
+      }
       const currentMilestone = milestones[index];
       const hasAutomation = !!currentMilestone?.transitionCondition?.intervalMinutes;
       // No pause on last milestone (nothing to transition to), when already paused, or when there's no automation
@@ -451,6 +484,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     }
 
     // Other milestones: show "jump to" or "start now" button
+    // When env is disabled, always show "go to" text (clicking doesn't auto-enable the flag)
+    const showStartNow = isScheduled && envEnabled;
     return (
       <Button
         size="small"
@@ -460,7 +495,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         startIcon={
           actionLoading ? (
             <CircularProgress size={14} color="inherit" />
-          ) : isScheduled ? (
+          ) : showStartNow ? (
             <StartIcon />
           ) : (
             <DoubleArrowIcon />
@@ -469,7 +504,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         disabled={actionLoading}
         sx={{ whiteSpace: 'nowrap' }}
       >
-        {isScheduled ? t('releaseFlow.startNow') : t('releaseFlow.goToMilestone')}
+        {showStartNow ? t('releaseFlow.startNow') : t('releaseFlow.goToMilestone')}
       </Button>
     );
   };

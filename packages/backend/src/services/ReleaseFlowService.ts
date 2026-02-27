@@ -14,6 +14,7 @@ import { ErrorCodes } from '../utils/apiResponse';
 import logger from '../config/logger';
 import db from '../config/knex';
 import { ulid } from 'ulid';
+import { pubSubService } from './PubSubService';
 
 export interface CreateTemplateInput {
   flowName: string;
@@ -206,6 +207,13 @@ export class ReleaseFlowService {
         progressionExecutedAt: null,
       });
 
+      // 1b. Clear pausedAt on all OTHER milestones (handles jumping from a paused milestone)
+      for (const m of plan.milestones || []) {
+        if (m.id !== milestone.id && m.pausedAt) {
+          await ReleaseFlowMilestoneModel.update(m.id, { pausedAt: null });
+        }
+      }
+
       // 2. CRITICAL: Clear existing live strategies for this flag and environment
       // This is a design choice: a release flow milestone OVERWRITES existing strategies
       await db('g_feature_strategies')
@@ -274,6 +282,19 @@ export class ReleaseFlowService {
         await featureFlagService.invalidateCache(plan.environment, [flag.flagName]);
       }
 
+      // 5. Broadcast SSE event for UI real-time update
+      await pubSubService.publishNotification({
+        type: 'release_flow.milestone_started',
+        data: {
+          planId: plan.id,
+          flagId: plan.flagId,
+          environment: plan.environment,
+          activeMilestoneId: milestone.id,
+          milestoneName: milestone.name,
+          status: 'active',
+        },
+      });
+
       return (await ReleaseFlowModel.findById(plan.id))!;
     } catch (error) {
       await trx.rollback();
@@ -336,6 +357,17 @@ export class ReleaseFlowService {
       environment: plan.environment,
     });
 
+    // Broadcast SSE event for UI real-time update
+    await pubSubService.publishNotification({
+      type: 'release_flow.plan_paused',
+      data: {
+        planId,
+        flagId: plan.flagId,
+        environment: plan.environment,
+        status: 'paused',
+      },
+    });
+
     return (await ReleaseFlowModel.findById(planId))!;
   }
 
@@ -383,6 +415,17 @@ export class ReleaseFlowService {
       environment: plan.environment,
     });
 
+    // Broadcast SSE event for UI real-time update
+    await pubSubService.publishNotification({
+      type: 'release_flow.plan_resumed',
+      data: {
+        planId,
+        flagId: plan.flagId,
+        environment: plan.environment,
+        status: 'active',
+      },
+    });
+
     return (await ReleaseFlowModel.findById(planId))!;
   }
 
@@ -423,6 +466,17 @@ export class ReleaseFlowService {
         resourceId: planId,
         userId: userId ?? undefined,
         environment: plan.environment,
+      });
+
+      // Broadcast SSE event for UI real-time update
+      await pubSubService.publishNotification({
+        type: 'release_flow.plan_completed',
+        data: {
+          planId,
+          flagId: plan.flagId,
+          environment: plan.environment,
+          status: 'completed',
+        },
       });
 
       return (await ReleaseFlowModel.findById(planId))!;

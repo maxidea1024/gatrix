@@ -50,7 +50,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const onDisconnectRef = useRef<typeof onDisconnect>();
   const onErrorRef = useRef<typeof onError>();
   const onEventRef = useRef<typeof onEvent>();
-  const connectRef = useRef<() => void>(() => {});
+  const connectRef = useRef<() => void>(() => { });
   const isConnectingRef = useRef(false);
 
   useEffect(() => {
@@ -303,6 +303,17 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         case 'entity_lock.taken_over':
           // Dispatch custom event for entity lock takeover
           window.dispatchEvent(new CustomEvent('entity-lock-taken-over', { detail: event.data }));
+          break;
+
+        case 'release_flow.milestone_started':
+        case 'release_flow.milestone_progressed':
+        case 'release_flow.plan_paused':
+        case 'release_flow.plan_resumed':
+        case 'release_flow.plan_completed':
+          // Dispatch custom event for release flow updates
+          window.dispatchEvent(
+            new CustomEvent('release-flow-updated', { detail: event.data })
+          );
           break;
 
         default:

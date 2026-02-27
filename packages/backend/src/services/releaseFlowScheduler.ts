@@ -38,23 +38,23 @@ export class ReleaseFlowScheduler {
     logger.info('Starting release flow scheduler...');
 
     try {
-      // Schedule periodic check every minute using QueueService
+      // Remove any existing repeatable job to pick up interval changes
       const repeatables = await this.queueService.listRepeatable('scheduler');
-      const exists = repeatables.some((j) => j.name === 'release-flow:progression-check');
-
-      if (!exists) {
-        await this.queueService.addJob(
-          'scheduler',
-          'release-flow:progression-check',
-          {},
-          {
-            repeat: { pattern: '* * * * *' }, // Every minute
-          }
-        );
-        logger.info('Scheduled release-flow:progression-check job');
-      } else {
-        logger.info('release-flow:progression-check job already scheduled');
+      for (const job of repeatables) {
+        if (job.name === 'release-flow:progression-check') {
+          await this.queueService.removeRepeatable('scheduler', job.key);
+        }
       }
+
+      await this.queueService.addJob(
+        'scheduler',
+        'release-flow:progression-check',
+        {},
+        {
+          repeat: { pattern: '* * * * *' }, // Every minute
+        }
+      );
+      logger.info('Scheduled release-flow:progression-check job');
 
       this.isRunning = true;
       logger.info('Release flow scheduler started successfully');
