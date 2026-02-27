@@ -6,4 +6,4 @@
 export * from './errors/index';
 
 // Feature flag evaluation
-export * from './evaluation/index';
+export * from './features/index';

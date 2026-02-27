@@ -264,6 +264,11 @@ interface FeatureFlag {
 
 const STRATEGY_TYPES = [
   {
+    name: 'default',
+    titleKey: 'featureFlags.strategies.default.title',
+    descKey: 'featureFlags.strategies.default.desc',
+  },
+  {
     name: 'flexibleRollout',
     titleKey: 'featureFlags.strategies.flexibleRollout.title',
     descKey: 'featureFlags.strategies.flexibleRollout.desc',
@@ -282,6 +287,11 @@ const STRATEGY_TYPES = [
     name: 'gradualRolloutUserId',
     titleKey: 'featureFlags.strategies.gradualRolloutUserId.title',
     descKey: 'featureFlags.strategies.gradualRolloutUserId.desc',
+  },
+  {
+    name: 'gradualRolloutSessionId',
+    titleKey: 'featureFlags.strategies.gradualRolloutSessionId.title',
+    descKey: 'featureFlags.strategies.gradualRolloutSessionId.desc',
   },
   {
     name: 'remoteAddress',

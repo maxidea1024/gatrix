@@ -11,7 +11,7 @@ import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
 import { ValidationRules } from '../../models/FeatureFlag';
 import { networkTrafficService } from '../../services/NetworkTrafficService';
 import { validateFlagValue } from '../../utils/validateFlagValue';
-import { VALUE_SOURCE } from '@gatrix/shared';
+import { VALUE_SOURCE, evaluateStrategyWithDetails } from '@gatrix/shared';
 
 const router = Router();
 
@@ -1418,27 +1418,28 @@ function evaluateFlagWithDetails(
       });
     }
 
-    // Evaluate rollout - always show rollout check
-    let rolloutPassed = true;
-    const rollout = strategy.parameters?.rollout ?? 100;
-    const stickiness = strategy.parameters?.stickiness || 'default';
-    const groupId = strategy.parameters?.groupId || flag.flagName;
-    const percentage = calculatePercentage(context, stickiness, groupId);
-
-    if (rollout < 100) {
-      rolloutPassed = percentage <= rollout;
-    }
+    // Evaluate strategy-specific isEnabled logic
+    const strategyResult = evaluateStrategyWithDetails(
+      strategy.strategyName,
+      strategy.parameters || {},
+      context
+    );
 
     strategyStep.checks.push({
-      type: 'ROLLOUT',
-      rollout: rollout,
-      percentage: percentage,
-      passed: contextFailed ? null : rolloutPassed,
-      message: rollout === 100 ? 'Rollout 100% - all users included' : undefined,
+      type: 'STRATEGY_RULE',
+      strategyType: strategy.strategyName,
+      passed: contextFailed ? null : strategyResult.enabled,
+      strategyFound: strategyResult.strategyFound,
+      reason: strategyResult.reason,
+      parameters: strategy.parameters || {},
+      details: strategyResult.details,
+      message: !strategyResult.strategyFound
+        ? `Unknown strategy type: ${strategy.strategyName}`
+        : strategyResult.reason,
     });
 
     // Determine if strategy matched
-    const strategyMatched = segmentsPassed && constraintsPassed && rolloutPassed;
+    const strategyMatched = segmentsPassed && constraintsPassed && strategyResult.enabled;
     strategyStep.passed = contextFailed ? null : strategyMatched;
     strategyStep.message = contextFailed
       ? 'Skipped - context validation failed'
@@ -1534,66 +1535,7 @@ function evaluateFlagWithDetails(
   };
 }
 
-function evaluateStrategyWithDetails(
-  strategy: any,
-  context: Record<string, any>,
-  flag: any,
-  segmentsMap: Map<string, any>,
-  strategyIndex: number
-): { matched: boolean; failReason?: string; details?: any } {
-  // Check segments
-  if (strategy.segments && strategy.segments.length > 0) {
-    for (const segmentName of strategy.segments) {
-      const segment = segmentsMap.get(segmentName);
-      if (!segment) continue;
 
-      if (segment.constraints && segment.constraints.length > 0) {
-        for (const constraint of segment.constraints) {
-          if (!evaluateConstraint(constraint, context)) {
-            return {
-              matched: false,
-              failReason: 'SEGMENT_NOT_MATCHED',
-              details: {
-                failedSegment: segmentName,
-                failedConstraint: constraint,
-              },
-            };
-          }
-        }
-      }
-    }
-  }
-
-  // Check constraints
-  if (strategy.constraints && strategy.constraints.length > 0) {
-    for (const constraint of strategy.constraints) {
-      if (!evaluateConstraint(constraint, context)) {
-        return {
-          matched: false,
-          failReason: 'CONSTRAINT_NOT_MATCHED',
-          details: { failedConstraint: constraint },
-        };
-      }
-    }
-  }
-
-  // Check rollout
-  const rollout = strategy.parameters?.rollout ?? 100;
-  if (rollout < 100) {
-    const stickiness = strategy.parameters?.stickiness || 'default';
-    const groupId = strategy.parameters?.groupId || flag.flagName;
-    const percentage = calculatePercentage(context, stickiness, groupId);
-    if (percentage > rollout) {
-      return {
-        matched: false,
-        failReason: 'ROLLOUT_EXCLUDED',
-        details: { rollout, percentage },
-      };
-    }
-  }
-
-  return { matched: true };
-}
 
 function evaluateConstraint(constraint: any, context: Record<string, any>): boolean {
   const contextValue = getContextValue(constraint.contextName, context);

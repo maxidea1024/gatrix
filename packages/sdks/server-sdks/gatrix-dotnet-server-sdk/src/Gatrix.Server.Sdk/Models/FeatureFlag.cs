@@ -113,6 +113,18 @@ public class StrategyParameters
 
     [JsonPropertyName("groupId")]
     public string? GroupId { get; set; }
+
+    [JsonPropertyName("percentage")]
+    public int? Percentage { get; set; }
+
+    [JsonPropertyName("userIds")]
+    public string? UserIds { get; set; }
+
+    [JsonPropertyName("IPs")]
+    public string? IPs { get; set; }
+
+    [JsonPropertyName("hostNames")]
+    public string? HostNames { get; set; }
 }
 
 /// <summary>

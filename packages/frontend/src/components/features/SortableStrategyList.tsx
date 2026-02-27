@@ -293,6 +293,12 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                 <MenuItem value="gradualRolloutUserId">
                   {t('featureFlags.strategyTypes.gradualRolloutUserId')}
                 </MenuItem>
+                <MenuItem value="gradualRolloutRandom">
+                  {t('featureFlags.strategyTypes.gradualRolloutRandom')}
+                </MenuItem>
+                <MenuItem value="gradualRolloutSessionId">
+                  {t('featureFlags.strategyTypes.gradualRolloutSessionId')}
+                </MenuItem>
                 <MenuItem value="remoteAddress">
                   {t('featureFlags.strategyTypes.remoteAddress')}
                 </MenuItem>
@@ -302,11 +308,13 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
               </Select>
             </FormControl>
 
-            {/* Flexible Rollout Parameters */}
+            {/* Strategy-specific Parameters */}
+
+            {/* flexibleRollout: rollout slider + stickiness + groupId */}
             {strategy.name === 'flexibleRollout' && (
               <Box sx={{ px: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.rollout || 100}%
+                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.rollout ?? 100}%
                 </Typography>
                 <Slider
                   value={strategy.parameters?.rollout ?? 100}
@@ -348,6 +356,177 @@ const SortableStrategyItem: React.FC<SortableStrategyItemProps> = ({
                     <MenuItem value="random">{t('featureFlags.stickinessOptions.random')}</MenuItem>
                   </Select>
                 </FormControl>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t('featureFlags.groupId')}
+                  value={strategy.parameters?.groupId || ''}
+                  onChange={(e) =>
+                    updateStrategy({
+                      parameters: { ...strategy.parameters, groupId: e.target.value },
+                    })
+                  }
+                  disabled={!canManage}
+                  sx={{ mt: 2 }}
+                />
+              </Box>
+            )}
+
+            {/* userWithId: userIds text input */}
+            {strategy.name === 'userWithId' && (
+              <Box sx={{ px: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t('featureFlags.userIds')}
+                  placeholder={t('featureFlags.csvPlaceholder')}
+                  helperText={t('featureFlags.csvHelp')}
+                  value={strategy.parameters?.userIds || ''}
+                  onChange={(e) =>
+                    updateStrategy({
+                      parameters: { ...strategy.parameters, userIds: e.target.value },
+                    })
+                  }
+                  disabled={!canManage}
+                />
+              </Box>
+            )}
+
+            {/* gradualRolloutUserId: percentage slider + groupId (stickiness fixed to userId) */}
+            {strategy.name === 'gradualRolloutUserId' && (
+              <Box sx={{ px: 1 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.percentage ?? 0}%
+                </Typography>
+                <Slider
+                  value={strategy.parameters?.percentage ?? 0}
+                  onChange={(_, value) =>
+                    updateStrategy({
+                      parameters: {
+                        ...strategy.parameters,
+                        percentage: value as number,
+                      },
+                    })
+                  }
+                  min={0}
+                  max={100}
+                  valueLabelDisplay="auto"
+                  disabled={!canManage}
+                />
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t('featureFlags.groupId')}
+                  value={strategy.parameters?.groupId || ''}
+                  onChange={(e) =>
+                    updateStrategy({
+                      parameters: { ...strategy.parameters, groupId: e.target.value },
+                    })
+                  }
+                  disabled={!canManage}
+                  sx={{ mt: 2 }}
+                />
+              </Box>
+            )}
+
+            {/* gradualRolloutRandom: percentage slider only (no stickiness) */}
+            {strategy.name === 'gradualRolloutRandom' && (
+              <Box sx={{ px: 1 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.percentage ?? 0}%
+                </Typography>
+                <Slider
+                  value={strategy.parameters?.percentage ?? 0}
+                  onChange={(_, value) =>
+                    updateStrategy({
+                      parameters: {
+                        ...strategy.parameters,
+                        percentage: value as number,
+                      },
+                    })
+                  }
+                  min={0}
+                  max={100}
+                  valueLabelDisplay="auto"
+                  disabled={!canManage}
+                />
+              </Box>
+            )}
+
+            {/* gradualRolloutSessionId: percentage slider + groupId (stickiness fixed to sessionId) */}
+            {strategy.name === 'gradualRolloutSessionId' && (
+              <Box sx={{ px: 1 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('featureFlags.rolloutPercentage')}: {strategy.parameters?.percentage ?? 0}%
+                </Typography>
+                <Slider
+                  value={strategy.parameters?.percentage ?? 0}
+                  onChange={(_, value) =>
+                    updateStrategy({
+                      parameters: {
+                        ...strategy.parameters,
+                        percentage: value as number,
+                      },
+                    })
+                  }
+                  min={0}
+                  max={100}
+                  valueLabelDisplay="auto"
+                  disabled={!canManage}
+                />
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t('featureFlags.groupId')}
+                  value={strategy.parameters?.groupId || ''}
+                  onChange={(e) =>
+                    updateStrategy({
+                      parameters: { ...strategy.parameters, groupId: e.target.value },
+                    })
+                  }
+                  disabled={!canManage}
+                  sx={{ mt: 2 }}
+                />
+              </Box>
+            )}
+
+            {/* remoteAddress: IPs text input */}
+            {strategy.name === 'remoteAddress' && (
+              <Box sx={{ px: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t('featureFlags.remoteAddresses')}
+                  placeholder={t('featureFlags.remoteAddressesPlaceholder')}
+                  helperText={t('featureFlags.remoteAddressesHelp')}
+                  value={strategy.parameters?.IPs || ''}
+                  onChange={(e) =>
+                    updateStrategy({
+                      parameters: { ...strategy.parameters, IPs: e.target.value },
+                    })
+                  }
+                  disabled={!canManage}
+                />
+              </Box>
+            )}
+
+            {/* applicationHostname: hostNames text input */}
+            {strategy.name === 'applicationHostname' && (
+              <Box sx={{ px: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t('featureFlags.hostnames')}
+                  placeholder={t('featureFlags.hostnamesPlaceholder')}
+                  helperText={t('featureFlags.hostnamesHelp')}
+                  value={strategy.parameters?.hostNames || ''}
+                  onChange={(e) =>
+                    updateStrategy({
+                      parameters: { ...strategy.parameters, hostNames: e.target.value },
+                    })
+                  }
+                  disabled={!canManage}
+                />
               </Box>
             )}
 

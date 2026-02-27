@@ -159,17 +159,9 @@ public class FeatureFlagEvaluator
             }
         }
 
-        // 3. Check rollout percentage
-        var rollout = strategy.Parameters?.Rollout ?? 100;
-        if (rollout < 100)
-        {
-            var stickiness = strategy.Parameters?.Stickiness ?? "default";
-            var groupId = strategy.Parameters?.GroupId ?? flag.Name;
-            var percentage = CalculatePercentage(context, stickiness, groupId);
-            if (percentage > rollout) return false;
-        }
-
-        return true;
+        // 3. Strategy-specific evaluation via strategy registry
+        return Strategies.StrategyRegistry.EvaluateStrategy(
+            strategy.Name, strategy.Parameters, context, flag.Name);
     }
 
     /// <summary>
@@ -318,30 +310,8 @@ public class FeatureFlagEvaluator
             stickinessValue = val?.ToString() ?? Random.Shared.NextDouble().ToString(CultureInfo.InvariantCulture);
         }
 
-        int len = groupId.Length + suffix.Length + 1 + stickinessValue.Length;
-        char[]? rented = null;
-        Span<char> seedSpan = len <= 256 
-            ? stackalloc char[len] 
-            : (rented = System.Buffers.ArrayPool<char>.Shared.Rent(len));
-
-        try
-        {
-            groupId.AsSpan().CopyTo(seedSpan);
-            if (suffix.Length > 0)
-            {
-                suffix.AsSpan().CopyTo(seedSpan[groupId.Length..]);
-            }
-            seedSpan[groupId.Length + suffix.Length] = ':';
-            stickinessValue.AsSpan().CopyTo(seedSpan[(groupId.Length + suffix.Length + 1)..]);
-
-            var hash = MurmurHash3.Hash(seedSpan[..len]);
-            return (hash % 10000) / 100.0;
-        }
-        finally
-        {
-            if (rented != null)
-                System.Buffers.ArrayPool<char>.Shared.Return(rented);
-        }
+        // Delegate to StrategyUtils for consistent MurmurHash3 hashing
+        return Strategies.StrategyUtils.CalculatePercentage(stickinessValue, groupId, suffix);
     }
 
     // Variant selection (weighted)

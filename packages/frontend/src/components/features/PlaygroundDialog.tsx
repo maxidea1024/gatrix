@@ -415,8 +415,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       ALL_STRATEGIES_DISABLED: t('playground.reasons.ALL_STRATEGIES_DISABLED'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasons.strategyMatched', {
-            strategy: localizeStrategyName(reasonDetails.strategyName),
-          })
+          strategy: localizeStrategyName(reasonDetails.strategyName),
+        })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
       CONTEXT_VALIDATION_FAILED: t('playground.reasons.contextValidationFailed'),
@@ -953,8 +953,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 // Only use legalValues from validationRules when rules are enabled
                 const effectiveLegalValues =
                   rulesEnabled &&
-                  contextField?.validationRules?.legalValues &&
-                  contextField.validationRules.legalValues.length > 0
+                    contextField?.validationRules?.legalValues &&
+                    contextField.validationRules.legalValues.length > 0
                     ? contextField.validationRules.legalValues
                     : null;
                 const hasLegalValues =
@@ -1780,9 +1780,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   transition: 'all 0.2s',
                                   '&:hover': hasDetails
                                     ? {
-                                        bgcolor: 'action.hover',
-                                        transform: 'scale(1.1)',
-                                      }
+                                      bgcolor: 'action.hover',
+                                      transform: 'scale(1.1)',
+                                    }
                                     : {},
                                 }}
                                 onClick={(e) => {
@@ -2159,24 +2159,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 position: 'relative',
                                 '&::before': isMatched
                                   ? {
+                                    content: '""',
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: 4,
+                                    bgcolor: 'success.main',
+                                  }
+                                  : wasEvaluated && !stepResult?.passed
+                                    ? {
                                       content: '""',
                                       position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: 4,
-                                      bgcolor: 'success.main',
+                                      bgcolor: 'error.main',
                                     }
-                                  : wasEvaluated && !stepResult?.passed
-                                    ? {
-                                        content: '""',
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 0,
-                                        bottom: 0,
-                                        width: 4,
-                                        bgcolor: 'error.main',
-                                      }
                                     : {},
                               }}
                             >
@@ -2658,7 +2658,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 sx={{
                                   borderBottom:
                                     stepIdx <
-                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                      (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
                                       ? 1
                                       : 0,
                                   borderColor: 'divider',
@@ -2761,9 +2761,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     ? t('playground.contextErrors.emptyValue')
                                                     : err.type === 'TYPE_MISMATCH'
                                                       ? t('playground.contextErrors.typeMismatch', {
-                                                          expected: err.data?.expectedType,
-                                                          actual: err.data?.actualType,
-                                                        })
+                                                        expected: err.data?.expectedType,
+                                                        actual: err.data?.actualType,
+                                                      })
                                                       : err.type === 'INVALID_VALUE'
                                                         ? t('playground.contextErrors.invalidValue')
                                                         : err.type === 'WHITESPACE'
@@ -2818,9 +2818,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     allSkipped
                                                       ? t('playground.checkAllSkipped')
                                                       : t('playground.checkCountDetail', {
-                                                          passed: passedCount,
-                                                          total: totalCount,
-                                                        })
+                                                        passed: passedCount,
+                                                        total: totalCount,
+                                                      })
                                                   }
                                                   size="small"
                                                   sx={{
@@ -2900,7 +2900,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                   } else if (
                                                     (prevCheck.type === 'CONSTRAINTS_CHECK' ||
                                                       prevCheck.type === 'STRATEGY_CONSTRAINT') &&
-                                                    check.type === 'ROLLOUT'
+                                                    (check.type === 'ROLLOUT' || check.type === 'STRATEGY_RULE')
                                                   ) {
                                                     showOperator = true;
                                                     operatorType = 'AND';
@@ -2908,7 +2908,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     (prevCheck.type === 'SEGMENTS_CHECK' ||
                                                       prevCheck.type === 'SEGMENT' ||
                                                       prevCheck.type === 'SEGMENT_CONSTRAINT') &&
-                                                    check.type === 'ROLLOUT'
+                                                    (check.type === 'ROLLOUT' || check.type === 'STRATEGY_RULE')
                                                   ) {
                                                     showOperator = true;
                                                     operatorType = 'AND';
@@ -2934,6 +2934,11 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                   );
                                                 } else if (check.type === 'SEGMENT') {
                                                   checkLabel = `${t('playground.checkTypes.segment')}: ${check.name}`;
+                                                } else if (check.type === 'STRATEGY_RULE') {
+                                                  const strategyTypeLabel = check.strategyType
+                                                    ? getLocalizedStrategyName(check.strategyType)
+                                                    : '';
+                                                  checkLabel = `${t('playground.checkTypes.strategyRule')}: ${strategyTypeLabel}`;
                                                 }
 
                                                 return (
@@ -3028,14 +3033,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                           >
                                                             {check.rollout === 100
                                                               ? t(
-                                                                  'playground.checkMessages.rollout100'
-                                                                )
+                                                                'playground.checkMessages.rollout100'
+                                                              )
                                                               : t('playground.rolloutDetail', {
-                                                                  percentage:
-                                                                    check.percentage?.toFixed(1) ??
-                                                                    '?',
-                                                                  rollout: check.rollout ?? 100,
-                                                                })}
+                                                                percentage:
+                                                                  check.percentage?.toFixed(1) ??
+                                                                  '?',
+                                                                rollout: check.rollout ?? 100,
+                                                              })}
                                                           </Typography>
                                                         ) : check.constraint ? (
                                                           <Box sx={{ mt: 0.5 }}>
@@ -3079,7 +3084,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                 >
                                                                   {check.contextValue ===
                                                                     undefined ||
-                                                                  check.contextValue === null ? (
+                                                                    check.contextValue === null ? (
                                                                     <span
                                                                       style={{
                                                                         color: '#d32f2f',
@@ -3135,17 +3140,78 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                             sx={{ display: 'block' }}
                                                           >
                                                             {check.message ===
-                                                            'Segment has no constraints - passed'
+                                                              'Segment has no constraints - passed'
                                                               ? t(
-                                                                  'playground.checkMessages.segmentNoConstraints'
-                                                                )
+                                                                'playground.checkMessages.segmentNoConstraints'
+                                                              )
                                                               : check.message ===
-                                                                  'Segment not found - skipped'
+                                                                'Segment not found - skipped'
                                                                 ? t(
-                                                                    'playground.checkMessages.segmentNotFound'
-                                                                  )
+                                                                  'playground.checkMessages.segmentNotFound'
+                                                                )
                                                                 : check.message}
                                                           </Typography>
+                                                        ) : check.type === 'STRATEGY_RULE' ? (
+                                                          <Box>
+                                                            {check.message && (
+                                                              <Typography
+                                                                variant="caption"
+                                                                color="text.secondary"
+                                                                sx={{ display: 'block' }}
+                                                              >
+                                                                {check.message}
+                                                              </Typography>
+                                                            )}
+                                                            {check.details && (
+                                                              <Box
+                                                                sx={{
+                                                                  mt: 0.5,
+                                                                  p: 0.75,
+                                                                  bgcolor: 'action.hover',
+                                                                  borderRadius: 0.5,
+                                                                  fontSize: '0.7rem',
+                                                                  fontFamily: 'monospace',
+                                                                }}
+                                                              >
+                                                                {Object.entries(
+                                                                  check.details as Record<string, unknown>
+                                                                ).map(([key, val]) => (
+                                                                  <Box
+                                                                    key={key}
+                                                                    sx={{
+                                                                      display: 'flex',
+                                                                      gap: 0.5,
+                                                                      py: 0.15,
+                                                                    }}
+                                                                  >
+                                                                    <Typography
+                                                                      variant="caption"
+                                                                      sx={{
+                                                                        fontFamily: 'monospace',
+                                                                        color: 'text.secondary',
+                                                                        fontWeight: 600,
+                                                                        minWidth: 100,
+                                                                      }}
+                                                                    >
+                                                                      {key}:
+                                                                    </Typography>
+                                                                    <Typography
+                                                                      variant="caption"
+                                                                      sx={{
+                                                                        fontFamily: 'monospace',
+                                                                        color: 'text.primary',
+                                                                        wordBreak: 'break-all',
+                                                                      }}
+                                                                    >
+                                                                      {typeof val === 'object'
+                                                                        ? JSON.stringify(val)
+                                                                        : String(val ?? '')}
+                                                                    </Typography>
+                                                                  </Box>
+                                                                ))}
+                                                              </Box>
+                                                            )}
+                                                          </Box>
                                                         ) : null}
                                                       </Box>
                                                     </Box>
@@ -3357,8 +3423,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 {innerValue === ''
                                   ? t('common.emptyString')
                                   : typeof innerValue === 'object' &&
-                                      innerValue !== null &&
-                                      Object.keys(innerValue).length === 0
+                                    innerValue !== null &&
+                                    Object.keys(innerValue).length === 0
                                     ? t('common.emptyObject')
                                     : innerValue}
                               </Typography>
@@ -3620,7 +3686,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       null,
                       2
                     )}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     readOnly
                     height={200}
                   />

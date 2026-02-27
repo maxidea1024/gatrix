@@ -3,7 +3,18 @@ import logger from '../config/logger';
 import { ulid } from 'ulid';
 import { parseJsonField } from '../utils/dbUtils';
 
-// ==================== Types ====================
+// Re-export shared types for backward compatibility
+// All consumers that import from this file still work unchanged
+export type {
+  ValueType,
+  ConstraintOperator,
+  StrategyParameters,
+  Constraint,
+} from '@gatrix/shared';
+
+import type { Constraint, StrategyParameters, ValueType } from '@gatrix/shared';
+
+// ==================== Backend-only Types ====================
 
 export type FlagType =
   | 'release'
@@ -12,7 +23,6 @@ export type FlagType =
   | 'killSwitch'
   | 'permission'
   | 'remoteConfig'; // Purpose
-export type ValueType = 'string' | 'number' | 'boolean' | 'json';
 
 export interface ValidationRules {
   enabled?: boolean;
@@ -48,59 +58,6 @@ export type FieldType =
   | 'languageCode'
   | 'localeCode'
   | 'timezone';
-
-export type ConstraintOperator =
-  // String operators (use inverted flag for negation)
-  | 'str_eq'
-  | 'str_contains'
-  | 'str_starts_with'
-  | 'str_ends_with'
-  | 'str_in'
-  | 'str_regex'
-  // Number operators
-  | 'num_eq'
-  | 'num_gt'
-  | 'num_gte'
-  | 'num_lt'
-  | 'num_lte'
-  | 'num_in'
-  // Boolean operators
-  | 'bool_is'
-  // Date operators
-  | 'date_eq'
-  | 'date_gt'
-  | 'date_gte'
-  | 'date_lt'
-  | 'date_lte'
-  // Semver operators
-  | 'semver_eq'
-  | 'semver_gt'
-  | 'semver_gte'
-  | 'semver_lt'
-  | 'semver_lte'
-  | 'semver_in'
-  // Common operators (type-agnostic)
-  | 'exists'
-  | 'not_exists'
-  // Array operators
-  | 'arr_any'
-  | 'arr_all'
-  | 'arr_empty';
-
-export interface StrategyParameters {
-  rollout?: number;
-  stickiness?: string;
-  groupId?: string;
-}
-
-export interface Constraint {
-  contextName: string;
-  operator: ConstraintOperator;
-  value?: string;
-  values?: string[];
-  caseInsensitive?: boolean;
-  inverted?: boolean;
-}
 
 // ==================== Interfaces ====================
 
