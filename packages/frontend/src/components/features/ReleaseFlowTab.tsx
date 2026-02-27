@@ -22,6 +22,7 @@ import {
   Select,
   Menu,
   MenuItem,
+  LinearProgress,
 } from '@mui/material';
 import {
   PlayArrow as StartIcon,
@@ -55,7 +56,7 @@ import {
   setTransitionCondition,
   removeTransitionCondition,
 } from '../../services/releaseFlowService';
-import { formatRelativeTime } from '../../utils/dateFormat';
+import { formatRelativeTime, formatWith } from '../../utils/dateFormat';
 import SafeguardPanel from './SafeguardPanel';
 import StrategyListReadonly from './StrategyListReadonly';
 import { ContextFieldInfo } from './ConstraintDisplay';
@@ -128,12 +129,7 @@ function getScheduledTime(startedAt: string | undefined, intervalMinutes: number
 
 /** Format a Date as localized time string */
 function formatScheduledTime(date: Date): string {
-  return date.toLocaleString(undefined, {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatWith(date, 'MM.DD HH:mm');
 }
 
 // ==================== Component ====================
@@ -165,6 +161,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
   const [applying, setApplying] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [autoControlling, setAutoControlling] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(initialShowTemplates);
 
   const [jumpConfirmOpen, setJumpConfirmOpen] = useState(false);
@@ -182,6 +179,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const [transitionUnit, setTransitionUnit] = useState<TimeUnit>('hours');
   const [transitionSaving, setTransitionSaving] = useState(false);
 
+  // Tick counter for real-time progress bar updates (increments every second)
+  const [, setProgressTick] = useState(0);
+  useEffect(() => {
+    if (plan?.status !== 'active') return;
+    const timer = setInterval(() => setProgressTick((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, [plan?.status]);
+
   // Auto-pause/resume based on environment enabled state
   const prevEnvEnabledRef = React.useRef(envEnabled);
 
@@ -191,36 +196,41 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     prevEnvEnabledRef.current = envEnabled;
 
     const handleAutoControl = async () => {
-      if (!envEnabled && plan.status === 'active') {
-        // Environment disabled -> auto-pause
-        try {
-          await pausePlan(plan.id);
-          enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
-          mutatePlan();
-          if (onPlanChange) onPlanChange();
-        } catch (error) {
-          console.error('Auto-pause failed', error);
+      setAutoControlling(true);
+      try {
+        if (!envEnabled && plan.status === 'active') {
+          // Environment disabled -> auto-pause
+          try {
+            await pausePlan(plan.id);
+            enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
+            mutatePlan();
+            if (onPlanChange) onPlanChange();
+          } catch (error) {
+            console.error('Auto-pause failed', error);
+          }
+        } else if (envEnabled && plan.status === 'paused') {
+          // Environment re-enabled -> auto-resume
+          try {
+            await resumePlan(plan.id);
+            enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
+            mutatePlan();
+            if (onPlanChange) onPlanChange();
+          } catch (error) {
+            console.error('Auto-resume failed', error);
+          }
+        } else if (envEnabled && plan.status === 'draft') {
+          // Environment enabled with draft plan -> auto-start
+          try {
+            await startPlan(plan.id);
+            enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
+            mutatePlan();
+            if (onPlanChange) onPlanChange();
+          } catch (error) {
+            console.error('Auto-start failed', error);
+          }
         }
-      } else if (envEnabled && plan.status === 'paused') {
-        // Environment re-enabled -> auto-resume
-        try {
-          await resumePlan(plan.id);
-          enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
-          mutatePlan();
-          if (onPlanChange) onPlanChange();
-        } catch (error) {
-          console.error('Auto-resume failed', error);
-        }
-      } else if (envEnabled && plan.status === 'draft') {
-        // Environment enabled with draft plan -> auto-start
-        try {
-          await startPlan(plan.id);
-          enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
-          mutatePlan();
-          if (onPlanChange) onPlanChange();
-        } catch (error) {
-          console.error('Auto-start failed', error);
-        }
+      } finally {
+        setAutoControlling(false);
       }
     };
 
@@ -449,7 +459,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     // Active milestone: show pause or resume button
     if (index === currentMilestoneIndex) {
       // Show Resume button when paused and environment is enabled
-      if (isPaused && envEnabled) {
+      // Suppress during auto-control (including the first render frame before the effect fires)
+      const willAutoControl = prevEnvEnabledRef.current !== envEnabled;
+      if (isPaused && envEnabled && !autoControlling && !willAutoControl) {
         return (
           <Button
             variant="outlined"
@@ -458,7 +470,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             onClick={handleResume}
             startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <StartIcon />}
             disabled={actionLoading}
-            sx={{ whiteSpace: 'nowrap' }}
+            sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
             {t('releaseFlow.resume')}
           </Button>
@@ -476,7 +488,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           onClick={handlePause}
           startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <PauseIcon />}
           disabled={actionLoading}
-          sx={{ whiteSpace: 'nowrap' }}
+          sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {t('releaseFlow.pause')}
         </Button>
@@ -497,14 +509,12 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             <CircularProgress size={14} color="inherit" />
           ) : showStartNow ? (
             <StartIcon />
-          ) : (
-            <DoubleArrowIcon />
-          )
+          ) : undefined
         }
         disabled={actionLoading}
-        sx={{ whiteSpace: 'nowrap' }}
+        sx={{ width: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
       >
-        {showStartNow ? t('releaseFlow.startNow') : t('releaseFlow.goToMilestone')}
+        {showStartNow ? t('releaseFlow.startNow') : t('releaseFlow.moveToMilestone')}
       </Button>
     );
   };
@@ -727,17 +737,46 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                   </Typography>
                 </Tooltip>
                 {(() => {
+                  if (isCompleted) {
+                    return (
+                      <Chip
+                        label={t('releaseFlow.statusCompleted')}
+                        color="success"
+                        size="small"
+                        sx={{
+                          height: 22,
+                          '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                        }}
+                      />
+                    );
+                  }
+                  if (plan?.status === 'paused') {
+                    const activeMilestone = milestones.find((m: any) => m.id === plan.activeMilestoneId);
+                    const pausedTime = activeMilestone?.pausedAt;
+                    const pausedLabel = pausedTime
+                      ? `${t('releaseFlow.statusPaused')}: ${formatRelativeTime(pausedTime)}`
+                      : t('releaseFlow.statusPaused');
+                    return (
+                      <Chip
+                        icon={<PauseIcon sx={{ fontSize: 14 }} />}
+                        label={pausedLabel}
+                        color="warning"
+                        size="small"
+                        sx={{
+                          height: 22,
+                          '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                        }}
+                      />
+                    );
+                  }
                   const statusMap: Record<
                     string,
-                    { label: string; color: 'default' | 'success' | 'primary' | 'warning' }
+                    { label: string; color: 'default' | 'primary' }
                   > = {
                     draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
                     active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                    paused: { label: t('releaseFlow.statusPaused'), color: 'warning' },
                   };
-                  const status = isCompleted
-                    ? { label: t('releaseFlow.statusCompleted'), color: 'success' as const }
-                    : statusMap[plan?.status || 'draft'];
+                  const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
                       label={status.label}
@@ -913,6 +952,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           sx={{
                             px: 2,
                             py: 1.25,
+                            minHeight: 48,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
@@ -1030,27 +1070,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           </Box>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {/* Paused badge on the milestone itself */}
-                            {status === 'paused' &&
-                              (() => {
-                                const pausedTime = milestone.pausedAt;
-                                return (
-                                  <Chip
-                                    icon={<PauseIcon sx={{ fontSize: 14 }} />}
-                                    label={
-                                      pausedTime
-                                        ? `${t('releaseFlow.pausedAt')}: ${formatRelativeTime(pausedTime)}`
-                                        : t('releaseFlow.pausedAt')
-                                    }
-                                    color="warning"
-                                    size="small"
-                                    sx={{
-                                      height: 22,
-                                      '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' },
-                                    }}
-                                  />
-                                );
-                              })()}
+
                             <Box
                               onClick={(e: React.MouseEvent) => e.stopPropagation()}
                               sx={{ flexShrink: 0 }}
@@ -1097,6 +1117,33 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             </Box>
                           </Box>
                         </Collapse>
+
+                        {/* Transition Progress Bar */}
+                        {(() => {
+                          if (status !== 'active' && status !== 'paused') return null;
+                          const interval = milestone.transitionCondition?.intervalMinutes;
+                          if (!interval || !milestone.startedAt) return null;
+                          const totalMs = interval * 60 * 1000;
+                          const elapsedMs = Date.now() - new Date(milestone.startedAt).getTime();
+                          const progress = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100));
+                          return (
+                            <LinearProgress
+                              variant="determinate"
+                              value={progress}
+                              sx={{
+                                height: 3,
+                                borderRadius: 0,
+                                bgcolor: (theme) =>
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.08)'
+                                    : 'rgba(0,0,0,0.06)',
+                                '& .MuiLinearProgress-bar': {
+                                  bgcolor: status === 'paused' ? 'warning.main' : 'primary.main',
+                                },
+                              }}
+                            />
+                          );
+                        })()}
                       </Paper>
 
                       {/* Connector between milestones */}
