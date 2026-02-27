@@ -439,7 +439,7 @@ namespace Gatrix.Unity.SDK
 
             var oldSynchronizedFlags = new Dictionary<string, EvaluatedFlag>(_synchronizedFlags);
             _synchronizedFlags = new Dictionary<string, EvaluatedFlag>(_realtimeFlags);
-            InvokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags, _synchronizedFlags, forceRealtime: false);
+            InvokeWatchCallbacks(_syncedWatchCallbacks, oldSynchronizedFlags, _synchronizedFlags, forceRealtime: false, _flagsContextHash, _lastContextHash);
             _pendingSync = false;
             _syncFlagsCount++;
             _emitter.Emit(GatrixEvents.FlagsSync);
@@ -462,7 +462,7 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>Check if offline mode is enabled</summary>
-        public bool IsOfflineMode() => _config.OfflineMode;
+        public bool IsOfflineMode() => FeaturesConfig.OfflineMode;
 
         /// <summary>Check if currently fetching flags</summary>
         public bool IsFetching() => _isFetchingFlags;

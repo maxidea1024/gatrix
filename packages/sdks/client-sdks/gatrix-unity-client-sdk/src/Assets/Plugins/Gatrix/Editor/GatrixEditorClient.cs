@@ -54,14 +54,22 @@ namespace Gatrix.Unity.SDK.Editor
             if (behaviour?.Settings == null) return;
             if (!behaviour.Settings.IsValid(out _)) return;
 
+            // Read cached flags directly — if none exist, skip editor client creation
+            var cachedJson = FeaturesClient.EditorGetCachedFlagsJson();
+            if (string.IsNullOrEmpty(cachedJson)) return;
+
+            var cachedFlags = GatrixJson.DeserializeFlags(cachedJson);
+            if (cachedFlags == null || cachedFlags.Count == 0) return;
+
             var config = behaviour.Settings.ToConfig();
 
-            // Offline mode: never make network requests in Edit Mode
-            config.OfflineMode = true;
+            // Offline mode with bootstrap: no network, no polling, no streaming
+            config.Features ??= new FeaturesConfig();
+            config.Features.OfflineMode = true;
+            config.Features.Bootstrap = cachedFlags;
+            config.Features.BootstrapOverride = true;
 
             _client = new GatrixClient(config);
-
-            // StartAsync loads from local storage and skips network in offline mode — effectively synchronous
             _client.Features.StartAsync().Forget();
         }
 

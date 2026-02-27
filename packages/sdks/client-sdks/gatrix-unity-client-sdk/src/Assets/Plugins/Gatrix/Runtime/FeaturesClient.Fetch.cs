@@ -441,7 +441,7 @@ namespace Gatrix.Unity.SDK
                 _fetchCts = new CancellationTokenSource();
                 var ct = _fetchCts.Token;
 
-                var timeout = FeaturesConfig.FetchTimeout * 1000;
+                var timeout = (int)(FeaturesConfig.FetchTimeout * 1000);
                 HttpResponseMessage response = null;
 
                 using (var timeoutCts = new CancellationTokenSource(timeout))

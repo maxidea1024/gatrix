@@ -153,7 +153,7 @@ namespace Gatrix.Unity.SDK.Editor
 
                 // 3. Other Settings
                 GatrixEditorStyle.DrawSectionHeader("Settings", GatrixEditorStyle.AccentGreen);
-                DrawPropertiesExcluding(serializedObject, "m_Script", "_flagName", "_use");
+                DrawPropertiesExcluding(serializedObject, "m_Script", "_flagName", "_flagSyncMode", "_use");
 
                 // 4. Live Flag Status (Play Mode only)
                 DrawLiveFlagStatus();
