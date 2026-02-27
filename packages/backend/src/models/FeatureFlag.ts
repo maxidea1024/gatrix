@@ -1075,7 +1075,10 @@ export class FeatureSegmentModel {
         .select(
           'g_feature_segments.*',
           'g_users.name as createdByName',
-          'g_users.email as createdByEmail'
+          'g_users.email as createdByEmail',
+          db.raw(
+            `(SELECT COUNT(DISTINCT ffs.strategyId) FROM g_feature_flag_segments ffs WHERE ffs.segmentId = g_feature_segments.id) as referenceCount`
+          )
         )
         .leftJoin('g_users', 'g_feature_segments.createdBy', 'g_users.id');
 
@@ -1094,6 +1097,7 @@ export class FeatureSegmentModel {
         isActive: Boolean(s.isActive),
         constraints: parseJsonField<Constraint[]>(s.constraints) || [],
         tags: parseJsonField<string[]>(s.tags) || [],
+        referenceCount: Number(s.referenceCount) || 0,
       }));
     } catch (error) {
       logger.error('Error finding segments:', error);
@@ -1228,6 +1232,53 @@ export class FeatureSegmentModel {
       throw error;
     }
   }
+
+  /**
+   * Get detailed references for a segment (flags and release templates that use it)
+   */
+  static async getReferences(
+    id: string
+  ): Promise<{
+    flags: { flagName: string; environment: string }[];
+    templates: { flowName: string; id: string; milestoneName: string }[];
+  }> {
+    try {
+      // Find feature flags referencing this segment via strategies
+      const flagRows = await db('g_feature_flag_segments as ffs')
+        .join('g_feature_strategies as fs', 'ffs.strategyId', 'fs.id')
+        .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
+        .where('ffs.segmentId', id)
+        .where('ff.isArchived', false)
+        .select('ff.flagName', 'fs.environment')
+        .groupBy('ff.flagName', 'fs.environment');
+
+      // Find release flow templates referencing this segment
+      const templateRows = await db('g_release_flow_strategy_segments as rss')
+        .join('g_release_flow_strategies as rs', 'rss.strategyId', 'rs.id')
+        .join('g_release_flow_milestones as rm', 'rs.milestoneId', 'rm.id')
+        .join('g_release_flows as rf', 'rm.flowId', 'rf.id')
+        .where('rss.segmentId', id)
+        .where('rf.discriminator', 'template')
+        .where('rf.isArchived', false)
+        .select('rf.flowName', 'rf.id', 'rm.name as milestoneName')
+        .groupBy('rf.flowName', 'rf.id', 'rm.name');
+
+      return {
+        flags: flagRows.map((r: any) => ({
+          flagName: r.flagName,
+          environment: r.environment,
+        })),
+        templates: templateRows.map((r: any) => ({
+          flowName: r.flowName,
+          id: r.id,
+          milestoneName: r.milestoneName,
+        })),
+      };
+    } catch (error) {
+      logger.error('Error getting segment references:', error);
+      throw error;
+    }
+  }
 }
 
 // ==================== Feature Context Field Model ====================
@@ -1255,11 +1306,35 @@ export class FeatureContextFieldModel {
 
       const fields = await query.orderBy('g_feature_context_fields.createdAt', 'desc');
 
+      // Compute reference counts by scanning strategy constraints
+      const strategies = await db('g_feature_strategies')
+        .whereNotNull('constraints')
+        .where('constraints', '!=', '[]')
+        .select('constraints');
+
+      const segments = await db('g_feature_segments')
+        .whereNotNull('constraints')
+        .where('constraints', '!=', '[]')
+        .select('constraints');
+
+      // Count references per field name
+      const refCounts: Record<string, number> = {};
+      const allConstraintSets = [...strategies, ...segments];
+      for (const row of allConstraintSets) {
+        const constraints = parseJsonField<any[]>(row.constraints) || [];
+        for (const c of constraints) {
+          if (c.contextName) {
+            refCounts[c.contextName] = (refCounts[c.contextName] || 0) + 1;
+          }
+        }
+      }
+
       return fields.map((f: any) => ({
         ...f,
         stickiness: Boolean(f.stickiness),
         validationRules: parseJsonField<ValidationRules>(f.validationRules) || undefined,
         tags: parseJsonField<string[]>(f.tags) || [],
+        referenceCount: refCounts[f.fieldName] || 0,
       }));
     } catch (error) {
       logger.error('Error finding context fields:', error);
@@ -1345,6 +1420,77 @@ export class FeatureContextFieldModel {
       await db('g_feature_context_fields').where('fieldName', fieldName).del();
     } catch (error) {
       logger.error('Error deleting context field:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get detailed references for a context field
+   * Searches strategy constraints, segment constraints, and release template strategy constraints
+   */
+  static async getReferences(
+    fieldName: string
+  ): Promise<{
+    flags: { flagName: string; environment: string }[];
+    segments: { segmentName: string; id: string }[];
+    templates: { flowName: string; id: string; milestoneName: string }[];
+  }> {
+    try {
+      // Find feature flags referencing this context field in strategy constraints
+      const flagRows = await db('g_feature_strategies as fs')
+        .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
+        .where('ff.isArchived', false)
+        .whereNotNull('fs.constraints')
+        .where('fs.constraints', '!=', '[]')
+        .whereRaw(
+          `JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
+          [fieldName]
+        )
+        .select('ff.flagName', 'fs.environment')
+        .groupBy('ff.flagName', 'fs.environment');
+
+      // Find segments referencing this context field in their constraints
+      const segmentRows = await db('g_feature_segments')
+        .whereNotNull('constraints')
+        .where('constraints', '!=', '[]')
+        .whereRaw(
+          `JSON_SEARCH(constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
+          [fieldName]
+        )
+        .select('segmentName', 'id');
+
+      // Find release flow templates referencing this context field in strategy constraints
+      const templateRows = await db('g_release_flow_strategies as rs')
+        .join('g_release_flow_milestones as rm', 'rs.milestoneId', 'rm.id')
+        .join('g_release_flows as rf', 'rm.flowId', 'rf.id')
+        .where('rf.discriminator', 'template')
+        .where('rf.isArchived', false)
+        .whereNotNull('rs.constraints')
+        .where('rs.constraints', '!=', '[]')
+        .whereRaw(
+          `JSON_SEARCH(rs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
+          [fieldName]
+        )
+        .select('rf.flowName', 'rf.id', 'rm.name as milestoneName')
+        .groupBy('rf.flowName', 'rf.id', 'rm.name');
+
+      return {
+        flags: flagRows.map((r: any) => ({
+          flagName: r.flagName,
+          environment: r.environment,
+        })),
+        segments: segmentRows.map((r: any) => ({
+          segmentName: r.segmentName,
+          id: r.id,
+        })),
+        templates: templateRows.map((r: any) => ({
+          flowName: r.flowName,
+          id: r.id,
+          milestoneName: r.milestoneName,
+        })),
+      };
+    } catch (error) {
+      logger.error('Error getting context field references:', error);
       throw error;
     }
   }

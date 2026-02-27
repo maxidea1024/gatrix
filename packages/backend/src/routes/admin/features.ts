@@ -265,6 +265,16 @@ router.put(
   })
 );
 
+// Get segment references
+router.get(
+  '/segments/:id/references',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { FeatureSegmentModel } = await import('../../models/FeatureFlag');
+    const references = await FeatureSegmentModel.getReferences(req.params.id);
+    res.json({ success: true, data: { references } });
+  })
+);
+
 // Delete a segment
 router.delete(
   '/segments/:id',
@@ -315,6 +325,16 @@ router.put(
     );
 
     res.json({ success: true, data: { field } });
+  })
+);
+
+// Get context field references
+router.get(
+  '/context-fields/:fieldName/references',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { FeatureContextFieldModel } = await import('../../models/FeatureFlag');
+    const references = await FeatureContextFieldModel.getReferences(req.params.fieldName);
+    res.json({ success: true, data: { references } });
   })
 );
 
@@ -1162,14 +1182,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-                const fieldDef = fieldDefMap?.get(name);
-                const rules = fieldDef?.validationRules as any;
-                return {
-                  name,
-                  isRequired: rules?.isRequired === true,
-                  fieldType: (fieldDef?.fieldType as string) || 'string',
-                };
-              })
+              const fieldDef = fieldDefMap?.get(name);
+              const rules = fieldDef?.validationRules as any;
+              return {
+                name,
+                isRequired: rules?.isRequired === true,
+                fieldType: (fieldDef?.fieldType as string) || 'string',
+              };
+            })
             : undefined,
       },
     });

@@ -40,6 +40,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { extractErrorCode } from '@gatrix/shared';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyState from '../../components/common/EmptyState';
 import DynamicFilterBar, {
@@ -52,6 +53,9 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
+import ReferenceCheckDialog, {
+  ResourceReference,
+} from '../../components/common/ReferenceCheckDialog';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import api from '../../services/api';
 import ConstraintEditor, {
@@ -72,6 +76,7 @@ interface FeatureSegment {
   constraints: Constraint[];
   isActive?: boolean;
   tags?: string[];
+  referenceCount?: number;
   createdAt: string;
   updatedAt: string;
   createdByName?: string;
@@ -94,6 +99,8 @@ const FeatureSegmentsPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSegment, setDeletingSegment] = useState<FeatureSegment | null>(null);
+  const [referenceDialogOpen, setReferenceDialogOpen] = useState(false);
+  const [references, setReferences] = useState<ResourceReference | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingSegment, setEditingSegment] = useState<Partial<FeatureSegment> | null>(null);
   const [originalSegment, setOriginalSegment] = useState<Partial<FeatureSegment> | null>(null);
@@ -111,6 +118,7 @@ const FeatureSegmentsPage: React.FC = () => {
     { id: 'visibility', labelKey: 'featureFlags.visibility', visible: true },
     { id: 'segmentName', labelKey: 'featureFlags.segmentName', visible: true },
     { id: 'constraints', labelKey: 'featureFlags.constraints', visible: true },
+    { id: 'references', labelKey: 'common.references', visible: true },
     { id: 'tags', labelKey: 'featureFlags.tags', visible: true },
     { id: 'createdBy', labelKey: 'common.createdBy', visible: true },
     { id: 'createdAt', labelKey: 'featureFlags.createdAt', visible: true },
@@ -415,9 +423,34 @@ const FeatureSegmentsPage: React.FC = () => {
     }
   };
 
-  const handleDelete = (segment: FeatureSegment) => {
+  const handleDelete = async (segment: FeatureSegment) => {
     setDeletingSegment(segment);
-    setDeleteConfirmOpen(true);
+    try {
+      const result = await api.get(`/admin/features/segments/${segment.id}/references`);
+      const refs = result.data?.references;
+      if (refs && (refs.flags?.length > 0 || refs.templates?.length > 0)) {
+        setReferences(refs);
+        setReferenceDialogOpen(true);
+      } else {
+        setDeleteConfirmOpen(true);
+      }
+    } catch {
+      // If reference check fails, still allow delete attempt
+      setDeleteConfirmOpen(true);
+    }
+  };
+
+  const handleViewReferences = async (segment: FeatureSegment) => {
+    try {
+      const result = await api.get(`/admin/features/segments/${segment.id}/references`);
+      const refs = result.data?.references;
+      if (refs) {
+        setReferences(refs);
+        setReferenceDialogOpen(true);
+      }
+    } catch {
+      enqueueSnackbar(t('common.loadFailed'), { variant: 'error' });
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -427,12 +460,20 @@ const FeatureSegmentsPage: React.FC = () => {
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       loadSegments();
     } catch (error: any) {
-      enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
-        variant: 'error',
-      });
+      const errorCode = extractErrorCode(error?.response?.data);
+      if (errorCode === 'RESOURCE_IN_USE') {
+        const payload =
+          error?.response?.data?.error?.details?.payload ||
+          error?.response?.data?.error?.payload;
+        setReferences(payload?.references || null);
+        setReferenceDialogOpen(true);
+      } else {
+        enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
+          variant: 'error',
+        });
+      }
     } finally {
       setDeleteConfirmOpen(false);
-      setDeletingSegment(null);
     }
   };
 
@@ -588,7 +629,12 @@ const FeatureSegmentsPage: React.FC = () => {
                   <TableHead>
                     <TableRow>
                       {visibleColumns.map((col) => (
-                        <TableCell key={col.id}>{t(col.labelKey)}</TableCell>
+                        <TableCell
+                          key={col.id}
+                          align={col.id === 'references' ? 'center' : undefined}
+                        >
+                          {t(col.labelKey)}
+                        </TableCell>
                       ))}
                       {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                     </TableRow>
@@ -790,6 +836,27 @@ const FeatureSegmentsPage: React.FC = () => {
                                   ) : (
                                     <Typography variant="body2" color="text.disabled">
                                       -
+                                    </Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'references':
+                              return (
+                                <TableCell key={col.id} align="center">
+                                  {(segment.referenceCount ?? 0) > 0 ? (
+                                    <Tooltip title={t('common.viewReferences')}>
+                                      <Chip
+                                        label={segment.referenceCount}
+                                        size="small"
+                                        color="primary"
+                                        variant="outlined"
+                                        onClick={() => handleViewReferences(segment)}
+                                        sx={{ cursor: 'pointer', minWidth: 32 }}
+                                      />
+                                    </Tooltip>
+                                  ) : (
+                                    <Typography variant="body2" color="text.disabled">
+                                      {t('common.noReferences')}
                                     </Typography>
                                   )}
                                 </TableCell>
@@ -1093,6 +1160,14 @@ const FeatureSegmentsPage: React.FC = () => {
         message={t('featureFlags.deleteConfirmMessage', {
           name: deletingSegment?.segmentName || '',
         })}
+      />
+
+      {/* Reference Check Dialog */}
+      <ReferenceCheckDialog
+        open={referenceDialogOpen}
+        onClose={() => setReferenceDialogOpen(false)}
+        title={t('common.cannotDelete')}
+        references={references}
       />
 
       {/* Column Settings Dialog */}

@@ -1104,14 +1104,15 @@ class FeatureFlagService {
       throw new GatrixError('Segment not found', 404, true, ErrorCodes.NOT_FOUND);
     }
 
-    // Check if segment is used by any strategies
-    const usageCount = await FeatureSegmentModel.getUsageCount(id);
-    if (usageCount > 0) {
+    // Check if segment is referenced by any flags or templates
+    const references = await FeatureSegmentModel.getReferences(id);
+    if (references.flags.length > 0 || references.templates.length > 0) {
       throw new GatrixError(
-        `Segment is in use by ${usageCount} strategies`,
-        400,
+        'Segment is in use and cannot be deleted',
+        409,
         true,
-        ErrorCodes.BAD_REQUEST
+        ErrorCodes.RESOURCE_IN_USE,
+        { references }
       );
     }
 
@@ -1208,8 +1209,21 @@ class FeatureFlagService {
       );
     }
 
-    // Propagate change to all flags using this context field in constraints before deletion
-    await this.invalidateReferencingFlagsByContextField(fieldName);
+    // Check if context field is referenced by any flags, segments, or templates
+    const references = await FeatureContextFieldModel.getReferences(fieldName);
+    if (
+      references.flags.length > 0 ||
+      references.segments.length > 0 ||
+      references.templates.length > 0
+    ) {
+      throw new GatrixError(
+        'Context field is in use and cannot be deleted',
+        409,
+        true,
+        ErrorCodes.RESOURCE_IN_USE,
+        { references }
+      );
+    }
 
     await FeatureContextFieldModel.delete(fieldName);
   }
