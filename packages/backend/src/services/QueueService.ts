@@ -1,7 +1,6 @@
 import { Queue, Worker, Job, QueueEvents, RepeatableJob } from 'bullmq';
 import logger from '../config/logger';
 import { BullBoardConfig } from '../config/bullboard';
-import { CouponSettingsService } from './CouponSettingsService';
 
 export interface QueueJobData {
   type: string;
@@ -510,129 +509,27 @@ export class QueueService {
   }
 
   /**
-   * Process scheduler job - for now just console.log
+   * Process scheduler job via handler registry.
+   * Handlers are defined in schedulerJobs.ts for separation of concerns.
    */
   private async processSchedulerJob(job: Job<QueueJobData>): Promise<void> {
     const jobType = job.name || job.data?.type;
     logger.info('Processing scheduler job:', { jobId: job.id, jobType });
 
     try {
-      switch (jobType) {
-        case 'coupon:expire': {
-          const affected = await CouponSettingsService.disableExpiredCoupons();
-          logger.info('coupon:expire completed', { jobId: job.id, affected });
-          break;
-        }
-        case 'campaign-check': {
-          // Dynamic import to avoid circular dependency
-          const { CampaignScheduler } = await import('./campaignScheduler');
-          await CampaignScheduler.getInstance().checkAndUpdateCampaigns();
-          logger.info('campaign-check completed', { jobId: job.id });
-          break;
-        }
-        case 'lifecycle:cleanup': {
-          // Dynamic import to avoid circular dependency
-          const { processLifecycleCleanupJob } = await import('./lifecycleCleanupScheduler');
-          const retentionDays = job.data?.payload?.retentionDays ?? 14;
-          const deleted = await processLifecycleCleanupJob(retentionDays);
-          logger.info('lifecycle:cleanup completed', {
-            jobId: job.id,
-            deleted,
-          });
-          break;
-        }
-        case 'planning:cleanup': {
-          // Dynamic import to avoid circular dependency
-          const { PlanningDataService } = await import('./PlanningDataService');
-          const result = await PlanningDataService.cleanupAllEnvironments();
-          logger.info('planning:cleanup completed', {
-            jobId: job.id,
-            ...result,
-          });
-          break;
-        }
-        case 'change-request:cleanup': {
-          // Dynamic import to avoid circular dependency
-          const { ChangeRequestService } = await import('./ChangeRequestService');
-          const retentionDays = parseInt(
-            process.env.CHANGE_REQUEST_REJECTION_RETENTION_DAYS || '14',
-            10
-          );
-          const deleted = await ChangeRequestService.cleanupRejected(retentionDays);
-          logger.info('change-request:cleanup completed', {
-            jobId: job.id,
-            deleted,
-            retentionDays,
-          });
-          break;
-        }
-        case 'outbox:process': {
-          // Dynamic import to avoid circular dependency
-          const { processOutboxJob } = await import('./outboxScheduler');
-          const batchSize = job.data?.payload?.batchSize ?? 20;
-          const processed = await processOutboxJob(batchSize);
-          logger.info('outbox:process completed', { jobId: job.id, processed });
-          break;
-        }
-        case 'outbox:cleanup': {
-          // Dynamic import to avoid circular dependency
-          const { cleanupOutboxJob } = await import('./outboxScheduler');
-          const outboxRetentionDays = job.data?.payload?.retentionDays ?? 7;
-          const outboxDeleted = await cleanupOutboxJob(outboxRetentionDays);
-          logger.info('outbox:cleanup completed', {
-            jobId: job.id,
-            deleted: outboxDeleted,
-          });
-          break;
-        }
-        case 'lock:cleanup': {
-          // Dynamic import to avoid circular dependency
-          const { cleanupLocksJob } = await import('./outboxScheduler');
-          const locksDeleted = await cleanupLocksJob();
-          logger.info('lock:cleanup completed', {
-            jobId: job.id,
-            deleted: locksDeleted,
-          });
-          break;
-        }
-        case 'unknown-flags:flush': {
-          // Dynamic import to avoid circular dependency
-          const { processUnknownFlagsFlushJob } = await import('./UnknownFlagService');
-          const result = await processUnknownFlagsFlushJob();
-          if (result.flushed > 0 || result.errors > 0) {
-            logger.info('unknown-flags:flush completed', {
-              jobId: job.id,
-              ...result,
-            });
-          }
-          break;
-        }
-        case 'release-flow:progression-check': {
-          // Dynamic import to avoid circular dependency
-          const { ReleaseFlowScheduler } = await import('./releaseFlowScheduler');
-          await ReleaseFlowScheduler.getInstance().checkAndProgressMilestones();
-          logger.info('release-flow:progression-check completed', { jobId: job.id });
-          break;
-        }
-        case 'signal:process': {
-          // Dynamic import to avoid circular dependency
-          const { ActionExecutionService } = await import('./ActionExecutionService');
-          const signalResult = await ActionExecutionService.processUnprocessedSignals();
-          if (signalResult.processed > 0 || signalResult.errors > 0) {
-            logger.info('signal:process completed', {
-              jobId: job.id,
-              ...signalResult,
-            });
-          }
-          break;
-        }
-        default: {
-          logger.info('Unhandled scheduler job type, logging only', {
-            jobId: job.id,
-            jobType,
-            payload: job.data?.payload,
-          });
-        }
+      // Lazy-load handlers to avoid circular dependencies at module level
+      const { getSchedulerHandlers } = await import('./schedulerJobs');
+      const handlers = getSchedulerHandlers();
+      const handler = handlers[jobType];
+
+      if (handler) {
+        await handler(job);
+      } else {
+        logger.info('Unhandled scheduler job type, logging only', {
+          jobId: job.id,
+          jobType,
+          payload: job.data?.payload,
+        });
       }
     } catch (error) {
       logger.error('Scheduler job failed', { jobId: job.id, jobType, error });

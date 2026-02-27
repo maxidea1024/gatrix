@@ -100,8 +100,9 @@ class FlagStreamingService {
           if (event.type === 'feature_flag.changed') {
             const environment = event.data.environment as string;
             const changedKeys = (event.data.changedKeys as string[]) ?? [];
+            const revision = (event.data.revision as number) ?? 0;
             if (environment) {
-              this.notifyClients(environment, changedKeys);
+              this.notifyClients(environment, changedKeys, revision);
             }
           }
         } catch (err) {
@@ -313,13 +314,15 @@ class FlagStreamingService {
 
   /**
    * Notify all clients subscribed to a specific environment about flag changes.
+   * Revision is pre-computed by the event producer (FeatureFlagService) to avoid
+   * duplicate increments across multiple backend instances.
    * @param environment - The environment that changed
    * @param changedKeys - Flag names that changed (from backend event)
+   * @param revision - Pre-computed global revision from the event producer
    */
-  private async notifyClients(environment: string, changedKeys: string[]): Promise<void> {
-    const newRevision = await this.incrementGlobalRevision(environment);
+  private notifyClients(environment: string, changedKeys: string[], revision: number): void {
     const payload = {
-      globalRevision: newRevision,
+      globalRevision: revision,
       changedKeys,
       timestamp: Date.now(),
     };
@@ -344,7 +347,7 @@ class FlagStreamingService {
 
     if (notifiedCount > 0) {
       logger.debug(
-        `FlagStreamingService: Notified ${notifiedCount} clients for env=${environment}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
+        `FlagStreamingService: Notified ${notifiedCount} clients for env=${environment}, rev=${revision}, keys=[${changedKeys.join(',')}]`
       );
     }
   }
@@ -451,9 +454,9 @@ class FlagStreamingService {
 
   /**
    * Atomically increment and return new global revision for an environment via Redis INCR.
-   * This ensures consistency across multiple instances.
+   * Called by FeatureFlagService.invalidateCache() once at source, NOT by each instance.
    */
-  private async incrementGlobalRevision(environment: string): Promise<number> {
+  async incrementGlobalRevision(environment: string): Promise<number> {
     if (!this.redisClient) return 0;
     try {
       return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environment}`);

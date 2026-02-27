@@ -38,6 +38,7 @@ export class PubSubService extends EventEmitter {
   // Redis Pub/Sub for SSE broadcast
   private sseSubscriber: RedisClientType | null = null;
   private readonly SSE_CHANNEL = 'sse:notifications';
+  private readonly CACHE_CHANNEL = 'cache:invalidation';
 
   private isConnected = false;
   private readonly QUEUE_NAME = 'cache-invalidation';
@@ -147,6 +148,17 @@ export class PubSubService extends EventEmitter {
           }
         });
         logger.info(`Subscribed to Redis channel: ${this.SSE_CHANNEL}`);
+
+        // Subscribe to cache invalidation channel for cross-instance L1 cache sync
+        await this.sseSubscriber.subscribe(this.CACHE_CHANNEL, (payload: string) => {
+          try {
+            const message = JSON.parse(payload) as CacheInvalidationMessage;
+            this.processLocalCacheInvalidation(message);
+          } catch (err) {
+            logger.error('Failed to parse cache Pub/Sub message:', err);
+          }
+        });
+        logger.info(`Subscribed to Redis channel: ${this.CACHE_CHANNEL}`);
       } catch (err) {
         logger.warn(
           'Failed to initialize Redis Pub/Sub for SSE; falling back to BullMQ path only',
@@ -248,6 +260,37 @@ export class PubSubService extends EventEmitter {
   }
 
   /**
+   * Process local L1 cache invalidation from Pub/Sub broadcast.
+   * Only invalidates in-process L1 memory cache (NOT Redis — already handled at source).
+   */
+  private async processLocalCacheInvalidation(data: CacheInvalidationMessage): Promise<void> {
+    try {
+      // Ignore old messages (older than 30 seconds)
+      if (Date.now() - data.timestamp > 30_000) {
+        logger.debug('Ignoring old cache invalidation Pub/Sub message:', data);
+        return;
+      }
+
+      switch (data.type) {
+        case 'clear':
+          await cacheService.clear();
+          break;
+        case 'invalidate':
+          if (data.pattern) {
+            await cacheService.deleteByPattern(data.pattern);
+          } else if (data.key) {
+            await cacheService.delete(data.key);
+          }
+          break;
+      }
+
+      logger.debug('Local L1 cache invalidation via Pub/Sub:', data);
+    } catch (error: any) {
+      logger.error('Failed to process local cache invalidation:', error);
+    }
+  }
+
+  /**
    * Add cache invalidation job to queue
    */
   private async addCacheInvalidationJob(
@@ -331,8 +374,8 @@ export class PubSubService extends EventEmitter {
       logger.error('Failed to perform direct Redis invalidation:', error);
     }
 
-    // Broadcast to other instances via queue
-    await this.addCacheInvalidationJob({
+    // Broadcast to other instances via Redis Pub/Sub for L1 cache sync
+    await this.publishCacheInvalidation({
       type: 'invalidate',
       pattern,
     });
@@ -348,12 +391,12 @@ export class PubSubService extends EventEmitter {
     await cacheService.delete(key);
     logger.debug(`Local cache deleted for key: ${key}`);
 
-    // Broadcast to other instances via queue
-    await this.addCacheInvalidationJob({
+    // Broadcast to other instances via Redis Pub/Sub for L1 cache sync
+    await this.publishCacheInvalidation({
       type: 'invalidate',
       key,
     });
-    logger.debug(`Cache invalidation job queued for key: ${key}`);
+    logger.debug(`Cache invalidation published via Pub/Sub for key: ${key}`);
   }
 
   /**
@@ -363,10 +406,36 @@ export class PubSubService extends EventEmitter {
     // Clear local cache immediately
     await cacheService.clear();
 
-    // Broadcast to other instances via queue
-    await this.addCacheInvalidationJob({
+    // Broadcast to other instances via Redis Pub/Sub for L1 cache sync
+    await this.publishCacheInvalidation({
       type: 'clear',
     });
+  }
+
+  /**
+   * Publish cache invalidation to all instances via Redis Pub/Sub.
+   * Each instance's subscriber will invalidate its own L1 memory cache.
+   */
+  private async publishCacheInvalidation(
+    message: Omit<CacheInvalidationMessage, 'timestamp'>
+  ): Promise<void> {
+    try {
+      const fullMessage: CacheInvalidationMessage = {
+        ...message,
+        timestamp: Date.now(),
+      };
+      const client = redisClient.getClient();
+      await client.publish(this.CACHE_CHANNEL, JSON.stringify(fullMessage));
+      logger.debug('Cache invalidation published to Pub/Sub channel', {
+        type: fullMessage.type,
+        key: fullMessage.key,
+        pattern: fullMessage.pattern,
+      });
+    } catch (error: any) {
+      logger.error('Failed to publish cache invalidation via Redis Pub/Sub:', error);
+      // Fallback: enqueue to BullMQ for at-least-once delivery (single instance only)
+      await this.addCacheInvalidationJob(message);
+    }
   }
 
   /**
@@ -444,7 +513,7 @@ export class PubSubService extends EventEmitter {
    */
   async publishEvent(event: {
     type: string;
-    data: { id: number | string; timestamp: number; [key: string]: any };
+    data: { id: number | string; timestamp: number;[key: string]: any };
   }): Promise<void> {
     try {
       const client = redisClient.getClient();

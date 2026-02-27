@@ -260,10 +260,8 @@ export class PlanningDataController {
       environment,
     });
 
-    // Notify all clients via SSE about planning data update
-    const { SSENotificationService } = await import('../services/sseNotificationService');
-    const sseService = SSENotificationService.getInstance();
-    sseService.sendNotification({
+    // Notify all clients via SSE about planning data update (via PubSub for cross-instance delivery)
+    await pubSubService.publishNotification({
       type: 'planning_data_updated',
       data: {
         filesUploaded: result.filesUploaded,
@@ -271,7 +269,6 @@ export class PlanningDataController {
         timestamp: new Date().toISOString(),
         uploadRecord: result.uploadRecord,
       },
-      timestamp: new Date(),
       targetChannels: ['admin'],
     });
 

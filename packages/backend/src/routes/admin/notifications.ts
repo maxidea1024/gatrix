@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { authenticate, AuthenticatedRequest } from '../../middleware/auth';
 import SSENotificationService from '../../services/sseNotificationService';
+import { pubSubService } from '../../services/PubSubService';
 import logger from '../../config/logger';
 
 const router = Router();
@@ -129,7 +130,7 @@ router.post('/sse/unsubscribe', (req: Request, res: Response) => {
 /**
  * Send test notification (admin only)
  */
-router.post('/test', (req: Request, res: Response) => {
+router.post('/test', async (req: Request, res: Response) => {
   if ((req as any).user?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }
@@ -137,18 +138,17 @@ router.post('/test', (req: Request, res: Response) => {
   const { type, data, targetUsers, targetChannels } = req.body;
 
   try {
-    const sentCount = sseService.sendNotification({
+    // Publish via PubSub so all instances receive the notification
+    await pubSubService.publishNotification({
       type: type || 'test',
       data: data || { message: 'Test notification' },
-      timestamp: new Date(),
       targetUsers,
       targetChannels,
     });
 
     res.json({
       success: true,
-      message: `Test notification sent to ${sentCount} clients`,
-      sentCount,
+      message: 'Test notification published to all instances',
     });
   } catch (error) {
     logger.error('Error sending test notification:', error);

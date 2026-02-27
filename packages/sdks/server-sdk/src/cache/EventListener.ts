@@ -857,35 +857,6 @@ export class EventListener {
         break;
       }
 
-      case 'vars.updated': {
-        if (features.vars === false) {
-          this.logger.debug('Vars event ignored - feature is disabled', {
-            event: event.type,
-          });
-          break;
-        }
-        const varsEnv = event.data.environment as string;
-        if (!varsEnv) {
-          this.logger.warn('Vars update event missing environment', {
-            event: event.type,
-          });
-          break;
-        }
-        this.logger.info('Vars update event received, refreshing vars cache', {
-          key: event.data.key,
-          environment: varsEnv,
-        });
-        try {
-          await this.cacheManager.getVarsService()?.refreshByEnvironment(varsEnv);
-          this.logger.info('Vars cache refreshed successfully');
-        } catch (error: any) {
-          this.logger.error('Failed to refresh vars cache', {
-            error: error.message,
-          });
-        }
-        break;
-      }
-
       case 'segment.created':
       case 'segment.updated':
       case 'segment.deleted': {
@@ -909,6 +880,35 @@ export class EventListener {
           );
         } catch (error: any) {
           this.logger.error('Failed to refresh feature flags cache after segment change', {
+            error: error.message,
+          });
+        }
+        break;
+      }
+
+      case 'vars.updated': {
+        if (features.vars === false) {
+          this.logger.debug('Vars event ignored - feature is disabled', {
+            event: event.type,
+          });
+          break;
+        }
+        const varsEnv = event.data.environment as string;
+        if (!varsEnv) {
+          this.logger.warn('Vars update event missing environment', {
+            event: event.type,
+          });
+          break;
+        }
+        this.logger.info('Vars update event received, refreshing vars cache', {
+          key: event.data.key,
+          environment: varsEnv,
+        });
+        try {
+          await this.cacheManager.getVarsService()?.refreshByEnvironment(varsEnv);
+          this.logger.info('Vars cache refreshed successfully');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh vars cache', {
             error: error.message,
           });
         }

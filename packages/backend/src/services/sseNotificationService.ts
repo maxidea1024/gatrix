@@ -342,73 +342,7 @@ export class SSENotificationService extends EventEmitter {
   }
 }
 
-/**
- * Remote Config specific notification helpers
- */
-export class RemoteConfigNotifications {
-  private static sseService = SSENotificationService.getInstance();
-
-  /**
-   * Notify about config changes
-   */
-  static async notifyConfigChange(
-    configId: number,
-    action: 'created' | 'updated' | 'deleted' | 'campaign_started' | 'campaign_ended',
-    config: any
-  ): Promise<void> {
-    const event: NotificationEvent = {
-      type: 'remote_config_change',
-      data: {
-        configId,
-        action,
-        config,
-      },
-      timestamp: new Date(),
-      targetChannels: ['remote_config', 'admin'],
-    };
-
-    await pubSubService.publishNotification(event);
-    logger.info('Remote config change notification published via PubSub');
-  }
-
-  /**
-   * Notify about deployment
-   */
-  static notifyDeployment(deploymentId: number, configs: any[]): void {
-    const event: NotificationEvent = {
-      type: 'remote_config_deployment',
-      data: {
-        deploymentId,
-        configCount: configs.length,
-        configs,
-      },
-      timestamp: new Date(),
-      targetChannels: ['remote_config', 'admin'],
-    };
-
-    const sentCount = this.sseService.sendNotification(event);
-    logger.info(`Remote config deployment notification sent to ${sentCount} clients`);
-  }
-
-  /**
-   * Notify about campaign status change
-   */
-  static notifyCampaignStatusChange(campaignId: number, isActive: boolean, reason: string): void {
-    const event: NotificationEvent = {
-      type: 'campaign_status_change',
-      data: {
-        campaignId,
-        isActive,
-        reason,
-      },
-      timestamp: new Date(),
-      targetChannels: ['remote_config', 'campaigns', 'admin'],
-    };
-
-    const sentCount = this.sseService.sendNotification(event);
-    logger.info(`Campaign status change notification sent to ${sentCount} clients`);
-  }
-}
+export default SSENotificationService;
 
 /**
  * Change Request specific notification helpers
@@ -534,5 +468,3 @@ export class ChangeRequestNotifications {
     logger.info(`Change request rejected notification published via PubSub`);
   }
 }
-
-export default SSENotificationService;

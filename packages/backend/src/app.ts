@@ -16,8 +16,6 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter } from './middleware/rateLimiter';
 import { appInstance } from './utils/AppInstance';
 import { ALLOWED_HEADERS } from './constants/headers';
-// import { initializeJobTypes } from './services/jobs';
-// import { CampaignScheduler } from './services/campaignScheduler';
 
 // Import main routes module
 import routes from './routes';
@@ -231,25 +229,5 @@ app.use(notFoundHandler);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
-
-// Initialize job types
-// try {
-//   initializeJobTypes();
-// } catch (error) {
-//   logger.error('Failed to initialize job types:', error);
-// }
-
-// Initialize campaign scheduler
-// try {
-//   const campaignScheduler = CampaignScheduler.getInstance();
-//   if (campaignScheduler) {
-//     campaignScheduler.start();
-//     logger.info('Campaign scheduler initialized successfully');
-//   } else {
-//     logger.error('Campaign scheduler getInstance returned undefined');
-//   }
-// } catch (error) {
-//   logger.error('Failed to initialize campaign scheduler:', error);
-// }
 
 export default app;

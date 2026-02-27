@@ -1278,13 +1278,19 @@ class FeatureFlagService {
       // Invalidate evaluate API definitions cache
       await pubSubService.invalidateKey(`feature_flags:definitions:${environment}`);
 
-      // Publish SDK event for real-time updates
+      // Increment revision ONCE here at the source, not in each instance's notifyClients.
+      // This prevents N instances from incrementing revision N times for a single change.
+      const { flagStreamingService } = await import('./FlagStreamingService');
+      const revision = await flagStreamingService.incrementGlobalRevision(environment);
+
+      // Publish SDK event for real-time updates (revision included in payload)
       await pubSubService.publishSDKEvent({
         type: 'feature_flag.changed',
         data: {
           environment,
           changedKeys: changedFlagNames ?? [],
           timestamp: Date.now(),
+          revision,
         },
       });
 
