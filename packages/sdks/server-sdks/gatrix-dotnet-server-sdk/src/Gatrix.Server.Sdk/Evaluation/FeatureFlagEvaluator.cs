@@ -46,7 +46,6 @@ public class FeatureFlagEvaluator
                         Name = variantData?.Name ?? defaultEnabledName,
                         Weight = variantData?.Weight ?? 100,
                         Value = GetFallbackValue(variantData?.Value ?? flag.EnabledValue, flag.ValueType),
-                        ValueType = flag.ValueType ?? "string",
                         Enabled = true,
                     };
 
@@ -57,6 +56,7 @@ public class FeatureFlagEvaluator
                         Enabled = true,
                         Reason = EvaluationReasons.StrategyMatch,
                         Variant = variant,
+                        ValueType = flag.ValueType ?? "string",
                     };
                 }
             }
@@ -79,7 +79,6 @@ public class FeatureFlagEvaluator
                     Name = variantData?.Name ?? defaultEnabledName,
                     Weight = variantData?.Weight ?? 100,
                     Value = GetFallbackValue(variantData?.Value ?? flag.EnabledValue, flag.ValueType),
-                    ValueType = flag.ValueType ?? "string",
                     Enabled = true,
                 };
 
@@ -90,6 +89,7 @@ public class FeatureFlagEvaluator
                     Enabled = true,
                     Reason = EvaluationReasons.Default,
                     Variant = variant,
+                    ValueType = flag.ValueType ?? "string",
                 };
             }
         }
@@ -110,9 +110,9 @@ public class FeatureFlagEvaluator
                 Name = defaultDisabledName,
                 Weight = 100,
                 Value = GetFallbackValue(flag.DisabledValue, flag.ValueType),
-                ValueType = flag.ValueType ?? "string",
                 Enabled = false,
             },
+            ValueType = flag.ValueType ?? "string",
         };
     }
 

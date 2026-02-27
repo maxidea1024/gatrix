@@ -4,7 +4,6 @@ import {
   ReleaseFlowStrategyModel,
   ReleaseFlowAttributes,
   ReleaseFlowMilestoneAttributes,
-  ReleaseFlowStrategyAttributes,
   TransitionCondition,
 } from '../models/ReleaseFlow';
 import { FeatureStrategyModel } from '../models/FeatureFlag';
@@ -15,6 +14,7 @@ import logger from '../config/logger';
 import db from '../config/knex';
 import { ulid } from 'ulid';
 import { pubSubService } from './PubSubService';
+import { queueService } from './QueueService';
 
 export interface CreateTemplateInput {
   flowName: string;
@@ -35,6 +35,58 @@ export interface CreateTemplateInput {
 }
 
 export class ReleaseFlowService {
+  // ==================== Delayed Job Helpers ====================
+
+  /**
+   * Unique job ID for a plan's milestone progression delayed job.
+   * Using a deterministic ID allows us to cancel/replace the job easily.
+   */
+  private progressionJobId(planId: string): string {
+    return `rf-progress:${planId}`;
+  }
+
+  /**
+   * Schedule a delayed job to progress to the next milestone after the
+   * transition interval elapses. Cancels any existing job for this plan first.
+   */
+  private async scheduleProgressionJob(planId: string, delayMs: number): Promise<void> {
+    // Cancel any existing delayed job for this plan
+    await this.cancelProgressionJob(planId);
+
+    const jobId = this.progressionJobId(planId);
+    await queueService.addJob(
+      'scheduler',
+      'release-flow:milestone-progression',
+      { planId },
+      { delay: delayMs }
+    );
+    logger.info(`Scheduled milestone progression for plan ${planId} in ${delayMs}ms (jobId hint: ${jobId})`);
+  }
+
+  /**
+   * Cancel any pending progression delayed job for a plan.
+   */
+  private async cancelProgressionJob(planId: string): Promise<void> {
+    try {
+      const queue = queueService.getQueue('scheduler');
+      if (!queue) return;
+
+      // Find and remove delayed jobs matching this plan
+      const delayed = await queue.getDelayed();
+      for (const job of delayed) {
+        if (
+          job.name === 'release-flow:milestone-progression' &&
+          job.data?.payload?.planId === planId
+        ) {
+          await job.remove();
+          logger.info(`Cancelled progression job ${job.id} for plan ${planId}`);
+        }
+      }
+    } catch (error) {
+      logger.warn(`Failed to cancel progression job for plan ${planId}:`, error);
+    }
+  }
+
   /**
    * Create a new release flow template
    */
@@ -282,7 +334,16 @@ export class ReleaseFlowService {
         await featureFlagService.invalidateCache(plan.environment, [flag.flagName]);
       }
 
-      // 5. Broadcast SSE event for UI real-time update
+      // 5. Schedule delayed job for automatic progression
+      if (milestone.transitionCondition?.intervalMinutes) {
+        const delayMs = milestone.transitionCondition.intervalMinutes * 60 * 1000;
+        await this.scheduleProgressionJob(plan.id, delayMs);
+      } else {
+        // No transition condition — cancel any lingering delayed job
+        await this.cancelProgressionJob(plan.id);
+      }
+
+      // 6. Broadcast SSE event for UI real-time update
       await pubSubService.publishNotification({
         type: 'release_flow.milestone_started',
         data: {
@@ -346,6 +407,9 @@ export class ReleaseFlowService {
       });
     }
 
+    // Cancel any pending progression delayed job
+    await this.cancelProgressionJob(planId);
+
     await ReleaseFlowModel.update(planId, { status: 'paused', updatedBy: userId });
 
     await AuditLogModel.create({
@@ -401,6 +465,18 @@ export class ReleaseFlowService {
         await ReleaseFlowMilestoneModel.update(plan.activeMilestoneId, {
           pausedAt: null,
         });
+      }
+    }
+
+    // Re-schedule delayed job with remaining transition time
+    if (plan.activeMilestoneId) {
+      // Re-read the milestone to get the updated startedAt
+      const updatedMilestone = await ReleaseFlowMilestoneModel.findById(plan.activeMilestoneId);
+      if (updatedMilestone?.transitionCondition?.intervalMinutes && updatedMilestone.startedAt) {
+        const requiredMs = updatedMilestone.transitionCondition.intervalMinutes * 60 * 1000;
+        const elapsedMs = new Date().getTime() - new Date(updatedMilestone.startedAt).getTime();
+        const remainingMs = Math.max(0, requiredMs - elapsedMs);
+        await this.scheduleProgressionJob(planId, remainingMs);
       }
     }
 
@@ -677,6 +753,9 @@ export class ReleaseFlowService {
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Plan not found', 404, true, ErrorCodes.NOT_FOUND);
     }
+
+    // Cancel any pending progression delayed job
+    await this.cancelProgressionJob(planId);
 
     await ReleaseFlowModel.update(planId, {
       isArchived: true,

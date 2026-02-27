@@ -141,9 +141,6 @@ public class Variant
     [JsonPropertyName("value")]
     public object? Value { get; set; }
 
-    [JsonPropertyName("valueType")]
-    public string? ValueType { get; set; }
-
     [JsonPropertyName("enabled")]
     public bool? Enabled { get; set; }
 }

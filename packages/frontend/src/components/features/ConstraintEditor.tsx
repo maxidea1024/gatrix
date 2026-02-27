@@ -57,70 +57,27 @@ import LocalizedDateTimePicker from '@/components/common/LocalizedDateTimePicker
 import CountrySelect from '@/components/common/CountrySelect';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 
-// Constraint types matching backend FeatureFlag.ts
-export interface Constraint {
-  contextName: string;
-  operator: ConstraintOperator;
-  value?: string;
-  values?: string[];
-  inverted?: boolean;
-  caseInsensitive?: boolean;
-}
+import { Constraint, ConstraintOperator } from '@gatrix/shared';
 
-export type ConstraintOperator =
-  // String operators (use inverted flag for negation)
-  | 'str_eq'
-  | 'str_contains'
-  | 'str_starts_with'
-  | 'str_ends_with'
-  | 'str_in'
-  | 'str_regex'
-  // Number operators
-  | 'num_eq'
-  | 'num_gt'
-  | 'num_gte'
-  | 'num_lt'
-  | 'num_lte'
-  | 'num_in'
-  // Boolean operators
-  | 'bool_is'
-  // Date operators
-  | 'date_eq'
-  | 'date_gt'
-  | 'date_gte'
-  | 'date_lt'
-  | 'date_lte'
-  // Semver operators
-  | 'semver_eq'
-  | 'semver_gt'
-  | 'semver_gte'
-  | 'semver_lt'
-  | 'semver_lte'
-  | 'semver_in'
-  // Common operators (type-agnostic)
-  | 'exists'
-  | 'not_exists'
-  // Array operators
-  | 'arr_any'
-  | 'arr_all'
-  | 'arr_empty';
+// Re-export for backward compatibility
+export type { Constraint, ConstraintOperator };
 
 export interface ContextField {
   fieldName: string;
   displayName: string;
   description?: string;
   fieldType:
-    | 'string'
-    | 'number'
-    | 'boolean'
-    | 'date'
-    | 'semver'
-    | 'array'
-    | 'country'
-    | 'countryCode3'
-    | 'languageCode'
-    | 'localeCode'
-    | 'timezone';
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'semver'
+  | 'array'
+  | 'country'
+  | 'countryCode3'
+  | 'languageCode'
+  | 'localeCode'
+  | 'timezone';
   validationRules?: any;
 }
 
@@ -460,8 +417,7 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     )}
                     <Typography component="span">
                       {t(
-                        `featureFlags.operators.${selected}${
-                          constraint.inverted ? '_inverted' : ''
+                        `featureFlags.operators.${selected}${constraint.inverted ? '_inverted' : ''
                         }`,
                         label
                       )}

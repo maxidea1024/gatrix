@@ -220,8 +220,8 @@ public class FeatureFlagService : IFeatureFlagService
                     Weight = 100,
                     Enabled = false,
                     Value = null,
-                    ValueType = "string",
                 },
+                ValueType = "string",
             };
         }
 
@@ -242,8 +242,8 @@ public class FeatureFlagService : IFeatureFlagService
                     Weight = 100,
                     Enabled = false,
                     Value = null,
-                    ValueType = "string",
                 },
+                ValueType = "string",
             };
         }
 
@@ -523,7 +523,7 @@ public class FeatureFlagService : IFeatureFlagService
     private static bool IsTypeMismatch(EvaluationResult result, string expectedType)
     {
         if (result.Reason == EvaluationReasons.NotFound) return false;
-        var actualType = result.Variant.ValueType?.ToLowerInvariant();
+        var actualType = result.ValueType?.ToLowerInvariant();
         if (actualType is null) return false;
         return actualType != expectedType;
     }

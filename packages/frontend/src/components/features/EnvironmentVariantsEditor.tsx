@@ -609,13 +609,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const viewOnlyStyle = !isActuallyEditable
       ? {
-          bgcolor: (theme: any) =>
-            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          borderRadius: 1,
-        }
+        bgcolor: (theme: any) =>
+          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        borderRadius: 1,
+      }
       : {};
 
     if (valueType === 'boolean') {
@@ -811,6 +811,34 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               />
             )}
 
+            {/* Fixed weight checkbox - right-aligned above variants */}
+            {flagType !== 'remoteConfig' && variantCount > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={useFixedWeightVariants}
+                      onChange={(e) => {
+                        const newValue = e.target.checked;
+                        onUseFixedWeightVariantsChange?.(newValue);
+                        if (!newValue) {
+                          // When unchecking, redistribute weights equally
+                          setEditingVariants(distributeWeights(editingVariants));
+                        }
+                      }}
+                      disabled={!canManage || isArchived}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" color="text.secondary">
+                      {t('featureFlags.useFixedWeightVariants')}
+                    </Typography>
+                  }
+                />
+              </Box>
+            )}
+
             <Stack spacing={1}>
               {editingVariants.map((variant, index) => {
                 const variantColor = VARIANT_COLORS[index % VARIANT_COLORS.length];
@@ -972,33 +1000,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
               })}
             </Stack>
 
-            {/* Fixed weight checkbox - right-aligned below variants */}
-            {flagType !== 'remoteConfig' && variantCount > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={useFixedWeightVariants}
-                      onChange={(e) => {
-                        const newValue = e.target.checked;
-                        onUseFixedWeightVariantsChange?.(newValue);
-                        if (!newValue) {
-                          // When unchecking, redistribute weights equally
-                          setEditingVariants(distributeWeights(editingVariants));
-                        }
-                      }}
-                      disabled={!canManage || isArchived}
-                    />
-                  }
-                  label={
-                    <Typography variant="body2" color="text.secondary">
-                      {t('featureFlags.useFixedWeightVariants')}
-                    </Typography>
-                  }
-                />
-              </Box>
-            )}
+
 
             {canManage && !isArchived && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>

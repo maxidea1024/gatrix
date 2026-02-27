@@ -54,18 +54,18 @@ Gatrix Feature Flags allow you to control feature availability without code depl
 2. Click **Create Flag**
 3. Configure the flag:
 
-| Field                 | Type     | Required | Description                                              |
-| --------------------- | -------- | -------- | -------------------------------------------------------- |
-| Key (`flagName`)      | Text     | ✅       | Unique identifier (e.g., `new-checkout-flow`)            |
-| Display Name          | Text     | ✅       | Human-readable display name                              |
-| Description           | Textarea | —        | Purpose and context description                          |
-| Flag Type (`flagType`)| Select   | ✅       | Purpose category (see below)                             |
-| Value Type (`valueType`)| Select | ✅       | `boolean`, `string`, `number`, `json`                    |
-| Enabled Value         | Dynamic  | ✅       | Value returned when flag evaluates to enabled            |
-| Disabled Value        | Dynamic  | ✅       | Value returned when flag evaluates to disabled           |
-| Impression Data       | Toggle   | —        | Enable impression tracking for this flag                 |
-| Stale After (days)    | Number   | —        | Flag is considered stale after this many days            |
-| Tags                  | Tags     | —        | Categorization tags                                      |
+| Field                    | Type     | Required | Description                                    |
+| ------------------------ | -------- | -------- | ---------------------------------------------- |
+| Key (`flagName`)         | Text     | ✅        | Unique identifier (e.g., `new-checkout-flow`)  |
+| Display Name             | Text     | ✅        | Human-readable display name                    |
+| Description              | Textarea | —        | Purpose and context description                |
+| Flag Type (`flagType`)   | Select   | ✅        | Purpose category (see below)                   |
+| Value Type (`valueType`) | Select   | ✅        | `boolean`, `string`, `number`, `json`          |
+| Enabled Value            | Dynamic  | ✅        | Value returned when flag evaluates to enabled  |
+| Disabled Value           | Dynamic  | ✅        | Value returned when flag evaluates to disabled |
+| Impression Data          | Toggle   | —        | Enable impression tracking for this flag       |
+| Stale After (days)       | Number   | —        | Flag is considered stale after this many days  |
+| Tags                     | Tags     | —        | Categorization tags                            |
 
 4. Click **Create**
 
@@ -78,35 +78,35 @@ Flag keys are case-sensitive. Use string literals in code for static analysis co
 
 Flag types describe the **purpose** of the flag, not its data type:
 
-| Flag Type       | Description                                                         |
-| --------------- | ------------------------------------------------------------------- |
-| `release`       | Control feature rollout to users                                    |
-| `experiment`    | A/B testing and experimentation                                     |
-| `operational`   | Operational controls (rate limits, circuit breakers)                 |
-| `killSwitch`    | Emergency toggle to disable a feature                               |
-| `permission`    | Access control based on user attributes                             |
-| `remoteConfig`  | Remote configuration values (game balance, UI settings, etc.)       |
+| Flag Type      | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `release`      | Control feature rollout to users                              |
+| `experiment`   | A/B testing and experimentation                               |
+| `operational`  | Operational controls (rate limits, circuit breakers)          |
+| `killSwitch`   | Emergency toggle to disable a feature                         |
+| `permission`   | Access control based on user attributes                       |
+| `remoteConfig` | Remote configuration values (game balance, UI settings, etc.) |
 
 ### Value Types
 
-| Value Type | Description                | Default Fallback | Example                                     |
-| ---------- | -------------------------- | ---------------- | ------------------------------------------- |
-| `boolean`  | True/false toggle          | `false`          | `true`                                       |
-| `string`   | Text value                 | `""`             | `"dark-theme"`                               |
-| `number`   | Numeric value              | `0`              | `100`                                        |
-| `json`     | Complex object             | `{}`             | `{ "limit": 10, "theme": "modern" }`        |
+| Value Type | Description       | Default Fallback | Example                              |
+| ---------- | ----------------- | ---------------- | ------------------------------------ |
+| `boolean`  | True/false toggle | `false`          | `true`                               |
+| `string`   | Text value        | `""`             | `"dark-theme"`                       |
+| `number`   | Numeric value     | `0`              | `100`                                |
+| `json`     | Complex object    | `{}`             | `{ "limit": 10, "theme": "modern" }` |
 
 ## Per-Environment Settings
 
 Each flag can have different settings per environment:
 
-| Setting          | Description                                          |
-| ---------------- | ---------------------------------------------------- |
-| `isEnabled`      | Whether the flag is active in this environment       |
-| `enabledValue`   | Override the global enabled value (optional)         |
-| `disabledValue`  | Override the global disabled value (optional)        |
-| `strategies`     | Targeting rules specific to this environment         |
-| `variants`       | Variant distribution specific to this environment    |
+| Setting         | Description                                       |
+| --------------- | ------------------------------------------------- |
+| `isEnabled`     | Whether the flag is active in this environment    |
+| `enabledValue`  | Override the global enabled value (optional)      |
+| `disabledValue` | Override the global disabled value (optional)     |
+| `strategies`    | Targeting rules specific to this environment      |
+| `variants`      | Variant distribution specific to this environment |
 
 ### Example: 환경별 설정 (Environment-Specific Settings)
 
@@ -139,11 +139,11 @@ Flag isEnabled?
 
 ### Strategy Parameters
 
-| Parameter    | Type   | Description                                                         |
-| ------------ | ------ | ------------------------------------------------------------------- |
-| `rollout`    | number | Percentage of users (0–100) who receive the enabled value           |
+| Parameter    | Type   | Description                                                                         |
+| ------------ | ------ | ----------------------------------------------------------------------------------- |
+| `rollout`    | number | Percentage of users (0–100) who receive the enabled value                           |
 | `stickiness` | string | Context field for consistent bucketing (`userId`, `sessionId`, `random`, or custom) |
-| `groupId`    | string | Group identifier for rollout bucketing (defaults to flag name)      |
+| `groupId`    | string | Group identifier for rollout bucketing (defaults to flag name)                      |
 
 ### Rollout Bucketing
 
@@ -181,59 +181,59 @@ interface Constraint {
 
 #### String Operators
 
-| Operator          | Description                | Value Type | Example                              |
-| ----------------- | -------------------------- | ---------- | ------------------------------------ |
+| Operator          | Description                | Value Type | Example                             |
+| ----------------- | -------------------------- | ---------- | ----------------------------------- |
 | `str_eq`          | Equals                     | single     | `country str_eq "KR"`               |
-| `str_contains`    | Contains substring         | single     | `email str_contains "@company.com"`  |
-| `str_starts_with` | Starts with prefix         | single     | `userId str_starts_with "test_"`     |
-| `str_ends_with`   | Ends with suffix           | single     | `email str_ends_with ".kr"`          |
+| `str_contains`    | Contains substring         | single     | `email str_contains "@company.com"` |
+| `str_starts_with` | Starts with prefix         | single     | `userId str_starts_with "test_"`    |
+| `str_ends_with`   | Ends with suffix           | single     | `email str_ends_with ".kr"`         |
 | `str_in`          | In list                    | multiple   | `country str_in ["KR", "JP", "US"]` |
-| `str_regex`       | Matches regular expression | single     | `email str_regex "^admin@.*"`        |
+| `str_regex`       | Matches regular expression | single     | `email str_regex "^admin@.*"`       |
 
 #### Number Operators
 
-| Operator   | Description            | Value Type | Example                     |
-| ---------- | ---------------------- | ---------- | --------------------------- |
-| `num_eq`   | Equals                 | single     | `level num_eq 10`           |
-| `num_gt`   | Greater than           | single     | `level num_gt 50`           |
-| `num_gte`  | Greater than or equal  | single     | `level num_gte 50`          |
-| `num_lt`   | Less than              | single     | `age num_lt 18`             |
-| `num_lte`  | Less than or equal     | single     | `age num_lte 18`            |
-| `num_in`   | In list                | multiple   | `level num_in [1, 5, 10]`   |
+| Operator  | Description           | Value Type | Example                   |
+| --------- | --------------------- | ---------- | ------------------------- |
+| `num_eq`  | Equals                | single     | `level num_eq 10`         |
+| `num_gt`  | Greater than          | single     | `level num_gt 50`         |
+| `num_gte` | Greater than or equal | single     | `level num_gte 50`        |
+| `num_lt`  | Less than             | single     | `age num_lt 18`           |
+| `num_lte` | Less than or equal    | single     | `age num_lte 18`          |
+| `num_in`  | In list               | multiple   | `level num_in [1, 5, 10]` |
 
 #### Boolean Operators
 
-| Operator  | Description    | Value Type | Example                  |
-| --------- | -------------- | ---------- | ------------------------ |
-| `bool_is` | Is true/false  | single     | `isPremium bool_is true` |
+| Operator  | Description   | Value Type | Example                  |
+| --------- | ------------- | ---------- | ------------------------ |
+| `bool_is` | Is true/false | single     | `isPremium bool_is true` |
 
 #### Date Operators
 
-| Operator   | Description           | Value Type | Example                              |
-| ---------- | --------------------- | ---------- | ------------------------------------ |
-| `date_eq`  | Equals                | single     | `registerDate date_eq "2025-01-01"`  |
-| `date_gt`  | After                 | single     | `registerDate date_gt "2025-01-01"`  |
-| `date_gte` | On or after           | single     | `registerDate date_gte "2025-01-01"` |
-| `date_lt`  | Before                | single     | `registerDate date_lt "2025-06-01"`  |
-| `date_lte` | On or before          | single     | `registerDate date_lte "2025-06-01"` |
+| Operator   | Description  | Value Type | Example                              |
+| ---------- | ------------ | ---------- | ------------------------------------ |
+| `date_eq`  | Equals       | single     | `registerDate date_eq "2025-01-01"`  |
+| `date_gt`  | After        | single     | `registerDate date_gt "2025-01-01"`  |
+| `date_gte` | On or after  | single     | `registerDate date_gte "2025-01-01"` |
+| `date_lt`  | Before       | single     | `registerDate date_lt "2025-06-01"`  |
+| `date_lte` | On or before | single     | `registerDate date_lte "2025-06-01"` |
 
 #### Semver Operators
 
-| Operator     | Description           | Value Type | Example                              |
-| ------------ | --------------------- | ---------- | ------------------------------------ |
-| `semver_eq`  | Equals                | single     | `appVersion semver_eq "2.0.0"`       |
-| `semver_gt`  | Greater than          | single     | `appVersion semver_gt "1.5.0"`       |
-| `semver_gte` | Greater than or equal | single     | `appVersion semver_gte "1.5.0"`      |
-| `semver_lt`  | Less than             | single     | `appVersion semver_lt "3.0.0"`       |
-| `semver_lte` | Less than or equal    | single     | `appVersion semver_lte "3.0.0"`      |
+| Operator     | Description           | Value Type | Example                                   |
+| ------------ | --------------------- | ---------- | ----------------------------------------- |
+| `semver_eq`  | Equals                | single     | `appVersion semver_eq "2.0.0"`            |
+| `semver_gt`  | Greater than          | single     | `appVersion semver_gt "1.5.0"`            |
+| `semver_gte` | Greater than or equal | single     | `appVersion semver_gte "1.5.0"`           |
+| `semver_lt`  | Less than             | single     | `appVersion semver_lt "3.0.0"`            |
+| `semver_lte` | Less than or equal    | single     | `appVersion semver_lte "3.0.0"`           |
 | `semver_in`  | In list               | multiple   | `appVersion semver_in ["2.0.0", "2.1.0"]` |
 
 #### Common Operators (Type-Agnostic)
 
-| Operator     | Description          | Value Type | Example                     |
-| ------------ | -------------------- | ---------- | --------------------------- |
-| `exists`     | Field has a value    | none       | `userId exists`             |
-| `not_exists` | Field has no value   | none       | `userId not_exists`         |
+| Operator     | Description        | Value Type | Example             |
+| ------------ | ------------------ | ---------- | ------------------- |
+| `exists`     | Field has a value  | none       | `userId exists`     |
+| `not_exists` | Field has no value | none       | `userId not_exists` |
 
 #### Array Operators
 
@@ -321,41 +321,41 @@ interface EvaluationContext {
 
 ### Built-in Context Fields
 
-| Field           | Type   | Description                                                    |
-| --------------- | ------ | -------------------------------------------------------------- |
-| `userId`        | string | Unique user identifier — primary stickiness key               |
-| `sessionId`     | string | Session identifier — auto-generated if not provided           |
-| `appName`       | string | Application name from SDK config                              |
-| `appVersion`    | string | Application version (supports semver comparison)              |
-| `remoteAddress` | string | Client IP address (provided by server during evaluation)       |
+| Field           | Type   | Description                                              |
+| --------------- | ------ | -------------------------------------------------------- |
+| `userId`        | string | Unique user identifier — primary stickiness key          |
+| `sessionId`     | string | Session identifier — auto-generated if not provided      |
+| `appName`       | string | Application name from SDK config                         |
+| `appVersion`    | string | Application version (supports semver comparison)         |
+| `remoteAddress` | string | Client IP address (provided by server during evaluation) |
 
 ### Custom Context Fields (Properties)
 
 Custom properties support four types:
 
-| Type      | Description                    | Example Operators                                     |
-| --------- | ------------------------------ | ----------------------------------------------------- |
-| `string`  | Text values                    | `str_eq`, `str_contains`, `str_in`, `str_regex`       |
-| `number`  | Numeric values                 | `num_eq`, `num_gt`, `num_lt`, `num_in`                |
-| `boolean` | True/false values              | `bool_is`                                             |
-| `array`   | List of string values          | `arr_any`, `arr_all`, `arr_empty`                     |
+| Type      | Description           | Example Operators                               |
+| --------- | --------------------- | ----------------------------------------------- |
+| `string`  | Text values           | `str_eq`, `str_contains`, `str_in`, `str_regex` |
+| `number`  | Numeric values        | `num_eq`, `num_gt`, `num_lt`, `num_in`          |
+| `boolean` | True/false values     | `bool_is`                                       |
+| `array`   | List of string values | `arr_any`, `arr_all`, `arr_empty`               |
 
 ### Predefined Custom Fields
 
 Gatrix provides commonly used context fields out of the box:
 
-| Key               | Type    | Description                        |
-| ----------------- | ------- | ---------------------------------- |
-| `userLevel`       | number  | User's current level in the game   |
-| `country`         | string  | Country code (ISO 3166-1 alpha-2)  |
-| `platform`        | string  | Device platform (ios, android, web, windows, mac, linux) |
-| `language`        | string  | Preferred language (ko, en, ja, zh, ...) |
-| `isPremium`       | boolean | Premium subscription status        |
-| `registrationDate`| number  | Days since registration            |
-| `lastLoginDate`   | number  | Days since last login              |
-| `totalPurchases`  | number  | Total purchase amount (USD)        |
-| `gameMode`        | string  | Current game mode                  |
-| `tags`            | array   | Custom tags assigned to user       |
+| Key                | Type    | Description                                              |
+| ------------------ | ------- | -------------------------------------------------------- |
+| `userLevel`        | number  | User's current level in the game                         |
+| `country`          | string  | Country code (ISO 3166-1 alpha-2)                        |
+| `platform`         | string  | Device platform (ios, android, web, windows, mac, linux) |
+| `language`         | string  | Preferred language (ko, en, ja, zh, ...)                 |
+| `isPremium`        | boolean | Premium subscription status                              |
+| `registrationDate` | number  | Days since registration                                  |
+| `lastLoginDate`    | number  | Days since last login                                    |
+| `totalPurchases`   | number  | Total purchase amount (USD)                              |
+| `gameMode`         | string  | Current game mode                                        |
+| `tags`             | array   | Custom tags assigned to user                             |
 
 ## Variants
 
@@ -368,7 +368,6 @@ interface FeatureVariant {
   variantName: string;     // Unique identifier within the flag
   weight: number;          // Weight for distribution (0–100)
   value?: any;             // Variant-specific value
-  valueType: ValueType;    // Same as flag's valueType
   weightLock?: boolean;    // Lock this variant's weight during redistribution
 }
 ```
@@ -389,29 +388,29 @@ Cumulative weight check:
 
 ### Reserved Variant Names
 
-| Name        | Meaning                                 |
-| ----------- | --------------------------------------- |
-| `$default`  | Default variant (no variants defined)   |
-| `$disabled` | Flag is disabled                        |
-| `$missing`  | Flag does not exist in cache            |
-| `$config`   | Flag uses configuration value           |
+| Name        | Meaning                               |
+| ----------- | ------------------------------------- |
+| `$default`  | Default variant (no variants defined) |
+| `$disabled` | Flag is disabled                      |
+| `$missing`  | Flag does not exist in cache          |
+| `$config`   | Flag uses configuration value         |
 
 ## SDK Usage
 
 ### Available Client SDKs
 
-| SDK                   | Language      | Package                         |
-| --------------------- | ------------- | ------------------------------- |
-| **JavaScript/TypeScript** | JS/TS     | `@gatrix/js-client-sdk`         |
-| **React**             | JS/TS         | `@gatrix/react-sdk`             |
-| **Vue**               | JS/TS         | `@gatrix/vue-sdk`               |
-| **Svelte**            | JS/TS         | `@gatrix/svelte-sdk`            |
-| **Unity**             | C#            | `gatrix-unity-client-sdk`       |
-| **Unreal Engine**     | C++           | `gatrix-unreal-client-sdk`      |
-| **Cocos2d-x**         | C++           | `gatrix-cocos2dx-client-sdk`    |
-| **Flutter**           | Dart          | `gatrix-flutter-client-sdk`     |
-| **Godot**             | GDScript      | `gatrix-godot-client-sdk`       |
-| **Python**            | Python        | `gatrix-python-client-sdk`      |
+| SDK                       | Language | Package                      |
+| ------------------------- | -------- | ---------------------------- |
+| **JavaScript/TypeScript** | JS/TS    | `@gatrix/js-client-sdk`      |
+| **React**                 | JS/TS    | `@gatrix/react-sdk`          |
+| **Vue**                   | JS/TS    | `@gatrix/vue-sdk`            |
+| **Svelte**                | JS/TS    | `@gatrix/svelte-sdk`         |
+| **Unity**                 | C#       | `gatrix-unity-client-sdk`    |
+| **Unreal Engine**         | C++      | `gatrix-unreal-client-sdk`   |
+| **Cocos2d-x**             | C++      | `gatrix-cocos2dx-client-sdk` |
+| **Flutter**               | Dart     | `gatrix-flutter-client-sdk`  |
+| **Godot**                 | GDScript | `gatrix-godot-client-sdk`    |
+| **Python**                | Python   | `gatrix-python-client-sdk`   |
 
 ### SDK Lifecycle
 
@@ -459,24 +458,24 @@ await client.start();
 
 ### Configuration Options
 
-| Option             | Type    | Default         | Description                                                |
-| ------------------ | ------- | --------------- | ---------------------------------------------------------- |
-| `apiUrl`           | string  | **required**    | Edge API or Backend URL                                    |
-| `apiToken`         | string  | **required**    | Client API token                                           |
-| `appName`          | string  | **required**    | Application name                                           |
-| `environment`      | string  | **required**    | Environment name                                           |
-| `refreshInterval`  | number  | `30`            | Seconds between polls (1–86400)                            |
-| `disableRefresh`   | boolean | `false`         | Disable automatic polling                                  |
-| `explicitSyncMode` | boolean | `false`         | Buffer changes, apply with `syncFlags()`                   |
-| `offlineMode`      | boolean | `false`         | No network requests; requires bootstrap or cache           |
-| `bootstrap`        | array   | —               | Initial flags for instant availability                     |
-| `bootstrapOverride`| boolean | `false`         | Override cached flags with bootstrap                       |
-| `disableMetrics`   | boolean | `false`         | Disable metrics collection                                 |
-| `impressionDataAll`| boolean | `false`         | Track impressions for all flags                            |
-| `enableDevMode`    | boolean | `false`         | Detailed debug logging (prefixed with `[DEV]`)             |
-| `cacheKeyPrefix`   | string  | `"gatrix_cache"`| Prefix for storage keys                                    |
-| `customHeaders`    | object  | —               | Additional HTTP headers                                    |
-| `storageProvider`  | object  | localStorage    | Custom storage provider                                    |
+| Option              | Type    | Default          | Description                                      |
+| ------------------- | ------- | ---------------- | ------------------------------------------------ |
+| `apiUrl`            | string  | **required**     | Edge API or Backend URL                          |
+| `apiToken`          | string  | **required**     | Client API token                                 |
+| `appName`           | string  | **required**     | Application name                                 |
+| `environment`       | string  | **required**     | Environment name                                 |
+| `refreshInterval`   | number  | `30`             | Seconds between polls (1–86400)                  |
+| `disableRefresh`    | boolean | `false`          | Disable automatic polling                        |
+| `explicitSyncMode`  | boolean | `false`          | Buffer changes, apply with `syncFlags()`         |
+| `offlineMode`       | boolean | `false`          | No network requests; requires bootstrap or cache |
+| `bootstrap`         | array   | —                | Initial flags for instant availability           |
+| `bootstrapOverride` | boolean | `false`          | Override cached flags with bootstrap             |
+| `disableMetrics`    | boolean | `false`          | Disable metrics collection                       |
+| `impressionDataAll` | boolean | `false`          | Track impressions for all flags                  |
+| `enableDevMode`     | boolean | `false`          | Detailed debug logging (prefixed with `[DEV]`)   |
+| `cacheKeyPrefix`    | string  | `"gatrix_cache"` | Prefix for storage keys                          |
+| `customHeaders`     | object  | —                | Additional HTTP headers                          |
+| `storageProvider`   | object  | localStorage     | Custom storage provider                          |
 
 ### Flag Access Methods
 
@@ -531,14 +530,14 @@ JavaScript/TypeScript SDKs provide `numberVariation()` because TypeScript's `num
 - `intVariation(flagName, fallbackValue)` / `intVariationOrThrow(flagName)` — Returns integer
 - `floatVariation(flagName, fallbackValue)` / `floatVariationOrThrow(flagName)` — Returns float/double
 
-| SDK        | Integer Function    | Float Function        |
-| ---------- | ------------------- | --------------------- |
-| Unity (C#) | `IntVariation()`    | `FloatVariation()`    |
-| Unreal (C++)| `IntVariation()`   | `FloatVariation()`    |
-| Cocos2d-x  | `intVariation()`    | `floatVariation()`    |
-| Flutter    | `intVariation()`    | `doubleVariation()`   |
-| Godot      | `int_variation()`   | `float_variation()`   |
-| Python     | `int_variation()`   | `float_variation()`   |
+| SDK          | Integer Function  | Float Function      |
+| ------------ | ----------------- | ------------------- |
+| Unity (C#)   | `IntVariation()`  | `FloatVariation()`  |
+| Unreal (C++) | `IntVariation()`  | `FloatVariation()`  |
+| Cocos2d-x    | `intVariation()`  | `floatVariation()`  |
+| Flutter      | `intVariation()`  | `doubleVariation()` |
+| Godot        | `int_variation()` | `float_variation()` |
+| Python       | `int_variation()` | `float_variation()` |
 :::
 
 #### Variation Details
@@ -704,22 +703,22 @@ features.setExplicitSyncMode(false);
 
 ### Events
 
-| Event                    | Description                                        | Payload                          |
-| ------------------------ | -------------------------------------------------- | -------------------------------- |
-| `flags.init`             | SDK initialized from storage/bootstrap             | —                                |
-| `flags.ready`            | First successful fetch completed                   | —                                |
-| `flags.fetch_start`      | Started fetching                                   | `{ etag }`                       |
-| `flags.fetch_success`    | Fetch succeeded                                    | —                                |
-| `flags.fetch_error`      | Fetch failed                                       | `{ status?, error? }`            |
-| `flags.fetch_end`        | Fetch completed (success or error)                 | —                                |
-| `flags.change`           | Flags changed from server                          | `{ flags }`                      |
-| `flags.{name}.change`    | Individual flag changed                            | `(newFlag, oldFlag, changeType)` |
-| `flags.removed`          | Flags removed from server                          | `string[]` (flag names)          |
-| `flags.pending_sync`     | Pending sync available (explicit sync mode)        | —                                |
-| `flags.impression`       | Flag accessed (if impression tracking enabled)     | `ImpressionEvent`                |
-| `flags.error`            | General SDK error                                  | `{ type, error }`                |
-| `flags.recovered`        | Recovered from error state                         | —                                |
-| `flags.metrics.sent`     | Metrics sent successfully                          | `{ count }`                      |
+| Event                 | Description                                    | Payload                          |
+| --------------------- | ---------------------------------------------- | -------------------------------- |
+| `flags.init`          | SDK initialized from storage/bootstrap         | —                                |
+| `flags.ready`         | First successful fetch completed               | —                                |
+| `flags.fetch_start`   | Started fetching                               | `{ etag }`                       |
+| `flags.fetch_success` | Fetch succeeded                                | —                                |
+| `flags.fetch_error`   | Fetch failed                                   | `{ status?, error? }`            |
+| `flags.fetch_end`     | Fetch completed (success or error)             | —                                |
+| `flags.change`        | Flags changed from server                      | `{ flags }`                      |
+| `flags.{name}.change` | Individual flag changed                        | `(newFlag, oldFlag, changeType)` |
+| `flags.removed`       | Flags removed from server                      | `string[]` (flag names)          |
+| `flags.pending_sync`  | Pending sync available (explicit sync mode)    | —                                |
+| `flags.impression`    | Flag accessed (if impression tracking enabled) | `ImpressionEvent`                |
+| `flags.error`         | General SDK error                              | `{ type, error }`                |
+| `flags.recovered`     | Recovered from error state                     | —                                |
+| `flags.metrics.sent`  | Metrics sent successfully                      | `{ count }`                      |
 
 ```typescript
 // Subscribe to events
@@ -747,12 +746,12 @@ client.onAny((eventName, ...args) => {
 
 The SDK implements robust polling with exponential backoff:
 
-| Scenario                  | Behavior                                                        |
-| ------------------------- | --------------------------------------------------------------- |
-| Successful fetch          | Schedule next fetch after `refreshInterval` seconds             |
-| Retryable error           | Exponential backoff: `min(initialBackoffMs * 2^(n-1), maxBackoffMs)` |
-| Non-retryable (401, 403)  | Polling stops. Call `fetchFlags()` manually to resume.          |
-| Recovery after errors     | `consecutiveFailures` resets, normal polling resumes            |
+| Scenario                 | Behavior                                                             |
+| ------------------------ | -------------------------------------------------------------------- |
+| Successful fetch         | Schedule next fetch after `refreshInterval` seconds                  |
+| Retryable error          | Exponential backoff: `min(initialBackoffMs * 2^(n-1), maxBackoffMs)` |
+| Non-retryable (401, 403) | Polling stops. Call `fetchFlags()` manually to resume.               |
+| Recovery after errors    | `consecutiveFailures` resets, normal polling resumes                 |
 
 :::info Polling Never Stops on Errors
 Polling **always** continues after errors (except 401/403). The SDK uses exponential backoff but never permanently stops. This ensures resilience in production environments.
@@ -775,15 +774,15 @@ const client = new GatrixClient({
 
 SDKs support custom storage for flag caching:
 
-| SDK        | Default Storage          | Custom Support                  |
-| ---------- | ------------------------ | ------------------------------- |
-| JS/TS      | `localStorage`           | `IStorageProvider` interface    |
-| Unity      | `PlayerPrefs`            | `IGatrixStorageProvider`        |
-| Unreal     | File-based (`{Saved}/Gatrix/`) | `IGatrixStorageProvider`  |
-| Flutter    | `SharedPreferences`      | `GatrixStorageProvider`         |
-| Cocos2d-x  | `UserDefault`            | `IGatrixStorageProvider`        |
-| Godot      | `ConfigFile`             | Custom implementation           |
-| Python     | In-memory                | `StorageProvider` interface     |
+| SDK       | Default Storage                | Custom Support               |
+| --------- | ------------------------------ | ---------------------------- |
+| JS/TS     | `localStorage`                 | `IStorageProvider` interface |
+| Unity     | `PlayerPrefs`                  | `IGatrixStorageProvider`     |
+| Unreal    | File-based (`{Saved}/Gatrix/`) | `IGatrixStorageProvider`     |
+| Flutter   | `SharedPreferences`            | `GatrixStorageProvider`      |
+| Cocos2d-x | `UserDefault`                  | `IGatrixStorageProvider`     |
+| Godot     | `ConfigFile`                   | Custom implementation        |
+| Python    | In-memory                      | `StorageProvider` interface  |
 
 ### Metrics
 
@@ -951,14 +950,14 @@ speed = client.features.float_variation("game-speed", 1.0)
 
 All client SDKs include these headers on every request:
 
-| Header               | Value                        | Description                        |
-| -------------------- | ---------------------------- | ---------------------------------- |
-| `X-API-Token`        | `{apiToken}`                 | Authentication token               |
-| `X-Application-Name` | `{appName}`                  | Application name                   |
-| `X-Connection-Id`    | `{uuid}`                     | Unique per-SDK-instance ID         |
-| `X-SDK-Version`      | `{sdkName}/{version}`        | SDK identification                 |
-| `X-Environment`      | `{environment}`              | Environment (fetchFlags only)      |
-| `If-None-Match`      | `{etag}`                     | ETag for 304 support               |
+| Header               | Value                 | Description                   |
+| -------------------- | --------------------- | ----------------------------- |
+| `X-API-Token`        | `{apiToken}`          | Authentication token          |
+| `X-Application-Name` | `{appName}`           | Application name              |
+| `X-Connection-Id`    | `{uuid}`              | Unique per-SDK-instance ID    |
+| `X-SDK-Version`      | `{sdkName}/{version}` | SDK identification            |
+| `X-Environment`      | `{environment}`       | Environment (fetchFlags only) |
+| `If-None-Match`      | `{etag}`              | ETag for 304 support          |
 
 ## Evaluation Result
 
@@ -988,16 +987,16 @@ The server returns evaluated flags in this format:
 
 ### Evaluation Reasons
 
-| Reason            | Description                                          |
-| ----------------- | ---------------------------------------------------- |
-| `enabled`         | Flag is enabled, no strategies                       |
-| `disabled`        | Flag is disabled                                     |
-| `strategy_match`  | A strategy matched the context                       |
-| `constraint_match`| A constraint matched                                 |
-| `rollout`         | User falls within rollout percentage                 |
-| `default`         | No strategies matched, using default                 |
-| `not_found`       | Flag does not exist                                  |
-| `error`           | Evaluation error occurred                            |
+| Reason             | Description                          |
+| ------------------ | ------------------------------------ |
+| `enabled`          | Flag is enabled, no strategies       |
+| `disabled`         | Flag is disabled                     |
+| `strategy_match`   | A strategy matched the context       |
+| `constraint_match` | A constraint matched                 |
+| `rollout`          | User falls within rollout percentage |
+| `default`          | No strategies matched, using default |
+| `not_found`        | Flag does not exist                  |
+| `error`            | Evaluation error occurred            |
 
 ## Best Practices
 

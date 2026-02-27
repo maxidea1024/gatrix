@@ -50,7 +50,6 @@ interface EvaluationVariant {
   name: string;
   weight: number;
   value?: any;
-  valueType?: string;
 }
 
 // Type for minimal segment data needed for runtime evaluation
@@ -160,7 +159,6 @@ export default class ServerFeatureFlagController {
               name: v.variantName,
               weight: v.weight,
               value: v.value,
-              valueType: v.valueType,
             })
           );
 
@@ -285,7 +283,6 @@ export default class ServerFeatureFlagController {
           name: v.variantName,
           weight: v.weight,
           value: v.value,
-          valueType: v.valueType,
         })),
         valueType: flag.valueType,
         enabledValue:

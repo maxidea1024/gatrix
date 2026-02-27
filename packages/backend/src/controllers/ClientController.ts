@@ -613,7 +613,6 @@ export class ClientController {
               name: v.variantName,
               weight: v.weight,
               value: v.value,
-              valueType: v.valueType,
             })) || [],
         };
 

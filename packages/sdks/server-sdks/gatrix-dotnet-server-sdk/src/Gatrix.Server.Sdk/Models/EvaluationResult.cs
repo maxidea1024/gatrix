@@ -64,6 +64,12 @@ public class EvaluationResult
     /// </summary>
     [JsonPropertyName("reason")]
     public string Reason { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Value type of the flag (string, number, boolean, json)
+    /// </summary>
+    [JsonPropertyName("valueType")]
+    public string? ValueType { get; set; }
 }
 
 /// <summary>

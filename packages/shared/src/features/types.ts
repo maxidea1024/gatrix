@@ -88,9 +88,8 @@ export interface Constraint {
 export interface Variant {
   name: string;
   weight: number;
-  value?: any;
-  valueType?: ValueType;
-  enabled?: boolean;
+  value: any;
+  enabled: boolean;
 }
 
 // ==================== Segment ====================
@@ -134,9 +133,9 @@ export interface FeatureFlag {
   impressionDataEnabled: boolean;
   strategies: FeatureStrategy[];
   variants: Variant[];
-  valueType?: ValueType;
-  enabledValue?: any;
-  disabledValue?: any;
+  valueType: ValueType;
+  enabledValue: any;
+  disabledValue: any;
   /** Where enabledValue/disabledValue originate: 'environment' if from env override, 'flag' if from global default */
   valueSource?: 'environment' | 'flag';
   version?: number;

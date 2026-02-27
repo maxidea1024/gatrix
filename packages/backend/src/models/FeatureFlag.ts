@@ -1196,7 +1196,7 @@ export class FeatureSegmentModel {
   static async getReferences(
     id: string
   ): Promise<{
-    flags: { flagName: string; environment: string }[];
+    flags: { flagName: string; environment: string; strategyName: string }[];
     templates: { flowName: string; id: string; milestoneName: string }[];
   }> {
     try {
@@ -1206,8 +1206,8 @@ export class FeatureSegmentModel {
         .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
         .where('ffs.segmentId', id)
         .where('ff.isArchived', false)
-        .select('ff.flagName', 'fs.environment')
-        .groupBy('ff.flagName', 'fs.environment');
+        .select('ff.flagName', 'fs.environment', 'fs.strategyName')
+        .groupBy('ff.flagName', 'fs.environment', 'fs.strategyName');
 
       // Find release flow templates referencing this segment
       const templateRows = await db('g_release_flow_strategy_segments as rss')
@@ -1224,6 +1224,7 @@ export class FeatureSegmentModel {
         flags: flagRows.map((r: any) => ({
           flagName: r.flagName,
           environment: r.environment,
+          strategyName: r.strategyName,
         })),
         templates: templateRows.map((r: any) => ({
           flowName: r.flowName,
@@ -1388,7 +1389,7 @@ export class FeatureContextFieldModel {
   static async getReferences(
     fieldName: string
   ): Promise<{
-    flags: { flagName: string; environment: string }[];
+    flags: { flagName: string; environment: string; strategyName: string }[];
     segments: { segmentName: string; id: string }[];
     templates: { flowName: string; id: string; milestoneName: string }[];
   }> {
@@ -1403,8 +1404,8 @@ export class FeatureContextFieldModel {
           `JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
           [fieldName]
         )
-        .select('ff.flagName', 'fs.environment')
-        .groupBy('ff.flagName', 'fs.environment');
+        .select('ff.flagName', 'fs.environment', 'fs.strategyName')
+        .groupBy('ff.flagName', 'fs.environment', 'fs.strategyName');
 
       // Find segments referencing this context field in their constraints
       const segmentRows = await db('g_feature_segments')
@@ -1435,6 +1436,7 @@ export class FeatureContextFieldModel {
         flags: flagRows.map((r: any) => ({
           flagName: r.flagName,
           environment: r.environment,
+          strategyName: r.strategyName,
         })),
         segments: segmentRows.map((r: any) => ({
           segmentName: r.segmentName,

@@ -213,6 +213,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingField, setDeletingField] = useState<FeatureContextField | null>(null);
   const [referenceDialogOpen, setReferenceDialogOpen] = useState(false);
+  const [referenceDialogMode, setReferenceDialogMode] = useState<'view' | 'delete'>('view');
   const [references, setReferences] = useState<ResourceReference | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingField, setEditingField] = useState<Partial<FeatureContextField> | null>(null);
@@ -547,6 +548,7 @@ const FeatureContextFieldsPage: React.FC = () => {
         (refs.flags?.length > 0 || refs.segments?.length > 0 || refs.templates?.length > 0)
       ) {
         setReferences(refs);
+        setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
       } else {
         setDeleteConfirmOpen(true);
@@ -565,6 +567,7 @@ const FeatureContextFieldsPage: React.FC = () => {
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);
+        setReferenceDialogMode('view');
         setReferenceDialogOpen(true);
       }
     } catch {
@@ -585,6 +588,7 @@ const FeatureContextFieldsPage: React.FC = () => {
           error?.response?.data?.error?.details?.payload ||
           error?.response?.data?.error?.payload;
         setReferences(payload?.references || null);
+        setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
       } else {
         enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
@@ -1486,8 +1490,9 @@ const FeatureContextFieldsPage: React.FC = () => {
       <ReferenceCheckDialog
         open={referenceDialogOpen}
         onClose={() => setReferenceDialogOpen(false)}
-        title={t('common.cannotDelete')}
+        title={referenceDialogMode === 'delete' ? t('common.cannotDelete') : t('common.references')}
         references={references}
+        mode={referenceDialogMode}
       />
 
       {/* Column Settings Dialog */}

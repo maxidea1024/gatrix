@@ -100,6 +100,7 @@ const FeatureSegmentsPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSegment, setDeletingSegment] = useState<FeatureSegment | null>(null);
   const [referenceDialogOpen, setReferenceDialogOpen] = useState(false);
+  const [referenceDialogMode, setReferenceDialogMode] = useState<'view' | 'delete'>('view');
   const [references, setReferences] = useState<ResourceReference | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingSegment, setEditingSegment] = useState<Partial<FeatureSegment> | null>(null);
@@ -430,6 +431,7 @@ const FeatureSegmentsPage: React.FC = () => {
       const refs = result.data?.references;
       if (refs && (refs.flags?.length > 0 || refs.templates?.length > 0)) {
         setReferences(refs);
+        setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
       } else {
         setDeleteConfirmOpen(true);
@@ -446,6 +448,7 @@ const FeatureSegmentsPage: React.FC = () => {
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);
+        setReferenceDialogMode('view');
         setReferenceDialogOpen(true);
       }
     } catch {
@@ -466,6 +469,7 @@ const FeatureSegmentsPage: React.FC = () => {
           error?.response?.data?.error?.details?.payload ||
           error?.response?.data?.error?.payload;
         setReferences(payload?.references || null);
+        setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
       } else {
         enqueueSnackbar(parseApiErrorMessage(error, 'featureFlags.deleteFailed'), {
@@ -1166,8 +1170,9 @@ const FeatureSegmentsPage: React.FC = () => {
       <ReferenceCheckDialog
         open={referenceDialogOpen}
         onClose={() => setReferenceDialogOpen(false)}
-        title={t('common.cannotDelete')}
+        title={referenceDialogMode === 'delete' ? t('common.cannotDelete') : t('common.references')}
         references={references}
+        mode={referenceDialogMode}
       />
 
       {/* Column Settings Dialog */}

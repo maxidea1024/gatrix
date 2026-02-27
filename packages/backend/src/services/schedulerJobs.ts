@@ -82,6 +82,48 @@ export function getSchedulerHandlers(): Record<string, SchedulerJobHandler> {
             }
         },
 
+        'release-flow:milestone-progression': async (job) => {
+            const planId = job.data?.payload?.planId;
+            if (!planId) {
+                logger.warn('release-flow:milestone-progression missing planId', { jobId: job.id });
+                return;
+            }
+            const { releaseFlowService } = await import('./ReleaseFlowService');
+            const { safeguardService } = await import('./SafeguardService');
+            const { ReleaseFlowModel } = await import('../models/ReleaseFlow');
+
+            const plan = await ReleaseFlowModel.findById(planId);
+            if (!plan || plan.status !== 'active' || plan.discriminator !== 'plan') {
+                logger.info('release-flow:milestone-progression skipped (plan not active)', {
+                    jobId: job.id,
+                    planId,
+                    status: plan?.status,
+                });
+                return;
+            }
+
+            // Evaluate safeguards before progression
+            if (plan.activeMilestoneId) {
+                const { anyTriggered, results } = await safeguardService.evaluateMilestoneSafeguards(
+                    plan.activeMilestoneId
+                );
+                if (anyTriggered) {
+                    const triggeredNames = results
+                        .filter((r) => r.triggered)
+                        .map((r) => r.metricName)
+                        .join(', ');
+                    logger.warn(
+                        `release-flow:milestone-progression safeguard triggered (${triggeredNames}), pausing plan ${planId}`
+                    );
+                    await releaseFlowService.pausePlan(planId, 0);
+                    return;
+                }
+            }
+
+            logger.info(`release-flow:milestone-progression progressing plan ${planId}`);
+            await releaseFlowService.progressToNextMilestone(planId);
+        },
+
         'release-flow:progression-check': async (job) => {
             const { ReleaseFlowScheduler } = await import('./releaseFlowScheduler');
             await ReleaseFlowScheduler.getInstance().checkAndProgressMilestones();

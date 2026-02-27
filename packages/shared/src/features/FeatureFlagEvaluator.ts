@@ -47,7 +47,6 @@ export class FeatureFlagEvaluator {
               name: variantData?.name || defaultEnabledName,
               weight: variantData?.weight || 100,
               value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
-              valueType: flag.valueType || 'string',
               enabled: true,
             };
 
@@ -73,7 +72,6 @@ export class FeatureFlagEvaluator {
           name: variantData?.name || defaultEnabledName,
           weight: variantData?.weight || 100,
           value: this.getFallbackValue(variantData?.value ?? flag.enabledValue, flag.valueType),
-          valueType: flag.valueType || 'string',
           enabled: true,
         };
 
@@ -103,7 +101,6 @@ export class FeatureFlagEvaluator {
         name: defaultDisabledName,
         weight: 100,
         value: this.getFallbackValue(flag.disabledValue, flag.valueType),
-        valueType: flag.valueType || 'string',
         enabled: false,
       },
     };
