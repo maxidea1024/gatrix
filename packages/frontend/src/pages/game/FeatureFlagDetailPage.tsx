@@ -39,7 +39,6 @@ import {
   FormControlLabel,
   Checkbox,
   Slider,
-  Grid,
   Autocomplete,
   Switch,
   Dialog,
@@ -2241,7 +2240,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                           disableGutters
                           sx={{
                             '&:before': { display: 'none' },
-                            bgcolor: 'transparent',
+                            bgcolor: 'background.paper',
                           }}
                         >
                           <AccordionSummary
@@ -3015,32 +3014,69 @@ const FeatureFlagDetailPage: React.FC = () => {
               />
 
               {/* Flag Values */}
-              <Grid container spacing={3}>
-                <Grid size={{ xs: 12 }}>
+              <Stack spacing={2}>
+                <Box
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                  }}
+                >
                   <Typography
                     variant="subtitle2"
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+                    sx={{
+                      fontWeight: 600,
+                      flexShrink: 0,
+                      whiteSpace: 'nowrap',
+                      minWidth: 120,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                    }}
                   >
                     {t('featureFlags.enabledValue')}
                     <Tooltip title={t('featureFlags.enabledValueHelp')}>
                       <HelpOutlineIcon fontSize="small" color="action" />
                     </Tooltip>
                   </Typography>
-                  {renderValueInput('enabledValue')}
-                </Grid>
-                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ flex: 1 }}>{renderValueInput('enabledValue')}</Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                  }}
+                >
                   <Typography
                     variant="subtitle2"
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}
+                    sx={{
+                      fontWeight: 600,
+                      flexShrink: 0,
+                      whiteSpace: 'nowrap',
+                      minWidth: 120,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                    }}
                   >
                     {t('featureFlags.disabledValue')}
                     <Tooltip title={t('featureFlags.disabledValueHelp')}>
                       <HelpOutlineIcon fontSize="small" color="action" />
                     </Tooltip>
                   </Typography>
-                  {renderValueInput('disabledValue')}
-                </Grid>
-              </Grid>
+                  <Box sx={{ flex: 1 }}>{renderValueInput('disabledValue')}</Box>
+                </Box>
+              </Stack>
 
               {/* Action Buttons */}
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
@@ -3144,7 +3180,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         />
       </TabPanel>
       <TabPanel value={tabValue} index={4}>
-        <FeatureFlagAuditLogs flagName={flag.flagName} />
+        <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
       </TabPanel>
 
       {/* Delete Confirmation Dialog */}

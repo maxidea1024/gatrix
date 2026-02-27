@@ -134,6 +134,12 @@ export interface FlagListQuery {
   sortOrder?: 'asc' | 'desc';
 }
 
+// Request context for passing IP and user agent to audit logs
+export interface RequestContext {
+  ipAddress?: string;
+  userAgent?: string;
+}
+
 class FeatureFlagService {
   // ==================== Feature Flags ====================
 
@@ -206,7 +212,7 @@ class FeatureFlagService {
   /**
    * Create a new feature flag
    */
-  async createFlag(input: CreateFlagInput, userId: number): Promise<FeatureFlagAttributes> {
+  async createFlag(input: CreateFlagInput, userId: number, requestContext?: RequestContext): Promise<FeatureFlagAttributes> {
     const flagName = input.flagName || input.name;
     // Check for duplicate
     const existing = await FeatureFlagModel.findByName(input.environment!, flagName!);
@@ -324,6 +330,8 @@ class FeatureFlagService {
         strategies: input.strategies,
         variants: input.variants,
       },
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache
@@ -340,7 +348,8 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     input: UpdateFlagInput,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -451,6 +460,8 @@ class FeatureFlagService {
       environment,
       oldValues: flag,
       newValues: updated,
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Increment version and invalidate cache
@@ -475,9 +486,10 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     isEnabled: boolean,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    return this.updateFlag(environment, flagName, { isEnabled }, userId);
+    return this.updateFlag(environment, flagName, { isEnabled }, userId, requestContext);
   }
 
   async updateEnvironment(
@@ -500,7 +512,8 @@ class FeatureFlagService {
   async archiveFlag(
     environment: string,
     flagName: string,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -525,6 +538,8 @@ class FeatureFlagService {
       environment,
       oldValues: { isArchived: false },
       newValues: { isArchived: true },
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache (archived = removed from SDK's perspective)
@@ -539,7 +554,8 @@ class FeatureFlagService {
   async reviveFlag(
     environment: string,
     flagName: string,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -561,6 +577,8 @@ class FeatureFlagService {
       environment,
       oldValues: { isArchived: true },
       newValues: { isArchived: false },
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache
@@ -576,7 +594,8 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     isFavorite: boolean,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -597,6 +616,8 @@ class FeatureFlagService {
       environment,
       oldValues: { isFavorite: !isFavorite },
       newValues: { isFavorite },
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     return updated;
@@ -608,7 +629,8 @@ class FeatureFlagService {
   async markAsStale(
     environment: string,
     flagName: string,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -629,6 +651,8 @@ class FeatureFlagService {
       environment,
       oldValues: { stale: false },
       newValues: { stale: true },
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache
@@ -643,7 +667,8 @@ class FeatureFlagService {
   async markAsNotStale(
     environment: string,
     flagName: string,
-    userId: number
+    userId: number,
+    requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -664,6 +689,8 @@ class FeatureFlagService {
       environment,
       oldValues: { stale: true },
       newValues: { stale: false },
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache
@@ -675,7 +702,7 @@ class FeatureFlagService {
   /**
    * Delete a flag (permanently)
    */
-  async deleteFlag(environment: string, flagName: string, userId: number): Promise<void> {
+  async deleteFlag(environment: string, flagName: string, userId: number, requestContext?: RequestContext): Promise<void> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
@@ -701,6 +728,8 @@ class FeatureFlagService {
       userId,
       environment,
       oldValues: flag,
+      ipAddress: requestContext?.ipAddress,
+      userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache (permanently deleted)

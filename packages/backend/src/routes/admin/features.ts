@@ -6,7 +6,7 @@
 import { Router, Response } from 'express';
 import { AuthenticatedRequest } from '../../middleware/auth';
 import { asyncHandler } from '../../middleware/errorHandler';
-import { featureFlagService } from '../../services/FeatureFlagService';
+import { featureFlagService, RequestContext } from '../../services/FeatureFlagService';
 import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
 import { ValidationRules } from '../../models/FeatureFlag';
 import { networkTrafficService } from '../../services/NetworkTrafficService';
@@ -395,6 +395,12 @@ const requireEnvironment = (req: AuthenticatedRequest, res: Response): string | 
   return environment;
 };
 
+// Helper to extract request context for audit logs
+const getRequestContext = (req: AuthenticatedRequest): RequestContext => ({
+  ipAddress: req.ip,
+  userAgent: req.get('User-Agent'),
+});
+
 // List feature flags
 router.get(
   '/',
@@ -431,7 +437,7 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.createFlag({ ...req.body, environment }, userId!);
+    const flag = await featureFlagService.createFlag({ ...req.body, environment }, userId!, getRequestContext(req));
 
     res.status(201).json({ success: true, data: { flag } });
   })
@@ -467,7 +473,8 @@ router.put(
       environment,
       req.params.flagName,
       req.body,
-      userId!
+      userId!,
+      getRequestContext(req)
     );
 
     res.json({ success: true, data: { flag } });
@@ -487,7 +494,8 @@ router.post(
       environment,
       req.params.flagName,
       isEnabled,
-      userId!
+      userId!,
+      getRequestContext(req)
     );
 
     res.json({ success: true, data: { flag } });
@@ -503,7 +511,7 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.archiveFlag(environment, req.params.flagName, userId!);
+    const flag = await featureFlagService.archiveFlag(environment, req.params.flagName, userId!, getRequestContext(req));
 
     res.json({ success: true, data: { flag } });
   })
@@ -518,7 +526,7 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.reviveFlag(environment, req.params.flagName, userId!);
+    const flag = await featureFlagService.reviveFlag(environment, req.params.flagName, userId!, getRequestContext(req));
 
     res.json({ success: true, data: { flag } });
   })
@@ -538,7 +546,8 @@ router.post(
       environment,
       req.params.flagName,
       isFavorite,
-      userId!
+      userId!,
+      getRequestContext(req)
     );
 
     res.json({ success: true, data: { flag } });
@@ -554,7 +563,7 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.markAsStale(environment, req.params.flagName, userId!);
+    const flag = await featureFlagService.markAsStale(environment, req.params.flagName, userId!, getRequestContext(req));
 
     res.json({ success: true, data: { flag } });
   })
@@ -569,7 +578,7 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.markAsNotStale(environment, req.params.flagName, userId!);
+    const flag = await featureFlagService.markAsNotStale(environment, req.params.flagName, userId!, getRequestContext(req));
 
     res.json({ success: true, data: { flag } });
   })
@@ -584,7 +593,7 @@ router.delete(
 
     const userId = req.user?.id;
 
-    await featureFlagService.deleteFlag(environment, req.params.flagName, userId!);
+    await featureFlagService.deleteFlag(environment, req.params.flagName, userId!, getRequestContext(req));
 
     res.json({ success: true, message: 'Flag deleted successfully' });
   })

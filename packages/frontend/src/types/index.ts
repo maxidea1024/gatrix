@@ -133,6 +133,7 @@ export interface AuditLog {
   entityId?: string | number;
   oldValues?: any;
   newValues?: any;
+  description?: string;
   details?: any;
   ipAddress?: string;
   userAgent?: string;

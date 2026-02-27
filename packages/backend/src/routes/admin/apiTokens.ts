@@ -50,6 +50,7 @@ router.post(
       tokenType: req.body?.tokenType,
       expiresAt: req.body?.expiresAt,
     }),
+    getDescription: (req) => `API token '${req.body?.tokenName}' (${req.body?.tokenType}) created`,
   }) as any,
   ApiTokensController.createToken as any
 );
@@ -65,6 +66,7 @@ router.put(
       description: req.body?.description,
       expiresAt: req.body?.expiresAt,
     }),
+    getDescription: (req) => `API token '${req.body?.tokenName}' updated`,
   }) as any,
   ApiTokensController.updateToken as any
 );
@@ -74,6 +76,7 @@ router.post(
     action: 'api_token_regenerate',
     resourceType: 'api_token',
     getResourceId: (req) => req.params?.id,
+    getDescription: (req) => `API token #${req.params?.id} regenerated`,
   }) as any,
   ApiTokensController.regenerateToken as any
 );
@@ -83,6 +86,7 @@ router.delete(
     action: 'api_token_delete',
     resourceType: 'api_token',
     getResourceId: (req) => req.params?.id,
+    getDescription: (req) => `API token #${req.params?.id} deleted`,
   }) as any,
   ApiTokensController.deleteToken as any
 );

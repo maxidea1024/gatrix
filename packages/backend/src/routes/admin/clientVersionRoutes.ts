@@ -42,6 +42,7 @@ router.post(
     resourceType: 'client_version',
     getResourceId: (req) => req.body?.version,
     getNewValues: (req) => req.body,
+    getDescription: (req) => `Client version '${req.body?.clientVersion}' (${req.body?.platform}) created with status '${req.body?.clientStatus}'`,
   }) as any,
   ClientVersionController.createClientVersion as any
 );
@@ -53,10 +54,9 @@ router.post(
   auditLog({
     action: 'client_version_bulk_create',
     resourceType: 'client_version',
-    // ?�괄 ?�성??경우 ?�일 ID가 ?�으므�?getResourceId ?�거
     getNewValues: (req) => req.body,
-    // ?�답?�서 ?�성??�?번째 ?�라?�언??버전??ID�??�용
     getResourceIdFromResponse: (res: any) => res?.data?.[0]?.id,
+    getDescription: (req) => `${req.body?.versions?.length || 0} client version(s) bulk created`,
   }) as any,
   ClientVersionController.bulkCreateClientVersions as any
 );
@@ -70,6 +70,7 @@ router.put(
     resourceType: 'client_version',
     getResourceId: (req) => req.params?.id,
     getNewValues: (req) => req.body,
+    getDescription: (req) => `Client version #${req.params?.id} updated${req.body?.clientStatus ? ` (status: ${req.body.clientStatus})` : ''}`,
   }) as any,
   ClientVersionController.updateClientVersion as any
 );
@@ -83,6 +84,7 @@ router.delete(
     resourceType: 'client_version',
     getResourceId: (req) => req.params?.id,
     getNewValues: () => ({}),
+    getDescription: (req) => `Client version #${req.params?.id} deleted`,
   }) as any,
   ClientVersionController.deleteClientVersion as any
 );

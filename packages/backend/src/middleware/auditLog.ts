@@ -418,6 +418,8 @@ export const auditGameWorldToggleVisibility = enhancedAuditLog({
     worldId: oldValues?.worldId,
     description: `Changed visibility from ${oldValues?.isVisible} to ${newValues?.changedTo}`,
   }),
+  getDescription: (_req, oldValues, newValues) =>
+    `Game world '${oldValues?.name}' (${oldValues?.worldId}) visibility changed from ${oldValues?.isVisible ? 'visible' : 'hidden'} to ${newValues?.changedTo ? 'visible' : 'hidden'}`,
 });
 
 export const auditGameWorldToggleMaintenance = enhancedAuditLog({

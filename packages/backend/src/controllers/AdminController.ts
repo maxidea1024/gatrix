@@ -507,6 +507,9 @@ export class AdminController {
         | 'include_all'
         | undefined;
 
+      // Handle resourceId filter
+      const resourceId = (req.query.resourceId as string) || (req.query.resource_id as string);
+
       // Keep as ISO string, don't convert to Date object
       const startDate = (req.query.startDate as string) || (req.query.start_date as string);
       const endDate = (req.query.endDate as string) || (req.query.end_date as string);
@@ -523,6 +526,7 @@ export class AdminController {
         filters.resourceType = resourceTypeValue;
         if (resourceTypeOperator) filters.resource_type_operator = resourceTypeOperator;
       }
+      if (resourceId) filters.resourceId = resourceId;
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
 

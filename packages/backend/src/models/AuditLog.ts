@@ -31,6 +31,9 @@ export class AuditLogModel {
         const eventsToTrigger: string[] = [];
         let primaryEventType = auditData.action;
 
+        // Normalize dot-separated actions to underscore format (e.g., feature_flag.create → feature_flag_create)
+        primaryEventType = primaryEventType.replace(/\./g, '_');
+
         // 1. Determine primary event type (with mapping)
         let isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
 
@@ -47,10 +50,12 @@ export class AuditLogModel {
             primaryEventType = 'game_world_visibility_changed';
             isPrimaryValid = ALL_INTEGRATION_EVENTS.includes(primaryEventType as any);
           } else {
-            // Generic mappings
+            // Generic mappings: append 'd' to past-tense-ify
             if (primaryEventType.endsWith('_create')) primaryEventType += 'd';
             else if (primaryEventType.endsWith('_update')) primaryEventType += 'd';
             else if (primaryEventType.endsWith('_delete')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_archive')) primaryEventType += 'd';
+            else if (primaryEventType.endsWith('_revive')) primaryEventType += 'd';
             else if (primaryEventType.endsWith('_bulk_create')) primaryEventType += 'd';
             else if (primaryEventType.endsWith('_bulk_update')) primaryEventType += 'd';
 
@@ -178,6 +183,7 @@ export class AuditLogModel {
       action_operator?: 'any_of' | 'include_all';
       resourceType?: string | string[];
       resource_type_operator?: 'any_of' | 'include_all';
+      resourceId?: string;
       startDate?: Date;
       endDate?: Date;
     } = {}
@@ -242,6 +248,11 @@ export class AuditLogModel {
           } else {
             query.where('al.entityType', filters.resourceType);
           }
+        }
+
+        // Handle resourceId filter
+        if (filters.resourceId) {
+          query.where('al.entityId', filters.resourceId);
         }
 
         if (filters.user) {

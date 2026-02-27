@@ -133,9 +133,10 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
 
 interface FeatureFlagAuditLogsProps {
   flagName: string;
+  flagId: string;
 }
 
-const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName }) => {
+const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, flagId }) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const theme = useTheme();
@@ -164,6 +165,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName })
     { id: 'action', labelKey: 'auditLogs.action', visible: true },
     { id: 'resource', labelKey: 'auditLogs.resource', visible: true },
     { id: 'resourceId', labelKey: 'auditLogs.resourceId', visible: true },
+    { id: 'description', labelKey: 'auditLogs.description', visible: true },
     { id: 'ipAddress', labelKey: 'auditLogs.ipAddress', visible: true },
   ];
 
@@ -220,7 +222,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName })
       setLoading(true);
 
       const filters: AuditLogFilters = {
-        ['resource_id' as keyof AuditLogFilters]: flagName,
+        ['resource_id' as keyof AuditLogFilters]: flagId,
       };
 
       if (dateFrom) {
@@ -354,9 +356,9 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName })
     switch (columnId) {
       case 'createdAt':
         return (
-          <Tooltip title={formatDateTimeDetailed((log as any).createdAt || log.created_at)}>
+          <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
             <Typography variant="body2">
-              {formatRelativeTime((log as any).createdAt || log.created_at, undefined, language)}
+              {formatRelativeTime(log.createdAt, undefined, language)}
             </Typography>
           </Tooltip>
         );
@@ -384,18 +386,14 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName })
           />
         );
       case 'resource':
-        const resourceType =
-          (log as any).resourceType || (log as any).resource_type || (log as any).entityType;
-        return resourceType ? (
+        return log.resourceType ? (
           <Box>
             <Typography variant="body2" fontWeight="medium">
-              {t(`auditLogs.resources.${resourceType}`, resourceType)}
+              {t(`auditLogs.resources.${log.resourceType}`, log.resourceType)}
             </Typography>
             {(() => {
-              const oldVals = (log as any).oldValues || (log as any).old_values;
-              const newVals = (log as any).newValues || (log as any).new_values;
               const resourceName =
-                oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
+                log.oldValues?.name || log.newValues?.name || log.oldValues?.worldId || log.newValues?.worldId;
               return resourceName ? (
                 <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
                   {resourceName}
@@ -409,21 +407,50 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName })
           </Typography>
         );
       case 'resourceId':
-        const resourceId =
-          (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
-        return resourceId ? (
+        return log.resourceId ? (
           <Typography variant="caption" color="text.secondary">
-            ID: {resourceId}
+            ID: {log.resourceId}
           </Typography>
         ) : (
           <Typography variant="body2" color="text.secondary">
             -
           </Typography>
         );
+      case 'description':
+        return (
+          <Tooltip
+            title={log.description || ''}
+            placement="bottom-start"
+            slotProps={{
+              tooltip: {
+                sx: {
+                  maxWidth: 400,
+                  fontSize: '0.8125rem',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  p: 1.5,
+                },
+              },
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                maxWidth: 300,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {log.description || '-'}
+            </Typography>
+          </Tooltip>
+        );
       case 'ipAddress':
         return (
           <Typography variant="body2" fontFamily="monospace">
-            {log.ip_address || '-'}
+            {log.ipAddress || '-'}
           </Typography>
         );
       default:
