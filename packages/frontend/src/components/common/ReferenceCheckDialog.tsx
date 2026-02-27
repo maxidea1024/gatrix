@@ -50,9 +50,10 @@ const ReferenceCheckDialog: React.FC<ReferenceCheckDialogProps> = ({
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const handleFlagClick = (flagName: string) => {
+    const handleFlagClick = (flagName: string, environment?: string) => {
         onClose();
-        navigate(`/feature-flags/${encodeURIComponent(flagName)}`);
+        const envParam = environment ? `?env=${encodeURIComponent(environment)}` : '';
+        navigate(`/feature-flags/${encodeURIComponent(flagName)}${envParam}`);
     };
 
     const handleSegmentClick = () => {
@@ -108,7 +109,7 @@ const ReferenceCheckDialog: React.FC<ReferenceCheckDialogProps> = ({
                             {references.flags.map((flag, index) => (
                                 <ListItem key={`flag-${index}`} disablePadding>
                                     <ListItemButton
-                                        onClick={() => handleFlagClick(flag.flagName)}
+                                        onClick={() => handleFlagClick(flag.flagName, flag.environment)}
                                         sx={{ borderRadius: 1, py: 0.5 }}
                                     >
                                         <ListItemIcon sx={{ minWidth: 32 }}>
