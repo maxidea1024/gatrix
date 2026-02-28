@@ -17,10 +17,10 @@ export class ServerEnvironmentController {
     try {
       const environments = await Environment.query()
         .orderBy('displayOrder', 'asc')
-        .orderBy('environmentId', 'asc');
+        .orderBy('id', 'asc');
 
       const result = environments.map((env) => ({
-        environmentId: env.name,
+        environmentId: env.id,
         displayName: env.displayName,
         environmentType: env.environmentType,
         color: env.color,
