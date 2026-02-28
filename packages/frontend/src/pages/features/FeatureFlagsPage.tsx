@@ -105,7 +105,8 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
-import { environmentService, Environment } from '../../services/environmentService';
+import { Environment } from '../../services/environmentService';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
 import api from '../../services/api';
@@ -194,7 +195,11 @@ const FeatureFlagsPage: React.FC = () => {
   const [deletingFlag, setDeletingFlag] = useState<FeatureFlag | null>(null);
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
-  const [environments, setEnvironments] = useState<Environment[]>([]);
+  const { environments: envListRaw, currentEnvironmentId } = useEnvironment();
+  const environments: Environment[] = useMemo(() =>
+    envListRaw.filter((e) => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder),
+    [envListRaw]
+  );
   const [selectedFlags, setSelectedFlags] = useState<Set<string>>(new Set());
 
   // Create dialog state
@@ -808,6 +813,7 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!currentEnvironmentId) return; // Wait for environment to be set
     loadFlags();
   }, [
     page,
@@ -820,25 +826,13 @@ const FeatureFlagsPage: React.FC = () => {
     tagFilter,
     valueTypeFilter,
     currentProjectId,
+    currentEnvironmentId,
   ]);
 
   useEffect(() => {
     loadTags();
     loadFlagTypes();
-    loadEnvironments();
   }, []);
-
-  const loadEnvironments = async () => {
-    try {
-      const envs = await environmentService.getEnvironments();
-      // Filter only visible environments and sort by displayOrder
-      setEnvironments(
-        envs.filter((e) => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder)
-      );
-    } catch {
-      setEnvironments([]);
-    }
-  };
 
   const loadFlagTypes = async () => {
     try {

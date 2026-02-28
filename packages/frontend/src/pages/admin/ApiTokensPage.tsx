@@ -85,7 +85,8 @@ import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import { apiTokenService } from '@/services/apiTokenService';
-import { environmentService, Environment } from '@/services/environmentService';
+import { Environment } from '@/services/environmentService';
+import { useEnvironments } from '@/contexts/EnvironmentContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
@@ -263,7 +264,8 @@ const ApiTokensPage: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState<ApiAccessToken | null>(null);
 
   // Environment state
-  const [environments, setEnvironments] = useState<Environment[]>([]);
+  const { environments: envList } = useEnvironments();
+  const environments: Environment[] = envList;
   const [fullEditingData, setFullEditingData] = useState<any>(null);
 
   // Form states
@@ -377,18 +379,7 @@ const ApiTokensPage: React.FC = () => {
     loadTokens();
   }, [page, rowsPerPage, sortBy, sortOrder, activeFilters, projectApiPath]);
 
-  // Load environments on mount
-  useEffect(() => {
-    const loadEnvironments = async () => {
-      try {
-        const envs = await environmentService.getEnvironments();
-        setEnvironments(envs);
-      } catch (error) {
-        console.error('Failed to load environments:', error);
-      }
-    };
-    loadEnvironments();
-  }, []);
+
 
   const loadTokens = async () => {
     try {
