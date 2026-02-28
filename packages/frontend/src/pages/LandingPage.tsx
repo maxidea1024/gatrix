@@ -30,7 +30,12 @@ const LandingPage: React.FC = () => {
   // Get browser's default timezone
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const [selectedLanguage, setSelectedLanguage] = useState(language);
+  // Normalize language code (e.g., 'en-US' -> 'en') to match available options
+  const supportedLanguages = ['en', 'ko', 'zh'];
+  const normalizedLanguage = supportedLanguages.includes(language)
+    ? language
+    : supportedLanguages.find((l) => language.startsWith(l)) || 'en';
+  const [selectedLanguage, setSelectedLanguage] = useState(normalizedLanguage);
   const [selectedTimezone, setSelectedTimezone] = useState(browserTimezone);
   const [selectedTheme, setSelectedTheme] = useState<ThemeMode>(mode);
 
