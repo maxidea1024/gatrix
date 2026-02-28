@@ -59,16 +59,31 @@ export class AuthService {
       delete (userWithoutPassword as any).passwordHash;
 
       // Generate tokens
-      // Note: role is now determined via g_organisation_members.orgRole, not g_users.role
+      // Look up org membership to include correct orgId/orgRole in JWT
+      let orgId = '';
+      let orgRole = 'user';
+      try {
+        const membership = await db('g_organisation_members')
+          .where('userId', user.id)
+          .orderBy('joinedAt', 'asc')
+          .first();
+        if (membership) {
+          orgId = membership.orgId;
+          orgRole = membership.orgRole || 'user';
+        }
+      } catch (err) {
+        logger.warn('Failed to lookup org membership during login:', err);
+      }
+
       const accessToken = JwtUtils.generateToken(
         userWithoutPassword as any,
-        '',
-        'user'
+        orgId,
+        orgRole
       );
       const refreshToken = JwtUtils.generateRefreshToken(
         userWithoutPassword as any,
-        '',
-        'user'
+        orgId,
+        orgRole
       );
 
       logger.info('User logged in successfully:', {
