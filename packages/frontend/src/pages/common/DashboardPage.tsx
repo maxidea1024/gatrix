@@ -54,6 +54,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useUserStats } from '@/hooks/useSWR';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
@@ -289,6 +290,7 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const isAdminUser = isAdmin();
   const { switchEnvironment, currentEnvironmentId } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
 
   const [alertsSummary, setAlertsSummary] = useState<{
     total: number;
@@ -735,9 +737,12 @@ const DashboardPage: React.FC = () => {
         setEnvCountsLoading(true);
 
         // First get user's accessible environments
+        const projectApiPath = getProjectApiPath();
+        if (!projectApiPath) return;
+
         const [accessResponse, envsResponse] = await Promise.all([
           api.get('/admin/users/me/environments'),
-          api.get('/admin/environments'),
+          api.get(`${projectApiPath}/environments`),
         ]);
 
         if (!isMounted) return;
@@ -761,7 +766,7 @@ const DashboardPage: React.FC = () => {
         // Fetch counts for each environment
         const countsPromises = displayEnvs.map(async (env: Environment) => {
           try {
-            const res = await api.get(`/admin/environments/${env.environmentId}/related-data`);
+            const res = await api.get(`${projectApiPath}/environments/${env.environmentId}/related-data`);
             const rawData = res?.data?.relatedData;
             // Extract count from each { count, items } object
             const counts = rawData

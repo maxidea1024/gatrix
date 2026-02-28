@@ -39,6 +39,7 @@ import {
   Info as InfoIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
@@ -61,6 +62,7 @@ interface UserEnvironmentAccess {
 
 const ProfilePage: React.FC = () => {
   const { user, refreshAuth, permissions } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
   const { t } = useTranslation();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -96,12 +98,16 @@ const ProfilePage: React.FC = () => {
 
       try {
         setEnvLoading(true);
-        const [accessResponse, envsResponse] = await Promise.all([
+        const projectApiPath = getProjectApiPath();
+        const requests: Promise<any>[] = [
           api.get<UserEnvironmentAccess>('/admin/users/me/environments'),
-          api.get<Environment[]>('/admin/environments'),
-        ]);
-        setEnvironmentAccess(accessResponse.data || null);
-        setEnvironments(envsResponse.data || []);
+        ];
+        if (projectApiPath) {
+          requests.push(api.get<Environment[]>(`${projectApiPath}/environments`));
+        }
+        const results = await Promise.all(requests);
+        setEnvironmentAccess(results[0].data || null);
+        setEnvironments(results[1]?.data || []);
       } catch (error) {
         console.error('Failed to fetch environment access:', error);
       } finally {

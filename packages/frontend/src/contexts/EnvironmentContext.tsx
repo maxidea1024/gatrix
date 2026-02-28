@@ -9,6 +9,7 @@ import React, {
 import { environmentService, Environment } from '../services/environmentService';
 import { apiService } from '../services/api';
 import { useAuth } from './AuthContext';
+import { useOrgProject } from './OrgProjectContext';
 
 const STORAGE_KEY = 'gatrix_selected_environment';
 const STORAGE_KEY_NAME = 'gatrix_selected_environment_name';
@@ -53,6 +54,7 @@ const storeEnvironment = (environmentId: string, name: string): void => {
 
 export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
+  const { getProjectApiPath, currentProjectId } = useOrgProject();
   const [allEnvironments, setAllEnvironments] = useState<Environment[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [currentEnvironmentId, setCurrentEnvironmentId] = useState<string | null>(
@@ -67,13 +69,22 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
 
   // Load environments from API
   const loadEnvironments = useCallback(async () => {
+    const projectApiPath = getProjectApiPath();
+    if (!projectApiPath) {
+      // No org/project selected yet — skip loading
+      setEnvironments([]);
+      setAllEnvironments([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
       console.log('[EnvironmentContext] Calling environmentService.getEnvironments()...');
 
-      // Load all environments first
-      const envList = await environmentService.getEnvironments();
+      // Load all environments for the current project
+      const envList = await environmentService.getEnvironments(projectApiPath);
       console.log('[EnvironmentContext] Got environments:', envList);
 
       // Store all environments for admin UI
@@ -144,33 +155,21 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     } finally {
       setIsLoading(false);
     }
-  }, []);
-
-  // Fetch environments only when authenticated
-  useEffect(() => {
-    console.log('[EnvironmentContext] isAuthenticated changed:', isAuthenticated);
-    if (isAuthenticated) {
-      console.log('[EnvironmentContext] Loading environments...');
-      loadEnvironments();
-    } else {
-      // Reset when unauthenticated
-      setEnvironments([]);
-      setError(null);
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, loadEnvironments]);
+  }, [getProjectApiPath]);
 
   // Reload environments when project changes
   useEffect(() => {
-    const handleProjectChanged = () => {
-      if (isAuthenticated) {
-        console.log('[EnvironmentContext] Project changed, reloading environments...');
-        loadEnvironments();
-      }
-    };
-    window.addEventListener('project-changed', handleProjectChanged);
-    return () => window.removeEventListener('project-changed', handleProjectChanged);
-  }, [isAuthenticated, loadEnvironments]);
+    if (isAuthenticated && currentProjectId) {
+      console.log('[EnvironmentContext] Project changed, reloading environments...');
+      loadEnvironments();
+    } else if (!isAuthenticated) {
+      // Reset when unauthenticated
+      setEnvironments([]);
+      setAllEnvironments([]);
+      setError(null);
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, currentProjectId, loadEnvironments]);
 
   // Switch to a different environment
   const switchEnvironment = useCallback(

@@ -184,13 +184,25 @@ export interface EnvironmentRelatedData {
   hasData: boolean;
 }
 
+/**
+ * Build base path for environment API calls.
+ * All environment endpoints are project-scoped:
+ *   /admin/orgs/:orgId/projects/:projectId/environments
+ */
+function envBasePath(projectApiPath: string | null): string {
+  if (!projectApiPath) {
+    throw new Error('Project context required for environment operations');
+  }
+  return `${projectApiPath}/environments`;
+}
+
 class EnvironmentService {
   /**
    * Get all environments
    */
-  async getEnvironments(includeHidden: boolean = false): Promise<Environment[]> {
+  async getEnvironments(projectApiPath: string | null, includeHidden: boolean = false): Promise<Environment[]> {
     try {
-      const response = await api.get('/admin/environments', {
+      const response = await api.get(envBasePath(projectApiPath), {
         params: includeHidden ? { includeHidden: 'true' } : undefined,
       });
       return response.data || [];
@@ -202,11 +214,10 @@ class EnvironmentService {
 
   /**
    * Get environment by name
-   * @param environment Environment name (primary key)
    */
-  async getEnvironment(environmentId: string): Promise<Environment> {
+  async getEnvironment(projectApiPath: string | null, environmentId: string): Promise<Environment> {
     try {
-      const response = await api.get(`/admin/environments/${ environmentId }`);
+      const response = await api.get(`${envBasePath(projectApiPath)}/${environmentId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching environment:', error);
@@ -217,9 +228,9 @@ class EnvironmentService {
   /**
    * Create new environment
    */
-  async createEnvironment(data: CreateEnvironmentData): Promise<Environment> {
+  async createEnvironment(projectApiPath: string | null, data: CreateEnvironmentData): Promise<Environment> {
     try {
-      const response = await api.post('/admin/environments', data);
+      const response = await api.post(envBasePath(projectApiPath), data);
       return response.data;
     } catch (error) {
       console.error('Error creating environment:', error);
@@ -229,11 +240,10 @@ class EnvironmentService {
 
   /**
    * Update an existing environment
-   * @param environment Environment name (primary key)
    */
-  async updateEnvironment(environmentId: string, data: UpdateEnvironmentData): Promise<Environment> {
+  async updateEnvironment(projectApiPath: string | null, environmentId: string, data: UpdateEnvironmentData): Promise<Environment> {
     try {
-      const response = await api.put(`/admin/environments/${ environmentId }`, data);
+      const response = await api.put(`${envBasePath(projectApiPath)}/${environmentId}`, data);
       return response.data;
     } catch (error) {
       console.error('Error updating environment:', error);
@@ -243,13 +253,11 @@ class EnvironmentService {
 
   /**
    * Get copy preview between two environments
-   * @param sourceEnvironment Source environment name
-   * @param targetEnvironment Target environment name
    */
-  async getCopyPreview(sourceEnvironment: string, targetEnvironment: string): Promise<CopyPreview> {
+  async getCopyPreview(projectApiPath: string | null, sourceEnvironment: string, targetEnvironment: string): Promise<CopyPreview> {
     try {
       const response = await api.get(
-        `/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}/preview`
+        `${envBasePath(projectApiPath)}/${sourceEnvironment}/copy/${targetEnvironment}/preview`
       );
       return response.data;
     } catch (error) {
@@ -260,17 +268,16 @@ class EnvironmentService {
 
   /**
    * Copy data from one environment to another
-   * @param sourceEnvironment Source environment name
-   * @param targetEnvironment Target environment name
    */
   async copyEnvironmentData(
+    projectApiPath: string | null,
     sourceEnvironment: string,
     targetEnvironment: string,
     options: CopyOptions
   ): Promise<CopyResult> {
     try {
       const response = await api.post(
-        `/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}`,
+        `${envBasePath(projectApiPath)}/${sourceEnvironment}/copy/${targetEnvironment}`,
         options
       );
       return response.data;
@@ -282,11 +289,10 @@ class EnvironmentService {
 
   /**
    * Get related data counts for an environment (for delete confirmation)
-   * @param environment Environment name (primary key)
    */
-  async getRelatedData(environmentId: string): Promise<EnvironmentRelatedData> {
+  async getRelatedData(projectApiPath: string | null, environmentId: string): Promise<EnvironmentRelatedData> {
     try {
-      const response = await api.get(`/admin/environments/${ environmentId }/related-data`);
+      const response = await api.get(`${envBasePath(projectApiPath)}/${environmentId}/related-data`);
       return response.data;
     } catch (error) {
       console.error('Error fetching related data:', error);
@@ -296,12 +302,10 @@ class EnvironmentService {
 
   /**
    * Delete an environment
-   * @param environment Environment name (primary key)
-   * @param force If true, delete all related data as well
    */
-  async deleteEnvironment(environmentId: string, force: boolean = false): Promise<void> {
+  async deleteEnvironment(projectApiPath: string | null, environmentId: string, force: boolean = false): Promise<void> {
     try {
-      await api.delete(`/admin/environments/${ environmentId }`, {
+      await api.delete(`${envBasePath(projectApiPath)}/${environmentId}`, {
         data: { force },
       });
     } catch (error) {

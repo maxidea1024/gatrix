@@ -48,6 +48,7 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
+import { useEnvironments } from '@/contexts/EnvironmentContext';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 // Provider icons
@@ -464,9 +465,8 @@ export const EditIntegrationPage: React.FC = () => {
 
   const [tabValue, setTabValue] = useState(parseInt(searchParams.get('tab') || '0', 10));
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
-  const [environments, setEnvironments] = useState<{ environmentId: string; displayName?: string }[]>(
-    []
-  );
+  const { environments: envList } = useEnvironments();
+  const environments = envList.map((e) => ({ environmentId: e.environmentId, displayName: e.displayName }));
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [description, setDescription] = useState('');
   const [isEnabled, setIsEnabled] = useState(true);
@@ -491,7 +491,6 @@ export const EditIntegrationPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    fetchEnvironments();
   }, [id]);
 
   useEffect(() => {
@@ -547,14 +546,6 @@ export const EditIntegrationPage: React.FC = () => {
     }
   };
 
-  const fetchEnvironments = async () => {
-    try {
-      const res = await api.get('/admin/environments');
-      setEnvironments(res?.data || []);
-    } catch {
-      // Ignore error
-    }
-  };
 
   const fetchEventLogs = async (isRefresh = false) => {
     try {
