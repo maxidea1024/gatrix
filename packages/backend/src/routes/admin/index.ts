@@ -68,7 +68,7 @@ router.use('/rbac', rbacRoutes);
 
 // Apply authentication middleware to all other admin routes
 router.use(authenticate as any);
-router.use(requireAdmin as any);
+// Note: requireAdmin removed - each route uses its own requirePermission via RBAC
 
 // Apply environment context middleware to set current environment from X-Environment header
 router.use(environmentContextMiddleware as any);
