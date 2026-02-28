@@ -91,6 +91,9 @@ export class AuthService {
         email: user.email,
       });
 
+      // Include role from org membership in the response user object
+      (userWithoutPassword as any).role = orgRole;
+
       return {
         user: userWithoutPassword as any,
         accessToken,
