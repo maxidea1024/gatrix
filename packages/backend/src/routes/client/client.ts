@@ -372,16 +372,15 @@ router.get('/cache-stats', clientSDKAuth, ClientController.getCacheStats);
 
 router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache);
 
-// Feature Flag evaluation routes (Server-side)
-// Environment is specified in the path: /features/:environment/eval
-router.post('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
-router.get('/features/:environment/eval', clientSDKAuth, ClientController.evaluateFlags);
+// Feature Flag evaluation routes (token determines environment)
+router.post('/features/eval', clientSDKAuth, ClientController.evaluateFlags);
+router.get('/features/eval', clientSDKAuth, ClientController.evaluateFlags);
 
 // Feature Flag streaming route (SSE for real-time invalidation)
-router.get('/features/:environment/stream/sse', clientSDKAuth, ClientController.streamFlags);
+router.get('/features/stream/sse', clientSDKAuth, ClientController.streamFlags);
 
 // Metrics route
-router.post('/features/:environment/metrics', clientSDKAuth, ClientController.submitMetrics);
+router.post('/features/metrics', clientSDKAuth, ClientController.submitMetrics);
 
 // Client SDK routes (with API token authentication)
 router.get('/test', clientSDKAuth, (req: any, res: any) => {

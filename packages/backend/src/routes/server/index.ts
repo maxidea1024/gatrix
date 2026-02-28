@@ -117,78 +117,78 @@ router.post(
 );
 
 // ============================================================================
-// Environment-specific routes: /api/v1/server/:env/...
+// Environment-specific routes (token determines environment)
 // ============================================================================
 
 // Coupon routes
-router.post('/:env/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
+router.post(/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
 
 // Game world routes
-router.get('/:env/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
+router.get(/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
 router.get(
-  '/:env/game-worlds/world/:worldId',
+  /game-worlds/world/:worldId',
   serverSDKAuth,
   ServerGameWorldController.getGameWorldByWorldId
 );
-router.get('/:env/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
+router.get(/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
 
 // Ingame popup notice routes
 router.get(
-  '/:env/ingame-popup-notices',
+  /ingame-popup-notices',
   serverSDKAuth,
   IngamePopupNoticeController.getServerIngamePopupNotices
 );
 router.get(
-  '/:env/ingame-popup-notices/:id',
+  /ingame-popup-notices/:id',
   serverSDKAuth,
   IngamePopupNoticeController.getServerIngamePopupNoticeById
 );
 
 // Survey routes
-router.get('/:env/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
-router.get('/:env/surveys', serverSDKAuth, SurveyController.getServerSurveys);
-router.get('/:env/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
+router.get(/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
+router.get(/surveys', serverSDKAuth, SurveyController.getServerSurveys);
+router.get(/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
 
 // Whitelist routes
-router.get('/:env/whitelists', serverSDKAuth, getWhitelistsHandler);
+router.get(/whitelists', serverSDKAuth, getWhitelistsHandler);
 
 // Vars (KV) routes
-router.get('/:env/vars', serverSDKAuth, VarsController.getServerVars as any);
+router.get(/vars', serverSDKAuth, VarsController.getServerVars as any);
 
 // Maintenance routes
-router.get('/:env/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
+router.get(/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
 
 // Client version routes
-router.get('/:env/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
+router.get(/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
 router.get(
-  '/:env/client-versions/:id',
+  /client-versions/:id',
   serverSDKAuth,
   ServerClientVersionController.getClientVersionById
 );
 
 // Service notice routes
-router.get('/:env/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
+router.get(/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
 router.get(
-  '/:env/service-notices/:id',
+  /service-notices/:id',
   serverSDKAuth,
   ServerServiceNoticeController.getServiceNoticeById
 );
 
 // Banner routes
-router.get('/:env/banners', serverSDKAuth, ServerBannerController.getBanners);
-router.get('/:env/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
+router.get(/banners', serverSDKAuth, ServerBannerController.getBanners);
+router.get(/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
 
 // Store product routes
-router.get('/:env/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
+router.get(/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
 router.get(
-  '/:env/store-products/:id',
+  /store-products/:id',
   serverSDKAuth,
   ServerStoreProductController.getStoreProductById
 );
 
 // Planning data upload route (for external CLI uploads)
 router.post(
-  '/:env/planning-data/upload',
+  /planning-data/upload',
   serverSDKAuth as any,
   upload.any() as any,
   PlanningDataController.uploadPlanningData as any
@@ -196,26 +196,26 @@ router.post(
 
 // Feature flag routes
 router.get(
-  '/:env/features',
+  /features',
   serverSDKAuth as any,
   ServerFeatureFlagController.getFeatureFlags as any
 );
 router.get(
-  '/:env/features/:flagName',
+  /features/:flagName',
   serverSDKAuth as any,
   ServerFeatureFlagController.getFeatureFlag as any
 );
 router.post(
-  '/:env/features/metrics',
+  /features/metrics',
   serverSDKAuth as any,
   ServerFeatureFlagController.receiveMetrics as any
 );
 router.post(
-  '/:env/features/unknown',
+  /features/unknown',
   serverSDKAuth as any,
   ServerFeatureFlagController.reportUnknownFlag as any
 );
-router.get('/:env/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
+router.get(/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
 
 // Impact metrics routes (SDK → backend)
 import ImpactMetricsController from '../../controllers/ImpactMetricsController';

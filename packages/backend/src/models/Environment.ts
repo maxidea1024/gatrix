@@ -157,6 +157,13 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
+   * Get environment by ID (ULID)
+   */
+  static async getById(id: string): Promise<Environment | undefined> {
+    return await this.query().findById(id);
+  }
+
+  /**
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
@@ -432,7 +439,7 @@ export class Environment extends Model implements EnvironmentData {
         }
       ),
       safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
-      safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
+      safeQuery<{ id: string; tokenName: string }>('g_api_access_tokens', ['id', 'tokenName']),
       safeQuery<{ id: string; eventType: string }>('g_server_lifecycle_events', [
         'id',
         'eventType',
@@ -441,19 +448,11 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; action: string }>('g_audit_logs', ['id', 'action']),
     ]);
 
-    // For API tokens, we need to get the token names
-    let apiTokens: {
-      count: number;
-      items: Array<{ id: string; name: string }>;
-    } = { count: 0, items: [] };
-    if (apiTokenEnvs.count > 0) {
-      const tokenIds = apiTokenEnvs.items.map((item) => item.tokenId);
-      const tokens = await knex('g_api_access_tokens')
-        .whereIn('id', tokenIds)
-        .select(['id', 'tokenName as name'])
-        .limit(maxItems);
-      apiTokens = { count: apiTokenEnvs.count, items: tokens };
-    }
+    // API tokens now have direct environmentId column
+    const apiTokens = {
+      count: apiTokenEnvs.count,
+      items: apiTokenEnvs.items.map((t: any) => ({ id: t.id, name: t.tokenName })),
+    };
 
     const result = {
       gameWorlds,
@@ -682,7 +681,7 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_coupons');
         await safeDelete(trx, 'g_store_products');
         await safeDelete(trx, 'g_banners');
-        await safeDelete(trx, 'g_api_access_token_environments');
+        await safeDelete(trx, 'g_api_access_tokens');
         await safeDelete(trx, 'g_server_lifecycle_events');
         await safeDelete(trx, 'g_user_environments');
         await safeDelete(trx, 'g_tags'); // Tags are global, but check for environment column just in case schema changes

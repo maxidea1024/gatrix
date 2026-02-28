@@ -233,7 +233,7 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
     logger.warn('Auth: Application name missing', { url: req.originalUrl });
     return res.status(400).json({
       success: false,
-      error: { code: ErrorCodes.BAD_REQUEST, message: 'X-Application-Name is required' },
+      error: { code: ErrorCodes.BAD_REQUEST, message: `${HEADERS.X_APPLICATION_NAME} is required` },
     });
   }
 
@@ -280,7 +280,7 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
     let env = await CacheService.get<Environment>(cacheKey);
 
     if (!env) {
-      env = (await Environment.getByName(environmentId)) || null;
+      env = (await Environment.getById(environmentId)) || null;
       if (!env) {
         logger.warn('Auth: Environment not found', { environmentId });
         return res.status(404).json({
