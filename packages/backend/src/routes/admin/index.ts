@@ -49,6 +49,7 @@ import signalEndpointRoutes from './signalEndpoints';
 import actionSetRoutes from './actionSets';
 import queueMonitorRoutes from './queueMonitor';
 import rbacRoutes from './rbac';
+import ImpactMetricsController from '../../controllers/ImpactMetricsController';
 
 const router = express.Router();
 

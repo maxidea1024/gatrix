@@ -195,7 +195,7 @@ export interface FeatureMetricsAttributes {
  * Used on the WRITE path to ensure stored values have the correct type,
  * and on the READ path as defense-in-depth.
  */
-function coerceValueByType(value: any, valueType: string | undefined): any {
+export function coerceValueByType(value: any, valueType: string | undefined): any {
   if (value === null || value === undefined) return value;
   switch (valueType) {
     case 'string':

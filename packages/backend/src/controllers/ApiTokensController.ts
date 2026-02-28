@@ -259,8 +259,6 @@ class ApiTokensController {
 
         // Update token
         await trx('g_api_access_tokens').where('id', id).update(updateData);
-
-        }
       });
 
       // Get updated token with user info

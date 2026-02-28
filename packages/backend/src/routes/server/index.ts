@@ -121,74 +121,74 @@ router.post(
 // ============================================================================
 
 // Coupon routes
-router.post(/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
+router.post('/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
 
 // Game world routes
-router.get(/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
+router.get('/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
 router.get(
-  /game-worlds/world/:worldId',
+  '/game-worlds/world/:worldId',
   serverSDKAuth,
   ServerGameWorldController.getGameWorldByWorldId
 );
-router.get(/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
+router.get('/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
 
 // Ingame popup notice routes
 router.get(
-  /ingame-popup-notices',
+  '/ingame-popup-notices',
   serverSDKAuth,
   IngamePopupNoticeController.getServerIngamePopupNotices
 );
 router.get(
-  /ingame-popup-notices/:id',
+  '/ingame-popup-notices/:id',
   serverSDKAuth,
   IngamePopupNoticeController.getServerIngamePopupNoticeById
 );
 
 // Survey routes
-router.get(/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
-router.get(/surveys', serverSDKAuth, SurveyController.getServerSurveys);
-router.get(/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
+router.get('/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
+router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
+router.get('/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
 
 // Whitelist routes
-router.get(/whitelists', serverSDKAuth, getWhitelistsHandler);
+router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
 
 // Vars (KV) routes
-router.get(/vars', serverSDKAuth, VarsController.getServerVars as any);
+router.get('/vars', serverSDKAuth, VarsController.getServerVars as any);
 
 // Maintenance routes
-router.get(/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
+router.get('/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
 
 // Client version routes
-router.get(/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
+router.get('/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
 router.get(
-  /client-versions/:id',
+  '/client-versions/:id',
   serverSDKAuth,
   ServerClientVersionController.getClientVersionById
 );
 
 // Service notice routes
-router.get(/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
+router.get('/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
 router.get(
-  /service-notices/:id',
+  '/service-notices/:id',
   serverSDKAuth,
   ServerServiceNoticeController.getServiceNoticeById
 );
 
 // Banner routes
-router.get(/banners', serverSDKAuth, ServerBannerController.getBanners);
-router.get(/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
+router.get('/banners', serverSDKAuth, ServerBannerController.getBanners);
+router.get('/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
 
 // Store product routes
-router.get(/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
+router.get('/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
 router.get(
-  /store-products/:id',
+  '/store-products/:id',
   serverSDKAuth,
   ServerStoreProductController.getStoreProductById
 );
 
 // Planning data upload route (for external CLI uploads)
 router.post(
-  /planning-data/upload',
+  '/planning-data/upload',
   serverSDKAuth as any,
   upload.any() as any,
   PlanningDataController.uploadPlanningData as any
@@ -196,26 +196,26 @@ router.post(
 
 // Feature flag routes
 router.get(
-  /features',
+  '/features',
   serverSDKAuth as any,
   ServerFeatureFlagController.getFeatureFlags as any
 );
 router.get(
-  /features/:flagName',
+  '/features/:flagName',
   serverSDKAuth as any,
   ServerFeatureFlagController.getFeatureFlag as any
 );
 router.post(
-  /features/metrics',
+  '/features/metrics',
   serverSDKAuth as any,
   ServerFeatureFlagController.receiveMetrics as any
 );
 router.post(
-  /features/unknown',
+  '/features/unknown',
   serverSDKAuth as any,
   ServerFeatureFlagController.reportUnknownFlag as any
 );
-router.get(/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
+router.get('/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
 
 // Impact metrics routes (SDK → backend)
 import ImpactMetricsController from '../../controllers/ImpactMetricsController';

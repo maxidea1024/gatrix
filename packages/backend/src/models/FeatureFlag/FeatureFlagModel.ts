@@ -3,6 +3,9 @@ import logger from '../../config/logger';
 import { ulid } from 'ulid';
 import { parseJsonField } from '../../utils/dbUtils';
 import { ValidationRules, FeatureFlagAttributes, FeatureStrategyAttributes, FeatureVariantAttributes, ValueType, coerceValueByType } from './types';
+import { FeatureStrategyModel } from './FeatureStrategyModel';
+import { FeatureVariantModel } from './FeatureVariantModel';
+import { FeatureFlagEnvironmentModel } from './FeatureFlagEnvironmentModel';
 
 export class FeatureFlagModel {
   /**
