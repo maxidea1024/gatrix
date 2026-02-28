@@ -47,6 +47,7 @@ import serviceAccountRoutes from './serviceAccounts';
 import signalEndpointRoutes from './signalEndpoints';
 import actionSetRoutes from './actionSets';
 import queueMonitorRoutes from './queueMonitor';
+import rbacRoutes from './rbac';
 
 const router = express.Router();
 
@@ -59,6 +60,9 @@ router.use('/services', serviceDiscoveryRoutes);
 // These must be mounted BEFORE requireAdmin middleware
 import { UserController } from '../../controllers/UserController';
 router.get('/users/me/environments', authenticate as any, UserController.getMyEnvironmentAccess);
+
+// RBAC management routes (uses its own RBAC middleware, not legacy requireAdmin)
+router.use('/rbac', rbacRoutes);
 
 // Apply authentication middleware to all other admin routes
 router.use(authenticate as any);

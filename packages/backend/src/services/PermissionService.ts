@@ -328,7 +328,7 @@ class PermissionService {
   /**
    * Get all roleIds for a user (direct roles + group roles), with caching
    */
-  private async getAllRoleIds(userId: string): Promise<string[]> {
+  async getAllRoleIds(userId: string): Promise<string[]> {
     const key = cacheKey.userRoles(userId);
 
     try {

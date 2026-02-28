@@ -225,37 +225,14 @@ export class WhitelistModel {
     try {
       const updateData: any = {};
 
-      if (data.accountId !== undefined) {
-        updateData.accountId = data.accountId;
-      }
-
-      if (data.ipAddress !== undefined) {
-        updateData.ipAddress = data.ipAddress || null;
-      }
-
-      if (data.isEnabled !== undefined) {
-        updateData.isEnabled = data.isEnabled;
-      }
-
-      if (data.startDate !== undefined) {
-        updateData.startDate = data.startDate || null;
-      }
-
-      if (data.endDate !== undefined) {
-        updateData.endDate = data.endDate || null;
-      }
-
-      if (data.purpose !== undefined) {
-        updateData.purpose = data.purpose || null;
-      }
-
-      if (data.tags !== undefined) {
-        updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
-      }
-
-      if (data.updatedBy !== undefined) {
-        updateData.updatedBy = data.updatedBy;
-      }
+      if (data.accountId !== undefined) updateData.accountId = data.accountId;
+      if (data.ipAddress !== undefined) updateData.ipAddress = data.ipAddress || null;
+      if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
+      if (data.startDate !== undefined) updateData.startDate = data.startDate || null;
+      if (data.endDate !== undefined) updateData.endDate = data.endDate || null;
+      if (data.purpose !== undefined) updateData.purpose = data.purpose || null;
+      if (data.tags !== undefined) updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
+      if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       if (Object.keys(updateData).length === 0) {
         throw new GatrixError('No fields to update', 400);
