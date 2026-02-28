@@ -684,7 +684,7 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_api_access_tokens');
         await safeDelete(trx, 'g_server_lifecycle_events');
         await safeDelete(trx, 'g_user_environments');
-        await safeDelete(trx, 'g_tags'); // Tags are global, but check for environment column just in case schema changes
+        await safeDelete(trx, 'g_tags');
 
         // Finally delete the environment itself
         await trx('g_environments').where('environment', environment).del();
