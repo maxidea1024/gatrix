@@ -1,7 +1,7 @@
 import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
-import crypto from 'crypto';
+import { nanoid } from 'nanoid';
 
 const logger = createLogger('AdminApiToken');
 
@@ -39,7 +39,7 @@ export class AdminApiToken {
    * Generate a prefixed admin token: gx_admin_xxx
    */
   static generateTokenValue(): string {
-    const random = crypto.randomBytes(32).toString('base64url');
+    const random = nanoid();
     return `gx_admin_${random}`;
   }
 

@@ -276,10 +276,10 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
     [projectId]
   );
 
-  const crypto = require('crypto');
+  const { nanoid } = require('nanoid');
   for (const env of environments) {
     // Create client key
-    const clientKey = `gx_client_${crypto.randomBytes(24).toString('hex')}`;
+    const clientKey = `gx_client_${nanoid()}`;
     await database.query(
       `INSERT INTO g_environment_keys (id, environmentId, keyType, keyValue, keyName, isActive, createdBy, createdAt)
        VALUES (?, ?, 'client', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
@@ -287,7 +287,7 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
     );
 
     // Create server key
-    const serverKey = `gx_server_${crypto.randomBytes(24).toString('hex')}`;
+    const serverKey = `gx_server_${nanoid()}`;
     await database.query(
       `INSERT INTO g_environment_keys (id, environmentId, keyType, keyValue, keyName, isActive, createdBy, createdAt)
        VALUES (?, ?, 'server', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,

@@ -1,7 +1,7 @@
 import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
-import crypto from 'crypto';
+import { nanoid } from 'nanoid';
 
 const logger = createLogger('EnvironmentKey');
 
@@ -39,7 +39,7 @@ export class EnvironmentKey {
    */
   static generateKeyValue(keyType: KeyType): string {
     const prefix = keyType === 'client' ? 'gx_client_' : 'gx_server_';
-    const random = crypto.randomBytes(32).toString('base64url');
+    const random = nanoid();
     return `${prefix}${random}`;
   }
 
