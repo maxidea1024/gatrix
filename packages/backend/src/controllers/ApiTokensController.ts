@@ -89,21 +89,6 @@ class ApiTokensController {
         .limit(Number(limit))
         .offset(Number(offset));
 
-      // Get environment assignments for each token (only IDs - frontend has environment list)
-      const tokenIds = tokens.map((t: any) => t.id);
-      const environmentAssignments =
-        tokenIds.length > 0
-          ? await knex('g_api_access_token_environments')
-              .whereIn('tokenId', tokenIds)
-              .select('tokenId', 'environmentId')
-          : [];
-
-      // Group environment names by token
-      const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
-        if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environmentId);
-        return acc;
-      }, {});
 
       // Format tokens (mask token for display, keep original for copying)
       const formattedTokens = tokens.map((token: any) => {
@@ -118,9 +103,7 @@ class ApiTokensController {
           // Keep original tokenValue for copying
           // Add maskedTokenValue for display
           maskedTokenValue: maskedToken,
-          allowAllEnvironments: Boolean(token.allowAllEnvironments),
-          environments: envByToken[token.id] || [],
-          environmentIds: envByToken[token.id] || [], // Backward compatibility
+          environmentId: token.environmentId || null,
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || '',
@@ -171,8 +154,7 @@ class ApiTokensController {
         description,
         tokenType,
         expiresAt,
-        allowAllEnvironments = true,
-        environments = [],
+        environmentId,
       } = req.body;
       const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
@@ -193,7 +175,7 @@ class ApiTokensController {
           description: description || null,
           tokenValue: tokenValue, // Store plain token value
           tokenType,
-          allowAllEnvironments: allowAllEnvironments,
+          environmentId: environmentId || null,
           expiresAt: expiresAt || null,
           createdBy: userId,
           updatedBy: userId,
@@ -201,15 +183,6 @@ class ApiTokensController {
           updatedAt: trx.fn.now(),
         });
 
-        // If not allowing all environments, insert environment assignments
-        if (!allowAllEnvironments && environments.length > 0) {
-          const envInserts = environments.map((envName: string) => ({
-            id: ulid(), // Generate ULID for each record
-            tokenId: tokenId,
-            environmentId: envName,
-          }));
-          await trx('g_api_access_token_environments').insert(envInserts);
-        }
 
         return { id: tokenId };
       });
@@ -221,7 +194,7 @@ class ApiTokensController {
           data: {
             id: result.id,
             tokenType,
-            allowAllEnvironments,
+            environmentId: environmentId || null,
             timestamp: Date.now(),
           },
         });
@@ -239,9 +212,7 @@ class ApiTokensController {
           tokenName,
           tokenType,
           tokenValue, // Only shown once!
-          allowAllEnvironments,
-          environments: allowAllEnvironments ? [] : environments,
-          environmentIds: allowAllEnvironments ? [] : environments, // Backward compatibility
+          environmentId: environmentId || null,
           expiresAt,
           createdAt: new Date().toISOString(),
         },
@@ -261,7 +232,7 @@ class ApiTokensController {
   async updateToken(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tokenName, description, expiresAt, allowAllEnvironments, environments } = req.body;
+      const { tokenName, description, expiresAt, environmentId } = req.body;
       const userId = (req as any).user.id;
 
       // Check if token exists
@@ -284,26 +255,11 @@ class ApiTokensController {
         if (tokenName !== undefined) updateData.tokenName = tokenName;
         if (description !== undefined) updateData.description = description;
         if (expiresAt !== undefined) updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
-        if (allowAllEnvironments !== undefined)
-          updateData.allowAllEnvironments = allowAllEnvironments;
+        if (environmentId !== undefined) updateData.environmentId = environmentId;
 
         // Update token
         await trx('g_api_access_tokens').where('id', id).update(updateData);
 
-        // Update environment assignments if provided
-        if (environments !== undefined) {
-          // Delete existing assignments
-          await trx('g_api_access_token_environments').where('tokenId', id).delete();
-
-          // Insert new assignments
-          if (!allowAllEnvironments && environments.length > 0) {
-            const envInserts = environments.map((envName: string) => ({
-              id: ulid(), // Generate ULID for each record
-              tokenId: id,
-              environmentId: envName,
-            }));
-            await trx('g_api_access_token_environments').insert(envInserts);
-          }
         }
       });
 
@@ -318,10 +274,6 @@ class ApiTokensController {
         .where('g_api_access_tokens.id', id)
         .first();
 
-      // Get environment IDs only (frontend has environment list)
-      const envAssignments = await knex('g_api_access_token_environments')
-        .where('tokenId', id)
-        .select('environmentId');
 
       // Format response
       const formattedToken = {
@@ -330,8 +282,7 @@ class ApiTokensController {
           updatedToken.tokenValue?.substring(0, 4) +
           '••••••••' +
           updatedToken.tokenValue?.substring(updatedToken.tokenValue.length - 4),
-        allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
-        environments: envAssignments.map((e: any) => e.environmentId),
+        environmentId: updatedToken.environmentId || null,
         creator: {
           name: updatedToken.creatorName || 'Unknown',
           email: updatedToken.creatorEmail || '',
@@ -353,7 +304,7 @@ class ApiTokensController {
           data: {
             id,
             tokenType: updatedToken.tokenType,
-            allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
+            environmentId: updatedToken.environmentId || null,
             timestamp: Date.now(),
           },
         });
@@ -472,13 +423,8 @@ class ApiTokensController {
         await pubSubService.invalidateByPattern(`server_api_token:${tokenPrefix}.*`);
       }
 
-      // Use transaction to delete token and its environment assignments
-      await knex.transaction(async (trx) => {
-        // Delete environment assignments first
-        await trx('g_api_access_token_environments').where('tokenId', id).delete();
-        // Delete token
-        await trx('g_api_access_tokens').where('id', id).delete();
-      });
+      // Delete token (no junction table needed)
+      await knex('g_api_access_tokens').where('id', id).delete();
 
       // Publish token deleted event for Edge mirroring
       try {
