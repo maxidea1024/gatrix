@@ -33,7 +33,7 @@ public class StoreProductService : BaseEnvironmentService<StoreProduct, StorePro
 
     protected override string ServiceName => "StoreProduct";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/store-products";
+        $"/api/v1/server/store-products";
     protected override List<StoreProduct> ExtractItems(StoreProductListResponse response) => response.Products;
     protected override object GetItemId(StoreProduct item) => item.Id;
 
@@ -57,7 +57,7 @@ public class StoreProductService : BaseEnvironmentService<StoreProduct, StorePro
             await Task.Delay(100, ct);
 
             var response = await ApiClient.GetAsync<StoreProductByIdResponse>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/store-products/{Uri.EscapeDataString(id)}", ct: ct);
+                $"/api/v1/server/store-products/{Uri.EscapeDataString(id)}", ct: ct);
 
             if (!response.Success || response.Data?.Product is null)
             {

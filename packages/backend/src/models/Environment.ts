@@ -275,7 +275,7 @@ export class Environment extends Model implements EnvironmentData {
     featureSegments: { count: number; items: Array<{ id: string; segmentName: string }> };
     featureMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
     featureVariantMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
-    networkTraffic: { count: number; items: Array<{ id: string; appName: string }> };
+    featureNetworkTraffic: { count: number; items: Array<{ id: string; appName: string }> };
     unknownFlags: { count: number; items: Array<{ id: string; flagName: string }> };
     changeRequests: { count: number; items: Array<{ id: string; title: string }> };
     entityLocks: { count: number; items: Array<{ id: string; entityType: string }> };
@@ -363,7 +363,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments,
       featureMetrics,
       featureVariantMetrics,
-      networkTraffic,
+      featureNetworkTraffic,
       unknownFlags,
       changeRequests,
       entityLocks,
@@ -412,8 +412,8 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; segmentName: string }>('g_feature_segments', ['id', 'segmentName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', ['id', 'flagName']),
-      safeQuery<{ id: string; appName: string }>('NetworkTraffic', ['id', 'appName']),
-      safeQuery<{ id: string; flagName: string }>('unknown_flags', ['id', 'flagName']),
+      safeQuery<{ id: string; appName: string }>('g_network_traffic', ['id', 'appName']),
+      safeQuery<{ id: string; flagName: string }>('g_unknown_flags', ['id', 'flagName']),
       safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),
       safeQuery<{ id: string; entityType: string }>('g_entity_locks', ['id', 'entityType']),
       safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
@@ -425,8 +425,8 @@ export class Environment extends Model implements EnvironmentData {
         'description',
       ]),
       safeQuery<{ id: string; surveyTitle: string }>('g_surveys', ['id', 'surveyTitle']),
-      safeQuery<{ id: string; branch: string }>('crashes', ['id', 'branch']),
-      safeQuery<{ id: string; platform: string }>('crash_events', ['id', 'platform']),
+      safeQuery<{ id: string; branch: string }>('g_crashes', ['id', 'branch']),
+      safeQuery<{ id: string; platform: string }>('g_crash_events', ['id', 'platform']),
       safeQuery<{ id: string; name: string }>('g_reward_item_templates', ['id', 'name']),
       safeQuery<{ id: string; name: string }>('g_reward_templates', ['id', 'name']),
       safeQuery<{ id: string; name: string }>('g_coupon_settings', ['id', 'name']),
@@ -466,7 +466,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments,
       featureMetrics,
       featureVariantMetrics,
-      networkTraffic,
+      featureNetworkTraffic,
       unknownFlags,
       changeRequests,
       entityLocks,
@@ -503,7 +503,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments.count +
       featureMetrics.count +
       featureVariantMetrics.count +
-      networkTraffic.count +
+      featureNetworkTraffic.count +
       unknownFlags.count +
       changeRequests.count +
       entityLocks.count +
@@ -544,7 +544,7 @@ export class Environment extends Model implements EnvironmentData {
     featureSegments: number;
     featureMetrics: number;
     featureVariantMetrics: number;
-    networkTraffic: number;
+    featureNetworkTraffic: number;
     unknownFlags: number;
     changeRequests: number;
     entityLocks: number;
@@ -581,7 +581,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments: details.featureSegments.count,
       featureMetrics: details.featureMetrics.count,
       featureVariantMetrics: details.featureVariantMetrics.count,
-      networkTraffic: details.networkTraffic.count,
+      featureNetworkTraffic: details.featureNetworkTraffic.count,
       unknownFlags: details.unknownFlags.count,
       changeRequests: details.changeRequests.count,
       entityLocks: details.entityLocks.count,
@@ -663,8 +663,8 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_feature_segments');
         await safeDelete(trx, 'g_feature_metrics');
         await safeDelete(trx, 'g_feature_variant_metrics');
-        await safeDelete(trx, 'NetworkTraffic');
-        await safeDelete(trx, 'unknown_flags');
+        await safeDelete(trx, 'g_network_traffic');
+        await safeDelete(trx, 'g_unknown_flags');
         await safeDelete(trx, 'g_change_requests');
         await safeDelete(trx, 'g_entity_locks');
         await safeDelete(trx, 'g_message_templates');
@@ -673,8 +673,8 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_service_notices');
         await safeDelete(trx, 'g_ingame_popup_notices');
         await safeDelete(trx, 'g_surveys');
-        await safeDelete(trx, 'crashes');
-        await safeDelete(trx, 'crash_events');
+        await safeDelete(trx, 'g_crashes');
+        await safeDelete(trx, 'g_crash_events');
         await safeDelete(trx, 'g_reward_item_templates');
         await safeDelete(trx, 'g_reward_templates');
         await safeDelete(trx, 'g_coupon_settings');

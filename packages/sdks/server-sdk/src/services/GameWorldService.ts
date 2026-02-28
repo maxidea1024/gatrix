@@ -1,7 +1,7 @@
 /**
  * Game World Service
  * Handles game world list and detail retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/game-worlds
+ * Uses per-environment API pattern: GET /api/v1/server/game-worlds
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
@@ -29,7 +29,7 @@ export class GameWorldService extends BaseEnvironmentService<
   // ==================== Abstract Method Implementations ====================
 
   protected getEndpoint(environment: string): string {
-    return `/api/v1/server/${encodeURIComponent(environment)}/game-worlds`;
+    return `/api/v1/server/game-worlds`;
   }
 
   protected extractItems(response: GameWorldListResponse): GameWorld[] {
@@ -50,7 +50,7 @@ export class GameWorldService extends BaseEnvironmentService<
 
   /**
    * Get game world by ID
-   * GET /api/v1/server/:env/game-worlds/:id
+   * GET /api/v1/server/game-worlds/:id
    * @param id Game world ID
    * @param environment Environment name (required)
    */
@@ -58,7 +58,7 @@ export class GameWorldService extends BaseEnvironmentService<
     this.logger.debug('Fetching game world by ID', { id, environment });
 
     const response = await this.apiClient.get<GameWorld>(
-      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/${id}`
+      `/api/v1/server/game-worlds/${id}`
     );
 
     if (!response.success || !response.data) {
@@ -75,7 +75,7 @@ export class GameWorldService extends BaseEnvironmentService<
 
   /**
    * Get game world by worldId
-   * GET /api/v1/server/:env/game-worlds/world/:worldId
+   * GET /api/v1/server/game-worlds/world/:worldId
    * @param worldId World ID
    * @param environment Environment name (required)
    */
@@ -86,7 +86,7 @@ export class GameWorldService extends BaseEnvironmentService<
     });
 
     const response = await this.apiClient.get<GameWorld>(
-      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/world/${encodeURIComponent(worldId)}`
+      `/api/v1/server/game-worlds/world/${encodeURIComponent(worldId)}`
     );
 
     if (!response.success || !response.data) {

@@ -17,7 +17,7 @@ public class VarsService : BaseEnvironmentService<VarItem, List<VarItem>>, IVars
     }
 
     protected override string GetEndpoint(string environment) => 
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/vars";
+        $"/api/v1/server/vars";
 
     protected override List<VarItem> ExtractItems(List<VarItem> response) => 
         response;

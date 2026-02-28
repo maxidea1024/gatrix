@@ -1,7 +1,7 @@
 /**
  * Popup Notice Service
  * Handles in-game popup notice retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/ingame-popup-notices
+ * Uses per-environment API pattern: GET /api/v1/server/ingame-popup-notices
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
@@ -32,7 +32,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
   // ==================== Abstract Method Implementations ====================
 
   protected getEndpoint(environment: string): string {
-    return `/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices`;
+    return `/api/v1/server/ingame-popup-notices`;
   }
 
   protected extractItems(response: PopupNoticeListResponse): PopupNotice[] {
@@ -51,7 +51,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
 
   /**
    * Get popup notice by ID
-   * GET /api/v1/server/:env/ingame-popup-notices/:id
+   * GET /api/v1/server/ingame-popup-notices/:id
    * @param id Popup notice ID
    * @param environment Environment name (required)
    */
@@ -59,7 +59,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
     this.logger.debug('Fetching popup notice by ID', { id, environment });
 
     const response = await this.apiClient.get<{ notice: PopupNotice }>(
-      `/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices/${id}`
+      `/api/v1/server/ingame-popup-notices/${id}`
     );
 
     if (!response.success || !response.data) {

@@ -1108,7 +1108,6 @@ class FeaturesClient:
     def _build_fetch_request(self) -> Request:
         """Build the HTTP request for fetching flags."""
         headers = self._common_headers()
-        headers["X-Environment"] = self._environment
         if self._etag:
             headers["If-None-Match"] = self._etag
 
@@ -1618,7 +1617,7 @@ class FeaturesClient:
         self._emitter.emit(EVENTS.FLAGS_FETCH, [{"etag": None, "partial": True}])
 
         try:
-            url = f"{self._api_url}/client/features/{self._environment}/eval"
+            url = f"{self._api_url}/client/features/eval"
             params = self._context.__dict__.copy()
             params["flagNames"] = keys_str
 

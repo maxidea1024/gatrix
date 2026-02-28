@@ -288,7 +288,6 @@ export class GatrixServerSDK {
       baseURL: configWithDefaults.gatrixUrl,
       apiToken: configWithDefaults.apiToken,
       applicationName: configWithDefaults.applicationName,
-      environment: configWithDefaults.environment, // Pass environment for X-Environment header
       logger: this.logger,
       retry: configWithDefaults.retry,
       metrics: this.metrics,
@@ -347,9 +346,10 @@ export class GatrixServerSDK {
       throw createError(ErrorCode.INVALID_CONFIG, 'group is required');
     }
 
-    if (!config.environment) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'environment is required');
-    }
+    // environment is now optional (token handles it)
+    // if (!config.environment) {
+    //   throw createError(ErrorCode.INVALID_CONFIG, 'environment is required');
+    // }
 
     // Validate URL format
     try {
@@ -900,7 +900,7 @@ export class GatrixServerSDK {
    * Used in single-environment mode (game servers)
    */
   getDefaultEnvironment(): string {
-    return this.config.environment;
+    return this.config.environment || 'unknown';
   }
 
   /**
@@ -923,7 +923,7 @@ export class GatrixServerSDK {
       );
     }
 
-    return this.config.environment;
+    return this.config.environment || 'unknown';
   }
 
   // ============================================================================

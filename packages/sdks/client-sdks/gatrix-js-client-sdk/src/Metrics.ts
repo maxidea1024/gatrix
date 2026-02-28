@@ -18,7 +18,7 @@ export interface MetricsOptions {
   appName: string;
   apiUrl: string;
   apiToken: string;
-  environment: string;
+  environment?: string;
   customHeaders?: Record<string, string>;
   metricsInterval?: number; // seconds (default: 60)
   metricsIntervalInitial?: number; // seconds before first send (default: 2)
@@ -81,7 +81,7 @@ export class Metrics {
     this.appName = options.appName;
     this.apiUrl = options.apiUrl;
     this.apiToken = options.apiToken;
-    this.environment = options.environment;
+    this.environment = options.environment || '';
     this.customHeaders = options.customHeaders ?? {};
     this.metricsInterval = (options.metricsInterval ?? 60) * 1000;
     this.metricsIntervalInitial = (options.metricsIntervalInitial ?? 2) * 1000;
@@ -243,7 +243,7 @@ export class Metrics {
 
   private buildMetricsUrl(): string {
     // Metrics endpoint: {apiUrl}/client/features/{environment}/metrics
-    return `${this.apiUrl}/client/features/${this.environment}/metrics`;
+    return `${this.apiUrl}/client/features/metrics`;
   }
 
   private getHeaders(): Record<string, string> {

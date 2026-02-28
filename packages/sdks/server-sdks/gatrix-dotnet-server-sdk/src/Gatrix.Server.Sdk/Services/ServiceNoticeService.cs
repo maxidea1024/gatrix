@@ -22,7 +22,7 @@ public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<S
 
     protected override string ServiceName => "ServiceNotice";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/service-notices";
+        $"/api/v1/server/service-notices";
     protected override List<ServiceNotice> ExtractItems(List<ServiceNotice> response) => response;
     protected override object GetItemId(ServiceNotice item) => item.Id;
 

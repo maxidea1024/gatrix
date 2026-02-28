@@ -1,7 +1,7 @@
 /**
  * Coupon Service
  * Handles coupon redemption
- * Uses per-environment API pattern: POST /api/v1/server/:env/coupons/:code/redeem
+ * Uses per-environment API pattern: POST /api/v1/server/coupons/:code/redeem
  */
 
 import { ApiClient } from '../client/ApiClient';
@@ -20,7 +20,7 @@ export class CouponService {
 
   /**
    * Redeem a coupon code
-   * POST /api/v1/server/:env/coupons/:code/redeem
+   * POST /api/v1/server/coupons/:code/redeem
    *
    * @throws {CouponRedeemError} When coupon redemption fails with specific error code
    *
@@ -51,7 +51,7 @@ export class CouponService {
 
     try {
       const response = await this.apiClient.post<RedeemCouponResponse>(
-        `/api/v1/server/${encodeURIComponent(environment)}/coupons/${encodeURIComponent(code)}/redeem`,
+        `/api/v1/server/coupons/${encodeURIComponent(code)}/redeem`,
         body
       );
 

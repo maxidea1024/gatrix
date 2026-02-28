@@ -22,7 +22,7 @@ public class ClientVersionService : BaseEnvironmentService<ClientVersion, List<C
 
     protected override string ServiceName => "ClientVersion";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/client-versions";
+        $"/api/v1/server/client-versions";
     protected override List<ClientVersion> ExtractItems(List<ClientVersion> response) => response;
     protected override object GetItemId(ClientVersion item) => item.Id;
 

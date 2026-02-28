@@ -22,7 +22,7 @@ public class BannerService : BaseEnvironmentService<Banner, List<Banner>>, IBann
 
     protected override string ServiceName => "Banner";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/banners";
+        $"/api/v1/server/banners";
     protected override List<Banner> ExtractItems(List<Banner> response) => response;
     protected override object GetItemId(Banner item) => item.BannerId;
 

@@ -128,7 +128,7 @@ class SseConnection:
 
     def _build_url(self) -> str:
         base_url = self._config.url or (
-            f"{self._api_url}/client/features/{self._environment}/stream/sse"
+            f"{self._api_url}/client/features/stream/sse"
         )
         params = (
             f"x-api-token={self._api_token}"
@@ -150,7 +150,6 @@ class SseConnection:
             req.add_header("Cache-Control", "no-cache")
             req.add_header("X-API-Token", self._api_token)
             req.add_header("X-Application-Name", self._app_name)
-            req.add_header("X-Environment", self._environment)
             req.add_header("X-Connection-Id", self._connection_id)
             req.add_header("X-SDK-Version", self._sdk_version)
             for k, v in self._custom_headers.items():

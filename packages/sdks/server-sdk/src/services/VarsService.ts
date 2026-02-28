@@ -1,7 +1,7 @@
 /**
  * Vars (KV) Service
  * Handles key-value settings retrieval and caching
- * Uses per-environment API pattern: GET /api/v1/server/:env/vars
+ * Uses per-environment API pattern: GET /api/v1/server/vars
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
@@ -25,7 +25,7 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
   // ==================== Abstract Method Implementations ====================
 
   protected getEndpoint(environment: string): string {
-    return `/api/v1/server/${encodeURIComponent(environment)}/vars`;
+    return `/api/v1/server/vars`;
   }
 
   protected extractItems(response: VarItem[]): VarItem[] {

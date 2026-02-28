@@ -7,7 +7,7 @@ import { generateULID } from '../utils/ulid';
  * Represents an individual crash occurrence
  */
 export class CrashEvent extends Model {
-  static tableName = 'crash_events';
+  static tableName = 'g_crash_events';
 
   id!: string; // ULID
   crashId!: string; // Reference to crashes.id
