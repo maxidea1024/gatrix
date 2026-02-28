@@ -208,7 +208,7 @@ namespace Gatrix.Unity.SDK
 
             const int maxRetries = 2;
             // ... rest of method ...
-            var url = $"{_apiUrl}/client/features/{_environment}/metrics";
+            var url = $"{_apiUrl}/client/features/metrics";
             var json = GatrixJson.SerializeMetrics(payload);
 
             for (int attempt = 0; attempt <= maxRetries; attempt++)
