@@ -76,7 +76,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         modelClass: Environment,
         join: {
           from: 'g_api_access_tokens.environmentId',
-          to: 'g_environments.environmentId',
+          to: 'g_environments.id',
         },
       },
       creator: {

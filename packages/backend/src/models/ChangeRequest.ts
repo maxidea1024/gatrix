@@ -108,7 +108,7 @@ export class ChangeRequest extends Model {
         modelClass: Environment,
         join: {
           from: 'g_change_requests.environmentId',
-          to: 'g_environments.environmentId',
+          to: 'g_environments.id',
         },
       },
       changeItems: {

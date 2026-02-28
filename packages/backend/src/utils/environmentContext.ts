@@ -64,7 +64,7 @@ export async function validateEnvironment(db: any, environmentId: string): Promi
   if (!isValidEnvironment(environmentId)) {
     return false;
   }
-  const result = await db('g_environments').where('environmentId', environmentId).first();
+  const result = await db('g_environments').where('id', environmentId).first();
   return !!result;
 }
 
@@ -73,9 +73,9 @@ export async function validateEnvironment(db: any, environmentId: string): Promi
  */
 export async function getAllEnvironments(db: any): Promise<string[]> {
   const environments = await db('g_environments')
-    .select('environmentId')
+    .select('id')
     .orderBy('displayOrder', 'asc');
-  return environments.map((e: any) => e.environmentId);
+  return environments.map((e: any) => e.id);
 }
 
 /**
