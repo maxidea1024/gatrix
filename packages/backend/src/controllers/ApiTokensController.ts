@@ -20,6 +20,7 @@ class ApiTokensController {
         sortBy = 'createdAt',
         sortOrder = 'desc',
       } = req.query;
+      const projectId = (req as any).projectId;
       const offset = (Number(page) - 1) * Number(limit);
 
       // Build query with user join
@@ -39,6 +40,10 @@ class ApiTokensController {
         query = query.where('tokenName', 'like', `%${search}%`);
       }
 
+      if (projectId) {
+        query = query.where('g_api_access_tokens.projectId', projectId);
+      }
+
       // Get total count (separate query)
       let countQuery = knex('g_api_access_tokens');
 
@@ -48,6 +53,10 @@ class ApiTokensController {
 
       if (search) {
         countQuery = countQuery.where('tokenName', 'like', `%${search}%`);
+      }
+
+      if (projectId) {
+        countQuery = countQuery.where('projectId', projectId);
       }
 
       const [{ count: total }] = await countQuery.count('* as count');
@@ -165,6 +174,7 @@ class ApiTokensController {
         allowAllEnvironments = true,
         environments = [],
       } = req.body;
+      const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
 
       // Generate secure token (store as plain text)
@@ -178,6 +188,7 @@ class ApiTokensController {
         // Insert token (store plain text)
         await trx('g_api_access_tokens').insert({
           id: tokenId,
+          projectId: projectId || null,
           tokenName,
           description: description || null,
           tokenValue: tokenValue, // Store plain token value
@@ -503,20 +514,29 @@ class ApiTokensController {
    */
   async getTokenStats(req: Request, res: Response) {
     try {
+      const projectId = (req as any).projectId;
+
+      // Build base query with optional org filter
+      const baseQuery = () => {
+        let q = knex('g_api_access_tokens');
+        if (projectId) q = q.where('projectId', projectId);
+        return q;
+      };
+
       // Get total tokens
-      const [{ count: totalTokens }] = await knex('g_api_access_tokens').count('* as count');
+      const [{ count: totalTokens }] = await baseQuery().count('* as count');
 
       // Get all tokens (no isActive filter needed)
-      const [{ count: activeTokens }] = await knex('g_api_access_tokens').count('* as count');
+      const [{ count: activeTokens }] = await baseQuery().count('* as count');
 
       // Get expired tokens
-      const [{ count: expiredTokens }] = await knex('g_api_access_tokens')
+      const [{ count: expiredTokens }] = await baseQuery()
         .whereNotNull('expiresAt')
         .where('expiresAt', '<', knex.fn.now())
         .count('* as count');
 
       // Get recently used tokens (last 7 days)
-      const [{ count: recentlyUsed }] = await knex('g_api_access_tokens')
+      const [{ count: recentlyUsed }] = await baseQuery()
         .where('lastUsedAt', '>=', knex.raw('DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)'))
         .count('* as count');
 

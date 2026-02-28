@@ -41,7 +41,7 @@ import DynamicFilterBar, {
   ActiveFilter,
   FilterDefinition,
 } from '@/components/common/DynamicFilterBar';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
 import {
   formatDateTime,
@@ -616,7 +616,7 @@ const CouponUsagePage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loading')}</Typography>
             </Box>
           ) : records.length === 0 ? (
-            <EmptyState message={t('coupons.couponUsage.noRecords')} />
+            <EmptyPagePlaceholder message={t('coupons.couponUsage.noRecords')} />
           ) : (
             <>
               <TableContainer>

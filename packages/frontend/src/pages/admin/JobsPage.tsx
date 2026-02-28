@@ -55,7 +55,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { getContrastColor } from '@/utils/colorUtils';
 
@@ -600,7 +600,7 @@ const JobsPage: React.FC = () => {
         </Paper>
       ) : jobs.length === 0 ? (
         <Paper sx={{ p: 0 }}>
-          <EmptyState
+          <EmptyPagePlaceholder
             message={t('jobs.noJobsFound')}
             subtitle={canManage ? t('common.addFirstItem') : undefined}
             onAddClick={canManage ? handleAddJob : undefined}

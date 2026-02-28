@@ -219,9 +219,9 @@ router.put(
 router.get(
   '/segments',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { search } = req.query;
+    const { search, projectId } = req.query;
 
-    const segments = await featureFlagService.listSegments(search as string);
+    const segments = await featureFlagService.listSegments(search as string, projectId as string);
 
     res.json({ success: true, data: { segments } });
   })
@@ -293,8 +293,8 @@ router.delete(
 router.get(
   '/context-fields',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { search } = req.query;
-    const fields = await featureFlagService.listContextFields(search as string | undefined);
+    const { search, projectId } = req.query;
+    const fields = await featureFlagService.listContextFields(search as string | undefined, projectId as string | undefined);
 
     res.json({ success: true, data: { contextFields: fields } });
   })
@@ -408,7 +408,7 @@ router.get(
     const environmentId = requireEnvironment(req, res);
     if (!environmentId) return;
 
-    const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } =
+    const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder, projectId } =
       req.query;
 
     const result = await featureFlagService.listFlags({
@@ -422,6 +422,7 @@ router.get(
       limit: parseInt(limit as string) || 50,
       sortBy: sortBy as string,
       sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
+      projectId: projectId as string,
     });
 
     res.json({ success: true, data: result });

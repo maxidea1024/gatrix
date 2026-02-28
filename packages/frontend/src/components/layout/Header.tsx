@@ -26,6 +26,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/contexts/ThemeContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { EnvironmentSelector } from '@/components/EnvironmentSelector';
+import { OrgProjectSelector } from '@/components/OrgProjectSelector';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -114,6 +115,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title = 'Admin Pane
 
         {user && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Org/Project selector */}
+            <OrgProjectSelector size="small" />
+
             {/* Environment selector */}
             <EnvironmentSelector size="small" />
 

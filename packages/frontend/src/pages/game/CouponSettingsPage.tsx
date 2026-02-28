@@ -80,7 +80,7 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '@/components/common/DynamicFilterBar';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import {
   formatDateTime,
   parseUTCForPicker,
@@ -1388,7 +1388,7 @@ const CouponSettingsPage: React.FC = () => {
                 ) : items.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={colCount} sx={{ p: 0 }}>
-                      <EmptyState
+                      <EmptyPagePlaceholder
                         message={t('coupons.couponSettings.noCoupons')}
                         subtitle={canManage ? t('common.addFirstItem') : undefined}
                         onAddClick={
@@ -2638,7 +2638,7 @@ const CouponSettingsPage: React.FC = () => {
                   ) : codesItems.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} sx={{ p: 0 }}>
-                        <EmptyState message={t('common.noData')} />
+                        <EmptyPagePlaceholder message={t('common.noData')} />
                       </TableCell>
                     </TableRow>
                   ) : (

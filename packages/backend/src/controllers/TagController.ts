@@ -5,7 +5,8 @@ import { AuthenticatedRequest } from '../middleware/auth';
 
 export const TagController = {
   list: asyncHandler(async (req: Request, res: Response) => {
-    const tags = await TagService.list();
+    const projectId = req.query.projectId as string | undefined;
+    const tags = await TagService.list(projectId);
     res.json({ success: true, data: { tags } });
   }),
 

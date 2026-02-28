@@ -53,7 +53,7 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
@@ -559,7 +559,7 @@ const IngamePopupNoticesPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : notices.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('ingamePopupNotices.noNoticesFound')}
               onAddClick={canManage ? handleCreate : undefined}
               addButtonLabel={t('ingamePopupNotices.createNotice')}

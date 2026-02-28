@@ -10,32 +10,24 @@ import {
 
 class ApiTokenService {
   /**
+   * Build project-scoped base path for API token endpoints.
+   * Falls back to legacy path if no project path is provided.
+   */
+  private basePath(projectApiPath: string | null): string {
+    return projectApiPath ? `${projectApiPath}/api-tokens` : '/admin/api-tokens';
+  }
+
+  /**
    * Get all API tokens with pagination and filters
    */
-  async getTokens(params: GetTokensRequest = {}): Promise<GetTokensResponse> {
+  async getTokens(
+    params: GetTokensRequest = {},
+    projectApiPath: string | null = null
+  ): Promise<GetTokensResponse> {
     try {
-      const response = await api.get('/admin/api-tokens', { params });
+      const response = await api.get(this.basePath(projectApiPath), { params });
 
-      // api.request() returns response.data which is: { success: true, data: { tokens: [...], pagination: {...} } }
-      // So response is already the full response object
-      const backendData = response.data; // This is the nested data object from backend
-
-      console.log('[ApiTokenService] getTokens response:', {
-        hasData: !!backendData,
-        hasTokens: !!backendData?.tokens,
-        tokensLength: backendData?.tokens?.length || 0,
-        firstToken: backendData?.tokens?.[0]
-          ? {
-              id: backendData.tokens[0].id,
-              tokenName: backendData.tokens[0].tokenName,
-              hasTokenValue: !!(backendData.tokens[0] as any).tokenValue,
-              tokenValueLength: (backendData.tokens[0] as any).tokenValue?.length || 0,
-              tokenValuePreview:
-                (backendData.tokens[0] as any).tokenValue?.substring(0, 10) + '...',
-              hasTokenHash: !!backendData.tokens[0].tokenHash,
-            }
-          : null,
-      });
+      const backendData = response.data;
 
       const result = {
         data: backendData.tokens || [],
@@ -54,9 +46,12 @@ class ApiTokenService {
   /**
    * Get API token by ID
    */
-  async getTokenById(id: number): Promise<ApiAccessToken> {
+  async getTokenById(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.get(`/admin/api-tokens/${id}`);
+      const response = await api.get(`${this.basePath(projectApiPath)}/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching API token:', error);
@@ -67,9 +62,12 @@ class ApiTokenService {
   /**
    * Create new API token
    */
-  async createToken(data: CreateTokenRequest): Promise<CreateTokenResponse> {
+  async createToken(
+    data: CreateTokenRequest,
+    projectApiPath: string | null = null
+  ): Promise<CreateTokenResponse> {
     try {
-      const response = await api.post('/admin/api-tokens', data);
+      const response = await api.post(this.basePath(projectApiPath), data);
       return response.data;
     } catch (error) {
       console.error('Error creating API token:', error);
@@ -80,9 +78,13 @@ class ApiTokenService {
   /**
    * Update API token
    */
-  async updateToken(id: number, data: UpdateTokenRequest): Promise<ApiAccessToken> {
+  async updateToken(
+    id: number,
+    data: UpdateTokenRequest,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.put(`/admin/api-tokens/${id}`, data);
+      const response = await api.put(`${this.basePath(projectApiPath)}/${id}`, data);
       return response.data;
     } catch (error) {
       console.error('Error updating API token:', error);
@@ -93,9 +95,14 @@ class ApiTokenService {
   /**
    * Regenerate API token (creates new token value)
    */
-  async regenerateToken(id: number): Promise<CreateTokenResponse> {
+  async regenerateToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<CreateTokenResponse> {
     try {
-      const response = await api.post(`/admin/api-tokens/${id}/regenerate`);
+      const response = await api.post(
+        `${this.basePath(projectApiPath)}/${id}/regenerate`
+      );
       return response.data;
     } catch (error) {
       console.error('Error regenerating API token:', error);
@@ -106,9 +113,12 @@ class ApiTokenService {
   /**
    * Delete API token
    */
-  async deleteToken(id: number): Promise<void> {
+  async deleteToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<void> {
     try {
-      await api.delete(`/admin/api-tokens/${id}`);
+      await api.delete(`${this.basePath(projectApiPath)}/${id}`);
     } catch (error) {
       console.error('Error deleting API token:', error);
       throw error;
@@ -118,9 +128,14 @@ class ApiTokenService {
   /**
    * Revoke API token (set as inactive)
    */
-  async revokeToken(id: number): Promise<ApiAccessToken> {
+  async revokeToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.patch(`/admin/api-tokens/${id}/revoke`);
+      const response = await api.patch(
+        `${this.basePath(projectApiPath)}/${id}/revoke`
+      );
       return response.data;
     } catch (error) {
       console.error('Error revoking API token:', error);
@@ -131,9 +146,14 @@ class ApiTokenService {
   /**
    * Activate API token
    */
-  async activateToken(id: number): Promise<ApiAccessToken> {
+  async activateToken(
+    id: number,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.patch(`/admin/api-tokens/${id}/activate`);
+      const response = await api.patch(
+        `${this.basePath(projectApiPath)}/${id}/activate`
+      );
       return response.data;
     } catch (error) {
       console.error('Error activating API token:', error);
@@ -144,11 +164,16 @@ class ApiTokenService {
   /**
    * Extend token expiration
    */
-  async extendToken(id: number, expiresAt: string): Promise<ApiAccessToken> {
+  async extendToken(
+    id: number,
+    expiresAt: string,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken> {
     try {
-      const response = await api.patch(`/admin/api-tokens/${id}/extend`, {
-        expiresAt,
-      });
+      const response = await api.patch(
+        `${this.basePath(projectApiPath)}/${id}/extend`,
+        { expiresAt }
+      );
       return response.data;
     } catch (error) {
       console.error('Error extending API token:', error);
@@ -159,14 +184,16 @@ class ApiTokenService {
   /**
    * Get token usage statistics
    */
-  async getTokenStats(): Promise<{
+  async getTokenStats(
+    projectApiPath: string | null = null
+  ): Promise<{
     totalTokens: number;
     activeTokens: number;
     expiredTokens: number;
     recentlyUsed: number;
   }> {
     try {
-      const response = await api.get('/admin/api-tokens/stats');
+      const response = await api.get(`${this.basePath(projectApiPath)}/stats`);
       return response.data;
     } catch (error) {
       console.error('Error fetching token stats:', error);
@@ -177,9 +204,14 @@ class ApiTokenService {
   /**
    * Get tokens for specific environment
    */
-  async getTokensForEnvironment(environmentId: string): Promise<ApiAccessToken[]> {
+  async getTokensForEnvironment(
+    environmentId: string,
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken[]> {
     try {
-      const response = await api.get(`/admin/api-tokens/environmentId/${ environmentId }`);
+      const response = await api.get(
+        `${this.basePath(projectApiPath)}/environmentId/${environmentId}`
+      );
       return response.data;
     } catch (error) {
       console.error('Error fetching environment tokens:', error);
@@ -190,9 +222,11 @@ class ApiTokenService {
   /**
    * Get admin tokens
    */
-  async getAdminTokens(): Promise<ApiAccessToken[]> {
+  async getAdminTokens(
+    projectApiPath: string | null = null
+  ): Promise<ApiAccessToken[]> {
     try {
-      const response = await api.get('/admin/api-tokens/admin');
+      const response = await api.get(`${this.basePath(projectApiPath)}/admin`);
       return response.data;
     } catch (error) {
       console.error('Error fetching admin tokens:', error);

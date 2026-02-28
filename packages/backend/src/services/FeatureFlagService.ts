@@ -53,6 +53,7 @@ export interface CreateFlagInput {
   strategies?: any[]; // Optional: strategies to create (used in import)
   variants?: any[]; // Optional: variants to create (used in import)
   validationRules?: ValidationRules; // Optional: validation rules for flag values
+  projectId?: string; // Project scoping
 }
 
 export interface UpdateFlagInput {
@@ -110,6 +111,7 @@ export interface CreateSegmentInput {
   constraints: Constraint[];
   isActive?: boolean;
   tags?: string[];
+  projectId?: string;
 }
 
 export interface UpdateSegmentInput {
@@ -132,6 +134,7 @@ export interface FlagListQuery {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  projectId?: string;
 }
 
 // Request context for passing IP and user agent to audit logs
@@ -287,7 +290,8 @@ class FeatureFlagService {
       environmentId: input.environmentId,
       isEnabled: input.isEnabled ?? false,
       isArchived: false,
-    });
+      projectId: input.projectId,
+    } as any);
 
     // Create strategies if provided
     if (input.strategies && input.strategies.length > 0) {
@@ -1045,8 +1049,8 @@ class FeatureFlagService {
   /**
    * List segments
    */
-  async listSegments(search?: string): Promise<FeatureSegmentAttributes[]> {
-    return FeatureSegmentModel.findAll(search);
+  async listSegments(search?: string, projectId?: string): Promise<FeatureSegmentAttributes[]> {
+    return FeatureSegmentModel.findAll(search, projectId);
   }
 
   /**
@@ -1082,7 +1086,8 @@ class FeatureFlagService {
       isActive: input.isActive ?? true,
       tags: input.tags,
       createdBy: userId,
-    });
+      projectId: input.projectId,
+    } as any);
 
     // Publish segment.created event with full segment data
     // SDKs can update their segment cache directly without an API call
@@ -1171,8 +1176,8 @@ class FeatureFlagService {
   /**
    * List context fields
    */
-  async listContextFields(search?: string): Promise<FeatureContextFieldAttributes[]> {
-    return FeatureContextFieldModel.findAll(search);
+  async listContextFields(search?: string, projectId?: string): Promise<FeatureContextFieldAttributes[]> {
+    return FeatureContextFieldModel.findAll(search, projectId);
   }
 
   /**
@@ -1201,7 +1206,8 @@ class FeatureFlagService {
       stickiness: input.stickiness ?? false,
       sortOrder: input.sortOrder ?? 0,
       createdBy: userId,
-    });
+      projectId: input.projectId,
+    } as any);
   }
 
   /**

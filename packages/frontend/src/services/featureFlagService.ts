@@ -70,6 +70,9 @@ export interface FeatureFlag {
   isEnabled?: boolean;
   lastSeenAt?: string;
   codeReferenceCount?: number;
+  potentiallyStale?: boolean;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 export interface FeatureFlagListParams {
@@ -82,6 +85,7 @@ export interface FeatureFlagListParams {
   isArchived?: boolean;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  projectId?: string;
 }
 
 export interface FeatureFlagListResponse {
@@ -105,6 +109,7 @@ export interface CreateFeatureFlagInput {
   staleAfterDays?: number;
   tags?: string[];
   validationRules?: ValidationRules;
+  projectId?: string;
 }
 
 export interface UpdateFeatureFlagInput {

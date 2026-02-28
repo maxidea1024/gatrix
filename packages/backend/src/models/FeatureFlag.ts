@@ -59,6 +59,7 @@ export type FieldType =
 // Feature Flag - Now GLOBAL (no environment column)
 export interface FeatureFlagAttributes {
   id: string;
+  projectId: string;
   flagName: string;
   displayName?: string;
   description?: string;
@@ -142,9 +143,10 @@ export interface FeatureVariantAttributes {
   updatedAt?: Date;
 }
 
-// Segment - Now GLOBAL (no environment column)
+// Segment - Project scoped
 export interface FeatureSegmentAttributes {
   id: string;
+  projectId: string;
   segmentName: string;
   displayName?: string;
   description?: string;
@@ -159,6 +161,7 @@ export interface FeatureSegmentAttributes {
 
 export interface FeatureContextFieldAttributes {
   id: string;
+  projectId: string;
   fieldName: string;
   displayName?: string;
   fieldType: FieldType;
@@ -228,6 +231,7 @@ export class FeatureFlagModel {
    */
   static async findAll(filters: {
     environmentId: string;
+    projectId?: string;
     search?: string;
     flagType?: string;
 
@@ -246,6 +250,7 @@ export class FeatureFlagModel {
     try {
       const {
         environmentId,
+        projectId,
         search,
         flagType,
 
@@ -282,6 +287,7 @@ export class FeatureFlagModel {
           );
 
       const applyFilters = (query: any) => {
+        if (projectId) query.where('f.projectId', projectId);
         if (search) {
           query.where((qb: any) => {
             qb.where('f.flagName', 'like', `%${search}%`)
@@ -507,6 +513,7 @@ export class FeatureFlagModel {
       const id = ulid();
       await db('g_feature_flags').insert({
         id,
+        projectId: (data as any).projectId,
         flagName: data.flagName,
         displayName: data.displayName || data.flagName,
         description: data.description || null,
@@ -1023,9 +1030,9 @@ export class FeatureVariantModel {
 
 export class FeatureSegmentModel {
   /**
-   * Find all segments (now global, no environment filter)
+   * Find all segments filtered by project
    */
-  static async findAll(search?: string): Promise<FeatureSegmentAttributes[]> {
+  static async findAll(search?: string, projectId?: string): Promise<FeatureSegmentAttributes[]> {
     try {
       let query = db('g_feature_segments')
         .select(
@@ -1037,6 +1044,10 @@ export class FeatureSegmentModel {
           )
         )
         .leftJoin('g_users', 'g_feature_segments.createdBy', 'g_users.id');
+
+      if (projectId) {
+        query = query.where('g_feature_segments.projectId', projectId);
+      }
 
       if (search) {
         query = query.where((qb: any) => {
@@ -1126,6 +1137,7 @@ export class FeatureSegmentModel {
       const id = ulid();
       await db('g_feature_segments').insert({
         id,
+        projectId: (data as any).projectId,
         segmentName: data.segmentName,
         displayName: data.displayName || data.segmentName,
         description: data.description || null,
@@ -1239,7 +1251,7 @@ export class FeatureSegmentModel {
 // ==================== Feature Context Field Model ====================
 
 export class FeatureContextFieldModel {
-  static async findAll(search?: string): Promise<FeatureContextFieldAttributes[]> {
+  static async findAll(search?: string, projectId?: string): Promise<FeatureContextFieldAttributes[]> {
     try {
       let query = db('g_feature_context_fields')
         .select(
@@ -1248,6 +1260,10 @@ export class FeatureContextFieldModel {
           'g_users.email as createdByEmail'
         )
         .leftJoin('g_users', 'g_feature_context_fields.createdBy', 'g_users.id');
+
+      if (projectId) {
+        query = query.where('g_feature_context_fields.projectId', projectId);
+      }
 
       if (search) {
         query = query.where((qb: any) => {
@@ -1321,6 +1337,7 @@ export class FeatureContextFieldModel {
       const id = ulid();
       await db('g_feature_context_fields').insert({
         id,
+        projectId: (data as any).projectId,
         fieldName: data.fieldName,
         fieldType: data.fieldType,
         displayName: data.displayName || null,

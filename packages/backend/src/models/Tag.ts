@@ -3,7 +3,7 @@ import { generateULID } from '../utils/ulid';
 
 export interface TagAttributes {
   id: string;
-  // Global tag, no environmentId
+  projectId?: string | null;
   name: string;
   color: string;
   description?: string | null;
@@ -21,6 +21,7 @@ export interface CreateTagData {
   name: string;
   color?: string;
   description?: string | null;
+  projectId?: string | null;
   createdBy?: string | null;
 }
 
@@ -32,8 +33,8 @@ export interface UpdateTagData {
 }
 
 export default class TagModel {
-  static async list(): Promise<TagAttributes[]> {
-    return await db('g_tags as t')
+  static async list(projectId?: string): Promise<TagAttributes[]> {
+    const query = db('g_tags as t')
       .leftJoin('g_users as c', 'c.id', 't.createdBy')
       .leftJoin('g_users as u', 'u.id', 't.updatedBy')
       .select([
@@ -43,7 +44,13 @@ export default class TagModel {
         'u.name as updatedByName',
         'u.email as updatedByEmail',
       ])
-      .orderBy('t.createdAt', 'desc'); // Sort by most recent first
+      .orderBy('t.createdAt', 'desc');
+
+    if (projectId) {
+      query.where('t.projectId', projectId);
+    }
+
+    return await query;
   }
 
   static async findById(id: string): Promise<TagAttributes | null> {
@@ -81,12 +88,15 @@ export default class TagModel {
   }
 
   static async create(data: CreateTagData): Promise<TagAttributes> {
-    const insertData = {
+    const insertData: any = {
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     };
+    if (data.projectId) {
+      insertData.projectId = data.projectId;
+    }
     const newId = generateULID();
     await db('g_tags').insert({ id: newId, ...insertData });
     return (await this.findById(newId))!;

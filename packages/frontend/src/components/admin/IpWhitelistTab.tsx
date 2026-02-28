@@ -56,7 +56,7 @@ import SimplePagination from '../common/SimplePagination';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import FormDialogHeader from '../common/FormDialogHeader';
-import EmptyState from '../common/EmptyState';
+import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import dayjs from 'dayjs';
 
 interface IpWhitelistTabProps {
@@ -418,7 +418,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
               <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
             </Box>
           ) : ipWhitelists.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('ipWhitelist.noEntries')}
               subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAdd : undefined}

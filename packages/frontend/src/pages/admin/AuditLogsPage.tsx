@@ -78,7 +78,7 @@ import { AuditLogService, AuditLogFilters } from '../../services/auditLogService
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
@@ -742,7 +742,7 @@ const AuditLogsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingAuditLogs')}</Typography>
             </Box>
           ) : auditLogs.length === 0 ? (
-            <EmptyState message={t('auditLogs.noLogsFound')} />
+            <EmptyPagePlaceholder message={t('auditLogs.noLogsFound')} />
           ) : (
             <>
               <TableContainer

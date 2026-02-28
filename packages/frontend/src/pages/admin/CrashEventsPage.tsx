@@ -80,7 +80,7 @@ import {
 } from '@/types/crash';
 import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -1051,7 +1051,7 @@ const CrashEventsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : events.length === 0 ? (
-            <EmptyState message={t('crashes.noEvents')} />
+            <EmptyPagePlaceholder message={t('crashes.noEvents')} />
           ) : (
             <>
               <TableContainer>

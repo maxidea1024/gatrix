@@ -110,7 +110,7 @@ import { getContrastColor } from '../../utils/colorUtils';
 import JsonEditor from '../../components/common/JsonEditor';
 import ValueEditorField from '../../components/common/ValueEditorField';
 import BooleanSwitch from '../../components/common/BooleanSwitch';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
 import { environmentService, Environment } from '../../services/environmentService';
 import { useEnvironment } from '../../contexts/EnvironmentContext';

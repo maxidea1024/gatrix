@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
@@ -160,6 +161,7 @@ const FeatureFlagsPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
   const navigate = useNavigate();
+  const { currentProjectId } = useOrgProject();
   const [searchParams] = useSearchParams();
 
   // Compact view state - query param overrides localStorage
@@ -462,6 +464,7 @@ const FeatureFlagsPage: React.FC = () => {
         isArchived,
         sortBy: orderBy,
         sortOrder: order,
+        projectId: currentProjectId || undefined,
       });
 
       if (
@@ -697,7 +700,7 @@ const FeatureFlagsPage: React.FC = () => {
         variant: 'error',
       });
     }
-    setExportMenuAnchor(null);
+    setImportExportMenuAnchor(null);
   };
 
   const handleImport = async () => {
@@ -814,6 +817,7 @@ const FeatureFlagsPage: React.FC = () => {
     statusFilter,
     tagFilter,
     valueTypeFilter,
+    currentProjectId,
   ]);
 
   useEffect(() => {
@@ -1034,7 +1038,11 @@ const FeatureFlagsPage: React.FC = () => {
   // Copy flag name to clipboard
   const handleCopyName = () => {
     if (actionMenuFlag) {
-      copyToClipboardWithNotification(actionMenuFlag.flagName, t, enqueueSnackbar);
+      copyToClipboardWithNotification(
+        actionMenuFlag.flagName,
+        () => enqueueSnackbar(t('common.copySuccess'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
     }
     handleActionMenuClose();
   };
@@ -1395,6 +1403,7 @@ const FeatureFlagsPage: React.FC = () => {
       case 'killSwitch':
         return 'error';
       case 'permission':
+      case 'remoteConfig':
         return 'default';
       default:
         return 'default';
@@ -1930,7 +1939,7 @@ const FeatureFlagsPage: React.FC = () => {
                               sx={{ display: 'flex', gap: 0.5, flexShrink: 0, flexWrap: 'wrap' }}
                             >
                               {flag.tags.slice(0, 5).map((tagName) => {
-                                const tagObj = allTags.find((tItem) => tItem.tagName === tagName);
+                                const tagObj = allTags.find((tItem) => tItem.name === tagName);
                                 const color = tagObj?.color || '#888';
                                 return (
                                   <Chip
@@ -2196,8 +2205,8 @@ const FeatureFlagsPage: React.FC = () => {
                                             e.stopPropagation();
                                             copyToClipboardWithNotification(
                                               flag.flagName,
-                                              enqueueSnackbar,
-                                              t
+                                              () => enqueueSnackbar(t('common.copySuccess'), { variant: 'success' }),
+                                              () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
                                             );
                                           }}
                                           sx={{
@@ -3321,7 +3330,6 @@ const FeatureFlagsPage: React.FC = () => {
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
-        open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         columns={columns}
         onColumnsChange={handleColumnsChange}

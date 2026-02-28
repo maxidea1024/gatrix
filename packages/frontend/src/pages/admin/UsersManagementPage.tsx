@@ -109,7 +109,7 @@ import { invitationService } from '../../services/invitationService';
 import { Invitation, CreateInvitationRequest } from '../../types/invitation';
 import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useDebounce } from '../../hooks/useDebounce';
 import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, {
@@ -1970,7 +1970,7 @@ const UsersManagementPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingUsers')}</Typography>
             </Box>
           ) : users.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('users.noUsersFound')}
               subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAddUser : undefined}

@@ -96,7 +96,7 @@ import translationService from '@/services/translationService';
 import { getLanguageDisplayName } from '@/contexts/I18nContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import MultiLanguageMessageInput, {
   MessageLocale,
 } from '@/components/common/MultiLanguageMessageInput';
@@ -1038,7 +1038,7 @@ const MessageTemplatesPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : items.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('messageTemplates.noTemplatesFound')}
               subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAdd : undefined}

@@ -259,6 +259,30 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
             path: '/admin/service-accounts',
             permission: 'service-accounts',
           },
+          {
+            text: 'sidebar.organisations',
+            icon: 'Business',
+            path: '/admin/organisations',
+            permission: 'security',
+          },
+          {
+            text: 'sidebar.projects',
+            icon: 'Folder',
+            path: '/admin/projects',
+            permission: 'security',
+          },
+          {
+            text: 'sidebar.roles',
+            icon: 'Shield',
+            path: '/admin/roles',
+            permission: 'security',
+          },
+          {
+            text: 'sidebar.groups',
+            icon: 'Group',
+            path: '/admin/groups',
+            permission: 'security',
+          },
         ],
       },
       {

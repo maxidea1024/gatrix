@@ -134,7 +134,7 @@ import {
 import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -1734,7 +1734,7 @@ const ClientVersionsPage: React.FC = () => {
             <Typography color="text.secondary">{t('common.loadingData')}</Typography>
           </Box>
         ) : clientVersions.length === 0 ? (
-          <EmptyState
+          <EmptyPagePlaceholder
             message={t('clientVersions.noVersionsFound')}
             subtitle={canManage ? t('common.addFirstItem') : undefined}
             onAddClick={

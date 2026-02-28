@@ -3,7 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import { Add as AddIcon, Inbox as InboxIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
-interface EmptyStateProps {
+interface EmptyPagePlaceholderProps {
   /** Main message to display */
   message: string;
   /** Subtitle text shown below the main message */
@@ -21,12 +21,12 @@ interface EmptyStateProps {
 }
 
 /**
- * EmptyState component for displaying when there is no data.
+ * EmptyPagePlaceholder component for displaying when there is no data.
  * Unlike EmptyTableRow, this is a standalone component that can be rendered
  * outside of a table structure, making it ideal for hiding table headers
  * when there's no data.
  */
-const EmptyState: React.FC<EmptyStateProps> = ({
+const EmptyPagePlaceholder: React.FC<EmptyPagePlaceholderProps> = ({
   message,
   subtitle,
   icon,
@@ -94,4 +94,4 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   );
 };
 
-export default EmptyState;
+export default EmptyPagePlaceholder;

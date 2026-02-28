@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { User, Tag } from '@/types';
-import { TagService } from '@/services/tagService';
+import { tagService } from '@/services/tagService';
 
 interface UserFormProps {
   open: boolean;
@@ -97,7 +97,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
   const loadTags = async () => {
     try {
       setTagsLoading(true);
-      const tags = await TagService.getAllTags();
+      const tags = await tagService.list();
       setAllTags(tags);
     } catch (error) {
       console.error('Failed to load tags:', error);

@@ -35,11 +35,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { tagService, Tag } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { ColorPicker } from '@/components/common/ColorPicker';
 import { getContrastColor } from '@/utils/colorUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const randomHexColor = () =>
   `#${Math.floor(Math.random() * 0xffffff)
@@ -50,6 +51,7 @@ const TagsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { currentProjectId } = useOrgProject();
   const canManage = hasPermission([PERMISSIONS.TAGS_MANAGE]);
 
   // Data/state
@@ -78,7 +80,7 @@ const TagsPage: React.FC = () => {
   const loadTags = async () => {
     try {
       setLoading(true);
-      const items = await tagService.list();
+      const items = await tagService.list(currentProjectId || undefined);
       setTags(items);
     } catch {
       enqueueSnackbar(t('errors.loadError'), { variant: 'error' });
@@ -88,7 +90,7 @@ const TagsPage: React.FC = () => {
   };
   useEffect(() => {
     loadTags();
-  }, []);
+  }, [currentProjectId]);
 
   // Derived
   const filtered = useMemo(() => {
@@ -286,14 +288,14 @@ const TagsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : tags.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('tags.noTagsFound')}
               onAddClick={canManage ? () => nameInputRef.current?.focus() : undefined}
               addButtonLabel={t('tags.addTag')}
               subtitle={canManage ? t('common.addFirstItem') : undefined}
             />
           ) : filtered.length === 0 ? (
-            <EmptyState message={t('tags.noMatchingTags')} />
+            <EmptyPagePlaceholder message={t('tags.noMatchingTags')} />
           ) : (
             <TableContainer>
               <Table>

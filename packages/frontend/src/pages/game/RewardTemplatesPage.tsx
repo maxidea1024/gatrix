@@ -39,7 +39,7 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
 import { tagService } from '../../services/tagService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -688,7 +688,7 @@ const RewardTemplatesPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : templates.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('rewardTemplates.noTemplatesFound')}
               onAddClick={canManage ? handleCreate : undefined}
               addButtonLabel={t('rewardTemplates.createTemplate')}

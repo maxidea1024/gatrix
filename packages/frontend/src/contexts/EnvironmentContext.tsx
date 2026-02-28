@@ -160,6 +160,18 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     }
   }, [isAuthenticated, loadEnvironments]);
 
+  // Reload environments when project changes
+  useEffect(() => {
+    const handleProjectChanged = () => {
+      if (isAuthenticated) {
+        console.log('[EnvironmentContext] Project changed, reloading environments...');
+        loadEnvironments();
+      }
+    };
+    window.addEventListener('project-changed', handleProjectChanged);
+    return () => window.removeEventListener('project-changed', handleProjectChanged);
+  }, [isAuthenticated, loadEnvironments]);
+
   // Switch to a different environment
   const switchEnvironment = useCallback(
     (environmentId: string) => {

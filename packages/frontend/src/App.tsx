@@ -30,6 +30,7 @@ import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
 import { GameWorldProvider } from './contexts/GameWorldContext';
 import { PlanningDataProvider } from './contexts/PlanningDataContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
+import { OrgProjectProvider } from './contexts/OrgProjectContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -108,6 +109,10 @@ import EditIntegrationPage from './pages/settings/EditIntegrationPage';
 import SignalEndpointsPage from './pages/admin/SignalEndpointsPage';
 import ActionSetsPage from './pages/admin/ActionSetsPage';
 import ServiceAccountsPage from './pages/admin/ServiceAccountsPage';
+import RolesPage from './pages/admin/RolesPage';
+import GroupsPage from './pages/admin/GroupsPage';
+import OrganisationsPage from './pages/admin/OrganisationsPage';
+import ProjectsPage from './pages/admin/ProjectsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -125,15 +130,15 @@ import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
 import LiveEventPage from './pages/game/LiveEventPage';
 import PlanningDataPage from './pages/game/PlanningDataPage';
 import PlanningDataHistoryPage from './pages/game/PlanningDataHistoryPage';
-import FeatureFlagsPage from './pages/game/FeatureFlagsPage';
-import FeatureFlagDetailPage from './pages/game/FeatureFlagDetailPage';
-import FeatureSegmentsPage from './pages/game/FeatureSegmentsPage';
-import FeatureContextFieldsPage from './pages/game/FeatureContextFieldsPage';
-import FeatureFlagTypesPage from './pages/game/FeatureFlagTypesPage';
-import FeatureNetworkPage from './pages/game/FeatureNetworkPage';
+import FeatureFlagsPage from './pages/features/FeatureFlagsPage';
+import FeatureFlagDetailPage from './pages/features/FeatureFlagDetailPage';
+import FeatureSegmentsPage from './pages/features/FeatureSegmentsPage';
+import FeatureContextFieldsPage from './pages/features/FeatureContextFieldsPage';
+import FeatureFlagTypesPage from './pages/features/FeatureFlagTypesPage';
+import FeatureNetworkPage from './pages/features/FeatureNetworkPage';
 import UnknownFlagsPage from './pages/features/UnknownFlagsPage';
-import ReleaseFlowTemplatesPage from './pages/game/ReleaseFlowTemplatesPage';
-import ImpactMetricsPage from './pages/game/ImpactMetricsPage';
+import ReleaseFlowTemplatesPage from './pages/features/ReleaseFlowTemplatesPage';
+import ImpactMetricsPage from './pages/features/ImpactMetricsPage';
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -315,6 +320,7 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <OrgProjectProvider>
         <EnvironmentProvider>
           <EnvironmentChangeOverlay />
           <PlatformConfigProvider>
@@ -625,6 +631,10 @@ const AppContent: React.FC = () => {
                                       path="service-accounts"
                                       element={<ServiceAccountsPage />}
                                     />
+                                    <Route path="roles" element={<RolesPage />} />
+                                    <Route path="groups" element={<GroupsPage />} />
+                                    <Route path="organisations" element={<OrganisationsPage />} />
+                                    <Route path="projects" element={<ProjectsPage />} />
                                   </Routes>
                                 </EnvironmentAwareLayout>
                               </ProtectedRoute>
@@ -741,6 +751,7 @@ const AppContent: React.FC = () => {
             </GameWorldProvider>
           </PlatformConfigProvider>
         </EnvironmentProvider>
+        </OrgProjectProvider>
       </AuthProvider>
     </ThemeProvider>
   );

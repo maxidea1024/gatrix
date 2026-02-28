@@ -108,7 +108,7 @@ import {
   MaintenanceStatusType,
 } from '@/utils/maintenanceStatusUtils';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import translationService from '../../services/translationService';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -1719,7 +1719,7 @@ const GameWorldsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : worlds.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('gameWorlds.noWorldsFound')}
               subtitle={canManage ? t('common.addFirstItem') : undefined}
               onAddClick={canManage ? handleAddWorld : undefined}

@@ -63,7 +63,7 @@ import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 
@@ -594,7 +594,7 @@ const WhitelistPage: React.FC = () => {
                     <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
                   </Box>
                 ) : whitelists.length === 0 ? (
-                  <EmptyState
+                  <EmptyPagePlaceholder
                     message={t('whitelist.noEntries')}
                     subtitle={canManage ? t('common.addFirstItem') : undefined}
                     onAddClick={canManage ? handleAdd : undefined}

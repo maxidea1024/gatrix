@@ -16,8 +16,10 @@ export interface Tag {
 }
 
 export const tagService = {
-  async list(): Promise<Tag[]> {
-    const res = await apiService.get<{ tags: Tag[] }>('/admin/tags');
+  async list(projectId?: string): Promise<Tag[]> {
+    const params: Record<string, string> = {};
+    if (projectId) params.projectId = projectId;
+    const res = await apiService.get<{ tags: Tag[] }>('/admin/tags', { params });
     return res.data?.tags || [];
   },
 

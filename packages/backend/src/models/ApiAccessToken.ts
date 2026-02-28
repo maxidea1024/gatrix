@@ -9,6 +9,7 @@ export type TokenType = 'client' | 'server' | 'edge' | 'all';
 
 export interface ApiAccessTokenData {
   id?: string; // ULID (26 characters)
+  projectId?: string;
   tokenName: string;
   description?: string;
   tokenValue: string;
@@ -27,6 +28,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static tableName = 'g_api_access_tokens';
 
   id!: string; // ULID
+  projectId?: string;
   tokenName!: string;
   description?: string;
   tokenValue!: string;
@@ -200,7 +202,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }
 
   /**
-   * Validate token and record usage (캐시 기반)
+   * Validate token and record usage (cache-based)
    */
   static async validateAndUse(token: string): Promise<ApiAccessToken | null> {
     const tokenRecord = await this.findByToken(token);
@@ -209,12 +211,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       return null;
     }
 
-    // 캐시 기반 ?�용??추적 (비동기로 처리?�여 API ?�답 ?�도???�향 ?�음)
+    // Cache-based usage tracking (async to avoid impacting API response speed)
     if (tokenRecord.id) {
-      // ?�적 import�??�환 참조 방�?
+      // Dynamic import to avoid circular references
       const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
       apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch((error) => {
-        // ?�용??추적 ?�패가 API ?�청??방해?��? ?�도�?로그�??��?
+        // Usage tracking failure should not block API requests, just log it
         const logger = require('../config/logger').default;
         logger.error('Failed to record token usage:', error);
       });

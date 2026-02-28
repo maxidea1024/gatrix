@@ -43,7 +43,7 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import bannerService, { Banner, BannerStatus } from '../../services/bannerService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -498,7 +498,7 @@ const BannerManagementPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : banners.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('banners.noBannersFound')}
               onAddClick={canManage ? handleCreate : undefined}
               addButtonLabel={t('banners.createBanner')}

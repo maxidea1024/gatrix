@@ -87,7 +87,7 @@ import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import { apiTokenService } from '@/services/apiTokenService';
 import { environmentService, Environment } from '@/services/environmentService';
 import SimplePagination from '@/components/common/SimplePagination';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import DynamicFilterBar, {
@@ -99,6 +99,7 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 import { PERMISSIONS } from '@/types/permissions';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface CreateTokenData {
   tokenName: string;
@@ -198,6 +199,7 @@ const ApiTokensPage: React.FC = () => {
 
   // Check if user can manage (create/edit/delete) tokens
   const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
+  const { currentProjectId } = useOrgProject();
 
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
@@ -372,7 +374,7 @@ const ApiTokensPage: React.FC = () => {
 
   useEffect(() => {
     loadTokens();
-  }, [page, rowsPerPage, sortBy, sortOrder, activeFilters]);
+  }, [page, rowsPerPage, sortBy, sortOrder, activeFilters, currentProjectId]);
 
   // Load environments on mount
   useEffect(() => {
@@ -404,6 +406,7 @@ const ApiTokensPage: React.FC = () => {
         limit: rowsPerPage,
         sortBy,
         sortOrder,
+        projectId: currentProjectId || undefined,
         ...filterParams,
       });
       setTokens(response.data || []);
@@ -597,7 +600,10 @@ const ApiTokensPage: React.FC = () => {
 
   const handleCreate = async () => {
     try {
-      const response = await apiTokenService.createToken(formData);
+      const response = await apiTokenService.createToken({
+        ...formData,
+        projectId: currentProjectId || undefined,
+      });
       console.log('Create token response:', response); // 디버깅용
 
       // 토큰 정보를 먼저 설정
@@ -1121,7 +1127,7 @@ const ApiTokensPage: React.FC = () => {
                       colSpan={columns.filter((col) => col.visible).length + (canManage ? 2 : 1)}
                       sx={{ p: 0 }}
                     >
-                      <EmptyState
+                      <EmptyPagePlaceholder
                         message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
                         subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
                         onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}

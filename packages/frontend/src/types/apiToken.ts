@@ -2,6 +2,7 @@ export type TokenType = 'client' | 'server' | 'edge' | 'all';
 
 export interface ApiAccessToken {
   id: string; // ULID (26 characters)
+  projectId?: string;
   tokenName: string;
   description?: string;
   tokenHash: string;
@@ -36,6 +37,7 @@ export interface CreateTokenRequest {
   allowAllEnvironments?: boolean;
   environments?: string[];
   expiresAt?: string;
+  projectId?: string;
 }
 
 export interface UpdateTokenRequest {
@@ -71,6 +73,7 @@ export interface GetTokensRequest {
   environmentId?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  projectId?: string;
 }
 
 export interface GetTokensResponse {

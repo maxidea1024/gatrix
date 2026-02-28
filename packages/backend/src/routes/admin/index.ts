@@ -1,6 +1,7 @@
 import express from 'express';
 import { authenticate, requireAdmin, requirePermission } from '../../middleware/auth';
 import { environmentContextMiddleware } from '../../middleware/environmentMiddleware';
+import { orgProjectScope } from '../../middleware/orgProjectScope';
 import { PERMISSIONS } from '../../types/permissions';
 
 // Import all admin-related route modules
@@ -99,6 +100,96 @@ router.use(
   apiTokenRoutes
 );
 
+// ========================================
+// Project-scoped routes
+// /orgs/:orgId/projects/:projectId/...
+// ========================================
+const projectRouter = express.Router({ mergeParams: true });
+projectRouter.use(orgProjectScope as any);
+
+// Feature Flags
+projectRouter.use(
+  '/features',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  featureRoutes
+);
+
+// Tags
+projectRouter.use(
+  '/tags',
+  requirePermission([PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE]) as any,
+  tagRoutes
+);
+
+// Environments
+projectRouter.use('/environments', environmentRoutes);
+
+// Unknown Flags
+projectRouter.use(
+  '/unknown-flags',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  unknownFlagsRoutes
+);
+
+// Release Flows
+projectRouter.use(
+  '/release-flows',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  releaseFlowRoutes
+);
+
+// Change Requests
+projectRouter.use(
+  '/change-requests',
+  requirePermission([PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE]) as any,
+  changeRequestRoutes
+);
+
+// Impact Metrics
+projectRouter.get(
+  '/impact-metrics/available',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getAvailableMetrics as any
+);
+projectRouter.get(
+  '/impact-metrics/labels',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getMetricLabels as any
+);
+projectRouter.get(
+  '/impact-metrics',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.queryTimeSeries as any
+);
+projectRouter.get(
+  '/impact-metrics/configs/:flagId',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.getConfigs.bind(ImpactMetricsController) as any
+);
+projectRouter.post(
+  '/impact-metrics/configs',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.createConfig.bind(ImpactMetricsController) as any
+);
+projectRouter.put(
+  '/impact-metrics/configs/layouts',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.updateLayouts.bind(ImpactMetricsController) as any
+);
+projectRouter.put(
+  '/impact-metrics/configs/:id',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.updateConfig.bind(ImpactMetricsController) as any
+);
+projectRouter.delete(
+  '/impact-metrics/configs/:id',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  ImpactMetricsController.deleteConfig.bind(ImpactMetricsController) as any
+);
+
+// Mount project-scoped router
+router.use('/orgs/:orgId/projects/:projectId', projectRouter);
+
 // Client versions - requires client-versions.view or client-versions.manage permission
 router.use(
   '/client-versions',
@@ -109,12 +200,7 @@ router.use(
 // Audit logs - requires audit-logs.view permission
 router.use('/audit-logs', requirePermission(PERMISSIONS.AUDIT_LOGS_VIEW) as any, auditLogRoutes);
 
-// Tags - requires tags.view or tags.manage permission
-router.use(
-  '/tags',
-  requirePermission([PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE]) as any,
-  tagRoutes
-);
+// Tags — MOVED to project-scoped router above
 
 // Message templates and translation - part of maintenance templates
 router.use(
@@ -143,9 +229,7 @@ router.use(
   gameWorldRoutes
 );
 
-// Environments - no permission required for listing (returns only user's accessible environments)
-// Managing environments (create/update/delete) requires permission check inside routes
-router.use('/environments', environmentRoutes);
+// Environments — MOVED to project-scoped router above
 
 // Jobs and scheduler - requires scheduler.view or scheduler.manage permission
 router.use(
@@ -268,33 +352,15 @@ router.use(
   serverLifecycleRoutes
 );
 
-// Change Requests - requires change-requests.view or change-requests.manage permission
-router.use(
-  '/change-requests',
-  requirePermission([PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE]) as any,
-  changeRequestRoutes
-);
+// Unknown Flags — MOVED to project-scoped router above
 
-// Feature Flags - requires feature-flags.view or feature-flags.manage permission
-router.use(
-  '/features',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  featureRoutes
-);
+// Feature Flags — MOVED to project-scoped router above
 
-// Platform Defaults - requires client-versions.view or client-versions.manage permission
-router.use(
-  '/platform-defaults',
-  requirePermission([PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE]) as any,
-  platformDefaultsRoutes
-);
+// Environments — already moved above
 
-// Unknown Flags - requires feature-flags.view or feature-flags.manage permission
-router.use(
-  '/unknown-flags',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  unknownFlagsRoutes
-);
+// Release Flows — MOVED to project-scoped router above
+
+// Change Requests — MOVED to project-scoped router above
 
 // Integrations - requires security.view or security.manage permission
 router.use(
@@ -303,12 +369,7 @@ router.use(
   integrationRoutes
 );
 
-// Release Flows - requires feature-flags.view or feature-flags.manage permission
-router.use(
-  '/release-flows',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  releaseFlowRoutes
-);
+// Release Flows — MOVED to project-scoped router above
 
 // Service Accounts - requires service-accounts.view or service-accounts.manage permission
 router.use(
@@ -344,48 +405,6 @@ router.use(
   queueMonitorRoutes
 );
 
-// Impact Metrics (admin query endpoints for charts and safeguard evaluation)
-import ImpactMetricsController from '../../controllers/ImpactMetricsController';
-router.get(
-  '/impact-metrics/available',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.getAvailableMetrics as any
-);
-router.get(
-  '/impact-metrics/labels',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.getMetricLabels as any
-);
-router.get(
-  '/impact-metrics',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.queryTimeSeries as any
-);
-// Impact Metric Chart Configs (CRUD)
-router.get(
-  '/impact-metrics/configs/:flagId',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.getConfigs.bind(ImpactMetricsController) as any
-);
-router.post(
-  '/impact-metrics/configs',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.createConfig.bind(ImpactMetricsController) as any
-);
-router.put(
-  '/impact-metrics/configs/layouts',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.updateLayouts.bind(ImpactMetricsController) as any
-);
-router.put(
-  '/impact-metrics/configs/:id',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.updateConfig.bind(ImpactMetricsController) as any
-);
-router.delete(
-  '/impact-metrics/configs/:id',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
-  ImpactMetricsController.deleteConfig.bind(ImpactMetricsController) as any
-);
+// Impact Metrics — MOVED to project-scoped router above
 
 export default router;

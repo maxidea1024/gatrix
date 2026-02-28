@@ -8,11 +8,10 @@ import { ErrorCodes } from '../utils/apiResponse';
 
 // ==================== Constants ====================
 
-const UNSECURED_TOKENS = {
-  CLIENT: 'gatrix-unsecured-client-api-token',
-  SERVER: 'gatrix-unsecured-server-api-token',
-  EDGE: 'gatrix-unsecured-edge-api-token',
-} as const;
+// Unsecured token format: unsecured-{org}:{project}:{env}-{server|client|edge}-api-token
+// Only allowed when ALLOW_UNSECURED_TOKENS=true is set in the environment
+const ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
+const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
 
 export const EDGE_BYPASS_TOKEN =
   process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
@@ -28,6 +27,9 @@ export interface SDKRequest extends Request {
   environmentModel?: Environment;
   isUnsecuredToken?: boolean;
   isEdgeBypassToken?: boolean;
+  unsecuredOrgId?: string;
+  unsecuredProjectId?: string;
+  unsecuredEnvironmentId?: string;
 }
 
 // ==================== Helpers ====================
@@ -50,34 +52,36 @@ function extractToken(req: Request): string | undefined {
 
 /**
  * Handles special internal/testing tokens
+ * Unsecured token format: unsecured-{org}:{project}:{env}-{server|client|edge}-api-token
  */
 function handleSpecialTokens(token: string): {
   apiToken: Partial<ApiAccessToken>;
   isUnsecured?: boolean;
   isEdgeBypass?: boolean;
+  unsecuredOrgId?: string;
+  unsecuredProjectId?: string;
+  unsecuredEnvironmentId?: string;
 } | null {
-  // Unsecured testing tokens
-  if (
-    token === UNSECURED_TOKENS.CLIENT ||
-    token === UNSECURED_TOKENS.SERVER ||
-    token === UNSECURED_TOKENS.EDGE
-  ) {
-    const typeMap: Record<string, 'client' | 'server' | 'edge' | 'all'> = {
-      [UNSECURED_TOKENS.CLIENT]: 'client',
-      [UNSECURED_TOKENS.SERVER]: 'server',
-      [UNSECURED_TOKENS.EDGE]: 'all',
-    };
-    const type = typeMap[token] || 'client';
-    return {
-      apiToken: {
-        id: `unsecured-${type}`,
-        tokenType: type as any,
-        tokenName: `Unsecured ${type.toUpperCase()} Token`,
-        allowAllEnvironments: true,
-        createdBy: '', // Mock system user ID
-      },
-      isUnsecured: true,
-    };
+  // Unsecured tokens — only allowed when explicitly enabled
+  if (ALLOW_UNSECURED_TOKENS) {
+    const match = token.match(UNSECURED_TOKEN_REGEX);
+    if (match) {
+      const [, orgId, projectId, envId, tokenType] = match;
+      const type = tokenType === 'edge' ? 'all' : (tokenType as 'client' | 'server');
+      return {
+        apiToken: {
+          id: `unsecured-${tokenType}-${orgId}-${projectId}`,
+          projectId,
+          tokenType: type as any,
+          tokenName: `Unsecured ${tokenType.toUpperCase()} Token (${orgId}/${projectId}/${envId})`,
+          allowAllEnvironments: false,
+        },
+        isUnsecured: true,
+        unsecuredOrgId: orgId,
+        unsecuredProjectId: projectId,
+        unsecuredEnvironmentId: envId,
+      };
+    }
   }
 
   // Edge internal bypass token
@@ -88,7 +92,7 @@ function handleSpecialTokens(token: string): {
         tokenType: 'all',
         tokenName: 'Edge Bypass Token (Internal)',
         allowAllEnvironments: true,
-        createdBy: '', // Mock system user ID
+        createdBy: '',
       },
       isEdgeBypass: true,
     };

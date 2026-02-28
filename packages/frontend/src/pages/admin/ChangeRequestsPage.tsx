@@ -44,7 +44,7 @@ import changeRequestService, {
   ChangeRequestStatus,
 } from '@/services/changeRequestService';
 import SimplePagination from '@/components/common/SimplePagination';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
@@ -728,7 +728,7 @@ const ChangeRequestsPage: React.FC = () => {
           {isLoading && <LinearProgress />}
 
           {!isLoading && (!data?.items || data.items.length === 0) ? (
-            <EmptyState message={t('changeRequest.noRequests')} />
+            <EmptyPagePlaceholder message={t('changeRequest.noRequests')} />
           ) : (
             <>
               <TableContainer>

@@ -51,7 +51,7 @@ import SyncPreviewDialog, {
 } from '../../components/game/SyncPreviewDialog';
 import BatchProcessDialog from '../../components/game/BatchProcessDialog';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -973,7 +973,7 @@ const StoreProductsPage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : products.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('storeProducts.noProductsFound')}
               onAddClick={canManage ? handleSyncPreview : undefined}
               addButtonLabel={t('storeProducts.syncWithPlanningData')}

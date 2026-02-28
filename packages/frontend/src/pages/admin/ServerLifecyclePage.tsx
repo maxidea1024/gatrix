@@ -53,7 +53,7 @@ import { RelativeTime } from '../../components/common/RelativeTime';
 import serverLifecycleService, {
   ServerLifecycleEvent,
 } from '../../services/serverLifecycleService';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -1225,7 +1225,7 @@ const ServerLifecyclePage: React.FC = () => {
             <Typography color="text.secondary">{t('common.loadingData')}</Typography>
           </Box>
         ) : !data?.data || data.data.length === 0 ? (
-          <EmptyState message={t('serverLifecycle.noEvents')} />
+          <EmptyPagePlaceholder message={t('serverLifecycle.noEvents')} />
         ) : (
           <TableContainer>
             <Table aria-label="server lifecycle table" size="small">

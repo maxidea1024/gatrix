@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { varsService, VarItem } from '@/services/varsService';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
@@ -268,7 +268,7 @@ const KeyValuePage: React.FC = () => {
               <Typography color="text.secondary">{t('common.loadingData')}</Typography>
             </Box>
           ) : items.length === 0 ? (
-            <EmptyState
+            <EmptyPagePlaceholder
               message={t('settings.kv.noItems')}
               onAddClick={canManage ? handleCreate : undefined}
               addButtonLabel={t('settings.kv.create')}

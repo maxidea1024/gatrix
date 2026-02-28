@@ -3,8 +3,8 @@ import TagAssignmentModel from '../models/TagAssignment';
 import { GatrixError } from '../middleware/errorHandler';
 
 export class TagService {
-  static async list() {
-    return await TagModel.list();
+  static async list(projectId?: string) {
+    return await TagModel.list(projectId);
   }
 
   static async create(data: CreateTagData, userId?: string) {
