@@ -23,7 +23,7 @@ export class User extends Model {
   email!: string;
   name!: string;
   passwordHash?: string;
-  role!: string;
+
   status!: string;
   authType!: string;
   emailVerified!: boolean;
@@ -47,7 +47,7 @@ export class UserModel {
           'g_users.name',
           'g_users.avatarUrl',
           'g_users.preferredLanguage',
-          'g_users.role',
+
           'g_users.status',
           'g_users.authType',
           'g_users.emailVerified',
@@ -96,7 +96,7 @@ export class UserModel {
           'name',
           'avatarUrl',
           'preferredLanguage',
-          'role',
+
           'status',
           'emailVerified',
           'emailVerifiedAt',
@@ -131,7 +131,7 @@ export class UserModel {
         name: userData.name,
         avatarUrl: userData.avatarUrl || null,
         preferredLanguage: userData.preferredLanguage || 'en',
-        role: userData.role || 'user',
+
         status: userData.status || 'pending',
         authType: userData.authType || 'local',
         emailVerified: userData.emailVerified || false,
@@ -215,16 +215,7 @@ export class UserModel {
 
       // Apply filters function
       const applyFilters = (query: any) => {
-        // Handle role filter (single or multiple)
-        if (filters.role) {
-          if (Array.isArray(filters.role)) {
-            logger.info(`[UserModel] Applying role filter (array): ${filters.role.join(', ')}`);
-            query.whereIn('g_users.role', filters.role);
-          } else {
-            logger.info(`[UserModel] Applying role filter (single): ${filters.role}`);
-            query.where('g_users.role', filters.role);
-          }
-        }
+        // Role filter is handled via g_organisation_members.orgRole, not g_users.role
 
         // Handle status filter (single or multiple)
         if (filters.status) {
@@ -289,7 +280,7 @@ export class UserModel {
           'g_users.name',
           'g_users.avatarUrl',
           'g_users.preferredLanguage',
-          'g_users.role',
+
           'g_users.status',
           'g_users.authType',
           'g_users.emailVerified',
@@ -298,7 +289,7 @@ export class UserModel {
           'g_users.createdAt',
           'g_users.updatedAt',
           'g_users.createdBy',
-          'g_users.allowAllEnvironments',
+
           'creator.name as createdByName',
           'creator.email as createdByEmail',
         ])
@@ -496,7 +487,7 @@ export class UserModel {
   static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
     try {
       const users = await db('g_users')
-        .select('id', 'name', 'email', 'role', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
+        .select('id', 'name', 'email', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
         .where('status', 'active') // 활성 사용자만 검색
         .andWhere(function () {
           this.where('name', 'like', `%${query}%`).orWhere('email', 'like', `%${query}%`);
@@ -522,7 +513,7 @@ export class UserModel {
           'email',
           'name',
           'avatarUrl',
-          'role',
+
           'status',
           'lastLoginAt',
           'createdAt',

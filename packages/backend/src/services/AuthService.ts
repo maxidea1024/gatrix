@@ -59,15 +59,16 @@ export class AuthService {
       delete (userWithoutPassword as any).passwordHash;
 
       // Generate tokens
+      // Note: role is now determined via g_organisation_members.orgRole, not g_users.role
       const accessToken = JwtUtils.generateToken(
         userWithoutPassword as any,
         '',
-        user.role || 'user'
+        'user'
       );
       const refreshToken = JwtUtils.generateRefreshToken(
         userWithoutPassword as any,
         '',
-        user.role || 'user'
+        'user'
       );
 
       logger.info('User logged in successfully:', {
