@@ -21,6 +21,7 @@ export class ServerEnvironmentController {
 
       const result = environments.map((env) => ({
         environmentId: env.id,
+        name: env.name,
         displayName: env.displayName,
         environmentType: env.environmentType,
         color: env.color,

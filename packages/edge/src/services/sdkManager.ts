@@ -24,6 +24,34 @@ class SDKManager {
   private async doInitialize(): Promise<void> {
     logger.info('Initializing GatrixServerSDK...');
 
+    // Resolve environment name to ULID ID from backend
+    let resolvedEnvironmentId = config.environment;
+    try {
+      const axios = require('axios');
+      const envResponse = await axios.get(`${config.gatrixUrl}/api/v1/server/environments`, {
+        headers: {
+          'x-api-token': config.apiToken,
+        },
+        timeout: 10000,
+      });
+
+      if (envResponse.data?.success && envResponse.data?.data?.environments) {
+        const envList = envResponse.data.data.environments;
+        // Find environment by name match
+        const matched = envList.find(
+          (e: any) => e.name === config.environment
+        );
+        if (matched) {
+          resolvedEnvironmentId = matched.environmentId;
+          logger.info(`Resolved environment '${config.environment}' -> ID: ${resolvedEnvironmentId}`);
+        } else {
+          logger.warn(`Environment '${config.environment}' not found in backend, using as-is`);
+        }
+      }
+    } catch (error: any) {
+      logger.warn(`Failed to resolve environment from backend: ${error.message}, using '${config.environment}' as-is`);
+    }
+
     const sdkConfig: GatrixSDKConfig = {
       gatrixUrl: config.gatrixUrl,
       apiToken: config.apiToken,
@@ -32,7 +60,7 @@ class SDKManager {
       // SDK required fields
       service: config.service,
       group: config.group,
-      environment: config.environment,
+      environment: resolvedEnvironmentId,
 
       // Multi-environment mode for Edge
       environments: config.environments,
