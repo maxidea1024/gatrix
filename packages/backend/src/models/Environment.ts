@@ -412,7 +412,7 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; segmentName: string }>('g_feature_segments', ['id', 'segmentName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', ['id', 'flagName']),
-      safeQuery<{ id: string; appName: string }>('g_network_traffic', ['id', 'appName']),
+      safeQuery<{ id: string; appName: string }>('g_feature_network_traffic', ['id', 'appName']),
       safeQuery<{ id: string; flagName: string }>('g_unknown_flags', ['id', 'flagName']),
       safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),
       safeQuery<{ id: string; entityType: string }>('g_entity_locks', ['id', 'entityType']),
@@ -663,7 +663,7 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_feature_segments');
         await safeDelete(trx, 'g_feature_metrics');
         await safeDelete(trx, 'g_feature_variant_metrics');
-        await safeDelete(trx, 'g_network_traffic');
+        await safeDelete(trx, 'g_feature_network_traffic');
         await safeDelete(trx, 'g_unknown_flags');
         await safeDelete(trx, 'g_change_requests');
         await safeDelete(trx, 'g_entity_locks');
