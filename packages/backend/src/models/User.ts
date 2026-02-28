@@ -47,7 +47,6 @@ export class UserModel {
           'g_users.name',
           'g_users.avatarUrl',
           'g_users.preferredLanguage',
-
           'g_users.status',
           'g_users.authType',
           'g_users.emailVerified',
@@ -58,8 +57,10 @@ export class UserModel {
           'g_users.createdBy',
           'creator.name as createdByName',
           'creator.email as createdByEmail',
+          db.raw('COALESCE(om.orgRole, \'user\') as role'),
         ])
         .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+        .leftJoin('g_organisation_members as om', 'g_users.id', 'om.userId')
         .where('g_users.id', id)
         .first();
 
@@ -272,7 +273,9 @@ export class UserModel {
 
       // Get users with camelCase field names
       const usersQuery = applyFilters(
-        db('g_users').leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+        db('g_users')
+          .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+          .leftJoin('g_organisation_members as om', 'g_users.id', 'om.userId')
       )
         .select([
           'g_users.id',
@@ -280,7 +283,6 @@ export class UserModel {
           'g_users.name',
           'g_users.avatarUrl',
           'g_users.preferredLanguage',
-
           'g_users.status',
           'g_users.authType',
           'g_users.emailVerified',
@@ -289,7 +291,7 @@ export class UserModel {
           'g_users.createdAt',
           'g_users.updatedAt',
           'g_users.createdBy',
-
+          db.raw('COALESCE(om.orgRole, \'user\') as role'),
           'creator.name as createdByName',
           'creator.email as createdByEmail',
         ])
@@ -305,29 +307,13 @@ export class UserModel {
       // Get all user IDs for batch loading
       const userIds = users.map((u: any) => u.id);
 
-      // Batch load environment assignments
-      const envAssignments =
-        userIds.length > 0
-          ? await db('g_user_environments')
-              .whereIn('userId', userIds)
-              .select('userId', 'environmentId')
-          : [];
-
-      // Group environment names by user
-      const envByUser = envAssignments.reduce((acc: any, env: any) => {
-        if (!acc[env.userId]) acc[env.userId] = [];
-        acc[env.userId].push(env.environmentId);
-        return acc;
-      }, {});
-
-      // 각 사용자에 대해 태그 및 환경 정보 로드
+      // Load tags for all users
       const usersWithExtras = await Promise.all(
         users.map(async (user: any) => {
           const tags = await this.getTags(user.id);
           return {
             ...user,
             tags,
-            environments: envByUser[user.id] || [],
           };
         })
       );
@@ -533,39 +519,28 @@ export class UserModel {
   }
 
   // Environment access methods
+  // NOTE: Legacy g_user_environments table and allowAllEnvironments column removed in RBAC redesign.
+  // Environment access is now managed via g_role_environment_permissions.
+  // These stubs return permissive defaults until fully migrated.
 
   /**
    * Get user's environment access settings
+   * @deprecated Use role-based environment permissions instead
    */
   static async getEnvironmentAccess(userId: string): Promise<{
     allowAllEnvironments: boolean;
     environments: string[];
   }> {
-    try {
-      // Get allowAllEnvironments flag
-      const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
-
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      // Get specific environment assignments
-      const environments = await db('g_user_environments')
-        .select('environmentId')
-        .where('userId', userId);
-
-      return {
-        allowAllEnvironments: !!user.allowAllEnvironments,
-        environments: environments.map((e: any) => e.environmentId),
-      };
-    } catch (error) {
-      logger.error('Error getting user environment access:', error);
-      throw error;
-    }
+    // Return all-access by default until role-based env permissions are wired
+    return {
+      allowAllEnvironments: true,
+      environments: [],
+    };
   }
 
   /**
    * Set user's environment access
+   * @deprecated Use role-based environment permissions instead
    */
   static async setEnvironmentAccess(
     userId: string,
@@ -573,89 +548,25 @@ export class UserModel {
     environments: string[],
     updatedBy: string
   ): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Update allowAllEnvironments flag
-        await trx('g_users').where('id', userId).update({
-          allowAllEnvironments,
-          updatedBy,
-          updatedAt: trx.fn.now(),
-        });
-
-        // Clear existing environment assignments
-        await trx('g_user_environments').where('userId', userId).del();
-
-        // Add new environment assignments (only if not allowAllEnvironments)
-        if (!allowAllEnvironments && environments.length > 0) {
-          const assignments = environments.map((envId) => ({
-            userId,
-            environmentId: envId,
-            createdBy: updatedBy,
-            createdAt: new Date(),
-          }));
-
-          await trx('g_user_environments').insert(assignments);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting user environment access:', error);
-      throw error;
-    }
+    logger.warn('setEnvironmentAccess: Legacy method called, no-op until RBAC migration complete');
   }
 
   /**
    * Check if user has access to a specific environment
+   * @deprecated Use role-based environment permissions instead
    */
   static async hasEnvironmentAccess(userId: string, environmentId: string): Promise<boolean> {
-    try {
-      const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
-
-      if (!user) {
-        return false;
-      }
-
-      // Admin with all environments access
-      if (user.allowAllEnvironments) {
-        return true;
-      }
-
-      // Check specific environment assignment
-      const assignment = await db('g_user_environments')
-        .where('userId', userId)
-        .where('environmentId', environmentId)
-        .first();
-
-      return !!assignment;
-    } catch (error) {
-      logger.error('Error checking user environment access:', error);
-      return false;
-    }
+    // Allow all access by default until role-based env permissions are wired
+    return true;
   }
 
   /**
    * Get accessible environment names for a user
+   * @deprecated Use role-based environment permissions instead
    */
   static async getAccessibleEnvironments(userId: string): Promise<string[] | 'all'> {
-    try {
-      const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
-
-      if (!user) {
-        return [];
-      }
-
-      if (user.allowAllEnvironments) {
-        return 'all';
-      }
-
-      const environments = await db('g_user_environments')
-        .select('environmentId')
-        .where('userId', userId);
-
-      return environments.map((e: any) => e.environmentId);
-    } catch (error) {
-      logger.error('Error getting accessible environment names:', error);
-      return [];
-    }
+    // Return 'all' by default until role-based env permissions are wired
+    return 'all';
   }
 
   // Permission methods for RBAC
