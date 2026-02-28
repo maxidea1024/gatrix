@@ -199,7 +199,8 @@ const ApiTokensPage: React.FC = () => {
 
   // Check if user can manage (create/edit/delete) tokens
   const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
-  const { currentProjectId } = useOrgProject();
+  const { currentProjectId, getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
@@ -374,7 +375,7 @@ const ApiTokensPage: React.FC = () => {
 
   useEffect(() => {
     loadTokens();
-  }, [page, rowsPerPage, sortBy, sortOrder, activeFilters, currentProjectId]);
+  }, [page, rowsPerPage, sortBy, sortOrder, activeFilters, projectApiPath]);
 
   // Load environments on mount
   useEffect(() => {
@@ -406,9 +407,8 @@ const ApiTokensPage: React.FC = () => {
         limit: rowsPerPage,
         sortBy,
         sortOrder,
-        projectId: currentProjectId || undefined,
         ...filterParams,
-      });
+      }, projectApiPath);
       setTokens(response.data || []);
       setTotal(response.total || 0);
     } catch (error) {
@@ -602,8 +602,7 @@ const ApiTokensPage: React.FC = () => {
     try {
       const response = await apiTokenService.createToken({
         ...formData,
-        projectId: currentProjectId || undefined,
-      });
+      }, projectApiPath);
       console.log('Create token response:', response); // 디버깅용
 
       // 토큰 정보를 먼저 설정
@@ -657,7 +656,7 @@ const ApiTokensPage: React.FC = () => {
         allowAllEnvironments: formData.allowAllEnvironments,
         environments: formData.allowAllEnvironments ? [] : formData.environments,
         expiresAt: formData.expiresAt,
-      });
+      }, projectApiPath);
       await loadTokens();
       setEditDialogOpen(false);
       setSelectedToken(null);
@@ -684,7 +683,7 @@ const ApiTokensPage: React.FC = () => {
     }
 
     try {
-      await apiTokenService.deleteToken(selectedToken.id);
+      await apiTokenService.deleteToken(selectedToken.id, projectApiPath);
       await loadTokens();
       setDeleteDialogOpen(false);
       setSelectedToken(null);
@@ -702,7 +701,7 @@ const ApiTokensPage: React.FC = () => {
     if (!selectedToken) return;
 
     try {
-      const response = await apiTokenService.regenerateToken(selectedToken.id);
+      const response = await apiTokenService.regenerateToken(selectedToken.id, projectApiPath);
       console.log('Regenerate token response:', response); // 디버깅용
 
       // 백엔드 응답 구조 확인 및 토큰 값 추출
@@ -892,7 +891,7 @@ const ApiTokensPage: React.FC = () => {
 
       // Delete selected tokens
       for (const tokenId of selectedTokenIds) {
-        await apiTokenService.deleteToken(tokenId);
+        await apiTokenService.deleteToken(tokenId, projectApiPath);
       }
 
       enqueueSnackbar(t('apiTokens.bulkDeleteSuccess'), { variant: 'success' });

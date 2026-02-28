@@ -15,20 +15,26 @@ export interface Tag {
   updatedByEmail?: string | null;
 }
 
+/** Build tags base path from project-scoped path or fallback */
+function basePath(projectApiPath: string | null): string {
+  return projectApiPath ? `${projectApiPath}/tags` : '/admin/tags';
+}
+
 export const tagService = {
-  async list(projectId?: string): Promise<Tag[]> {
-    const params: Record<string, string> = {};
-    if (projectId) params.projectId = projectId;
-    const res = await apiService.get<{ tags: Tag[] }>('/admin/tags', { params });
+  async list(projectApiPath: string | null = null): Promise<Tag[]> {
+    const res = await apiService.get<{ tags: Tag[] }>(basePath(projectApiPath));
     return res.data?.tags || [];
   },
 
-  async create(payload: {
-    name: string;
-    color?: string;
-    description?: string | null;
-  }): Promise<Tag> {
-    const res = await apiService.post<{ tag: Tag }>('/admin/tags', payload);
+  async create(
+    payload: {
+      name: string;
+      color?: string;
+      description?: string | null;
+    },
+    projectApiPath: string | null = null
+  ): Promise<Tag> {
+    const res = await apiService.post<{ tag: Tag }>(basePath(projectApiPath), payload);
     return res.data!.tag;
   },
 
@@ -38,25 +44,35 @@ export const tagService = {
       name: string;
       color: string;
       description: string | null;
-    }>
+    }>,
+    projectApiPath: string | null = null
   ): Promise<Tag> {
-    const res = await apiService.put<{ tag: Tag }>(`/admin/tags/${id}`, payload);
+    const res = await apiService.put<{ tag: Tag }>(`${basePath(projectApiPath)}/${id}`, payload);
     return res.data!.tag;
   },
 
-  async remove(id: number): Promise<void> {
-    await apiService.delete(`/admin/tags/${id}`);
+  async remove(id: number, projectApiPath: string | null = null): Promise<void> {
+    await apiService.delete(`${basePath(projectApiPath)}/${id}`);
   },
 
-  async listForEntity(entityType: string, entityId: number): Promise<Tag[]> {
-    const res = await apiService.get<{ tags: Tag[] }>(`/admin/tags/assignments`, {
+  async listForEntity(
+    entityType: string,
+    entityId: number,
+    projectApiPath: string | null = null
+  ): Promise<Tag[]> {
+    const res = await apiService.get<{ tags: Tag[] }>(`${basePath(projectApiPath)}/assignments`, {
       params: { entityType, entityId },
     });
     return res.data?.tags || [];
   },
 
-  async setForEntity(entityType: string, entityId: number, tagIds: number[]): Promise<void> {
-    await apiService.put(`/admin/tags/assignments`, {
+  async setForEntity(
+    entityType: string,
+    entityId: number,
+    tagIds: number[],
+    projectApiPath: string | null = null
+  ): Promise<void> {
+    await apiService.put(`${basePath(projectApiPath)}/assignments`, {
       entityType,
       entityId,
       tagIds,

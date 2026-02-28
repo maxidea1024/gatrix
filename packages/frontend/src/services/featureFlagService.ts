@@ -85,7 +85,6 @@ export interface FeatureFlagListParams {
   isArchived?: boolean;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
-  projectId?: string;
 }
 
 export interface FeatureFlagListResponse {
@@ -109,7 +108,6 @@ export interface CreateFeatureFlagInput {
   staleAfterDays?: number;
   tags?: string[];
   validationRules?: ValidationRules;
-  projectId?: string;
 }
 
 export interface UpdateFeatureFlagInput {
@@ -127,13 +125,19 @@ export interface UpdateFeatureFlagInput {
 
 // ==================== Service ====================
 
+/** Build features base path from project-scoped path or fallback */
+function basePath(projectApiPath: string | null): string {
+  return projectApiPath ? `${projectApiPath}/features` : '/admin/features';
+}
+
 /**
  * Get all feature flags
  */
 export async function getFeatureFlags(
-  params: FeatureFlagListParams = {}
+  params: FeatureFlagListParams = {},
+  projectApiPath: string | null = null
 ): Promise<FeatureFlagListResponse> {
-  const response = await api.get('/admin/features', { params });
+  const response = await api.get(basePath(projectApiPath), { params });
   // Backend returns { data: [...], total: N }, map to { flags: [...], total: N }
   const result = response.data;
   return {
@@ -147,16 +151,22 @@ export async function getFeatureFlags(
 /**
  * Get a specific feature flag
  */
-export async function getFeatureFlag(flagName: string): Promise<FeatureFlag> {
-  const response = await api.get(`/admin/features/${flagName}`);
+export async function getFeatureFlag(
+  flagName: string,
+  projectApiPath: string | null = null
+): Promise<FeatureFlag> {
+  const response = await api.get(`${basePath(projectApiPath)}/${flagName}`);
   return response.data.flag;
 }
 
 /**
  * Create a new feature flag
  */
-export async function createFeatureFlag(data: CreateFeatureFlagInput): Promise<FeatureFlag> {
-  const response = await api.post('/admin/features', data);
+export async function createFeatureFlag(
+  data: CreateFeatureFlagInput,
+  projectApiPath: string | null = null
+): Promise<FeatureFlag> {
+  const response = await api.post(basePath(projectApiPath), data);
   return response.data.flag;
 }
 
@@ -165,9 +175,10 @@ export async function createFeatureFlag(data: CreateFeatureFlagInput): Promise<F
  */
 export async function updateFeatureFlag(
   flagName: string,
-  data: UpdateFeatureFlagInput
+  data: UpdateFeatureFlagInput,
+  projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.put(`/admin/features/${flagName}`, data);
+  const response = await api.put(`${basePath(projectApiPath)}/${flagName}`, data);
   return response.data.flag;
 }
 
@@ -177,9 +188,10 @@ export async function updateFeatureFlag(
 export async function toggleFeatureFlag(
   flagName: string,
   isEnabled: boolean,
-  environmentId?: string
+  environmentId?: string,
+  projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
-  const response = await api.post(`/admin/features/${flagName}/toggle`, {
+  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/toggle`, {
     isEnabled, environmentId,
   });
   return response.data.flag;
@@ -188,24 +200,34 @@ export async function toggleFeatureFlag(
 /**
  * Archive a feature flag
  */
-export async function archiveFeatureFlag(flagName: string): Promise<FeatureFlag> {
-  const response = await api.post(`/admin/features/${flagName}/archive`);
+export async function archiveFeatureFlag(
+  flagName: string,
+  projectApiPath: string | null = null
+): Promise<FeatureFlag> {
+  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/archive`);
   return response.data.flag;
 }
 
 /**
  * Revive an archived feature flag
  */
-export async function reviveFeatureFlag(flagName: string): Promise<FeatureFlag> {
-  const response = await api.post(`/admin/features/${flagName}/revive`);
+export async function reviveFeatureFlag(
+  flagName: string,
+  projectApiPath: string | null = null
+): Promise<FeatureFlag> {
+  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/revive`);
   return response.data.flag;
 }
 
 /**
  * Toggle favorite status
  */
-export async function toggleFavorite(flagName: string, isFavorite: boolean): Promise<FeatureFlag> {
-  const response = await api.post(`/admin/features/${flagName}/favorite`, {
+export async function toggleFavorite(
+  flagName: string,
+  isFavorite: boolean,
+  projectApiPath: string | null = null
+): Promise<FeatureFlag> {
+  const response = await api.post(`${basePath(projectApiPath)}/${flagName}/favorite`, {
     isFavorite,
   });
   return response.data.flag;
@@ -214,8 +236,11 @@ export async function toggleFavorite(flagName: string, isFavorite: boolean): Pro
 /**
  * Delete a feature flag
  */
-export async function deleteFeatureFlag(flagName: string): Promise<void> {
-  await api.delete(`/admin/features/${flagName}`);
+export async function deleteFeatureFlag(
+  flagName: string,
+  projectApiPath: string | null = null
+): Promise<void> {
+  await api.delete(`${basePath(projectApiPath)}/${flagName}`);
 }
 
 const featureFlagService = {

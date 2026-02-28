@@ -81,6 +81,7 @@ import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog';
 import ContextFieldChip, { ContextFieldInfo } from '../common/ContextFieldChip';
 
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 interface ContextField {
   fieldName: string;
   displayName: string;
@@ -189,6 +190,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   initialFlagDetails,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -385,7 +388,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       setLoadingFlagDetails(true);
       setFlagDetails(null);
       featureFlagService
-        .getFeatureFlag(selectedEvaluation.flagName)
+        .getFeatureFlag(selectedEvaluation.flagName, projectApiPath)
         .then((flag) => {
           setFlagDetails(flag);
         })

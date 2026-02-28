@@ -157,6 +157,8 @@ const getTypeIconSmall = (type: string) => getFlagTypeIcon(type, 16);
 
 const FeatureFlagsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
@@ -465,7 +467,7 @@ const FeatureFlagsPage: React.FC = () => {
         sortBy: orderBy,
         sortOrder: order,
         projectId: currentProjectId || undefined,
-      });
+      }, projectApiPath);
 
       if (
         result &&
@@ -591,14 +593,14 @@ const FeatureFlagsPage: React.FC = () => {
         page: 1,
         limit: 10000, // Get all flags
         isArchived: false,
-      });
+      }, projectApiPath);
 
       if (result && result.flags && result.flags.length > 0) {
         // Fetch detailed info for each flag (includes strategies)
         const detailedFlags = await Promise.all(
           result.flags.map(async (flag) => {
             try {
-              return await featureFlagService.getFeatureFlag(flag.flagName);
+              return await featureFlagService.getFeatureFlag(flag.flagName, projectApiPath);
             } catch {
               return flag; // Fallback to basic info if detail fetch fails
             }
@@ -904,7 +906,7 @@ const FeatureFlagsPage: React.FC = () => {
     );
 
     try {
-      await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environmentId);
+      await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environmentId, projectApiPath);
       const envDisplayName =
         environments.find((e) => e.environmentId === environmentId)?.displayName || environmentId;
       enqueueSnackbar(
@@ -974,12 +976,12 @@ const FeatureFlagsPage: React.FC = () => {
   const handleArchiveToggle = async (flag: FeatureFlag) => {
     try {
       if (flag.isArchived) {
-        await featureFlagService.reviveFeatureFlag(flag.flagName);
+        await featureFlagService.reviveFeatureFlag(flag.flagName, projectApiPath);
         enqueueSnackbar(t('featureFlags.reviveSuccess'), {
           variant: 'success',
         });
       } else {
-        await featureFlagService.archiveFeatureFlag(flag.flagName);
+        await featureFlagService.archiveFeatureFlag(flag.flagName, projectApiPath);
         enqueueSnackbar(t('featureFlags.archiveSuccess'), {
           variant: 'success',
         });
@@ -1171,7 +1173,7 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of nonArchivedFlags) {
-        await featureFlagService.archiveFeatureFlag(flag.flagName);
+        await featureFlagService.archiveFeatureFlag(flag.flagName, projectApiPath);
       }
       enqueueSnackbar(
         t('featureFlags.bulkArchiveSuccess', {
@@ -1201,7 +1203,7 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of archivedFlags) {
-        await featureFlagService.reviveFeatureFlag(flag.flagName);
+        await featureFlagService.reviveFeatureFlag(flag.flagName, projectApiPath);
       }
       enqueueSnackbar(t('featureFlags.bulkReviveSuccess', { count: archivedFlags.length }), {
         variant: 'success',
@@ -1266,7 +1268,7 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of targetFlags) {
-        await featureFlagService.toggleFeatureFlag(flag.flagName, enable, environmentId);
+        await featureFlagService.toggleFeatureFlag(flag.flagName, enable, environmentId, projectApiPath);
       }
       enqueueSnackbar(
         enable

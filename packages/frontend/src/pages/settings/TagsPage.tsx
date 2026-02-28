@@ -51,7 +51,8 @@ const TagsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const { currentProjectId } = useOrgProject();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([PERMISSIONS.TAGS_MANAGE]);
 
   // Data/state
@@ -80,7 +81,7 @@ const TagsPage: React.FC = () => {
   const loadTags = async () => {
     try {
       setLoading(true);
-      const items = await tagService.list(currentProjectId || undefined);
+      const items = await tagService.list(projectApiPath);
       setTags(items);
     } catch {
       enqueueSnackbar(t('errors.loadError'), { variant: 'error' });
@@ -90,7 +91,7 @@ const TagsPage: React.FC = () => {
   };
   useEffect(() => {
     loadTags();
-  }, [currentProjectId]);
+  }, [projectApiPath]);
 
   // Derived
   const filtered = useMemo(() => {
@@ -110,7 +111,7 @@ const TagsPage: React.FC = () => {
         name,
         color: newColor,
         description: newDescription || null,
-      });
+      }, projectApiPath);
       setTags((prev) => [...prev, tag]);
       setNewName('');
       setNewDescription('');
@@ -127,7 +128,7 @@ const TagsPage: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await tagService.remove(id);
+      await tagService.remove(id, projectApiPath);
       setTags((prev) => prev.filter((t) => t.id !== id));
       enqueueSnackbar(t('common.success'), { variant: 'success' });
     } catch (e: any) {
@@ -174,7 +175,7 @@ const TagsPage: React.FC = () => {
         name,
         color: editColor,
         description: editDescription || null,
-      });
+      }, projectApiPath);
       setTags((prev) => prev.map((t) => (t.id === id ? updated : t)));
       setEditingId(null);
       enqueueSnackbar(t('common.success'), { variant: 'success' });

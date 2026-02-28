@@ -53,6 +53,7 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import featureFlagService from '@/services/featureFlagService';
 import environmentService, { Environment } from '@/services/environmentService';
 
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 // Action type options
 const ACTION_TYPES = [
   { value: 'TOGGLE_FLAG', labelKey: 'actionSets.actionTypes.toggleFlag' },
@@ -85,6 +86,8 @@ interface ActionItem {
 
 const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onClose, onSave }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [source, setSource] = useState('');
@@ -100,7 +103,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
     const loadData = async () => {
       try {
         const [flagResult, envResult] = await Promise.all([
-          featureFlagService.getFeatureFlags({ limit: 1000, isArchived: false }),
+          featureFlagService.getFeatureFlags({ limit: 1000, isArchived: false }, projectApiPath),
           environmentService.getEnvironments(),
         ]);
         setFlagOptions(flagResult.flags.map((f) => f.flagName));
