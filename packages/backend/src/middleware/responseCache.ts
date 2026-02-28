@@ -194,7 +194,7 @@ export async function invalidateCache(pattern: string): Promise<number> {
 }
 
 // Invalidate cache for specific user
-export async function invalidateUserCache(userId: number): Promise<number> {
+export async function invalidateUserCache(userId: string): Promise<number> {
   return invalidateCache(`cache:*:user:${userId}*`);
 }
 

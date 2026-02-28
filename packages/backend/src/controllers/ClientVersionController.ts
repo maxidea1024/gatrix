@@ -80,12 +80,12 @@ const createClientVersionSchema = Joi.object({
   tags: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().integer().positive().required(),
+        id: Joi.string().required(),
         name: Joi.string().optional(),
         color: Joi.string().optional(),
         description: Joi.string().optional().allow(null),
-        createdBy: Joi.number().integer().optional(),
-        updatedBy: Joi.number().integer().optional(),
+        createdBy: Joi.string().optional(),
+        updatedBy: Joi.string().optional(),
         createdAt: Joi.date().optional(),
         updatedAt: Joi.date().optional(),
       }).unknown(true)
@@ -166,8 +166,8 @@ const getClientVersionsQuerySchema = Joi.object({
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
-  createdBy: Joi.number().integer().optional(),
-  updatedBy: Joi.number().integer().optional(),
+  createdBy: Joi.string().optional(),
+  updatedBy: Joi.string().optional(),
   createdAtFrom: Joi.date().iso().optional(),
   createdAtTo: Joi.date().iso().optional(),
   updatedAtFrom: Joi.date().iso().optional(),
@@ -198,8 +198,8 @@ const exportClientVersionsQuerySchema = Joi.object({
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
-  createdBy: Joi.number().integer().optional(),
-  updatedBy: Joi.number().integer().optional(),
+  createdBy: Joi.string().optional(),
+  updatedBy: Joi.string().optional(),
   createdAtFrom: Joi.date().iso().optional(),
   createdAtTo: Joi.date().iso().optional(),
   updatedAtFrom: Joi.date().iso().optional(),
@@ -209,7 +209,7 @@ const exportClientVersionsQuerySchema = Joi.object({
 });
 
 const bulkUpdateStatusSchema = Joi.object({
-  ids: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
+  ids: Joi.array().items(Joi.string()).min(1).required(),
   clientStatus: Joi.string()
     .valid(...Object.values(ClientStatus))
     .required(),
@@ -226,7 +226,7 @@ const bulkUpdateStatusSchema = Joi.object({
       })
     )
     .optional(),
-  messageTemplateId: Joi.number().integer().positive().optional(),
+  messageTemplateId: Joi.string().optional(),
 });
 
 const bulkCreateClientVersionSchema = Joi.object({
@@ -287,7 +287,7 @@ const bulkCreateClientVersionSchema = Joi.object({
   tags: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().integer().positive().required(),
+        id: Joi.string().required(),
         name: Joi.string().required(),
         color: Joi.string().required(),
       })
@@ -376,8 +376,8 @@ export class ClientVersionController {
 
   // 클라이언트 버전 상세 조회
   static async getClientVersionById(req: AuthenticatedRequest, res: Response) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = req.params.id;
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Invalid client version ID',
@@ -555,8 +555,8 @@ export class ClientVersionController {
 
   // 클라이언트 버전 수정
   static async updateClientVersion(req: AuthenticatedRequest, res: Response) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = req.params.id;
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Invalid client version ID',
@@ -595,7 +595,7 @@ export class ClientVersionController {
       userId,
       environment,
       'g_client_versions',
-      String(id),
+      id,
       updateData,
       async (processedData: any) => {
         return await ClientVersionService.updateClientVersion(id, processedData, environment);
@@ -634,8 +634,8 @@ export class ClientVersionController {
 
   // 클라이언트 버전 삭제
   static async deleteClientVersion(req: AuthenticatedRequest, res: Response) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = req.params.id;
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Invalid client version ID',
@@ -656,7 +656,7 @@ export class ClientVersionController {
       userId,
       environment,
       'g_client_versions',
-      String(id),
+      id,
       async () => {
         await ClientVersionService.deleteClientVersion(id, environment);
       }
@@ -729,7 +729,7 @@ export class ClientVersionController {
           userId,
           environment,
           'g_client_versions',
-          String(id),
+          id,
           updateDataAttrs
         );
       }
@@ -777,7 +777,7 @@ export class ClientVersionController {
         });
       }
 
-      await ClientVersionModel.setTags(parseInt(id), tagIds);
+      await ClientVersionModel.setTags(id, tagIds);
 
       res.json({
         success: true,
@@ -796,7 +796,7 @@ export class ClientVersionController {
   static async getTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
-      const tags = await ClientVersionModel.getTags(parseInt(id));
+      const tags = await ClientVersionModel.getTags(id);
 
       res.json({
         success: true,

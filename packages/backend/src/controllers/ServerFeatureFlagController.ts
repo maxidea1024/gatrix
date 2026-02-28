@@ -17,11 +17,7 @@ import {
 import db from '../config/knex';
 import { featureMetricsService } from '../services/FeatureMetricsService';
 import { networkTrafficService } from '../services/NetworkTrafficService';
-import {
-  ErrorCodes,
-  sendBadRequest,
-  sendInternalError,
-} from '../utils/apiResponse';
+import { ErrorCodes, sendBadRequest, sendInternalError } from '../utils/apiResponse';
 
 // Type for minimal flag data needed for runtime evaluation
 interface EvaluationFlag {
@@ -77,12 +73,15 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => { });
+      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
 
       // Parse optional flagNames filter (comma-separated query parameter)
       const flagNamesParam = req.query.flagNames as string | undefined;
       const flagNamesFilter = flagNamesParam
-        ? flagNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+        ? flagNamesParam
+            .split(',')
+            .map((n) => n.trim())
+            .filter(Boolean)
         : undefined;
 
       // Parse compact option: strip strategies/variants/enabledValue from disabled flags
@@ -201,7 +200,12 @@ export default class ServerFeatureFlagController {
         data,
       });
     } catch (error: any) {
-      sendInternalError(res, 'Failed to fetch feature flags', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+      sendInternalError(
+        res,
+        'Failed to fetch feature flags',
+        error,
+        ErrorCodes.RESOURCE_FETCH_FAILED
+      );
     }
   }
 
@@ -314,12 +318,15 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => { });
+      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
 
       // Parse optional segmentNames filter (comma-separated query parameter)
       const segmentNamesParam = req.query.segmentNames as string | undefined;
       const segmentNamesFilter = segmentNamesParam
-        ? segmentNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+        ? segmentNamesParam
+            .split(',')
+            .map((n) => n.trim())
+            .filter(Boolean)
         : undefined;
 
       const rawSegments = segmentNamesFilter

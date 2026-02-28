@@ -15,7 +15,7 @@ export class ChangeRequest extends Model {
   static tableName = 'g_change_requests';
 
   id!: string;
-  requesterId!: number;
+  requesterId!: string;
   environment!: string;
   status!: ChangeRequestStatus;
   title!: string;
@@ -25,10 +25,10 @@ export class ChangeRequest extends Model {
   priority!: ChangeRequestPriority;
   category!: string;
   type?: string;
-  rejectedBy?: number;
+  rejectedBy?: string;
   rejectedAt?: string;
   rejectionReason?: string;
-  executedBy?: number;
+  executedBy?: string;
   createdAt!: Date;
   updatedAt!: Date;
 

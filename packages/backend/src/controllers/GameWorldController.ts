@@ -53,7 +53,7 @@ const createGameWorldSchema = Joi.object({
         'worldServerAddress must be a valid URL, domain, IP, or host:port (e.g., https://world.example.com, world.example.com, 192.168.1.100:8080)',
       'any.required': 'worldServerAddress is required',
     }),
-  tagIds: Joi.array().items(Joi.number().integer().min(1)).optional(),
+  tagIds: Joi.array().items(Joi.string()).optional(),
 });
 
 const updateGameWorldSchema = Joi.object({
@@ -94,7 +94,7 @@ const updateGameWorldSchema = Joi.object({
       'string.pattern.base':
         'worldServerAddress must be a valid URL, domain, IP, or host:port (e.g., https://world.example.com, world.example.com, 192.168.1.100:8080)',
     }),
-  tagIds: Joi.array().items(Joi.number().integer().min(1)).optional(),
+  tagIds: Joi.array().items(Joi.string()).optional(),
 });
 
 // Update maintenance status schema
@@ -102,7 +102,7 @@ const updateMaintenanceSchema = Joi.object({
   isMaintenance: Joi.boolean().required(),
   maintenanceStartDate: Joi.string().isoDate().optional().allow('', null).empty('').default(null),
   maintenanceEndDate: Joi.string().isoDate().optional().allow('', null).empty('').default(null),
-  maintenanceMessageTemplateId: Joi.number().integer().optional().allow(null),
+  maintenanceMessageTemplateId: Joi.string().optional().allow(null),
   maintenanceMessage: Joi.when('maintenanceMessageTemplateId', {
     is: Joi.exist().not(null),
     then: Joi.string().optional().allow('').empty('').default(null),
@@ -194,10 +194,10 @@ export class GameWorldController {
   });
 
   static getGameWorldById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -329,10 +329,10 @@ export class GameWorldController {
   });
 
   static updateGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -387,7 +387,7 @@ export class GameWorldController {
       authenticatedUserId,
       environment,
       'g_game_worlds',
-      String(id),
+      id,
       { ...updateData, tagIds },
       async (processedData) => {
         const { tagIds: processedTagIds, ...processedWorldData } = processedData as any;
@@ -429,10 +429,10 @@ export class GameWorldController {
   });
 
   static deleteGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -450,7 +450,7 @@ export class GameWorldController {
       authenticatedUserId,
       environment,
       'g_game_worlds',
-      String(id),
+      id,
       async () => {
         await GameWorldService.deleteGameWorld(id, environment);
 
@@ -483,11 +483,11 @@ export class GameWorldController {
   });
 
   static toggleVisibility = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
     logger.info(`GameWorldController.toggleVisibility called for id: ${id}`);
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -505,7 +505,7 @@ export class GameWorldController {
       authenticatedUserId,
       environment,
       'g_game_worlds',
-      String(id),
+      id,
       async (currentData: any) => {
         return { isVisible: !currentData.isVisible };
       },
@@ -543,10 +543,10 @@ export class GameWorldController {
   });
 
   static toggleMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -564,7 +564,7 @@ export class GameWorldController {
       authenticatedUserId,
       environment,
       'g_game_worlds',
-      String(id),
+      id,
       async (currentData: any) => {
         return { isMaintenance: !currentData.isMaintenance };
       },
@@ -603,10 +603,10 @@ export class GameWorldController {
   });
 
   static updateMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -677,7 +677,7 @@ export class GameWorldController {
       authenticatedUserId,
       environment,
       'g_game_worlds',
-      String(id),
+      id,
       updateData,
       async (processedData: any) => {
         const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
@@ -741,10 +741,10 @@ export class GameWorldController {
   });
 
   static moveUp = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
@@ -762,10 +762,10 @@ export class GameWorldController {
   });
 
   static moveDown = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 

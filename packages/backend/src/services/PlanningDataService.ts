@@ -18,7 +18,7 @@ export interface RewardTypeInfo {
 }
 
 export interface RewardItem {
-  id: number;
+  id: string;
   name: string;
   nameKr?: string; // Korean name (original)
   nameEn?: string; // English name (from localization)
@@ -605,7 +605,7 @@ export class PlanningDataService {
     environment: string,
     files: any,
     uploadInfo?: {
-      uploadedBy?: number;
+      uploadedBy?: string;
       uploaderName?: string;
       uploadSource?: 'web' | 'cli';
       uploadComment?: string;

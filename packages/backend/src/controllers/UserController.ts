@@ -26,11 +26,11 @@ const updateUserSchema = Joi.object({
   role: Joi.string().valid('admin', 'user').optional(),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional(),
   email_verified: Joi.boolean().optional(),
-  tagIds: Joi.array().items(Joi.number().integer().positive()).optional(),
+  tagIds: Joi.array().items(Joi.string()).optional(),
 });
 
 const setUserTagsSchema = Joi.object({
-  tagIds: Joi.array().items(Joi.number().integer().positive()).required(),
+  tagIds: Joi.array().items(Joi.string()).required(),
 });
 
 const updateLanguageSchema = Joi.object({
@@ -38,11 +38,11 @@ const updateLanguageSchema = Joi.object({
 });
 
 const addUserTagSchema = Joi.object({
-  tagId: Joi.number().integer().positive().required(),
+  tagId: Joi.string().required(),
 });
 
 const verifyEmailSchema = Joi.object({
-  userId: Joi.number().integer().positive().required(),
+  userId: Joi.string().required(),
 });
 
 const createUserSchema = Joi.object({
@@ -55,7 +55,7 @@ const createUserSchema = Joi.object({
     .optional()
     .default('active'),
   emailVerified: Joi.boolean().optional().default(true),
-  tagIds: Joi.array().items(Joi.number().integer().positive()).optional().default([]),
+  tagIds: Joi.array().items(Joi.string()).optional().default([]),
 });
 
 const setEnvironmentAccessSchema = Joi.object({
@@ -121,9 +121,9 @@ export class UserController {
   });
 
   static getUserById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -136,9 +136,9 @@ export class UserController {
   });
 
   static updateUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -190,9 +190,9 @@ export class UserController {
   });
 
   static deleteUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -210,9 +210,9 @@ export class UserController {
   });
 
   static approveUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -227,9 +227,9 @@ export class UserController {
   });
 
   static rejectUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -242,9 +242,9 @@ export class UserController {
   });
 
   static suspendUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -263,9 +263,9 @@ export class UserController {
   });
 
   static unsuspendUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -280,9 +280,9 @@ export class UserController {
   });
 
   static promoteToAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -296,9 +296,9 @@ export class UserController {
   });
 
   static demoteFromAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -417,9 +417,9 @@ export class UserController {
 
   // 태그 관련 엔드포인트들
   static getUserTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -432,9 +432,9 @@ export class UserController {
   });
 
   static setUserTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -455,9 +455,9 @@ export class UserController {
   });
 
   static addUserTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -478,10 +478,10 @@ export class UserController {
   });
 
   static removeUserTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-    const tagId = parseInt(req.params.tagId);
+    const userId = req.params.id;
+    const tagId = req.params.tagId;
 
-    if (isNaN(userId) || isNaN(tagId)) {
+    if (!userId || !tagId) {
       throw new GatrixError('Invalid user ID or tag ID', 400);
     }
 
@@ -495,9 +495,9 @@ export class UserController {
 
   // 관리자가 사용자 이메일을 강제 인증 처리
   static verifyUserEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -512,9 +512,9 @@ export class UserController {
   // 사용자에게 이메일 인증 메일 재전송
   static resendVerificationEmail = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -556,8 +556,8 @@ export class UserController {
    * Get user's environment access settings
    */
   static getEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
+    const userId = req.params.id;
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -573,8 +573,8 @@ export class UserController {
    * Set user's environment access
    */
   static setEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
+    const userId = req.params.id;
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 

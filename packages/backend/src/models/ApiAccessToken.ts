@@ -17,8 +17,8 @@ export interface ApiAccessTokenData {
   lastUsedAt?: Date;
   usageCount?: number;
   allowAllEnvironments: boolean;
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -35,8 +35,8 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   lastUsedAt?: Date;
   usageCount?: number;
   allowAllEnvironments!: boolean;
-  createdBy!: number;
-  updatedBy?: number;
+  createdBy!: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -164,7 +164,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     tokenName: string;
     tokenType: TokenType;
     expiresAt?: Date;
-    createdBy: number;
+    createdBy: string;
     allowAllEnvironments?: boolean;
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
     // Generate token

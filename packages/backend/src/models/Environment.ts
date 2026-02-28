@@ -25,15 +25,17 @@ export interface EnvironmentData {
   strictConflictCheck?: boolean; // CR version conflict check strictness
   enableSoftLock?: boolean; // Soft lock for concurrent editing
   enableHardLock?: boolean; // Hard lock warning for pending CRs
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export class Environment extends Model implements EnvironmentData {
   static tableName = 'g_environments';
-  static idColumn = 'environment';
+  static idColumn = 'id';
+
+  id!: string;
 
   environment!: string;
   displayName!: string;
@@ -50,8 +52,8 @@ export class Environment extends Model implements EnvironmentData {
   strictConflictCheck?: boolean; // CR version conflict check strictness
   enableSoftLock?: boolean; // Soft lock for concurrent editing
   enableHardLock?: boolean; // Hard lock warning for pending CRs
-  createdBy!: number;
-  updatedBy?: number;
+  createdBy!: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -63,7 +65,8 @@ export class Environment extends Model implements EnvironmentData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environment', 'displayName', 'createdBy'],
+      required: ['environment', 'displayName'],
+
       properties: {
         environment: {
           type: 'string',
@@ -88,8 +91,8 @@ export class Environment extends Model implements EnvironmentData {
         strictConflictCheck: { type: 'boolean' },
         enableSoftLock: { type: 'boolean' },
         enableHardLock: { type: 'boolean' },
-        createdBy: { type: 'integer' },
-        updatedBy: { type: ['integer', 'null'] },
+        createdBy: { type: 'string' },
+        updatedBy: { type: ['string', 'null'] },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' },
       },
@@ -127,6 +130,9 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   $beforeInsert() {
+    if (!this.id) {
+      this.id = ulid();
+    }
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -229,7 +235,7 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Update environment
    */
-  async updateEnvironment(data: Partial<EnvironmentData>, updatedBy: number): Promise<Environment> {
+  async updateEnvironment(data: Partial<EnvironmentData>, updatedBy: string): Promise<Environment> {
     // If setting as default, unset other defaults
     if (data.isDefault) {
       await Environment.query().patch({ isDefault: false });
@@ -262,8 +268,8 @@ export class Environment extends Model implements EnvironmentData {
     featureSegments: { count: number; items: Array<{ id: string; segmentName: string }> };
     featureMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
     featureVariantMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
-    networkTraffic: { count: number; items: Array<{ id: number; appName: string }> };
-    unknownFlags: { count: number; items: Array<{ id: number; flagName: string }> };
+    networkTraffic: { count: number; items: Array<{ id: string; appName: string }> };
+    unknownFlags: { count: number; items: Array<{ id: string; flagName: string }> };
     changeRequests: { count: number; items: Array<{ id: string; title: string }> };
     entityLocks: { count: number; items: Array<{ id: string; entityType: string }> };
     messageTemplates: {
@@ -300,7 +306,7 @@ export class Environment extends Model implements EnvironmentData {
     };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
     serverLifecycleEvents: { count: number; items: Array<{ id: string; eventType: string }> };
-    userEnvironments: { count: number; items: Array<{ id: string; userId: number }> };
+    userEnvironments: { count: number; items: Array<{ id: string; userId: string }> };
     auditLogs: { count: number; items: Array<{ id: string; action: string }> };
     total: number;
   }> {
@@ -399,8 +405,8 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; segmentName: string }>('g_feature_segments', ['id', 'segmentName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', ['id', 'flagName']),
-      safeQuery<{ id: number; appName: string }>('NetworkTraffic', ['id', 'appName']),
-      safeQuery<{ id: number; flagName: string }>('unknown_flags', ['id', 'flagName']),
+      safeQuery<{ id: string; appName: string }>('NetworkTraffic', ['id', 'appName']),
+      safeQuery<{ id: string; flagName: string }>('unknown_flags', ['id', 'flagName']),
       safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),
       safeQuery<{ id: string; entityType: string }>('g_entity_locks', ['id', 'entityType']),
       safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
@@ -431,7 +437,7 @@ export class Environment extends Model implements EnvironmentData {
         'id',
         'eventType',
       ]),
-      safeQuery<{ id: string; userId: number }>('g_user_environments', ['id', 'userId']),
+      safeQuery<{ id: string; userId: string }>('g_user_environments', ['id', 'userId']),
       safeQuery<{ id: string; action: string }>('g_audit_logs', ['id', 'action']),
     ]);
 

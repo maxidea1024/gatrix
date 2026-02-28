@@ -45,7 +45,7 @@ export class GameWorldService {
     }
   }
 
-  static async getGameWorldById(id: number, environment: string): Promise<GameWorld> {
+  static async getGameWorldById(id: string, environment: string): Promise<GameWorld> {
     try {
       const world = await GameWorldModel.findById(id, environment);
       if (!world) {
@@ -122,7 +122,7 @@ export class GameWorldService {
   }
 
   static async updateGameWorld(
-    id: number,
+    id: string,
     worldData: UpdateGameWorldData,
     environment: string
   ): Promise<GameWorld> {
@@ -171,7 +171,7 @@ export class GameWorldService {
     }
   }
 
-  static async deleteGameWorld(id: number, environment: string): Promise<void> {
+  static async deleteGameWorld(id: string, environment: string): Promise<void> {
     try {
       // Check if game world exists
       const existingWorld = await GameWorldModel.findById(id, environment);
@@ -206,7 +206,7 @@ export class GameWorldService {
     }
   }
 
-  static async toggleVisibility(id: number, environment: string): Promise<GameWorld> {
+  static async toggleVisibility(id: string, environment: string): Promise<GameWorld> {
     logger.info(`toggleVisibility called for id: ${id}`);
     try {
       const world = await GameWorldModel.findById(id, environment);
@@ -260,7 +260,7 @@ export class GameWorldService {
     }
   }
 
-  static async toggleMaintenance(id: number, environment: string): Promise<GameWorld> {
+  static async toggleMaintenance(id: string, environment: string): Promise<GameWorld> {
     try {
       const world = await GameWorldModel.findById(id, environment);
       if (!world) {
@@ -304,7 +304,7 @@ export class GameWorldService {
   }
 
   static async updateDisplayOrders(
-    orderUpdates: { id: number; displayOrder: number }[],
+    orderUpdates: { id: string; displayOrder: number }[],
     environment: string
   ): Promise<void> {
     try {
@@ -330,7 +330,7 @@ export class GameWorldService {
     }
   }
 
-  static async moveUp(id: number, environment: string): Promise<boolean> {
+  static async moveUp(id: string, environment: string): Promise<boolean> {
     try {
       const result = await GameWorldModel.moveUp(id, environment);
 
@@ -345,7 +345,7 @@ export class GameWorldService {
     }
   }
 
-  static async moveDown(id: number, environment: string): Promise<boolean> {
+  static async moveDown(id: string, environment: string): Promise<boolean> {
     try {
       const result = await GameWorldModel.moveDown(id, environment);
 
@@ -396,7 +396,7 @@ export class GameWorldService {
    * @returns Maintenance message or null if not found
    */
   static async getMaintenanceMessage(
-    worldId: number,
+    worldId: string,
     environment: string,
     lang: string = 'en'
   ): Promise<string | null> {

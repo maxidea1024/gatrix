@@ -5,12 +5,7 @@ import { parseJsonField } from '../utils/dbUtils';
 
 // Re-export shared types for backward compatibility
 // All consumers that import from this file still work unchanged
-export type {
-  ValueType,
-  ConstraintOperator,
-  StrategyParameters,
-  Constraint,
-} from '@gatrix/shared';
+export type { ValueType, ConstraintOperator, StrategyParameters, Constraint } from '@gatrix/shared';
 
 import type { Constraint, StrategyParameters, ValueType } from '@gatrix/shared';
 
@@ -81,9 +76,9 @@ export interface FeatureFlagAttributes {
   disabledValue: any; // Value when flag evaluates to false
   useFixedWeightVariants: boolean; // Whether variants use fixed weight ratios
   validationRules?: ValidationRules; // Type-specific validation rules
-  createdBy: number;
+  createdBy: string;
   createdByName?: string; // Joined from g_users
-  updatedBy?: number;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
   version?: number;
@@ -124,8 +119,8 @@ export interface FeatureStrategyAttributes {
   constraints?: Constraint[];
   sortOrder: number;
   isEnabled: boolean;
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
   // Relations - segment names returned from enrichStrategiesWithSegments
@@ -141,8 +136,8 @@ export interface FeatureVariantAttributes {
   weight: number;
   value?: any;
   valueType: ValueType;
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -156,8 +151,8 @@ export interface FeatureSegmentAttributes {
   constraints: Constraint[];
   isActive: boolean;
   tags?: string[];
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -173,8 +168,8 @@ export interface FeatureContextFieldAttributes {
   stickiness: boolean;
   isEnabled?: boolean;
   sortOrder: number;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -467,16 +462,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-            {
-              id: envSettings.id,
-              flagId: id,
-              environment,
-              isEnabled: Boolean(envSettings.isEnabled),
-              enabledValue: parseJsonField(envSettings.enabledValue),
-              disabledValue: parseJsonField(envSettings.disabledValue),
-              lastSeenAt: envSettings.lastSeenAt,
-            },
-          ]
+              {
+                id: envSettings.id,
+                flagId: id,
+                environment,
+                isEnabled: Boolean(envSettings.isEnabled),
+                enabledValue: parseJsonField(envSettings.enabledValue),
+                disabledValue: parseJsonField(envSettings.disabledValue),
+                lastSeenAt: envSettings.lastSeenAt,
+              },
+            ]
           : [],
       };
     } catch (error) {
@@ -1193,9 +1188,7 @@ export class FeatureSegmentModel {
   /**
    * Get detailed references for a segment (flags and release templates that use it)
    */
-  static async getReferences(
-    id: string
-  ): Promise<{
+  static async getReferences(id: string): Promise<{
     flags: { flagName: string; environment: string; strategyName: string }[];
     templates: { flowName: string; id: string; milestoneName: string }[];
   }> {
@@ -1386,9 +1379,7 @@ export class FeatureContextFieldModel {
    * Get detailed references for a context field
    * Searches strategy constraints, segment constraints, and release template strategy constraints
    */
-  static async getReferences(
-    fieldName: string
-  ): Promise<{
+  static async getReferences(fieldName: string): Promise<{
     flags: { flagName: string; environment: string; strategyName: string }[];
     segments: { segmentName: string; id: string }[];
     templates: { flowName: string; id: string; milestoneName: string }[];
@@ -1400,10 +1391,9 @@ export class FeatureContextFieldModel {
         .where('ff.isArchived', false)
         .whereNotNull('fs.constraints')
         .where('fs.constraints', '!=', '[]')
-        .whereRaw(
-          `JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
-          [fieldName]
-        )
+        .whereRaw(`JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`, [
+          fieldName,
+        ])
         .select('ff.flagName', 'fs.environment', 'fs.strategyName')
         .groupBy('ff.flagName', 'fs.environment', 'fs.strategyName');
 
@@ -1411,10 +1401,9 @@ export class FeatureContextFieldModel {
       const segmentRows = await db('g_feature_segments')
         .whereNotNull('constraints')
         .where('constraints', '!=', '[]')
-        .whereRaw(
-          `JSON_SEARCH(constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
-          [fieldName]
-        )
+        .whereRaw(`JSON_SEARCH(constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`, [
+          fieldName,
+        ])
         .select('segmentName', 'id');
 
       // Find release flow templates referencing this context field in strategy constraints
@@ -1425,10 +1414,9 @@ export class FeatureContextFieldModel {
         .where('rf.isArchived', false)
         .whereNotNull('rs.constraints')
         .where('rs.constraints', '!=', '[]')
-        .whereRaw(
-          `JSON_SEARCH(rs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`,
-          [fieldName]
-        )
+        .whereRaw(`JSON_SEARCH(rs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`, [
+          fieldName,
+        ])
         .select('rf.flowName', 'rf.id', 'rm.name as milestoneName')
         .groupBy('rf.flowName', 'rf.id', 'rm.name');
 

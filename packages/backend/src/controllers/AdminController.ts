@@ -20,7 +20,7 @@ const setEnvironmentAccessSchema = Joi.object({
 const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
 
 // Helper function to check if a user is the super admin
-const isSuperAdminUser = async (userId: number): Promise<boolean> => {
+const isSuperAdminUser = async (userId: string): Promise<boolean> => {
   const user = await db('g_users').where('id', userId).select('email').first();
   return user?.email === SUPER_ADMIN_EMAIL;
 };
@@ -155,7 +155,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const user = await UserService.getUserById(userId);
 
       res.json({
@@ -228,7 +228,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const { tagIds, ...updates } = req.body;
 
       if (!req.user?.userId) {
@@ -279,7 +279,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
       // Prevent admin from deleting themselves
       if (req.user?.userId === userId) {
@@ -308,7 +308,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
       // Protect super admin from being modified by others
       if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
@@ -332,7 +332,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
       // Prevent admin from suspending themselves
       if (req.user?.userId === userId) {
@@ -370,7 +370,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       await UserService.promoteToAdmin(userId);
 
       // Send real-time notification to the affected user
@@ -398,7 +398,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
       // Prevent admin from demoting themselves
       if (req.user?.userId === userId) {
@@ -432,9 +432,9 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (!userId || isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -699,7 +699,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       await UserService.activateUser(userId);
 
       res.json({
@@ -717,7 +717,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       await UserService.deleteUser(userId);
 
       res.json({
@@ -1104,8 +1104,8 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
+      const userId = req.params.id;
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -1129,8 +1129,8 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
+      const userId = req.params.id;
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -1193,9 +1193,9 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -1228,9 +1228,9 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 

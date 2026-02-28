@@ -31,7 +31,7 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const actionSet = await ActionSetModel.findById(id);
 
     if (!actionSet) {
@@ -52,7 +52,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Name is required' });
@@ -88,9 +88,9 @@ router.post('/', async (req: Request, res: Response) => {
  */
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     const actionSet = await ActionSetModel.update(id, {
       name,
@@ -122,7 +122,7 @@ router.put('/:id', async (req: Request, res: Response) => {
  */
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const success = await ActionSetModel.delete(id);
 
     if (!success) {
@@ -142,8 +142,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
  */
 router.post('/:id/toggle', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
-    const user = req.user as { id: number; name: string };
+    const id = req.params.id;
+    const user = req.user as { id: string; name: string };
 
     const actionSet = await ActionSetModel.toggleEnabled(id, user.id);
 
@@ -164,7 +164,7 @@ router.post('/:id/toggle', async (req: Request, res: Response) => {
  */
 router.get('/:id/events', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
 

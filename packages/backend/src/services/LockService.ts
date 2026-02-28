@@ -12,7 +12,7 @@ export interface LockCheckResult {
   isLocked: boolean;
   lockType?: LockType;
   lockedBy?: {
-    id: number;
+    id: string;
     name?: string;
     email?: string;
   };
@@ -25,7 +25,7 @@ export interface AcquireLockOptions {
   entityType: string;
   entityId: string;
   environment: string;
-  userId: number;
+  userId: string;
   lockType?: LockType;
   expiresInMinutes?: number;
 }
@@ -38,7 +38,7 @@ export class LockService {
     entityType: string,
     entityId: string,
     environment: string,
-    currentUserId?: number
+    currentUserId?: string
   ): Promise<LockCheckResult> {
     const lock = await EntityLock.query()
       .where('entityType', entityType)
@@ -174,7 +174,7 @@ export class LockService {
     entityType: string,
     entityId: string,
     environment: string,
-    userId?: number
+    userId?: string
   ): Promise<boolean> {
     let query = EntityLock.query()
       .where('entityType', entityType)
@@ -213,14 +213,14 @@ export class LockService {
   /**
    * Get all locks for a user
    */
-  static async getUserLocks(userId: number): Promise<EntityLock[]> {
+  static async getUserLocks(userId: string): Promise<EntityLock[]> {
     return await EntityLock.query().where('lockedBy', userId).orderBy('createdAt', 'desc');
   }
 
   /**
    * Release all locks for a user (e.g., on logout)
    */
-  static async releaseAllUserLocks(userId: number): Promise<number> {
+  static async releaseAllUserLocks(userId: string): Promise<number> {
     const deleted = await EntityLock.query().where('lockedBy', userId).delete();
 
     if (deleted > 0) {

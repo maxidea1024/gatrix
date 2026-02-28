@@ -23,7 +23,7 @@ export type StandardEventType =
   | 'whitelist.updated';
 
 export interface StandardEventData {
-  id: number | string;
+  id: string;
   timestamp: number;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
   isActive?: boolean | number; // For survey.updated events (MySQL returns 0/1)

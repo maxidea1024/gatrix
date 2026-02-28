@@ -10,7 +10,7 @@ export interface TriggerCondition {
 
 export interface Reward {
   type: string;
-  id: number;
+  id: string;
   quantity: number;
 }
 
@@ -43,8 +43,8 @@ export interface Survey {
   targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
 export interface SurveyConfig {
@@ -73,7 +73,7 @@ export interface CreateSurveyInput {
   targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
-  createdBy?: number;
+  createdBy?: string;
   environment: string;
 }
 
@@ -96,7 +96,7 @@ export interface UpdateSurveyInput {
   targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export class SurveyService {

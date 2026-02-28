@@ -13,8 +13,8 @@ export interface Integration {
   parameters: Record<string, any>;
   events: string[];
   environments: string[];
-  createdBy: number | null;
-  updatedBy: number | null;
+  createdBy: string | null;
+  updatedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
   // Joined fields
@@ -34,7 +34,7 @@ export interface CreateIntegrationData {
   parameters: Record<string, any>;
   events: string[];
   environments?: string[];
-  createdBy?: number;
+  createdBy?: string;
 }
 
 export interface UpdateIntegrationData {
@@ -44,7 +44,7 @@ export interface UpdateIntegrationData {
   parameters?: Record<string, any>;
   events?: string[];
   environments?: string[];
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export class IntegrationModel {
@@ -265,7 +265,7 @@ export class IntegrationModel {
   /**
    * Toggle integration enabled status
    */
-  static async toggleEnabled(id: string, updatedBy?: number): Promise<Integration | null> {
+  static async toggleEnabled(id: string, updatedBy?: string): Promise<Integration | null> {
     try {
       const existing = await this.findById(id);
       if (!existing) {

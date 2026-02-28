@@ -14,7 +14,7 @@ export interface StoreProduct {
   environment: string;
   isActive: boolean;
   productId: string;
-  cmsProductId: number | null;
+  cmsProductId: string | null;
   productName: string;
   // Multi-language name fields
   nameKo: string | null;
@@ -31,8 +31,8 @@ export interface StoreProduct {
   descriptionEn: string | null;
   descriptionZh: string | null;
   metadata: Record<string, any> | null;
-  createdBy: number | null;
-  updatedBy: number | null;
+  createdBy: string | null;
+  updatedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
   tags?: any[];
@@ -57,7 +57,7 @@ export interface CreateStoreProductInput {
   descriptionEn?: string;
   descriptionZh?: string;
   metadata?: Record<string, any>;
-  createdBy?: number;
+  createdBy?: string;
   environment: string;
 }
 
@@ -80,7 +80,7 @@ export interface UpdateStoreProductInput {
   descriptionEn?: string;
   descriptionZh?: string;
   metadata?: Record<string, any>;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export interface GetStoreProductsParams {
@@ -633,7 +633,7 @@ class StoreProductService {
   static async toggleActive(
     id: string,
     isActive: boolean,
-    updatedBy: number,
+    updatedBy: string,
     environment: string
   ): Promise<StoreProduct> {
     return this.updateStoreProduct(id, { isActive, updatedBy }, environment);
@@ -645,7 +645,7 @@ class StoreProductService {
   static async bulkUpdateActiveStatus(
     ids: string[],
     isActive: boolean,
-    updatedBy: number,
+    updatedBy: string,
     environment: string
   ): Promise<number> {
     const pool = database.getPool();
@@ -706,7 +706,7 @@ class StoreProductService {
       targetIsActive: boolean;
       environment: string;
     },
-    updatedBy?: number
+    updatedBy?: string
   ): Promise<{ affectedCount: number; affectedIds: string[] }> {
     const pool = database.getPool();
     const environment = params.environment;
@@ -848,12 +848,12 @@ class StoreProductService {
       const dbProducts = rows as StoreProduct[];
 
       // Create maps for comparison - use id as key (productCode can be duplicated)
-      const planningMap = new Map<number, CmsCashShopProduct>();
+      const planningMap = new Map<string, CmsCashShopProduct>();
       for (const p of planningProducts) {
         planningMap.set(p.id, p);
       }
 
-      const dbMap = new Map<number, StoreProduct>();
+      const dbMap = new Map<string, StoreProduct>();
       for (const p of dbProducts) {
         if (p.cmsProductId !== null) {
           dbMap.set(p.cmsProductId, p);
@@ -1005,7 +1005,7 @@ class StoreProductService {
    */
   static async applySync(
     environment: string,
-    userId?: number,
+    userId?: string,
     selected?: SelectedSyncItems
   ): Promise<SyncApplyResult> {
     const pool = database.getPool();
@@ -1164,12 +1164,12 @@ export interface SyncAddItem {
   descriptionKo: string | null;
   descriptionEn: string | null;
   descriptionZh: string | null;
-  cmsProductId: number;
+  cmsProductId: string;
 }
 
 export interface SyncUpdateItem {
   id: string;
-  cmsProductId: number;
+  cmsProductId: string;
   productCode: string;
   name: string;
   changes: SyncChange[];
@@ -1177,7 +1177,7 @@ export interface SyncUpdateItem {
 
 export interface SyncDeleteItem {
   id: string;
-  cmsProductId: number | null;
+  cmsProductId: string | null;
   productCode: string;
   name: string;
 }
@@ -1202,8 +1202,8 @@ export interface SyncApplyResult {
 }
 
 export interface SelectedSyncItems {
-  toAdd: number[]; // cmsProductId array
-  toUpdate: number[]; // cmsProductId array
+  toAdd: string[]; // cmsProductId array
+  toUpdate: string[]; // cmsProductId array
   toDelete: string[]; // id array
 }
 

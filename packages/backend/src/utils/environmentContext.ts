@@ -83,7 +83,7 @@ export async function getAllEnvironments(db: any): Promise<string[]> {
  */
 export async function hasEnvironmentAccess(
   _db: any,
-  _userId: number,
+  _userId: string,
   _environment: string
 ): Promise<boolean> {
   // TODO: Implement environment access control based on user roles and token permissions

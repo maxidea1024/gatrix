@@ -38,7 +38,7 @@ const createIngamePopupNoticeSchema = Joi.object({
   showOnce: Joi.boolean().optional(),
   startDate: Joi.string().isoDate().optional().allow(null, ''),
   endDate: Joi.string().isoDate().optional().allow(null, ''),
-  messageTemplateId: Joi.number().integer().positive().optional().allow(null),
+  messageTemplateId: Joi.string().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),
 });
@@ -60,7 +60,7 @@ const updateIngamePopupNoticeSchema = Joi.object({
   showOnce: Joi.boolean().optional(),
   startDate: Joi.string().isoDate().optional().allow(null, ''),
   endDate: Joi.string().isoDate().optional().allow(null, ''),
-  messageTemplateId: Joi.number().integer().positive().optional().allow(null),
+  messageTemplateId: Joi.string().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),
 });
@@ -133,7 +133,7 @@ class IngamePopupNoticeController {
    */
   async getIngamePopupNoticeById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
 
       if (!environment) {
@@ -233,7 +233,7 @@ class IngamePopupNoticeController {
    */
   async updateIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
 
       if (!environment) {
@@ -260,7 +260,7 @@ class IngamePopupNoticeController {
         updatedBy,
         environment,
         'g_ingame_popup_notices',
-        String(id),
+        id,
         data,
         async (processedData: any) => {
           const notice = await IngamePopupNoticeService.updateIngamePopupNotice(
@@ -310,7 +310,7 @@ class IngamePopupNoticeController {
    */
   async deleteIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
       const userId = req.user?.userId;
 
@@ -327,7 +327,7 @@ class IngamePopupNoticeController {
         userId,
         environment,
         'g_ingame_popup_notices',
-        String(id),
+        id,
         async () => {
           await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
 
@@ -392,7 +392,7 @@ class IngamePopupNoticeController {
             userId,
             environment,
             'g_ingame_popup_notices',
-            String(id),
+            id,
             async () => {
               await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
             }
@@ -425,7 +425,7 @@ class IngamePopupNoticeController {
    */
   async toggleActive(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
       const userId = req.user?.userId;
 
@@ -442,7 +442,7 @@ class IngamePopupNoticeController {
         userId,
         environment,
         'g_ingame_popup_notices',
-        String(id),
+        id,
         async (currentNotice: any) => {
           return { isActive: !currentNotice.isActive };
         },
@@ -540,7 +540,7 @@ class IngamePopupNoticeController {
    */
   async getServerIngamePopupNoticeById(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment!;
       const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
 

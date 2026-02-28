@@ -18,9 +18,9 @@ export interface SSENotificationBusMessage {
   type: string;
   data: any;
   timestamp?: number; // epoch ms
-  targetUsers?: number[];
+  targetUsers?: string[];
   targetChannels?: string[];
-  excludeUsers?: number[];
+  excludeUsers?: string[];
   originServerId?: string;
 }
 
@@ -513,7 +513,7 @@ export class PubSubService extends EventEmitter {
    */
   async publishEvent(event: {
     type: string;
-    data: { id: number | string; timestamp: number;[key: string]: any };
+    data: { id: string; timestamp: number; [key: string]: any };
   }): Promise<void> {
     try {
       const client = redisClient.getClient();

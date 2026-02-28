@@ -9,7 +9,7 @@ export class SessionManager {
   /**
    * Get all active sessions for a user
    */
-  static async getUserSessions(userId: number): Promise<string[]> {
+  static async getUserSessions(userId: string): Promise<string[]> {
     try {
       const client = redisClient.getClient();
       const sessionIds = await client.sMembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
@@ -23,7 +23,7 @@ export class SessionManager {
   /**
    * Add session to user's active sessions
    */
-  static async addUserSession(userId: number, sessionId: string): Promise<void> {
+  static async addUserSession(userId: string, sessionId: string): Promise<void> {
     try {
       const client = redisClient.getClient();
       const userSessionsKey = `${this.USER_SESSIONS_PREFIX}${userId}`;
@@ -41,7 +41,7 @@ export class SessionManager {
   /**
    * Remove session from user's active sessions
    */
-  static async removeUserSession(userId: number, sessionId: string): Promise<void> {
+  static async removeUserSession(userId: string, sessionId: string): Promise<void> {
     try {
       const client = redisClient.getClient();
       const userSessionsKey = `${this.USER_SESSIONS_PREFIX}${userId}`;
@@ -61,7 +61,7 @@ export class SessionManager {
   /**
    * Destroy all sessions for a user (useful for logout all devices)
    */
-  static async destroyAllUserSessions(userId: number): Promise<void> {
+  static async destroyAllUserSessions(userId: string): Promise<void> {
     try {
       const client = redisClient.getClient();
       const sessionIds = await this.getUserSessions(userId);
@@ -110,7 +110,7 @@ export class SessionManager {
   /**
    * Get active session count for a user
    */
-  static async getUserSessionCount(userId: number): Promise<number> {
+  static async getUserSessionCount(userId: string): Promise<number> {
     try {
       const client = redisClient.getClient();
       return await client.sCard(`${this.USER_SESSIONS_PREFIX}${userId}`);

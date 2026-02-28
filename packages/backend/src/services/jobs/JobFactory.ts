@@ -10,11 +10,11 @@ export interface JobExecutionResult {
 
 // Job 실행 컨텍스트
 export interface JobExecutionContext {
-  jobId: number;
+  jobId: string;
   jobName: string;
   jobType: string;
   jobDataMap: any;
-  executionId: number;
+  executionId: string;
   retryAttempt: number;
   maxRetryCount: number;
   timeoutSeconds: number;

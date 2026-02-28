@@ -145,13 +145,13 @@ export interface CrashDetail extends ClientCrash {
  * Crash retention settings
  */
 export interface CrashRetentionSettings {
-  id: number;
+  id: string;
   crashEventsRetentionDays: number; // Retention period for crash events in days
   crashesRetentionDays: number; // Retention period for crashes in days
   stackFilesRetentionDays: number; // Retention period for stack files in days
   logFilesRetentionDays: number; // Retention period for log files in days
   updatedAt: Date;
-  updatedBy?: number; // User ID who updated settings
+  updatedBy?: string; // User ID who updated settings
 }
 
 /**

@@ -31,7 +31,7 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const account = await ServiceAccountModel.findById(id);
 
     if (!account) {
@@ -52,7 +52,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, role, permissions, allowAllEnvironments, environments } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Name is required' });
@@ -81,9 +81,9 @@ router.post('/', async (req: Request, res: Response) => {
  */
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const { name, role, permissions, allowAllEnvironments, environments } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     const account = await ServiceAccountModel.update(id, {
       name,
@@ -112,7 +112,7 @@ router.put('/:id', async (req: Request, res: Response) => {
  */
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const success = await ServiceAccountModel.delete(id);
 
     if (!success) {
@@ -132,9 +132,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
  */
 router.post('/:id/tokens', async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
     const { name, description, expiresAt } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Token name is required' });
@@ -175,8 +175,8 @@ router.post('/:id/tokens', async (req: Request, res: Response) => {
  */
 router.delete('/:id/tokens/:tokenId', async (req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.id);
-    const tokenId = parseInt(req.params.tokenId);
+    const userId = req.params.id;
+    const tokenId = req.params.tokenId;
 
     const success = await ServiceAccountModel.deleteToken(tokenId, userId);
 

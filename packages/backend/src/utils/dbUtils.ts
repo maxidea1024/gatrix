@@ -10,6 +10,13 @@
  * See ISSUES.md for details.
  */
 export function parseJsonField<T>(value: any): T | undefined {
-  if (value === null || value === undefined || value === 'null') return undefined;
+  if (value === null || value === undefined || value === 'null') {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    return JSON.parse(value);
+  }
+
   return value as T;
 }

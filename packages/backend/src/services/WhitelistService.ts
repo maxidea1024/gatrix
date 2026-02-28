@@ -41,7 +41,7 @@ export class WhitelistService {
     }
   }
 
-  static async getWhitelistById(id: number, environment: string): Promise<Whitelist> {
+  static async getWhitelistById(id: string, environment: string): Promise<Whitelist> {
     try {
       const whitelist = await WhitelistModel.findById(id, environment);
       if (!whitelist) {
@@ -105,7 +105,7 @@ export class WhitelistService {
   }
 
   static async updateWhitelist(
-    id: number,
+    id: string,
     environment: string,
     data: UpdateWhitelistData
   ): Promise<Whitelist> {
@@ -159,7 +159,7 @@ export class WhitelistService {
     }
   }
 
-  static async deleteWhitelist(id: number, environment: string): Promise<void> {
+  static async deleteWhitelist(id: string, environment: string): Promise<void> {
     try {
       // Check if whitelist exists
       const existing = await this.getWhitelistById(id, environment);
@@ -203,7 +203,7 @@ export class WhitelistService {
   static async bulkCreateWhitelists(
     environment: string,
     entries: BulkCreateEntry[],
-    createdBy: number
+    createdBy: string
   ): Promise<number> {
     try {
       if (entries.length === 0) {
@@ -275,9 +275,9 @@ export class WhitelistService {
    * Toggle enabled status of account whitelist entry
    */
   static async toggleWhitelistStatus(
-    id: number,
+    id: string,
     environment: string,
-    updatedBy: number
+    updatedBy: string
   ): Promise<Whitelist> {
     try {
       const existing = await this.getWhitelistById(id, environment);

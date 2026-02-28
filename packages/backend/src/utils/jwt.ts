@@ -4,40 +4,43 @@ import logger from '../config/logger';
 import { UserWithoutPassword } from '../types/user';
 
 export interface JwtPayload {
-  userId: number;
+  userId: string;
   email: string;
-  role: string;
+  orgId: string;
+  orgRole: string;
   iat?: number;
   exp?: number;
 }
 
 export class JwtUtils {
-  static generateToken(user: UserWithoutPassword): string {
+  static generateToken(user: UserWithoutPassword, orgId: string, orgRole: string): string {
     const payload: JwtPayload = {
-      userId: user.id,
+      userId: user.id as any,
       email: user.email,
-      role: user.role,
+      orgId,
+      orgRole,
     };
 
     const options: jwt.SignOptions = {
       expiresIn: config.jwt.expiresIn as any,
-      issuer: 'admin-panel',
-      audience: 'admin-panel-users',
+      issuer: 'gatrix',
+      audience: 'gatrix-users',
     };
     return jwt.sign(payload, config.jwt.secret as string, options);
   }
 
-  static generateRefreshToken(user: UserWithoutPassword): string {
+  static generateRefreshToken(user: UserWithoutPassword, orgId: string, orgRole: string): string {
     const payload: JwtPayload = {
-      userId: user.id,
+      userId: user.id as any,
       email: user.email,
-      role: user.role,
+      orgId,
+      orgRole,
     };
 
     const options: jwt.SignOptions = {
-      expiresIn: '30d', // Refresh token expires in 30 days
-      issuer: 'admin-panel',
-      audience: 'admin-panel-refresh',
+      expiresIn: '30d',
+      issuer: 'gatrix',
+      audience: 'gatrix-refresh',
     };
     return jwt.sign(payload, config.jwt.secret as string, options);
   }
@@ -50,13 +53,14 @@ export class JwtUtils {
       });
 
       const decoded = jwt.verify(token, config.jwt.secret as string, {
-        issuer: 'admin-panel',
-        audience: 'admin-panel-users',
+        issuer: 'gatrix',
+        audience: 'gatrix-users',
       }) as JwtPayload & { exp: number; iat: number };
 
       logger.debug('JWT token verified successfully:', {
         userId: decoded.userId,
-        role: decoded.role,
+        orgId: decoded.orgId,
+        orgRole: decoded.orgRole,
         exp: decoded.exp,
         iat: decoded.iat,
         expiresAt: new Date(decoded.exp * 1000).toISOString(),
@@ -89,8 +93,8 @@ export class JwtUtils {
   static verifyRefreshToken(token: string): JwtPayload | null {
     try {
       const decoded = jwt.verify(token, config.jwt.secret as string, {
-        issuer: 'admin-panel',
-        audience: 'admin-panel-refresh',
+        issuer: 'gatrix',
+        audience: 'gatrix-refresh',
       }) as JwtPayload;
 
       return decoded;

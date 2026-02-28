@@ -1351,7 +1351,7 @@ class ConsoleService {
         timestamp = new Date(input).getTime();
       }
 
-      if (isNaN(timestamp)) {
+      if (!timestamp) {
         return { output: '\u001b[31mError:\u001b[0m Invalid timestamp' };
       }
 

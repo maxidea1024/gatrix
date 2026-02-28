@@ -1,15 +1,16 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 
 export interface TagAttributes {
-  id: number;
+  id: string;
   // Global tag, no environmentId
   name: string;
   color: string;
   description?: string | null;
   createdAt: string;
   updatedAt: string;
-  createdBy?: number | null;
-  updatedBy?: number | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
   createdByName?: string | null;
   updatedByName?: string | null;
   createdByEmail?: string | null;
@@ -20,14 +21,14 @@ export interface CreateTagData {
   name: string;
   color?: string;
   description?: string | null;
-  createdBy?: number | null;
+  createdBy?: string | null;
 }
 
 export interface UpdateTagData {
   name?: string;
   color?: string;
   description?: string | null;
-  updatedBy?: number | null;
+  updatedBy?: string | null;
 }
 
 export default class TagModel {
@@ -45,7 +46,7 @@ export default class TagModel {
       .orderBy('t.createdAt', 'desc'); // Sort by most recent first
   }
 
-  static async findById(id: number): Promise<TagAttributes | null> {
+  static async findById(id: string): Promise<TagAttributes | null> {
     const row = await db('g_tags').where('id', id).first();
     return row || null;
   }
@@ -68,13 +69,15 @@ export default class TagModel {
         });
       return (await this.findById(existing.id))!;
     }
-    const [id] = await db('g_tags').insert({
+    const newId = generateULID();
+    await db('g_tags').insert({
+      id: newId,
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     });
-    return (await this.findById(id))!;
+    return (await this.findById(newId))!;
   }
 
   static async create(data: CreateTagData): Promise<TagAttributes> {
@@ -84,11 +87,12 @@ export default class TagModel {
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     };
-    const [id] = await db('g_tags').insert(insertData);
-    return (await this.findById(id))!;
+    const newId = generateULID();
+    await db('g_tags').insert({ id: newId, ...insertData });
+    return (await this.findById(newId))!;
   }
 
-  static async update(id: number, data: UpdateTagData): Promise<TagAttributes | null> {
+  static async update(id: string, data: UpdateTagData): Promise<TagAttributes | null> {
     const updateData: any = {};
     Object.entries(data).forEach(([k, v]) => {
       if (v !== undefined) {
@@ -107,7 +111,7 @@ export default class TagModel {
     return this.findById(id);
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(id: string): Promise<void> {
     await db('g_tags').where('id', id).del();
   }
 }

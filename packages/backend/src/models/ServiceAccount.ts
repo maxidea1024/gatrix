@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
@@ -7,12 +8,12 @@ const logger = createLogger('ServiceAccountModel');
 
 // Types
 export interface ServiceAccount {
-  id: number;
+  id: string;
   name: string;
   email: string;
   status: string;
   authType: 'service-account';
-  createdBy: number | null;
+  createdBy: string | null;
   createdByName?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -24,13 +25,13 @@ export interface ServiceAccount {
 }
 
 export interface ServiceAccountToken {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   name: string;
   description: string | null;
   expiresAt: Date | null;
   lastUsedAt: Date | null;
-  createdBy: number;
+  createdBy: string;
   createdAt: Date;
 }
 
@@ -40,7 +41,7 @@ export interface CreateServiceAccountData {
   permissions?: string[];
   allowAllEnvironments?: boolean;
   environments?: string[];
-  createdBy: number;
+  createdBy: string;
 }
 
 export interface UpdateServiceAccountData {
@@ -49,7 +50,7 @@ export interface UpdateServiceAccountData {
   permissions?: string[];
   allowAllEnvironments?: boolean;
   environments?: string[];
-  updatedBy: number;
+  updatedBy: string;
 }
 
 export class ServiceAccountModel {
@@ -65,7 +66,10 @@ export class ServiceAccountModel {
       const uniqueId = crypto.randomBytes(4).toString('hex');
       const email = `sa-${uniqueId}@service-account.local`;
 
-      const [insertId] = await db(this.TABLE).insert({
+      const id = generateULID();
+
+      await db(this.TABLE).insert({
+        id,
         name: data.name,
         email,
         role: data.role || 'user',
@@ -80,15 +84,15 @@ export class ServiceAccountModel {
 
       // Set environment access if provided
       if (!data.allowAllEnvironments && data.environments && data.environments.length > 0) {
-        await UserModel.setEnvironmentAccess(insertId, false, data.environments, data.createdBy);
+        await UserModel.setEnvironmentAccess(id, false, data.environments, data.createdBy);
       }
 
       // Set permissions if provided
       if (data.permissions && data.permissions.length > 0) {
-        await UserModel.setPermissions(insertId, data.permissions);
+        await UserModel.setPermissions(id, data.permissions);
       }
 
-      const account = await this.findById(insertId);
+      const account = await this.findById(id);
       if (!account) {
         throw new Error('Failed to create service account');
       }
@@ -103,7 +107,7 @@ export class ServiceAccountModel {
   /**
    * Find service account by ID
    */
-  static async findById(id: number): Promise<ServiceAccount | null> {
+  static async findById(id: string): Promise<ServiceAccount | null> {
     try {
       const row = await db(this.TABLE)
         .select([
@@ -166,7 +170,7 @@ export class ServiceAccountModel {
   /**
    * Update a service account
    */
-  static async update(id: number, data: UpdateServiceAccountData): Promise<ServiceAccount | null> {
+  static async update(id: string, data: UpdateServiceAccountData): Promise<ServiceAccount | null> {
     try {
       const updateData: any = {};
       if (data.name !== undefined) updateData.name = data.name;
@@ -208,7 +212,7 @@ export class ServiceAccountModel {
   /**
    * Delete a service account
    */
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await db(this.TABLE)
         .where('id', id)
@@ -226,9 +230,9 @@ export class ServiceAccountModel {
    * Returns the plain token (only shown once)
    */
   static async createToken(
-    userId: number,
+    userId: string,
     name: string,
-    createdBy: number,
+    createdBy: string,
     description?: string,
     expiresAt?: Date
   ): Promise<{ token: ServiceAccountToken; plainToken: string }> {
@@ -237,7 +241,10 @@ export class ServiceAccountModel {
       const plainToken = `gsa_${crypto.randomBytes(32).toString('hex')}`;
       const tokenHash = await bcrypt.hash(plainToken, 10);
 
-      const [insertId] = await db(this.TOKENS_TABLE).insert({
+      const id = generateULID();
+
+      await db(this.TOKENS_TABLE).insert({
+        id,
         userId,
         name,
         tokenHash,
@@ -257,7 +264,7 @@ export class ServiceAccountModel {
           'createdBy',
           'createdAt'
         )
-        .where('id', insertId)
+        .where('id', id)
         .first();
 
       return { token, plainToken };
@@ -270,7 +277,7 @@ export class ServiceAccountModel {
   /**
    * Find tokens for a service account
    */
-  static async findTokens(userId: number): Promise<ServiceAccountToken[]> {
+  static async findTokens(userId: string): Promise<ServiceAccountToken[]> {
     try {
       return db(this.TOKENS_TABLE)
         .select(
@@ -294,7 +301,7 @@ export class ServiceAccountModel {
   /**
    * Delete a token
    */
-  static async deleteToken(tokenId: number, userId: number): Promise<boolean> {
+  static async deleteToken(tokenId: string, userId: string): Promise<boolean> {
     try {
       const result = await db(this.TOKENS_TABLE).where('id', tokenId).where('userId', userId).del();
       return result > 0;

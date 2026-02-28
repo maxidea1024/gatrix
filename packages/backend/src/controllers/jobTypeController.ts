@@ -166,7 +166,7 @@ export const getJobTypes = async (req: Request, res: Response) => {
 export const getJobType = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const jobType = await JobTypeModel.findById(parseInt(id));
+    const jobType = await JobTypeModel.findById(id);
 
     if (!jobType) {
       return res.status(404).json({

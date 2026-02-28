@@ -137,7 +137,7 @@ export class ServerClientVersionController {
     try {
       const { id } = req.params;
       const environment = req.environment;
-      const versionId = parseInt(id);
+      const versionId = id;
 
       if (!environment) {
         return res.status(400).json({
@@ -149,7 +149,7 @@ export class ServerClientVersionController {
         });
       }
 
-      if (isNaN(versionId)) {
+      if (!versionId) {
         return res.status(400).json({
           success: false,
           error: {

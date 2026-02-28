@@ -78,7 +78,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = (req.query.environment as string) || 'production';
     const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
 

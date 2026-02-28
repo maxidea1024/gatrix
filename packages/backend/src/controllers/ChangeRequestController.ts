@@ -65,7 +65,7 @@ export class ChangeRequestController {
       // Show: all non-draft OR (draft AND own)
       query = query.where((builder) => {
         builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-          subBuilder.where('status', 'draft').where('requesterId', userId || 0);
+          subBuilder.where('status', 'draft').where('requesterId', userId || '');
         });
       });
     }
@@ -82,7 +82,7 @@ export class ChangeRequestController {
             }
           } else {
             builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-              subBuilder.where('status', 'draft').where('requesterId', userId || 0);
+              subBuilder.where('status', 'draft').where('requesterId', userId || '');
             });
           }
         })

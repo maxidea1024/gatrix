@@ -9,8 +9,8 @@ export interface ProjectData {
   description?: string;
   isDefault: boolean;
   isActive: boolean;
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -24,8 +24,8 @@ export class Project extends Model implements ProjectData {
   description?: string;
   isDefault!: boolean;
   isActive!: boolean;
-  createdBy!: number;
-  updatedBy?: number;
+  createdBy!: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 

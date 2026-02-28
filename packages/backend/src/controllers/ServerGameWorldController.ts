@@ -142,7 +142,7 @@ export class ServerGameWorldController {
     try {
       const { id } = req.params;
       const environment = req.environment;
-      const worldId = parseInt(id);
+      const worldId = id;
 
       if (!environment) {
         return res.status(400).json({
@@ -154,7 +154,7 @@ export class ServerGameWorldController {
         });
       }
 
-      if (isNaN(worldId)) {
+      if (!worldId) {
         return res.status(400).json({
           success: false,
           error: {

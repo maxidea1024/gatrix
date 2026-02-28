@@ -18,9 +18,9 @@ class ServerUserController {
   // 사용자 ID로 사용자 정보 조회
   static async getUserById(req: ServerUserRequest, res: Response) {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         return sendBadRequest(res, 'Invalid user ID', { field: 'id' });
       }
 

@@ -67,7 +67,7 @@ export class IpWhitelistService {
   /**
    * Get IP whitelist entry by ID
    */
-  static async getIpWhitelistById(id: number, environment: string): Promise<IpWhitelist> {
+  static async getIpWhitelistById(id: string, environment: string): Promise<IpWhitelist> {
     try {
       const ipWhitelist = await IpWhitelistModel.findById(id, environment);
 
@@ -180,7 +180,7 @@ export class IpWhitelistService {
    * Update IP whitelist entry
    */
   static async updateIpWhitelist(
-    id: number,
+    id: string,
     environment: string,
     data: UpdateIpWhitelistData
   ): Promise<IpWhitelist> {
@@ -262,7 +262,7 @@ export class IpWhitelistService {
   /**
    * Delete IP whitelist entry
    */
-  static async deleteIpWhitelist(id: number, environment: string): Promise<void> {
+  static async deleteIpWhitelist(id: string, environment: string): Promise<void> {
     try {
       // Check if entry exists
       const existing = await this.getIpWhitelistById(id, environment);
@@ -305,9 +305,9 @@ export class IpWhitelistService {
    * Toggle enabled status of IP whitelist entry
    */
   static async toggleIpWhitelistStatus(
-    id: number,
+    id: string,
     environment: string,
-    updatedBy: number
+    updatedBy: string
   ): Promise<IpWhitelist> {
     try {
       const existing = await this.getIpWhitelistById(id, environment);
@@ -410,7 +410,7 @@ export class IpWhitelistService {
   static async bulkCreateIpWhitelists(
     environment: string,
     entries: Omit<CreateIpWhitelistData, 'createdBy' | 'environment'>[],
-    createdBy: number
+    createdBy: string
   ): Promise<number> {
     try {
       if (!entries || entries.length === 0) {

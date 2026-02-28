@@ -32,7 +32,7 @@ export class UserService {
     role?: 'admin' | 'user';
     status?: 'active' | 'pending' | 'suspended';
     emailVerified?: boolean;
-    createdBy?: number;
+    createdBy?: string;
   }): Promise<UserWithoutPassword> {
     try {
       // Check if user already exists
@@ -87,7 +87,7 @@ export class UserService {
     }
   }
 
-  static async getUserById(id: number): Promise<UserWithoutPassword> {
+  static async getUserById(id: string): Promise<UserWithoutPassword> {
     try {
       const user = await UserModel.findById(id);
       if (!user) {
@@ -101,7 +101,7 @@ export class UserService {
     }
   }
 
-  static async updateUser(id: number, updateData: any): Promise<UserWithoutPassword> {
+  static async updateUser(id: string, updateData: any): Promise<UserWithoutPassword> {
     try {
       // Validate updates for admin
       const allowedFields = ['name', 'email', 'status', 'role', 'avatarUrl'];
@@ -137,7 +137,7 @@ export class UserService {
     }
   }
 
-  static async deleteUser(id: number): Promise<void> {
+  static async deleteUser(id: string): Promise<void> {
     try {
       const user = await UserModel.findById(id);
       if (!user) {
@@ -188,7 +188,7 @@ export class UserService {
     }
   }
 
-  static async activateUser(userId: number): Promise<void> {
+  static async activateUser(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -227,7 +227,7 @@ export class UserService {
     }
   }
 
-  static async suspendUser(userId: number): Promise<void> {
+  static async suspendUser(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -250,7 +250,7 @@ export class UserService {
     }
   }
 
-  static async promoteToAdmin(userId: number): Promise<void> {
+  static async promoteToAdmin(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -275,7 +275,7 @@ export class UserService {
     }
   }
 
-  static async demoteFromAdmin(userId: number): Promise<void> {
+  static async demoteFromAdmin(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -310,7 +310,7 @@ export class UserService {
     }
   }
   // 태그 관련 메서드들
-  static async getUserTags(userId: number): Promise<any[]> {
+  static async getUserTags(userId: string): Promise<any[]> {
     try {
       return await UserModel.getTags(userId);
     } catch (error) {
@@ -319,7 +319,7 @@ export class UserService {
     }
   }
 
-  static async setUserTags(userId: number, tagIds: number[], updatedBy: number): Promise<void> {
+  static async setUserTags(userId: string, tagIds: string[], updatedBy: string): Promise<void> {
     try {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
@@ -337,7 +337,7 @@ export class UserService {
     }
   }
 
-  static async addUserTag(userId: number, tagId: number, createdBy: number): Promise<void> {
+  static async addUserTag(userId: string, tagId: string, createdBy: string): Promise<void> {
     try {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
@@ -355,7 +355,7 @@ export class UserService {
     }
   }
 
-  static async removeUserTag(userId: number, tagId: number): Promise<void> {
+  static async removeUserTag(userId: string, tagId: string): Promise<void> {
     try {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
@@ -374,7 +374,7 @@ export class UserService {
   }
 
   // 관리자가 사용자 이메일을 강제 인증 처리
-  static async verifyUserEmail(userId: number): Promise<void> {
+  static async verifyUserEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -400,7 +400,7 @@ export class UserService {
   }
 
   // 사용자에게 이메일 인증 메일 재전송
-  static async resendVerificationEmail(userId: number): Promise<void> {
+  static async resendVerificationEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -437,7 +437,7 @@ export class UserService {
   /**
    * Update user's preferred language
    */
-  static async updateUserLanguage(userId: number, preferredLanguage: string): Promise<void> {
+  static async updateUserLanguage(userId: string, preferredLanguage: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {

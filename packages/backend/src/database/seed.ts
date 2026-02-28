@@ -5,123 +5,303 @@ import { config } from '../config';
 import logger from '../config/logger';
 import database from '../config/database';
 
-async function createAdminUser() {
+const { ulid } = require('ulid');
+
+// ==================== Default Organisation / Project / Environments ====================
+
+async function createDefaultOrganisation(): Promise<string> {
+  const existing = await database.query('SELECT id FROM g_organisations WHERE orgName = ?', [
+    'default',
+  ]);
+  if (existing.length > 0) {
+    logger.info('Default organisation already exists, skipping creation');
+    return existing[0].id;
+  }
+
+  const orgId = ulid();
+  await database.query(
+    `INSERT INTO g_organisations (id, orgName, displayName, description, isActive, createdAt, updatedAt)
+     VALUES (?, 'default', 'Default Organisation', 'Auto-created default organisation', TRUE, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+    [orgId]
+  );
+  logger.info(`Default organisation created: ${orgId}`);
+  return orgId;
+}
+
+async function createDefaultProject(orgId: string, createdBy: string): Promise<string> {
+  const existing = await database.query(
+    'SELECT id FROM g_projects WHERE orgId = ? AND projectName = ?',
+    [orgId, 'default']
+  );
+  if (existing.length > 0) {
+    logger.info('Default project already exists, skipping creation');
+    return existing[0].id;
+  }
+
+  const projectId = ulid();
+  await database.query(
+    `INSERT INTO g_projects (id, orgId, projectName, displayName, isDefault, isActive, createdBy, createdAt, updatedAt)
+     VALUES (?, ?, 'default', 'Default Project', TRUE, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+    [projectId, orgId, createdBy]
+  );
+  logger.info(`Default project created: ${projectId}`);
+  return projectId;
+}
+
+async function createDefaultEnvironments(projectId: string, createdBy: string) {
+  const existing = await database.query(
+    'SELECT environment FROM g_environments WHERE projectId = ?',
+    [projectId]
+  );
+  if (existing.length > 0) {
+    logger.info('Default environments already exist, skipping creation');
+    return;
+  }
+
+  const environments = [
+    {
+      env: 'development',
+      displayName: 'Development',
+      type: 'development',
+      color: '#4CAF50',
+      order: 0,
+      isDefault: true,
+    },
+    {
+      env: 'staging',
+      displayName: 'Staging',
+      type: 'staging',
+      color: '#FF9800',
+      order: 1,
+      isDefault: false,
+    },
+    {
+      env: 'production',
+      displayName: 'Production',
+      type: 'production',
+      color: '#F44336',
+      order: 2,
+      isDefault: false,
+      requiresApproval: true,
+    },
+  ];
+
+  for (const e of environments) {
+    await database.query(
+      `INSERT INTO g_environments (environment, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [
+        e.env,
+        e.displayName,
+        e.type,
+        e.order,
+        e.color,
+        projectId,
+        e.isDefault,
+        e.requiresApproval || false,
+        createdBy,
+      ]
+    );
+    logger.info(`  Environment created: ${e.env}`);
+  }
+}
+
+// ==================== Users & RBAC ====================
+
+async function createAdminUser(orgId: string): Promise<string> {
   try {
-    // Check if admin user already exists
     const existingAdmin = await database.query(
-      'SELECT id FROM g_users WHERE email = ? OR role = "admin"',
-      [config.admin.email]
+      'SELECT u.id FROM g_users u JOIN g_organisation_members om ON u.id = om.userId WHERE u.email = ? AND om.orgRole = ?',
+      [config.admin.email, 'admin']
     );
 
     if (existingAdmin.length > 0) {
       logger.info('Admin user already exists, skipping creation');
-      return;
+      return existingAdmin[0].id;
     }
 
-    // Hash the admin password
     const passwordHash = await bcrypt.hash(config.admin.password, 12);
+    const userId = ulid();
 
-    // Create admin user
-    const result = await database.query(
-      `INSERT INTO g_users (email, passwordHash, name, role, status, emailVerified, emailVerifiedAt)
-       VALUES (?, ?, ?, 'admin', 'active', TRUE, UTC_TIMESTAMP())`,
-      [config.admin.email, passwordHash, config.admin.name]
+    // Create user
+    await database.query(
+      `INSERT INTO g_users (id, email, passwordHash, name, status, emailVerified, emailVerifiedAt, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, 'active', TRUE, UTC_TIMESTAMP(), UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [userId, config.admin.email, passwordHash, config.admin.name]
     );
 
-    logger.info(`Admin user created successfully with ID: ${result.insertId}`);
-    logger.info(`Admin credentials:`);
-    logger.info(`  Email: ${config.admin.email}`);
-    logger.info(`  Password: ${config.admin.password}`);
+    // Add as org admin
+    await database.query(
+      `INSERT INTO g_organisation_members (id, orgId, userId, orgRole, joinedAt)
+       VALUES (?, ?, ?, 'admin', UTC_TIMESTAMP())`,
+      [ulid(), orgId, userId]
+    );
+
+    logger.info(`Admin user created: ${config.admin.email} (ID: ${userId})`);
     logger.warn('Please change the default admin password after first login!');
 
-    // Log the admin creation
+    // Audit log
     await database.query(
-      `INSERT INTO g_audit_logs (userId, action, resourceType, resourceId, details)
-       VALUES (?, 'create', 'user', ?, ?)`,
+      `INSERT INTO g_audit_logs (id, userId, action, resourceType, resourceId, details, createdAt)
+       VALUES (?, ?, 'create', 'user', ?, ?, UTC_TIMESTAMP())`,
       [
-        result.insertId,
-        result.insertId.toString(),
+        ulid(),
+        userId,
+        userId,
         JSON.stringify({
           message: 'Admin user created during seeding',
           email: config.admin.email,
-          role: 'admin',
         }),
       ]
     );
+
+    return userId;
   } catch (error) {
     logger.error('Failed to create admin user:', error);
     throw error;
   }
 }
 
-async function createSampleUsers() {
-  try {
-    // Check if sample users already exist
-    const existingUsers = await database.query(
-      'SELECT COUNT(*) as count FROM g_users WHERE role = "user"'
+// ==================== Default Context Fields ====================
+
+async function createDefaultContextFields(projectId: string) {
+  const existing = await database.query(
+    'SELECT id FROM g_feature_context_fields WHERE projectId = ? LIMIT 1',
+    [projectId]
+  );
+  if (existing.length > 0) {
+    logger.info('Default context fields already exist, skipping creation');
+    return;
+  }
+
+  const defaultFields = [
+    {
+      fieldName: 'userId',
+      fieldType: 'string',
+      description: 'Unique user identifier',
+      stickiness: true,
+      sortOrder: 1,
+    },
+    {
+      fieldName: 'sessionId',
+      fieldType: 'string',
+      description: 'Session identifier',
+      stickiness: true,
+      sortOrder: 2,
+    },
+    {
+      fieldName: 'environmentName',
+      fieldType: 'string',
+      description: 'Environment name',
+      stickiness: false,
+      sortOrder: 3,
+    },
+    {
+      fieldName: 'appName',
+      fieldType: 'string',
+      description: 'Application name',
+      stickiness: false,
+      sortOrder: 4,
+    },
+    {
+      fieldName: 'appVersion',
+      fieldType: 'semver',
+      description: 'Application version',
+      stickiness: false,
+      sortOrder: 5,
+    },
+    {
+      fieldName: 'country',
+      fieldType: 'string',
+      description: 'Country code',
+      stickiness: false,
+      sortOrder: 6,
+    },
+    {
+      fieldName: 'city',
+      fieldType: 'string',
+      description: 'City name',
+      stickiness: false,
+      sortOrder: 7,
+    },
+    {
+      fieldName: 'ip',
+      fieldType: 'string',
+      description: 'IP address',
+      stickiness: false,
+      sortOrder: 8,
+    },
+    {
+      fieldName: 'userAgent',
+      fieldType: 'string',
+      description: 'User agent string',
+      stickiness: false,
+      sortOrder: 9,
+    },
+    {
+      fieldName: 'currentTime',
+      fieldType: 'date',
+      description: 'Current timestamp',
+      stickiness: false,
+      sortOrder: 10,
+    },
+  ];
+
+  for (const f of defaultFields) {
+    await database.query(
+      `INSERT INTO g_feature_context_fields (id, projectId, fieldName, fieldType, description, stickiness, sortOrder, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())
+       ON DUPLICATE KEY UPDATE description = VALUES(description)`,
+      [ulid(), projectId, f.fieldName, f.fieldType, f.description, f.stickiness, f.sortOrder]
+    );
+  }
+  logger.info('Default context fields created');
+}
+
+// ==================== Default Environment Keys ====================
+
+async function createDefaultEnvironmentKeys(projectId: string, createdBy: string) {
+  const existing = await database.query(
+    `SELECT ek.id FROM g_environment_keys ek
+     JOIN g_environments e ON ek.environment = e.environment
+     WHERE e.projectId = ? LIMIT 1`,
+    [projectId]
+  );
+  if (existing.length > 0) {
+    logger.info('Default environment keys already exist, skipping creation');
+    return;
+  }
+
+  const environments = await database.query(
+    'SELECT environment FROM g_environments WHERE projectId = ?',
+    [projectId]
+  );
+
+  const crypto = require('crypto');
+  for (const env of environments) {
+    // Create client key
+    const clientKey = `gx_client_${crypto.randomBytes(24).toString('hex')}`;
+    await database.query(
+      `INSERT INTO g_environment_keys (id, environment, keyType, keyValue, keyName, isActive, createdBy, createdAt)
+       VALUES (?, ?, 'client', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
+      [ulid(), env.environment, clientKey, `${env.environment} Client Key`, createdBy]
     );
 
-    if (existingUsers[0].count > 0) {
-      logger.info('Sample users already exist, skipping creation');
-      return;
-    }
+    // Create server key
+    const serverKey = `gx_server_${crypto.randomBytes(24).toString('hex')}`;
+    await database.query(
+      `INSERT INTO g_environment_keys (id, environment, keyType, keyValue, keyName, isActive, createdBy, createdAt)
+       VALUES (?, ?, 'server', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
+      [ulid(), env.environment, serverKey, `${env.environment} Server Key`, createdBy]
+    );
 
-    const sampleUsers = [
-      {
-        email: 'user1@example.com',
-        name: 'John Doe',
-        status: 'active',
-      },
-      {
-        email: 'user2@example.com',
-        name: 'Jane Smith',
-        status: 'pending',
-      },
-      {
-        email: 'user3@example.com',
-        name: 'Bob Johnson',
-        status: 'suspended',
-      },
-    ];
-
-    for (const user of sampleUsers) {
-      const passwordHash = await bcrypt.hash('password123', 12);
-
-      const result = await database.query(
-        `INSERT INTO g_users (email, passwordHash, name, role, status, emailVerified, emailVerifiedAt)
-         VALUES (?, ?, ?, 'user', ?, TRUE, UTC_TIMESTAMP())`,
-        [user.email, passwordHash, user.name, user.status]
-      );
-
-      logger.info(`Sample user created: ${user.email} (${user.status})`);
-
-      // Log the user creation
-      await database.query(
-        `INSERT INTO g_audit_logs (userId, action, resourceType, resourceId, details)
-         VALUES (?, 'create', 'user', ?, ?)`,
-        [
-          result.insertId,
-          result.insertId.toString(),
-          JSON.stringify({
-            message: 'Sample user created during seeding',
-            email: user.email,
-            role: 'user',
-            status: user.status,
-          }),
-        ]
-      );
-    }
-
-    logger.info('Sample users created successfully');
-  } catch (error) {
-    logger.error('Failed to create sample users:', error);
-    throw error;
+    logger.info(`  Environment keys created for: ${env.environment}`);
   }
 }
 
-const { ulid } = require('ulid');
+// ==================== Sample Release Flow Templates ====================
 
-async function createSampleReleaseFlows() {
+async function createSampleReleaseFlows(createdBy: string) {
   try {
     const existingFlows = await database.query(
       'SELECT COUNT(*) as count FROM g_release_flows WHERE discriminator = "template"'
@@ -132,12 +312,12 @@ async function createSampleReleaseFlows() {
       return;
     }
 
-    // 1. Standard Progressive Rollout Template
+    // Standard Progressive Rollout Template
     const templateId = ulid();
     await database.query(
       `INSERT INTO g_release_flows (id, flowName, displayName, description, discriminator, isArchived, createdBy, createdAt, updatedAt)
-       VALUES (?, 'standard-rollout', 'Standard Progressive Rollout', 'Gradual rollout: internal -> 10% -> 50% -> 100%', 'template', FALSE, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
-      [templateId]
+       VALUES (?, 'standard-rollout', 'Standard Progressive Rollout', 'Gradual rollout: internal -> 10% -> 50% -> 100%', 'template', FALSE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [templateId, createdBy]
     );
 
     const milestones = [
@@ -206,13 +386,32 @@ async function createSampleReleaseFlows() {
   }
 }
 
+// ==================== Main Seed / Clear Functions ====================
+
 async function seedDatabase() {
   try {
     logger.info('Starting database seeding...');
 
-    await createAdminUser();
-    await createSampleUsers();
-    await createSampleReleaseFlows();
+    // 1. Create default organisation
+    const orgId = await createDefaultOrganisation();
+
+    // 2. Create admin user with org membership
+    const adminUserId = await createAdminUser(orgId);
+
+    // 3. Create default project under the organisation
+    const projectId = await createDefaultProject(orgId, adminUserId);
+
+    // 4. Create default environments under the project
+    await createDefaultEnvironments(projectId, adminUserId);
+
+    // 5. Create default context fields for the project
+    await createDefaultContextFields(projectId);
+
+    // 6. Create default environment keys
+    await createDefaultEnvironmentKeys(projectId, adminUserId);
+
+    // 7. Create sample release flow templates
+    await createSampleReleaseFlows(adminUserId);
 
     logger.info('Database seeding completed successfully');
   } catch (error) {
@@ -225,11 +424,55 @@ async function clearDatabase() {
   try {
     logger.info('Clearing database...');
 
-    // Clear tables in reverse order of dependencies
-    await database.query('DELETE FROM g_audit_logs');
-    await database.query('DELETE FROM g_oauth_accounts');
-    await database.query('DELETE FROM g_sessions');
-    await database.query('DELETE FROM g_users');
+    // Disable FK checks for clean truncation
+    await database.query('SET FOREIGN_KEY_CHECKS = 0');
+
+    const tables = [
+      'g_audit_logs',
+      'g_oauth_accounts',
+      'g_password_reset_tokens',
+      'g_sessions',
+      'g_mails',
+      'g_invitations',
+      'g_environment_keys',
+      'g_admin_api_tokens',
+      'g_release_flow_safeguards',
+      'g_release_flow_strategy_segments',
+      'g_release_flow_strategies',
+      'g_release_flow_milestones',
+      'g_release_flows',
+      'g_feature_code_references',
+      'g_impact_metric_configs',
+      'g_feature_flag_segments',
+      'g_feature_variant_metrics',
+      'g_feature_metrics',
+      'g_feature_variants',
+      'g_feature_strategies',
+      'g_feature_flag_environments',
+      'g_feature_segments',
+      'g_feature_context_fields',
+      'g_feature_flags',
+      'g_user_roles',
+      'g_group_roles',
+      'g_group_members',
+      'g_groups',
+      'g_role_environment_permissions',
+      'g_role_project_permissions',
+      'g_role_org_permissions',
+      'g_roles',
+      'g_environments',
+      'g_projects',
+      'g_organisation_members',
+      'g_sso_providers',
+      'g_users',
+      'g_organisations',
+    ];
+
+    for (const table of tables) {
+      await database.query(`DELETE FROM ${table}`);
+    }
+
+    await database.query('SET FOREIGN_KEY_CHECKS = 1');
 
     logger.info('Database cleared successfully');
   } catch (error) {

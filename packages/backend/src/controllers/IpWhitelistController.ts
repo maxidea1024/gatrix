@@ -62,7 +62,7 @@ const getIpWhitelistsQuerySchema = Joi.object({
   ipAddress: Joi.string().optional(),
   purpose: Joi.string().optional(),
   isEnabled: Joi.boolean().optional(),
-  createdBy: Joi.number().integer().optional(),
+  createdBy: Joi.string().optional(),
   search: Joi.string().optional(),
   tags: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).optional(),
   _t: Joi.string().optional(), // Cache busting parameter
@@ -125,10 +125,10 @@ export class IpWhitelistController {
   });
 
   static getIpWhitelistById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid IP whitelist ID', 400);
     }
     if (!environment) {
@@ -173,7 +173,7 @@ export class IpWhitelistController {
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
-      req.user?.userId || 0,
+      req.user?.userId || '',
       environment,
       'g_ip_whitelist',
       { ...createData, environment },
@@ -200,10 +200,10 @@ export class IpWhitelistController {
   });
 
   static updateIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid IP whitelist ID', 400);
     }
     if (!environment) {
@@ -232,7 +232,7 @@ export class IpWhitelistController {
       userId,
       environment,
       'g_ip_whitelist',
-      String(id),
+      id,
       updateData,
       async (processedData) => {
         return await IpWhitelistService.updateIpWhitelist(id, environment, processedData as any);
@@ -257,10 +257,10 @@ export class IpWhitelistController {
   });
 
   static deleteIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const environment = req.environment;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid IP whitelist ID', 400);
     }
     if (!environment) {
@@ -278,7 +278,7 @@ export class IpWhitelistController {
       userId,
       environment,
       'g_ip_whitelist',
-      String(id),
+      id,
       async () => {
         await IpWhitelistService.deleteIpWhitelist(id, environment);
       }
@@ -303,10 +303,10 @@ export class IpWhitelistController {
 
   static toggleIpWhitelistStatus = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
 
-      if (isNaN(id)) {
+      if (!id) {
         throw new GatrixError('Invalid IP whitelist ID', 400);
       }
       if (!environment) {
@@ -324,7 +324,7 @@ export class IpWhitelistController {
         userId,
         environment,
         'g_ip_whitelist',
-        String(id),
+        id,
         async (currentData: any) => {
           return { isEnabled: !currentData.isEnabled };
         },

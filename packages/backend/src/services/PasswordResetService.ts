@@ -5,8 +5,8 @@ import emailService from './EmailService';
 import logger from '../config/logger';
 
 export interface PasswordResetToken {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   token: string;
   expiresAt: Date;
   used: boolean;
@@ -96,7 +96,7 @@ export class PasswordResetService {
 
   async validateResetToken(
     token: string
-  ): Promise<{ valid: boolean; userId?: number; message: string }> {
+  ): Promise<{ valid: boolean; userId?: string; message: string }> {
     try {
       const resetToken = await db('g_password_reset_tokens')
         .select('id', 'userId', 'expiresAt', 'used')

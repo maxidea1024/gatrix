@@ -5,7 +5,7 @@ import { pubSubService } from './PubSubService';
 
 export interface SSEClient {
   id: string;
-  userId?: number;
+  userId?: string;
   response: Response;
   lastPing: Date;
   subscriptions: Set<string>;
@@ -15,9 +15,9 @@ export interface NotificationEvent {
   type: string;
   data: any;
   timestamp: Date;
-  targetUsers?: number[];
+  targetUsers?: string[];
   targetChannels?: string[];
-  excludeUsers?: number[];
+  excludeUsers?: string[];
 }
 
 export class SSENotificationService extends EventEmitter {
@@ -42,7 +42,7 @@ export class SSENotificationService extends EventEmitter {
   /**
    * Add a new SSE client
    */
-  public addClient(clientId: string, response: Response, userId?: number): void {
+  public addClient(clientId: string, response: Response, userId?: string): void {
     // Set SSE headers
     response.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -164,7 +164,7 @@ export class SSENotificationService extends EventEmitter {
   /**
    * Send event to specific user
    */
-  public sendToUser(userId: number, event: NotificationEvent): number {
+  public sendToUser(userId: string, event: NotificationEvent): number {
     if (event.excludeUsers?.includes(userId)) {
       return 0;
     }
@@ -296,10 +296,10 @@ export class SSENotificationService extends EventEmitter {
    */
   public getStats(): {
     totalClients: number;
-    clientsByUser: Record<number, number>;
+    clientsByUser: Record<string, number>;
     subscriptionCounts: Record<string, number>;
   } {
-    const clientsByUser: Record<number, number> = {};
+    const clientsByUser: Record<string, number> = {};
     const subscriptionCounts: Record<string, number> = {};
 
     this.clients.forEach((client) => {
@@ -357,7 +357,7 @@ export class ChangeRequestNotifications {
     id: string;
     title: string;
     environment: string;
-    requesterId: number;
+    requesterId: string;
     requesterName?: string;
   }): Promise<void> {
     const event: NotificationEvent = {
@@ -385,10 +385,10 @@ export class ChangeRequestNotifications {
       id: string;
       title: string;
       environment: string;
-      requesterId: number;
+      requesterId: string;
     },
     approverName?: string,
-    actorId?: number
+    actorId?: string
   ): Promise<void> {
     const event: NotificationEvent = {
       type: 'change_request_approved',
@@ -415,10 +415,10 @@ export class ChangeRequestNotifications {
       id: string;
       title: string;
       environment: string;
-      requesterId: number;
+      requesterId: string;
     },
     executorName?: string,
-    actorId?: number
+    actorId?: string
   ): Promise<void> {
     const event: NotificationEvent = {
       type: 'change_request_executed',
@@ -444,11 +444,11 @@ export class ChangeRequestNotifications {
       id: string;
       title: string;
       environment: string;
-      requesterId: number;
+      requesterId: string;
     },
     rejectorName?: string,
     comment?: string,
-    actorId?: number
+    actorId?: string
   ): Promise<void> {
     const event: NotificationEvent = {
       type: 'change_request_rejected',

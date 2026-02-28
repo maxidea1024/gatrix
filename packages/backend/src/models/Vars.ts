@@ -3,7 +3,7 @@ import db from '../config/knex';
 export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
 
 export interface VarItem {
-  id: number;
+  id: string;
   environment: string;
   varKey: string;
   varValue: string | null;
@@ -11,8 +11,8 @@ export interface VarItem {
   description: string | null;
   isSystemDefined: boolean;
   isCopyable: boolean;
-  createdBy: number;
-  updatedBy: number | null;
+  createdBy: string;
+  updatedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
   createdByName?: string;
@@ -46,7 +46,7 @@ export default class VarsModel {
   static async set(
     key: string,
     value: string | null,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<void> {
     await db('g_vars')
@@ -111,7 +111,7 @@ export default class VarsModel {
    */
   static async createKV(
     data: CreateVarData,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<VarItem> {
     // Ensure key starts with 'kv:'
@@ -140,7 +140,7 @@ export default class VarsModel {
   static async updateKV(
     key: string,
     data: UpdateVarData,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<VarItem> {
     // Check if item exists and is not system-defined for type changes

@@ -7,7 +7,7 @@ export class TagService {
     return await TagModel.list();
   }
 
-  static async create(data: CreateTagData, userId?: number) {
+  static async create(data: CreateTagData, userId?: string) {
     const name = data.name?.trim();
     if (!name) throw new GatrixError('Tag name is required', 400);
     const existing = await TagModel.findByName(name);
@@ -15,7 +15,7 @@ export class TagService {
     return await TagModel.create({ ...data, name, createdBy: userId ?? null });
   }
 
-  static async update(id: number, data: UpdateTagData, userId?: number) {
+  static async update(id: string, data: UpdateTagData, userId?: string) {
     if (data.name !== undefined) {
       const name = data.name?.trim();
       if (!name) throw new GatrixError('Tag name is required', 400);
@@ -32,20 +32,20 @@ export class TagService {
     return tag;
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(id: string): Promise<void> {
     await TagModel.delete(id);
   }
 
   static async setTagsForEntity(
     entityType: string,
-    entityId: string | number,
-    tagIds: number[],
-    createdBy?: number
+    entityId: string,
+    tagIds: string[],
+    createdBy?: string
   ): Promise<void> {
     await TagAssignmentModel.setTagsForEntity(entityType, entityId, tagIds, createdBy);
   }
 
-  static async listTagsForEntity(entityType: string, entityId: string | number) {
+  static async listTagsForEntity(entityType: string, entityId: string) {
     return await TagAssignmentModel.listTagsForEntity(entityType, entityId);
   }
 }

@@ -135,7 +135,7 @@ export class RewardTemplateController {
       await TagService.setTagsForEntity(
         'reward_template',
         template.id,
-        tagIds.map(Number),
+        tagIds,
         authenticatedUserId
       );
     }
@@ -235,7 +235,7 @@ export class RewardTemplateController {
       await TagService.setTagsForEntity(
         'reward_template',
         template.id,
-        tagIds.map(Number),
+        tagIds,
         authenticatedUserId
       );
     }

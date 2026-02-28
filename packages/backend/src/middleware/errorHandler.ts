@@ -26,7 +26,7 @@ export class GatrixError extends Error implements AppError {
     this.code = code;
     this.payload = payload;
 
-    //TODO 개발 환경에서만 callstack을 추적하는게?
+    //TODO 개발 ?�경?�서�?callstack??추적?�는�?
     Error.captureStackTrace(this, this.constructor);
   }
 }

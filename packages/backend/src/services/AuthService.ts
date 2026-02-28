@@ -59,8 +59,16 @@ export class AuthService {
       delete (userWithoutPassword as any).passwordHash;
 
       // Generate tokens
-      const accessToken = JwtUtils.generateToken(userWithoutPassword as any);
-      const refreshToken = JwtUtils.generateRefreshToken(userWithoutPassword as any);
+      const accessToken = JwtUtils.generateToken(
+        userWithoutPassword as any,
+        '',
+        user.role || 'user'
+      );
+      const refreshToken = JwtUtils.generateRefreshToken(
+        userWithoutPassword as any,
+        '',
+        user.role || 'user'
+      );
 
       logger.info('User logged in successfully:', {
         userId: user.id,
@@ -151,8 +159,8 @@ export class AuthService {
       }
 
       // Generate new tokens
-      const newAccessToken = JwtUtils.generateToken(user);
-      const newRefreshToken = JwtUtils.generateRefreshToken(user);
+      const newAccessToken = JwtUtils.generateToken(user, payload.orgId, payload.orgRole);
+      const newRefreshToken = JwtUtils.generateRefreshToken(user, payload.orgId, payload.orgRole);
 
       return {
         accessToken: newAccessToken,
@@ -168,7 +176,7 @@ export class AuthService {
   }
 
   static async changePassword(
-    userId: number,
+    userId: string,
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
@@ -262,7 +270,7 @@ export class AuthService {
     }
   }
 
-  static async verifyEmail(userId: number): Promise<void> {
+  static async verifyEmail(userId: string): Promise<void> {
     try {
       await UserModel.update(userId, {
         emailVerified: true,
@@ -277,7 +285,7 @@ export class AuthService {
     }
   }
 
-  static async getProfile(userId: number): Promise<UserWithoutPassword> {
+  static async getProfile(userId: string): Promise<UserWithoutPassword> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -295,7 +303,7 @@ export class AuthService {
   }
 
   static async updateProfile(
-    userId: number,
+    userId: string,
     updateData: {
       name?: string;
       avatarUrl?: string;

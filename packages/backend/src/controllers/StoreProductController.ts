@@ -157,12 +157,7 @@ export class StoreProductController {
 
         // Set tags for the product
         if (Array.isArray(tagIds) && tagIds.length > 0) {
-          await TagService.setTagsForEntity(
-            'store_product',
-            product.id,
-            tagIds.map(Number),
-            userId
-          );
+          await TagService.setTagsForEntity('store_product', product.id, tagIds, userId);
         }
 
         return product;
@@ -243,12 +238,7 @@ export class StoreProductController {
 
         // Set tags for the product
         if (Array.isArray(tagIds)) {
-          await TagService.setTagsForEntity(
-            'store_product',
-            product.id,
-            tagIds.map(Number),
-            userId
-          );
+          await TagService.setTagsForEntity('store_product', product.id, tagIds, userId);
         }
 
         return { product };
@@ -416,7 +406,7 @@ export class StoreProductController {
         userId,
         environment,
         'g_store_products',
-        String(id),
+        id,
         { isActive },
         async (processedData: any) => {
           const product = await StoreProductService.toggleActive(

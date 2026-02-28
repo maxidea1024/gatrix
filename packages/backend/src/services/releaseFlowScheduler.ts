@@ -138,7 +138,7 @@ export class ReleaseFlowScheduler {
                 logger.warn(
                   `Release flow plan ${flowId}: safeguard triggered (${triggeredNames}), pausing plan`
                 );
-                await releaseFlowService.pausePlan(flowId, 0);
+                await releaseFlowService.pausePlan(flowId, '');
                 continue;
               }
             }

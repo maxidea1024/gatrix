@@ -5,7 +5,7 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('ChatServerService');
 
 interface UserData {
-  id: number;
+  id: string;
   username: string;
   name?: string;
   email?: string;
@@ -144,7 +144,7 @@ export class ChatServerService {
   /**
    * 사용자 상태 업데이트
    */
-  async updateUserStatus(userId: number, status: string, customStatus?: string): Promise<void> {
+  async updateUserStatus(userId: string, status: string, customStatus?: string): Promise<void> {
     try {
       const response = await this.axiosInstance.put(`/api/v1/users/${userId}/status`, {
         status,
@@ -167,7 +167,7 @@ export class ChatServerService {
   /**
    * 사용자 삭제
    */
-  async deleteUser(userId: number): Promise<void> {
+  async deleteUser(userId: string): Promise<void> {
     try {
       const response = await this.axiosInstance.delete(`/api/v1/users/${userId}`);
 
@@ -187,7 +187,7 @@ export class ChatServerService {
   /**
    * Chat WebSocket 토큰 생성
    */
-  async generateChatToken(userId: number): Promise<string> {
+  async generateChatToken(userId: string): Promise<string> {
     try {
       const response = await this.axiosInstance.post('/api/v1/auth/token', {
         userId,
@@ -207,7 +207,7 @@ export class ChatServerService {
   /**
    * 사용자 채널 목록 조회
    */
-  async getUserChannels(userId: number): Promise<any> {
+  async getUserChannels(userId: string): Promise<any> {
     try {
       // Chat Server의 /api/v1/channels/my 엔드포인트 사용
       // 사용자 ID를 헤더로 전달
@@ -236,7 +236,7 @@ export class ChatServerService {
     name: string;
     description?: string;
     type: string;
-    createdBy: number;
+    createdBy: string;
   }): Promise<any> {
     try {
       const response = await this.axiosInstance.post('/api/v1/channels', channelData);
@@ -311,7 +311,7 @@ export class ChatServerService {
   /**
    * 사용자 목록 조회
    */
-  async getUsers(userId: number, search?: string): Promise<any[]> {
+  async getUsers(userId: string, search?: string): Promise<any[]> {
     try {
       const params: any = {};
       if (search) {

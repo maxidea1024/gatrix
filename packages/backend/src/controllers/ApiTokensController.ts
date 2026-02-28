@@ -420,7 +420,7 @@ class ApiTokensController {
       res.json({
         success: true,
         data: {
-          id: Number(id),
+          id: id,
           tokenName: existingToken.tokenName,
           tokenType: existingToken.tokenType,
           tokenValue, // Only shown once!

@@ -161,7 +161,7 @@ export class ChangeRequestService {
    * Now uses ops-based model
    */
   static async upsertChangeRequestItem(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -426,7 +426,7 @@ export class ChangeRequestService {
 
   static async approveChangeRequest(
     changeRequestId: string,
-    approverId: number,
+    approverId: string,
     comment?: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
@@ -557,7 +557,7 @@ export class ChangeRequestService {
             requesterId: cr.requesterId,
           },
           'System (Auto)',
-          0
+          ''
         );
       } catch (err) {
         logger.error('[ChangeRequest] Failed to send auto-approve notification', err);
@@ -571,7 +571,7 @@ export class ChangeRequestService {
 
   static async rejectChangeRequest(
     changeRequestId: string,
-    rejectedBy: number | null,
+    rejectedBy: string | null,
     comment: string
   ): Promise<ChangeRequest> {
     if (!comment) throw new Error('Rejection comment is mandatory.');
@@ -597,7 +597,7 @@ export class ChangeRequestService {
     // Create Audit Log with comment
     await knex('g_audit_logs').insert({
       action: 'CHANGE_REQUEST_REJECTED',
-      userId: rejectedBy || 0, // 0 for system
+      userId: rejectedBy || '', // 0 for system
       changeRequestId: cr.id,
       entityType: 'ChangeRequest',
       entityId: 0,
@@ -614,7 +614,7 @@ export class ChangeRequestService {
       },
       rejectorName,
       comment,
-      rejectedBy || 0
+      rejectedBy || ''
     );
 
     const updated = await cr.$query().findById(cr.id);
@@ -624,7 +624,7 @@ export class ChangeRequestService {
 
   static async reopenChangeRequest(
     changeRequestId: string,
-    requesterId: number
+    requesterId: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx).findById(changeRequestId);
@@ -686,7 +686,7 @@ export class ChangeRequestService {
 
   static async executeChangeRequest(
     changeRequestId: string,
-    userId: number
+    userId: string
   ): Promise<ChangeRequest> {
     // Import service registry
     const { hasServiceHandler, getServiceHandler } = await import('./ServiceRegistry');
@@ -1173,7 +1173,7 @@ export class ChangeRequestService {
 
   static async revertChangeRequest(
     changeRequestId: string,
-    userId: number
+    userId: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const originalCr = await ChangeRequest.query(trx)
@@ -1350,7 +1350,7 @@ export class ChangeRequestService {
    */
   static async getChangeRequestCounts(
     environment: string,
-    userId: number
+    userId: string
   ): Promise<Record<string, number>> {
     const counts = await ChangeRequest.query()
       .where('environment', environment)

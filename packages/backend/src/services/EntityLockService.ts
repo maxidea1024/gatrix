@@ -9,7 +9,7 @@ import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 
 interface LockInfo {
-  userId: number;
+  userId: string;
   userName: string;
   userEmail: string;
   lockedAt: number; // Unix timestamp in ms
@@ -26,7 +26,7 @@ class EntityLockService {
   /**
    * Generate Redis key for entity lock
    */
-  private getLockKey(table: string, entityId: string | number, environment: string): string {
+  private getLockKey(table: string, entityId: string, environment: string): string {
     return `${LOCK_KEY_PREFIX}:${environment}:${table}:${entityId}`;
   }
 
@@ -36,9 +36,9 @@ class EntityLockService {
    */
   async acquireLock(
     table: string,
-    entityId: string | number,
+    entityId: string,
     environment: string,
-    userId: number,
+    userId: string,
     userName: string,
     userEmail: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
@@ -93,9 +93,9 @@ class EntityLockService {
    */
   async forceAcquireLock(
     table: string,
-    entityId: string | number,
+    entityId: string,
     environment: string,
-    userId: number,
+    userId: string,
     userName: string,
     userEmail: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
@@ -128,7 +128,7 @@ class EntityLockService {
             type: 'entity_lock.taken_over',
             data: {
               table,
-              entityId: String(entityId),
+              entityId: entityId,
               environment,
               previousOwner: {
                 userId: previousOwner.userId,
@@ -159,9 +159,9 @@ class EntityLockService {
    */
   async releaseLock(
     table: string,
-    entityId: string | number,
+    entityId: string,
     environment: string,
-    userId: number
+    userId: string
   ): Promise<boolean> {
     const key = this.getLockKey(table, entityId, environment);
 
@@ -185,7 +185,7 @@ class EntityLockService {
           type: 'entity_lock.released',
           data: {
             table,
-            entityId: String(entityId),
+            entityId: entityId,
             environment,
             releasedBy: userId,
           },
@@ -204,11 +204,7 @@ class EntityLockService {
   /**
    * Check if an entity is locked
    */
-  async checkLock(
-    table: string,
-    entityId: string | number,
-    environment: string
-  ): Promise<LockInfo | null> {
+  async checkLock(table: string, entityId: string, environment: string): Promise<LockInfo | null> {
     const key = this.getLockKey(table, entityId, environment);
 
     try {
@@ -228,9 +224,9 @@ class EntityLockService {
    */
   async extendLock(
     table: string,
-    entityId: string | number,
+    entityId: string,
     environment: string,
-    userId: number,
+    userId: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
     const key = this.getLockKey(table, entityId, environment);
@@ -262,7 +258,7 @@ class EntityLockService {
    */
   async checkPendingCR(
     table: string,
-    entityId: string | number,
+    entityId: string,
     environment: string
   ): Promise<{ hasPending: boolean; crId?: string; crTitle?: string }> {
     // Import dynamically to avoid circular dependency
@@ -273,7 +269,7 @@ class EntityLockService {
       // Find open or approved CRs that affect this entity
       const pendingItem = await ChangeItem.query()
         .where('targetTable', table)
-        .where('targetId', String(entityId))
+        .where('targetId', entityId)
         .whereIn('opType', ['UPDATE', 'DELETE'])
         .whereExists(
           ChangeRequest.query()

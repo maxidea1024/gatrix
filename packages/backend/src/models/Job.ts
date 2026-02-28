@@ -1,9 +1,10 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export interface JobFilters {
   environment: string;
-  jobTypeId?: number;
+  jobTypeId?: string;
   isEnabled?: boolean;
   search?: string;
   limit?: number;
@@ -18,23 +19,23 @@ export interface JobListResult {
 export interface CreateJobData {
   name: string;
   memo?: string;
-  jobTypeId: number;
+  jobTypeId: string;
   isEnabled: boolean;
   jobDataMap?: any;
-  tagIds?: number[];
-  createdBy: number;
-  updatedBy: number;
+  tagIds?: string[];
+  createdBy: string;
+  updatedBy: string;
   environment: string;
 }
 
 export interface UpdateJobData {
   name?: string;
   memo?: string;
-  jobTypeId?: number;
+  jobTypeId?: string;
   isEnabled?: boolean;
   jobDataMap?: any;
-  tagIds?: number[];
-  updatedBy: number;
+  tagIds?: string[];
+  updatedBy: string;
 }
 
 // JSON 파싱 유틸리티 함수
@@ -204,7 +205,7 @@ export class JobModel {
     }
   }
 
-  static async findById(id: number, environment: string): Promise<any | null> {
+  static async findById(id: string, environment: string): Promise<any | null> {
     try {
       const job = await db('g_jobs as j')
         .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
@@ -259,7 +260,9 @@ export class JobModel {
     const trx = await db.transaction();
     try {
       const environment = jobData.environment;
-      const [insertId] = await trx('g_jobs').insert({
+      const id = generateULID();
+      await trx('g_jobs').insert({
+        id,
         name: jobData.name,
         memo: jobData.memo,
         jobTypeId: jobData.jobTypeId,
@@ -276,7 +279,7 @@ export class JobModel {
       if (jobData.tagIds && jobData.tagIds.length > 0) {
         const tagAssignments = jobData.tagIds.map((tagId) => ({
           entityType: 'job',
-          entityId: insertId,
+          entityId: id,
           tagId: tagId,
           createdBy: jobData.createdBy || 1,
           createdAt: new Date(),
@@ -285,7 +288,7 @@ export class JobModel {
       }
 
       await trx.commit();
-      return await this.findById(insertId, environment);
+      return await this.findById(id, environment);
     } catch (error) {
       await trx.rollback();
       logger.error('Error creating job:', error);
@@ -293,7 +296,7 @@ export class JobModel {
     }
   }
 
-  static async update(id: number, jobData: UpdateJobData, environment: string): Promise<any> {
+  static async update(id: string, jobData: UpdateJobData, environment: string): Promise<any> {
     const trx = await db.transaction();
     try {
       const updateData: any = {};
@@ -336,7 +339,7 @@ export class JobModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environment: string): Promise<void> {
     const trx = await db.transaction();
     try {
       // 태그 할당 삭제
@@ -354,7 +357,7 @@ export class JobModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(jobId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTags(jobId: string, tagIds: string[], createdBy?: string): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
@@ -366,7 +369,7 @@ export class JobModel {
             entityType: 'job',
             entityId: jobId,
             tagId: tagId,
-            createdBy: createdBy || 1,
+            createdBy: createdBy || '',
             createdAt: new Date(),
           }));
           await trx('g_tag_assignments').insert(assignments);
@@ -378,7 +381,7 @@ export class JobModel {
     }
   }
 
-  static async getTags(jobId: number): Promise<any[]> {
+  static async getTags(jobId: string): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')

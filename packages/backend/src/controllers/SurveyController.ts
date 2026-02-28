@@ -13,7 +13,7 @@ import logger from '../config/logger';
 
 interface ServerReward {
   type: number;
-  id: number;
+  id: string;
   quantity: number;
 }
 
@@ -24,7 +24,7 @@ function normalizeParticipationRewards(rawItems: any[] | null | undefined): Serv
 
   return rawItems.map((item: any) => ({
     type: Number(item.rewardType ?? item.type ?? 0),
-    id: Number(item.itemId ?? item.id ?? 0),
+    id: String(item.itemId ?? item.id ?? ''),
     quantity: Number(item.quantity ?? 0),
   }));
 }

@@ -212,7 +212,11 @@ class FeatureFlagService {
   /**
    * Create a new feature flag
    */
-  async createFlag(input: CreateFlagInput, userId: number, requestContext?: RequestContext): Promise<FeatureFlagAttributes> {
+  async createFlag(
+    input: CreateFlagInput,
+    userId: string,
+    requestContext?: RequestContext
+  ): Promise<FeatureFlagAttributes> {
     const flagName = input.flagName || input.name;
     // Check for duplicate
     const existing = await FeatureFlagModel.findByName(input.environment!, flagName!);
@@ -348,7 +352,7 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     input: UpdateFlagInput,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
@@ -486,7 +490,7 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     isEnabled: boolean,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     return this.updateFlag(environment, flagName, { isEnabled }, userId, requestContext);
@@ -512,7 +516,7 @@ class FeatureFlagService {
   async archiveFlag(
     environment: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
@@ -554,7 +558,7 @@ class FeatureFlagService {
   async reviveFlag(
     environment: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
@@ -594,7 +598,7 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     isFavorite: boolean,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
@@ -629,7 +633,7 @@ class FeatureFlagService {
   async markAsStale(
     environment: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
@@ -667,7 +671,7 @@ class FeatureFlagService {
   async markAsNotStale(
     environment: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
     const flag = await this.getFlag(environment, flagName);
@@ -702,7 +706,12 @@ class FeatureFlagService {
   /**
    * Delete a flag (permanently)
    */
-  async deleteFlag(environment: string, flagName: string, userId: number, requestContext?: RequestContext): Promise<void> {
+  async deleteFlag(
+    environment: string,
+    flagName: string,
+    userId: string,
+    requestContext?: RequestContext
+  ): Promise<void> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
@@ -745,7 +754,7 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     input: CreateStrategyInput,
-    userId: number
+    userId: string
   ): Promise<FeatureStrategyAttributes> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -779,7 +788,7 @@ class FeatureFlagService {
   async updateStrategy(
     strategyId: string,
     input: UpdateStrategyInput,
-    userId: number
+    userId: string
   ): Promise<FeatureStrategyAttributes> {
     const strategy = await FeatureStrategyModel.findById(strategyId);
     if (!strategy) {
@@ -804,7 +813,7 @@ class FeatureFlagService {
   /**
    * Delete a strategy
    */
-  async deleteStrategy(strategyId: string, userId: number): Promise<void> {
+  async deleteStrategy(strategyId: string, userId: string): Promise<void> {
     const strategy = await FeatureStrategyModel.findById(strategyId);
     if (!strategy) {
       throw new GatrixError('Strategy not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -825,7 +834,7 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     strategies: CreateStrategyInput[],
-    userId: number
+    userId: string
   ): Promise<FeatureStrategyAttributes[]> {
     const flag = await this.getFlag(environment, flagName);
     if (!flag) {
@@ -897,7 +906,7 @@ class FeatureFlagService {
     environment: string,
     flagName: string,
     variants: CreateVariantInput[],
-    userId: number,
+    userId: string,
     valueType?: ValueType,
     enabledValue?: any,
     disabledValue?: any,
@@ -1052,7 +1061,7 @@ class FeatureFlagService {
    */
   async createSegment(
     input: CreateSegmentInput,
-    userId: number
+    userId: string
   ): Promise<FeatureSegmentAttributes> {
     // Check if segment name already exists (segments are now global)
     const existing = await FeatureSegmentModel.findByName(input.segmentName);
@@ -1095,7 +1104,7 @@ class FeatureFlagService {
   async updateSegment(
     id: string,
     input: UpdateSegmentInput,
-    userId: number
+    userId: string
   ): Promise<FeatureSegmentAttributes> {
     const segment = await this.getSegment(id);
     if (!segment) {
@@ -1127,7 +1136,7 @@ class FeatureFlagService {
   /**
    * Delete a segment
    */
-  async deleteSegment(id: string, userId: number): Promise<void> {
+  async deleteSegment(id: string, userId: string): Promise<void> {
     const segment = await this.getSegment(id);
     if (!segment) {
       throw new GatrixError('Segment not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -1171,7 +1180,7 @@ class FeatureFlagService {
    */
   async createContextField(
     input: Partial<FeatureContextFieldAttributes>,
-    userId: number
+    userId: string
   ): Promise<FeatureContextFieldAttributes> {
     const existing = await FeatureContextFieldModel.findByFieldName(input.fieldName!);
     if (existing) {
@@ -1201,7 +1210,7 @@ class FeatureFlagService {
   async updateContextField(
     fieldName: string,
     input: Partial<FeatureContextFieldAttributes>,
-    userId: number
+    userId: string
   ): Promise<FeatureContextFieldAttributes> {
     const field = await FeatureContextFieldModel.findByFieldName(fieldName);
     if (!field) {
@@ -1227,7 +1236,7 @@ class FeatureFlagService {
   /**
    * Delete a context field
    */
-  async deleteContextField(fieldName: string, userId: number): Promise<void> {
+  async deleteContextField(fieldName: string, userId: string): Promise<void> {
     const field = await FeatureContextFieldModel.findByFieldName(fieldName);
     if (!field) {
       throw new GatrixError(

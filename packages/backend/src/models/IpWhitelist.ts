@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export interface IpWhitelistFilters {
@@ -6,7 +7,7 @@ export interface IpWhitelistFilters {
   ipAddress?: string;
   purpose?: string;
   isEnabled?: boolean;
-  createdBy?: number;
+  createdBy?: string;
   limit?: number;
   offset?: number;
 }
@@ -20,22 +21,22 @@ export interface IpWhitelistListResponse {
 }
 
 export interface IpWhitelist {
-  id?: number;
+  id?: string;
   environment: string;
   ipAddress: string;
   purpose?: string;
   isEnabled: boolean;
   startDate?: Date;
   endDate?: Date;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface CreateIpWhitelistData extends Omit<IpWhitelist, 'id' | 'createdAt' | 'updatedAt'> {
   purpose?: string;
-  createdBy?: number;
+  createdBy?: string;
   startDate?: Date;
   endDate?: Date;
 }
@@ -119,7 +120,7 @@ export class IpWhitelistModel {
     }
   }
 
-  static async findById(id: number, environment: string): Promise<any | null> {
+  static async findById(id: string, environment: string): Promise<any | null> {
     try {
       const ipWhitelist = await db('g_ip_whitelist as iw')
         .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
@@ -138,21 +139,23 @@ export class IpWhitelistModel {
 
   static async create(data: any, environment: string): Promise<any> {
     try {
-      const [insertId] = await db('g_ip_whitelist').insert({
+      const id = generateULID();
+      await db('g_ip_whitelist').insert({
+        id,
         ...data,
         environment: environment,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
-      return await this.findById(insertId, environment);
+      return await this.findById(id, environment);
     } catch (error) {
       logger.error('Error creating IP whitelist:', error);
       throw error;
     }
   }
 
-  static async update(id: number, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environment: string): Promise<any> {
     try {
       await db('g_ip_whitelist')
         .where('id', id)
@@ -169,7 +172,7 @@ export class IpWhitelistModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environment: string): Promise<void> {
     try {
       await db('g_ip_whitelist').where('id', id).where('environment', environment).del();
     } catch (error) {
@@ -210,7 +213,7 @@ export class IpWhitelistModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(whitelistId: number, tagIds: number[]): Promise<void> {
+  static async setTags(whitelistId: string, tagIds: string[]): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
@@ -236,7 +239,7 @@ export class IpWhitelistModel {
     }
   }
 
-  static async getTags(whitelistId: number): Promise<any[]> {
+  static async getTags(whitelistId: string): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')

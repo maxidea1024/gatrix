@@ -24,7 +24,7 @@ export class EntityLock extends Model {
   entityType!: string;
   entityId!: string;
   environment!: string;
-  lockedBy!: number;
+  lockedBy!: string;
   lockType!: LockType;
   expiresAt?: Date;
   createdAt!: Date;

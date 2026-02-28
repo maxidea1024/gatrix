@@ -1,4 +1,5 @@
 import knex from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 import { GameWorldModel } from '../models/GameWorld';
 import { PlanningDataService } from './PlanningDataService';
@@ -289,7 +290,7 @@ export class EnvironmentCopyService {
     sourceEnvironment: string,
     targetEnvironment: string,
     options: CopyOptions,
-    userId: number
+    userId: string
   ): Promise<CopyResult> {
     const result: CopyResult = {
       templates: emptyResult(),
@@ -527,7 +528,7 @@ export class EnvironmentCopyService {
   private static async copyTemplates(
     _sourceEnv: string,
     _targetEnv: string,
-    _userId: number,
+    _userId: string,
     _overwrite: boolean,
     _result: CopyResultItem
   ): Promise<void> {
@@ -537,7 +538,7 @@ export class EnvironmentCopyService {
   private static async copyGameWorlds(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -591,7 +592,7 @@ export class EnvironmentCopyService {
   private static async copySegments(
     _sourceEnv: string,
     _targetEnv: string,
-    _userId: number,
+    _userId: string,
     _overwrite: boolean,
     _result: CopyResultItem
   ): Promise<void> {
@@ -602,7 +603,7 @@ export class EnvironmentCopyService {
     tableName: string,
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     result: CopyResultItem
   ): Promise<void> {
     try {
@@ -632,7 +633,7 @@ export class EnvironmentCopyService {
   private static async copyClientVersions(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -679,7 +680,7 @@ export class EnvironmentCopyService {
   private static async copyCoupons(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -732,7 +733,7 @@ export class EnvironmentCopyService {
   private static async copyMessageTemplates(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -748,7 +749,7 @@ export class EnvironmentCopyService {
           continue;
         }
         const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
-        let newId: number;
+        let newId: string;
         if (existing) {
           await knex('g_message_templates')
             .where('id', existing.id)
@@ -762,14 +763,16 @@ export class EnvironmentCopyService {
           // Delete old locales
           await knex('g_message_template_locales').where('templateId', existing.id).del();
         } else {
-          const [insertId] = await knex('g_message_templates').insert({
+          const id = generateULID();
+          await knex('g_message_templates').insert({
+            id,
             ...data,
             environment: targetEnv,
             createdBy: userId,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-          newId = insertId;
+          newId = id;
         }
         // Copy locales
         const locales = await knex('g_message_template_locales').where('templateId', item.id);
@@ -792,7 +795,7 @@ export class EnvironmentCopyService {
   private static async copyRewardTemplates(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -808,7 +811,7 @@ export class EnvironmentCopyService {
           continue;
         }
         const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = item;
-        let newId: number;
+        let newId: string;
         if (existing) {
           await knex('g_reward_templates')
             .where('id', existing.id)
@@ -822,14 +825,16 @@ export class EnvironmentCopyService {
           // Delete old items
           await knex('g_reward_items').where('templateId', existing.id).del();
         } else {
-          const [insertId] = await knex('g_reward_templates').insert({
+          const id = generateULID();
+          await knex('g_reward_templates').insert({
+            id,
             ...data,
             environment: targetEnv,
             createdBy: userId,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-          newId = insertId;
+          newId = id;
         }
         // Copy reward items
         const items = await knex('g_reward_items').where('templateId', item.id);
@@ -852,7 +857,7 @@ export class EnvironmentCopyService {
   private static async copyServiceMaintenance(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     result: CopyResultItem
   ): Promise<void> {
     const sources = await knex('g_service_maintenance').where('environment', sourceEnv);
@@ -888,7 +893,7 @@ export class EnvironmentCopyService {
   private static async copyVars(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -933,7 +938,7 @@ export class EnvironmentCopyService {
   private static async copyContextFields(
     _sourceEnv: string,
     _targetEnv: string,
-    _userId: number,
+    _userId: string,
     _overwrite: boolean,
     _result: CopyResultItem
   ): Promise<void> {
@@ -944,7 +949,7 @@ export class EnvironmentCopyService {
   private static async copyCampaigns(
     _sourceEnv: string,
     _targetEnv: string,
-    _userId: number,
+    _userId: string,
     _overwrite: boolean,
     _result: CopyResultItem
   ): Promise<void> {
@@ -954,7 +959,7 @@ export class EnvironmentCopyService {
   private static async copyAccountWhitelist(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -1000,7 +1005,7 @@ export class EnvironmentCopyService {
   private static async copyIpWhitelist(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {
@@ -1046,7 +1051,7 @@ export class EnvironmentCopyService {
   private static async copyJobs(
     sourceEnv: string,
     targetEnv: string,
-    userId: number,
+    userId: string,
     overwrite: boolean,
     result: CopyResultItem
   ): Promise<void> {

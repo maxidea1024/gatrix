@@ -42,7 +42,8 @@ router.post(
     resourceType: 'client_version',
     getResourceId: (req) => req.body?.version,
     getNewValues: (req) => req.body,
-    getDescription: (req) => `Client version '${req.body?.clientVersion}' (${req.body?.platform}) created with status '${req.body?.clientStatus}'`,
+    getDescription: (req) =>
+      `Client version '${req.body?.clientVersion}' (${req.body?.platform}) created with status '${req.body?.clientStatus}'`,
   }) as any,
   ClientVersionController.createClientVersion as any
 );
@@ -70,7 +71,8 @@ router.put(
     resourceType: 'client_version',
     getResourceId: (req) => req.params?.id,
     getNewValues: (req) => req.body,
-    getDescription: (req) => `Client version #${req.params?.id} updated${req.body?.clientStatus ? ` (status: ${req.body.clientStatus})` : ''}`,
+    getDescription: (req) =>
+      `Client version #${req.params?.id} updated${req.body?.clientStatus ? ` (status: ${req.body.clientStatus})` : ''}`,
   }) as any,
   ClientVersionController.updateClientVersion as any
 );

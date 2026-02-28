@@ -52,8 +52,8 @@ passport.use(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: config.jwt.secret,
-      issuer: 'admin-panel',
-      audience: 'admin-panel-users',
+      issuer: 'gatrix',
+      audience: 'gatrix-users',
     },
     async (payload: JwtPayload, done) => {
       try {

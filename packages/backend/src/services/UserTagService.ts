@@ -4,7 +4,7 @@ import logger from '../config/logger';
 
 export class UserTagService {
   // 사용자 태그 조회
-  static async getUserTags(userId: number): Promise<any[]> {
+  static async getUserTags(userId: string): Promise<any[]> {
     try {
       return await UserModel.getTags(userId);
     } catch (error) {
@@ -14,7 +14,7 @@ export class UserTagService {
   }
 
   // 사용자 태그 설정 (기존 태그 모두 교체)
-  static async setUserTags(userId: number, tagIds: number[], updatedBy: number): Promise<void> {
+  static async setUserTags(userId: string, tagIds: string[], updatedBy: string): Promise<void> {
     try {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
@@ -33,7 +33,7 @@ export class UserTagService {
   }
 
   // 사용자에게 태그 추가
-  static async addUserTag(userId: number, tagId: number, createdBy: number): Promise<void> {
+  static async addUserTag(userId: string, tagId: string, createdBy: string): Promise<void> {
     try {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
@@ -52,7 +52,7 @@ export class UserTagService {
   }
 
   // 사용자에서 태그 제거
-  static async removeUserTag(userId: number, tagId: number): Promise<void> {
+  static async removeUserTag(userId: string, tagId: string): Promise<void> {
     try {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);

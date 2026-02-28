@@ -57,9 +57,9 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
 export const getJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const jobId = parseInt(id);
+    const jobId = id;
 
-    if (isNaN(jobId)) {
+    if (!jobId) {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
@@ -133,9 +133,9 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const jobId = parseInt(id);
+    const jobId = id;
 
-    if (isNaN(jobId)) {
+    if (!jobId) {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
@@ -184,9 +184,9 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const jobId = parseInt(id);
+    const jobId = id;
 
-    if (isNaN(jobId)) {
+    if (!jobId) {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
@@ -228,7 +228,7 @@ export const setJobTags = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    await JobModel.setTags(parseInt(id), tagIds);
+    await JobModel.setTags(id, tagIds);
 
     return sendSuccessResponse(res, undefined, 'Tags updated successfully');
   } catch (error) {
@@ -245,7 +245,7 @@ export const setJobTags = async (req: AuthenticatedRequest, res: Response) => {
 export const getJobTags = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const tags = await JobModel.getTags(parseInt(id));
+    const tags = await JobModel.getTags(id);
 
     return sendSuccessResponse(res, tags);
   } catch (error) {

@@ -21,9 +21,8 @@ export class EnvironmentController {
       environments.map(async (env) => {
         const stats = await env.getStats();
         return {
-          id: env.environment, // Map environment to id for frontend compatibility
-          environmentName: env.environment, // Also provide as environmentName
           ...env,
+          environmentName: env.environment, // Also provide as environmentName
           stats,
         };
       })

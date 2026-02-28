@@ -72,7 +72,7 @@ export class VarsService {
   static async updateKV(
     key: string,
     value: string | null,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<void> {
     await VarsModel.set(key, value, userId, environment);

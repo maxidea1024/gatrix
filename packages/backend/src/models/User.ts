@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { generateULID } from '../utils/ulid';
 import db from '../config/knex';
 import logger from '../config/logger';
 import {
@@ -18,7 +19,7 @@ import {
 export class User extends Model {
   static tableName = 'g_users';
 
-  id!: number;
+  id!: string;
   email!: string;
   name!: string;
   passwordHash?: string;
@@ -30,14 +31,14 @@ export class User extends Model {
   lastLoginAt?: Date;
   avatarUrl?: string;
   preferredLanguage?: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt!: Date;
   updatedAt!: Date;
 }
 
 export class UserModel {
-  static async findById(id: number): Promise<UserWithoutPassword | null> {
+  static async findById(id: string): Promise<UserWithoutPassword | null> {
     try {
       const user = await db('g_users')
         .select([
@@ -121,7 +122,10 @@ export class UserModel {
         passwordHash = await bcrypt.hash(userData.password, 12);
       }
 
-      const [insertId] = await db('g_users').insert({
+      const id = generateULID();
+
+      await db('g_users').insert({
+        id,
         email: userData.email,
         passwordHash: passwordHash || null,
         name: userData.name,
@@ -134,7 +138,7 @@ export class UserModel {
         createdBy: userData.createdBy || null,
       });
 
-      const user = await this.findById(insertId);
+      const user = await this.findById(id);
       if (!user) {
         throw new Error('Failed to create user');
       }
@@ -146,7 +150,7 @@ export class UserModel {
     }
   }
 
-  static async update(id: number, userData: UpdateUserData): Promise<UserWithoutPassword | null> {
+  static async update(id: string, userData: UpdateUserData): Promise<UserWithoutPassword | null> {
     try {
       const updateData: any = {};
 
@@ -171,7 +175,7 @@ export class UserModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await db('g_users').where('id', id).del();
 
@@ -361,7 +365,7 @@ export class UserModel {
     }
   }
 
-  static async updatePassword(id: number, newPassword: string): Promise<boolean> {
+  static async updatePassword(id: string, newPassword: string): Promise<boolean> {
     try {
       const passwordHash = await bcrypt.hash(newPassword, 12);
       const result = await db('g_users').where('id', id).update({
@@ -376,7 +380,7 @@ export class UserModel {
     }
   }
 
-  static async updateLastLogin(id: number): Promise<void> {
+  static async updateLastLogin(id: string): Promise<void> {
     try {
       await db('g_users').where('id', id).update({
         lastLoginAt: db.fn.now(),
@@ -388,7 +392,7 @@ export class UserModel {
   }
 
   // 태그 관련 메서드들
-  static async getTags(userId: number): Promise<any[]> {
+  static async getTags(userId: string): Promise<any[]> {
     try {
       const tags = await db('g_tag_assignments')
         .join('g_tags', 'g_tag_assignments.tagId', 'g_tags.id')
@@ -411,7 +415,11 @@ export class UserModel {
     }
   }
 
-  static async setTags(userId: number, tagIds: number[], updatedBy: number): Promise<void> {
+  static async setTags(
+    userId: string,
+    tagIds: (string | number)[],
+    updatedBy: string
+  ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
@@ -438,7 +446,7 @@ export class UserModel {
     }
   }
 
-  static async addTag(userId: number, tagId: number, createdBy: number): Promise<void> {
+  static async addTag(userId: string, tagId: string, createdBy: string): Promise<void> {
     try {
       await db('g_tag_assignments').insert({
         tagId,
@@ -455,7 +463,7 @@ export class UserModel {
     }
   }
 
-  static async removeTag(userId: number, tagId: number): Promise<void> {
+  static async removeTag(userId: string, tagId: string): Promise<void> {
     try {
       await db('g_tag_assignments')
         .where('entityType', 'user')
@@ -471,7 +479,7 @@ export class UserModel {
   /**
    * Update user's preferred language
    */
-  static async updateLanguage(userId: number, preferredLanguage: string): Promise<void> {
+  static async updateLanguage(userId: string, preferredLanguage: string): Promise<void> {
     try {
       await db('g_users').where('id', userId).update({
         preferredLanguage,
@@ -538,7 +546,7 @@ export class UserModel {
   /**
    * Get user's environment access settings
    */
-  static async getEnvironmentAccess(userId: number): Promise<{
+  static async getEnvironmentAccess(userId: string): Promise<{
     allowAllEnvironments: boolean;
     environments: string[];
   }> {
@@ -569,10 +577,10 @@ export class UserModel {
    * Set user's environment access
    */
   static async setEnvironmentAccess(
-    userId: number,
+    userId: string,
     allowAllEnvironments: boolean,
     environments: string[],
-    updatedBy: number
+    updatedBy: string
   ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
@@ -607,7 +615,7 @@ export class UserModel {
   /**
    * Check if user has access to a specific environment
    */
-  static async hasEnvironmentAccess(userId: number, environment: string): Promise<boolean> {
+  static async hasEnvironmentAccess(userId: string, environment: string): Promise<boolean> {
     try {
       const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
 
@@ -636,7 +644,7 @@ export class UserModel {
   /**
    * Get accessible environment names for a user
    */
-  static async getAccessibleEnvironments(userId: number): Promise<string[] | 'all'> {
+  static async getAccessibleEnvironments(userId: string): Promise<string[] | 'all'> {
     try {
       const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
 
@@ -664,7 +672,7 @@ export class UserModel {
   /**
    * Get all permissions for a user
    */
-  static async getPermissions(userId: number): Promise<string[]> {
+  static async getPermissions(userId: string): Promise<string[]> {
     try {
       const permissions = await db('g_user_permissions')
         .select('permission')
@@ -681,7 +689,7 @@ export class UserModel {
    * Check if user has a specific permission
    * Supports wildcard '*' permission that grants all permissions
    */
-  static async hasPermission(userId: number, permission: string): Promise<boolean> {
+  static async hasPermission(userId: string, permission: string): Promise<boolean> {
     try {
       // Check for wildcard permission or exact match
       const result = await db('g_user_permissions')
@@ -702,7 +710,7 @@ export class UserModel {
    * Check if user has any of the specified permissions
    * Supports wildcard '*' permission that grants all permissions
    */
-  static async hasAnyPermission(userId: number, permissions: string[]): Promise<boolean> {
+  static async hasAnyPermission(userId: string, permissions: string[]): Promise<boolean> {
     try {
       // Check for wildcard permission or any of the specified permissions
       const result = await db('g_user_permissions')
@@ -722,7 +730,7 @@ export class UserModel {
   /**
    * Set permissions for a user (replaces all existing permissions)
    */
-  static async setPermissions(userId: number, permissions: string[]): Promise<void> {
+  static async setPermissions(userId: string, permissions: string[]): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // Delete all existing permissions
@@ -747,7 +755,7 @@ export class UserModel {
   /**
    * Add a permission to a user
    */
-  static async addPermission(userId: number, permission: string): Promise<void> {
+  static async addPermission(userId: string, permission: string): Promise<void> {
     try {
       await db('g_user_permissions')
         .insert({ userId, permission })
@@ -762,7 +770,7 @@ export class UserModel {
   /**
    * Remove a permission from a user
    */
-  static async removePermission(userId: number, permission: string): Promise<void> {
+  static async removePermission(userId: string, permission: string): Promise<void> {
     try {
       await db('g_user_permissions').where('userId', userId).where('permission', permission).del();
     } catch (error) {

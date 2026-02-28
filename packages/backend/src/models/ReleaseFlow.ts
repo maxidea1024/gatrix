@@ -25,8 +25,8 @@ export interface ReleaseFlowAttributes {
   status: FlowStatus;
   isArchived: boolean;
   archivedAt?: Date;
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 

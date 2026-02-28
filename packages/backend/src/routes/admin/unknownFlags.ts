@@ -44,7 +44,7 @@ router.get('/count', async (req, res) => {
  */
 router.post('/:id/resolve', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const user = (req as any).user;
     const resolvedBy = user?.username || 'unknown';
 
@@ -62,7 +62,7 @@ router.post('/:id/resolve', async (req, res) => {
  */
 router.post('/:id/unresolve', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     await unknownFlagService.unresolveUnknownFlag(id);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
@@ -77,7 +77,7 @@ router.post('/:id/unresolve', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     await unknownFlagService.deleteUnknownFlag(id);
     res.json({ success: true, data: { success: true } });
   } catch (error) {

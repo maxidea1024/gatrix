@@ -1,11 +1,14 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 import { AuditLog, CreateAuditLogData } from '../types/user';
 
 export class AuditLogModel {
   static async create(auditData: CreateAuditLogData): Promise<AuditLog> {
     try {
-      const [insertId] = await db('g_audit_logs').insert({
+      const id = generateULID();
+      await db('g_audit_logs').insert({
+        id,
         userId: auditData.userId || null,
         action: auditData.action,
         description: auditData.description || null,
@@ -17,7 +20,7 @@ export class AuditLogModel {
         userAgent: auditData.userAgent || null,
       });
 
-      const auditLog = await this.findById(insertId);
+      const auditLog = await this.findById(id);
       if (!auditLog) {
         throw new Error('Failed to create audit log');
       }
@@ -141,7 +144,7 @@ export class AuditLogModel {
     }
   }
 
-  static async findById(id: number): Promise<AuditLog | null> {
+  static async findById(id: string): Promise<AuditLog | null> {
     try {
       const auditLog = await db('g_audit_logs').where('id', id).first();
 
@@ -176,7 +179,7 @@ export class AuditLogModel {
     page: number = 1,
     limit: number = 10,
     filters: {
-      userId?: number;
+      userId?: string;
       user?: string; // search by email or name
       ipAddress?: string;
       action?: string | string[];
@@ -355,7 +358,7 @@ export class AuditLogModel {
   }
 
   static async findByUserId(
-    userId: number,
+    userId: string,
     page: number = 1,
     limit: number = 10
   ): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {

@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export enum JobExecutionStatus {
@@ -11,8 +12,8 @@ export enum JobExecutionStatus {
 }
 
 export interface JobExecutionAttributes {
-  id: number;
-  jobId: number;
+  id: string;
+  jobId: string;
   scheduleId?: number;
   status: JobExecutionStatus;
   startedAt?: string;
@@ -28,7 +29,7 @@ export interface JobExecutionAttributes {
 }
 
 export interface CreateJobExecutionData {
-  jobId: number;
+  jobId: string;
   scheduleId?: number;
   status?: JobExecutionStatus;
   retryAttempt?: number;
@@ -44,7 +45,7 @@ export interface UpdateJobExecutionData {
 }
 
 export interface JobExecutionFilters {
-  jobId?: number;
+  jobId?: string;
   scheduleId?: number;
   status?: JobExecutionStatus;
   dateFrom?: string;
@@ -91,7 +92,7 @@ export class JobExecutionModel {
     }
   }
 
-  static async findById(id: number): Promise<JobExecutionAttributes | null> {
+  static async findById(id: string): Promise<JobExecutionAttributes | null> {
     try {
       const results = await db('g_job_executions as je')
         .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
@@ -114,14 +115,16 @@ export class JobExecutionModel {
 
   static async create(data: CreateJobExecutionData): Promise<JobExecutionAttributes> {
     try {
-      const [insertId] = await db('g_job_executions').insert({
+      const id = generateULID();
+      await db('g_job_executions').insert({
+        id,
         jobId: data.jobId,
         scheduleId: data.scheduleId || null,
         status: data.status || JobExecutionStatus.PENDING,
         retryAttempt: data.retryAttempt || 0,
       });
 
-      const created = await this.findById(insertId);
+      const created = await this.findById(id);
       if (!created) {
         throw new Error('Failed to retrieve created job execution');
       }
@@ -133,7 +136,7 @@ export class JobExecutionModel {
     }
   }
 
-  static async update(id: number, data: UpdateJobExecutionData): Promise<JobExecutionAttributes> {
+  static async update(id: string, data: UpdateJobExecutionData): Promise<JobExecutionAttributes> {
     try {
       const updateData: any = {};
 
@@ -180,7 +183,7 @@ export class JobExecutionModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await db('g_job_executions').where('id', id).del();
 
@@ -191,7 +194,7 @@ export class JobExecutionModel {
     }
   }
 
-  static async findByJob(jobId: number, limit?: number): Promise<JobExecutionAttributes[]> {
+  static async findByJob(jobId: string, limit?: number): Promise<JobExecutionAttributes[]> {
     try {
       return await this.findAll({ jobId, limit });
     } catch (error) {

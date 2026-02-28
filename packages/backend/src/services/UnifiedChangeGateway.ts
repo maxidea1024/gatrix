@@ -21,7 +21,7 @@ export class UnifiedChangeGateway {
    * Request a modification (update) through the Change Request system
    */
   static async requestModification(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -34,7 +34,7 @@ export class UnifiedChangeGateway {
    * Request a creation through the Change Request system
    */
   static async requestCreation(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     createData: any,
@@ -91,7 +91,7 @@ export class UnifiedChangeGateway {
    * Request a deletion through the Change Request system
    */
   static async requestDeletion(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -178,7 +178,7 @@ export class UnifiedChangeGateway {
    * Internal method to process update changes
    */
   public static async processChange(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,

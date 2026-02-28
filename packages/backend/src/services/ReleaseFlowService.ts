@@ -60,7 +60,9 @@ export class ReleaseFlowService {
       { planId },
       { delay: delayMs }
     );
-    logger.info(`Scheduled milestone progression for plan ${planId} in ${delayMs}ms (jobId hint: ${jobId})`);
+    logger.info(
+      `Scheduled milestone progression for plan ${planId} in ${delayMs}ms (jobId hint: ${jobId})`
+    );
   }
 
   /**
@@ -90,7 +92,7 @@ export class ReleaseFlowService {
   /**
    * Create a new release flow template
    */
-  async createTemplate(input: CreateTemplateInput, userId: number): Promise<ReleaseFlowAttributes> {
+  async createTemplate(input: CreateTemplateInput, userId: string): Promise<ReleaseFlowAttributes> {
     const trx = await db.transaction();
     try {
       const flow = await ReleaseFlowModel.create({
@@ -152,7 +154,7 @@ export class ReleaseFlowService {
     flagId: string,
     environment: string,
     templateId: string,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowAttributes> {
     const template = await ReleaseFlowModel.findById(templateId);
     if (!template || template.discriminator !== 'template') {
@@ -233,7 +235,7 @@ export class ReleaseFlowService {
   async startMilestone(
     planId: string,
     milestoneId: string,
-    userId: number | null
+    userId: string | null
   ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
@@ -319,10 +321,7 @@ export class ReleaseFlowService {
 
       // 4. CRITICAL: Bump flag version and notify SDKs about strategy changes
       // Without this, SDKs will not detect the new strategies from the milestone
-      const flag = await db('g_feature_flags')
-        .where('id', plan.flagId)
-        .select('flagName')
-        .first();
+      const flag = await db('g_feature_flags').where('id', plan.flagId).select('flagName').first();
       if (flag && plan.environment) {
         await db('g_feature_flags')
           .where('id', plan.flagId)
@@ -367,7 +366,7 @@ export class ReleaseFlowService {
   /**
    * Start a plan (begins from the first milestone)
    */
-  async startPlan(planId: string, userId: number): Promise<ReleaseFlowAttributes> {
+  async startPlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -390,7 +389,7 @@ export class ReleaseFlowService {
   /**
    * Pause the current plan (stops progression timer)
    */
-  async pausePlan(planId: string, userId: number): Promise<ReleaseFlowAttributes> {
+  async pausePlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -438,7 +437,7 @@ export class ReleaseFlowService {
   /**
    * Resume a paused plan
    */
-  async resumePlan(planId: string, userId: number): Promise<ReleaseFlowAttributes> {
+  async resumePlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -510,7 +509,7 @@ export class ReleaseFlowService {
    */
   async progressToNextMilestone(
     planId: string,
-    userId?: number
+    userId?: string
   ): Promise<ReleaseFlowAttributes | null> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan' || plan.status !== 'active') {
@@ -577,7 +576,7 @@ export class ReleaseFlowService {
   async setTransitionCondition(
     milestoneId: string,
     transitionCondition: TransitionCondition,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowMilestoneAttributes> {
     const milestone = await ReleaseFlowMilestoneModel.findById(milestoneId);
     if (!milestone) {
@@ -612,7 +611,7 @@ export class ReleaseFlowService {
    */
   async removeTransitionCondition(
     milestoneId: string,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowMilestoneAttributes> {
     const milestone = await ReleaseFlowMilestoneModel.findById(milestoneId);
     if (!milestone) {
@@ -637,7 +636,7 @@ export class ReleaseFlowService {
   async updateTemplate(
     id: string,
     input: Partial<CreateTemplateInput>,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowAttributes> {
     const trx = await db.transaction();
     try {
@@ -706,7 +705,7 @@ export class ReleaseFlowService {
     }
   }
 
-  async deleteTemplate(id: string, userId: number): Promise<void> {
+  async deleteTemplate(id: string, userId: string): Promise<void> {
     const existing = await ReleaseFlowModel.findById(id);
     if (!existing || existing.discriminator !== 'template') {
       throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -748,7 +747,7 @@ export class ReleaseFlowService {
   /**
    * Delete (archive) an applied release flow plan
    */
-  async deletePlan(planId: string, userId: number): Promise<void> {
+  async deletePlan(planId: string, userId: string): Promise<void> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Plan not found', 404, true, ErrorCodes.NOT_FOUND);

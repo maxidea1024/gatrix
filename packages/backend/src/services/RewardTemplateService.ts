@@ -18,8 +18,8 @@ export interface RewardTemplate {
   description?: string;
   rewardItems: ParticipationReward[];
   tags?: string[];
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,7 +29,7 @@ export interface CreateRewardTemplateInput {
   description?: string;
   rewardItems: ParticipationReward[];
   tags?: string[];
-  createdBy?: number;
+  createdBy?: string;
 }
 
 export interface UpdateRewardTemplateInput {
@@ -37,7 +37,7 @@ export interface UpdateRewardTemplateInput {
   description?: string;
   rewardItems?: ParticipationReward[];
   tags?: string[];
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export interface GetRewardTemplatesParams {

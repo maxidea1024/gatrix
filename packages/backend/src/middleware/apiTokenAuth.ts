@@ -74,7 +74,7 @@ function handleSpecialTokens(token: string): {
         tokenType: type as any,
         tokenName: `Unsecured ${type.toUpperCase()} Token`,
         allowAllEnvironments: true,
-        createdBy: 0, // Mock system user ID
+        createdBy: '', // Mock system user ID
       },
       isUnsecured: true,
     };
@@ -88,7 +88,7 @@ function handleSpecialTokens(token: string): {
         tokenType: 'all',
         tokenName: 'Edge Bypass Token (Internal)',
         allowAllEnvironments: true,
-        createdBy: 0, // Mock system user ID
+        createdBy: '', // Mock system user ID
       },
       isEdgeBypass: true,
     };

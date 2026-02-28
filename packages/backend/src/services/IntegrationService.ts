@@ -55,7 +55,7 @@ export class IntegrationService {
    */
   static async create(
     data: CreateIntegrationData,
-    auditUser: { id: number; name: string }
+    auditUser: { id: string; name: string }
   ): Promise<Integration> {
     // Validate provider
     if (!ADDON_DEFINITIONS[data.provider]) {
@@ -95,7 +95,7 @@ export class IntegrationService {
   static async update(
     id: string,
     data: UpdateIntegrationData,
-    auditUser: { id: number; name: string }
+    auditUser: { id: string; name: string }
   ): Promise<Integration | null> {
     const existing = await IntegrationModel.findById(id);
     if (!existing) {
@@ -149,7 +149,7 @@ export class IntegrationService {
   /**
    * Delete an integration
    */
-  static async delete(id: string, auditUser: { id: number; name: string }): Promise<boolean> {
+  static async delete(id: string, auditUser: { id: string; name: string }): Promise<boolean> {
     const existing = await IntegrationModel.findById(id);
     if (!existing) {
       return false;
@@ -204,7 +204,7 @@ export class IntegrationService {
    */
   static async toggle(
     id: string,
-    auditUser: { id: number; name: string }
+    auditUser: { id: string; name: string }
   ): Promise<Integration | null> {
     const existing = await IntegrationModel.findById(id);
     if (!existing) {
@@ -280,7 +280,7 @@ export class IntegrationService {
    */
   static async sendTestMessage(
     integrationId: string,
-    auditUser: { id: number; name: string }
+    auditUser: { id: string; name: string }
   ): Promise<void> {
     const integration = await IntegrationModel.findById(integrationId);
     if (!integration) {

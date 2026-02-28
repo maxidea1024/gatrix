@@ -32,7 +32,7 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const endpoint = await SignalEndpointModel.findById(id);
 
     if (!endpoint) {
@@ -53,7 +53,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, description } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Name is required' });
@@ -79,9 +79,9 @@ router.post('/', async (req: Request, res: Response) => {
  */
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const { name, description, isEnabled } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     const endpoint = await SignalEndpointModel.update(id, {
       name,
@@ -108,7 +108,7 @@ router.put('/:id', async (req: Request, res: Response) => {
  */
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const success = await SignalEndpointModel.delete(id);
 
     if (!success) {
@@ -128,8 +128,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
  */
 router.post('/:id/toggle', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
-    const user = req.user as { id: number; name: string };
+    const id = req.params.id;
+    const user = req.user as { id: string; name: string };
 
     const endpoint = await SignalEndpointModel.toggleEnabled(id, user.id);
 
@@ -150,9 +150,9 @@ router.post('/:id/toggle', async (req: Request, res: Response) => {
  */
 router.post('/:id/tokens', async (req: Request, res: Response) => {
   try {
-    const endpointId = parseInt(req.params.id);
+    const endpointId = req.params.id;
     const { name } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Token name is required' });
@@ -197,7 +197,7 @@ router.post('/:id/tokens', async (req: Request, res: Response) => {
  */
 router.delete('/:id/tokens/:tokenId', async (req: Request, res: Response) => {
   try {
-    const tokenId = parseInt(req.params.tokenId);
+    const tokenId = req.params.tokenId;
     const success = await SignalEndpointModel.deleteToken(tokenId);
 
     if (!success) {
@@ -217,7 +217,7 @@ router.delete('/:id/tokens/:tokenId', async (req: Request, res: Response) => {
  */
 router.get('/:id/signals', async (req: Request, res: Response) => {
   try {
-    const endpointId = parseInt(req.params.id);
+    const endpointId = req.params.id;
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
 

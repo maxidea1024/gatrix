@@ -24,8 +24,8 @@ export interface ClientVersionFilters {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAtFrom?: Date;
   createdAtTo?: Date;
   updatedAtFrom?: Date;
@@ -53,14 +53,14 @@ export interface ClientVersionListResponse {
 export interface BulkStatusUpdateRequest {
   ids: number[];
   clientStatus: ClientStatus;
-  updatedBy: number;
+  updatedBy: string;
   // 점검 관련 필드들
   maintenanceStartDate?: string;
   maintenanceEndDate?: string;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
-  messageTemplateId?: number;
+  messageTemplateId?: string;
 }
 
 /**
@@ -315,7 +315,7 @@ export class ClientVersionService {
   }
 
   static async getClientVersionById(
-    id: number,
+    id: string,
     environment: string
   ): Promise<ClientVersionAttributes | null> {
     const version = await ClientVersionModel.findById(id, environment);
@@ -441,7 +441,7 @@ export class ClientVersionService {
   }
 
   static async updateClientVersion(
-    id: number,
+    id: string,
     data: Partial<ClientVersionCreationAttributes>,
     environment: string
   ): Promise<ClientVersionAttributes | null> {
@@ -489,7 +489,7 @@ export class ClientVersionService {
     return updatedClientVersion;
   }
 
-  static async deleteClientVersion(id: number, environment: string): Promise<boolean> {
+  static async deleteClientVersion(id: string, environment: string): Promise<boolean> {
     const clientVersion = await ClientVersionModel.findById(id, environment);
     await ClientVersionModel.delete(id, environment);
     const deletedRowsCount = 1;
@@ -541,7 +541,7 @@ export class ClientVersionService {
   static async checkDuplicate(
     platform: string,
     clientVersion: string,
-    excludeId?: number,
+    excludeId?: string,
     environment?: string
   ): Promise<boolean> {
     return await ClientVersionModel.checkDuplicate(platform, clientVersion, excludeId, environment);

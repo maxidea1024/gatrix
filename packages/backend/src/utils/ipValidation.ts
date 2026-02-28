@@ -60,7 +60,7 @@ export function isValidCIDR(cidr: string): boolean {
   if (!isValidIP(ip)) return false;
 
   // Validate prefix
-  if (isNaN(prefix)) return false;
+  if (!prefix) return false;
 
   if (isValidIPv4(ip)) {
     // IPv4 prefix should be 0-32

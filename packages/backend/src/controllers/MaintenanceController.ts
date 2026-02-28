@@ -156,7 +156,7 @@ export class MaintenanceController {
         }
       }
 
-      const userId = req.user?.userId || 0;
+      const userId = req.user?.userId || '';
       // Pass environment explicitly to avoid AsyncLocalStorage context issues
       await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId, environment);
 
@@ -241,7 +241,7 @@ export class MaintenanceController {
       }
       // Each template: { message?: string, messages?: { ko?: string, en?: string, zh?: string } }
       const templates = Array.isArray(req.body?.templates) ? req.body.templates : [];
-      const userId = req.user?.userId || 0;
+      const userId = req.user?.userId || '';
       await VarsModel.set('maintenanceTemplates', JSON.stringify(templates), userId, environment);
       res.json({
         success: true,

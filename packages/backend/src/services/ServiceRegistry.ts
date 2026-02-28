@@ -25,17 +25,17 @@ export interface ServiceHandler {
    * @param environment - Environment name
    * @param userId - User performing the action
    */
-  apply: (id: string | number, data: any, environment: string, userId?: number) => Promise<any>;
+  apply: (id: string, data: any, environment: string, userId?: string) => Promise<unknown>;
 
   /**
    * Create a new entity (optional)
    */
-  create?: (data: any, environment: string, userId?: number) => Promise<any>;
+  create?: (data: any, environment: string, userId?: string) => Promise<unknown>;
 
   /**
    * Delete an entity (optional)
    */
-  delete?: (id: string | number, environment: string, userId?: number) => Promise<void>;
+  delete?: (id: string, environment: string, userId?: string) => Promise<void>;
 }
 
 /**
@@ -47,22 +47,22 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Service Notices
   g_service_notices: {
     apply: async (id, data, environment) => {
-      return await serviceNoticeService.updateServiceNotice(Number(id), data, environment);
+      return await serviceNoticeService.updateServiceNotice(id, data, environment);
     },
     create: async (data, environment) => {
       return await serviceNoticeService.createServiceNotice(data, environment);
     },
     delete: async (id, environment) => {
-      await serviceNoticeService.deleteServiceNotice(Number(id), environment);
+      await serviceNoticeService.deleteServiceNotice(id, environment);
     },
   },
 
   // Client Versions
   g_client_versions: {
     apply: async (id, data, environment, userId) => {
-      const result = await ClientVersionService.updateClientVersion(Number(id), data, environment);
+      const result = await ClientVersionService.updateClientVersion(id, data, environment);
       if (data.tagIds && Array.isArray(data.tagIds)) {
-        await TagService.setTagsForEntity('client_version', Number(id), data.tagIds, userId);
+        await TagService.setTagsForEntity('client_version', id, data.tagIds, userId);
       }
       return result;
     },
@@ -76,16 +76,16 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       return result;
     },
     delete: async (id, environment) => {
-      await ClientVersionService.deleteClientVersion(Number(id), environment);
+      await ClientVersionService.deleteClientVersion(id, environment);
     },
   },
 
   // Store Products
   g_store_products: {
     apply: async (id, data, environment, userId) => {
-      const result = await StoreProductService.updateStoreProduct(String(id), data, environment);
+      const result = await StoreProductService.updateStoreProduct(id, data, environment);
       if (data.tagIds && Array.isArray(data.tagIds)) {
-        await TagService.setTagsForEntity('store_product', String(id), data.tagIds, userId);
+        await TagService.setTagsForEntity('store_product', id, data.tagIds, userId);
       }
       return result;
     },
@@ -100,20 +100,20 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       return result;
     },
     delete: async (id, environment) => {
-      await StoreProductService.deleteStoreProduct(String(id), environment);
+      await StoreProductService.deleteStoreProduct(id, environment);
     },
   },
 
   // Surveys
   g_surveys: {
     apply: async (id, data, environment) => {
-      return await SurveyService.updateSurvey(String(id), data, environment);
+      return await SurveyService.updateSurvey(id, data, environment);
     },
     create: async (data, environment) => {
       return await SurveyService.createSurvey({ ...data, environment });
     },
     delete: async (id, environment) => {
-      await SurveyService.deleteSurvey(String(id), environment);
+      await SurveyService.deleteSurvey(id, environment);
     },
   },
 
@@ -121,20 +121,20 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   g_ingame_popup_notices: {
     apply: async (id, data, environment, userId) => {
       const result = await ingamePopupNoticeService.updateIngamePopupNotice(
-        Number(id),
+        id,
         data,
-        userId || 0,
+        userId || '',
         environment
       );
       if (data.tagIds && Array.isArray(data.tagIds)) {
-        await TagService.setTagsForEntity('ingame_popup_notice', Number(id), data.tagIds, userId);
+        await TagService.setTagsForEntity('ingame_popup_notice', id, data.tagIds, userId);
       }
       return result;
     },
     create: async (data, environment, userId) => {
       const result = await ingamePopupNoticeService.createIngamePopupNotice(
         data,
-        userId || 0,
+        userId || '',
         environment
       );
       if (data.tagIds && Array.isArray(data.tagIds)) {
@@ -143,16 +143,16 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       return result;
     },
     delete: async (id, environment) => {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(Number(id), environment);
+      await ingamePopupNoticeService.deleteIngamePopupNotice(id, environment);
     },
   },
 
   // Game Worlds
   g_game_worlds: {
     apply: async (id, data, environment, userId) => {
-      const result = await GameWorldService.updateGameWorld(Number(id), data, environment);
+      const result = await GameWorldService.updateGameWorld(id, data, environment);
       if (data.tagIds && Array.isArray(data.tagIds)) {
-        await TagService.setTagsForEntity('game_world', Number(id), data.tagIds, userId);
+        await TagService.setTagsForEntity('game_world', id, data.tagIds, userId);
       }
       return result;
     },
@@ -164,46 +164,46 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       return result;
     },
     delete: async (id, environment) => {
-      await GameWorldService.deleteGameWorld(Number(id), environment);
+      await GameWorldService.deleteGameWorld(id, environment);
     },
   },
 
   // Banners
   g_banners: {
     apply: async (id, data, environment) => {
-      return await BannerService.updateBanner(String(id), environment, data);
+      return await BannerService.updateBanner(id, environment, data);
     },
     create: async (data, environment) => {
       return await BannerService.createBanner({ ...data, environment });
     },
     delete: async (id, environment) => {
-      await BannerService.deleteBanner(String(id), environment);
+      await BannerService.deleteBanner(id, environment);
     },
   },
 
   // Account Whitelist
   g_account_whitelist: {
     apply: async (id, data, environment) => {
-      return await WhitelistService.updateWhitelist(Number(id), environment, data);
+      return await WhitelistService.updateWhitelist(id, environment, data);
     },
     create: async (data, environment) => {
       return await WhitelistService.createWhitelist(environment, data);
     },
     delete: async (id, environment) => {
-      await WhitelistService.deleteWhitelist(Number(id), environment);
+      await WhitelistService.deleteWhitelist(id, environment);
     },
   },
 
   // IP Whitelist
   g_ip_whitelist: {
     apply: async (id, data, environment) => {
-      return await IpWhitelistService.updateIpWhitelist(Number(id), environment, data);
+      return await IpWhitelistService.updateIpWhitelist(id, environment, data);
     },
     create: async (data, environment) => {
       return await IpWhitelistService.createIpWhitelist(environment, data);
     },
     delete: async (id, environment) => {
-      await IpWhitelistService.deleteIpWhitelist(Number(id), environment);
+      await IpWhitelistService.deleteIpWhitelist(id, environment);
     },
   },
 
@@ -218,8 +218,8 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       const { SERVER_SDK_ETAG } = await import('../constants/cacheKeys');
 
       // id is the varKey for g_vars
-      const varKey = String(id);
-      await VarsModel.set(varKey, data.value, data.userId || 0, environment);
+      const varKey = id;
+      await VarsModel.set(varKey, data.value, data.userId || '', environment);
 
       // Publish appropriate events based on the key
       if (varKey === 'isMaintenance' || varKey === 'maintenanceDetail') {
@@ -245,7 +245,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
     apply: async (id, data, environment, userId) => {
       // Get current flag name for service call
       const FeatureFlagModel = (await import('../models/FeatureFlag')).FeatureFlagModel;
-      const existingFlag = await FeatureFlagModel.findById(String(id));
+      const existingFlag = await FeatureFlagModel.findById(id);
       if (!existingFlag) {
         throw new Error(`Feature flag with id ${id} not found`);
       }
@@ -253,17 +253,17 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
         environment,
         existingFlag.flagName,
         data,
-        userId || 0
+        userId || ''
       );
     },
     create: async (data, environment, userId) => {
-      return await featureFlagService.createFlag({ ...data, environment }, userId || 0);
+      return await featureFlagService.createFlag({ ...data, environment }, userId || '');
     },
     delete: async (id, environment, userId) => {
       const FeatureFlagModel = (await import('../models/FeatureFlag')).FeatureFlagModel;
-      const existingFlag = await FeatureFlagModel.findById(String(id));
+      const existingFlag = await FeatureFlagModel.findById(id);
       if (existingFlag) {
-        await featureFlagService.deleteFlag(environment, existingFlag.flagName, userId || 0);
+        await featureFlagService.deleteFlag(environment, existingFlag.flagName, userId || '');
       }
     },
   },
@@ -289,11 +289,11 @@ export function getServiceHandler(tableName: string): ServiceHandler | undefined
  */
 export async function executeChangeViaService(
   tableName: string,
-  id: string | number,
+  id: string,
   data: any,
   environment: string,
   isCreate: boolean = false,
-  userId?: number
+  userId?: string
 ): Promise<{ usedService: boolean; result?: any }> {
   const handler = getServiceHandler(tableName);
 

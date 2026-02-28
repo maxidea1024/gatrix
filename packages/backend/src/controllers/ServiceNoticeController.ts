@@ -88,7 +88,7 @@ class ServiceNoticeController {
    */
   getServiceNoticeById = async (req: AuthenticatedRequest, res: Response, _next: any) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
 
       if (!environment) {
@@ -198,7 +198,7 @@ class ServiceNoticeController {
    */
   updateServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const data = req.body;
       const environment = req.environment;
       const userId = req.user?.userId;
@@ -225,7 +225,7 @@ class ServiceNoticeController {
         userId!,
         environment,
         'g_service_notices',
-        String(id),
+        id,
         data,
         async (processedData: any) => {
           const notice = await ServiceNoticeService.updateServiceNotice(
@@ -274,7 +274,7 @@ class ServiceNoticeController {
    */
   deleteServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
       const userId = req.user?.userId;
 
@@ -289,7 +289,7 @@ class ServiceNoticeController {
         userId!,
         environment,
         'g_service_notices',
-        String(id),
+        id,
         async () => {
           await ServiceNoticeService.deleteServiceNotice(id, environment);
         }
@@ -357,7 +357,7 @@ class ServiceNoticeController {
             userId!,
             environment,
             'g_service_notices',
-            String(id),
+            id,
             async () => {
               await ServiceNoticeService.deleteServiceNotice(id, environment);
             }
@@ -403,7 +403,7 @@ class ServiceNoticeController {
    */
   toggleActive = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const environment = req.environment;
       const userId = req.user?.userId;
 
@@ -424,7 +424,7 @@ class ServiceNoticeController {
         userId!,
         environment,
         'g_service_notices',
-        String(id),
+        id,
         async (currentData: any) => {
           return { isActive: !currentData.isActive };
         },

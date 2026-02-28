@@ -112,8 +112,8 @@ export interface BannerAttributes {
   sequences: Sequence[];
   version: number;
   status: BannerStatus;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -369,7 +369,7 @@ export class BannerModel {
     bannerId: string,
     status: BannerStatus,
     environment: string,
-    updatedBy?: number
+    updatedBy?: string
   ): Promise<BannerAttributes> {
     try {
       await db('g_banners')
@@ -397,7 +397,7 @@ export class BannerModel {
     bannerId: string,
     newBannerId: string,
     environment: string,
-    createdBy?: number
+    createdBy?: string
   ): Promise<BannerAttributes> {
     try {
       const original = await this.findById(bannerId, environment);

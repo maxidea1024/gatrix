@@ -2,7 +2,7 @@ import { Model } from 'objection';
 import { convertToMySQLDateTime } from '../utils/dateUtils';
 
 export interface ServerLifecycleEventData {
-  id?: number;
+  id?: string;
   environment: string;
   instanceId: string;
   serviceType: string;
@@ -31,7 +31,7 @@ export interface ServerLifecycleEventData {
 export class ServerLifecycleEvent extends Model implements ServerLifecycleEventData {
   static tableName = 'g_server_lifecycle_events';
 
-  id?: number;
+  id?: string;
   environment!: string;
   instanceId!: string;
   serviceType!: string;

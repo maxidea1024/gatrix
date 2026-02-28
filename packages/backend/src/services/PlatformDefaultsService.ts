@@ -51,7 +51,7 @@ export class PlatformDefaultsService {
   static async setPlatformDefaults(
     platform: string,
     defaults: PlatformDefaults,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<void> {
     try {
@@ -70,7 +70,7 @@ export class PlatformDefaultsService {
    */
   static async setAllDefaults(
     defaultsMap: PlatformDefaultsMap,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<void> {
     try {
@@ -87,7 +87,7 @@ export class PlatformDefaultsService {
    */
   static async deletePlatformDefaults(
     platform: string,
-    userId: number,
+    userId: string,
     environment: string
   ): Promise<void> {
     try {

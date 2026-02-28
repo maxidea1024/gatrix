@@ -70,9 +70,9 @@ export class ChatSyncController {
    */
   static async syncUser(req: AuthenticatedRequest, res: Response) {
     try {
-      const targetUserId = parseInt(req.params.userId);
+      const targetUserId = req.params.userId;
 
-      if (isNaN(targetUserId)) {
+      if (!targetUserId) {
         return res.status(400).json({
           success: false,
           error: { message: 'Invalid userId' },

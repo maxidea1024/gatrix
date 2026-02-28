@@ -6,7 +6,7 @@
 import db from '../config/knex';
 
 export interface TrafficRecord {
-  id: number;
+  id: string;
   environment: string;
   appName: string;
   endpoint: string;

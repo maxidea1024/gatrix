@@ -48,7 +48,7 @@ export const auditLog = (options: AuditLogOptions) => {
           return;
         }
 
-        // Resource ID 결정 (요청에서 또는 응답에서)
+        // Resource ID 결정 (?�청?�서 ?�는 ?�답?�서)
         let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
@@ -181,10 +181,10 @@ export const auditUserApprove = enhancedAuditLog({
     operation: 'approve_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    statusChange: `${oldValues?.status} → active`,
+    statusChange: `${oldValues?.status} ??active`,
   }),
   getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) approved (${oldValues?.status} → active)`,
+    `User '${oldValues?.name}' (${oldValues?.email}) approved (${oldValues?.status} ??active)`,
 });
 
 export const auditUserReject = enhancedAuditLog({
@@ -204,10 +204,10 @@ export const auditUserReject = enhancedAuditLog({
     operation: 'reject_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    statusChange: `${oldValues?.status} → deleted`,
+    statusChange: `${oldValues?.status} ??deleted`,
   }),
   getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) rejected (${oldValues?.status} → deleted)`,
+    `User '${oldValues?.name}' (${oldValues?.email}) rejected (${oldValues?.status} ??deleted)`,
 });
 
 export const auditUserSuspend = enhancedAuditLog({
@@ -227,10 +227,10 @@ export const auditUserSuspend = enhancedAuditLog({
     operation: 'suspend_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    statusChange: `${oldValues?.status} → suspended`,
+    statusChange: `${oldValues?.status} ??suspended`,
   }),
   getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) suspended (${oldValues?.status} → suspended)`,
+    `User '${oldValues?.name}' (${oldValues?.email}) suspended (${oldValues?.status} ??suspended)`,
 });
 
 export const auditUserUnsuspend = enhancedAuditLog({
@@ -250,10 +250,10 @@ export const auditUserUnsuspend = enhancedAuditLog({
     operation: 'unsuspend_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    statusChange: `${oldValues?.status} → active`,
+    statusChange: `${oldValues?.status} ??active`,
   }),
   getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) unsuspended (${oldValues?.status} → active)`,
+    `User '${oldValues?.name}' (${oldValues?.email}) unsuspended (${oldValues?.status} ??active)`,
 });
 
 export const auditUserPromote = enhancedAuditLog({
@@ -273,10 +273,10 @@ export const auditUserPromote = enhancedAuditLog({
     operation: 'promote_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    roleChange: `${oldValues?.role} → admin`,
+    roleChange: `${oldValues?.role} ??admin`,
   }),
   getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) promoted to admin (${oldValues?.role} → admin)`,
+    `User '${oldValues?.name}' (${oldValues?.email}) promoted to admin (${oldValues?.role} ??admin)`,
 });
 
 export const auditUserDemote = enhancedAuditLog({
@@ -296,10 +296,10 @@ export const auditUserDemote = enhancedAuditLog({
     operation: 'demote_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    roleChange: `${oldValues?.role} → user`,
+    roleChange: `${oldValues?.role} ??user`,
   }),
   getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) demoted to user (${oldValues?.role} → user)`,
+    `User '${oldValues?.name}' (${oldValues?.email}) demoted to user (${oldValues?.role} ??user)`,
 });
 
 // Game world actions
@@ -328,8 +328,8 @@ export const auditGameWorldUpdate = enhancedAuditLog({
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
   fetchOldValues: async (req) => {
-    const id = parseInt(req.params?.id);
-    if (isNaN(id)) return null;
+    const id = req.params.id;
+    if (!id) return null;
     return await fetchGameWorldById(id);
   },
   getNewValues: (req, _res, oldValues) => {
@@ -371,8 +371,8 @@ export const auditGameWorldDelete = enhancedAuditLog({
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
   fetchOldValues: async (req) => {
-    const id = parseInt(req.params?.id);
-    if (isNaN(id)) return null;
+    const id = req.params.id;
+    if (!id) return null;
     return await fetchGameWorldById(id);
   },
   getNewValues: (_req, _res, oldValues) => ({
@@ -398,8 +398,8 @@ export const auditGameWorldToggleVisibility = enhancedAuditLog({
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
   fetchOldValues: async (req) => {
-    const id = parseInt(req.params?.id);
-    if (isNaN(id)) return null;
+    const id = req.params.id;
+    if (!id) return null;
     return await fetchGameWorldById(id);
   },
   getNewValues: (req, res, oldValues) => {
@@ -427,8 +427,8 @@ export const auditGameWorldToggleMaintenance = enhancedAuditLog({
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
   fetchOldValues: async (req) => {
-    const id = parseInt(req.params?.id);
-    if (isNaN(id)) return null;
+    const id = req.params.id;
+    if (!id) return null;
     return await fetchGameWorldById(id);
   },
   getNewValues: (req, res, oldValues) => {
@@ -482,9 +482,8 @@ export const auditPasswordChange = auditLog({
   getDescription: (req: AuthenticatedRequest) => `User '${req.user?.email}' changed password`,
 });
 
-// 기본 auditLog 함수만 유지하고 개별 미들웨어는 제거
-// 각 라우트에서 auditLog를 직접 사용하도록 변경
-
+// 기본 auditLog ?�수�??��??�고 개별 미들?�어???�거
+// �??�우?�에??auditLog�?직접 ?�용?�도�?변�?
 export const auditProfileUpdate = auditLog({
   action: 'profile_update',
   resourceType: 'user',
@@ -520,7 +519,7 @@ export const auditServiceNoticeUpdate = enhancedAuditLog({
     if (!id) return null;
     try {
       const ServiceNoticeService = require('../services/ServiceNoticeService').default;
-      const notice = await ServiceNoticeService.getServiceNoticeById(parseInt(id));
+      const notice = await ServiceNoticeService.getServiceNoticeById(id);
       return {
         title: notice.title,
         category: notice.category,
@@ -558,7 +557,7 @@ export const auditServiceNoticeDelete = enhancedAuditLog({
     if (!id) return null;
     try {
       const ServiceNoticeService = require('../services/ServiceNoticeService').default;
-      const notice = await ServiceNoticeService.getServiceNoticeById(parseInt(id));
+      const notice = await ServiceNoticeService.getServiceNoticeById(id);
       return {
         title: notice.title,
         category: notice.category,
@@ -597,7 +596,7 @@ export const auditServiceNoticeToggleActive = enhancedAuditLog({
     if (!id) return null;
     try {
       const ServiceNoticeService = require('../services/ServiceNoticeService').default;
-      const notice = await ServiceNoticeService.getServiceNoticeById(parseInt(id));
+      const notice = await ServiceNoticeService.getServiceNoticeById(id);
       return {
         title: notice.title,
         isActive: notice.isActive,
@@ -612,7 +611,7 @@ export const auditServiceNoticeToggleActive = enhancedAuditLog({
   getContext: (_req, oldValues) => ({
     operation: 'toggle_service_notice_status',
     noticeTitle: oldValues?.title,
-    statusChange: `${oldValues?.isActive ? 'active' : 'inactive'} → ${!oldValues?.isActive ? 'active' : 'inactive'}`,
+    statusChange: `${oldValues?.isActive ? 'active' : 'inactive'} ??${!oldValues?.isActive ? 'active' : 'inactive'}`,
   }),
   getDescription: (_req, oldValues) =>
     `Service notice '${oldValues?.title}' ${!oldValues?.isActive ? 'activated' : 'deactivated'}`,

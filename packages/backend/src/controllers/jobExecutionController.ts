@@ -36,7 +36,7 @@ export const getJobExecutions = async (req: Request, res: Response) => {
 export const getJobExecution = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const execution = await JobExecutionModel.findById(parseInt(id));
+    const execution = await JobExecutionModel.findById(id);
 
     if (!execution) {
       return res.status(404).json({

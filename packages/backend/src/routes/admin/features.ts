@@ -437,7 +437,11 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.createFlag({ ...req.body, environment }, userId!, getRequestContext(req));
+    const flag = await featureFlagService.createFlag(
+      { ...req.body, environment },
+      userId!,
+      getRequestContext(req)
+    );
 
     res.status(201).json({ success: true, data: { flag } });
   })
@@ -511,7 +515,12 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.archiveFlag(environment, req.params.flagName, userId!, getRequestContext(req));
+    const flag = await featureFlagService.archiveFlag(
+      environment,
+      req.params.flagName,
+      userId!,
+      getRequestContext(req)
+    );
 
     res.json({ success: true, data: { flag } });
   })
@@ -526,7 +535,12 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.reviveFlag(environment, req.params.flagName, userId!, getRequestContext(req));
+    const flag = await featureFlagService.reviveFlag(
+      environment,
+      req.params.flagName,
+      userId!,
+      getRequestContext(req)
+    );
 
     res.json({ success: true, data: { flag } });
   })
@@ -563,7 +577,12 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.markAsStale(environment, req.params.flagName, userId!, getRequestContext(req));
+    const flag = await featureFlagService.markAsStale(
+      environment,
+      req.params.flagName,
+      userId!,
+      getRequestContext(req)
+    );
 
     res.json({ success: true, data: { flag } });
   })
@@ -578,7 +597,12 @@ router.post(
 
     const userId = req.user?.id;
 
-    const flag = await featureFlagService.markAsNotStale(environment, req.params.flagName, userId!, getRequestContext(req));
+    const flag = await featureFlagService.markAsNotStale(
+      environment,
+      req.params.flagName,
+      userId!,
+      getRequestContext(req)
+    );
 
     res.json({ success: true, data: { flag } });
   })
@@ -593,7 +617,12 @@ router.delete(
 
     const userId = req.user?.id;
 
-    await featureFlagService.deleteFlag(environment, req.params.flagName, userId!, getRequestContext(req));
+    await featureFlagService.deleteFlag(
+      environment,
+      req.params.flagName,
+      userId!,
+      getRequestContext(req)
+    );
 
     res.json({ success: true, message: 'Flag deleted successfully' });
   })
@@ -1191,14 +1220,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-              const fieldDef = fieldDefMap?.get(name);
-              const rules = fieldDef?.validationRules as any;
-              return {
-                name,
-                isRequired: rules?.isRequired === true,
-                fieldType: (fieldDef?.fieldType as string) || 'string',
-              };
-            })
+                const fieldDef = fieldDefMap?.get(name);
+                const rules = fieldDef?.validationRules as any;
+                return {
+                  name,
+                  isRequired: rules?.isRequired === true,
+                  fieldType: (fieldDef?.fieldType as string) || 'string',
+                };
+              })
             : undefined,
       },
     });
@@ -1268,9 +1297,7 @@ function evaluateFlagWithDetails(
       enabled: false,
       reason: 'FLAG_DISABLED',
       variant: {
-        name: isEnvSource
-          ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
-          : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
+        name: isEnvSource ? VALUE_SOURCE.ENV_DEFAULT_DISABLED : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(envDisabledValue ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
         valueSource: isEnvSource ? 'environment' : 'flag',
@@ -1543,8 +1570,6 @@ function evaluateFlagWithDetails(
     },
   };
 }
-
-
 
 function evaluateConstraint(constraint: any, context: Record<string, any>): boolean {
   const contextValue = getContextValue(constraint.contextName, context);

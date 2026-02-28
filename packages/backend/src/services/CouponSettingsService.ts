@@ -32,8 +32,8 @@ export interface CouponSetting {
   targetPlatformsInverted?: boolean;
   targetChannelsInverted?: boolean;
   targetWorldsInverted?: boolean;
-  createdBy?: number | null;
-  updatedBy?: number | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
 }
 
 export interface CreateCouponSettingInput {
@@ -63,11 +63,11 @@ export interface CreateCouponSettingInput {
   targetChannelsInverted?: boolean;
   targetWorldsInverted?: boolean;
   targetUserIdsInverted?: boolean;
-  createdBy?: number | null;
+  createdBy?: string | null;
 }
 
 export interface UpdateCouponSettingInput extends Partial<CreateCouponSettingInput> {
-  updatedBy?: number | null;
+  updatedBy?: string | null;
 }
 
 export interface CouponUsageQuery {

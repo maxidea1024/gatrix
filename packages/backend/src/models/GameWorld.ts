@@ -1,20 +1,21 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL } from '../utils/dateUtils';
 
 export interface GameWorldMaintenanceLocale {
-  id?: number;
-  gameWorldId: number;
+  id?: string;
+  gameworldId: string;
   lang: 'ko' | 'en' | 'zh';
   message: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface GameWorld {
-  id: number;
+  id: string;
   environment: string;
   worldId: string;
   name: string;
@@ -35,8 +36,8 @@ export interface GameWorld {
   infraSettings?: Record<string, any> | null; // Infrastructure settings for game server configuration (passed to SDK)
   infraSettingsRaw?: string | null; // Original JSON5 source for editing (preserves comments)
   worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt: string;
   updatedAt: string;
   createdByName?: string;
@@ -65,7 +66,7 @@ export interface CreateGameWorldData {
   infraSettings?: Record<string, any> | null;
   infraSettingsRaw?: string | null; // Original JSON5 source for editing
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
-  createdBy: number;
+  createdBy: string;
 }
 
 export interface UpdateGameWorldData {
@@ -88,7 +89,7 @@ export interface UpdateGameWorldData {
   infraSettings?: Record<string, any> | null;
   infraSettingsRaw?: string | null; // Original JSON5 source for editing
   worldServerAddress?: string | null;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export interface GameWorldListParams {
@@ -100,7 +101,7 @@ export interface GameWorldListParams {
 }
 
 export class GameWorldModel {
-  static async findById(id: number, environment: string): Promise<GameWorld | null> {
+  static async findById(id: string, environment: string): Promise<GameWorld | null> {
     try {
       return await this.findByIdWith(db, id, environment);
     } catch (error) {
@@ -110,7 +111,7 @@ export class GameWorldModel {
   }
 
   // Use provided connection/transaction to ensure visibility inside transactions
-  static async findByIdWith(conn: any, id: number, environment: string): Promise<GameWorld | null> {
+  static async findByIdWith(conn: any, id: string, environment: string): Promise<GameWorld | null> {
     const gameWorld = await conn('g_game_worlds as gw')
       .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
       .leftJoin('g_users as u', 'gw.updatedBy', 'u.id')
@@ -253,7 +254,7 @@ export class GameWorldModel {
       }
 
       // Validate createdBy
-      if (!worldData.createdBy || typeof worldData.createdBy !== 'number') {
+      if (!worldData.createdBy) {
         throw new Error(`Invalid createdBy value: ${worldData.createdBy}`);
       }
 
@@ -289,12 +290,14 @@ export class GameWorldModel {
           'maintenanceEndDate',
         ]);
 
-        const [insertId] = await trx('g_game_worlds').insert(convertedData);
+        const newId = generateULID();
+        convertedData.id = newId;
+        await trx('g_game_worlds').insert(convertedData);
 
         // 점검 메시지 로케일 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
-            gameWorldId: insertId,
+            gameWorldId: newId,
             lang: locale.lang,
             message: locale.message,
             createdBy: worldData.createdBy,
@@ -307,7 +310,7 @@ export class GameWorldModel {
         }
 
         // Use the same transaction connection to ensure visibility before commit
-        const world = await this.findByIdWith(trx, insertId, environment);
+        const world = await this.findByIdWith(trx, newId, environment);
         if (!world) {
           throw new Error('Failed to create game world');
         }
@@ -321,7 +324,7 @@ export class GameWorldModel {
   }
 
   static async update(
-    id: number,
+    id: string,
     worldData: UpdateGameWorldData,
     environment: string
   ): Promise<GameWorld | null> {
@@ -390,7 +393,7 @@ export class GameWorldModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<boolean> {
+  static async delete(id: string, environment: string): Promise<boolean> {
     try {
       const result = await db('g_game_worlds')
         .where('id', id)
@@ -404,7 +407,7 @@ export class GameWorldModel {
     }
   }
 
-  static async exists(worldId: string, id: number, environment: string): Promise<boolean> {
+  static async exists(worldId: string, id: string, environment: string): Promise<boolean> {
     try {
       const result = await db('g_game_worlds')
         .where('worldId', worldId)
@@ -421,7 +424,7 @@ export class GameWorldModel {
   }
 
   static async updateDisplayOrders(
-    orderUpdates: { id: number; displayOrder: number }[],
+    orderUpdates: { id: string; displayOrder: number }[],
     environment: string
   ): Promise<void> {
     try {
@@ -450,7 +453,7 @@ export class GameWorldModel {
     }
   }
 
-  static async moveUp(id: number, environment: string): Promise<boolean> {
+  static async moveUp(id: string, environment: string): Promise<boolean> {
     try {
       // Get current world
       const currentWorld = await this.findById(id, environment);
@@ -483,7 +486,7 @@ export class GameWorldModel {
     }
   }
 
-  static async moveDown(id: number, environment: string): Promise<boolean> {
+  static async moveDown(id: string, environment: string): Promise<boolean> {
     try {
       // Get current world
       const currentWorld = await this.findById(id, environment);

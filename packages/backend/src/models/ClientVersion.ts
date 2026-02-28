@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export interface ClientVersionFilters {
@@ -31,7 +32,7 @@ export enum ClientStatus {
 }
 
 export interface ClientVersionAttributes {
-  id?: number;
+  id?: string;
   environment: string;
   clientVersion: string;
   platform: string;
@@ -48,19 +49,19 @@ export interface ClientVersionAttributes {
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface ClientVersionMaintenanceLocale {
-  id?: number;
-  clientVersionId: number;
+  id?: string;
+  clientVersionId: string;
   lang: 'ko' | 'en' | 'zh';
   message: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -227,7 +228,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async findById(id: number, environment: string, trx?: any): Promise<any | null> {
+  static async findById(id: string, environment: string, trx?: any): Promise<any | null> {
     try {
       const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
       const clientVersion = await query
@@ -276,7 +277,10 @@ export class ClientVersionModel {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
         const { tags, maintenanceLocales, ...clientVersionData } = data;
 
-        const [insertId] = await trx('g_client_versions').insert({
+        const id = generateULID();
+
+        await trx('g_client_versions').insert({
+          id,
           ...clientVersionData,
           environment: environment,
           createdAt: new Date(),
@@ -286,7 +290,7 @@ export class ClientVersionModel {
         // 점검 메시지 로케일 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
-            clientVersionId: insertId,
+            clientVersionId: id,
             lang: locale.lang,
             message: locale.message,
             createdBy: data.createdBy,
@@ -298,7 +302,7 @@ export class ClientVersionModel {
           await trx('g_client_version_maintenance_locales').insert(localeInserts);
         }
 
-        return await this.findById(insertId, environment, trx);
+        return await this.findById(id, environment, trx);
       });
     } catch (error) {
       logger.error('Error creating client version:', error);
@@ -306,7 +310,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async update(id: number, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environment: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -349,7 +353,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environment: string): Promise<void> {
     try {
       await db('g_client_versions').where('id', id).where('environment', environment).del();
     } catch (error) {
@@ -364,7 +368,7 @@ export class ClientVersionModel {
     environment: string
   ): Promise<any> {
     try {
-      const insertedIds: number[] = [];
+      const insertedIds: string[] = [];
 
       // 먼저 모든 데이터를 삽입
       await db.transaction(async (trx) => {
@@ -372,26 +376,29 @@ export class ClientVersionModel {
           // tags 필드는 별도 테이블에서 관리하므로 제거
           const { maintenanceLocales, ...clientVersionData } = item as any;
 
-          const [insertId] = await trx('g_client_versions').insert({
+          const id = generateULID();
+
+          await trx('g_client_versions').insert({
+            id,
             ...clientVersionData,
             environment: environment,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-          insertedIds.push(insertId);
+          insertedIds.push(id);
         }
       });
 
       // 트랜잭션 완료 후 생성된 데이터 조회
       const results = [];
-      for (const id of insertedIds) {
-        const clientVersion = await this.findById(id, environment);
+      for (const cvId of insertedIds) {
+        const clientVersion = await this.findById(cvId, environment);
         if (clientVersion) {
           results.push(clientVersion);
         } else {
-          logger.warn(`Failed to find created client version with id: ${id}`);
+          logger.warn(`Failed to find created client version with id: ${cvId}`);
           // 기본 객체라도 반환하여 null 방지
-          results.push({ id, platform: 'unknown', clientVersion: 'unknown' });
+          results.push({ id: cvId, platform: 'unknown', clientVersion: 'unknown' });
         }
       }
 
@@ -482,7 +489,7 @@ export class ClientVersionModel {
   static async checkDuplicate(
     platform: string,
     clientVersion: string,
-    excludeId?: number,
+    excludeId?: string,
     environment?: string
   ): Promise<boolean> {
     try {
@@ -509,9 +516,9 @@ export class ClientVersionModel {
 
   // 태그 관련 메서드들
   static async setTags(
-    clientVersionId: number,
-    tagIds: number[],
-    createdBy?: number
+    clientVersionId: string,
+    tagIds: string[],
+    createdBy?: string
   ): Promise<void> {
     try {
       logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
@@ -533,7 +540,7 @@ export class ClientVersionModel {
             entityType: 'client_version',
             entityId: clientVersionId,
             tagId: tagId,
-            createdBy: createdBy || 1,
+            createdBy: createdBy || '',
             createdAt: new Date(),
           }));
 
@@ -550,7 +557,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async getTags(clientVersionId: number, trx?: any): Promise<any[]> {
+  static async getTags(clientVersionId: string, trx?: any): Promise<any[]> {
     try {
       const query = trx ? trx('g_tag_assignments as ta') : db('g_tag_assignments as ta');
       const tags = await query
@@ -568,7 +575,7 @@ export class ClientVersionModel {
   }
 
   static async getMaintenanceLocales(
-    clientVersionId: number
+    clientVersionId: string
   ): Promise<ClientVersionMaintenanceLocale[]> {
     try {
       const locales = await db('g_client_version_maintenance_locales')

@@ -1,9 +1,10 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export interface MessageTemplateFilters {
   environment: string;
-  createdBy?: number | number[];
+  createdBy?: string[];
   createdBy_operator?: 'any_of' | 'include_all';
   isEnabled?: boolean | boolean[];
   isEnabled_operator?: 'any_of' | 'include_all';
@@ -20,15 +21,15 @@ export interface MessageTemplateListResult {
 }
 
 export interface MessageTemplate {
-  id?: number;
+  id?: string;
   environment: string;
   name: string;
   type: string;
   isEnabled: boolean;
   supportsMultiLanguage: boolean;
   defaultMessage: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -180,7 +181,7 @@ export class MessageTemplateModel {
     }
   }
 
-  static async findById(id: number, environment: string): Promise<any | null> {
+  static async findById(id: string, environment: string): Promise<any | null> {
     try {
       const template = await db('g_message_templates as mt')
         .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
@@ -215,7 +216,9 @@ export class MessageTemplateModel {
     try {
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 생성
-        const [insertId] = await trx('g_message_templates').insert({
+        const id = generateULID();
+        await trx('g_message_templates').insert({
+          id,
           environment: environment,
           name: data.name,
           type: data.type,
@@ -237,7 +240,7 @@ export class MessageTemplateModel {
         // 언어별 메시지 처리
         if (data.locales && data.locales.length > 0) {
           const localeInserts = data.locales.map((locale: any) => ({
-            templateId: insertId,
+            templateId: id,
             lang: locale.lang,
             message: locale.message,
             createdBy: data.createdBy || data.created_by,
@@ -249,12 +252,12 @@ export class MessageTemplateModel {
           await trx('g_message_template_locales').insert(localeInserts);
         }
 
-        const created = await this.findById(insertId, environment);
+        const created = await this.findById(id, environment);
 
         if (!created) {
           // 직접 ID와 기본 정보를 반환
           return {
-            id: insertId,
+            id: id,
             name: data.name,
             type: data.type,
             defaultMessage: data.defaultMessage || data.default_message || data.content || '',
@@ -276,7 +279,7 @@ export class MessageTemplateModel {
     }
   }
 
-  static async update(id: number, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environment: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 업데이트
@@ -320,7 +323,7 @@ export class MessageTemplateModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environment: string): Promise<void> {
     try {
       await db('g_message_templates').where('id', id).where('environment', environment).del();
     } catch (error) {
@@ -330,7 +333,7 @@ export class MessageTemplateModel {
   }
 
   // 추가 메서드들
-  static async findByName(name: string, excludeId?: number): Promise<any | null> {
+  static async findByName(name: string, excludeId?: string): Promise<any | null> {
     try {
       let query = db('g_message_templates').where('name', name);
 
@@ -346,7 +349,7 @@ export class MessageTemplateModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(templateId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTags(templateId: string, tagIds: string[], createdBy?: string): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
@@ -361,7 +364,7 @@ export class MessageTemplateModel {
             entityType: 'message_template',
             entityId: templateId,
             tagId: tagId,
-            createdBy: createdBy || 1,
+            createdBy: createdBy || '',
             createdAt: new Date(),
           }));
           await trx('g_tag_assignments').insert(assignments);
@@ -373,7 +376,7 @@ export class MessageTemplateModel {
     }
   }
 
-  static async getTags(templateId: number): Promise<any[]> {
+  static async getTags(templateId: string): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')

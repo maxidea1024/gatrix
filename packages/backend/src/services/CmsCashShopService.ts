@@ -19,7 +19,7 @@ export interface MultiLangText {
  * Matches the structure from cashshop-lookup.json planning data
  */
 export interface CmsCashShopProduct {
-  id: number;
+  id: string;
   name: MultiLangText; // Multi-language product name
   description: MultiLangText; // Multi-language product description
   productCode: string; // SDO product code

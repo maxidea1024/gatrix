@@ -1,9 +1,10 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 import { getCurrentEnvironment } from '../utils/environmentContext';
 
 export interface JobTypeAttributes {
-  id: number;
+  id: string;
   name: string;
   displayName: string;
   description?: string;
@@ -11,8 +12,8 @@ export interface JobTypeAttributes {
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdByName?: string;
   updatedByName?: string;
 }
@@ -23,7 +24,7 @@ export interface CreateJobTypeData {
   description?: string;
   jobSchema?: any;
   isEnabled?: boolean;
-  createdBy?: number;
+  createdBy?: string;
 }
 
 export interface UpdateJobTypeData {
@@ -31,7 +32,7 @@ export interface UpdateJobTypeData {
   description?: string;
   jobSchema?: any;
   isEnabled?: boolean;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export class JobTypeModel {
@@ -87,7 +88,7 @@ export class JobTypeModel {
     }
   }
 
-  static async findById(id: number, environment?: string): Promise<JobTypeAttributes | null> {
+  static async findById(id: string, environment?: string): Promise<JobTypeAttributes | null> {
     try {
       const envName = environment ?? getCurrentEnvironment();
       const row = await db('g_job_types as jt')
@@ -138,7 +139,10 @@ export class JobTypeModel {
       const envName = getCurrentEnvironment();
       const schemaJson = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
 
-      const [insertId] = await db('g_job_types').insert({
+      const id = generateULID();
+
+      await db('g_job_types').insert({
+        id,
         environment: envName,
         name: data.name,
         displayName: data.displayName,
@@ -148,7 +152,7 @@ export class JobTypeModel {
         createdBy: data.createdBy || null,
       });
 
-      const created = await this.findById(insertId, envName);
+      const created = await this.findById(id, envName);
       if (!created) {
         throw new Error('Failed to retrieve created job type');
       }
@@ -161,7 +165,7 @@ export class JobTypeModel {
   }
 
   static async update(
-    id: number,
+    id: string,
     data: UpdateJobTypeData,
     environment?: string
   ): Promise<JobTypeAttributes> {
@@ -201,7 +205,7 @@ export class JobTypeModel {
     }
   }
 
-  static async delete(id: number, environment?: string): Promise<boolean> {
+  static async delete(id: string, environment?: string): Promise<boolean> {
     try {
       const envName = environment ?? getCurrentEnvironment();
       const result = await db('g_job_types').where('id', id).where('environment', envName).del();

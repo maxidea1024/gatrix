@@ -1,10 +1,11 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { generateULID } from '../utils/ulid';
 import database from '../config/database';
 import { convertFromMySQLDateTime, convertToMySQLDateTime } from '../utils/dateUtils';
 import { pubSubService } from './PubSubService';
 
 export interface IngamePopupNotice {
-  id: number;
+  id: string;
   environment: string;
   isActive: boolean;
   content: string; // Database field for admin UI
@@ -23,13 +24,13 @@ export interface IngamePopupNotice {
   showOnce: boolean;
   startDate?: string | null;
   endDate?: string | null;
-  messageTemplateId: number | null;
+  messageTemplateId: string | null;
   useTemplate: boolean;
   description: string | null;
   createdAt: string;
   updatedAt: string;
-  createdBy: number;
-  updatedBy: number | null;
+  createdBy: string;
+  updatedBy: string | null;
 }
 
 export interface CreateIngamePopupNoticeData {
@@ -194,7 +195,7 @@ class IngamePopupNoticeService {
    * Get ingame popup notice by ID
    */
   async getIngamePopupNoticeById(
-    id: number,
+    id: string,
     environment: string
   ): Promise<IngamePopupNotice | null> {
     const pool = database.getPool();
@@ -215,20 +216,23 @@ class IngamePopupNoticeService {
    */
   async createIngamePopupNotice(
     data: CreateIngamePopupNoticeData,
-    createdBy: number,
+    createdBy: string,
     environment: string
   ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
 
+    const generatedId = generateULID();
+
     const [result] = await pool.execute<ResultSetHeader>(
       `INSERT INTO g_ingame_popup_notices (
-        environment, isActive, content, targetWorlds, targetWorldsInverted, targetPlatforms, targetPlatformsInverted,
+        id, environment, isActive, content, targetWorlds, targetWorldsInverted, targetPlatforms, targetPlatformsInverted,
         targetChannels, targetChannelsInverted, targetSubchannels, targetSubchannelsInverted,
         targetUserIds, targetUserIdsInverted,
         displayPriority, showOnce, startDate, endDate,
         messageTemplateId, useTemplate, description, createdBy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        generatedId,
         environment,
         data.isActive,
         data.content,
@@ -253,7 +257,7 @@ class IngamePopupNoticeService {
       ]
     );
 
-    const notice = await this.getIngamePopupNoticeById(result.insertId, environment);
+    const notice = await this.getIngamePopupNoticeById(generatedId, environment);
     if (!notice) {
       throw new Error('Failed to create ingame popup notice');
     }
@@ -276,9 +280,9 @@ class IngamePopupNoticeService {
    * Update ingame popup notice
    */
   async updateIngamePopupNotice(
-    id: number,
+    id: string,
     data: UpdateIngamePopupNoticeData,
-    updatedBy: number,
+    updatedBy: string,
     environment: string
   ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
@@ -398,7 +402,7 @@ class IngamePopupNoticeService {
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(id: number, environment: string): Promise<void> {
+  async deleteIngamePopupNotice(id: string, environment: string): Promise<void> {
     const pool = database.getPool();
 
     await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environment = ?', [
@@ -420,7 +424,7 @@ class IngamePopupNoticeService {
   /**
    * Delete multiple ingame popup notices
    */
-  async deleteMultipleIngamePopupNotices(ids: number[], environment: string): Promise<void> {
+  async deleteMultipleIngamePopupNotices(ids: string[], environment: string): Promise<void> {
     const pool = database.getPool();
     const placeholders = ids.map(() => '?').join(',');
 
@@ -445,7 +449,7 @@ class IngamePopupNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: number, environment: string): Promise<IngamePopupNotice> {
+  async toggleActive(id: string, environment: string): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     await pool.execute(
       'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',

@@ -13,7 +13,7 @@ const REDIS_KEY_PREFIX = 'unknown_flags:buffer:';
 const REDIS_METADATA_PREFIX = 'unknown_flags:meta:';
 
 export interface UnknownFlag {
-  id: number;
+  id: string;
   flagName: string;
   environment: string;
   appName: string | null;
@@ -240,7 +240,7 @@ export class UnknownFlagService {
   /**
    * Resolve an unknown flag (mark as handled)
    */
-  async resolveUnknownFlag(id: number, resolvedBy: string): Promise<void> {
+  async resolveUnknownFlag(id: string, resolvedBy: string): Promise<void> {
     await db('unknown_flags')
       .where({ id })
       .update({
@@ -253,7 +253,7 @@ export class UnknownFlagService {
   /**
    * Unresolve an unknown flag (mark as unresolved again)
    */
-  async unresolveUnknownFlag(id: number): Promise<void> {
+  async unresolveUnknownFlag(id: string): Promise<void> {
     await db('unknown_flags').where({ id }).update({
       isResolved: false,
       resolvedAt: null,
@@ -264,7 +264,7 @@ export class UnknownFlagService {
   /**
    * Delete an unknown flag record
    */
-  async deleteUnknownFlag(id: number): Promise<void> {
+  async deleteUnknownFlag(id: string): Promise<void> {
     await db('unknown_flags').where({ id }).delete();
   }
 

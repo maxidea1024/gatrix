@@ -25,7 +25,7 @@ export interface CreateBannerInput {
   playbackSpeed?: number;
   shuffle?: boolean;
   sequences?: Sequence[];
-  createdBy?: number;
+  createdBy?: string;
 }
 
 export interface UpdateBannerInput {
@@ -37,7 +37,7 @@ export interface UpdateBannerInput {
   playbackSpeed?: number;
   shuffle?: boolean;
   sequences?: Sequence[];
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export interface GetBannersParams {
@@ -306,7 +306,7 @@ class BannerService {
   static async publishBanner(
     bannerId: string,
     environment: string,
-    updatedBy?: number
+    updatedBy?: string
   ): Promise<BannerAttributes> {
     try {
       const banner = await BannerModel.updateStatus(bannerId, 'published', environment, updatedBy);
@@ -353,7 +353,7 @@ class BannerService {
   static async archiveBanner(
     bannerId: string,
     environment: string,
-    updatedBy?: number
+    updatedBy?: string
   ): Promise<BannerAttributes> {
     try {
       const banner = await BannerModel.updateStatus(bannerId, 'archived', environment, updatedBy);
@@ -400,7 +400,7 @@ class BannerService {
   static async duplicateBanner(
     bannerId: string,
     environment: string,
-    createdBy?: number
+    createdBy?: string
   ): Promise<BannerAttributes> {
     try {
       const newBannerId = ulid();

@@ -62,7 +62,7 @@ export const GAME_WORLDS = {
    * 특정 게임월드 상세 정보
    * @param id 게임월드 ID
    */
-  DETAIL: (id: number) => `game_world:${id}`,
+  DETAIL: (id: string) => `game_world:${id}`,
 
   /**
    * 월드 ID로 게임월드 조회
@@ -101,13 +101,13 @@ export const USER = {
    * 사용자 프로필 정보
    * @param userId 사용자 ID
    */
-  PROFILE: (userId: number) => `user:${userId}:profile`,
+  PROFILE: (userId: string) => `user:${userId}:profile`,
 
   /**
    * 사용자 권한 정보
    * @param userId 사용자 ID
    */
-  PERMISSIONS: (userId: number) => `user:${userId}:permissions`,
+  PERMISSIONS: (userId: string) => `user:${userId}:permissions`,
 
   /**
    * 사용자 세션 정보
@@ -130,7 +130,7 @@ export const TAG = {
    * @param entityType 엔티티 타입 (game_world, user 등)
    * @param entityId 엔티티 ID
    */
-  BY_ENTITY: (entityType: string, entityId: number) => `tags:${entityType}:${entityId}`,
+  BY_ENTITY: (entityType: string, entityId: string) => `tags:${entityType}:${entityId}`,
 } as const;
 
 /**
@@ -221,7 +221,7 @@ export const JOB = {
    * 특정 작업 상세 정보
    * @param jobId 작업 ID
    */
-  DETAIL: (jobId: number) => `job:${jobId}`,
+  DETAIL: (jobId: string) => `job:${jobId}`,
 } as const;
 
 /**
@@ -240,7 +240,7 @@ export const AUDIT_LOG = {
    * @param userId 사용자 ID
    * @param page 페이지 번호
    */
-  BY_USER: (userId: number, page: number) => `audit_logs:user:${userId}:${page}`,
+  BY_USER: (userId: string, page: number) => `audit_logs:user:${userId}:${page}`,
 } as const;
 /**
  * Server SDK endpoint ETag cache keys
@@ -319,7 +319,7 @@ export const ENV_SCOPED = {
   GAME_WORLDS: {
     PUBLIC: 'game_worlds:public',
     ADMIN: 'game_worlds:admin',
-    DETAIL: (id: number) => `game_world:${id}`,
+    DETAIL: (id: string) => `game_world:${id}`,
     BY_WORLD_ID: (worldId: string) => `game_world:world_id:${worldId}`,
   },
 
@@ -425,7 +425,7 @@ export const PATTERNS = {
    * 특정 사용자 관련 모든 캐시
    * @param userId 사용자 ID
    */
-  USER: (userId: number) => `user:${userId}*`,
+  USER: (userId: string) => `user:${userId}*`,
 
   /**
    * 모든 태그 관련 캐시

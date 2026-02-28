@@ -28,7 +28,7 @@ export interface CreateIntegrationEventData {
 }
 
 export interface IntegrationEventWriteModel {
-  integrationId: number | string;
+  integrationId: string | string;
   state: IntegrationEventState;
   stateDetails: string;
   event: Record<string, any>;

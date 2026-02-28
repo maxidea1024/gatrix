@@ -1,9 +1,10 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import { GatrixError } from '../middleware/errorHandler';
 import TagAssignmentModel from './TagAssignment';
 
 export interface Whitelist {
-  id: number;
+  id: string;
   environment: string;
   accountId: string;
   ipAddress?: string;
@@ -12,8 +13,8 @@ export interface Whitelist {
   purpose?: string;
   isEnabled: boolean;
   tags?: string[];
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
   createdByName?: string;
@@ -30,7 +31,7 @@ export interface CreateWhitelistData {
   purpose?: string;
   isEnabled?: boolean;
   tags?: string[];
-  createdBy: number;
+  createdBy: string;
 }
 
 export interface UpdateWhitelistData {
@@ -41,14 +42,14 @@ export interface UpdateWhitelistData {
   purpose?: string;
   tags?: string[];
   isEnabled?: boolean;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export interface WhitelistFilters {
   environment: string;
   accountId?: string;
   ipAddress?: string;
-  createdBy?: number;
+  createdBy?: string;
   search?: string;
   tags?: string[];
   isEnabled?: boolean;
@@ -155,7 +156,7 @@ export class WhitelistModel {
     }
   }
 
-  static async findById(id: number, environment: string): Promise<Whitelist | null> {
+  static async findById(id: string, environment: string): Promise<Whitelist | null> {
     try {
       const result = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
@@ -191,7 +192,9 @@ export class WhitelistModel {
 
   static async create(data: CreateWhitelistData, environment: string): Promise<Whitelist> {
     try {
-      const [insertId] = await db('g_account_whitelist').insert({
+      const id = generateULID();
+      await db('g_account_whitelist').insert({
+        id,
         environment: environment,
         accountId: data.accountId,
         ipAddress: data.ipAddress || null,
@@ -203,7 +206,7 @@ export class WhitelistModel {
         createdBy: data.createdBy,
       });
 
-      const created = await this.findById(insertId, environment);
+      const created = await this.findById(id, environment);
       if (!created) {
         throw new GatrixError('Failed to create whitelist entry', 500);
       }
@@ -215,7 +218,7 @@ export class WhitelistModel {
   }
 
   static async update(
-    id: number,
+    id: string,
     data: UpdateWhitelistData,
     environment: string
   ): Promise<Whitelist | null> {
@@ -271,7 +274,7 @@ export class WhitelistModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<boolean> {
+  static async delete(id: string, environment: string): Promise<boolean> {
     try {
       const result = await db('g_account_whitelist')
         .where('id', id)
@@ -373,11 +376,11 @@ export class WhitelistModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(whitelistId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTags(whitelistId: string, tagIds: string[], createdBy?: string): Promise<void> {
     await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds, createdBy);
   }
 
-  static async getTags(whitelistId: number): Promise<any[]> {
+  static async getTags(whitelistId: string): Promise<any[]> {
     return await TagAssignmentModel.listTagsForEntity('whitelist', whitelistId);
   }
 }

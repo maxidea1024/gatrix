@@ -1,227 +1,352 @@
 /**
  * RBAC Permission Definitions
  *
- * Permission naming convention: {category}.{action}
- * Categories map to navigation menu items
+ * Naming convention: {scope}.{resource}.{action}
+ * Scopes: org | project | env
+ * Actions: read | write | access | create | approve
+ *
+ * Rules:
+ * - write includes read
+ * - access is for special access (console, chat)
+ * - create/approve are for change request workflows
  */
 
-// All available permissions in the system
-export const PERMISSIONS = {
-  // User Management
-  USERS_VIEW: 'users.view',
-  USERS_MANAGE: 'users.manage', // create, update, delete
+// ==================== Organisation Level ====================
 
-  // Client Versions
-  CLIENT_VERSIONS_VIEW: 'client-versions.view',
-  CLIENT_VERSIONS_MANAGE: 'client-versions.manage',
-
-  // Game Worlds
-  GAME_WORLDS_VIEW: 'game-worlds.view',
-  GAME_WORLDS_MANAGE: 'game-worlds.manage',
-
-  // Maintenance
-  MAINTENANCE_VIEW: 'maintenance.view',
-  MAINTENANCE_MANAGE: 'maintenance.manage',
-
-  // Maintenance Templates
-  MAINTENANCE_TEMPLATES_VIEW: 'maintenance-templates.view',
-  MAINTENANCE_TEMPLATES_MANAGE: 'maintenance-templates.manage',
-
-  // Scheduler (includes jobs and queue monitor)
-  SCHEDULER_VIEW: 'scheduler.view',
-  SCHEDULER_MANAGE: 'scheduler.manage',
-
-  // Audit Logs
-  AUDIT_LOGS_VIEW: 'audit-logs.view',
-
-  // Realtime Events
-  REALTIME_EVENTS_VIEW: 'realtime-events.view',
-
-  // Crash Events
-  CRASH_EVENTS_VIEW: 'crash-events.view',
-
-  // Security (API Tokens, Whitelist)
-  SECURITY_VIEW: 'security.view',
-  SECURITY_MANAGE: 'security.manage',
-
-  // Server Management
-  SERVERS_VIEW: 'servers.view',
-  SERVERS_MANAGE: 'servers.manage',
-
-  // Monitoring
-  MONITORING_VIEW: 'monitoring.view',
-
-  // Open API
-  OPEN_API_VIEW: 'open-api.view',
-
-  // Console
-  CONSOLE_ACCESS: 'console.access',
-
-  // Game Management - Service Notices
-  SERVICE_NOTICES_VIEW: 'service-notices.view',
-  SERVICE_NOTICES_MANAGE: 'service-notices.manage',
-
-  // Game Management - Ingame Popup Notices
-  INGAME_POPUP_NOTICES_VIEW: 'ingame-popup-notices.view',
-  INGAME_POPUP_NOTICES_MANAGE: 'ingame-popup-notices.manage',
-
-  // Game Management - Coupons
-  COUPONS_VIEW: 'coupons.view',
-  COUPONS_MANAGE: 'coupons.manage',
-
-  // Game Management - Surveys
-  SURVEYS_VIEW: 'surveys.view',
-  SURVEYS_MANAGE: 'surveys.manage',
-
-  // Game Management - Operation Events (Hot Time, Live Event)
-  OPERATION_EVENTS_VIEW: 'operation-events.view',
-  OPERATION_EVENTS_MANAGE: 'operation-events.manage',
-
-  // Game Management - Store Products
-  STORE_PRODUCTS_VIEW: 'store-products.view',
-  STORE_PRODUCTS_MANAGE: 'store-products.manage',
-
-  // Game Management - Reward Templates
-  REWARD_TEMPLATES_VIEW: 'reward-templates.view',
-  REWARD_TEMPLATES_MANAGE: 'reward-templates.manage',
-
-  // Game Management - Banners
-  BANNERS_VIEW: 'banners.view',
-  BANNERS_MANAGE: 'banners.manage',
-
-  // Game Management - Planning Data
-  PLANNING_DATA_VIEW: 'planning-data.view',
-  PLANNING_DATA_MANAGE: 'planning-data.manage',
-
-  // Game Management - Feature Flags
-  FEATURE_FLAGS_VIEW: 'feature-flags.view',
-  FEATURE_FLAGS_MANAGE: 'feature-flags.manage',
-
-  // Game Management - Change Requests
-  CHANGE_REQUESTS_VIEW: 'change-requests.view',
-  CHANGE_REQUESTS_MANAGE: 'change-requests.manage',
-
-  // Event Lens
-  EVENT_LENS_VIEW: 'event-lens.view',
-  EVENT_LENS_MANAGE: 'event-lens.manage',
-
-  // Settings - Tags
-  TAGS_VIEW: 'tags.view',
-  TAGS_MANAGE: 'tags.manage',
-
-  // Settings - Data Management
-  DATA_MANAGEMENT_VIEW: 'data-management.view',
-  DATA_MANAGEMENT_MANAGE: 'data-management.manage',
-
-  // Settings - Environments
-  ENVIRONMENTS_VIEW: 'environments.view',
-  ENVIRONMENTS_MANAGE: 'environments.manage',
-
-  // Settings - System Settings (Network, Integrations, Service Discovery, KV)
-  SYSTEM_SETTINGS_VIEW: 'system-settings.view',
-  SYSTEM_SETTINGS_MANAGE: 'system-settings.manage',
-
-  // Service Accounts
-  SERVICE_ACCOUNTS_VIEW: 'service-accounts.view',
-  SERVICE_ACCOUNTS_MANAGE: 'service-accounts.manage',
-
-  // Signal Endpoints
-  SIGNAL_ENDPOINTS_VIEW: 'signal-endpoints.view',
-  SIGNAL_ENDPOINTS_MANAGE: 'signal-endpoints.manage',
-
-  // Actions
-  ACTIONS_VIEW: 'actions.view',
-  ACTIONS_MANAGE: 'actions.manage',
-
-  // Chat
-  CHAT_ACCESS: 'chat.access',
+export const ORG_PERMISSIONS = {
+  USERS_READ: 'org.users.read',
+  USERS_WRITE: 'org.users.write',
+  GROUPS_WRITE: 'org.groups.write',
+  GROUP_MEMBERSHIP_WRITE: 'org.group_membership.write',
+  ROLES_WRITE: 'org.roles.write',
+  ADMIN_TOKENS_WRITE: 'org.admin_tokens.write',
+  SYSTEM_SETTINGS_READ: 'org.system_settings.read',
+  SYSTEM_SETTINGS_WRITE: 'org.system_settings.write',
+  AUDIT_LOGS_READ: 'org.audit_logs.read',
+  MONITORING_READ: 'org.monitoring.read',
+  CONSOLE_ACCESS: 'org.console.access',
+  EVENT_LENS_READ: 'org.event_lens.read',
+  EVENT_LENS_WRITE: 'org.event_lens.write',
+  CHAT_ACCESS: 'org.chat.access',
+  PROJECTS_WRITE: 'org.projects.write',
+  CRASH_EVENTS_READ: 'org.crash_events.read',
+  REALTIME_EVENTS_READ: 'org.realtime_events.read',
+  SCHEDULER_READ: 'org.scheduler.read',
+  SCHEDULER_WRITE: 'org.scheduler.write',
+  OPEN_API_READ: 'org.open_api.read',
+  INVITATIONS_WRITE: 'org.invitations.write',
+  IP_WHITELIST_READ: 'org.ip_whitelist.read',
+  IP_WHITELIST_WRITE: 'org.ip_whitelist.write',
+  ACCOUNT_WHITELIST_READ: 'org.account_whitelist.read',
+  ACCOUNT_WHITELIST_WRITE: 'org.account_whitelist.write',
+  INTEGRATIONS_READ: 'org.integrations.read',
+  INTEGRATIONS_WRITE: 'org.integrations.write',
+  TRANSLATION_WRITE: 'org.translation.write',
 } as const;
 
-export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+// ==================== Project Level ====================
 
-// All permissions as an array for iteration
-export const ALL_PERMISSIONS: Permission[] = Object.values(PERMISSIONS);
+export const PROJECT_PERMISSIONS = {
+  READ: 'project.read',
+  FEATURES_WRITE: 'project.features.write',
+  SEGMENTS_WRITE: 'project.segments.write',
+  CONTEXT_FIELDS_WRITE: 'project.context_fields.write',
+  TAGS_READ: 'project.tags.read',
+  TAGS_WRITE: 'project.tags.write',
+  PLANNING_DATA_READ: 'project.planning_data.read',
+  PLANNING_DATA_WRITE: 'project.planning_data.write',
+  RELEASE_FLOWS_WRITE: 'project.release_flows.write',
+  SERVICE_ACCOUNTS_READ: 'project.service_accounts.read',
+  SERVICE_ACCOUNTS_WRITE: 'project.service_accounts.write',
+  SIGNAL_ENDPOINTS_READ: 'project.signal_endpoints.read',
+  SIGNAL_ENDPOINTS_WRITE: 'project.signal_endpoints.write',
+  ACTIONS_READ: 'project.actions.read',
+  ACTIONS_WRITE: 'project.actions.write',
+  DATA_READ: 'project.data.read',
+  DATA_WRITE: 'project.data.write',
+  UNKNOWN_FLAGS_READ: 'project.unknown_flags.read',
+  IMPACT_METRICS_READ: 'project.impact_metrics.read',
+  IMPACT_METRICS_WRITE: 'project.impact_metrics.write',
+} as const;
 
-// Permission categories for UI grouping
+// ==================== Environment Level ====================
+
+export const ENV_PERMISSIONS = {
+  READ: 'env.read',
+  SETTINGS_WRITE: 'env.settings.write',
+  FEATURES_WRITE: 'env.features.write',
+  CHANGE_REQUESTS_CREATE: 'env.change_requests.create',
+  CHANGE_REQUESTS_APPROVE: 'env.change_requests.approve',
+  ENV_KEYS_WRITE: 'env.env_keys.write',
+  CLIENT_VERSIONS_READ: 'env.client_versions.read',
+  CLIENT_VERSIONS_WRITE: 'env.client_versions.write',
+  GAME_WORLDS_READ: 'env.game_worlds.read',
+  GAME_WORLDS_WRITE: 'env.game_worlds.write',
+  MAINTENANCE_READ: 'env.maintenance.read',
+  MAINTENANCE_WRITE: 'env.maintenance.write',
+  MAINTENANCE_TEMPLATES_READ: 'env.maintenance_templates.read',
+  MAINTENANCE_TEMPLATES_WRITE: 'env.maintenance_templates.write',
+  SERVICE_NOTICES_READ: 'env.service_notices.read',
+  SERVICE_NOTICES_WRITE: 'env.service_notices.write',
+  BANNERS_READ: 'env.banners.read',
+  BANNERS_WRITE: 'env.banners.write',
+  COUPONS_READ: 'env.coupons.read',
+  COUPONS_WRITE: 'env.coupons.write',
+  SURVEYS_READ: 'env.surveys.read',
+  SURVEYS_WRITE: 'env.surveys.write',
+  STORE_PRODUCTS_READ: 'env.store_products.read',
+  STORE_PRODUCTS_WRITE: 'env.store_products.write',
+  REWARD_TEMPLATES_READ: 'env.reward_templates.read',
+  REWARD_TEMPLATES_WRITE: 'env.reward_templates.write',
+  INGAME_POPUPS_READ: 'env.ingame_popups.read',
+  INGAME_POPUPS_WRITE: 'env.ingame_popups.write',
+  OPERATION_EVENTS_READ: 'env.operation_events.read',
+  OPERATION_EVENTS_WRITE: 'env.operation_events.write',
+  VARS_WRITE: 'env.vars.write',
+  SERVERS_READ: 'env.servers.read',
+  SERVERS_WRITE: 'env.servers.write',
+  COUPON_SETTINGS_READ: 'env.coupon_settings.read',
+  COUPON_SETTINGS_WRITE: 'env.coupon_settings.write',
+  MESSAGE_TEMPLATES_READ: 'env.message_templates.read',
+  MESSAGE_TEMPLATES_WRITE: 'env.message_templates.write',
+  PLATFORM_DEFAULTS_READ: 'env.platform_defaults.read',
+  PLATFORM_DEFAULTS_WRITE: 'env.platform_defaults.write',
+  CMS_CASH_SHOP_READ: 'env.cms_cash_shop.read',
+  CMS_CASH_SHOP_WRITE: 'env.cms_cash_shop.write',
+} as const;
+
+// ==================== Type Exports ====================
+
+export type OrgPermission = (typeof ORG_PERMISSIONS)[keyof typeof ORG_PERMISSIONS];
+export type ProjectPermission = (typeof PROJECT_PERMISSIONS)[keyof typeof PROJECT_PERMISSIONS];
+export type EnvPermission = (typeof ENV_PERMISSIONS)[keyof typeof ENV_PERMISSIONS];
+export type Permission = OrgPermission | ProjectPermission | EnvPermission;
+
+export const ALL_ORG_PERMISSIONS: OrgPermission[] = Object.values(ORG_PERMISSIONS);
+export const ALL_PROJECT_PERMISSIONS: ProjectPermission[] = Object.values(PROJECT_PERMISSIONS);
+export const ALL_ENV_PERMISSIONS: EnvPermission[] = Object.values(ENV_PERMISSIONS);
+export const ALL_PERMISSIONS: Permission[] = [
+  ...ALL_ORG_PERMISSIONS,
+  ...ALL_PROJECT_PERMISSIONS,
+  ...ALL_ENV_PERMISSIONS,
+];
+
+// ==================== Permission Categories (for UI grouping) ====================
+
 export const PERMISSION_CATEGORIES = {
-  ADMIN_PANEL: {
-    label: 'Admin Panel',
+  ORG_MANAGEMENT: {
+    label: 'Organisation Management',
+    scope: 'org' as const,
     permissions: [
-      PERMISSIONS.USERS_VIEW,
-      PERMISSIONS.USERS_MANAGE,
-      PERMISSIONS.CLIENT_VERSIONS_VIEW,
-      PERMISSIONS.CLIENT_VERSIONS_MANAGE,
-      PERMISSIONS.GAME_WORLDS_VIEW,
-      PERMISSIONS.GAME_WORLDS_MANAGE,
-      PERMISSIONS.MAINTENANCE_VIEW,
-      PERMISSIONS.MAINTENANCE_MANAGE,
-      PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
-      PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
-      PERMISSIONS.SCHEDULER_VIEW,
-      PERMISSIONS.SCHEDULER_MANAGE,
-      PERMISSIONS.AUDIT_LOGS_VIEW,
-      PERMISSIONS.REALTIME_EVENTS_VIEW,
-      PERMISSIONS.CRASH_EVENTS_VIEW,
-      PERMISSIONS.SECURITY_VIEW,
-      PERMISSIONS.SECURITY_MANAGE,
-      PERMISSIONS.SERVERS_VIEW,
-      PERMISSIONS.SERVERS_MANAGE,
-      PERMISSIONS.MONITORING_VIEW,
-      PERMISSIONS.OPEN_API_VIEW,
-      PERMISSIONS.CONSOLE_ACCESS,
+      ORG_PERMISSIONS.USERS_READ,
+      ORG_PERMISSIONS.USERS_WRITE,
+      ORG_PERMISSIONS.GROUPS_WRITE,
+      ORG_PERMISSIONS.GROUP_MEMBERSHIP_WRITE,
+      ORG_PERMISSIONS.ROLES_WRITE,
+      ORG_PERMISSIONS.INVITATIONS_WRITE,
+      ORG_PERMISSIONS.PROJECTS_WRITE,
     ],
   },
-  GAME_MANAGEMENT: {
-    label: 'Game Management',
+  ORG_SECURITY: {
+    label: 'Security & Access',
+    scope: 'org' as const,
     permissions: [
-      PERMISSIONS.SERVICE_NOTICES_VIEW,
-      PERMISSIONS.SERVICE_NOTICES_MANAGE,
-      PERMISSIONS.INGAME_POPUP_NOTICES_VIEW,
-      PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE,
-      PERMISSIONS.COUPONS_VIEW,
-      PERMISSIONS.COUPONS_MANAGE,
-      PERMISSIONS.SURVEYS_VIEW,
-      PERMISSIONS.SURVEYS_MANAGE,
-      PERMISSIONS.OPERATION_EVENTS_VIEW,
-      PERMISSIONS.OPERATION_EVENTS_MANAGE,
-      PERMISSIONS.STORE_PRODUCTS_VIEW,
-      PERMISSIONS.STORE_PRODUCTS_MANAGE,
-      PERMISSIONS.REWARD_TEMPLATES_VIEW,
-      PERMISSIONS.REWARD_TEMPLATES_MANAGE,
-      PERMISSIONS.BANNERS_VIEW,
-      PERMISSIONS.BANNERS_MANAGE,
-      PERMISSIONS.PLANNING_DATA_VIEW,
-      PERMISSIONS.PLANNING_DATA_MANAGE,
-      PERMISSIONS.CHANGE_REQUESTS_VIEW,
-      PERMISSIONS.CHANGE_REQUESTS_MANAGE,
+      ORG_PERMISSIONS.ADMIN_TOKENS_WRITE,
+      ORG_PERMISSIONS.IP_WHITELIST_READ,
+      ORG_PERMISSIONS.IP_WHITELIST_WRITE,
+      ORG_PERMISSIONS.ACCOUNT_WHITELIST_READ,
+      ORG_PERMISSIONS.ACCOUNT_WHITELIST_WRITE,
+      ORG_PERMISSIONS.INTEGRATIONS_READ,
+      ORG_PERMISSIONS.INTEGRATIONS_WRITE,
     ],
   },
-  EVENT_LENS: {
-    label: 'Event Lens',
-    permissions: [PERMISSIONS.EVENT_LENS_VIEW, PERMISSIONS.EVENT_LENS_MANAGE],
+  ORG_MONITORING: {
+    label: 'Monitoring & Logs',
+    scope: 'org' as const,
+    permissions: [
+      ORG_PERMISSIONS.AUDIT_LOGS_READ,
+      ORG_PERMISSIONS.MONITORING_READ,
+      ORG_PERMISSIONS.CRASH_EVENTS_READ,
+      ORG_PERMISSIONS.REALTIME_EVENTS_READ,
+      ORG_PERMISSIONS.CONSOLE_ACCESS,
+      ORG_PERMISSIONS.EVENT_LENS_READ,
+      ORG_PERMISSIONS.EVENT_LENS_WRITE,
+    ],
   },
-  AUTOMATION: {
+  ORG_SYSTEM: {
+    label: 'System',
+    scope: 'org' as const,
+    permissions: [
+      ORG_PERMISSIONS.SYSTEM_SETTINGS_READ,
+      ORG_PERMISSIONS.SYSTEM_SETTINGS_WRITE,
+      ORG_PERMISSIONS.SCHEDULER_READ,
+      ORG_PERMISSIONS.SCHEDULER_WRITE,
+      ORG_PERMISSIONS.OPEN_API_READ,
+      ORG_PERMISSIONS.CHAT_ACCESS,
+      ORG_PERMISSIONS.TRANSLATION_WRITE,
+    ],
+  },
+  PROJECT_FEATURES: {
+    label: 'Feature Management',
+    scope: 'project' as const,
+    permissions: [
+      PROJECT_PERMISSIONS.READ,
+      PROJECT_PERMISSIONS.FEATURES_WRITE,
+      PROJECT_PERMISSIONS.SEGMENTS_WRITE,
+      PROJECT_PERMISSIONS.CONTEXT_FIELDS_WRITE,
+      PROJECT_PERMISSIONS.RELEASE_FLOWS_WRITE,
+      PROJECT_PERMISSIONS.UNKNOWN_FLAGS_READ,
+      PROJECT_PERMISSIONS.IMPACT_METRICS_READ,
+      PROJECT_PERMISSIONS.IMPACT_METRICS_WRITE,
+    ],
+  },
+  PROJECT_SETTINGS: {
+    label: 'Project Settings',
+    scope: 'project' as const,
+    permissions: [
+      PROJECT_PERMISSIONS.TAGS_READ,
+      PROJECT_PERMISSIONS.TAGS_WRITE,
+      PROJECT_PERMISSIONS.DATA_READ,
+      PROJECT_PERMISSIONS.DATA_WRITE,
+      PROJECT_PERMISSIONS.PLANNING_DATA_READ,
+      PROJECT_PERMISSIONS.PLANNING_DATA_WRITE,
+    ],
+  },
+  PROJECT_AUTOMATION: {
     label: 'Automation',
+    scope: 'project' as const,
     permissions: [
-      PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
-      PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
-      PERMISSIONS.SIGNAL_ENDPOINTS_VIEW,
-      PERMISSIONS.SIGNAL_ENDPOINTS_MANAGE,
-      PERMISSIONS.ACTIONS_VIEW,
-      PERMISSIONS.ACTIONS_MANAGE,
+      PROJECT_PERMISSIONS.SERVICE_ACCOUNTS_READ,
+      PROJECT_PERMISSIONS.SERVICE_ACCOUNTS_WRITE,
+      PROJECT_PERMISSIONS.SIGNAL_ENDPOINTS_READ,
+      PROJECT_PERMISSIONS.SIGNAL_ENDPOINTS_WRITE,
+      PROJECT_PERMISSIONS.ACTIONS_READ,
+      PROJECT_PERMISSIONS.ACTIONS_WRITE,
     ],
   },
-  SETTINGS: {
-    label: 'Settings',
+  ENV_FLAGS: {
+    label: 'Environment Flags',
+    scope: 'env' as const,
     permissions: [
-      PERMISSIONS.TAGS_VIEW,
-      PERMISSIONS.TAGS_MANAGE,
-      PERMISSIONS.DATA_MANAGEMENT_VIEW,
-      PERMISSIONS.DATA_MANAGEMENT_MANAGE,
-      PERMISSIONS.ENVIRONMENTS_VIEW,
-      PERMISSIONS.ENVIRONMENTS_MANAGE,
-      PERMISSIONS.SYSTEM_SETTINGS_VIEW,
-      PERMISSIONS.SYSTEM_SETTINGS_MANAGE,
+      ENV_PERMISSIONS.READ,
+      ENV_PERMISSIONS.SETTINGS_WRITE,
+      ENV_PERMISSIONS.FEATURES_WRITE,
+      ENV_PERMISSIONS.ENV_KEYS_WRITE,
+      ENV_PERMISSIONS.CHANGE_REQUESTS_CREATE,
+      ENV_PERMISSIONS.CHANGE_REQUESTS_APPROVE,
     ],
   },
+  ENV_GAME_OPS: {
+    label: 'Game Operations',
+    scope: 'env' as const,
+    permissions: [
+      ENV_PERMISSIONS.CLIENT_VERSIONS_READ,
+      ENV_PERMISSIONS.CLIENT_VERSIONS_WRITE,
+      ENV_PERMISSIONS.GAME_WORLDS_READ,
+      ENV_PERMISSIONS.GAME_WORLDS_WRITE,
+      ENV_PERMISSIONS.MAINTENANCE_READ,
+      ENV_PERMISSIONS.MAINTENANCE_WRITE,
+      ENV_PERMISSIONS.MAINTENANCE_TEMPLATES_READ,
+      ENV_PERMISSIONS.MAINTENANCE_TEMPLATES_WRITE,
+      ENV_PERMISSIONS.MESSAGE_TEMPLATES_READ,
+      ENV_PERMISSIONS.MESSAGE_TEMPLATES_WRITE,
+      ENV_PERMISSIONS.SERVICE_NOTICES_READ,
+      ENV_PERMISSIONS.SERVICE_NOTICES_WRITE,
+      ENV_PERMISSIONS.SERVERS_READ,
+      ENV_PERMISSIONS.SERVERS_WRITE,
+      ENV_PERMISSIONS.PLATFORM_DEFAULTS_READ,
+      ENV_PERMISSIONS.PLATFORM_DEFAULTS_WRITE,
+    ],
+  },
+  ENV_CONTENT: {
+    label: 'Content Management',
+    scope: 'env' as const,
+    permissions: [
+      ENV_PERMISSIONS.BANNERS_READ,
+      ENV_PERMISSIONS.BANNERS_WRITE,
+      ENV_PERMISSIONS.COUPONS_READ,
+      ENV_PERMISSIONS.COUPONS_WRITE,
+      ENV_PERMISSIONS.COUPON_SETTINGS_READ,
+      ENV_PERMISSIONS.COUPON_SETTINGS_WRITE,
+      ENV_PERMISSIONS.SURVEYS_READ,
+      ENV_PERMISSIONS.SURVEYS_WRITE,
+      ENV_PERMISSIONS.STORE_PRODUCTS_READ,
+      ENV_PERMISSIONS.STORE_PRODUCTS_WRITE,
+      ENV_PERMISSIONS.CMS_CASH_SHOP_READ,
+      ENV_PERMISSIONS.CMS_CASH_SHOP_WRITE,
+      ENV_PERMISSIONS.REWARD_TEMPLATES_READ,
+      ENV_PERMISSIONS.REWARD_TEMPLATES_WRITE,
+      ENV_PERMISSIONS.INGAME_POPUPS_READ,
+      ENV_PERMISSIONS.INGAME_POPUPS_WRITE,
+      ENV_PERMISSIONS.OPERATION_EVENTS_READ,
+      ENV_PERMISSIONS.OPERATION_EVENTS_WRITE,
+      ENV_PERMISSIONS.VARS_WRITE,
+    ],
+  },
+} as const;
+
+// ==================== Flat PERMISSIONS (for gradual migration from existing routes) ====================
+
+export const PERMISSIONS = {
+  USERS_VIEW: ORG_PERMISSIONS.USERS_READ,
+  USERS_MANAGE: ORG_PERMISSIONS.USERS_WRITE,
+  CLIENT_VERSIONS_VIEW: ENV_PERMISSIONS.CLIENT_VERSIONS_READ,
+  CLIENT_VERSIONS_MANAGE: ENV_PERMISSIONS.CLIENT_VERSIONS_WRITE,
+  GAME_WORLDS_VIEW: ENV_PERMISSIONS.GAME_WORLDS_READ,
+  GAME_WORLDS_MANAGE: ENV_PERMISSIONS.GAME_WORLDS_WRITE,
+  MAINTENANCE_VIEW: ENV_PERMISSIONS.MAINTENANCE_READ,
+  MAINTENANCE_MANAGE: ENV_PERMISSIONS.MAINTENANCE_WRITE,
+  MAINTENANCE_TEMPLATES_VIEW: ENV_PERMISSIONS.MAINTENANCE_TEMPLATES_READ,
+  MAINTENANCE_TEMPLATES_MANAGE: ENV_PERMISSIONS.MAINTENANCE_TEMPLATES_WRITE,
+  SCHEDULER_VIEW: ORG_PERMISSIONS.SCHEDULER_READ,
+  SCHEDULER_MANAGE: ORG_PERMISSIONS.SCHEDULER_WRITE,
+  AUDIT_LOGS_VIEW: ORG_PERMISSIONS.AUDIT_LOGS_READ,
+  REALTIME_EVENTS_VIEW: ORG_PERMISSIONS.REALTIME_EVENTS_READ,
+  CRASH_EVENTS_VIEW: ORG_PERMISSIONS.CRASH_EVENTS_READ,
+  SECURITY_VIEW: ORG_PERMISSIONS.IP_WHITELIST_READ,
+  SECURITY_MANAGE: ORG_PERMISSIONS.IP_WHITELIST_WRITE,
+  SERVERS_VIEW: ENV_PERMISSIONS.SERVERS_READ,
+  SERVERS_MANAGE: ENV_PERMISSIONS.SERVERS_WRITE,
+  MONITORING_VIEW: ORG_PERMISSIONS.MONITORING_READ,
+  OPEN_API_VIEW: ORG_PERMISSIONS.OPEN_API_READ,
+  CONSOLE_ACCESS: ORG_PERMISSIONS.CONSOLE_ACCESS,
+  SERVICE_NOTICES_VIEW: ENV_PERMISSIONS.SERVICE_NOTICES_READ,
+  SERVICE_NOTICES_MANAGE: ENV_PERMISSIONS.SERVICE_NOTICES_WRITE,
+  INGAME_POPUP_NOTICES_VIEW: ENV_PERMISSIONS.INGAME_POPUPS_READ,
+  INGAME_POPUP_NOTICES_MANAGE: ENV_PERMISSIONS.INGAME_POPUPS_WRITE,
+  COUPONS_VIEW: ENV_PERMISSIONS.COUPONS_READ,
+  COUPONS_MANAGE: ENV_PERMISSIONS.COUPONS_WRITE,
+  SURVEYS_VIEW: ENV_PERMISSIONS.SURVEYS_READ,
+  SURVEYS_MANAGE: ENV_PERMISSIONS.SURVEYS_WRITE,
+  OPERATION_EVENTS_VIEW: ENV_PERMISSIONS.OPERATION_EVENTS_READ,
+  OPERATION_EVENTS_MANAGE: ENV_PERMISSIONS.OPERATION_EVENTS_WRITE,
+  STORE_PRODUCTS_VIEW: ENV_PERMISSIONS.STORE_PRODUCTS_READ,
+  STORE_PRODUCTS_MANAGE: ENV_PERMISSIONS.STORE_PRODUCTS_WRITE,
+  REWARD_TEMPLATES_VIEW: ENV_PERMISSIONS.REWARD_TEMPLATES_READ,
+  REWARD_TEMPLATES_MANAGE: ENV_PERMISSIONS.REWARD_TEMPLATES_WRITE,
+  BANNERS_VIEW: ENV_PERMISSIONS.BANNERS_READ,
+  BANNERS_MANAGE: ENV_PERMISSIONS.BANNERS_WRITE,
+  PLANNING_DATA_VIEW: PROJECT_PERMISSIONS.PLANNING_DATA_READ,
+  PLANNING_DATA_MANAGE: PROJECT_PERMISSIONS.PLANNING_DATA_WRITE,
+  FEATURE_FLAGS_VIEW: PROJECT_PERMISSIONS.READ,
+  FEATURE_FLAGS_MANAGE: PROJECT_PERMISSIONS.FEATURES_WRITE,
+  CHANGE_REQUESTS_VIEW: ENV_PERMISSIONS.CHANGE_REQUESTS_CREATE,
+  CHANGE_REQUESTS_MANAGE: ENV_PERMISSIONS.CHANGE_REQUESTS_APPROVE,
+  EVENT_LENS_VIEW: ORG_PERMISSIONS.EVENT_LENS_READ,
+  EVENT_LENS_MANAGE: ORG_PERMISSIONS.EVENT_LENS_WRITE,
+  TAGS_VIEW: PROJECT_PERMISSIONS.TAGS_READ,
+  TAGS_MANAGE: PROJECT_PERMISSIONS.TAGS_WRITE,
+  DATA_MANAGEMENT_VIEW: PROJECT_PERMISSIONS.DATA_READ,
+  DATA_MANAGEMENT_MANAGE: PROJECT_PERMISSIONS.DATA_WRITE,
+  ENVIRONMENTS_VIEW: ENV_PERMISSIONS.READ,
+  ENVIRONMENTS_MANAGE: ENV_PERMISSIONS.SETTINGS_WRITE,
+  SYSTEM_SETTINGS_VIEW: ORG_PERMISSIONS.SYSTEM_SETTINGS_READ,
+  SYSTEM_SETTINGS_MANAGE: ORG_PERMISSIONS.SYSTEM_SETTINGS_WRITE,
+  SERVICE_ACCOUNTS_VIEW: PROJECT_PERMISSIONS.SERVICE_ACCOUNTS_READ,
+  SERVICE_ACCOUNTS_MANAGE: PROJECT_PERMISSIONS.SERVICE_ACCOUNTS_WRITE,
+  SIGNAL_ENDPOINTS_VIEW: PROJECT_PERMISSIONS.SIGNAL_ENDPOINTS_READ,
+  SIGNAL_ENDPOINTS_MANAGE: PROJECT_PERMISSIONS.SIGNAL_ENDPOINTS_WRITE,
+  ACTIONS_VIEW: PROJECT_PERMISSIONS.ACTIONS_READ,
+  ACTIONS_MANAGE: PROJECT_PERMISSIONS.ACTIONS_WRITE,
+  CHAT_ACCESS: ORG_PERMISSIONS.CHAT_ACCESS,
 } as const;
