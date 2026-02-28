@@ -173,22 +173,12 @@ export class JobTypeModel {
       const envName = environmentId ?? getCurrentEnvironment();
       const updateData: any = {};
 
-      if (data.displayName !== undefined) {
-        updateData.displayName = data.displayName;
-      }
-      if (data.description !== undefined) {
-        updateData.description = data.description;
-      }
-      if (data.jobSchema !== undefined) {
-        updateData.jobSchema = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
-      }
-      if (data.isEnabled !== undefined) {
-        updateData.isEnabled = data.isEnabled;
-      }
-      if (data.updatedBy !== undefined) {
-        updateData.updatedBy = data.updatedBy;
-      }
-
+      if (data.displayName !== undefined) updateData.displayName = data.displayName;
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.jobSchema !== undefined) updateData.jobSchema = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
+      if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
+      if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
+      
       updateData.updatedAt = db.fn.now();
 
       await db('g_job_types').where('id', id).where('environmentId', envName).update(updateData);

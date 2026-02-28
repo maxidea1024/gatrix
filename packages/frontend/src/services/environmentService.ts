@@ -1,7 +1,7 @@
 import api from './api';
 
 export interface Environment {
-  environment: string; // Primary identifier (environment name)
+  environmentId: string; // Primary identifier (environmentId name)
   environmentName: string; // Alias for backward compatibility
   displayName: string;
   environmentType: 'development' | 'staging' | 'production';
@@ -20,7 +20,7 @@ export interface Environment {
 }
 
 export interface CreateEnvironmentData {
-  environment: string; // Environment name (primary key)
+  environmentId: string; // Environment name (primary key)
   displayName: string;
   description?: string;
   environmentType: 'development' | 'staging' | 'production';
@@ -107,11 +107,11 @@ export interface CopyPreviewSummary {
 
 export interface CopyPreview {
   source: {
-    environment: string;
+    environmentId: string;
     name: string;
   };
   target: {
-    environment: string;
+    environmentId: string;
     name: string;
   };
   summary: {
@@ -173,8 +173,8 @@ export interface RelatedDataDetails {
 }
 
 export interface EnvironmentRelatedData {
-  environment: {
-    environment: string;
+  environmentId: {
+    environmentId: string;
     displayName: string;
     isSystemDefined: boolean;
     isDefault: boolean;
@@ -204,9 +204,9 @@ class EnvironmentService {
    * Get environment by name
    * @param environment Environment name (primary key)
    */
-  async getEnvironment(environment: string): Promise<Environment> {
+  async getEnvironment(environmentId: string): Promise<Environment> {
     try {
-      const response = await api.get(`/admin/environments/${environment}`);
+      const response = await api.get(`/admin/environments/${ environmentId }`);
       return response.data;
     } catch (error) {
       console.error('Error fetching environment:', error);
@@ -231,9 +231,9 @@ class EnvironmentService {
    * Update an existing environment
    * @param environment Environment name (primary key)
    */
-  async updateEnvironment(environment: string, data: UpdateEnvironmentData): Promise<Environment> {
+  async updateEnvironment(environmentId: string, data: UpdateEnvironmentData): Promise<Environment> {
     try {
-      const response = await api.put(`/admin/environments/${environment}`, data);
+      const response = await api.put(`/admin/environments/${ environmentId }`, data);
       return response.data;
     } catch (error) {
       console.error('Error updating environment:', error);
@@ -284,9 +284,9 @@ class EnvironmentService {
    * Get related data counts for an environment (for delete confirmation)
    * @param environment Environment name (primary key)
    */
-  async getRelatedData(environment: string): Promise<EnvironmentRelatedData> {
+  async getRelatedData(environmentId: string): Promise<EnvironmentRelatedData> {
     try {
-      const response = await api.get(`/admin/environments/${environment}/related-data`);
+      const response = await api.get(`/admin/environments/${ environmentId }/related-data`);
       return response.data;
     } catch (error) {
       console.error('Error fetching related data:', error);
@@ -299,9 +299,9 @@ class EnvironmentService {
    * @param environment Environment name (primary key)
    * @param force If true, delete all related data as well
    */
-  async deleteEnvironment(environment: string, force: boolean = false): Promise<void> {
+  async deleteEnvironment(environmentId: string, force: boolean = false): Promise<void> {
     try {
-      await api.delete(`/admin/environments/${environment}`, {
+      await api.delete(`/admin/environments/${ environmentId }`, {
         data: { force },
       });
     } catch (error) {

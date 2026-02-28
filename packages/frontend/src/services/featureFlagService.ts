@@ -38,7 +38,7 @@ export interface ValidationRules {
 export interface FeatureFlagEnvironment {
   id: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   isEnabled: boolean;
   lastSeenAt?: string;
 }
@@ -172,11 +172,10 @@ export async function updateFeatureFlag(
 export async function toggleFeatureFlag(
   flagName: string,
   isEnabled: boolean,
-  environment?: string
+  environmentId?: string
 ): Promise<FeatureFlag> {
   const response = await api.post(`/admin/features/${flagName}/toggle`, {
-    isEnabled,
-    environment,
+    isEnabled, environmentId,
   });
   return response.data.flag;
 }

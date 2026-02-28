@@ -15,8 +15,8 @@ export function useReleaseFlowTemplates(search?: string) {
 /**
  * Hook for a specific release flow plan for a flag and environment
  */
-export function useReleaseFlowPlan(flagId: string | null, environment: string | null) {
-  const url = flagId && environment ? `/admin/release-flows/plans/${flagId}/${environment}` : null;
+export function useReleaseFlowPlan(flagId: string | null, environmentId: string | null) {
+  const url = flagId && environmentId ? `/admin/release-flows/plans/${flagId}/${ environmentId }` : null;
 
   return useApi<ReleaseFlowPlan>(url);
 }
@@ -26,16 +26,16 @@ export function useReleaseFlowPlan(flagId: string | null, environment: string | 
  */
 export function useConditionalReleaseFlowPlan(
   flagId: string | null,
-  environment: string | null,
+  environmentId: string | null,
   condition: boolean
 ) {
-  const url = flagId && environment ? `/admin/release-flows/plans/${flagId}/${environment}` : null;
+  const url = flagId && environmentId ? `/admin/release-flows/plans/${flagId}/${ environmentId }` : null;
 
   return useConditionalApi<ReleaseFlowPlan>(url, condition);
 }
 
 export interface ReleaseFlowPlanSummary {
-  environment: string;
+  environmentId: string;
   status: string;
   displayName: string;
   activeMilestoneName: string | null;

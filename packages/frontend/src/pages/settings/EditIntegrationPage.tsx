@@ -228,7 +228,7 @@ const getEventDescriptionConfig = (log: EventLog): { key: string; params: any } 
     ...data,
     // Prefer friendly names if available
     name: data.segmentName || data.flagName || data.name || data.title || data.id || '',
-    environment: data.environment || '',
+    environmentId: data.environmentId || '',
     message: data.message || '',
     email: data.email || '',
     displayName: data.displayName || '',
@@ -265,7 +265,7 @@ const FallbackDescription: React.FC<{ log: EventLog }> = ({ log }) => {
   const data = log.eventData || {};
   if (data.email) return <>{data.email}</>;
   if (data.displayName) return <>{data.displayName}</>;
-  if (data.name && data.environment) return <>{`${data.environment}: ${data.name}`}</>;
+  if (data.name && data.environmentId) return <>{`${data.environmentId}: ${data.name}`}</>;
   if (data.name) return <>{data.name}</>;
   if (data.title) return <>{data.title}</>;
   if (data.message) return <>{data.message}</>;
@@ -342,7 +342,7 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
                     sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500 }}
                   />
                 ),
-                environment: (
+                environmentId: (
                   <LabelChip
                     size="small"
                     color="primary"
@@ -464,7 +464,7 @@ export const EditIntegrationPage: React.FC = () => {
 
   const [tabValue, setTabValue] = useState(parseInt(searchParams.get('tab') || '0', 10));
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
-  const [environments, setEnvironments] = useState<{ environment: string; displayName?: string }[]>(
+  const [environments, setEnvironments] = useState<{ environmentId: string; displayName?: string }[]>(
     []
   );
   const [integration, setIntegration] = useState<Integration | null>(null);
@@ -946,20 +946,20 @@ export const EditIntegrationPage: React.FC = () => {
             <FormGroup row>
               {environments.map((env) => (
                 <FormControlLabel
-                  key={env.environment}
+                  key={env.environmentId}
                   control={
                     <Checkbox
-                      checked={selectedEnvironments.includes(env.environment)}
+                      checked={selectedEnvironments.includes(env.environmentId)}
                       onChange={() => {
                         setSelectedEnvironments((prev) =>
-                          prev.includes(env.environment)
-                            ? prev.filter((e) => e !== env.environment)
-                            : [...prev, env.environment]
+                          prev.includes(env.environmentId)
+                            ? prev.filter((e) => e !== env.environmentId)
+                            : [...prev, env.environmentId]
                         );
                       }}
                     />
                   }
-                  label={env.displayName || env.environment}
+                  label={env.displayName || env.environmentId}
                 />
               ))}
             </FormGroup>

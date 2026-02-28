@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 export interface ResourceReference {
-    flags: { flagName: string; environment: string; strategyName?: string }[];
+    flags: { flagName: string; environmentId: string; strategyName?: string }[];
     segments?: { segmentName: string; id: string }[];
     templates?: { flowName: string; id: string; milestoneName?: string }[];
 }
@@ -55,9 +55,9 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
     const hasTemplates = (references.templates?.length ?? 0) > 0;
     const hasAny = hasFlags || hasSegments || hasTemplates;
 
-    const handleFlagClick = (flagName: string, environment?: string) => {
+    const handleFlagClick = (flagName: string, environmentId?: string) => {
         onNavigate?.();
-        const envParam = environment ? `?env=${encodeURIComponent(environment)}` : '';
+        const envParam = environmentId ? `?env=${encodeURIComponent(environmentId)}` : '';
         navigate(`/feature-flags/${encodeURIComponent(flagName)}${envParam}`);
     };
 
@@ -95,7 +95,7 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                             <TableHead>
                                 <TableRow sx={{ bgcolor: 'action.hover' }}>
                                     <TableCell sx={{ fontWeight: 600, py: 0.75 }}>{t('featureFlags.flagName')}</TableCell>
-                                    <TableCell sx={{ fontWeight: 600, py: 0.75 }}>{t('featureFlags.environment')}</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, py: 0.75 }}>{t('featureFlags.environmentId')}</TableCell>
                                     <TableCell sx={{ fontWeight: 600, py: 0.75 }}>{t('featureFlags.strategy')}</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -104,7 +104,7 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                                     <TableRow
                                         key={`flag-${index}`}
                                         hover
-                                        onClick={() => handleFlagClick(flag.flagName, flag.environment)}
+                                        onClick={() => handleFlagClick(flag.flagName, flag.environmentId)}
                                         sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
                                     >
                                         <TableCell sx={{ py: 0.75 }}>
@@ -114,7 +114,7 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                                         </TableCell>
                                         <TableCell sx={{ py: 0.75 }}>
                                             <Chip
-                                                label={flag.environment}
+                                                label={flag.environmentId}
                                                 size="small"
                                                 variant="outlined"
                                                 sx={{ height: 20, fontSize: '0.7rem' }}

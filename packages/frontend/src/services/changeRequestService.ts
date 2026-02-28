@@ -58,7 +58,7 @@ export interface Approval {
 export interface ChangeRequest {
   id: string;
   requesterId: number;
-  environment: string;
+  environmentId: string;
   status: ChangeRequestStatus;
   title: string;
   description?: string;
@@ -82,7 +82,7 @@ export interface ChangeRequest {
     email: string;
   };
   environmentModel?: {
-    environment: string;
+    environmentId: string;
     displayName: string;
     requiredApprovers: number;
   };

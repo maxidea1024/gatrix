@@ -63,6 +63,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { CrashEvent } from '@/types/crash';
 import { BugReport as BugReportIcon } from '@mui/icons-material';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { Environment } from '@/services/environmentService';
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import serverLifecycleService, { ServerLifecycleEvent } from '@/services/serverLifecycleService';
 
@@ -254,14 +255,7 @@ interface RecentActivity {
   userName?: string;
 }
 
-// Environment interface
-interface Environment {
-  id: string;
-  environmentName: string;
-  displayName: string;
-  description?: string;
-  color?: string;
-}
+// Environment extends the service-level Environment interface
 
 // Environment data counts interface
 interface EnvironmentDataCounts {
@@ -754,7 +748,7 @@ const DashboardPage: React.FC = () => {
         // Filter to accessible environments
         const accessibleEnvs = access?.allowAllEnvironments
           ? allEnvs
-          : allEnvs.filter((env: Environment) => access?.environments?.includes(env.environment));
+          : allEnvs.filter((env: Environment) => access?.environments?.includes(env.environmentId));
 
         // Show all accessible environments
         const displayEnvs = accessibleEnvs;
@@ -767,7 +761,7 @@ const DashboardPage: React.FC = () => {
         // Fetch counts for each environment
         const countsPromises = displayEnvs.map(async (env: Environment) => {
           try {
-            const res = await api.get(`/admin/environments/${env.environment}/related-data`);
+            const res = await api.get(`/admin/environments/${env.environmentId}/related-data`);
             const rawData = res?.data?.relatedData;
             // Extract count from each { count, items } object
             const counts = rawData
@@ -1191,16 +1185,16 @@ const DashboardPage: React.FC = () => {
 
               // Sort environments to put current environment first
               const sortedEnvs = [...environmentsWithCounts].sort((a, b) => {
-                if (a.environment === currentEnvironmentId) return -1;
-                if (b.environment === currentEnvironmentId) return 1;
+                if (a.environmentId === currentEnvironmentId) return -1;
+                if (b.environmentId === currentEnvironmentId) return 1;
                 return 0;
               });
 
               return sortedEnvs
                 .map((env) => {
-                  const isCurrentEnv = env.environment === currentEnvironmentId;
+                  const isCurrentEnv = env.environmentId === currentEnvironmentId;
                   return (
-                    <Grid key={env.environment} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                    <Grid key={env.environmentId} size={{ xs: 12, sm: smSize, md: mdSize }}>
                       <Card
                         sx={{
                           height: '100%',
@@ -1265,7 +1259,7 @@ const DashboardPage: React.FC = () => {
                               >
                                 <IconButton
                                   size="small"
-                                  onClick={() => switchEnvironment(env.environment)}
+                                  onClick={() => switchEnvironment(env.environmentId)}
                                   sx={{
                                     ml: 0.5,
                                     p: 0.5,
@@ -1361,8 +1355,8 @@ const DashboardPage: React.FC = () => {
                                 <Box
                                   key={item.label}
                                   onClick={() => {
-                                    if (env.environment !== currentEnvironmentId) {
-                                      switchEnvironment(env.environment);
+                                    if (env.environmentId !== currentEnvironmentId) {
+                                      switchEnvironment(env.environmentId);
                                     }
                                     navigate(item.path);
                                   }}

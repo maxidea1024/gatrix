@@ -47,7 +47,7 @@ import { Permission, getPermissionLabelKey, PERMISSION_CATEGORIES } from '@/type
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 
 interface Environment {
-  environment: string;
+  environmentId: string;
   environmentName: string;
   displayName: string;
   color?: string;
@@ -134,7 +134,7 @@ const ProfilePage: React.FC = () => {
           environmentAccess?.environments ||
           (environmentAccess as any)?.environments ||
           []
-        ).includes(env.environment)
+        ).includes(env.environmentId)
       );
 
   const handleEditToggle = () => {
@@ -700,7 +700,7 @@ const ProfilePage: React.FC = () => {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {accessibleEnvironments.map((env) => (
                     <Tooltip
-                      key={env.environment}
+                      key={env.environmentId}
                       title={env.description || ''}
                       arrow
                       placement="top"

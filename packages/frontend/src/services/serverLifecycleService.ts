@@ -2,7 +2,7 @@ import api from './api';
 
 export interface ServerLifecycleEvent {
   id: number;
-  environment: string; // Environment name (primary identifier)
+  environmentId: string; // Environment name (primary identifier)
   instanceId: string;
   serviceType: string;
   serviceGroup?: string;
@@ -39,7 +39,7 @@ class ServerLifecycleService {
     limit?: number;
     serviceType?: string;
     instanceId?: string;
-    environment?: string;
+    environmentId?: string;
     eventType?: string;
   }): Promise<EventsResponse> {
     const response = await api.get('/admin/server-lifecycle/events', {

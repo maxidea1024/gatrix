@@ -47,7 +47,7 @@ export interface ReleaseFlowPlan {
   displayName?: string;
   description?: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   templateId?: string;
   activeMilestoneId?: string;
   status: FlowStatus;
@@ -76,7 +76,7 @@ export interface CreateTemplateInput {
 
 export interface ApplyTemplateInput {
   flagId: string;
-  environment: string;
+  environmentId: string;
   templateId: string;
 }
 
@@ -111,9 +111,9 @@ export async function applyTemplate(data: ApplyTemplateInput): Promise<ReleaseFl
  */
 export async function getPlan(
   flagId: string,
-  environment: string
+  environmentId: string
 ): Promise<ReleaseFlowPlan | null> {
-  const response = await api.get(`/admin/release-flows/plans/${flagId}/${environment}`);
+  const response = await api.get(`/admin/release-flows/plans/${flagId}/${ environmentId }`);
   return response.data;
 }
 

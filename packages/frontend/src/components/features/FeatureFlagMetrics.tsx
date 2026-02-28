@@ -65,13 +65,13 @@ ChartJS.register(
 
 interface FeatureFlagMetricsProps {
   flagName: string;
-  environments: { environment: string; isEnabled: boolean }[];
+  environments: { environmentId: string; isEnabled: boolean }[];
   currentEnvironment: string;
 }
 
 interface MetricsBucket {
   id: string;
-  environment: string;
+  environmentId: string;
   flagName: string;
   metricsBucket: string;
   yesCount: number;
@@ -123,9 +123,9 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const [selectedEnvs, setSelectedEnvs] = useState<string[]>(() => {
     const envParam = searchParams.get('envs');
     if (envParam) {
-      return envParam.split(',').filter((e) => environments.some((env) => env.environment === e));
+      return envParam.split(',').filter((e) => environments.some((env) => env.environmentId === e));
     }
-    return environments.map((e) => e.environment);
+    return environments.map((e) => e.environmentId);
   });
   const [period, setPeriod] = useState<PeriodOption>(() => {
     const periodParam = searchParams.get('period') as PeriodOption;
@@ -241,7 +241,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
               .then((response) =>
                 (response.data.metrics || []).map((m) => ({
                   ...m,
-                  environment: env,
+                  environmentId: env,
                 }))
               )
           );
@@ -263,7 +263,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                 .then((response) =>
                   (response.data.metrics || []).map((m) => ({
                     ...m,
-                    environment: env,
+                    environmentId: env,
                     appName,
                   }))
                 )
@@ -292,7 +292,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   const envNamesKey = useMemo(
     () =>
       environments
-        .map((e) => e.environment)
+        .map((e) => e.environmentId)
         .sort()
         .join(','),
     [environments]
@@ -304,7 +304,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     let hasChanges = false;
 
     // Environment filter
-    const allEnvs = environments.map((e) => e.environment);
+    const allEnvs = environments.map((e) => e.environmentId);
     const envsKey = selectedEnvs.join(',');
     const currentEnvsParam = searchParams.get('envs') || '';
     if (selectedEnvs.length !== allEnvs.length || !selectedEnvs.every((e) => allEnvs.includes(e))) {
@@ -524,7 +524,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
     // Generate group key based on variantGroupBy
     const getGroupKey = (m: MetricsBucket): string => {
       if (variantGroupBy === 'app') return m.appName || 'unknown';
-      if (variantGroupBy === 'env') return m.environment || 'unknown';
+      if (variantGroupBy === 'env') return m.environmentId || 'unknown';
       return 'all';
     };
 
@@ -686,7 +686,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       return { labels: allDisplayTimes, datasets };
     } else if (chartGroupBy === 'env') {
       // Group by environment - show exposed/notExposed/total for each env
-      const envs = [...new Set(metrics.map((m) => m.environment))];
+      const envs = [...new Set(metrics.map((m) => m.environmentId))];
       const datasets: any[] = [];
 
       envs.forEach((env, idx) => {
@@ -695,7 +695,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
         const totalMetrics = new Map<string, number>();
 
         metrics
-          .filter((m) => m.environment === env)
+          .filter((m) => m.environmentId === env)
           .forEach((m) => {
             const displayTime = formatWith(m.metricsBucket, 'MM/DD HH:mm');
             exposedMetrics.set(displayTime, (exposedMetrics.get(displayTime) || 0) + m.yesCount);
@@ -917,12 +917,12 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           </Typography>
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
             {environments.map((env) => {
-              const isSelected = selectedEnvs.includes(env.environment);
+              const isSelected = selectedEnvs.includes(env.environmentId);
               return (
                 <Chip
-                  key={env.environment}
-                  label={env.environment}
-                  onClick={() => handleEnvToggle(env.environment)}
+                  key={env.environmentId}
+                  label={env.environmentId}
+                  onClick={() => handleEnvToggle(env.environmentId)}
                   color={isSelected ? 'primary' : 'default'}
                   variant={isSelected ? 'filled' : 'outlined'}
                   size="small"

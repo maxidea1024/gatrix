@@ -3,7 +3,7 @@ import { apiService } from './api';
 export interface UnknownFlag {
   id: number;
   flagName: string;
-  environment: string;
+  environmentId: string;
   appName: string | null;
   sdkVersion: string | null;
   accessCount: number;
@@ -17,14 +17,14 @@ export interface UnknownFlag {
 export const unknownFlagService = {
   async getUnknownFlags(options?: {
     includeResolved?: boolean;
-    environment?: string;
+    environmentId?: string;
   }): Promise<{ flags: UnknownFlag[]; total: number }> {
     const params = new URLSearchParams();
     if (options?.includeResolved) {
       params.append('includeResolved', 'true');
     }
-    if (options?.environment) {
-      params.append('environment', options.environment);
+    if (options?.environmentId) {
+      params.append('environment', options.environmentId);
     }
     const queryString = params.toString();
     const url = `/admin/unknown-flags${queryString ? `?${queryString}` : ''}`;

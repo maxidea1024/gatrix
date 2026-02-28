@@ -264,7 +264,7 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
           </Box>
         );
       case 'environment':
-        return <Typography variant="body2">{event.environment || '-'}</Typography>;
+        return <Typography variant="body2">{event.environmentId || '-'}</Typography>;
       case 'instanceId':
         return (
           <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -436,14 +436,14 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   {/* Environment */}
                   <Box>
                     <Typography variant="caption" color="textSecondary" display="block">
-                      {t('serverLifecycle.environment')}
+                      {t('serverLifecycle.environmentId')}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.environment || '-'}</Typography>
-                      {event.environment && (
+                      <Typography variant="body2">{event.environmentId || '-'}</Typography>
+                      {event.environmentId && (
                         <IconButton
                           size="small"
-                          onClick={() => handleCopy(event.environment!)}
+                          onClick={() => handleCopy(event.environmentId!)}
                           sx={{ p: 0.25 }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -763,7 +763,7 @@ const ServerLifecyclePage: React.FC = () => {
     { id: 'group', labelKey: 'serverLifecycle.group', visible: true },
     {
       id: 'environment',
-      labelKey: 'serverLifecycle.environment',
+      labelKey: 'serverLifecycle.environmentId',
       visible: true,
     },
     { id: 'instanceId', labelKey: 'serverLifecycle.instanceId', visible: true },

@@ -80,7 +80,7 @@ interface ActionSetDialogProps {
 interface ActionItem {
   actionType: string;
   sortOrder: number;
-  params: { flagName: string; environment: string };
+  params: { flagName: string; environmentId: string };
 }
 
 const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onClose, onSave }) => {
@@ -89,7 +89,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   const [description, setDescription] = useState('');
   const [source, setSource] = useState('');
   const [actions, setActions] = useState<ActionItem[]>([
-    { actionType: 'TOGGLE_FLAG', sortOrder: 0, params: { flagName: '', environment: '' } },
+    { actionType: 'TOGGLE_FLAG', sortOrder: 0, params: { flagName: '', environmentId: '' } },
   ]);
   const [flagOptions, setFlagOptions] = useState<string[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
@@ -124,7 +124,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
             sortOrder: a.sortOrder,
             params: {
               flagName: (a.params as Record<string, string>).flagName || '',
-              environment: (a.params as Record<string, string>).environment || '',
+              environmentId: (a.params as Record<string, string>).environmentId || '',
             },
           }))
         );
@@ -133,7 +133,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
           {
             actionType: 'TOGGLE_FLAG',
             sortOrder: 0,
-            params: { flagName: '', environment: '' },
+            params: { flagName: '', environmentId: '' },
           },
         ]);
       }
@@ -145,7 +145,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
         {
           actionType: 'TOGGLE_FLAG',
           sortOrder: 0,
-          params: { flagName: '', environment: '' },
+          params: { flagName: '', environmentId: '' },
         },
       ]);
     }
@@ -157,7 +157,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
       {
         actionType: 'TOGGLE_FLAG',
         sortOrder: actions.length,
-        params: { flagName: '', environment: '' },
+        params: { flagName: '', environmentId: '' },
       },
     ]);
   };
@@ -180,7 +180,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   const handleSave = () => {
     if (!name.trim()) return;
     const validActions = actions.filter(
-      (a) => a.params.flagName.trim() && a.params.environment.trim()
+      (a) => a.params.flagName.trim() && a.params.environmentId.trim()
     );
     if (validActions.length === 0) return;
 
@@ -197,7 +197,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   };
 
   const isValid =
-    name.trim() && actions.some((a) => a.params.flagName.trim() && a.params.environment.trim());
+    name.trim() && actions.some((a) => a.params.flagName.trim() && a.params.environmentId.trim());
 
   return (
     <ResizableDrawer
@@ -311,14 +311,14 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
                 sx={{ flex: 1, minWidth: 150 }}
               />
               <FormControl size="small" sx={{ flex: 1, minWidth: 120 }}>
-                <InputLabel>{t('actionSets.environment')}</InputLabel>
+                <InputLabel>{t('actionSets.environmentId')}</InputLabel>
                 <Select
-                  value={action.params.environment}
-                  label={t('actionSets.environment')}
+                  value={action.params.environmentId}
+                  label={t('actionSets.environmentId')}
                   onChange={(e) => handleActionChange(index, 'environment', e.target.value)}
                 >
                   {environments.map((env) => (
-                    <MenuItem key={env.environment} value={env.environment}>
+                    <MenuItem key={env.environmentId} value={env.environmentId}>
                       {env.displayName}
                     </MenuItem>
                   ))}

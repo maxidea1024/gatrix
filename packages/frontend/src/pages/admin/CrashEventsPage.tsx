@@ -240,7 +240,7 @@ const CrashEventsPage: React.FC = () => {
     },
     {
       id: 'environment',
-      labelKey: 'crashes.table.environment',
+      labelKey: 'crashes.table.environmentId',
       sortable: true,
       visible: true,
     },
@@ -368,7 +368,7 @@ const CrashEventsPage: React.FC = () => {
       },
       {
         key: 'environment',
-        label: t('crashes.filters.environment'),
+        label: t('crashes.filters.environmentId'),
         type: 'multiselect',
         operator: 'any_of',
         allowOperatorToggle: false,
@@ -709,7 +709,7 @@ const CrashEventsPage: React.FC = () => {
         ['ID', event.id],
         ['Created At', dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')],
         ['Platform', getPlatformName(event.platform)],
-        ['Environment', getEnvironmentName(event.environment)],
+        ['Environment', getEnvironmentName(event.environmentId)],
         ['Branch', event.branch],
         ['App Version', event.appVersion || '-'],
         ['Res Version', event.resVersion || '-'],
@@ -834,7 +834,7 @@ const CrashEventsPage: React.FC = () => {
       case 'environment':
         return (
           <Chip
-            label={getEnvironmentName(event.environment)}
+            label={getEnvironmentName(event.environmentId)}
             size="small"
             color="secondary"
             variant="outlined"
@@ -1312,7 +1312,7 @@ const CrashEventsPage: React.FC = () => {
                                               whiteSpace: 'nowrap',
                                             }}
                                           >
-                                            {t('crashes.table.environment')}
+                                            {t('crashes.table.environmentId')}
                                           </TableCell>
                                           <TableCell>
                                             <Box
@@ -1323,7 +1323,7 @@ const CrashEventsPage: React.FC = () => {
                                               }}
                                             >
                                               <Chip
-                                                label={getEnvironmentName(event.environment)}
+                                                label={getEnvironmentName(event.environmentId)}
                                                 size="small"
                                                 color="secondary"
                                                 variant="outlined"
@@ -1332,7 +1332,7 @@ const CrashEventsPage: React.FC = () => {
                                                 size="small"
                                                 onClick={async () => {
                                                   await copyToClipboardWithNotification(
-                                                    event.environment,
+                                                    event.environmentId,
                                                     () =>
                                                       enqueueSnackbar(
                                                         t('common.copiedToClipboard'),

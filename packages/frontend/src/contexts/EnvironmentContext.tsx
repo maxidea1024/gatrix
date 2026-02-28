@@ -25,7 +25,7 @@ export interface EnvironmentContextType {
   currentEnvironmentId: string | null; // Keep for backward compatibility (actually environment name)
   isLoading: boolean;
   error: string | null;
-  switchEnvironment: (environment: string) => void;
+  switchEnvironment: (environmentId: string) => void;
   refresh: () => Promise<void>;
 }
 
@@ -44,9 +44,9 @@ const getStoredEnvironment = (): string | null => {
 };
 
 // Store environment to localStorage
-const storeEnvironment = (environment: string, name: string): void => {
+const storeEnvironment = (environmentId: string, name: string): void => {
   if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY, environment);
+    localStorage.setItem(STORAGE_KEY, environmentId);
     localStorage.setItem(STORAGE_KEY_NAME, name);
   }
 };
@@ -63,7 +63,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
 
   // Find current environment from the list
   const currentEnvironment =
-    environments.find((env) => env.environment === currentEnvironmentId) || null;
+    environments.find((env) => env.environmentId === currentEnvironmentId) || null;
 
   // Load environments from API
   const loadEnvironments = useCallback(async () => {
@@ -95,7 +95,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         } else {
           // Use environments array (names) instead of environmentIds
           const accessList = userAccess.environments || (userAccess as any).environments || [];
-          accessibleEnvs = envList.filter((env) => accessList.includes(env.environment));
+          accessibleEnvs = envList.filter((env) => accessList.includes(env.environmentId));
         }
       } catch (accessError) {
         console.warn(
@@ -119,17 +119,17 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         if (defaultEnv) {
           console.log(
             '[EnvironmentContext] Auto-selecting default environment:',
-            defaultEnv.environment
+            defaultEnv.environmentId
           );
-          setCurrentEnvironmentId(defaultEnv.environment);
-          storeEnvironment(defaultEnv.environment, defaultEnv.displayName);
+          setCurrentEnvironmentId(defaultEnv.environmentId);
+          storeEnvironment(defaultEnv.environmentId, defaultEnv.displayName);
         }
-      } else if (storedEnv && !accessibleEnvs.find((e) => e.environment === storedEnv)) {
+      } else if (storedEnv && !accessibleEnvs.find((e) => e.environmentId === storedEnv)) {
         // If the stored environment doesn't exist anymore or not accessible, reset to first
         if (accessibleEnvs.length > 0) {
           console.log('[EnvironmentContext] Stored environment not found, resetting to first');
-          setCurrentEnvironmentId(accessibleEnvs[0].environment);
-          storeEnvironment(accessibleEnvs[0].environment, accessibleEnvs[0].displayName);
+          setCurrentEnvironmentId(accessibleEnvs[0].environmentId);
+          storeEnvironment(accessibleEnvs[0].environmentId, accessibleEnvs[0].displayName);
         } else {
           // No accessible environments - clear localStorage as well
           setCurrentEnvironmentId(null);
@@ -162,16 +162,16 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
 
   // Switch to a different environment
   const switchEnvironment = useCallback(
-    (environment: string) => {
-      const env = environments.find((e) => e.environment === environment);
+    (environmentId: string) => {
+      const env = environments.find((e) => e.environmentId === environmentId);
       if (env) {
-        setCurrentEnvironmentId(environment);
-        storeEnvironment(environment, env.displayName);
+        setCurrentEnvironmentId(environmentId);
+        storeEnvironment(environmentId, env.displayName);
 
         // Dispatch custom event to notify other components
         window.dispatchEvent(
           new CustomEvent('environment-changed', {
-            detail: { environment, env },
+            detail: { environmentId, env },
           })
         );
       }

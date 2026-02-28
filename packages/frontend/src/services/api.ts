@@ -79,13 +79,13 @@ class ApiService {
         const hasEnvironmentHeader =
           config.headers['x-environment'] || config.headers['X-Environment'];
         if (!hasEnvironmentHeader) {
-          const environment =
+          const environmentId =
             typeof window !== 'undefined'
               ? localStorage.getItem('gatrix_selected_environment')
               : null;
-          if (environment) {
+          if (environmentId) {
             // The backend expects X-Environment header with environment name
-            config.headers['X-Environment'] = environment;
+            config.headers['X-Environment'] = environmentId;
           }
         }
 

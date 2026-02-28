@@ -174,8 +174,8 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
             onChange={setPermissions}
             showEnvironments={true}
             environments={environments.map((env) => ({
-              id: env.environment,
-              environment: env.environment,
+              id: env.environmentId,
+              environmentId: env.environmentId,
               name: env.environmentName,
               displayName: env.displayName,
               environmentName: env.environmentName,

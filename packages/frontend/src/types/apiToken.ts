@@ -68,7 +68,7 @@ export interface GetTokensRequest {
   page?: number;
   limit?: number;
   tokenType?: TokenType;
-  environment?: string;
+  environmentId?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }

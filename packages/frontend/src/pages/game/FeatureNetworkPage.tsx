@@ -75,7 +75,7 @@ ChartJS.register(
 interface TrafficDataPoint {
   bucket: string;
   displayTime: string;
-  environment: string;
+  environmentId: string;
   appName: string;
   featuresCount: number;
   segmentsCount: number;
@@ -109,7 +109,7 @@ interface ChartDataPoint {
 interface ChartDataPointByApp {
   bucket: string;
   displayTime: string;
-  environment: string;
+  environmentId: string;
   appName: string;
   featuresCount: number;
   segmentsCount: number;
@@ -129,7 +129,7 @@ interface EvaluationTimeSeriesPoint {
 interface EvaluationTimeSeriesPointByApp {
   bucket: string;
   displayTime: string;
-  environment: string;
+  environmentId: string;
   appName: string;
   evaluations: number;
   yesCount: number;
@@ -401,7 +401,7 @@ const FeatureNetworkPage: React.FC = () => {
   useEffect(() => {
     if (envList.length > 0 && selectedEnvironments.length === 0 && initialEnvLoad) {
       // Select all environments by default only on first load
-      setSelectedEnvironments(envList.map((e) => e.environment));
+      setSelectedEnvironments(envList.map((e) => e.environmentId));
       setInitialEnvLoad(false);
     } else if (envList.length > 0 && initialEnvLoad) {
       setInitialEnvLoad(false);
@@ -490,9 +490,9 @@ const FeatureNetworkPage: React.FC = () => {
 
     if (chartGroupBy === 'env') {
       // Group by environment
-      const envNames = [...new Set(chartDataByApp.map((d) => d.environment))];
+      const envNames = [...new Set(chartDataByApp.map((d) => d.environmentId))];
       const datasets = envNames.map((envName, index) => {
-        const envData = chartDataByApp.filter((d) => d.environment === envName);
+        const envData = chartDataByApp.filter((d) => d.environmentId === envName);
         // Aggregate by displayTime
         const aggregated = new Map<string, number>();
         envData.forEach((d) => {
@@ -633,9 +633,9 @@ const FeatureNetworkPage: React.FC = () => {
 
     if (chartGroupBy === 'env') {
       // Group by environment
-      const envNames = [...new Set(evaluationTimeSeriesByApp.map((d) => d.environment))];
+      const envNames = [...new Set(evaluationTimeSeriesByApp.map((d) => d.environmentId))];
       const datasets = envNames.map((envName, index) => {
-        const envData = evaluationTimeSeriesByApp.filter((d) => d.environment === envName);
+        const envData = evaluationTimeSeriesByApp.filter((d) => d.environmentId === envName);
         // Aggregate by displayTime
         const aggregated = new Map<string, number>();
         envData.forEach((d) => {
@@ -835,25 +835,25 @@ const FeatureNetworkPage: React.FC = () => {
           {/* Environment Toggle */}
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-              {t('network.environment')}
+              {t('network.environmentId')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
               {envList.map((env) => (
                 <Chip
-                  key={env.environment}
-                  label={env.displayName || env.environment}
+                  key={env.environmentId}
+                  label={env.displayName || env.environmentId}
                   size="small"
                   onClick={() => {
-                    if (selectedEnvironments.includes(env.environment)) {
+                    if (selectedEnvironments.includes(env.environmentId)) {
                       setSelectedEnvironments(
-                        selectedEnvironments.filter((e) => e !== env.environment)
+                        selectedEnvironments.filter((e) => e !== env.environmentId)
                       );
                     } else {
-                      setSelectedEnvironments([...selectedEnvironments, env.environment]);
+                      setSelectedEnvironments([...selectedEnvironments, env.environmentId]);
                     }
                   }}
-                  color={selectedEnvironments.includes(env.environment) ? 'primary' : 'default'}
-                  variant={selectedEnvironments.includes(env.environment) ? 'filled' : 'outlined'}
+                  color={selectedEnvironments.includes(env.environmentId) ? 'primary' : 'default'}
+                  variant={selectedEnvironments.includes(env.environmentId) ? 'filled' : 'outlined'}
                   sx={{ borderRadius: '16px' }}
                 />
               ))}
@@ -1045,7 +1045,7 @@ const FeatureNetworkPage: React.FC = () => {
                     >
                       <TableRow>
                         <TableCell>{t('network.time')}</TableCell>
-                        <TableCell>{t('common.environment')}</TableCell>
+                        <TableCell>{t('common.environmentId')}</TableCell>
                         <TableCell>{t('network.application')}</TableCell>
                         <TableCell align="right">{t('network.features')}</TableCell>
                         <TableCell align="right">{t('network.segments')}</TableCell>
@@ -1068,7 +1068,7 @@ const FeatureNetworkPage: React.FC = () => {
                               <TableCell>{row.displayTime}</TableCell>
                               <TableCell>
                                 <Chip
-                                  label={row.environment}
+                                  label={row.environmentId}
                                   size="small"
                                   color="primary"
                                   variant="outlined"
@@ -1221,7 +1221,7 @@ const FeatureNetworkPage: React.FC = () => {
                     >
                       <TableRow>
                         <TableCell>{t('network.time')}</TableCell>
-                        <TableCell>{t('common.environment')}</TableCell>
+                        <TableCell>{t('common.environmentId')}</TableCell>
                         <TableCell>{t('network.application')}</TableCell>
                         <TableCell align="right">{t('network.flagEvaluations')}</TableCell>
                       </TableRow>
@@ -1242,7 +1242,7 @@ const FeatureNetworkPage: React.FC = () => {
                               <TableCell>{row.displayTime}</TableCell>
                               <TableCell>
                                 <Chip
-                                  label={row.environment}
+                                  label={row.environmentId}
                                   size="small"
                                   color="primary"
                                   variant="outlined"

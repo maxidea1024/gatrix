@@ -120,7 +120,7 @@ export interface Variant {
 }
 
 interface EnvironmentVariantsEditorProps {
-  environment: string;
+  environmentId: string;
   variants: Variant[];
   valueType: 'boolean' | 'string' | 'json' | 'number';
   flagType?: string;
@@ -158,8 +158,7 @@ const distributeWeights = (variants: Variant[]): Variant[] => {
   }));
 };
 
-const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
-  environment,
+const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({ environmentId,
   variants: initialVariants,
   valueType,
   flagType = 'flag',

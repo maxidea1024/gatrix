@@ -128,7 +128,7 @@ yarn planning-data:convert --input=./cms --output=./converted-planning-data --bi
 
 # Options:
 #   --api-url   (Required) Backend API URL
-#   --env       (Required) Target environment (dev, qa, production, development)
+#   --env       (Required) Target environmentId (dev, qa, production, development)
 #   --dir       (Optional) Directory with planning data files (default: ./output)
 #   --token     (Optional) Server API token (default: gatrix-unsecured-server-api-token)
 #   --uploader  (Optional) Uploader name for CI/CD

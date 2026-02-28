@@ -4,7 +4,7 @@ import { MutationResult, parseChangeRequestResponse } from './changeRequestUtils
 
 export interface StoreProduct {
   id: string;
-  environment: string;
+  environmentId: string;
   isActive: boolean;
   productId: string;
   cmsProductId: number | null;

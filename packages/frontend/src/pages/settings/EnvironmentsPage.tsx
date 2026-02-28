@@ -70,7 +70,7 @@ const EnvironmentsPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [newEnv, setNewEnv] = useState<CreateEnvironmentData>({
-    environment: '',
+    environmentId: '',
     displayName: '',
     description: '',
     environmentType: 'development',
@@ -124,7 +124,7 @@ const EnvironmentsPage: React.FC = () => {
 
   const handleOpenAddDialog = () => {
     setNewEnv({
-      environment: '',
+      environmentId: '',
       displayName: '',
       description: '',
       environmentType: 'development',
@@ -141,7 +141,7 @@ const EnvironmentsPage: React.FC = () => {
   };
 
   const handleCreateEnvironment = async () => {
-    if (!newEnv.environment || !newEnv.displayName) return;
+    if (!newEnv.environmentId || !newEnv.displayName) return;
 
     setCreating(true);
     try {
@@ -154,7 +154,7 @@ const EnvironmentsPage: React.FC = () => {
       enqueueSnackbar(t('environments.createSuccess'), { variant: 'success' });
       setAddDialogOpen(false);
       loadEnvironments();
-      refreshEnvironments(); // Refresh the global environment context
+      refreshEnvironments(); // Refresh the global environmentId context
     } catch (err: any) {
       const message = err?.response?.data?.message || t('environments.createFailed');
       enqueueSnackbar(message, { variant: 'error' });
@@ -184,7 +184,7 @@ const EnvironmentsPage: React.FC = () => {
     setLoadingRelatedData(true);
 
     try {
-      const data = await environmentService.getRelatedData(env.environment);
+      const data = await environmentService.getRelatedData(env.environmentId);
       setRelatedData(data);
     } catch (err) {
       console.error('Failed to load related data:', err);
@@ -208,7 +208,7 @@ const EnvironmentsPage: React.FC = () => {
 
     setDeleting(true);
     try {
-      await environmentService.deleteEnvironment(selectedEnvForDelete.environment, forceDelete);
+      await environmentService.deleteEnvironment(selectedEnvForDelete.environmentId, forceDelete);
       enqueueSnackbar(t('environments.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setSelectedEnvForDelete(null);
@@ -409,7 +409,7 @@ const EnvironmentsPage: React.FC = () => {
 
     setUpdating(true);
     try {
-      await environmentService.updateEnvironment(selectedEnvForEdit.environment, editEnv);
+      await environmentService.updateEnvironment(selectedEnvForEdit.environmentId, editEnv);
       enqueueSnackbar(t('environments.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       setSelectedEnvForEdit(null);
@@ -426,7 +426,7 @@ const EnvironmentsPage: React.FC = () => {
   // Handle toggle visibility
   const handleToggleVisibility = async (env: Environment) => {
     try {
-      await environmentService.updateEnvironment(env.environment, {
+      await environmentService.updateEnvironment(env.environmentId, {
         isHidden: !env.isHidden,
       });
       enqueueSnackbar(
@@ -517,7 +517,7 @@ const EnvironmentsPage: React.FC = () => {
               {environments
                 .filter((env) => env.environmentName !== 'gatrix-env')
                 .map((env) => (
-                  <TableRow key={env.environment}>
+                  <TableRow key={env.environmentId}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -694,11 +694,11 @@ const EnvironmentsPage: React.FC = () => {
             <TextField
               inputRef={addNameFieldRef}
               label={t('environments.name')}
-              value={newEnv.environment}
+              value={newEnv.environmentId}
               onChange={(e) =>
                 setNewEnv({
                   ...newEnv,
-                  environment: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''),
+                  environmentId: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''),
                 })
               }
               placeholder={t('environments.namePlaceholder')}
@@ -761,7 +761,7 @@ const EnvironmentsPage: React.FC = () => {
                   <em>{t('environments.noBase')}</em>
                 </MenuItem>
                 {environments.map((env) => (
-                  <MenuItem key={env.environment} value={env.environment}>
+                  <MenuItem key={env.environmentId} value={env.environmentId}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Box
                         sx={{
@@ -852,7 +852,7 @@ const EnvironmentsPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreateEnvironment}
-            disabled={!newEnv.environment || !newEnv.displayName || creating}
+            disabled={!newEnv.environmentId || !newEnv.displayName || creating}
           >
             {t('environments.create')}
           </Button>
@@ -890,7 +890,7 @@ const EnvironmentsPage: React.FC = () => {
 
                 {!relatedData.canDelete && (
                   <Alert severity="error" sx={{ mt: 2 }}>
-                    {relatedData.environment.isSystemDefined
+                    {relatedData.environmentId.isSystemDefined
                       ? t('environments.cannotDeleteSystem')
                       : t('environments.cannotDeleteDefault')}
                   </Alert>

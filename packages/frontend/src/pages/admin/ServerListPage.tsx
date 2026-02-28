@@ -544,7 +544,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
         case 'group':
           return service.labels.group || 'unknown';
         case 'environment':
-          return service.labels.environment || 'unknown';
+          return service.labels.environmentId || 'unknown';
         case 'cloudProvider':
           return service.labels.cloudProvider || 'unknown';
         case 'cloudRegion':
@@ -1681,7 +1681,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                             {service.internalAddress}
                           </TableCell>
                         </TableRow>
-                        {service.labels.environment && (
+                        {service.labels.environmentId && (
                           <TableRow>
                             <TableCell
                               sx={{
@@ -1690,11 +1690,11 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                                 fontWeight: 600,
                               }}
                             >
-                              {t('serverList.table.environment')}
+                              {t('serverList.table.environmentId')}
                             </TableCell>
                             <TableCell sx={{ fontSize: '0.75rem' }}>
                               <Chip
-                                label={service.labels.environment}
+                                label={service.labels.environmentId}
                                 size="small"
                                 variant="outlined"
                                 color="secondary"
@@ -2402,7 +2402,7 @@ const ServerListPage: React.FC = () => {
       case 'group':
         return t('serverList.grouping.group');
       case 'environment':
-        return t('serverList.grouping.environment');
+        return t('serverList.grouping.environmentId');
       case 'cloudProvider':
         return t('serverList.grouping.cloudProvider');
       case 'cloudRegion':
@@ -2431,7 +2431,7 @@ const ServerListPage: React.FC = () => {
     { id: 'group', labelKey: 'serverList.table.group', visible: true },
     {
       id: 'environment',
-      labelKey: 'serverList.table.environment',
+      labelKey: 'serverList.table.environmentId',
       visible: true,
     },
     {
@@ -2937,7 +2937,7 @@ const ServerListPage: React.FC = () => {
         service: s.labels.service,
         instanceId: s.instanceId,
         group: s.labels.group,
-        env: s.labels.environment,
+        env: s.labels.environmentId,
         hostname: s.hostname,
         internalIp: s.internalAddress,
         healthPort: healthPort,
@@ -3228,7 +3228,7 @@ const ServerListPage: React.FC = () => {
   );
   const uniqueEnvs = useMemo(
     () =>
-      [...new Set(services.map((s) => s.labels.environment).filter(Boolean))].sort() as string[],
+      [...new Set(services.map((s) => s.labels.environmentId).filter(Boolean))].sort() as string[],
     [services]
   );
   const uniqueRoles = useMemo(
@@ -3437,7 +3437,7 @@ const ServerListPage: React.FC = () => {
       if (filter.key === 'region' && filter.value && service.labels.region !== filter.value) {
         return false;
       }
-      if (filter.key === 'env' && filter.value && service.labels.environment !== filter.value) {
+      if (filter.key === 'env' && filter.value && service.labels.environmentId !== filter.value) {
         return false;
       }
       if (filter.key === 'role' && filter.value && service.labels.role !== filter.value) {
@@ -4272,9 +4272,9 @@ const ServerListPage: React.FC = () => {
                     case 'environment':
                       return (
                         <TableCell key={column.id}>
-                          {service.labels.environment ? (
+                          {service.labels.environmentId ? (
                             <Chip
-                              label={service.labels.environment}
+                              label={service.labels.environmentId}
                               size="small"
                               variant="outlined"
                               color="secondary"
@@ -5337,9 +5337,9 @@ const ServerListPage: React.FC = () => {
                         }}
                       />
                     )}
-                    {service.labels.environment && (
+                    {service.labels.environmentId && (
                       <Chip
-                        label={service.labels.environment}
+                        label={service.labels.environmentId}
                         size="small"
                         variant="outlined"
                         color="secondary"

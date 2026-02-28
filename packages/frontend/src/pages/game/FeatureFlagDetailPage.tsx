@@ -213,7 +213,7 @@ interface Variant {
 interface FeatureFlagEnvironment {
   id: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   isEnabled: boolean;
   overrideEnabledValue?: boolean;
   overrideDisabledValue?: boolean;
@@ -229,7 +229,7 @@ interface FlagLink {
 
 interface FeatureFlag {
   id: string;
-  environment: string;
+  environmentId: string;
   flagName: string;
   displayName?: string;
   description?: string;
@@ -448,7 +448,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     isCreating
       ? {
         id: '',
-        environment: '',
+        environmentId: '',
         flagName: generateDefaultFlagName(),
         displayName: '',
         description: '',
@@ -483,13 +483,13 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
   const [originalEditingStrategy, setOriginalEditingStrategy] = useState<Strategy | null>(null);
   const [strategyJsonErrors, setStrategyJsonErrors] = useState<Record<number, string | null>>({});
-  const [editingEnv, setEditingEnv] = useState<string | null>(null); // Track which environment we're editing strategy for
+  const [editingEnv, setEditingEnv] = useState<string | null>(null); // Track which environmentId we're editing strategy for
   const [isAddingStrategy, setIsAddingStrategy] = useState(false); // Explicitly track if we're adding a new strategy
   const [variantDialogOpen, setVariantDialogOpen] = useState(false);
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
   const [contextFields, setContextFields] = useState<ContextField[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
-  const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set()); // For environment cards
+  const [expandedSegments, setExpandedSegments] = useState<Set<string>>(new Set()); // For environmentId cards
   const [expandedSegmentsDialog, setExpandedSegmentsDialog] = useState<Set<string>>(new Set()); // For strategy editor dialog
   const [expandedConstraints, setExpandedConstraints] = useState<Set<string>>(new Set());
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -507,14 +507,14 @@ const FeatureFlagDetailPage: React.FC = () => {
   const { data: releaseFlowPlans, mutate: mutateReleaseFlowPlans } = useReleaseFlowPlansByFlag(
     flag?.id || null
   );
-  const releaseFlowEnvs = new Set((releaseFlowPlans || []).map((p) => p.environment));
+  const releaseFlowEnvs = new Set((releaseFlowPlans || []).map((p) => p.environmentId));
 
   const activeMilestoneByEnv = React.useMemo(() => {
     if (!releaseFlowPlans) return {};
     const map: Record<string, string> = {};
     releaseFlowPlans.forEach((plan) => {
       if (plan.activeMilestoneName) {
-        map[plan.environment] = plan.activeMilestoneName;
+        map[plan.environmentId] = plan.activeMilestoneName;
       }
     });
     return map;
@@ -685,7 +685,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       const envs = await environmentService.getEnvironments();
       setEnvironments(envs);
       // Auto-expand selected environment card immediately after loading
-      if (selectedEnvironment && envs.some((e) => e.environment === selectedEnvironment)) {
+      if (selectedEnvironment && envs.some((e) => e.environmentId === selectedEnvironment)) {
         setExpandedEnvs((prev) => {
           const newSet = new Set(prev);
           newSet.add(selectedEnvironment);
@@ -715,7 +715,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             endDate: endDate.toISOString(),
           },
           headers: {
-            'x-environment': env.environment,
+            'x-environment': env.environmentId,
           },
         });
         const metrics = response.data?.metrics || [];
@@ -727,9 +727,9 @@ const FeatureFlagDetailPage: React.FC = () => {
           }),
           { totalYes: 0, totalNo: 0, total: 0 }
         );
-        metricsMap[env.environment] = aggregated;
+        metricsMap[env.environmentId] = aggregated;
       } catch {
-        metricsMap[env.environment] = { totalYes: 0, totalNo: 0, total: 0 };
+        metricsMap[env.environmentId] = { totalYes: 0, totalNo: 0, total: 0 };
       }
     }
 
@@ -745,7 +745,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     for (const env of envList) {
       try {
         const response = await api.get(`/admin/features/${targetFlagName}`, {
-          headers: { 'x-environment': env.environment },
+          headers: { 'x-environment': env.environmentId },
         });
         const data = response.data?.flag || response.data;
 
@@ -759,7 +759,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         }));
 
         // Store variants separately for environment-specific management
-        variantsMap[env.environment] = flagVariants;
+        variantsMap[env.environmentId] = flagVariants;
 
         const strategies = (data.strategies || []).map((s: any, index: number) => ({
           ...s,
@@ -768,10 +768,10 @@ const FeatureFlagDetailPage: React.FC = () => {
           // Attach variants to the first strategy (for UI editing purposes)
           variants: index === 0 ? flagVariants : [],
         }));
-        strategiesMap[env.environment] = strategies;
+        strategiesMap[env.environmentId] = strategies;
       } catch {
-        strategiesMap[env.environment] = [];
-        variantsMap[env.environment] = [];
+        strategiesMap[env.environmentId] = [];
+        variantsMap[env.environmentId] = [];
       }
     }
 
@@ -812,7 +812,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       const envParam = searchParams.get('env');
       const targetEnv = envParam || selectedEnvironment;
       if (targetEnv) {
-        const envExists = environments.some((e) => e.environment === targetEnv);
+        const envExists = environments.some((e) => e.environmentId === targetEnv);
         if (envExists) {
           hasAutoExpandedRef.current = true;
           setExpandedEnvs(new Set([targetEnv]));
@@ -910,15 +910,15 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     // Optimistic update - update UI immediately
     const updatedEnvironments = (flag.environments || []).map((env) =>
-      env.environment === envKey ? { ...env, isEnabled: !currentEnabled } : env
+      env.environmentId === envKey ? { ...env, isEnabled: !currentEnabled } : env
     );
 
     // If environment doesn't exist in the array yet, add it
-    if (!updatedEnvironments.find((env) => env.environment === envKey)) {
+    if (!updatedEnvironments.find((env) => env.environmentId === envKey)) {
       updatedEnvironments.push({
         id: `temp-${envKey}`,
         flagId: flag.id,
-        environment: envKey,
+        environmentId: envKey,
         isEnabled: !currentEnabled,
       });
     }
@@ -928,10 +928,10 @@ const FeatureFlagDetailPage: React.FC = () => {
     try {
       await api.post(`/admin/features/${flag.flagName}/toggle`, {
         isEnabled: !currentEnabled,
-        environment: envKey,
+        environmentId: envKey,
       });
       const envDisplayName =
-        environments.find((e) => e.environment === envKey)?.displayName || envKey;
+        environments.find((e) => e.environmentId === envKey)?.displayName || envKey;
       enqueueSnackbar(
         <span>
           <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
@@ -2193,16 +2193,16 @@ const FeatureFlagDetailPage: React.FC = () => {
               {environments.map((env, envIndex) => {
                 // Get environment-specific isEnabled from flag.environments
                 const envSettings = flag.environments?.find(
-                  (e) => e.environment === env.environment
+                  (e) => e.environmentId === env.environmentId
                 );
                 const isEnabled = envSettings?.isEnabled ?? false;
                 // Use environment-specific strategies
-                const strategies = envStrategies[env.environment] || [];
+                const strategies = envStrategies[env.environmentId] || [];
                 const strategiesCount = strategies.length;
-                const isExpanded = expandedEnvs.has(env.environment);
+                const isExpanded = expandedEnvs.has(env.environmentId);
 
                 return (
-                  <React.Fragment key={env.environment}>
+                  <React.Fragment key={env.environmentId}>
                     {envIndex > 0 && <Divider sx={{ borderStyle: 'dashed', my: 1 }} />}
                     <Box
                       sx={{
@@ -2230,9 +2230,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                             setExpandedEnvs((prev) => {
                               const next = new Set(prev);
                               if (expanded) {
-                                next.add(env.environment);
+                                next.add(env.environmentId);
                               } else {
-                                next.delete(env.environment);
+                                next.delete(env.environmentId);
                               }
                               return next;
                             });
@@ -2265,7 +2265,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   size="small"
                                   checked={isEnabled}
                                   onChange={() => {
-                                    handleEnvToggle(env.environment, isEnabled);
+                                    handleEnvToggle(env.environmentId, isEnabled);
                                   }}
                                   disabled={!canManage || flag.isArchived}
                                   onClick={(e) => {
@@ -2280,7 +2280,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                             {/* Environment info */}
                             <Box sx={{ flex: 1 }}>
                               <Typography variant="caption" color="text.secondary">
-                                {t('featureFlags.environment')}
+                                {t('featureFlags.environmentId')}
                               </Typography>
                               <Box
                                 sx={{
@@ -2292,7 +2292,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <Typography variant="subtitle1" fontWeight={600}>
                                   {env.displayName}
                                 </Typography>
-                                {releaseFlowEnvs.has(env.environment) ? (
+                                {releaseFlowEnvs.has(env.environmentId) ? (
                                   <Typography
                                     variant="caption"
                                     sx={{
@@ -2310,8 +2310,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     }}
                                   >
                                     <ReleaseFlowActiveIcon sx={{ fontSize: 13 }} />
-                                    {activeMilestoneByEnv[env.environment]
-                                      ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environment]}`
+                                    {activeMilestoneByEnv[env.environmentId]
+                                      ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environmentId]}`
                                       : t('releaseFlow.tabTitle')}
                                   </Typography>
                                 ) : (
@@ -2337,7 +2337,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                             {/* Metrics mini pie chart */}
                             {(() => {
-                              const metrics = envMetrics[env.environment];
+                              const metrics = envMetrics[env.environmentId];
                               // Only show chart if we have actual metrics data
                               if (metrics && metrics.total > 0) {
                                 const yesPercent = Math.round(
@@ -2446,13 +2446,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                           </AccordionSummary>
 
                           <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
-                            {releaseFlowEnvs.has(env.environment) ? (
+                            {releaseFlowEnvs.has(env.environmentId) ? (
                               <>
                                 <ReleaseFlowTab
                                   flagId={flag.id}
                                   flagName={flag.flagName}
                                   environments={[
-                                    { environment: env.environment, displayName: env.displayName },
+                                    { environmentId: env.environmentId, displayName: env.displayName },
                                   ]}
                                   canManage={canManage}
                                   envEnabled={isEnabled}
@@ -2462,7 +2462,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   onPlanDeleted={() => {
                                     mutateReleaseFlowPlans();
                                     const nextManual = new Set(envManualReleaseFlow);
-                                    nextManual.delete(env.environment);
+                                    nextManual.delete(env.environmentId);
                                     setEnvManualReleaseFlow(nextManual);
                                   }}
                                 />
@@ -2470,30 +2470,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <Divider sx={{ my: 2 }} />
 
                                 <EnvironmentVariantsEditor
-                                  environment={env.environment}
-                                  variants={(envVariants[env.environment] || []) as EditorVariant[]}
+                                  environmentId={env.environmentId}
+                                  variants={(envVariants[env.environmentId] || []) as EditorVariant[]}
                                   valueType={flag.valueType || 'boolean'}
                                   flagType={flag.flagType || 'release'}
                                   enabledValue={flag.enabledValue}
                                   disabledValue={flag.disabledValue}
                                   envEnabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.enabledValue
                                   }
                                   envDisabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.disabledValue
                                   }
                                   overrideEnabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.overrideEnabledValue ?? false
                                   }
                                   overrideDisabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.overrideDisabledValue ?? false
                                   }
                                   canManage={canManage}
@@ -2503,7 +2503,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     handleUseFixedWeightVariantsChange
                                   }
                                   onSave={(variants) =>
-                                    handleSaveEnvVariants(env.environment, variants)
+                                    handleSaveEnvVariants(env.environmentId, variants)
                                   }
                                   onSaveValues={(
                                     enabledValue,
@@ -2512,7 +2512,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     overrideDisabled
                                   ) =>
                                     handleSaveEnvFallbackValue(
-                                      env.environment,
+                                      env.environmentId,
                                       enabledValue,
                                       disabledValue,
                                       overrideEnabled,
@@ -2520,7 +2520,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     )
                                   }
                                   onGoToPayloadTab={() => setTabValue(1)}
-                                  defaultExpanded={env.environment === selectedEnvironment}
+                                  defaultExpanded={env.environmentId === selectedEnvironment}
                                 />
                               </>
                             ) : strategies.length === 0 ? (
@@ -2542,7 +2542,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         variant="contained"
                                         size="small"
                                         startIcon={<AddIcon />}
-                                        onClick={() => handleAddStrategy(env.environment)}
+                                        onClick={() => handleAddStrategy(env.environmentId)}
                                       >
                                         {t('featureFlags.addFirstStrategy')}
                                       </Button>
@@ -2552,7 +2552,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                         startIcon={<ReleaseFlowActiveIcon sx={{ fontSize: 18 }} />}
                                         onClick={() => {
                                           setEnvManualReleaseFlow((prev) =>
-                                            new Set(prev).add(env.environment)
+                                            new Set(prev).add(env.environmentId)
                                           );
                                         }}
                                       >
@@ -2562,13 +2562,13 @@ const FeatureFlagDetailPage: React.FC = () => {
                                   )}
                                 </EmptyPlaceholder>
 
-                                {envManualReleaseFlow.has(env.environment) && (
+                                {envManualReleaseFlow.has(env.environmentId) && (
                                   <ReleaseFlowTab
                                     flagId={flag.id}
                                     flagName={flag.flagName}
                                     environments={[
                                       {
-                                        environment: env.environment,
+                                        environmentId: env.environmentId,
                                         displayName: env.displayName,
                                       },
                                     ]}
@@ -2580,7 +2580,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     onPlanChange={() => mutateReleaseFlowPlans()}
                                     onPlanDeleted={() => {
                                       const nextManual = new Set(envManualReleaseFlow);
-                                      nextManual.delete(env.environment);
+                                      nextManual.delete(env.environmentId);
                                       setEnvManualReleaseFlow(nextManual);
                                     }}
                                   />
@@ -2589,30 +2589,30 @@ const FeatureFlagDetailPage: React.FC = () => {
                                 <Divider sx={{ my: 2 }} />
 
                                 <EnvironmentVariantsEditor
-                                  environment={env.environment}
-                                  variants={(envVariants[env.environment] || []) as EditorVariant[]}
+                                  environmentId={env.environmentId}
+                                  variants={(envVariants[env.environmentId] || []) as EditorVariant[]}
                                   valueType={flag.valueType || 'boolean'}
                                   flagType={flag.flagType || 'release'}
                                   enabledValue={flag.enabledValue}
                                   disabledValue={flag.disabledValue}
                                   envEnabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.enabledValue
                                   }
                                   envDisabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.disabledValue
                                   }
                                   overrideEnabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.overrideEnabledValue ?? false
                                   }
                                   overrideDisabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.overrideDisabledValue ?? false
                                   }
                                   canManage={canManage}
@@ -2622,7 +2622,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     handleUseFixedWeightVariantsChange
                                   }
                                   onSave={(variants) =>
-                                    handleSaveEnvVariants(env.environment, variants)
+                                    handleSaveEnvVariants(env.environmentId, variants)
                                   }
                                   onSaveValues={(
                                     enabledValue,
@@ -2631,7 +2631,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     overrideDisabled
                                   ) =>
                                     handleSaveEnvFallbackValue(
-                                      env.environment,
+                                      env.environmentId,
                                       enabledValue,
                                       disabledValue,
                                       overrideEnabled,
@@ -2639,7 +2639,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     )
                                   }
                                   onGoToPayloadTab={() => setTabValue(1)}
-                                  defaultExpanded={env.environment === selectedEnvironment}
+                                  defaultExpanded={env.environmentId === selectedEnvironment}
                                 />
                               </>
                             ) : (
@@ -2656,7 +2656,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       const newIndex = strategies.findIndex(
                                         (s) => s.id === over.id
                                       );
-                                      handleReorderStrategies(env.environment, oldIndex, newIndex);
+                                      handleReorderStrategies(env.environmentId, oldIndex, newIndex);
                                     }
                                   }}
                                 >
@@ -2740,7 +2740,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                           onClick={() =>
                                                             handleEditStrategy(
                                                               strategy,
-                                                              env.environment
+                                                              env.environmentId
                                                             )
                                                           }
                                                         >
@@ -2754,7 +2754,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                                             handleOpenDeleteStrategyConfirm(
                                                               strategy.id,
                                                               index,
-                                                              env.environment
+                                                              env.environmentId
                                                             )
                                                           }
                                                         >
@@ -2788,7 +2788,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     <Button
                                       variant="contained"
                                       startIcon={<AddIcon />}
-                                      onClick={() => handleAddStrategy(env.environment)}
+                                      onClick={() => handleAddStrategy(env.environmentId)}
                                       size="small"
                                     >
                                       {t('featureFlags.addStrategy')}
@@ -2801,30 +2801,30 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                                 {/* Environment-specific Variants Editor */}
                                 <EnvironmentVariantsEditor
-                                  environment={env.environment}
-                                  variants={(envVariants[env.environment] || []) as EditorVariant[]}
+                                  environmentId={env.environmentId}
+                                  variants={(envVariants[env.environmentId] || []) as EditorVariant[]}
                                   valueType={flag.valueType || 'boolean'}
                                   flagType={flag.flagType || 'release'}
                                   enabledValue={flag.enabledValue}
                                   disabledValue={flag.disabledValue}
                                   envEnabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.enabledValue
                                   }
                                   envDisabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.disabledValue
                                   }
                                   overrideEnabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.overrideEnabledValue ?? false
                                   }
                                   overrideDisabledValue={
                                     flag.environments?.find(
-                                      (e) => e.environment === env.environment
+                                      (e) => e.environmentId === env.environmentId
                                     )?.overrideDisabledValue ?? false
                                   }
                                   canManage={canManage}
@@ -2834,7 +2834,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     handleUseFixedWeightVariantsChange
                                   }
                                   onSave={(variants) =>
-                                    handleSaveEnvVariants(env.environment, variants)
+                                    handleSaveEnvVariants(env.environmentId, variants)
                                   }
                                   onSaveValues={(
                                     enabledValue,
@@ -2843,7 +2843,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     overrideDisabled
                                   ) =>
                                     handleSaveEnvFallbackValue(
-                                      env.environment,
+                                      env.environmentId,
                                       enabledValue,
                                       disabledValue,
                                       overrideEnabled,
@@ -2851,7 +2851,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                                     )
                                   }
                                   onGoToPayloadTab={() => setTabValue(1)}
-                                  defaultExpanded={env.environment === selectedEnvironment}
+                                  defaultExpanded={env.environmentId === selectedEnvironment}
                                 />
                               </>
                             )}
@@ -3167,10 +3167,10 @@ const FeatureFlagDetailPage: React.FC = () => {
         <FeatureFlagMetrics
           flagName={flag.flagName}
           environments={(flag.environments || []).map((e) => ({
-            environment: e.environment,
+            environmentId: e.environmentId,
             isEnabled: e.isEnabled,
           }))}
-          currentEnvironment={flag.environments?.[0]?.environment || 'production'}
+          currentEnvironment={flag.environments?.[0]?.environmentId || 'production'}
         />
       </TabPanel>
       <TabPanel value={tabValue} index={3}>

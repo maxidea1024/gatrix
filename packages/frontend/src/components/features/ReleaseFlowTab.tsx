@@ -66,7 +66,7 @@ import ConfirmDialog from '../common/ConfirmDialog';
 interface ReleaseFlowTabProps {
   flagId: string;
   flagName: string;
-  environments: Array<{ environment: string; displayName: string }>;
+  environments: Array<{ environmentId: string; displayName: string }>;
   canManage: boolean;
   initialShowTemplates?: boolean;
   envEnabled?: boolean;
@@ -149,7 +149,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [selectedEnv, setSelectedEnv] = useState<string>(
-    environments.length > 0 ? environments[0].environment : ''
+    environments.length > 0 ? environments[0].environmentId : ''
   );
 
   const { data: templates, isLoading: loadingTemplates } = useReleaseFlowTemplates();
@@ -242,7 +242,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     const handleReleaseFlowUpdate = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       // Only refresh if this event is for our current flag/environment
-      if (detail?.flagId === flagId && detail?.environment === selectedEnv) {
+      if (detail?.flagId === flagId && detail?.environmentId === selectedEnv) {
         mutatePlan();
         if (onPlanChange) onPlanChange();
       }
@@ -263,7 +263,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       if (plan) {
         await deletePlan(plan.id);
       }
-      const newPlan = await applyTemplate({ flagId, environment: selectedEnv, templateId });
+      const newPlan = await applyTemplate({ flagId, environmentId: selectedEnv, templateId });
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
 
       // Auto-start the plan if the environment is already enabled
@@ -670,15 +670,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       {/* Environment Selector */}
       {environments.length > 1 && (
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="subtitle2">{t('featureFlags.environment')}:</Typography>
+          <Typography variant="subtitle2">{t('featureFlags.environmentId')}:</Typography>
           <Stack direction="row" spacing={1}>
             {environments.map((env) => (
               <Chip
-                key={env.environment}
+                key={env.environmentId}
                 label={env.displayName}
-                onClick={() => setSelectedEnv(env.environment)}
-                color={selectedEnv === env.environment ? 'primary' : 'default'}
-                variant={selectedEnv === env.environment ? 'filled' : 'outlined'}
+                onClick={() => setSelectedEnv(env.environmentId)}
+                color={selectedEnv === env.environmentId ? 'primary' : 'default'}
+                variant={selectedEnv === env.environmentId ? 'filled' : 'outlined'}
                 size="small"
               />
             ))}

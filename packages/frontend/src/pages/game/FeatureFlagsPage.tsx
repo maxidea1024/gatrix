@@ -581,7 +581,7 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   // Export/Import handlers
-  const handleExport = async (environment: string) => {
+  const handleExport = async (environmentId: string) => {
     try {
       // Get list of all flags first
       const result = await featureFlagService.getFeatureFlags({
@@ -632,12 +632,11 @@ const FeatureFlagsPage: React.FC = () => {
         }
 
         const exportData = {
-          exportedAt: new Date().toISOString(),
-          environment,
+          exportedAt: new Date().toISOString(), environmentId,
           segments,
           flags: detailedFlags.map((flag) => {
             // Strategies/variants are already filtered by environment in getFeatureFlag
-            const envData = flag.environments?.find((env: any) => env.environment === environment);
+            const envData = flag.environments?.find((env: any) => env.environmentId === environmentId);
 
             // Clean strategies - remove unnecessary metadata
             const strategies = ((flag as any).strategies ?? []).map((s: any) => ({
@@ -681,7 +680,7 @@ const FeatureFlagsPage: React.FC = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `feature-flags-${environment}-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `feature-flags-${ environmentId }-${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -871,7 +870,7 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   // Toggle flag for a specific environment
-  const handleToggle = async (flag: FeatureFlag, environment: string, currentEnabled: boolean) => {
+  const handleToggle = async (flag: FeatureFlag, environmentId: string, currentEnabled: boolean) => {
     const newEnabled = !currentEnabled;
 
     // Optimistic update - ensure environments array exists
@@ -881,16 +880,16 @@ const FeatureFlagsPage: React.FC = () => {
 
         // If environments array doesn't exist, create it with the toggled environment
         const existingEnvs = f.environments || [];
-        const envExists = existingEnvs.some((e) => e.environment === environment);
+        const envExists = existingEnvs.some((e) => e.environmentId === environmentId);
 
         let updatedEnvs;
         if (envExists) {
           updatedEnvs = existingEnvs.map((e) =>
-            e.environment === environment ? { ...e, isEnabled: newEnabled } : e
+            e.environmentId === environmentId ? { ...e, isEnabled: newEnabled } : e
           );
         } else {
           // Add new environment entry
-          updatedEnvs = [...existingEnvs, { environment, isEnabled: newEnabled }];
+          updatedEnvs = [...existingEnvs, { environmentId, isEnabled: newEnabled }];
         }
 
         return {
@@ -901,9 +900,9 @@ const FeatureFlagsPage: React.FC = () => {
     );
 
     try {
-      await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environment);
+      await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environmentId);
       const envDisplayName =
-        environments.find((e) => e.environment === environment)?.displayName || environment;
+        environments.find((e) => e.environmentId === environmentId)?.displayName || environmentId;
       enqueueSnackbar(
         <span>
           <strong>{flag.flagName}</strong> ({envDisplayName}){' '}
@@ -914,7 +913,7 @@ const FeatureFlagsPage: React.FC = () => {
 
       // Auto-control release flow if one exists for this flag+environment
       try {
-        const plan = await getPlan(flag.id, environment);
+        const plan = await getPlan(flag.id, environmentId);
         if (plan) {
           if (!newEnabled && plan.status === 'active') {
             // Environment disabled -> auto-pause
@@ -942,7 +941,7 @@ const FeatureFlagsPage: React.FC = () => {
 
           const existingEnvs = f.environments || [];
           const updatedEnvs = existingEnvs.map((e) =>
-            e.environment === environment ? { ...e, isEnabled: currentEnabled } : e
+            e.environmentId === environmentId ? { ...e, isEnabled: currentEnabled } : e
           );
 
           return {
@@ -960,7 +959,7 @@ const FeatureFlagsPage: React.FC = () => {
   // Get environment-specific enabled state
   const getEnvEnabled = (flag: FeatureFlag, envName: string): boolean => {
     if (flag.environments) {
-      const envData = flag.environments.find((e) => e.environment === envName);
+      const envData = flag.environments.find((e) => e.environmentId === envName);
       return envData?.isEnabled ?? false;
     }
     // Fallback to legacy isEnabled
@@ -1246,7 +1245,7 @@ const FeatureFlagsPage: React.FC = () => {
     }
   };
 
-  const handleBulkEnable = async (environment: string, enable: boolean) => {
+  const handleBulkEnable = async (environmentId: string, enable: boolean) => {
     const flagNames = Array.from(selectedFlags);
     const targetFlags = flags.filter((f) => flagNames.includes(f.flagName) && !f.isArchived);
 
@@ -1259,17 +1258,17 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of targetFlags) {
-        await featureFlagService.toggleFeatureFlag(flag.flagName, enable, environment);
+        await featureFlagService.toggleFeatureFlag(flag.flagName, enable, environmentId);
       }
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
               count: targetFlags.length,
-              env: environment,
+              env: environmentId,
             })
           : t('featureFlags.bulkDisableSuccess', {
               count: targetFlags.length,
-              env: environment,
+              env: environmentId,
             }),
         { variant: enable ? 'success' : 'warning' }
       );
@@ -1861,13 +1860,13 @@ const FeatureFlagsPage: React.FC = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           {environments.map((env) => {
-                            const isEnabled = getEnvEnabled(flag, env.environment);
+                            const isEnabled = getEnvEnabled(flag, env.environmentId);
                             return (
                               <FeatureSwitch
-                                key={`${flag.flagName}-${env.environment}-${isEnabled}`}
+                                key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
                                 size="small"
                                 checked={isEnabled}
-                                onChange={() => handleToggle(flag, env.environment, isEnabled)}
+                                onChange={() => handleToggle(flag, env.environmentId, isEnabled)}
                                 disabled={flag.isArchived || !canManage}
                                 onClick={(e) => e.stopPropagation()}
                                 color={env.color}
@@ -2276,10 +2275,10 @@ const FeatureFlagsPage: React.FC = () => {
                               return (
                                 <React.Fragment key={col.id}>
                                   {environments.map((env, envIndex) => {
-                                    const isEnabled = getEnvEnabled(flag, env.environment);
+                                    const isEnabled = getEnvEnabled(flag, env.environmentId);
                                     return (
                                       <TableCell
-                                        key={env.environment}
+                                        key={env.environmentId}
                                         align="center"
                                         sx={{
                                           px: 0.25,
@@ -2299,11 +2298,11 @@ const FeatureFlagsPage: React.FC = () => {
                                           }}
                                         >
                                           <FeatureSwitch
-                                            key={`${flag.flagName}-${env.environment}-${isEnabled}`}
+                                            key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
                                             size="small"
                                             checked={isEnabled}
                                             onChange={() => {
-                                              handleToggle(flag, env.environment, isEnabled);
+                                              handleToggle(flag, env.environmentId, isEnabled);
                                             }}
                                             disabled={flag.isArchived || !canManage}
                                             onClick={(e) => {
@@ -2485,10 +2484,10 @@ const FeatureFlagsPage: React.FC = () => {
                 onClose={() => setEnvMenuAnchor(null)}
               >
                 {environments.map((env) => (
-                  <Box key={env.environment}>
+                  <Box key={env.environmentId}>
                     <MenuItem
                       onClick={() => {
-                        handleBulkEnable(env.environment, true);
+                        handleBulkEnable(env.environmentId, true);
                         setEnvMenuAnchor(null);
                       }}
                     >
@@ -2501,7 +2500,7 @@ const FeatureFlagsPage: React.FC = () => {
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
-                        handleBulkEnable(env.environment, false);
+                        handleBulkEnable(env.environmentId, false);
                         setEnvMenuAnchor(null);
                       }}
                     >
@@ -3349,8 +3348,8 @@ const FeatureFlagsPage: React.FC = () => {
         </MenuItem>
         {environments.map((env) => (
           <MenuItem
-            key={`export-${env.environment}`}
-            onClick={() => handleExport(env.environment)}
+            key={`export-${env.environmentId}`}
+            onClick={() => handleExport(env.environmentId)}
             sx={{ pl: 4 }}
           >
             <ListItemIcon>

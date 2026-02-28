@@ -37,13 +37,12 @@ class EntityLockService {
   async acquireLock(
     table: string,
     entityId: string | number,
-    environment: string
+    environmentId: string
   ): Promise<AcquireLockResult> {
     try {
       const response = await api.post('/entity-locks/acquire', {
         table,
-        entityId: String(entityId),
-        environment,
+        entityId: String(entityId), environmentId,
       });
       // api.post returns response.data from axios, which is the actual API response
       // The response is { success: true, message: 'Lock acquired' }
@@ -70,13 +69,12 @@ class EntityLockService {
   async forceAcquireLock(
     table: string,
     entityId: string | number,
-    environment: string
+    environmentId: string
   ): Promise<boolean> {
     try {
       const response = await api.post('/entity-locks/force-acquire', {
         table,
-        entityId: String(entityId),
-        environment,
+        entityId: String(entityId), environmentId,
       });
       return (response as any).success;
     } catch (error) {
@@ -91,13 +89,12 @@ class EntityLockService {
   async releaseLock(
     table: string,
     entityId: string | number,
-    environment: string
+    environmentId: string
   ): Promise<boolean> {
     try {
       const response = await api.post('/entity-locks/release', {
         table,
-        entityId: String(entityId),
-        environment,
+        entityId: String(entityId), environmentId,
       });
       return (response as any).success;
     } catch (error) {
@@ -112,13 +109,12 @@ class EntityLockService {
   async extendLock(
     table: string,
     entityId: string | number,
-    environment: string
+    environmentId: string
   ): Promise<boolean> {
     try {
       const response = await api.post('/entity-locks/extend', {
         table,
-        entityId: String(entityId),
-        environment,
+        entityId: String(entityId), environmentId,
       });
       return (response as any).success;
     } catch (error) {
@@ -133,14 +129,13 @@ class EntityLockService {
   async checkLock(
     table: string,
     entityId: string | number,
-    environment: string
+    environmentId: string
   ): Promise<LockCheckResult> {
     try {
       const response = await api.get('/entity-locks/check', {
         params: {
           table,
-          entityId: String(entityId),
-          environment,
+          entityId: String(entityId), environmentId,
         },
       });
       return response as any as LockCheckResult;

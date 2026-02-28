@@ -79,7 +79,7 @@ const UnknownFlagsPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
-    { id: 'environment', labelKey: 'featureFlags.environment', visible: true },
+    { id: 'environment', labelKey: 'featureFlags.environmentId', visible: true },
     { id: 'appName', labelKey: 'featureFlags.appName', visible: true },
     { id: 'sdkVersion', labelKey: 'featureFlags.sdkVersion', visible: true },
     { id: 'accessCount', labelKey: 'featureFlags.accessCount', visible: true },
@@ -147,7 +147,7 @@ const UnknownFlagsPage: React.FC = () => {
         statusFilter?.includes('resolved') || statusFilter?.length === 2 || !statusFilter;
       const result = await unknownFlagService.getUnknownFlags({
         includeResolved,
-        environment: currentEnvironmentId || undefined,
+        environmentId: currentEnvironmentId || undefined,
       });
       setFlags(result.flags);
     } catch {
@@ -490,7 +490,7 @@ const UnknownFlagsPage: React.FC = () => {
                           return (
                             <TableCell key={col.id}>
                               <Chip
-                                label={flag.environment}
+                                label={flag.environmentId}
                                 size="small"
                                 sx={{ borderRadius: '16px' }}
                               />

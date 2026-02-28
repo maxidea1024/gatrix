@@ -177,9 +177,9 @@ class ApiTokenService {
   /**
    * Get tokens for specific environment
    */
-  async getTokensForEnvironment(environment: string): Promise<ApiAccessToken[]> {
+  async getTokensForEnvironment(environmentId: string): Promise<ApiAccessToken[]> {
     try {
-      const response = await api.get(`/admin/api-tokens/environment/${environment}`);
+      const response = await api.get(`/admin/api-tokens/environmentId/${ environmentId }`);
       return response.data;
     } catch (error) {
       console.error('Error fetching environment tokens:', error);

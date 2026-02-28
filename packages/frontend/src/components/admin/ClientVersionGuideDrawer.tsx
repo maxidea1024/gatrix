@@ -408,7 +408,7 @@ curl -X GET "${backendUrl}/api/v1/client/${currentEnvironmentId || 'your-environ
                   <strong>{t('clientVersions.sdkGuideDrawer.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/client/{'{environment}'}/client-version
+                  /api/v1/client/{'{ environmentId }'}/client-version
                 </Typography>
               </Paper>
 

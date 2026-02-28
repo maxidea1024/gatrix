@@ -336,7 +336,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       setEnvironments(filteredEnvs);
       // In embedded mode, auto-select all environments
       if (embedded && filteredEnvs.length > 0 && selectedEnvironments.length === 0) {
-        setSelectedEnvironments(filteredEnvs.map((e) => e.environment));
+        setSelectedEnvironments(filteredEnvs.map((e) => e.environmentId));
       }
     } catch {
       setEnvironments([]);
@@ -544,7 +544,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     // Determine which environments to check (selected or all)
     const envsToCheck =
       selectedEnvironments.length > 0
-        ? environments.filter((e) => selectedEnvironments.includes(e.environment))
+        ? environments.filter((e) => selectedEnvironments.includes(e.environmentId))
         : environments;
 
     if (envsToCheck.length > 0) {
@@ -553,7 +553,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         for (const env of envsToCheck) {
           try {
             const response = await api.get(`/admin/features/${flagName}`, {
-              headers: { 'x-environment': env.environment },
+              headers: { 'x-environment': env.environmentId },
             });
             const data = response.data?.flag || response.data;
             const strategies = data.strategies || [];
@@ -735,7 +735,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       const envsToEvaluate =
         selectedEnvironments.length > 0
           ? selectedEnvironments
-          : environments.map((e) => e.environment);
+          : environments.map((e) => e.environmentId);
 
       const requestBody: any = {
         environments: envsToEvaluate,
@@ -1663,7 +1663,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   {/* Hide flag name column in embedded mode (single flag) */}
                   {!embedded && <TableCell>{t('featureFlags.flagName')}</TableCell>}
                   {evaluatedEnvs.map((env) => {
-                    const envData = environments.find((e) => e.environment === env);
+                    const envData = environments.find((e) => e.environmentId === env);
                     const label = envData?.displayName || env;
                     return (
                       <TableCell
@@ -1932,7 +1932,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   }}
                 >
                   <Typography variant="caption" fontWeight={700} color="text.secondary">
-                    {t('playground.environment')}
+                    {t('playground.environmentId')}
                   </Typography>
                 </Box>
                 <Box
@@ -2000,7 +2000,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 >
                   {(() => {
                     const envData = environments.find(
-                      (e) => e.environment === selectedEvaluation.env
+                      (e) => e.environmentId === selectedEvaluation.env
                     );
                     return (
                       <Chip
@@ -2088,7 +2088,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 (() => {
                   // Find environment strategies
                   const envConfig = flagDetails.environments?.find(
-                    (e: any) => e.environment === selectedEvaluation.env
+                    (e: any) => e.environmentId === selectedEvaluation.env
                   );
 
                   // If there's an environment override, use its strategies.
@@ -2649,7 +2649,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             const isStrategy = step.step === 'STRATEGY_EVALUATION';
                             const stepBgColor = stepIdx % 2 === 0 ? 'transparent' : 'action.hover';
                             const envDisplayName =
-                              environments.find((e) => e.environment === selectedEvaluation.env)
+                              environments.find((e) => e.environmentId === selectedEvaluation.env)
                                 ?.displayName || selectedEvaluation.env;
 
                             return (
@@ -3777,7 +3777,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 </Box>
                 <Autocomplete
                   multiple
-                  options={environments.map((e) => e.environment)}
+                  options={environments.map((e) => e.environmentId)}
                   value={selectedEnvironments}
                   onChange={(_, value) => setSelectedEnvironments(value)}
                   renderInput={(params) => (

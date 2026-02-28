@@ -218,7 +218,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
   const [parameters, setParameters] = useState<Record<string, any>>({});
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
-  const [environments, setEnvironments] = useState<{ environment: string; displayName?: string }[]>(
+  const [environments, setEnvironments] = useState<{ environmentId: string; displayName?: string }[]>(
     []
   );
   const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({});

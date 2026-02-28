@@ -218,9 +218,9 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
             >
               {environments.map((env) => (
                 <MenuItem
-                  key={env.environment}
-                  value={env.environment}
-                  disabled={env.environment === targetId}
+                  key={env.environmentId}
+                  value={env.environmentId}
+                  disabled={env.environmentId === targetId}
                 >
                   {env.displayName}
                 </MenuItem>
@@ -238,9 +238,9 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
             >
               {environments.map((env) => (
                 <MenuItem
-                  key={env.environment}
-                  value={env.environment}
-                  disabled={env.environment === sourceId}
+                  key={env.environmentId}
+                  value={env.environmentId}
+                  disabled={env.environmentId === sourceId}
                 >
                   {env.displayName}
                 </MenuItem>

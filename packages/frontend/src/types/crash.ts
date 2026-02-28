@@ -7,7 +7,7 @@ export interface ClientCrash {
   id: string; // ULID
   chash: string; // MD5 hash
   branch: string; // Branch name
-  environment: string; // Environment
+  environmentId: string; // Environment
   platform: string; // Platform
   marketType?: string; // Market type
   isEditor: boolean; // Whether crash occurred in editor
@@ -42,7 +42,7 @@ export interface CrashEvent {
   platform: string; // Platform
   marketType?: string; // Market type
   branch: string; // Branch name
-  environment: string; // Environment
+  environmentId: string; // Environment
   isEditor: boolean; // Whether crash occurred in editor
 
   appVersion?: string; // App version (semver format)
@@ -76,7 +76,7 @@ export interface CrashFilters {
   dateFrom?: string;
   dateTo?: string;
   platform?: string;
-  environment?: string;
+  environmentId?: string;
   branch?: string;
   marketType?: string;
   isEditor?: boolean;
@@ -95,7 +95,7 @@ export interface GetCrashEventsRequest {
   sortOrder?: 'ASC' | 'DESC';
   platform?: string;
   platformOperator?: 'any_of' | 'include_all';
-  environment?: string;
+  environmentId?: string;
   environmentOperator?: 'any_of' | 'include_all';
   branch?: string;
   branchOperator?: 'any_of' | 'include_all';
@@ -184,12 +184,12 @@ export const getStateName = (state: CrashState): string => {
   }
 };
 
-export const getEnvironmentName = (environment: string): string => {
+export const getEnvironmentName = (environmentId: string): string => {
   const envMap: Record<string, string> = {
     dev: 'Development',
     staging: 'Staging',
     production: 'Production',
     qa: 'QA',
   };
-  return envMap[environment.toLowerCase()] || environment;
+  return envMap[environmentId.toLowerCase()] || environmentId;
 };

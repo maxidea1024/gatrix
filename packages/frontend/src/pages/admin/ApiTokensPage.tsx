@@ -491,14 +491,14 @@ const ApiTokensPage: React.FC = () => {
         }
         // Map environment names to environment objects from loaded environments
         const tokenEnvs = (token.environments || [])
-          .map((envName: string) => environments.find((e) => e.environment === envName))
+          .map((envName: string) => environments.find((e) => e.environmentId === envName))
           .filter(Boolean);
         return (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
             {tokenEnvs.length > 0 ? (
               tokenEnvs.map((env) => (
                 <Chip
-                  key={env!.environment}
+                  key={env!.environmentId}
                   label={env!.displayName || env!.environmentName}
                   size="small"
                   variant="outlined"
@@ -1388,21 +1388,21 @@ const ApiTokensPage: React.FC = () => {
                   <Box sx={{ mt: 1, pl: 4 }}>
                     {environments.map((env) => (
                       <FormControlLabel
-                        key={env.environment}
+                        key={env.environmentId}
                         control={
                           <Checkbox
-                            checked={formData.environments.includes(env.environment)}
+                            checked={formData.environments.includes(env.environmentId)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setFormData((prev) => ({
                                   ...prev,
-                                  environments: [...prev.environments, env.environment],
+                                  environments: [...prev.environments, env.environmentId],
                                 }));
                               } else {
                                 setFormData((prev) => ({
                                   ...prev,
                                   environments: prev.environments.filter(
-                                    (id) => id !== env.environment
+                                    (id) => id !== env.environmentId
                                   ),
                                 }));
                               }
@@ -1455,7 +1455,7 @@ const ApiTokensPage: React.FC = () => {
                 />
               </RadioGroup>
 
-              {/* Edge token environment selection - inline */}
+              {/* Edge token environmentId selection - inline */}
               {formData.tokenType === 'edge' && (
                 <Box
                   sx={{
@@ -1481,8 +1481,8 @@ const ApiTokensPage: React.FC = () => {
                   >
                     {environments.map((env) => (
                       <FormControlLabel
-                        key={env.environment}
-                        value={env.environment}
+                        key={env.environmentId}
+                        value={env.environmentId}
                         control={<Radio size="small" />}
                         label={env.displayName || env.environmentName}
                       />
@@ -1649,7 +1649,7 @@ const ApiTokensPage: React.FC = () => {
               <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
                 {t('apiTokens.environmentAccess')}
               </FormLabel>
-              {/* Edge tokens can only use single environment */}
+              {/* Edge tokens can only use single environmentId */}
               {selectedToken?.tokenType === 'edge' ? (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -1667,8 +1667,8 @@ const ApiTokensPage: React.FC = () => {
                   >
                     {environments.map((env) => (
                       <FormControlLabel
-                        key={env.environment}
-                        value={env.environment}
+                        key={env.environmentId}
+                        value={env.environmentId}
                         control={<Radio size="small" />}
                         label={env.displayName || env.environmentName}
                       />
@@ -1711,21 +1711,21 @@ const ApiTokensPage: React.FC = () => {
                     <Box sx={{ mt: 1, pl: 4 }}>
                       {environments.map((env) => (
                         <FormControlLabel
-                          key={env.environment}
+                          key={env.environmentId}
                           control={
                             <Checkbox
-                              checked={formData.environments.includes(env.environment)}
+                              checked={formData.environments.includes(env.environmentId)}
                               onChange={(e) => {
                                 if (e.target.checked) {
                                   setFormData((prev) => ({
                                     ...prev,
-                                    environments: [...prev.environments, env.environment],
+                                    environments: [...prev.environments, env.environmentId],
                                   }));
                                 } else {
                                   setFormData((prev) => ({
                                     ...prev,
                                     environments: prev.environments.filter(
-                                      (id) => id !== env.environment
+                                      (id) => id !== env.environmentId
                                     ),
                                   }));
                                 }
@@ -2373,7 +2373,7 @@ const ApiTokensPage: React.FC = () => {
                       <Chip label={t('apiTokens.allEnvironments')} size="small" color="success" />
                     ) : newTokenInfo.environments && newTokenInfo.environments.length > 0 ? (
                       newTokenInfo.environments.map((envName: string) => {
-                        const env = environments.find((e) => e.environment === envName);
+                        const env = environments.find((e) => e.environmentId === envName);
                         return env ? (
                           <Chip
                             key={envName}

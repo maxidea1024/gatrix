@@ -1220,7 +1220,7 @@ const UsersManagementPage: React.FC = () => {
           const getEnvNames = (ids: string[]) =>
             ids
               .map((id) => {
-                const env = environments.find((e) => e.environment === id);
+                const env = environments.find((e) => e.environmentId === id);
                 return env?.displayName || env?.environmentName || id;
               })
               .join(', ') || '-';
@@ -1655,7 +1655,7 @@ const UsersManagementPage: React.FC = () => {
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {userEnvIds.slice(0, 3).map((envName) => {
-              const env = environments.find((e) => e.environment === envName);
+              const env = environments.find((e) => e.environmentId === envName);
               return (
                 <Chip
                   key={envName}
@@ -2356,8 +2356,8 @@ const UsersManagementPage: React.FC = () => {
                   onChange={setNewUserPermissions}
                   showEnvironments={true}
                   environments={environments.map((env) => ({
-                    id: env.environment,
-                    environment: env.environment,
+                    id: env.environmentId,
+                    environmentId: env.environmentId,
                     name: env.environmentName,
                     displayName: env.displayName,
                     environmentName: env.environmentName,
@@ -2638,8 +2638,8 @@ const UsersManagementPage: React.FC = () => {
                 showTitle={false}
                 showEnvironments={true}
                 environments={environments.map((env) => ({
-                  id: env.environment,
-                  environment: env.environment,
+                  id: env.environmentId,
+                  environmentId: env.environmentId,
                   name: env.environmentName,
                   displayName: env.displayName,
                   environmentName: env.environmentName,
@@ -2787,7 +2787,7 @@ const UsersManagementPage: React.FC = () => {
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {promoteDialog.selectedEnvironments.map((envName) => {
-                        const env = environments.find((e) => e.environment === envName);
+                        const env = environments.find((e) => e.environmentId === envName);
                         const displayName = env?.displayName || env?.environmentName || envName;
                         return (
                           <Tooltip
@@ -3085,8 +3085,8 @@ const UsersManagementPage: React.FC = () => {
                     loading={permissionsLoading}
                     showEnvironments={true}
                     environments={environments.map((env) => ({
-                      id: env.environment,
-                      environment: env.environment,
+                      id: env.environmentId,
+                      environmentId: env.environmentId,
                       name: env.environmentName,
                       displayName: env.displayName,
                       environmentName: env.environmentName,

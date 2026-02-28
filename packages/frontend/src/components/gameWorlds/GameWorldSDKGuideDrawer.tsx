@@ -339,7 +339,7 @@ curl -X GET "${backendUrl}/api/v1/server/${currentEnvironmentId || 'your-environ
                   <strong>{t('gameWorlds.sdkGuide.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/{'{environment}'}/game-worlds
+                  /api/v1/server/{'{ environmentId }'}/game-worlds
                 </Typography>
               </Paper>
 

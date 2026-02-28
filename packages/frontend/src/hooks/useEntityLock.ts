@@ -66,24 +66,24 @@ export function useEntityLock({
   onLockLostRef.current = onLockLost;
 
   // Store environment values in refs for stable access
-  const environmentRef = useRef(currentEnvironment?.environment || '');
+  const environmentRef = useRef(currentEnvironment?.environmentId || '');
   const softLockEnabledRef = useRef(currentEnvironment?.enableSoftLock ?? false);
   const hardLockEnabledRef = useRef(currentEnvironment?.enableHardLock ?? false);
 
   // Update refs when environment changes
   useEffect(() => {
-    environmentRef.current = currentEnvironment?.environment || '';
+    environmentRef.current = currentEnvironment?.environmentId || '';
     softLockEnabledRef.current = currentEnvironment?.enableSoftLock ?? false;
     hardLockEnabledRef.current = currentEnvironment?.enableHardLock ?? false;
   }, [currentEnvironment]);
 
   // Release lock (exposed for manual use)
   const releaseLock = useCallback(async () => {
-    const environment = environmentRef.current;
-    if (!entityId || !environment || !table || !lockAcquiredRef.current) return;
+    const environmentId = environmentRef.current;
+    if (!entityId || !environmentId || !table || !lockAcquiredRef.current) return;
 
     try {
-      await entityLockService.releaseLock(table, entityId, environment);
+      await entityLockService.releaseLock(table, entityId, environmentId);
       setHasLock(false);
       lockAcquiredRef.current = false;
     } catch (error) {
@@ -93,11 +93,11 @@ export function useEntityLock({
 
   // Force takeover
   const forceTakeover = useCallback(async () => {
-    const environment = environmentRef.current;
-    if (!entityId || !environment || !table) return false;
+    const environmentId = environmentRef.current;
+    if (!entityId || !environmentId || !table) return false;
 
     try {
-      const success = await entityLockService.forceAcquireLock(table, entityId, environment);
+      const success = await entityLockService.forceAcquireLock(table, entityId, environmentId);
       if (success) {
         setHasLock(true);
         setLockedBy(null);
@@ -141,7 +141,7 @@ export function useEntityLock({
       const {
         table: releasedTable,
         entityId: releasedEntityId,
-        environment: releasedEnv,
+        environmentId: releasedEnv,
       } = event.detail;
 
       // Check if this release is for the entity we're waiting on
@@ -189,7 +189,7 @@ export function useEntityLock({
       const {
         table: takenTable,
         entityId: takenEntityId,
-        environment: takenEnv,
+        environmentId: takenEnv,
         newOwner,
       } = event.detail;
 
@@ -253,7 +253,7 @@ export function useEntityLock({
       return;
     }
 
-    const environment = environmentRef.current;
+    const environmentId = environmentRef.current;
     const softLockEnabled = softLockEnabledRef.current;
     const hardLockEnabled = hardLockEnabledRef.current;
 
@@ -263,10 +263,10 @@ export function useEntityLock({
 
     const handleLockAcquisition = async () => {
       // Soft lock handling
-      if (softLockEnabled && environment) {
+      if (softLockEnabled && environmentId) {
         setLoading(true);
         try {
-          const result = await entityLockService.acquireLock(table, entityId, environment);
+          const result = await entityLockService.acquireLock(table, entityId, environmentId);
           console.log('[useEntityLock] acquire result:', result);
           if (!isMounted) return;
 
@@ -297,9 +297,9 @@ export function useEntityLock({
       }
 
       // Hard lock handling (check for pending CRs)
-      if (hardLockEnabled && environment) {
+      if (hardLockEnabled && environmentId) {
         try {
-          const result = await entityLockService.checkLock(table, entityId, environment);
+          const result = await entityLockService.checkLock(table, entityId, environmentId);
           if (!isMounted) return;
 
           if (result.pendingCR) {
@@ -318,7 +318,7 @@ export function useEntityLock({
       }
 
       // Start heartbeat only if we acquired the lock
-      if (lockAcquiredRef.current && softLockEnabled && environment) {
+      if (lockAcquiredRef.current && softLockEnabled && environmentId) {
         if (heartbeatRef.current) {
           clearInterval(heartbeatRef.current);
         }
