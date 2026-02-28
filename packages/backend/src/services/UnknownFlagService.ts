@@ -15,7 +15,7 @@ const REDIS_METADATA_PREFIX = 'unknown_flags:meta:';
 export interface UnknownFlag {
   id: string;
   flagName: string;
-  environment: string;
+  environmentId: string;
   appName: string | null;
   sdkVersion: string | null;
   accessCount: number;
@@ -28,7 +28,7 @@ export interface UnknownFlag {
 
 export interface ReportUnknownFlagInput {
   flagName: string;
-  environment: string;
+  environmentId: string;
   appName?: string;
   sdkVersion?: string;
   count?: number;
@@ -46,8 +46,8 @@ export class UnknownFlagService {
       const count = input.count || 1;
 
       // Create unique key for this flag + environment combo
-      const bufferKey = `${REDIS_KEY_PREFIX}${input.environment}:${input.flagName}`;
-      const metadataKey = `${REDIS_METADATA_PREFIX}${input.environment}:${input.flagName}`;
+      const bufferKey = `${REDIS_KEY_PREFIX}${input.environmentId}:${input.flagName}`;
+      const metadataKey = `${REDIS_METADATA_PREFIX}${input.environmentId}:${input.flagName}`;
 
       // Increment count in Redis (atomic operation, handles high volume)
       await client.hIncrBy(bufferKey, 'count', count);
@@ -66,7 +66,7 @@ export class UnknownFlagService {
 
       logger.debug('Unknown flag buffered in Redis', {
         flagName: input.flagName,
-        environment: input.environment,
+        environmentId: input.environmentId,
       });
     } catch (error) {
       logger.error('Failed to buffer unknown flag in Redis', { error, input });
@@ -83,7 +83,7 @@ export class UnknownFlagService {
     const updated = await db('unknown_flags')
       .where({
         flagName: input.flagName,
-        environment: input.environment,
+        environmentId: input.environmentId,
         appName: input.appName || null,
         sdkVersion: input.sdkVersion || null,
       })
@@ -95,7 +95,7 @@ export class UnknownFlagService {
     if (updated === 0) {
       await db('unknown_flags').insert({
         flagName: input.flagName,
-        environment: input.environment,
+        environmentId: input.environmentId,
         appName: input.appName || null,
         sdkVersion: input.sdkVersion || null,
         accessCount: count,
@@ -125,7 +125,7 @@ export class UnknownFlagService {
           const keyParts = bufferKey.replace(REDIS_KEY_PREFIX, '').split(':');
           if (keyParts.length < 2) continue;
 
-          const environment = keyParts[0];
+          const environmentId = keyParts[0];
           const flagName = keyParts.slice(1).join(':'); // flagName might contain ":"
 
           // Get count and delete atomically using GETDEL (or GET + DEL)
@@ -138,7 +138,7 @@ export class UnknownFlagService {
           }
 
           // Get metadata
-          const metadataKey = `${REDIS_METADATA_PREFIX}${environment}:${flagName}`;
+          const metadataKey = `${REDIS_METADATA_PREFIX}${environmentId}:${flagName}`;
           const metadata = await client.hGetAll(metadataKey);
 
           // Delete keys first (to avoid double counting on retry)
@@ -148,14 +148,14 @@ export class UnknownFlagService {
           // Upsert to database
           await this.upsertToDb({
             flagName,
-            environment,
+            environmentId,
             appName: metadata.appName || null,
             sdkVersion: metadata.sdkVersion || null,
             count,
           });
 
           flushed++;
-          logger.debug('Flushed unknown flag to DB', { flagName, environment, count });
+          logger.debug('Flushed unknown flag to DB', { flagName, environmentId, count });
         } catch (error) {
           errors++;
           logger.error('Failed to flush buffer key', { bufferKey, error });
@@ -177,7 +177,7 @@ export class UnknownFlagService {
    */
   private async upsertToDb(data: {
     flagName: string;
-    environment: string;
+    environmentId: string;
     appName: string | null;
     sdkVersion: string | null;
     count: number;
@@ -185,7 +185,7 @@ export class UnknownFlagService {
     const updated = await db('unknown_flags')
       .where({
         flagName: data.flagName,
-        environment: data.environment,
+        environmentId: data.environmentId,
         appName: data.appName,
         sdkVersion: data.sdkVersion,
       })
@@ -197,7 +197,7 @@ export class UnknownFlagService {
     if (updated === 0) {
       await db('unknown_flags').insert({
         flagName: data.flagName,
-        environment: data.environment,
+        environmentId: data.environmentId,
         appName: data.appName,
         sdkVersion: data.sdkVersion,
         accessCount: data.count,
@@ -214,7 +214,7 @@ export class UnknownFlagService {
   async getUnknownFlags(
     options: {
       includeResolved?: boolean;
-      environment?: string;
+      environmentId?: string;
       limit?: number;
     } = {}
   ): Promise<UnknownFlag[]> {
@@ -224,8 +224,8 @@ export class UnknownFlagService {
       query = query.where('isResolved', false);
     }
 
-    if (options.environment) {
-      query = query.where('environment', options.environment);
+    if (options.environmentId) {
+      query = query.where('environmentId', options.environmentId);
     }
 
     query = query.orderBy('lastReportedAt', 'desc');

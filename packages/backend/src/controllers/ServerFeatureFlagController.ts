@@ -64,16 +64,16 @@ export default class ServerFeatureFlagController {
    */
   static async getFeatureFlags(req: Request, res: Response): Promise<void> {
     try {
-      const environment = req.params.env;
+      const environmentId = req.params.env;
 
-      if (!environment) {
+      if (!environmentId) {
         sendBadRequest(res, 'Environment is required');
         return;
       }
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environment, appName, 'features').catch(() => {});
+      networkTrafficService.recordTraffic(environmentId, appName, 'features').catch(() => {});
 
       // Parse optional flagNames filter (comma-separated query parameter)
       const flagNamesParam = req.query.flagNames as string | undefined;
@@ -89,7 +89,7 @@ export default class ServerFeatureFlagController {
 
       // Get all enabled, non-archived flags for this environment
       const result = await FeatureFlagModel.findAll({
-        environment,
+        environmentId,
         isArchived: false,
         flagNames: flagNamesFilter,
       });
@@ -103,7 +103,7 @@ export default class ServerFeatureFlagController {
       const flags: EvaluationFlag[] = await Promise.all(
         rawFlags.map(async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
           const envOverride = (flag as any).environments?.find(
-            (e: any) => e.environment === environment
+            (e: any) => e.environmentId === environmentId
           );
           const hasEnvOverride =
             envOverride?.enabledValue !== undefined || envOverride?.disabledValue !== undefined;
@@ -117,7 +117,7 @@ export default class ServerFeatureFlagController {
               impressionDataEnabled: flag.impressionDataEnabled,
               valueType: (flag as any).valueType,
               disabledValue: envOverride?.disabledValue ?? (flag as any).disabledValue,
-              valueSource: hasEnvOverride ? 'environment' : 'flag',
+              valueSource: hasEnvOverride ? 'environmentId' : 'flag',
               version: flag.version,
               compact: true,
             };
@@ -125,11 +125,11 @@ export default class ServerFeatureFlagController {
 
           const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
             flag.id,
-            environment
+            environmentId
           );
           const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(
             flag.id,
-            environment
+            environmentId
           );
 
           // Transform to minimal evaluation format
@@ -171,7 +171,7 @@ export default class ServerFeatureFlagController {
             valueType: (flag as any).valueType,
             enabledValue: envOverride?.enabledValue ?? (flag as any).enabledValue,
             disabledValue: envOverride?.disabledValue ?? (flag as any).disabledValue,
-            valueSource: hasEnvOverride ? 'environment' : 'flag',
+            valueSource: hasEnvOverride ? 'environmentId' : 'flag',
             version: flag.version,
           };
         })
@@ -215,9 +215,9 @@ export default class ServerFeatureFlagController {
    */
   static async getFeatureFlag(req: Request, res: Response): Promise<void> {
     try {
-      const { env: environment, flagName } = req.params;
+      const { env: environmentId, flagName } = req.params;
 
-      if (!environment || !flagName) {
+      if (!environmentId || !flagName) {
         res.status(400).json({
           success: false,
           error: 'Environment and flag name are required',
@@ -228,7 +228,7 @@ export default class ServerFeatureFlagController {
       // Parse compact option
       const compact = req.query.compact === 'true' || req.query.compact === '1';
 
-      const flag = await FeatureFlagModel.findByName(environment, flagName);
+      const flag = await FeatureFlagModel.findByName(environmentId, flagName);
 
       if (!flag || flag.isArchived) {
         res.status(404).json({ success: false, error: 'Flag not found' });
@@ -237,7 +237,7 @@ export default class ServerFeatureFlagController {
 
       // In compact mode, skip DB queries for disabled flags entirely
       if (compact && !flag.isEnabled) {
-        const envOverride = flag.environments?.find((e) => e.environment === environment);
+        const envOverride = flag.environments?.find((e) => e.environmentId === environmentId);
         const hasEnvOverride =
           envOverride?.enabledValue !== undefined || envOverride?.disabledValue !== undefined;
 
@@ -251,7 +251,7 @@ export default class ServerFeatureFlagController {
               impressionDataEnabled: flag.impressionDataEnabled,
               valueType: flag.valueType,
               disabledValue: envOverride?.disabledValue ?? flag.disabledValue,
-              valueSource: hasEnvOverride ? 'environment' : 'flag',
+              valueSource: hasEnvOverride ? 'environmentId' : 'flag',
               version: flag.version,
               compact: true,
             },
@@ -262,9 +262,9 @@ export default class ServerFeatureFlagController {
 
       const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
         flag.id,
-        environment
+        environmentId
       );
-      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
+      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environmentId);
 
       const evaluationFlag: EvaluationFlag = {
         id: flag.id,
@@ -290,10 +290,10 @@ export default class ServerFeatureFlagController {
         })),
         valueType: flag.valueType,
         enabledValue:
-          flag.environments?.find((e) => e.environment === environment)?.enabledValue ??
+          flag.environments?.find((e) => e.environmentId === environmentId)?.enabledValue ??
           flag.enabledValue,
         disabledValue:
-          flag.environments?.find((e) => e.environment === environment)?.disabledValue ??
+          flag.environments?.find((e) => e.environmentId === environmentId)?.disabledValue ??
           flag.disabledValue,
         version: flag.version,
       };
@@ -317,8 +317,8 @@ export default class ServerFeatureFlagController {
     try {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      const environment = req.params.env || 'global';
-      networkTrafficService.recordTraffic(environment, appName, 'segments').catch(() => {});
+      const environmentId = req.params.env || 'global';
+      networkTrafficService.recordTraffic(environmentId, appName, 'segments').catch(() => {});
 
       // Parse optional segmentNames filter (comma-separated query parameter)
       const segmentNamesParam = req.query.segmentNames as string | undefined;
@@ -356,7 +356,7 @@ export default class ServerFeatureFlagController {
   static async receiveMetrics(req: Request, res: Response): Promise<void> {
     try {
       const { metrics, timestamp, bucket } = req.body;
-      const environment = req.params.env || 'production';
+      const environmentId = req.params.env || 'production';
       // Get appName from X-Application-Name header
       const appName = req.headers['x-application-name'] as string | undefined;
 
@@ -373,7 +373,7 @@ export default class ServerFeatureFlagController {
 
       // Process aggregated metrics via queue with appName and bucket info
       await featureMetricsService.processAggregatedMetrics(
-        environment,
+        environmentId,
         metrics,
         reportedAt,
         appName,
@@ -395,7 +395,7 @@ export default class ServerFeatureFlagController {
   static async reportUnknownFlag(req: Request, res: Response): Promise<void> {
     try {
       const { flagName } = req.body;
-      const environment = req.params.env || 'production';
+      const environmentId = req.params.env || 'production';
       const appName = (req.headers['x-application-name'] as string) || req.body.appName;
       const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
@@ -408,7 +408,7 @@ export default class ServerFeatureFlagController {
       const { unknownFlagService } = await import('../services/UnknownFlagService');
       await unknownFlagService.reportUnknownFlag({
         flagName,
-        environment,
+        environmentId,
         appName,
         sdkVersion,
       });

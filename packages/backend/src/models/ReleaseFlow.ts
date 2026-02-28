@@ -20,7 +20,7 @@ export interface ReleaseFlowAttributes {
   description?: string;
   discriminator: FlowDiscriminator;
   flagId?: string;
-  environment?: string;
+  environmentId?: string;
   activeMilestoneId?: string;
   status: FlowStatus;
   isArchived: boolean;
@@ -131,12 +131,12 @@ export class ReleaseFlowModel {
 
   static async findPlanByFlagAndEnv(
     flagId: string,
-    environment: string
+    environmentId: string
   ): Promise<ReleaseFlowAttributes | null> {
     try {
       const flow = await db('g_release_flows')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where('discriminator', 'plan')
         .where('isArchived', false)
         .first();
@@ -156,7 +156,7 @@ export class ReleaseFlowModel {
    */
   static async findPlansByFlag(flagId: string): Promise<
     Array<{
-      environment: string;
+      environmentId: string;
       status: string;
       displayName: string;
       activeMilestoneName: string | null;
@@ -165,7 +165,7 @@ export class ReleaseFlowModel {
     try {
       const flows = await db('g_release_flows')
         .select(
-          'g_release_flows.environment',
+          'g_release_flows.environmentId',
           'g_release_flows.status',
           'g_release_flows.displayName',
           db.raw(`(
@@ -201,7 +201,7 @@ export class ReleaseFlowModel {
         description: data.description || null,
         discriminator: data.discriminator,
         flagId: data.flagId || null,
-        environment: data.environment || null,
+        environmentId: data.environmentId || null,
         activeMilestoneId: data.activeMilestoneId || null,
         isArchived: false,
         createdBy: data.createdBy,

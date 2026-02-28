@@ -27,19 +27,19 @@ export const environmentContextMiddleware = async (
     const environmentName = req.headers['x-environment'] as string;
 
     if (!environmentName) {
-      // If no environment is specified, we don't set req.environment
+      // If no environment is specified, we don't set req.environmentId
       // Controllers should handle missing environment if they need it
       return next();
     }
 
     // Validate environment exists
-    const environment = await Environment.getByName(environmentName);
-    if (!environment) {
+    const env = await Environment.getByName(environmentName);
+    if (!env) {
       logger.warn(`Invalid environment requested: ${environmentName}`);
       return next();
     }
 
-    req.environment = environment.environment;
+    req.environmentId = env.id;
 
     next();
   } catch (error) {
@@ -55,7 +55,7 @@ export const environmentContextMiddleware = async (
 export const requireEnvironmentType = (allowedTypes: string[]) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const environmentName = req.environment;
+      const environmentName = req.environmentId;
 
       if (!environmentName) {
         res.status(400).json({
@@ -65,12 +65,12 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
         return;
       }
 
-      const environment = await Environment.getByName(environmentName);
+      const env = await Environment.getByName(environmentName);
 
-      if (!environment || !allowedTypes.includes(environment.environmentType)) {
+      if (!env || !allowedTypes.includes(env.environmentType)) {
         res.status(403).json({
           success: false,
-          message: `This operation is not allowed in ${environment?.environmentType || 'unknown'} environment`,
+          message: `This operation is not allowed in ${env?.environmentType || 'unknown'} environment`,
         });
         return;
       }
@@ -96,17 +96,17 @@ export const preventProductionModification = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const environmentName = req.environment;
+    const environmentName = req.environmentId;
 
     if (!environmentName) {
       return next();
     }
 
-    const environment = await Environment.getByName(environmentName);
+    const environmentId = await Environment.getByName(environmentName);
 
-    if (environment?.environmentType === 'production') {
+    if (environmentId?.environmentType === 'production') {
       // For production, check if approval is required
-      if (environment.requiresApproval) {
+      if (environmentId.requiresApproval) {
         // TODO: Implement approval workflow
         // For now, just log a warning
         logger.warn(`Production modification attempted without approval workflow`);

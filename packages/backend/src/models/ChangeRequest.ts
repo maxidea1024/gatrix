@@ -16,7 +16,7 @@ export class ChangeRequest extends Model {
 
   id!: string;
   requesterId!: string;
-  environment!: string;
+  environmentId!: string;
   status!: ChangeRequestStatus;
   title!: string;
   description?: string;
@@ -43,11 +43,11 @@ export class ChangeRequest extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['requesterId', 'environment', 'title'],
+      required: ['requesterId', 'environmentId', 'title'],
       properties: {
         id: { type: 'string' },
         requesterId: { type: 'integer' },
-        environment: { type: 'string' },
+        environmentId: { type: 'string' },
         status: {
           type: 'string',
           enum: ['draft', 'open', 'approved', 'applied', 'rejected', 'conflict'],
@@ -107,8 +107,8 @@ export class ChangeRequest extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Environment,
         join: {
-          from: 'g_change_requests.environment',
-          to: 'g_environments.environment',
+          from: 'g_change_requests.environmentId',
+          to: 'g_environments.environmentId',
         },
       },
       changeItems: {

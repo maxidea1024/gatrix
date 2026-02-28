@@ -124,7 +124,7 @@ export class AuditLogModel {
           // This prevents slow addons from blocking the main API response
           IntegrationService.handleEvent({
             type: eventType as any,
-            environment: auditData.environment,
+            environmentId: auditData.environmentId,
             createdByUserId: auditData.userId,
             data: eventData,
             createdAt: new Date(),

@@ -86,13 +86,13 @@ class ApiTokensController {
         tokenIds.length > 0
           ? await knex('g_api_access_token_environments')
               .whereIn('tokenId', tokenIds)
-              .select('tokenId', 'environment')
+              .select('tokenId', 'environmentId')
           : [];
 
       // Group environment names by token
       const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environment);
+        acc[env.tokenId].push(env.environmentId);
         return acc;
       }, {});
 
@@ -195,7 +195,7 @@ class ApiTokensController {
           const envInserts = environments.map((envName: string) => ({
             id: ulid(), // Generate ULID for each record
             tokenId: tokenId,
-            environment: envName,
+            environmentId: envName,
           }));
           await trx('g_api_access_token_environments').insert(envInserts);
         }
@@ -289,7 +289,7 @@ class ApiTokensController {
             const envInserts = environments.map((envName: string) => ({
               id: ulid(), // Generate ULID for each record
               tokenId: id,
-              environment: envName,
+              environmentId: envName,
             }));
             await trx('g_api_access_token_environments').insert(envInserts);
           }
@@ -310,7 +310,7 @@ class ApiTokensController {
       // Get environment IDs only (frontend has environment list)
       const envAssignments = await knex('g_api_access_token_environments')
         .where('tokenId', id)
-        .select('environment');
+        .select('environmentId');
 
       // Format response
       const formattedToken = {
@@ -320,7 +320,7 @@ class ApiTokensController {
           '••••••••' +
           updatedToken.tokenValue?.substring(updatedToken.tokenValue.length - 4),
         allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
-        environments: envAssignments.map((e: any) => e.environment),
+        environments: envAssignments.map((e: any) => e.environmentId),
         creator: {
           name: updatedToken.creatorName || 'Unknown',
           email: updatedToken.creatorEmail || '',

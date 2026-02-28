@@ -12,13 +12,13 @@ const router = Router() as any;
 router.get(
   '/',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
     // Get all products with multi-language structure
-    const products = await CmsCashShopService.getProducts(environment);
+    const products = await CmsCashShopService.getProducts(environmentId);
 
     res.json({
       success: true,

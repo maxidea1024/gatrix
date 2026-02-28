@@ -85,9 +85,9 @@ export class CouponGenerationJob {
         [settingId]
       );
       const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
-      const environment = settings[0]?.environment;
+      const environmentId = settings[0]?.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new Error('Setting not found or missing environment');
       }
 
@@ -100,7 +100,7 @@ export class CouponGenerationJob {
         settingId,
         quantity,
         codePattern,
-        environment,
+        environmentId,
       });
 
       for (let i = 0; i < quantity; i += this.BATCH_SIZE) {
@@ -143,14 +143,14 @@ export class CouponGenerationJob {
           }
 
           localSet.add(code!);
-          batchCodes.push([ulid(), settingId, code!, environment]);
+          batchCodes.push([ulid(), settingId, code!, environmentId]);
         }
 
         // Insert batch immediately (streaming approach)
         if (batchCodes.length > 0) {
           const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
           await pool.execute(
-            `INSERT INTO g_coupons (id, settingId, code, environment) VALUES ${placeholders}`,
+            `INSERT INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
             batchCodes.flat()
           );
 

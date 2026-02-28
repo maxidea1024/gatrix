@@ -23,7 +23,7 @@ interface NewRelicRequestBody {
   eventType: string;
   gatrixEventType: string;
   featureName?: string;
-  environment?: string;
+  environmentId?: string;
   createdBy?: string;
   createdAt?: number;
   [key: string]: unknown;
@@ -121,7 +121,7 @@ export class NewRelicAddon extends Addon {
       eventType: 'GatrixServiceEvent',
       gatrixEventType: event.type,
       featureName: event.data?.name || event.data?.featureName,
-      environment: event.environment,
+      environmentId: event.environmentId,
       createdBy: event.createdBy || 'system',
       createdAt: event.createdAt ? event.createdAt.getTime() : Date.now(),
       ...event.data,

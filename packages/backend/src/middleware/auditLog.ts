@@ -69,7 +69,7 @@ export const auditLog = (options: AuditLogOptions) => {
           newValues: newValues,
           ipAddress: req.ip,
           userAgent: req.get('User-Agent'),
-          environment: req.environment,
+          environmentId: req.environmentId,
         });
       } catch (error) {
         // Don't fail the request if audit logging fails

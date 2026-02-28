@@ -128,10 +128,10 @@ const updateMaintenanceSchema = Joi.object({
 
 export class GameWorldController {
   static getGameWorlds = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     // If no environment is provided, return empty list (happens during initial frontend load)
-    if (!environment) {
+    if (!environmentId) {
       return res.json({
         success: true,
         data: {
@@ -144,7 +144,7 @@ export class GameWorldController {
 
     const worlds = await GameWorldService.getGameWorlds({
       ...req.query,
-      environment,
+      environmentId,
     });
 
     // Attach tags for each world
@@ -195,17 +195,17 @@ export class GameWorldController {
 
   static getGameWorldById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
-    const world = await GameWorldService.getGameWorldById(id, environment);
+    const world = await GameWorldService.getGameWorldById(id, environmentId);
     const tags = await TagService.listTagsForEntity('game_world', id);
 
     res.json({
@@ -217,17 +217,17 @@ export class GameWorldController {
 
   static getGameWorldByWorldId = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { worldId } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!worldId) {
       throw new GatrixError('World ID is required', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
-    const world = await GameWorldService.getGameWorldByWorldId(worldId, environment);
+    const world = await GameWorldService.getGameWorldByWorldId(worldId, environmentId);
     const tags = await TagService.listTagsForEntity('game_world', world.id);
 
     res.json({
@@ -238,8 +238,8 @@ export class GameWorldController {
   });
 
   static createGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -286,12 +286,12 @@ export class GameWorldController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_game_worlds',
-      { ...worldData, environment, tagIds },
+      { ...worldData, environmentId, tagIds },
       async () => {
         // Direct creation function - executed when CR is not required
-        const world = await GameWorldService.createGameWorld(worldData, environment);
+        const world = await GameWorldService.createGameWorld(worldData, environmentId);
         if (Array.isArray(tagIds)) {
           await TagService.setTagsForEntity('game_world', world.id, tagIds, authenticatedUserId);
         }
@@ -330,13 +330,13 @@ export class GameWorldController {
 
   static updateGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -385,13 +385,13 @@ export class GameWorldController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_game_worlds',
       id,
       { ...updateData, tagIds },
       async (processedData) => {
         const { tagIds: processedTagIds, ...processedWorldData } = processedData as any;
-        const world = await GameWorldService.updateGameWorld(id, processedWorldData, environment);
+        const world = await GameWorldService.updateGameWorld(id, processedWorldData, environmentId);
         if (Array.isArray(processedTagIds)) {
           await TagService.setTagsForEntity('game_world', id, processedTagIds, authenticatedUserId);
         }
@@ -430,13 +430,13 @@ export class GameWorldController {
 
   static deleteGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -448,11 +448,11 @@ export class GameWorldController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_game_worlds',
       id,
       async () => {
-        await GameWorldService.deleteGameWorld(id, environment);
+        await GameWorldService.deleteGameWorld(id, environmentId);
 
         // Publish event for SDK real-time updates
         await pubSubService.publishNotification({
@@ -484,14 +484,14 @@ export class GameWorldController {
 
   static toggleVisibility = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
     logger.info(`GameWorldController.toggleVisibility called for id: ${id}`);
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -503,14 +503,18 @@ export class GameWorldController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_game_worlds',
       id,
       async (currentData: any) => {
         return { isVisible: !currentData.isVisible };
       },
       async (processedData: any) => {
-        const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
+        const world = await GameWorldService.updateGameWorld(
+          id,
+          processedData as any,
+          environmentId
+        );
         const tags = await TagService.listTagsForEntity('game_world', id);
 
         // Publish event for SDK real-time updates
@@ -544,13 +548,13 @@ export class GameWorldController {
 
   static toggleMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -562,14 +566,18 @@ export class GameWorldController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_game_worlds',
       id,
       async (currentData: any) => {
         return { isMaintenance: !currentData.isMaintenance };
       },
       async (processedData: any) => {
-        const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
+        const world = await GameWorldService.updateGameWorld(
+          id,
+          processedData as any,
+          environmentId
+        );
         const tags = await TagService.listTagsForEntity('game_world', id);
 
         // Publish event for SDK real-time updates
@@ -604,13 +612,13 @@ export class GameWorldController {
 
   static updateMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -675,12 +683,16 @@ export class GameWorldController {
 
     const gatewayResult = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_game_worlds',
       id,
       updateData,
       async (processedData: any) => {
-        const world = await GameWorldService.updateGameWorld(id, processedData as any, environment);
+        const world = await GameWorldService.updateGameWorld(
+          id,
+          processedData as any,
+          environmentId
+        );
         const tags = await TagService.listTagsForEntity('game_world', id);
 
         // Publish event for SDK real-time updates
@@ -715,9 +727,9 @@ export class GameWorldController {
 
   static updateDisplayOrders = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { orderUpdates } = req.body;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -732,7 +744,7 @@ export class GameWorldController {
       }
     }
 
-    await GameWorldService.updateDisplayOrders(orderUpdates, environment);
+    await GameWorldService.updateDisplayOrders(orderUpdates, environmentId);
 
     res.json({
       success: true,
@@ -742,17 +754,17 @@ export class GameWorldController {
 
   static moveUp = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
-    const moved = await GameWorldService.moveUp(id, environment);
+    const moved = await GameWorldService.moveUp(id, environmentId);
 
     res.json({
       success: true,
@@ -763,17 +775,17 @@ export class GameWorldController {
 
   static moveDown = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = req.params.id;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Invalid game world ID', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
-    const moved = await GameWorldService.moveDown(id, environment);
+    const moved = await GameWorldService.moveDown(id, environmentId);
 
     res.json({
       success: true,
@@ -783,13 +795,13 @@ export class GameWorldController {
   });
 
   static invalidateCache = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
-    await GameWorldService.invalidateCache(environment);
+    await GameWorldService.invalidateCache(environmentId);
 
     res.json({
       success: true,

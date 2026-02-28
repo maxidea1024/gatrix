@@ -237,7 +237,10 @@ export class IntegrationService {
    */
   static async handleEvent(event: IntegrationSystemEvent): Promise<void> {
     try {
-      const integrations = await IntegrationModel.findEnabledByEvent(event.type, event.environment);
+      const integrations = await IntegrationModel.findEnabledByEvent(
+        event.type,
+        event.environmentId
+      );
 
       if (integrations.length === 0) {
         logger.debug(`No integrations configured for event ${event.type}`);
@@ -296,7 +299,7 @@ export class IntegrationService {
     // Create a test event
     const testEvent: IntegrationSystemEvent = {
       type: INTEGRATION_EVENTS.INTEGRATION_TEST,
-      environment: 'test',
+      environmentId: 'test',
       createdAt: new Date(),
       createdBy: auditUser.name,
       data: {

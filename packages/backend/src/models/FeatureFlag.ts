@@ -95,7 +95,7 @@ export interface FeatureFlagAttributes {
 export interface FeatureFlagEnvironmentAttributes {
   id: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   isEnabled: boolean;
   overrideEnabledValue?: boolean;
   overrideDisabledValue?: boolean;
@@ -111,7 +111,7 @@ export interface FeatureFlagEnvironmentAttributes {
 export interface FeatureStrategyAttributes {
   id: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   strategyName: string;
   /** Optional user-facing display name */
   title?: string;
@@ -131,7 +131,7 @@ export interface FeatureStrategyAttributes {
 export interface FeatureVariantAttributes {
   id: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   variantName: string;
   weight: number;
   value?: any;
@@ -176,7 +176,7 @@ export interface FeatureContextFieldAttributes {
 
 export interface FeatureMetricsAttributes {
   id: string;
-  environment: string;
+  environmentId: string;
   flagName: string;
   metricsBucket: Date;
   yesCount: number;
@@ -227,7 +227,7 @@ export class FeatureFlagModel {
    * Flags are global, isEnabled comes from g_feature_flag_environments
    */
   static async findAll(filters: {
-    environment: string;
+    environmentId: string;
     search?: string;
     flagType?: string;
 
@@ -245,7 +245,7 @@ export class FeatureFlagModel {
   }> {
     try {
       const {
-        environment,
+        environmentId,
         search,
         flagType,
 
@@ -264,9 +264,9 @@ export class FeatureFlagModel {
         db('g_feature_flags as f')
           .leftJoin('g_feature_flag_environments as e', function () {
             this.on('f.id', '=', 'e.flagId').andOn(
-              'e.environment',
+              'e.environmentId',
               '=',
-              db.raw('?', [environment])
+              db.raw('?', [environmentId])
             );
           })
           .leftJoin('g_users as u', 'f.createdBy', 'u.id')
@@ -306,7 +306,11 @@ export class FeatureFlagModel {
 
       const countResult = await applyFilters(
         db('g_feature_flags as f').leftJoin('g_feature_flag_environments as e', function () {
-          this.on('f.id', '=', 'e.flagId').andOn('e.environment', '=', db.raw('?', [environment]));
+          this.on('f.id', '=', 'e.flagId').andOn(
+            'e.environmentId',
+            '=',
+            db.raw('?', [environmentId])
+          );
         })
       )
         .count('f.id as total')
@@ -343,7 +347,7 @@ export class FeatureFlagModel {
           environments: envStates.map((e) => ({
             id: e.id,
             flagId: e.flagId,
-            environment: e.environment,
+            environmentId: e.environmentId,
             isEnabled: Boolean(e.isEnabled),
             overrideEnabledValue: Boolean(e.overrideEnabledValue),
             overrideDisabledValue: Boolean(e.overrideDisabledValue),
@@ -365,7 +369,7 @@ export class FeatureFlagModel {
    * Find flag by name with environment-specific strategies and variants
    */
   static async findByName(
-    environment: string,
+    environmentId: string,
     flagName: string
   ): Promise<(FeatureFlagAttributes & { isEnabled: boolean }) | null> {
     try {
@@ -382,14 +386,14 @@ export class FeatureFlagModel {
       const allEnvSettings = await db('g_feature_flag_environments').where('flagId', flag.id);
 
       // Get current environment settings
-      const envSettings = allEnvSettings.find((e) => e.environment === environment);
+      const envSettings = allEnvSettings.find((e) => e.environmentId === environmentId);
 
       // Load strategies and variants for this environment
       const strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
         flag.id,
-        environment
+        environmentId
       );
-      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
+      const variants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environmentId);
 
       return {
         ...flag,
@@ -410,7 +414,7 @@ export class FeatureFlagModel {
         environments: allEnvSettings.map((e) => ({
           id: e.id,
           flagId: e.flagId,
-          environment: e.environment,
+          environmentId: e.environmentId,
           isEnabled: Boolean(e.isEnabled),
           overrideEnabledValue: Boolean(e.overrideEnabledValue),
           overrideDisabledValue: Boolean(e.overrideDisabledValue),
@@ -425,7 +429,7 @@ export class FeatureFlagModel {
     }
   }
 
-  static async findById(id: string, environment?: string): Promise<FeatureFlagAttributes | null> {
+  static async findById(id: string, environmentId?: string): Promise<FeatureFlagAttributes | null> {
     try {
       const flag = await db('g_feature_flags as f')
         .select('f.*', 'creator.name as createdByName')
@@ -438,13 +442,13 @@ export class FeatureFlagModel {
       let strategies: FeatureStrategyAttributes[] = [];
       let variants: FeatureVariantAttributes[] = [];
 
-      if (environment) {
+      if (environmentId) {
         envSettings = await db('g_feature_flag_environments')
           .where('flagId', id)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .first();
-        strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(id, environment);
-        variants = await FeatureVariantModel.findByFlagIdAndEnvironment(id, environment);
+        strategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(id, environmentId);
+        variants = await FeatureVariantModel.findByFlagIdAndEnvironment(id, environmentId);
       }
 
       return {
@@ -465,7 +469,7 @@ export class FeatureFlagModel {
               {
                 id: envSettings.id,
                 flagId: id,
-                environment,
+                environmentId,
                 isEnabled: Boolean(envSettings.isEnabled),
                 enabledValue: parseJsonField(envSettings.enabledValue),
                 disabledValue: parseJsonField(envSettings.disabledValue),
@@ -495,7 +499,7 @@ export class FeatureFlagModel {
       | 'lastSeenAt'
       | 'createdByName'
     > & {
-      environment?: string;
+      environmentId?: string;
       isEnabled?: boolean;
     }
   ): Promise<FeatureFlagAttributes> {
@@ -522,15 +526,15 @@ export class FeatureFlagModel {
       });
 
       // If environment provided, create environment settings
-      if (data.environment) {
+      if (data.environmentId) {
         await FeatureFlagEnvironmentModel.create({
           flagId: id,
-          environment: data.environment,
+          environmentId: data.environmentId,
           isEnabled: data.isEnabled ?? true,
         });
       }
 
-      return this.findById(id, data.environment) as Promise<FeatureFlagAttributes>;
+      return this.findById(id, data.environmentId) as Promise<FeatureFlagAttributes>;
     } catch (error) {
       logger.error('Error creating feature flag:', error);
       throw error;
@@ -604,11 +608,11 @@ export class FeatureFlagModel {
     }
   }
 
-  static async updateLastSeenAt(flagId: string, environment: string): Promise<void> {
+  static async updateLastSeenAt(flagId: string, environmentId: string): Promise<void> {
     try {
       await db('g_feature_flag_environments')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update({ lastSeenAt: new Date() });
     } catch (error) {
       logger.error('Error updating lastSeenAt:', error);
@@ -638,12 +642,12 @@ export class FeatureFlagEnvironmentModel {
 
   static async findByFlagIdAndEnvironment(
     flagId: string,
-    environment: string
+    environmentId: string
   ): Promise<FeatureFlagEnvironmentAttributes | null> {
     try {
       const env = await db('g_feature_flag_environments')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .first();
       if (!env) return null;
       return {
@@ -668,7 +672,7 @@ export class FeatureFlagEnvironmentModel {
       await db('g_feature_flag_environments').insert({
         id,
         flagId: data.flagId,
-        environment: data.environment,
+        environmentId: data.environmentId,
         isEnabled: data.isEnabled ?? false,
         overrideEnabledValue: data.overrideEnabledValue ?? false,
         overrideDisabledValue: data.overrideDisabledValue ?? false,
@@ -679,7 +683,7 @@ export class FeatureFlagEnvironmentModel {
       });
       return this.findByFlagIdAndEnvironment(
         data.flagId,
-        data.environment
+        data.environmentId
       ) as Promise<FeatureFlagEnvironmentAttributes>;
     } catch (error) {
       logger.error('Error creating flag environment:', error);
@@ -689,24 +693,24 @@ export class FeatureFlagEnvironmentModel {
 
   static async updateIsEnabled(
     flagId: string,
-    environment: string,
+    environmentId: string,
     isEnabled: boolean
   ): Promise<FeatureFlagEnvironmentAttributes> {
     try {
       // Upsert - create if not exists
-      const existing = await this.findByFlagIdAndEnvironment(flagId, environment);
+      const existing = await this.findByFlagIdAndEnvironment(flagId, environmentId);
       if (!existing) {
-        return this.create({ flagId, environment, isEnabled });
+        return this.create({ flagId, environmentId, isEnabled });
       }
 
       await db('g_feature_flag_environments')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update({ isEnabled, updatedAt: new Date() });
 
       return this.findByFlagIdAndEnvironment(
         flagId,
-        environment
+        environmentId
       ) as Promise<FeatureFlagEnvironmentAttributes>;
     } catch (error) {
       logger.error('Error updating flag environment:', error);
@@ -716,7 +720,7 @@ export class FeatureFlagEnvironmentModel {
 
   static async update(
     flagId: string,
-    environment: string,
+    environmentId: string,
     data: Partial<FeatureFlagEnvironmentAttributes>
   ): Promise<FeatureFlagEnvironmentAttributes> {
     try {
@@ -727,11 +731,11 @@ export class FeatureFlagEnvironmentModel {
       }
 
       // Upsert - create if not exists
-      const existing = await this.findByFlagIdAndEnvironment(flagId, environment);
+      const existing = await this.findByFlagIdAndEnvironment(flagId, environmentId);
       if (!existing) {
         return this.create({
           flagId,
-          environment,
+          environmentId,
           isEnabled: data.isEnabled ?? false,
           enabledValue:
             data.enabledValue !== undefined
@@ -757,12 +761,12 @@ export class FeatureFlagEnvironmentModel {
 
       await db('g_feature_flag_environments')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update(updateData);
 
       return this.findByFlagIdAndEnvironment(
         flagId,
-        environment
+        environmentId
       ) as Promise<FeatureFlagEnvironmentAttributes>;
     } catch (error) {
       logger.error('Error updating flag environment:', error);
@@ -770,11 +774,11 @@ export class FeatureFlagEnvironmentModel {
     }
   }
 
-  static async delete(flagId: string, environment: string): Promise<void> {
+  static async delete(flagId: string, environmentId: string): Promise<void> {
     try {
       await db('g_feature_flag_environments')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .del();
     } catch (error) {
       logger.error('Error deleting flag environment:', error);
@@ -807,12 +811,12 @@ export class FeatureStrategyModel {
    */
   static async findByFlagIdAndEnvironment(
     flagId: string,
-    environment: string
+    environmentId: string
   ): Promise<FeatureStrategyAttributes[]> {
     try {
       const strategies = await db('g_feature_strategies')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .orderBy('sortOrder', 'asc');
 
       return this.enrichStrategiesWithSegments(strategies);
@@ -875,7 +879,7 @@ export class FeatureStrategyModel {
       await db('g_feature_strategies').insert({
         id,
         flagId: data.flagId,
-        environment: data.environment,
+        environmentId: data.environmentId,
         strategyName: data.strategyName,
         title: data.title || null,
         parameters: data.parameters ? JSON.stringify(data.parameters) : null,
@@ -947,12 +951,12 @@ export class FeatureVariantModel {
 
   static async findByFlagIdAndEnvironment(
     flagId: string,
-    environment: string
+    environmentId: string
   ): Promise<FeatureVariantAttributes[]> {
     try {
       const variants = await db('g_feature_variants')
         .where('flagId', flagId)
-        .where('environment', environment);
+        .where('environmentId', environmentId);
 
       return variants.map((v: any) => ({
         ...v,
@@ -972,7 +976,7 @@ export class FeatureVariantModel {
       await db('g_feature_variants').insert({
         id,
         flagId: data.flagId,
-        environment: data.environment,
+        environmentId: data.environmentId,
         variantName: data.variantName,
         weight: data.weight,
         value: data.value !== null && data.value !== undefined ? JSON.stringify(data.value) : null,
@@ -1002,11 +1006,11 @@ export class FeatureVariantModel {
     }
   }
 
-  static async deleteByFlagIdAndEnvironment(flagId: string, environment: string): Promise<void> {
+  static async deleteByFlagIdAndEnvironment(flagId: string, environmentId: string): Promise<void> {
     try {
       await db('g_feature_variants')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .del();
     } catch (error) {
       logger.error('Error deleting variants:', error);
@@ -1189,7 +1193,7 @@ export class FeatureSegmentModel {
    * Get detailed references for a segment (flags and release templates that use it)
    */
   static async getReferences(id: string): Promise<{
-    flags: { flagName: string; environment: string; strategyName: string }[];
+    flags: { flagName: string; environmentId: string; strategyName: string }[];
     templates: { flowName: string; id: string; milestoneName: string }[];
   }> {
     try {
@@ -1199,8 +1203,8 @@ export class FeatureSegmentModel {
         .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
         .where('ffs.segmentId', id)
         .where('ff.isArchived', false)
-        .select('ff.flagName', 'fs.environment', 'fs.strategyName')
-        .groupBy('ff.flagName', 'fs.environment', 'fs.strategyName');
+        .select('ff.flagName', 'fs.environmentId', 'fs.strategyName')
+        .groupBy('ff.flagName', 'fs.environmentId', 'fs.strategyName');
 
       // Find release flow templates referencing this segment
       const templateRows = await db('g_release_flow_strategy_segments as rss')
@@ -1216,7 +1220,7 @@ export class FeatureSegmentModel {
       return {
         flags: flagRows.map((r: any) => ({
           flagName: r.flagName,
-          environment: r.environment,
+          environmentId: r.environmentId,
           strategyName: r.strategyName,
         })),
         templates: templateRows.map((r: any) => ({
@@ -1380,7 +1384,7 @@ export class FeatureContextFieldModel {
    * Searches strategy constraints, segment constraints, and release template strategy constraints
    */
   static async getReferences(fieldName: string): Promise<{
-    flags: { flagName: string; environment: string; strategyName: string }[];
+    flags: { flagName: string; environmentId: string; strategyName: string }[];
     segments: { segmentName: string; id: string }[];
     templates: { flowName: string; id: string; milestoneName: string }[];
   }> {
@@ -1394,8 +1398,8 @@ export class FeatureContextFieldModel {
         .whereRaw(`JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`, [
           fieldName,
         ])
-        .select('ff.flagName', 'fs.environment', 'fs.strategyName')
-        .groupBy('ff.flagName', 'fs.environment', 'fs.strategyName');
+        .select('ff.flagName', 'fs.environmentId', 'fs.strategyName')
+        .groupBy('ff.flagName', 'fs.environmentId', 'fs.strategyName');
 
       // Find segments referencing this context field in their constraints
       const segmentRows = await db('g_feature_segments')
@@ -1423,7 +1427,7 @@ export class FeatureContextFieldModel {
       return {
         flags: flagRows.map((r: any) => ({
           flagName: r.flagName,
-          environment: r.environment,
+          environmentId: r.environmentId,
           strategyName: r.strategyName,
         })),
         segments: segmentRows.map((r: any) => ({
@@ -1447,7 +1451,7 @@ export class FeatureContextFieldModel {
 
 export class FeatureMetricsModel {
   static async recordMetrics(
-    environment: string,
+    environmentId: string,
     flagName: string,
     enabled: boolean,
     variantName?: string
@@ -1458,7 +1462,7 @@ export class FeatureMetricsModel {
       const id = ulid();
 
       await db.raw(
-        `INSERT INTO g_feature_metrics (id, environment, flagName, metricsBucket, yesCount, noCount, variantCounts)
+        `INSERT INTO g_feature_metrics (id, environmentId, flagName, metricsBucket, yesCount, noCount, variantCounts)
          VALUES (?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
            yesCount = yesCount + VALUES(yesCount),
@@ -1470,7 +1474,7 @@ export class FeatureMetricsModel {
            )`,
         [
           id,
-          environment,
+          environmentId,
           flagName,
           bucket,
           enabled ? 1 : 0,
@@ -1484,7 +1488,7 @@ export class FeatureMetricsModel {
   }
 
   static async getMetrics(
-    environment: string,
+    environmentId: string,
     flagName: string,
     startDate: Date,
     endDate: Date,
@@ -1493,7 +1497,7 @@ export class FeatureMetricsModel {
     try {
       // Build base query for main metrics
       let metricsQuery = db('g_feature_metrics')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where('flagName', flagName)
         .whereBetween('metricsBucket', [startDate, endDate]);
 
@@ -1510,7 +1514,7 @@ export class FeatureMetricsModel {
 
       // Build variant metrics query with same appName filter
       let variantQuery = db('g_feature_variant_metrics')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where('flagName', flagName)
         .whereBetween('metricsBucket', [startDate, endDate]);
 
@@ -1557,14 +1561,14 @@ export class FeatureMetricsModel {
    * Get distinct app names used in metrics for a flag
    */
   static async getAppNames(
-    environment: string,
+    environmentId: string,
     flagName: string,
     startDate: Date,
     endDate: Date
   ): Promise<string[]> {
     try {
       const result = await db('g_feature_metrics')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where('flagName', flagName)
         .whereBetween('metricsBucket', [startDate, endDate])
         .whereNotNull('appName')

@@ -139,7 +139,7 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [platform, branch, environment, stack]
+ *             required: [platform, branch, environmentId, stack]
  *             properties:
  *               platform: { type: string }
  *               branch: { type: string }
@@ -405,7 +405,7 @@ router.post(
   clientSDKAuth,
   body('platform').isString().notEmpty(),
   body('branch').isString().notEmpty(),
-  body('environment').isString().notEmpty(),
+  body('environmentId').isString().notEmpty(),
   body('stack').isString().notEmpty(),
   body('marketType').optional({ nullable: true }).isString(),
   body('isEditor').optional({ nullable: true }).isBoolean(),

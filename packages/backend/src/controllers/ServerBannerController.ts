@@ -17,9 +17,9 @@ export class ServerBannerController {
    */
   static async getBanners(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -30,14 +30,14 @@ export class ServerBannerController {
       }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.BANNER_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          const banners = await BannerModel.findPublished(environment);
+          const banners = await BannerModel.findPublished(environmentId);
 
           logger.info(
-            `Server SDK: Retrieved ${banners.length} published banners for environment ${environment}`
+            `Server SDK: Retrieved ${banners.length} published banners for environmentId ${environmentId}`
           );
 
           return {
@@ -68,9 +68,9 @@ export class ServerBannerController {
   static async getBannerById(req: EnvironmentRequest, res: Response) {
     try {
       const { bannerId } = req.params;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -91,7 +91,7 @@ export class ServerBannerController {
         });
       }
 
-      const banner = await BannerModel.findById(bannerId, environment);
+      const banner = await BannerModel.findById(bannerId, environmentId);
 
       if (!banner) {
         return res.status(404).json({
@@ -114,7 +114,7 @@ export class ServerBannerController {
         });
       }
 
-      logger.info(`Server SDK: Retrieved banner ${bannerId} for environment ${environment}`);
+      logger.info(`Server SDK: Retrieved banner ${bannerId} for environmentId ${environmentId}`);
 
       res.json({
         success: true,

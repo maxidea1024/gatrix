@@ -18,10 +18,10 @@ router.use(authenticate as any);
  */
 router.post('/acquire', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { table, entityId, environment } = req.body;
+    const { table, entityId, environmentId } = req.body;
     const user = (req as any).user;
 
-    if (!table || !entityId || !environment) {
+    if (!table || !entityId || !environmentId) {
       return res.status(400).json({
         error: 'Missing required fields: table, entityId, environment',
       });
@@ -30,7 +30,7 @@ router.post('/acquire', async (req: Request, res: Response, next: NextFunction) 
     const result = await entityLockService.acquireLock(
       table,
       entityId,
-      environment,
+      environmentId,
       user.id,
       user.name || user.email,
       user.email
@@ -62,10 +62,10 @@ router.post('/acquire', async (req: Request, res: Response, next: NextFunction) 
  */
 router.post('/force-acquire', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { table, entityId, environment } = req.body;
+    const { table, entityId, environmentId } = req.body;
     const user = (req as any).user;
 
-    if (!table || !entityId || !environment) {
+    if (!table || !entityId || !environmentId) {
       return res.status(400).json({
         error: 'Missing required fields: table, entityId, environment',
       });
@@ -74,7 +74,7 @@ router.post('/force-acquire', async (req: Request, res: Response, next: NextFunc
     const success = await entityLockService.forceAcquireLock(
       table,
       entityId,
-      environment,
+      environmentId,
       user.id,
       user.name || user.email,
       user.email
@@ -95,16 +95,16 @@ router.post('/force-acquire', async (req: Request, res: Response, next: NextFunc
  */
 router.post('/release', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { table, entityId, environment } = req.body;
+    const { table, entityId, environmentId } = req.body;
     const user = (req as any).user;
 
-    if (!table || !entityId || !environment) {
+    if (!table || !entityId || !environmentId) {
       return res.status(400).json({
         error: 'Missing required fields: table, entityId, environment',
       });
     }
 
-    const success = await entityLockService.releaseLock(table, entityId, environment, user.id);
+    const success = await entityLockService.releaseLock(table, entityId, environmentId, user.id);
 
     return res.json({
       success,
@@ -121,16 +121,16 @@ router.post('/release', async (req: Request, res: Response, next: NextFunction) 
  */
 router.post('/extend', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { table, entityId, environment } = req.body;
+    const { table, entityId, environmentId } = req.body;
     const user = (req as any).user;
 
-    if (!table || !entityId || !environment) {
+    if (!table || !entityId || !environmentId) {
       return res.status(400).json({
         error: 'Missing required fields: table, entityId, environment',
       });
     }
 
-    const success = await entityLockService.extendLock(table, entityId, environment, user.id);
+    const success = await entityLockService.extendLock(table, entityId, environmentId, user.id);
 
     return res.json({ success });
   } catch (error) {
@@ -144,17 +144,21 @@ router.post('/extend', async (req: Request, res: Response, next: NextFunction) =
  */
 router.get('/check', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { table, entityId, environment } = req.query;
+    const { table, entityId, environmentId } = req.query;
 
-    if (!table || !entityId || !environment) {
+    if (!table || !entityId || !environmentId) {
       return res.status(400).json({
         error: 'Missing required query params: table, entityId, environment',
       });
     }
 
     const [lockInfo, pendingCR] = await Promise.all([
-      entityLockService.checkLock(table as string, entityId as string, environment as string),
-      entityLockService.checkPendingCR(table as string, entityId as string, environment as string),
+      entityLockService.checkLock(table as string, entityId as string, environmentId as string),
+      entityLockService.checkPendingCR(
+        table as string,
+        entityId as string,
+        environmentId as string
+      ),
     ]);
 
     return res.json({

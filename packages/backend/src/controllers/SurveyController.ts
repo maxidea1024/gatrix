@@ -31,7 +31,7 @@ function normalizeParticipationRewards(rawItems: any[] | null | undefined): Serv
 
 async function buildParticipationRewardsForServerSurvey(
   survey: any,
-  environment: string
+  environmentId: string
 ): Promise<ServerReward[] | null> {
   if (Array.isArray(survey.participationRewards) && survey.participationRewards.length > 0) {
     return normalizeParticipationRewards(survey.participationRewards);
@@ -40,7 +40,7 @@ async function buildParticipationRewardsForServerSurvey(
   if (survey.rewardTemplateId) {
     const template = await RewardTemplateService.getRewardTemplateById(
       survey.rewardTemplateId,
-      environment
+      environmentId
     );
     return normalizeParticipationRewards(template.rewardItems);
   }
@@ -55,9 +55,9 @@ export class SurveyController {
    */
   static getSurveys = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, isActive, search } = req.query;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -66,7 +66,7 @@ export class SurveyController {
       limit: limit ? parseInt(limit as string) : undefined,
       isActive: isActive !== undefined ? isActive === 'true' : undefined,
       search: search as string,
-      environment,
+      environmentId,
     });
 
     res.json({
@@ -82,16 +82,16 @@ export class SurveyController {
    */
   static getSurveyById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Survey ID is required', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const survey = await SurveyService.getSurveyById(id, environment);
+    const survey = await SurveyService.getSurveyById(id, environmentId);
 
     res.json({
       success: true,
@@ -106,16 +106,16 @@ export class SurveyController {
    */
   static getSurveyByPlatformId = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platformSurveyId } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!platformSurveyId) {
       throw new GatrixError('Platform survey ID is required', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const survey = await SurveyService.getSurveyByPlatformId(platformSurveyId, environment);
+    const survey = await SurveyService.getSurveyByPlatformId(platformSurveyId, environmentId);
 
     res.json({
       success: true,
@@ -131,24 +131,24 @@ export class SurveyController {
   static createSurvey = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const authenticatedUserId =
       (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!authenticatedUserId) {
       throw new GatrixError('User authentication required', 401);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
     const surveyData = {
       ...req.body,
       createdBy: authenticatedUserId,
-      environment,
+      environmentId,
     };
 
     const result = await UnifiedChangeGateway.requestCreation(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_surveys',
       { ...req.body },
       async () => {
@@ -161,7 +161,7 @@ export class SurveyController {
           targetChannels: ['survey', 'admin'],
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environmentId}`);
         return survey;
       }
     );
@@ -187,12 +187,12 @@ export class SurveyController {
     const { id } = req.params;
     const authenticatedUserId =
       (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Survey ID is required', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -203,7 +203,7 @@ export class SurveyController {
 
     const result = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_surveys',
       id,
       { ...req.body },
@@ -211,7 +211,7 @@ export class SurveyController {
         const survey = await SurveyService.updateSurvey(
           id,
           { ...processedData, updatedBy: authenticatedUserId },
-          environment
+          environmentId
         );
 
         // Publish event for SDK real-time updates
@@ -221,7 +221,7 @@ export class SurveyController {
           targetChannels: ['survey', 'admin'],
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environmentId}`);
 
         return { survey };
       }
@@ -248,21 +248,21 @@ export class SurveyController {
    */
   static deleteSurvey = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
     const authenticatedUserId =
       (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     if (!authenticatedUserId) throw new GatrixError('User authentication required', 401);
 
     if (!id) throw new GatrixError('Survey ID is required', 400);
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
     const result = await UnifiedChangeGateway.requestDeletion(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_surveys',
       id,
       async () => {
-        await SurveyService.deleteSurvey(id, environment);
+        await SurveyService.deleteSurvey(id, environmentId);
 
         // Publish event for SDK real-time updates
         await pubSubService.publishNotification({
@@ -271,7 +271,7 @@ export class SurveyController {
           targetChannels: ['survey', 'admin'],
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environmentId}`);
       }
     );
 
@@ -293,18 +293,18 @@ export class SurveyController {
     const { id } = req.params;
     const authenticatedUserId =
       (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!id) {
       throw new GatrixError('Survey ID is required', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
     const result = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_surveys',
       id,
       async (currentSurvey: any) => {
@@ -317,10 +317,10 @@ export class SurveyController {
             isActive: (processedData as any).isActive,
             updatedBy: authenticatedUserId,
           },
-          environment
+          environmentId
         );
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environmentId}`);
         return { survey };
       }
     );
@@ -345,11 +345,11 @@ export class SurveyController {
    * GET /api/v1/admin/surveys/config
    */
   static getSurveyConfig = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
-    const config = await SurveyService.getSurveyConfig(environment);
+    const config = await SurveyService.getSurveyConfig(environmentId);
 
     res.json({
       success: true,
@@ -363,14 +363,14 @@ export class SurveyController {
    * PUT /api/v1/admin/surveys/config
    */
   static updateSurveyConfig = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
-    const config = await SurveyService.updateSurveyConfig(req.body, environment);
+    const config = await SurveyService.updateSurveyConfig(req.body, environmentId);
 
-    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEY_SETTINGS}:${environment}`);
-    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environment}`);
+    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEY_SETTINGS}:${environmentId}`);
+    await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SURVEYS}:${environmentId}`);
 
     res.json({
       success: true,
@@ -385,13 +385,13 @@ export class SurveyController {
    * Returns only the survey configuration settings
    */
   static getServerSurveySettings = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
-    const environment = req.environment!;
+    const environmentId = req.environmentId!;
     await respondWithEtagCache(res, {
-      cacheKey: `${SERVER_SDK_ETAG.SURVEY_SETTINGS}:${environment}`,
+      cacheKey: `${SERVER_SDK_ETAG.SURVEY_SETTINGS}:${environmentId}`,
       ttlMs: DEFAULT_CONFIG.SURVEY_SETTINGS_TTL,
       requestEtag: req.headers['if-none-match'],
       buildPayload: async () => {
-        const config = await SurveyService.getSurveyConfig(environment);
+        const config = await SurveyService.getSurveyConfig(environmentId);
 
         const settings = {
           defaultSurveyUrl: config.baseSurveyUrl,
@@ -414,9 +414,9 @@ export class SurveyController {
    * Returns surveys with common settings
    */
   static getServerSurveys = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
-    const environment = req.environment!;
+    const environmentId = req.environmentId!;
     await respondWithEtagCache(res, {
-      cacheKey: `${SERVER_SDK_ETAG.SURVEYS}:${environment}`,
+      cacheKey: `${SERVER_SDK_ETAG.SURVEYS}:${environmentId}`,
       ttlMs: DEFAULT_CONFIG.SURVEYS_TTL,
       requestEtag: req.headers['if-none-match'],
       buildPayload: async () => {
@@ -424,18 +424,18 @@ export class SurveyController {
           page: 1,
           limit: 1000,
           isActive: true,
-          environment,
+          environmentId,
         });
 
         // Get survey configuration
-        const config = await SurveyService.getSurveyConfig(environment);
+        const config = await SurveyService.getSurveyConfig(environmentId);
 
         // Filter out fields not needed by SDK and resolve participation rewards
         const filteredSurveys = await Promise.all(
           result.surveys.map(async (survey: any) => {
             const participationRewards = await buildParticipationRewardsForServerSurvey(
               survey,
-              environment
+              environmentId
             );
 
             return {
@@ -482,21 +482,21 @@ export class SurveyController {
    */
   static getServerSurveyById = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment!;
+    const environmentId = req.environmentId!;
 
     if (!id) {
       throw new GatrixError('Survey ID is required', 400);
     }
 
-    const survey: any = await SurveyService.getSurveyById(id, environment);
+    const survey: any = await SurveyService.getSurveyById(id, environmentId);
 
     // Get survey configuration
-    const config = await SurveyService.getSurveyConfig(environment);
+    const config = await SurveyService.getSurveyConfig(environmentId);
 
     // Resolve participation rewards
     const participationRewards = await buildParticipationRewardsForServerSurvey(
       survey,
-      environment
+      environmentId
     );
 
     // Format survey for Server SDK response (same format as getServerSurveys)

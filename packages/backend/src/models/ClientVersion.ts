@@ -3,7 +3,7 @@ import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export interface ClientVersionFilters {
-  environment: string;
+  environmentId: string;
   clientVersion?: string | string[];
   platform?: string | string[];
   clientStatus?: string | string[];
@@ -33,7 +33,7 @@ export enum ClientStatus {
 
 export interface ClientVersionAttributes {
   id?: string;
-  environment: string;
+  environmentId: string;
   clientVersion: string;
   platform: string;
   clientStatus: ClientStatus;
@@ -82,11 +82,11 @@ export interface BulkCreateClientVersionRequest {
 
 export class ClientVersionModel {
   // 사용 가능한 버전 목록 조회 (distinct)
-  static async getDistinctVersions(environment: string): Promise<string[]> {
+  static async getDistinctVersions(environmentId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('clientVersion')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .orderBy('clientVersion', 'desc');
 
       return result.map((row) => row.clientVersion);
@@ -103,14 +103,14 @@ export class ClientVersionModel {
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
-      const environment = filters.environment;
+      const environmentId = filters.environmentId;
 
       // 기본 쿼리 빌더 with environment filter
       const baseQuery = () =>
         db('g_client_versions as cv')
           .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
-          .where('cv.environment', environment);
+          .where('cv.environmentId', environmentId);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -228,7 +228,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async findById(id: string, environment: string, trx?: any): Promise<any | null> {
+  static async findById(id: string, environmentId: string, trx?: any): Promise<any | null> {
     try {
       const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
       const clientVersion = await query
@@ -242,7 +242,7 @@ export class ClientVersionModel {
           'updater.email as updatedByEmail',
         ])
         .where('cv.id', id)
-        .where('cv.environment', environment)
+        .where('cv.environmentId', environmentId)
         .first();
 
       if (!clientVersion) {
@@ -271,7 +271,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async create(data: any, environment: string): Promise<any> {
+  static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -282,7 +282,7 @@ export class ClientVersionModel {
         await trx('g_client_versions').insert({
           id,
           ...clientVersionData,
-          environment: environment,
+          environmentId: environmentId,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -302,7 +302,7 @@ export class ClientVersionModel {
           await trx('g_client_version_maintenance_locales').insert(localeInserts);
         }
 
-        return await this.findById(id, environment, trx);
+        return await this.findById(id, environmentId, trx);
       });
     } catch (error) {
       logger.error('Error creating client version:', error);
@@ -310,7 +310,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async update(id: string, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -318,7 +318,7 @@ export class ClientVersionModel {
 
         await trx('g_client_versions')
           .where('id', id)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .update({
             ...clientVersionData,
             updatedAt: new Date(),
@@ -345,7 +345,7 @@ export class ClientVersionModel {
           }
         }
 
-        return await this.findById(id, environment, trx);
+        return await this.findById(id, environmentId, trx);
       });
     } catch (error) {
       logger.error('Error updating client version:', error);
@@ -353,9 +353,9 @@ export class ClientVersionModel {
     }
   }
 
-  static async delete(id: string, environment: string): Promise<void> {
+  static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_client_versions').where('id', id).where('environment', environment).del();
+      await db('g_client_versions').where('id', id).where('environmentId', environmentId).del();
     } catch (error) {
       logger.error('Error deleting client version:', error);
       throw error;
@@ -365,7 +365,7 @@ export class ClientVersionModel {
   // 추가 메서드들
   static async bulkCreate(
     data: ClientVersionCreationAttributes[],
-    environment: string
+    environmentId: string
   ): Promise<any> {
     try {
       const insertedIds: string[] = [];
@@ -381,7 +381,7 @@ export class ClientVersionModel {
           await trx('g_client_versions').insert({
             id,
             ...clientVersionData,
-            environment: environment,
+            environmentId: environmentId,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
@@ -392,7 +392,7 @@ export class ClientVersionModel {
       // 트랜잭션 완료 후 생성된 데이터 조회
       const results = [];
       for (const cvId of insertedIds) {
-        const clientVersion = await this.findById(cvId, environment);
+        const clientVersion = await this.findById(cvId, environmentId);
         if (clientVersion) {
           results.push(clientVersion);
         } else {
@@ -409,7 +409,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async bulkUpdateStatus(data: any, environment: string): Promise<any> {
+  static async bulkUpdateStatus(data: any, environmentId: string): Promise<any> {
     try {
       const updateData: any = {
         clientStatus: data.clientStatus,
@@ -436,7 +436,7 @@ export class ClientVersionModel {
 
       await db('g_client_versions')
         .whereIn('id', data.ids)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update(updateData);
 
       // 언어별 메시지 처리
@@ -471,12 +471,12 @@ export class ClientVersionModel {
     }
   }
 
-  static async getPlatforms(environment: string): Promise<string[]> {
+  static async getPlatforms(environmentId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('platform')
         .select('platform')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .whereNotNull('platform')
         .orderBy('platform');
       return result.map((row) => row.platform);
@@ -490,17 +490,17 @@ export class ClientVersionModel {
     platform: string,
     clientVersion: string,
     excludeId?: string,
-    environment?: string
+    environmentId?: string
   ): Promise<boolean> {
     try {
-      if (!environment) {
+      if (!environmentId) {
         throw new Error('Environment is required for checking duplicate client versions');
       }
 
       let query = db('g_client_versions')
         .where('platform', platform)
         .where('clientVersion', clientVersion)
-        .where('environment', environment);
+        .where('environmentId', environmentId);
 
       if (excludeId) {
         query = query.where('id', '!=', excludeId);

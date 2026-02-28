@@ -11,8 +11,8 @@ export class VarsController {
   static async getVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environment = req.environment || 'development';
-      const value = await VarsModel.get(key, environment);
+      const environmentId = req.environmentId || 'development';
+      const value = await VarsModel.get(key, environmentId);
       res.json({ success: true, data: { key, value } });
     } catch (e) {
       next(e);
@@ -22,7 +22,7 @@ export class VarsController {
   static async setVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
       const incoming = req.body?.value ?? null;
       let toStore: string | null = null;
       if (incoming === null || incoming === undefined) {
@@ -33,17 +33,17 @@ export class VarsController {
         toStore = JSON.stringify(incoming);
       }
       const userId = req.user?.userId || (req as any).user?.id || 1;
-      await VarsModel.set(key, toStore, userId, environment);
+      await VarsModel.set(key, toStore, userId, environmentId);
 
       // Clear cache
-      await VarsService.clearCache(key, environment);
+      await VarsService.clearCache(key, environmentId);
 
       // Publish update event for SDKs
       await pubSubService.publishSDKEvent({
         type: 'vars.updated',
         data: {
           key: key,
-          environment: environment,
+          environmentId: environmentId,
         },
       });
 
@@ -66,8 +66,8 @@ export class VarsController {
           await pubSubService.publishSDKEvent({
             type: 'client_version.updated',
             data: {
-              id: -1, // Dummy ID to trigger refresh of the list for this environment
-              environment: environment,
+              id: -1, // Dummy ID to trigger refresh of the list for this environmentId
+              environmentId: environmentId,
             },
           });
         } catch (err) {
@@ -93,8 +93,8 @@ export class VarsController {
    */
   static async getAllKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const environment = req.environment || 'development';
-      const items = await VarsService.getAllKV(environment);
+      const environmentId = req.environmentId || 'development';
+      const items = await VarsService.getAllKV(environmentId);
       res.json({ success: true, data: items });
     } catch (e) {
       next(e);
@@ -107,14 +107,14 @@ export class VarsController {
    */
   static async getServerVars(req: SDKRequest, res: Response, next: NextFunction) {
     try {
-      const environment = req.params.env || req.environment || 'development';
+      const environmentId = req.params.env || req.environmentId || 'development';
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.VARS}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.VARS}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.VARS_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          const items = await VarsService.getAllKV(environment);
+          const items = await VarsService.getAllKV(environmentId);
           return { success: true, data: items };
         },
       });
@@ -130,9 +130,9 @@ export class VarsController {
   static async getKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
-      const item = await VarsModel.getKV(fullKey, environment);
+      const item = await VarsModel.getKV(fullKey, environmentId);
 
       if (!item) {
         return res.status(404).json({ success: false, message: 'KV item not found' });
@@ -157,7 +157,7 @@ export class VarsController {
   static async createKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { varKey, varValue, valueType, description } = req.body;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
 
       if (!varKey || !valueType) {
         return res.status(400).json({
@@ -171,18 +171,18 @@ export class VarsController {
       const item = await VarsModel.createKV(
         { varKey, varValue, valueType, description },
         userId,
-        environment
+        environmentId
       );
 
       // Clear cache
-      await VarsService.clearCache(item.varKey, environment);
+      await VarsService.clearCache(item.varKey, environmentId);
 
       // Publish update event for SDKs
       await pubSubService.publishSDKEvent({
         type: 'vars.updated',
         data: {
           key: item.varKey,
-          environment: environment,
+          environmentId: environmentId,
         },
       });
 
@@ -210,7 +210,7 @@ export class VarsController {
   static async updateKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const { varValue, valueType, description } = req.body;
 
@@ -219,18 +219,18 @@ export class VarsController {
         fullKey,
         { varValue, valueType, description },
         userId,
-        environment
+        environmentId
       );
 
       // Clear cache
-      await VarsService.clearCache(fullKey, environment);
+      await VarsService.clearCache(fullKey, environmentId);
 
       // Publish update event for SDKs
       await pubSubService.publishSDKEvent({
         type: 'vars.updated',
         data: {
           key: fullKey,
-          environment: environment,
+          environmentId: environmentId,
         },
       });
 
@@ -256,8 +256,8 @@ export class VarsController {
           await pubSubService.publishSDKEvent({
             type: 'client_version.updated',
             data: {
-              id: -1, // Dummy ID to trigger refresh of the list for this environment
-              environment: environment,
+              id: -1, // Dummy ID to trigger refresh of the list for this environmentId
+              environmentId: environmentId,
             },
           });
         } catch (err) {
@@ -314,20 +314,20 @@ export class VarsController {
   static async deleteKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
-      await VarsModel.deleteKV(fullKey, environment);
+      await VarsModel.deleteKV(fullKey, environmentId);
 
       // Clear cache
-      await VarsService.clearCache(fullKey, environment);
+      await VarsService.clearCache(fullKey, environmentId);
 
       // Publish update event for SDKs
       await pubSubService.publishSDKEvent({
         type: 'vars.updated',
         data: {
           key: fullKey,
-          environment: environment,
+          environmentId: environmentId,
         },
       });
 

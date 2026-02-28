@@ -319,13 +319,13 @@ export class UserModel {
         userIds.length > 0
           ? await db('g_user_environments')
               .whereIn('userId', userIds)
-              .select('userId', 'environment')
+              .select('userId', 'environmentId')
           : [];
 
       // Group environment names by user
       const envByUser = envAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.userId]) acc[env.userId] = [];
-        acc[env.userId].push(env.environment);
+        acc[env.userId].push(env.environmentId);
         return acc;
       }, {});
 
@@ -560,12 +560,12 @@ export class UserModel {
 
       // Get specific environment assignments
       const environments = await db('g_user_environments')
-        .select('environment')
+        .select('environmentId')
         .where('userId', userId);
 
       return {
         allowAllEnvironments: !!user.allowAllEnvironments,
-        environments: environments.map((e: any) => e.environment),
+        environments: environments.map((e: any) => e.environmentId),
       };
     } catch (error) {
       logger.error('Error getting user environment access:', error);
@@ -596,9 +596,9 @@ export class UserModel {
 
         // Add new environment assignments (only if not allowAllEnvironments)
         if (!allowAllEnvironments && environments.length > 0) {
-          const assignments = environments.map((environment) => ({
+          const assignments = environments.map((envId) => ({
             userId,
-            environment,
+            environmentId: envId,
             createdBy: updatedBy,
             createdAt: new Date(),
           }));
@@ -615,7 +615,7 @@ export class UserModel {
   /**
    * Check if user has access to a specific environment
    */
-  static async hasEnvironmentAccess(userId: string, environment: string): Promise<boolean> {
+  static async hasEnvironmentAccess(userId: string, environmentId: string): Promise<boolean> {
     try {
       const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
 
@@ -631,7 +631,7 @@ export class UserModel {
       // Check specific environment assignment
       const assignment = await db('g_user_environments')
         .where('userId', userId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .first();
 
       return !!assignment;
@@ -657,10 +657,10 @@ export class UserModel {
       }
 
       const environments = await db('g_user_environments')
-        .select('environment')
+        .select('environmentId')
         .where('userId', userId);
 
-      return environments.map((e: any) => e.environment);
+      return environments.map((e: any) => e.environmentId);
     } catch (error) {
       logger.error('Error getting accessible environment names:', error);
       return [];

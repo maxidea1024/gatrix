@@ -62,7 +62,7 @@ export class CouponRedeemService {
   static async redeemCoupon(
     code: string,
     request: RedeemRequest,
-    environment: string
+    environmentId: string
   ): Promise<RedeemResponse> {
     // Validate input
     if (!request.userId || !request.userName) {
@@ -89,7 +89,7 @@ export class CouponRedeemService {
       // 1. First try to find in g_coupons (NORMAL coupon)
       const coupon = await trx('g_coupons')
         .where('code', code)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .forUpdate()
         .first();
 
@@ -114,13 +114,13 @@ export class CouponRedeemService {
         // Get coupon setting
         setting = await trx('g_coupon_settings')
           .where('id', coupon.settingId)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .first();
       } else {
         // Not found in g_coupons, try SPECIAL coupon in g_coupon_settings
         setting = await trx('g_coupon_settings')
           .where('code', code)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .where('type', 'SPECIAL')
           .forUpdate()
           .first();
@@ -263,7 +263,7 @@ export class CouponRedeemService {
         userId: request.userId,
         settingId: setting.id,
         sequence,
-        environment,
+        environmentId,
         isSpecialCoupon,
       });
 
@@ -273,7 +273,7 @@ export class CouponRedeemService {
       if (setting.rewardTemplateId) {
         const template = await trx('g_reward_templates')
           .where('id', setting.rewardTemplateId)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .select('rewardItems')
           .first();
 

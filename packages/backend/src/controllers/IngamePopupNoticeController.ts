@@ -74,13 +74,13 @@ class IngamePopupNoticeController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const filters: IngamePopupNoticeFilters = { environment };
+      const filters: IngamePopupNoticeFilters = { environmentId };
 
       if (req.query.isActive !== undefined) {
         filters.isActive = req.query.isActive === 'true';
@@ -134,13 +134,13 @@ class IngamePopupNoticeController {
   async getIngamePopupNoticeById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
-      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environmentId);
 
       if (!notice) {
         return sendNotFound(res, 'Ingame popup notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -158,9 +158,9 @@ class IngamePopupNoticeController {
    */
   async createIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
@@ -182,14 +182,14 @@ class IngamePopupNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.requestCreation(
         createdBy,
-        environment,
+        environmentId,
         'g_ingame_popup_notices',
-        { ...data, environment },
+        { ...data, environmentId },
         async () => {
           const notice = await IngamePopupNoticeService.createIngamePopupNotice(
             data,
             createdBy,
-            environment
+            environmentId
           );
 
           // Publish event for SDK real-time updates
@@ -199,7 +199,7 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
 
           return notice;
         }
@@ -234,9 +234,9 @@ class IngamePopupNoticeController {
   async updateIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
@@ -258,7 +258,7 @@ class IngamePopupNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.processChange(
         updatedBy,
-        environment,
+        environmentId,
         'g_ingame_popup_notices',
         id,
         data,
@@ -267,7 +267,7 @@ class IngamePopupNoticeController {
             id,
             processedData as any,
             updatedBy,
-            environment
+            environmentId
           );
 
           // Publish event for SDK real-time updates
@@ -277,7 +277,7 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
 
           return notice;
         }
@@ -311,10 +311,10 @@ class IngamePopupNoticeController {
   async deleteIngamePopupNotice(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
@@ -325,11 +325,11 @@ class IngamePopupNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.requestDeletion(
         userId,
-        environment,
+        environmentId,
         'g_ingame_popup_notices',
         id,
         async () => {
-          await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
+          await IngamePopupNoticeService.deleteIngamePopupNotice(id, environmentId);
 
           // Publish event for SDK real-time updates
           await pubSubService.publishNotification({
@@ -338,7 +338,7 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
         }
       );
 
@@ -370,9 +370,9 @@ class IngamePopupNoticeController {
   ) {
     try {
       const { ids } = req.body;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
@@ -382,7 +382,7 @@ class IngamePopupNoticeController {
       }
 
       // Check if CR is required
-      const requiresCR = await UnifiedChangeGateway.requiresApproval(environment);
+      const requiresCR = await UnifiedChangeGateway.requiresApproval(environmentId);
 
       if (requiresCR) {
         // Create individual CRs for each item
@@ -390,11 +390,11 @@ class IngamePopupNoticeController {
         for (const id of ids) {
           const gatewayResult = await UnifiedChangeGateway.requestDeletion(
             userId,
-            environment,
+            environmentId,
             'g_ingame_popup_notices',
             id,
             async () => {
-              await IngamePopupNoticeService.deleteIngamePopupNotice(id, environment);
+              await IngamePopupNoticeService.deleteIngamePopupNotice(id, environmentId);
             }
           );
           results.push({ id, changeRequestId: gatewayResult.changeRequestId });
@@ -406,8 +406,8 @@ class IngamePopupNoticeController {
           message: `Change requests created for ${ids.length} notice(s). Deletions will be applied after approval.`,
         });
       } else {
-        await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environment);
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+        await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids, environmentId);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
         return sendSuccessResponse(
           res,
           undefined,
@@ -426,10 +426,10 @@ class IngamePopupNoticeController {
   async toggleActive(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment is required', 400);
       }
 
@@ -440,7 +440,7 @@ class IngamePopupNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.processChange(
         userId,
-        environment,
+        environmentId,
         'g_ingame_popup_notices',
         id,
         async (currentNotice: any) => {
@@ -451,7 +451,7 @@ class IngamePopupNoticeController {
             id,
             processedData as any,
             userId,
-            environment
+            environmentId
           );
 
           // Publish event for SDK real-time updates
@@ -461,7 +461,7 @@ class IngamePopupNoticeController {
             targetChannels: ['popup', 'admin'],
           });
 
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`);
 
           return notice;
         }
@@ -495,15 +495,15 @@ class IngamePopupNoticeController {
    */
   async getServerIngamePopupNotices(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
-      const environment = req.environment!;
+      const environmentId = req.environmentId!;
       const filters: IngamePopupNoticeFilters = {
-        environment,
+        environmentId,
         isActive: true,
         currentlyVisible: true,
       };
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.POPUP_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
@@ -541,8 +541,8 @@ class IngamePopupNoticeController {
   async getServerIngamePopupNoticeById(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environment = req.environment!;
-      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environment);
+      const environmentId = req.environmentId!;
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id, environmentId);
 
       if (!notice) {
         return sendNotFound(res, 'Ingame popup notice not found', ErrorCodes.RESOURCE_NOT_FOUND);

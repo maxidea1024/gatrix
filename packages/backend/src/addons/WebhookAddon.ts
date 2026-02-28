@@ -40,7 +40,7 @@ export class WebhookAddon extends Addon {
             data: event.data,
             preData: event.preData,
           },
-          environment: event.environment,
+          environmentId: event.environmentId,
           createdBy: event.createdBy,
           createdByUserId: event.createdByUserId,
           createdAt: event.createdAt.toISOString(),

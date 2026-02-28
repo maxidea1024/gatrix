@@ -21,8 +21,8 @@ export interface BulkCreateEntry {
 
 export class WhitelistService {
   static async getAllWhitelists(
-    environment: string,
-    filters: Omit<WhitelistFilters, 'environment'> = {},
+    environmentId: string,
+    filters: Omit<WhitelistFilters, 'environmentId'> = {},
     pagination: { page?: number; limit?: number } = {}
   ): Promise<WhitelistListResponse> {
     try {
@@ -31,7 +31,7 @@ export class WhitelistService {
 
       const result = await WhitelistModel.findAll(page, limit, {
         ...filters,
-        environment,
+        environmentId,
       });
 
       return result;
@@ -41,9 +41,9 @@ export class WhitelistService {
     }
   }
 
-  static async getWhitelistById(id: string, environment: string): Promise<Whitelist> {
+  static async getWhitelistById(id: string, environmentId: string): Promise<Whitelist> {
     try {
-      const whitelist = await WhitelistModel.findById(id, environment);
+      const whitelist = await WhitelistModel.findById(id, environmentId);
       if (!whitelist) {
         throw new GatrixError('Whitelist entry not found', 404);
       }
@@ -55,24 +55,27 @@ export class WhitelistService {
       }
       logger.error('Error getting whitelist by ID:', error, {
         id,
-        environment,
+        environmentId,
       });
       throw new GatrixError('Failed to get whitelist entry', 500);
     }
   }
 
-  static async createWhitelist(environment: string, data: CreateWhitelistData): Promise<Whitelist> {
+  static async createWhitelist(
+    environmentId: string,
+    data: CreateWhitelistData
+  ): Promise<Whitelist> {
     try {
       // Validate dates if provided
       if (data.startDate && data.endDate && data.startDate > data.endDate) {
         throw new GatrixError('Start date cannot be after end date', 400);
       }
 
-      const whitelist = await WhitelistModel.create(data, environment);
+      const whitelist = await WhitelistModel.create(data, environmentId);
 
       logger.info('Whitelist entry created successfully:', {
         id: whitelist.id,
-        environment: whitelist.environment,
+        environmentId: whitelist.environmentId,
         accountId: whitelist.accountId,
         createdBy: whitelist.createdBy,
       });
@@ -84,11 +87,11 @@ export class WhitelistService {
           data: {
             id: whitelist.id,
             timestamp: Date.now(),
-            environment,
+            environmentId,
           },
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -106,12 +109,12 @@ export class WhitelistService {
 
   static async updateWhitelist(
     id: string,
-    environment: string,
+    environmentId: string,
     data: UpdateWhitelistData
   ): Promise<Whitelist> {
     try {
       // Check if whitelist exists
-      const existing = await this.getWhitelistById(id, environment);
+      const existing = await this.getWhitelistById(id, environmentId);
 
       // Validate dates if provided
       const startDate = data.startDate !== undefined ? data.startDate : existing.startDate;
@@ -121,14 +124,14 @@ export class WhitelistService {
         throw new GatrixError('Start date cannot be after end date', 400);
       }
 
-      const updated = await WhitelistModel.update(id, data, environment);
+      const updated = await WhitelistModel.update(id, data, environmentId);
       if (!updated) {
         throw new GatrixError('Failed to update whitelist entry', 500);
       }
 
       logger.info('Whitelist entry updated successfully:', {
         id: updated.id,
-        environment: updated.environment,
+        environmentId: updated.environmentId,
         accountId: updated.accountId,
       });
 
@@ -139,11 +142,11 @@ export class WhitelistService {
           data: {
             id: updated.id,
             timestamp: Date.now(),
-            environment,
+            environmentId,
           },
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -154,24 +157,24 @@ export class WhitelistService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error('Error updating whitelist:', error, { id, environment });
+      logger.error('Error updating whitelist:', error, { id, environmentId });
       throw new GatrixError('Failed to update whitelist entry', 500);
     }
   }
 
-  static async deleteWhitelist(id: string, environment: string): Promise<void> {
+  static async deleteWhitelist(id: string, environmentId: string): Promise<void> {
     try {
       // Check if whitelist exists
-      const existing = await this.getWhitelistById(id, environment);
+      const existing = await this.getWhitelistById(id, environmentId);
 
-      const deleted = await WhitelistModel.delete(id, environment);
+      const deleted = await WhitelistModel.delete(id, environmentId);
       if (!deleted) {
         throw new GatrixError('Failed to delete whitelist entry', 500);
       }
 
       logger.info('Whitelist entry deleted successfully:', {
         id,
-        environment: existing.environment,
+        environmentId: existing.environmentId,
         accountId: existing.accountId,
       });
 
@@ -182,11 +185,11 @@ export class WhitelistService {
           data: {
             id,
             timestamp: Date.now(),
-            environment,
+            environmentId,
           },
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -195,13 +198,13 @@ export class WhitelistService {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error('Error deleting whitelist:', error, { id, environment });
+      logger.error('Error deleting whitelist:', error, { id, environmentId });
       throw new GatrixError('Failed to delete whitelist entry', 500);
     }
   }
 
   static async bulkCreateWhitelists(
-    environment: string,
+    environmentId: string,
     entries: BulkCreateEntry[],
     createdBy: string
   ): Promise<number> {
@@ -236,10 +239,10 @@ export class WhitelistService {
         isEnabled: true,
       }));
 
-      const createdCount = await WhitelistModel.bulkCreate(createData, environment);
+      const createdCount = await WhitelistModel.bulkCreate(createData, environmentId);
 
       logger.info('Bulk whitelist creation completed:', {
-        environment,
+        environmentId,
         requestedCount: entries.length,
         createdCount,
         createdBy,
@@ -252,11 +255,11 @@ export class WhitelistService {
           data: {
             id: 0,
             timestamp: Date.now(),
-            environment,
+            environmentId,
           },
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
       } catch (eventError) {
         logger.warn('Failed to invalidate whitelist ETag cache after bulk create:', eventError);
       }
@@ -276,11 +279,11 @@ export class WhitelistService {
    */
   static async toggleWhitelistStatus(
     id: string,
-    environment: string,
+    environmentId: string,
     updatedBy: string
   ): Promise<Whitelist> {
     try {
-      const existing = await this.getWhitelistById(id, environment);
+      const existing = await this.getWhitelistById(id, environmentId);
 
       const updated = await WhitelistModel.update(
         id,
@@ -288,7 +291,7 @@ export class WhitelistService {
           isEnabled: !existing.isEnabled,
           updatedBy,
         },
-        environment
+        environmentId
       );
 
       if (!updated) {
@@ -297,7 +300,7 @@ export class WhitelistService {
 
       logger.info('Account whitelist status toggled:', {
         id: updated.id,
-        environment: updated.environment,
+        environmentId: updated.environmentId,
         accountId: updated.accountId,
         isEnabled: updated.isEnabled,
         updatedBy,
@@ -310,11 +313,11 @@ export class WhitelistService {
           data: {
             id: updated.id,
             timestamp: Date.now(),
-            environment,
+            environmentId,
           },
         });
 
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -327,14 +330,14 @@ export class WhitelistService {
       }
       logger.error('Error toggling account whitelist status:', error, {
         id,
-        environment,
+        environmentId,
       });
       throw new GatrixError('Failed to toggle account whitelist status', 500);
     }
   }
 
   static async testWhitelist(
-    environment: string,
+    environmentId: string,
     accountId?: string,
     ipAddress?: string
   ): Promise<{
@@ -354,7 +357,7 @@ export class WhitelistService {
 
       // Check account whitelist
       if (accountId) {
-        const accountWhitelists = await WhitelistModel.findByAccountId(accountId, environment);
+        const accountWhitelists = await WhitelistModel.findByAccountId(accountId, environmentId);
         const now = new Date();
 
         for (const whitelist of accountWhitelists) {
@@ -384,7 +387,7 @@ export class WhitelistService {
       if (ipAddress) {
         const { IpWhitelistModel } = await import('../models/IpWhitelist');
         const ipWhitelists = await IpWhitelistModel.findAll(1, 1000, {
-          environment,
+          environmentId,
           isEnabled: true,
         });
         const now = new Date();
@@ -418,7 +421,7 @@ export class WhitelistService {
         matchedRules,
       };
     } catch (error) {
-      logger.error('Error test whitelist:', error, { environment });
+      logger.error('Error test whitelist:', error, { environmentId });
       throw new GatrixError('Failed to test whitelist', 500);
     }
   }

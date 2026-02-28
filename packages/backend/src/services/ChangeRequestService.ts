@@ -176,7 +176,7 @@ export class ChangeRequestService {
       // Block new edits when review is pending
       const pendingReview = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'open')
         .first();
 
@@ -210,7 +210,7 @@ export class ChangeRequestService {
         // Phase 2: Check if user already has a draft - enforce single draft rule
         const existingDraft = await ChangeRequest.query()
           .where('requesterId', userId)
-          .where('environment', environmentName)
+          .where('environmentId', environmentName)
           .where('status', 'draft')
           .first();
 
@@ -233,7 +233,7 @@ export class ChangeRequestService {
           cr = await ChangeRequest.query().insert({
             id: ulid(),
             requesterId: userId,
-            environment: environmentName,
+            environmentId: environmentName,
             status: 'draft',
             title: `[${cleanTable}] ${action}: ${identifier}`,
             priority: 'medium',
@@ -416,7 +416,7 @@ export class ChangeRequestService {
     await ChangeRequestNotifications.notifySubmitted({
       id: cr.id,
       title: cr.title,
-      environment: cr.environment,
+      environmentId: cr.environmentId,
       requesterId: cr.requesterId,
       requesterName: cr.requester?.name || cr.requester?.email,
     });
@@ -482,7 +482,7 @@ export class ChangeRequestService {
         // Fallback: fetch environment directly if relation failed to load
         const env = await knex('g_environments')
           .transacting(trx)
-          .where('environment', cr.environment)
+          .where('environmentId', cr.environmentId)
           .first();
         if (env) {
           requiredApprovers = Number(env.requiredApprovers);
@@ -490,7 +490,7 @@ export class ChangeRequestService {
       }
 
       logger.info(
-        `[ChangeRequest] Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environment})`
+        `[ChangeRequest] Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId})`
       );
 
       if (currentApprovals >= requiredApprovers) {
@@ -506,7 +506,7 @@ export class ChangeRequestService {
           {
             id: cr.id,
             title: cr.title,
-            environment: cr.environment,
+            environmentId: cr.environmentId,
             requesterId: cr.requesterId,
           },
           approver?.name || approver?.email,
@@ -553,7 +553,7 @@ export class ChangeRequestService {
           {
             id: cr.id,
             title: cr.title,
-            environment: cr.environment,
+            environmentId: cr.environmentId,
             requesterId: cr.requesterId,
           },
           'System (Auto)',
@@ -609,7 +609,7 @@ export class ChangeRequestService {
       {
         id: cr.id,
         title: cr.title,
-        environment: cr.environment,
+        environmentId: cr.environmentId,
         requesterId: cr.requesterId,
       },
       rejectorName,
@@ -644,7 +644,7 @@ export class ChangeRequestService {
       // Phase 4: Check for existing draft - prevent reopen conflict
       const existingDraft = await ChangeRequest.query(trx)
         .where('requesterId', cr.requesterId)
-        .where('environment', cr.environment)
+        .where('environmentId', cr.environmentId)
         .where('status', 'draft')
         .first();
 
@@ -661,7 +661,7 @@ export class ChangeRequestService {
       // Also check for pending review
       const pendingReview = await ChangeRequest.query(trx)
         .where('requesterId', cr.requesterId)
-        .where('environment', cr.environment)
+        .where('environmentId', cr.environmentId)
         .where('status', 'open')
         .first();
 
@@ -700,7 +700,7 @@ export class ChangeRequestService {
       if (cr.status !== 'approved') throw new Error('Change Request must be APPROVED to execute');
 
       // Get environment settings for conflict check policy
-      const env = await Environment.query(trx).findById(cr.environment);
+      const env = await Environment.query(trx).findById(cr.environmentId);
       const strictConflictCheck = env?.strictConflictCheck ?? true; // Default to strict
 
       // Collect items for post-transaction service calls and Outbox events
@@ -901,8 +901,8 @@ export class ChangeRequestService {
               }
 
               // Ensure environment is set for new records
-              if (!dbData.environment) {
-                dbData.environment = cr.environment;
+              if (!dbData.environmentId) {
+                dbData.environmentId = cr.environmentId;
               }
               // Ensure timestamps are set for new records
               if (!dbData.createdAt) {
@@ -987,8 +987,8 @@ export class ChangeRequestService {
               }
 
               // Ensure environment is set for new records
-              if (!dbData.environment) {
-                dbData.environment = cr.environment;
+              if (!dbData.environmentId) {
+                dbData.environmentId = cr.environmentId;
               }
               // Ensure timestamps are set for new records
               if (!dbData.createdAt) {
@@ -1074,7 +1074,7 @@ export class ChangeRequestService {
         {
           id: cr.id,
           title: cr.title,
-          environment: cr.environment,
+          environmentId: cr.environmentId,
           requesterId: cr.requesterId,
         },
         executor?.name || executor?.email,
@@ -1103,7 +1103,7 @@ export class ChangeRequestService {
             await handler.apply(
               call.targetId,
               call.afterData,
-              result.cr.environment, // Use environment from result CR
+              result.cr.environmentId, // Use environmentId from result CR
               userId // Pass executor ID to service for audit/context
             );
           } catch (err) {
@@ -1191,7 +1191,7 @@ export class ChangeRequestService {
         title: `Revert: ${originalCr.title}`,
         description: `Revert of request #${originalCr.id}`,
         requesterId: userId,
-        environment: originalCr.environment,
+        environmentId: originalCr.environmentId,
         status: 'open',
         type: 'revert',
         priority: originalCr.priority || 'medium',
@@ -1289,7 +1289,7 @@ export class ChangeRequestService {
         await ChangeRequestNotifications.notifySubmitted({
           id: newCr.id,
           title: newCr.title,
-          environment: newCr.environment,
+          environmentId: newCr.environmentId,
           requesterId: userId,
           requesterName: requester?.name || requester?.email,
         });
@@ -1349,11 +1349,11 @@ export class ChangeRequestService {
    * @param userId User ID (for draft visibility)
    */
   static async getChangeRequestCounts(
-    environment: string,
+    environmentId: string,
     userId: string
   ): Promise<Record<string, number>> {
     const counts = await ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where((builder) => {
         builder.whereNot('status', 'draft').orWhere((subBuilder) => {
           subBuilder.where('status', 'draft').where('requesterId', userId);

@@ -50,7 +50,7 @@ async function runTest() {
     const existingEnv = await Environment.query().findById(TEST_ENV);
     if (!existingEnv) {
       await Environment.query().insert({
-        environment: TEST_ENV,
+        environmentId: TEST_ENV,
         displayName: 'Test Environment',
         environmentType: 'development',
         isSystemDefined: false,
@@ -157,7 +157,7 @@ async function runTest() {
 
     // Cleanup
     console.log('Cleaning up...');
-    await ChangeRequest.query().delete().where('environment', TEST_ENV);
+    await ChangeRequest.query().delete().where('environmentId', TEST_ENV);
     await Environment.query().deleteById(TEST_ENV);
 
     console.log('ALL TESTS PASSED');

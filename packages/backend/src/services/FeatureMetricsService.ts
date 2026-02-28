@@ -21,7 +21,7 @@ interface AggregatedMetric {
 }
 
 interface MetricsJobPayload {
-  environment: string;
+  environmentId: string;
   appName?: string;
   metrics: AggregatedMetric[];
   reportedAt: string;
@@ -67,7 +67,7 @@ class FeatureMetricsService {
    * @param bucketStart - Start of the metrics collection window (for accurate hourBucket calculation)
    */
   async processAggregatedMetrics(
-    environment: string,
+    environmentId: string,
     metrics: AggregatedMetric[],
     timestamp?: string,
     appName?: string,
@@ -82,7 +82,7 @@ class FeatureMetricsService {
 
     // Add to queue for batch processing
     await queueService.addJob(QUEUE_NAME, 'aggregate-metrics', {
-      environment,
+      environmentId,
       appName,
       metrics,
       reportedAt,
@@ -91,7 +91,7 @@ class FeatureMetricsService {
     } as MetricsJobPayload);
 
     logger.debug('Feature metrics queued for processing', {
-      environment,
+      environmentId,
       appName,
       count: metrics.length,
       bucketStart,
@@ -104,7 +104,8 @@ class FeatureMetricsService {
   private async processMetricsJob(
     job: Job<{ type: string; payload: MetricsJobPayload; timestamp: number }>
   ): Promise<void> {
-    const { environment, appName, metrics, reportedAt, bucketStart, sdkVersion } = job.data.payload;
+    const { environmentId, appName, metrics, reportedAt, bucketStart, sdkVersion } =
+      job.data.payload;
 
     // Use bucketStart for more accurate hourBucket calculation (bucket window start)
     // Fallback to reportedAt for backward compatibility
@@ -118,7 +119,7 @@ class FeatureMetricsService {
 
       // Batch upsert metrics
       for (const metric of metrics) {
-        await this.upsertMetric(environment, appName, sdkVersion, metric, hourBucket);
+        await this.upsertMetric(environmentId, appName, sdkVersion, metric, hourBucket);
         uniqueFlagNames.add(metric.flagName);
       }
 
@@ -128,7 +129,7 @@ class FeatureMetricsService {
           // Get flag by name to get the ID
           const flag = await db('g_feature_flags').where('flagName', flagName).first();
           if (flag) {
-            await FeatureFlagModel.updateLastSeenAt(flag.id, environment);
+            await FeatureFlagModel.updateLastSeenAt(flag.id, environmentId);
           }
         } catch (err) {
           logger.debug('Failed to update lastSeenAt for flag', {
@@ -139,7 +140,7 @@ class FeatureMetricsService {
       }
 
       logger.debug('Feature metrics processed', {
-        environment,
+        environmentId,
         count: metrics.length,
         jobId: job.id,
       });
@@ -156,7 +157,7 @@ class FeatureMetricsService {
    * Upsert a single metric into the aggregation tables
    */
   private async upsertMetric(
-    environment: string,
+    environmentId: string,
     appName: string | undefined,
     sdkVersion: string | undefined,
     metric: AggregatedMetric,
@@ -174,7 +175,7 @@ class FeatureMetricsService {
     // Upsert main metrics (yesCount, noCount) with appName and sdkVersion
     await db.raw(
       `
-            INSERT INTO g_feature_metrics (id, environment, appName, sdkVersion, flagName, metricsBucket, yesCount, noCount, createdAt)
+            INSERT INTO g_feature_metrics (id, environmentId, appName, sdkVersion, flagName, metricsBucket, yesCount, noCount, createdAt)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
             ON DUPLICATE KEY UPDATE 
                 yesCount = yesCount + VALUES(yesCount), 
@@ -182,7 +183,7 @@ class FeatureMetricsService {
         `,
       [
         require('ulid').ulid(),
-        environment,
+        environmentId,
         appName || null,
         sdkVersion || null,
         flagName,
@@ -196,14 +197,14 @@ class FeatureMetricsService {
     if (variantName) {
       await db.raw(
         `
-                INSERT INTO g_feature_variant_metrics (id, environment, appName, sdkVersion, flagName, metricsBucket, variantName, count, createdAt)
+                INSERT INTO g_feature_variant_metrics (id, environmentId, appName, sdkVersion, flagName, metricsBucket, variantName, count, createdAt)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())
                 ON DUPLICATE KEY UPDATE 
                     count = count + VALUES(count)
             `,
         [
           require('ulid').ulid(),
-          environment,
+          environmentId,
           appName || null,
           sdkVersion || null,
           flagName,
@@ -219,14 +220,14 @@ class FeatureMetricsService {
    * Get metrics for a specific flag
    */
   async getMetricsForFlag(
-    environment: string,
+    environmentId: string,
     flagName: string,
     startDate: Date,
     endDate: Date
   ): Promise<any[]> {
     try {
       const metrics = await db('g_feature_metrics')
-        .where({ environment, flagName })
+        .where({ environmentId, flagName })
         .whereBetween('hourBucket', [startDate, endDate])
         .orderBy('hourBucket', 'asc');
 
@@ -234,7 +235,7 @@ class FeatureMetricsService {
     } catch (error) {
       logger.error('Failed to get metrics for flag', {
         error,
-        environment,
+        environmentId,
         flagName,
       });
       throw error;

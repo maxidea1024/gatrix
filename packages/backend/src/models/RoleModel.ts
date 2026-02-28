@@ -21,7 +21,7 @@ export interface RoleRecord {
 export interface RolePermissions {
   org: string[];
   project: Array<{ projectId: string; permission: string; isAdmin: boolean }>;
-  env: Array<{ environment: string; permission: string; isAdmin: boolean }>;
+  env: Array<{ environmentId: string; permission: string; isAdmin: boolean }>;
 }
 
 export interface CreateRoleData {
@@ -105,7 +105,7 @@ export class RoleModel {
         .select('projectId', 'permission', 'isAdmin'),
       db(this.ENV_PERMS_TABLE)
         .where('roleId', roleId)
-        .select('environment', 'permission', 'isAdmin'),
+        .select('environmentId', 'permission', 'isAdmin'),
     ]);
 
     return {
@@ -116,7 +116,7 @@ export class RoleModel {
         isAdmin: !!r.isAdmin,
       })),
       env: envPerms.map((r: any) => ({
-        environment: r.environment,
+        environmentId: r.environmentId,
         permission: r.permission,
         isAdmin: !!r.isAdmin,
       })),
@@ -163,7 +163,7 @@ export class RoleModel {
           permissions.env.map((e) => ({
             id: generateULID(),
             roleId,
-            environment: e.environment,
+            environmentId: e.environmentId,
             permission: e.permission,
             isAdmin: e.isAdmin,
           }))

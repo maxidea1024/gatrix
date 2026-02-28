@@ -558,7 +558,7 @@ router.get(
           .distinct(),
         db('g_role_environment_permissions')
           .whereIn('roleId', roleIds)
-          .select('environment', 'permission', 'isAdmin')
+          .select('environmentId', 'permission', 'isAdmin')
           .distinct(),
       ]);
 
@@ -661,7 +661,7 @@ router.delete(
 // GET /api/admin/rbac/environment-keys/:environment
 router.get('/environment-keys/:environment', async (req: any, res) => {
   try {
-    const keys = await EnvironmentKey.findByEnvironment(req.params.environment);
+    const keys = await EnvironmentKey.findByEnvironment(req.params.environmentId);
     // Mask key values
     const masked = keys.map((k) => ({
       ...k,
@@ -677,8 +677,8 @@ router.get('/environment-keys/:environment', async (req: any, res) => {
 // POST /api/admin/rbac/environment-keys
 router.post('/environment-keys', async (req: any, res) => {
   try {
-    const { environment, keyType, keyName } = req.body;
-    if (!environment || !keyType || !keyName) {
+    const { environmentId, keyType, keyName } = req.body;
+    if (!environmentId || !keyType || !keyName) {
       return res.status(400).json({
         success: false,
         message: 'environment, keyType, and keyName are required',
@@ -686,7 +686,7 @@ router.post('/environment-keys', async (req: any, res) => {
     }
 
     const result = await EnvironmentKey.create({
-      environment,
+      environmentId,
       keyType,
       keyName,
       createdBy: req.user.id,

@@ -25,17 +25,17 @@ export interface ServiceHandler {
    * @param environment - Environment name
    * @param userId - User performing the action
    */
-  apply: (id: string, data: any, environment: string, userId?: string) => Promise<unknown>;
+  apply: (id: string, data: any, environmentId: string, userId?: string) => Promise<unknown>;
 
   /**
    * Create a new entity (optional)
    */
-  create?: (data: any, environment: string, userId?: string) => Promise<unknown>;
+  create?: (data: any, environmentId: string, userId?: string) => Promise<unknown>;
 
   /**
    * Delete an entity (optional)
    */
-  delete?: (id: string, environment: string, userId?: string) => Promise<void>;
+  delete?: (id: string, environmentId: string, userId?: string) => Promise<void>;
 }
 
 /**
@@ -46,164 +46,164 @@ export interface ServiceHandler {
 export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Service Notices
   g_service_notices: {
-    apply: async (id, data, environment) => {
-      return await serviceNoticeService.updateServiceNotice(id, data, environment);
+    apply: async (id, data, environmentId) => {
+      return await serviceNoticeService.updateServiceNotice(id, data, environmentId);
     },
-    create: async (data, environment) => {
-      return await serviceNoticeService.createServiceNotice(data, environment);
+    create: async (data, environmentId) => {
+      return await serviceNoticeService.createServiceNotice(data, environmentId);
     },
-    delete: async (id, environment) => {
-      await serviceNoticeService.deleteServiceNotice(id, environment);
+    delete: async (id, environmentId) => {
+      await serviceNoticeService.deleteServiceNotice(id, environmentId);
     },
   },
 
   // Client Versions
   g_client_versions: {
-    apply: async (id, data, environment, userId) => {
-      const result = await ClientVersionService.updateClientVersion(id, data, environment);
+    apply: async (id, data, environmentId, userId) => {
+      const result = await ClientVersionService.updateClientVersion(id, data, environmentId);
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('client_version', id, data.tagIds, userId);
       }
       return result;
     },
-    create: async (data, environment, userId) => {
+    create: async (data, environmentId, userId) => {
       // Tags are usually not handled in service.create but passed separately or handled in controller
       // But for CR, we need to handle it here if passed in data
-      const result = await ClientVersionService.createClientVersion(data, environment);
+      const result = await ClientVersionService.createClientVersion(data, environmentId);
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('client_version', result.id!, data.tagIds, userId);
       }
       return result;
     },
-    delete: async (id, environment) => {
-      await ClientVersionService.deleteClientVersion(id, environment);
+    delete: async (id, environmentId) => {
+      await ClientVersionService.deleteClientVersion(id, environmentId);
     },
   },
 
   // Store Products
   g_store_products: {
-    apply: async (id, data, environment, userId) => {
-      const result = await StoreProductService.updateStoreProduct(id, data, environment);
+    apply: async (id, data, environmentId, userId) => {
+      const result = await StoreProductService.updateStoreProduct(id, data, environmentId);
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('store_product', id, data.tagIds, userId);
       }
       return result;
     },
-    create: async (data, environment, userId) => {
+    create: async (data, environmentId, userId) => {
       const result = await StoreProductService.createStoreProduct({
         ...data,
-        environment,
+        environmentId,
       });
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('store_product', result.id, data.tagIds, userId);
       }
       return result;
     },
-    delete: async (id, environment) => {
-      await StoreProductService.deleteStoreProduct(id, environment);
+    delete: async (id, environmentId) => {
+      await StoreProductService.deleteStoreProduct(id, environmentId);
     },
   },
 
   // Surveys
   g_surveys: {
-    apply: async (id, data, environment) => {
-      return await SurveyService.updateSurvey(id, data, environment);
+    apply: async (id, data, environmentId) => {
+      return await SurveyService.updateSurvey(id, data, environmentId);
     },
-    create: async (data, environment) => {
-      return await SurveyService.createSurvey({ ...data, environment });
+    create: async (data, environmentId) => {
+      return await SurveyService.createSurvey({ ...data, environmentId });
     },
-    delete: async (id, environment) => {
-      await SurveyService.deleteSurvey(id, environment);
+    delete: async (id, environmentId) => {
+      await SurveyService.deleteSurvey(id, environmentId);
     },
   },
 
   // Ingame Popup Notices
   g_ingame_popup_notices: {
-    apply: async (id, data, environment, userId) => {
+    apply: async (id, data, environmentId, userId) => {
       const result = await ingamePopupNoticeService.updateIngamePopupNotice(
         id,
         data,
         userId || '',
-        environment
+        environmentId
       );
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('ingame_popup_notice', id, data.tagIds, userId);
       }
       return result;
     },
-    create: async (data, environment, userId) => {
+    create: async (data, environmentId, userId) => {
       const result = await ingamePopupNoticeService.createIngamePopupNotice(
         data,
         userId || '',
-        environment
+        environmentId
       );
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('ingame_popup_notice', result.id, data.tagIds, userId);
       }
       return result;
     },
-    delete: async (id, environment) => {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(id, environment);
+    delete: async (id, environmentId) => {
+      await ingamePopupNoticeService.deleteIngamePopupNotice(id, environmentId);
     },
   },
 
   // Game Worlds
   g_game_worlds: {
-    apply: async (id, data, environment, userId) => {
-      const result = await GameWorldService.updateGameWorld(id, data, environment);
+    apply: async (id, data, environmentId, userId) => {
+      const result = await GameWorldService.updateGameWorld(id, data, environmentId);
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('game_world', id, data.tagIds, userId);
       }
       return result;
     },
-    create: async (data, environment, userId) => {
-      const result = await GameWorldService.createGameWorld(data, environment);
+    create: async (data, environmentId, userId) => {
+      const result = await GameWorldService.createGameWorld(data, environmentId);
       if (data.tagIds && Array.isArray(data.tagIds)) {
         await TagService.setTagsForEntity('game_world', result.id, data.tagIds, userId);
       }
       return result;
     },
-    delete: async (id, environment) => {
-      await GameWorldService.deleteGameWorld(id, environment);
+    delete: async (id, environmentId) => {
+      await GameWorldService.deleteGameWorld(id, environmentId);
     },
   },
 
   // Banners
   g_banners: {
-    apply: async (id, data, environment) => {
-      return await BannerService.updateBanner(id, environment, data);
+    apply: async (id, data, environmentId) => {
+      return await BannerService.updateBanner(id, environmentId, data);
     },
-    create: async (data, environment) => {
-      return await BannerService.createBanner({ ...data, environment });
+    create: async (data, environmentId) => {
+      return await BannerService.createBanner({ ...data, environmentId });
     },
-    delete: async (id, environment) => {
-      await BannerService.deleteBanner(id, environment);
+    delete: async (id, environmentId) => {
+      await BannerService.deleteBanner(id, environmentId);
     },
   },
 
   // Account Whitelist
   g_account_whitelist: {
-    apply: async (id, data, environment) => {
-      return await WhitelistService.updateWhitelist(id, environment, data);
+    apply: async (id, data, environmentId) => {
+      return await WhitelistService.updateWhitelist(id, environmentId, data);
     },
-    create: async (data, environment) => {
-      return await WhitelistService.createWhitelist(environment, data);
+    create: async (data, environmentId) => {
+      return await WhitelistService.createWhitelist(environmentId, data);
     },
-    delete: async (id, environment) => {
-      await WhitelistService.deleteWhitelist(id, environment);
+    delete: async (id, environmentId) => {
+      await WhitelistService.deleteWhitelist(id, environmentId);
     },
   },
 
   // IP Whitelist
   g_ip_whitelist: {
-    apply: async (id, data, environment) => {
-      return await IpWhitelistService.updateIpWhitelist(id, environment, data);
+    apply: async (id, data, environmentId) => {
+      return await IpWhitelistService.updateIpWhitelist(id, environmentId, data);
     },
-    create: async (data, environment) => {
-      return await IpWhitelistService.createIpWhitelist(environment, data);
+    create: async (data, environmentId) => {
+      return await IpWhitelistService.createIpWhitelist(environmentId, data);
     },
-    delete: async (id, environment) => {
-      await IpWhitelistService.deleteIpWhitelist(id, environment);
+    delete: async (id, environmentId) => {
+      await IpWhitelistService.deleteIpWhitelist(id, environmentId);
     },
   },
 
@@ -211,7 +211,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
   // Note: g_vars uses `varKey` as identifier, not numeric ID
   // Special handling: Maintenance status changes publish events via MaintenanceController pattern
   g_vars: {
-    apply: async (id, data, environment) => {
+    apply: async (id, data, environmentId) => {
       // Import VarsModel dynamically to avoid circular dependency
       const VarsModel = (await import('../models/Vars')).default;
       const { pubSubService } = await import('./PubSubService');
@@ -219,18 +219,18 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
 
       // id is the varKey for g_vars
       const varKey = id;
-      await VarsModel.set(varKey, data.value, data.userId || '', environment);
+      await VarsModel.set(varKey, data.value, data.userId || '', environmentId);
 
       // Publish appropriate events based on the key
       if (varKey === 'isMaintenance' || varKey === 'maintenanceDetail') {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.MAINTENANCE}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.MAINTENANCE}:${environmentId}`);
         await pubSubService.publishEvent({
           type: 'maintenance.settings.updated',
-          data: { id: 'maintenance', environment, timestamp: Date.now() },
+          data: { id: 'maintenance', environmentId, timestamp: Date.now() },
         });
         await pubSubService.publishNotification({
           type: 'maintenance_status_change',
-          data: { varKey, value: data.value, environment },
+          data: { varKey, value: data.value, environmentId },
           targetChannels: ['admin', 'general'],
         });
         logger.info(`[ServiceRegistry] Published maintenance event for ${varKey}`);
@@ -242,7 +242,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
 
   // Feature Flags
   g_feature_flags: {
-    apply: async (id, data, environment, userId) => {
+    apply: async (id, data, environmentId, userId) => {
       // Get current flag name for service call
       const FeatureFlagModel = (await import('../models/FeatureFlag')).FeatureFlagModel;
       const existingFlag = await FeatureFlagModel.findById(id);
@@ -250,20 +250,20 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
         throw new Error(`Feature flag with id ${id} not found`);
       }
       return await featureFlagService.updateFlag(
-        environment,
+        environmentId,
         existingFlag.flagName,
         data,
         userId || ''
       );
     },
-    create: async (data, environment, userId) => {
-      return await featureFlagService.createFlag({ ...data, environment }, userId || '');
+    create: async (data, environmentId, userId) => {
+      return await featureFlagService.createFlag({ ...data, environmentId }, userId || '');
     },
-    delete: async (id, environment, userId) => {
+    delete: async (id, environmentId, userId) => {
       const FeatureFlagModel = (await import('../models/FeatureFlag')).FeatureFlagModel;
       const existingFlag = await FeatureFlagModel.findById(id);
       if (existingFlag) {
-        await featureFlagService.deleteFlag(environment, existingFlag.flagName, userId || '');
+        await featureFlagService.deleteFlag(environmentId, existingFlag.flagName, userId || '');
       }
     },
   },
@@ -291,7 +291,7 @@ export async function executeChangeViaService(
   tableName: string,
   id: string,
   data: any,
-  environment: string,
+  environmentId: string,
   isCreate: boolean = false,
   userId?: string
 ): Promise<{ usedService: boolean; result?: any }> {
@@ -305,9 +305,9 @@ export async function executeChangeViaService(
   try {
     let result: any;
     if (isCreate && handler.create) {
-      result = await handler.create(data, environment, userId);
+      result = await handler.create(data, environmentId, userId);
     } else {
-      result = await handler.apply(id, data, environment, userId);
+      result = await handler.apply(id, data, environmentId, userId);
     }
     logger.info(`[ServiceRegistry] Applied change via service for ${tableName}:${id}`);
     return { usedService: true, result };

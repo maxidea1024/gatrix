@@ -24,7 +24,7 @@ export interface LockCheckResult {
 export interface AcquireLockOptions {
   entityType: string;
   entityId: string;
-  environment: string;
+  environmentId: string;
   userId: string;
   lockType?: LockType;
   expiresInMinutes?: number;
@@ -37,13 +37,13 @@ export class LockService {
   static async checkLock(
     entityType: string,
     entityId: string,
-    environment: string,
+    environmentId: string,
     currentUserId?: string
   ): Promise<LockCheckResult> {
     const lock = await EntityLock.query()
       .where('entityType', entityType)
       .where('entityId', entityId)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .withGraphFetched('user')
       .first();
 
@@ -110,7 +110,7 @@ export class LockService {
     const {
       entityType,
       entityId,
-      environment,
+      environmentId,
       userId,
       lockType = 'soft',
       expiresInMinutes = 30,
@@ -120,7 +120,7 @@ export class LockService {
     const existing = await EntityLock.query()
       .where('entityType', entityType)
       .where('entityId', entityId)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .first();
 
     if (existing) {
@@ -155,7 +155,7 @@ export class LockService {
       id: ulid(),
       entityType,
       entityId,
-      environment,
+      environmentId,
       lockedBy: userId,
       lockType,
       expiresAt,
@@ -173,13 +173,13 @@ export class LockService {
   static async releaseLock(
     entityType: string,
     entityId: string,
-    environment: string,
+    environmentId: string,
     userId?: string
   ): Promise<boolean> {
     let query = EntityLock.query()
       .where('entityType', entityType)
       .where('entityId', entityId)
-      .where('environment', environment);
+      .where('environmentId', environmentId);
 
     // If userId provided, only release own lock
     if (userId) {

@@ -9,7 +9,7 @@ export interface AppInstanceInfo {
   platform: string;
   nodeVersion: string;
   appVersion: string;
-  environment: string;
+  environmentId: string;
   startedAt: Date;
   uptime: number; // in seconds
 }
@@ -32,7 +32,7 @@ class AppInstance {
       platform: `${os.platform()}-${os.arch()}`,
       nodeVersion: process.version,
       appVersion: packageJson.version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
+      environmentId: process.env.NODE_ENV || 'development',
       startedAt: new Date(),
       uptime: 0,
     };
@@ -42,7 +42,7 @@ class AppInstance {
       processId: this._instanceInfo.processId,
       hostname: this._instanceInfo.hostname,
       platform: this._instanceInfo.platform,
-      environment: this._instanceInfo.environment,
+      environmentId: this._instanceInfo.environmentId,
     });
   }
 
@@ -83,7 +83,7 @@ class AppInstance {
       processId: info.processId,
       hostname: info.hostname,
       platform: info.platform,
-      environment: info.environment,
+      environmentId: info.environmentId,
       uptime: `${info.uptime}s`,
     };
   }
@@ -105,7 +105,7 @@ class AppInstance {
       status: 'healthy',
       uptime: info.uptime,
       memory: process.memoryUsage(),
-      environment: info.environment,
+      environmentId: info.environmentId,
       nodeVersion: info.nodeVersion,
       appVersion: info.appVersion,
     };

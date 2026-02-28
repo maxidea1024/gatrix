@@ -11,7 +11,7 @@ import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface StoreProduct {
   id: string;
-  environment: string;
+  environmentId: string;
   isActive: boolean;
   productId: string;
   cmsProductId: string | null;
@@ -58,7 +58,7 @@ export interface CreateStoreProductInput {
   descriptionZh?: string;
   metadata?: Record<string, any>;
   createdBy?: string;
-  environment: string;
+  environmentId: string;
 }
 
 export interface UpdateStoreProductInput {
@@ -91,7 +91,7 @@ export interface GetStoreProductsParams {
   sortOrder?: 'asc' | 'desc';
   store?: string;
   isActive?: boolean;
-  environment: string;
+  environmentId: string;
 }
 
 export interface GetStoreProductsResponse {
@@ -113,13 +113,13 @@ class StoreProductService {
     const search = params.search || '';
     const sortBy = params.sortBy || 'createdAt';
     const sortOrder = (params.sortOrder || 'desc').toUpperCase();
-    const environment = params.environment;
+    const environmentId = params.environmentId;
 
     const offset = (page - 1) * limit;
 
     // Build WHERE clause
     const conditions: string[] = ['environment = ?'];
-    const queryParams: (string | number | boolean | null)[] = [environment];
+    const queryParams: (string | number | boolean | null)[] = [environmentId];
 
     if (search) {
       // Check if search is a number (for CMS ID search)
@@ -230,7 +230,7 @@ class StoreProductService {
    * Get store product statistics
    */
   static async getStats(
-    environment: string
+    environmentId: string
   ): Promise<{ total: number; active: number; inactive: number }> {
     const pool = database.getPool();
 
@@ -240,8 +240,8 @@ class StoreProductService {
           COUNT(*) as total,
           SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as active,
           SUM(CASE WHEN isActive = 0 THEN 1 ELSE 0 END) as inactive
-        FROM g_store_products WHERE environment = ?`,
-        [environment]
+        FROM g_store_products WHERE environmentId = ?`,
+        [environmentId]
       );
 
       return {
@@ -258,13 +258,13 @@ class StoreProductService {
   /**
    * Get store product by ID
    */
-  static async getStoreProductById(id: string, environment: string): Promise<StoreProduct> {
+  static async getStoreProductById(id: string, environmentId: string): Promise<StoreProduct> {
     const pool = database.getPool();
 
     try {
       const [products] = await pool.execute<RowDataPacket[]>(
         'SELECT * FROM g_store_products WHERE id = ? AND environment = ?',
-        [id, environment]
+        [id, environmentId]
       );
 
       if (products.length === 0) {
@@ -330,18 +330,18 @@ class StoreProductService {
   static async createStoreProduct(input: CreateStoreProductInput): Promise<StoreProduct> {
     const pool = database.getPool();
     const id = ulid();
-    const environment = input.environment;
+    const environmentId = input.environmentId;
 
     try {
       await pool.execute(
         `INSERT INTO g_store_products
-         (id, environment, isActive, productId, productName, nameKo, nameEn, nameZh,
+         (id, environmentId, isActive, productId, productName, nameKo, nameEn, nameZh,
           store, price, currency, saleStartAt, saleEndAt, description,
           descriptionKo, descriptionEn, descriptionZh, metadata, createdBy, createdAt, updatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
         [
           id,
-          environment,
+          environmentId,
           input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
           input.productId,
           input.productName,
@@ -362,18 +362,18 @@ class StoreProductService {
         ]
       );
 
-      const product = await this.getStoreProductById(id, environment);
+      const product = await this.getStoreProductById(id, environmentId);
 
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
         await pubSubService.publishSDKEvent({
           type: 'store_product.created',
           data: {
             id,
-            environment: environment,
+            environmentId: environmentId,
             isActive: product?.isActive ? 1 : 0,
             timestamp: Date.now(),
           },
@@ -401,7 +401,7 @@ class StoreProductService {
   static async updateStoreProduct(
     id: string,
     input: UpdateStoreProductInput,
-    environment: string
+    environmentId: string
   ): Promise<StoreProduct> {
     const pool = database.getPool();
 
@@ -481,15 +481,15 @@ class StoreProductService {
     }
 
     if (updates.length === 0) {
-      return this.getStoreProductById(id, environment);
+      return this.getStoreProductById(id, environmentId);
     }
 
     updates.push('updatedAt = UTC_TIMESTAMP()');
-    values.push(id, environment);
+    values.push(id, environmentId);
 
     try {
       const [result] = await pool.execute<ResultSetHeader>(
-        `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
+        `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
         values
       );
 
@@ -497,18 +497,18 @@ class StoreProductService {
         throw new GatrixError('Store product not found', 404);
       }
 
-      const product = await this.getStoreProductById(id, environment);
+      const product = await this.getStoreProductById(id, environmentId);
 
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
         await pubSubService.publishSDKEvent({
           type: 'store_product.updated',
           data: {
             id,
-            environment: environment,
+            environmentId: environmentId,
             isActive: product?.isActive ? 1 : 0,
             timestamp: Date.now(),
           },
@@ -534,7 +534,7 @@ class StoreProductService {
   /**
    * Delete a store product
    */
-  static async deleteStoreProduct(id: string, environment: string): Promise<void> {
+  static async deleteStoreProduct(id: string, environmentId: string): Promise<void> {
     const pool = database.getPool();
 
     try {
@@ -543,7 +543,7 @@ class StoreProductService {
 
       const [result] = await pool.execute<ResultSetHeader>(
         'DELETE FROM g_store_products WHERE id = ? AND environment = ?',
-        [id, environment]
+        [id, environmentId]
       );
 
       if (result.affectedRows === 0) {
@@ -553,13 +553,13 @@ class StoreProductService {
       // Invalidate ETag cache and publish SDK event
       try {
         // Invalidate ETag cache so SDK fetches fresh data
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
         await pubSubService.publishSDKEvent({
           type: 'store_product.deleted',
           data: {
             id,
-            environment: environment,
+            environmentId: environmentId,
             timestamp: Date.now(),
           },
         });
@@ -579,7 +579,7 @@ class StoreProductService {
   /**
    * Delete multiple store products
    */
-  static async deleteStoreProducts(ids: string[], environment: string): Promise<number> {
+  static async deleteStoreProducts(ids: string[], environmentId: string): Promise<number> {
     const pool = database.getPool();
 
     if (ids.length === 0) return 0;
@@ -592,22 +592,22 @@ class StoreProductService {
 
       const placeholders = ids.map(() => '?').join(',');
       const [result] = await pool.execute<ResultSetHeader>(
-        `DELETE FROM g_store_products WHERE id IN (${placeholders}) AND environment = ?`,
-        [...ids, environment]
+        `DELETE FROM g_store_products WHERE id IN (${placeholders}) AND environmentId = ?`,
+        [...ids, environmentId]
       );
 
       // Invalidate ETag cache and publish SDK events for each deleted product
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
           for (const id of ids) {
             await pubSubService.publishSDKEvent({
               type: 'store_product.deleted',
               data: {
                 id,
-                environment: environment,
+                environmentId: environmentId,
                 timestamp: Date.now(),
               },
             });
@@ -634,9 +634,9 @@ class StoreProductService {
     id: string,
     isActive: boolean,
     updatedBy: string,
-    environment: string
+    environmentId: string
   ): Promise<StoreProduct> {
-    return this.updateStoreProduct(id, { isActive, updatedBy }, environment);
+    return this.updateStoreProduct(id, { isActive, updatedBy }, environmentId);
   }
 
   /**
@@ -646,7 +646,7 @@ class StoreProductService {
     ids: string[],
     isActive: boolean,
     updatedBy: string,
-    environment: string
+    environmentId: string
   ): Promise<number> {
     const pool = database.getPool();
 
@@ -655,22 +655,22 @@ class StoreProductService {
     try {
       const placeholders = ids.map(() => '?').join(',');
       const [result] = await pool.execute<ResultSetHeader>(
-        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id IN (${placeholders}) AND environment = ?`,
-        [isActive ? 1 : 0, updatedBy || null, ...ids, environment]
+        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = UTC_TIMESTAMP() WHERE id IN (${placeholders}) AND environmentId = ?`,
+        [isActive ? 1 : 0, updatedBy || null, ...ids, environmentId]
       );
 
       // Invalidate ETag cache and publish SDK events for each updated product
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
           for (const id of ids) {
             await pubSubService.publishSDKEvent({
               type: 'store_product.updated',
               data: {
                 id,
-                environment: environment,
+                environmentId: environmentId,
                 isActive: isActive ? 1 : 0,
                 timestamp: Date.now(),
               },
@@ -704,17 +704,17 @@ class StoreProductService {
       search?: string;
       currentIsActive?: boolean;
       targetIsActive: boolean;
-      environment: string;
+      environmentId: string;
     },
     updatedBy?: string
   ): Promise<{ affectedCount: number; affectedIds: string[] }> {
     const pool = database.getPool();
-    const environment = params.environment;
+    const environmentId = params.environmentId;
 
     try {
       // Build WHERE clause
       const conditions: string[] = ['environment = ?'];
-      const queryParams: (string | number | boolean | null)[] = [environment];
+      const queryParams: (string | number | boolean | null)[] = [environmentId];
 
       if (params.search) {
         conditions.push(
@@ -752,14 +752,14 @@ class StoreProductService {
       if (result.affectedRows > 0) {
         try {
           // Invalidate ETag cache so SDK fetches fresh data
-          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`);
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
           // Publish a batch event instead of individual events for performance
           await pubSubService.publishSDKEvent({
             type: 'store_product.bulk_updated',
             data: {
               count: result.affectedRows,
-              environment: environment,
+              environmentId: environmentId,
               isActive: params.targetIsActive ? 1 : 0,
               timestamp: Date.now(),
             },
@@ -767,7 +767,7 @@ class StoreProductService {
 
           logger.info('Published store product bulk update SDK event', {
             count: result.affectedRows,
-            environment: environment,
+            environmentId: environmentId,
             isActive: params.targetIsActive,
           });
         } catch (eventError) {
@@ -793,15 +793,15 @@ class StoreProductService {
   static async getCountByFilter(params: {
     search?: string;
     isActive?: boolean;
-    environment: string;
+    environmentId: string;
   }): Promise<number> {
     const pool = database.getPool();
-    const environment = params.environment;
+    const environmentId = params.environmentId;
 
     try {
       // Build WHERE clause
       const conditions: string[] = ['environment = ?'];
-      const queryParams: (string | number | boolean | null)[] = [environment];
+      const queryParams: (string | number | boolean | null)[] = [environmentId];
 
       if (params.search) {
         conditions.push(
@@ -834,16 +834,16 @@ class StoreProductService {
    * Preview sync with planning data
    * Returns what changes would be made without applying them
    */
-  static async previewSync(environment: string): Promise<SyncPreviewResult> {
+  static async previewSync(environmentId: string): Promise<SyncPreviewResult> {
     try {
       // Get planning data products (unified multi-language file)
-      const planningData = await PlanningDataService.getCashShopLookup(environment);
+      const planningData = await PlanningDataService.getCashShopLookup(environmentId);
       const planningProducts: CmsCashShopProduct[] = planningData.items || [];
 
       // Get current DB products
       const pool = database.getPool();
       const [rows] = await pool.execute('SELECT * FROM g_store_products WHERE environment = ?', [
-        environment,
+        environmentId,
       ]);
       const dbProducts = rows as StoreProduct[];
 
@@ -995,7 +995,7 @@ class StoreProductService {
         },
       };
     } catch (error) {
-      logger.error('Failed to preview sync', { error, environment });
+      logger.error('Failed to preview sync', { error, environmentId });
       throw new GatrixError('Failed to preview sync with planning data', 500);
     }
   }
@@ -1004,12 +1004,12 @@ class StoreProductService {
    * Apply sync with planning data (selective)
    */
   static async applySync(
-    environment: string,
+    environmentId: string,
     userId?: string,
     selected?: SelectedSyncItems
   ): Promise<SyncApplyResult> {
     const pool = database.getPool();
-    const preview = await this.previewSync(environment);
+    const preview = await this.previewSync(environmentId);
 
     // Filter items based on selection if provided
     const toAddFiltered = selected?.toAdd
@@ -1032,14 +1032,14 @@ class StoreProductService {
         const id = ulid();
         await pool.execute(
           `INSERT INTO g_store_products
-           (id, environment, isActive, productId, cmsProductId, productName,
+           (id, environmentId, isActive, productId, cmsProductId, productName,
             nameKo, nameEn, nameZh, store, price, currency,
             saleStartAt, saleEndAt, description, descriptionKo, descriptionEn, descriptionZh,
             metadata, createdBy, createdAt, updatedAt)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
           [
             id,
-            environment,
+            environmentId,
             0, // isActive = false for new products
             item.productCode,
             item.cmsProductId,
@@ -1127,7 +1127,7 @@ class StoreProductService {
       }
 
       logger.info('Sync applied successfully', {
-        environment,
+        environmentId,
         addedCount,
         updatedCount,
         deletedCount,
@@ -1140,7 +1140,7 @@ class StoreProductService {
         deletedCount,
       };
     } catch (error) {
-      logger.error('Failed to apply sync', { error, environment });
+      logger.error('Failed to apply sync', { error, environmentId });
       throw new GatrixError('Failed to apply sync with planning data', 500);
     }
   }

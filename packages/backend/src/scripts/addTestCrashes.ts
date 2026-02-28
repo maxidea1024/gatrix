@@ -15,7 +15,7 @@ const testCrashes = [
   {
     platform: 'windows',
     branch: 'main',
-    environment: 'production',
+    environmentId: 'production',
     appVersion: '1.2.3',
     resVersion: '1.0.5',
     accountId: 'ACC001',
@@ -33,7 +33,7 @@ const testCrashes = [
   {
     platform: 'android',
     branch: 'main',
-    environment: 'production',
+    environmentId: 'production',
     appVersion: '1.2.3',
     resVersion: '1.0.5',
     accountId: 'ACC002',
@@ -51,7 +51,7 @@ const testCrashes = [
   {
     platform: 'ios',
     branch: 'qa_2025',
-    environment: 'qa',
+    environmentId: 'qa',
     appVersion: '1.3.0-beta',
     resVersion: '1.1.0',
     accountId: 'ACC003',
@@ -69,7 +69,7 @@ const testCrashes = [
   {
     platform: 'windows',
     branch: 'dev',
-    environment: 'dev',
+    environmentId: 'dev',
     appVersion: '1.4.0-dev',
     resVersion: '1.2.0-dev',
     accountId: 'ACC004',
@@ -87,7 +87,7 @@ const testCrashes = [
   {
     platform: 'android',
     branch: 'main',
-    environment: 'production',
+    environmentId: 'production',
     appVersion: '1.2.3',
     resVersion: '1.0.5',
     accountId: 'ACC005',
@@ -113,7 +113,7 @@ async function addTestCrashes() {
       console.log(`\nAdding crash ${i + 1}/${testCrashes.length}...`);
       console.log(`  Platform: ${crashData.platform}`);
       console.log(`  Branch: ${crashData.branch}`);
-      console.log(`  Environment: ${crashData.environment}`);
+      console.log(`  Environment: ${crashData.environmentId}`);
 
       const firstLine =
         crashData.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
@@ -134,7 +134,7 @@ async function addTestCrashes() {
             id: crashId,
             chash,
             branch: crashData.branch,
-            environment: crashData.environment,
+            environmentId: crashData.environmentId,
             platform: crashData.platform,
             marketType: crashData.marketType,
             isEditor: crashData.isEditor || false,
@@ -158,7 +158,7 @@ async function addTestCrashes() {
           platform: crashData.platform,
           marketType: crashData.marketType,
           branch: crashData.branch,
-          environment: crashData.environment,
+          environmentId: crashData.environmentId,
           isEditor: crashData.isEditor || false,
           appVersion: crashData.appVersion,
           resVersion: crashData.resVersion,

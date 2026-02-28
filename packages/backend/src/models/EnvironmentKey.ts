@@ -11,7 +11,7 @@ export type KeyType = 'client' | 'server';
 
 export interface EnvironmentKeyRecord {
   id: string;
-  environment: string;
+  environmentId: string;
   keyType: KeyType;
   keyValue: string;
   keyName: string;
@@ -23,7 +23,7 @@ export interface EnvironmentKeyRecord {
 }
 
 export interface CreateKeyData {
-  environment: string;
+  environmentId: string;
   keyType: KeyType;
   keyName: string;
   createdBy: string;
@@ -54,7 +54,7 @@ export class EnvironmentKey {
 
     await db(this.TABLE).insert({
       id,
-      environment: data.environment,
+      environmentId: data.environmentId,
       keyType: data.keyType,
       keyValue,
       keyName: data.keyName,
@@ -99,9 +99,9 @@ export class EnvironmentKey {
   /**
    * Find all keys for an environment
    */
-  static async findByEnvironment(environment: string): Promise<EnvironmentKeyRecord[]> {
+  static async findByEnvironment(environmentId: string): Promise<EnvironmentKeyRecord[]> {
     try {
-      return db(this.TABLE).where('environment', environment).orderBy('createdAt', 'desc');
+      return db(this.TABLE).where('environmentId', environmentId).orderBy('createdAt', 'desc');
     } catch (error) {
       logger.error('Error finding keys for environment:', error);
       throw error;
@@ -168,20 +168,20 @@ export class EnvironmentKey {
    * Create default keys for a new environment (1 client + 1 server)
    */
   static async createDefaultKeys(
-    environment: string,
+    environmentId: string,
     createdBy: string
   ): Promise<{ clientKey: string; serverKey: string }> {
     const clientResult = await this.create({
-      environment,
+      environmentId,
       keyType: 'client',
-      keyName: `${environment} Client Key`,
+      keyName: `${environmentId} Client Key`,
       createdBy,
     });
 
     const serverResult = await this.create({
-      environment,
+      environmentId,
       keyType: 'server',
-      keyName: `${environment} Server Key`,
+      keyName: `${environmentId} Server Key`,
       createdBy,
     });
 

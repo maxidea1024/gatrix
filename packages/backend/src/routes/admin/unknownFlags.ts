@@ -10,11 +10,11 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const includeResolved = req.query.includeResolved === 'true';
-    const environment = req.query.environment as string | undefined;
+    const environmentId = req.query.environmentId as string | undefined;
 
     const flags = await unknownFlagService.getUnknownFlags({
       includeResolved,
-      environment,
+      environmentId,
     });
 
     res.json({ success: true, data: { flags, total: flags.length } });

@@ -55,13 +55,13 @@ class InternalApiTokensController {
         tokenIds.length > 0
           ? await knex('g_api_access_token_environments')
               .whereIn('tokenId', tokenIds)
-              .select('tokenId', 'environment')
+              .select('tokenId', 'environmentId')
           : [];
 
       // Group environment names by token
       const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environment);
+        acc[env.tokenId].push(env.environmentId);
         return acc;
       }, {});
 

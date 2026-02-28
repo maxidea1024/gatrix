@@ -356,7 +356,7 @@ export class ChangeRequestNotifications {
   static async notifySubmitted(changeRequest: {
     id: string;
     title: string;
-    environment: string;
+    environmentId: string;
     requesterId: string;
     requesterName?: string;
   }): Promise<void> {
@@ -365,7 +365,7 @@ export class ChangeRequestNotifications {
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         requesterId: changeRequest.requesterId,
         requesterName: changeRequest.requesterName,
       },
@@ -384,7 +384,7 @@ export class ChangeRequestNotifications {
     changeRequest: {
       id: string;
       title: string;
-      environment: string;
+      environmentId: string;
       requesterId: string;
     },
     approverName?: string,
@@ -395,7 +395,7 @@ export class ChangeRequestNotifications {
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         approverName,
       },
       timestamp: new Date(),
@@ -414,7 +414,7 @@ export class ChangeRequestNotifications {
     changeRequest: {
       id: string;
       title: string;
-      environment: string;
+      environmentId: string;
       requesterId: string;
     },
     executorName?: string,
@@ -425,7 +425,7 @@ export class ChangeRequestNotifications {
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         executorName,
       },
       timestamp: new Date(),
@@ -443,7 +443,7 @@ export class ChangeRequestNotifications {
     changeRequest: {
       id: string;
       title: string;
-      environment: string;
+      environmentId: string;
       requesterId: string;
     },
     rejectorName?: string,
@@ -455,7 +455,7 @@ export class ChangeRequestNotifications {
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         rejectorName,
         comment,
       },

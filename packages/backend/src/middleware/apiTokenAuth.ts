@@ -24,7 +24,7 @@ const CACHE_TTL = 300; // 5 minutes
 export interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
   environments?: Environment[];
-  environment?: string;
+  environmentId?: string;
   environmentModel?: Environment;
   isUnsecuredToken?: boolean;
   isEdgeBypassToken?: boolean;
@@ -114,7 +114,7 @@ async function checkEnvironmentAccess(
   const { default: knex } = await import('../config/knex');
   const envAccess = await knex('g_api_access_token_environments')
     .where('tokenId', apiToken.id)
-    .where('environment', environmentName)
+    .where('environmentId', environmentName)
     .first();
   return !!envAccess;
 }
@@ -257,8 +257,8 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
     const environmentName =
       (req.headers[HEADERS.X_ENVIRONMENT] as string) ||
       (req.params.env as string) ||
-      (req.params.environment as string) ||
-      (req.query.environment as string);
+      (req.params.environmentId as string) ||
+      (req.query.environmentId as string);
 
     if (!environmentName) {
       logger.warn('Auth: Environment missing in request', { url: req.originalUrl });
@@ -270,11 +270,11 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
     // Resolve and validate environment
     const cacheKey = `sdk_env:${environmentName}`;
-    let environment = await CacheService.get<Environment>(cacheKey);
+    let env = await CacheService.get<Environment>(cacheKey);
 
-    if (!environment) {
-      environment = (await Environment.getByName(environmentName)) || null;
-      if (!environment) {
+    if (!env) {
+      env = (await Environment.getByName(environmentName)) || null;
+      if (!env) {
         logger.warn('Auth: Environment not found', { environmentName });
         return res.status(404).json({
           success: false,
@@ -284,20 +284,20 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
           },
         });
       }
-      await CacheService.set(cacheKey, environment, CACHE_TTL);
+      await CacheService.set(cacheKey, env, CACHE_TTL);
     }
 
-    req.environment = environment.environment;
-    req.environmentModel = environment;
+    req.environmentId = env.id;
+    req.environmentModel = env;
 
     // Access check
     if (!req.isUnsecuredToken && req.apiToken) {
-      const hasAccess = await checkEnvironmentAccess(req.apiToken, req.environment);
+      const hasAccess = await checkEnvironmentAccess(req.apiToken, req.environmentId);
       if (!hasAccess) {
         logger.warn('Auth: Environment access denied', {
           tokenId: req.apiToken.id,
           tokenType: req.apiToken.tokenType,
-          env: req.environment,
+          env: req.environmentId,
           url: req.originalUrl,
           allowAll: req.apiToken.allowAllEnvironments,
         });

@@ -10,7 +10,7 @@ import logger from '../config/logger';
 
 // Helper to get environment from request
 function getEnvironment(req: AuthenticatedRequest): string {
-  const env = req.environment;
+  const env = req.environmentId;
   if (!env) {
     throw new GatrixError('Environment not specified', 400);
   }
@@ -40,7 +40,7 @@ export class ChangeRequestController {
    * GET /api/v1/admin/change-requests
    */
   static list = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const status = req.query.status as string | undefined;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -48,7 +48,7 @@ export class ChangeRequestController {
     const userId = req.user?.id;
 
     let query = ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .withGraphFetched('[requester, rejector, environmentModel, changeItems, approvals]')
       .orderBy('updatedAt', 'desc')
       .limit(limit)
@@ -73,7 +73,7 @@ export class ChangeRequestController {
     const [items, countResult] = await Promise.all([
       query,
       ChangeRequest.query()
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where((builder) => {
           if (status) {
             builder.where('status', status);
@@ -417,7 +417,7 @@ export class ChangeRequestController {
    * GET /api/v1/admin/change-requests/my
    */
   static getMyRequests = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -425,14 +425,14 @@ export class ChangeRequestController {
     }
 
     const asRequester = await ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where('requesterId', userId)
       .whereIn('status', ['draft', 'open', 'rejected'])
       .withGraphFetched('changeItems')
       .orderBy('updatedAt', 'desc');
 
     const pendingApproval = await ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where('status', 'open')
       .whereNotIn('id', (qb) => {
         qb.select('changeRequestId').from('g_approvals').where('approverId', userId);
@@ -500,14 +500,14 @@ export class ChangeRequestController {
    * GET /api/v1/admin/change-requests/stats
    */
   static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const userId = req.user?.userId;
 
     if (!userId) {
       throw new GatrixError('User not authenticated', 401);
     }
 
-    const stats = await ChangeRequestService.getChangeRequestCounts(environment, userId);
+    const stats = await ChangeRequestService.getChangeRequestCounts(environmentId, userId);
 
     res.json({
       success: true,

@@ -87,7 +87,7 @@ export interface AuditLog {
   entityId?: string;
   oldValues?: any;
   newValues?: any;
-  environment?: string;
+  environmentId?: string;
   resourceType?: string;
   resourceId?: string;
   details?: any;
@@ -106,5 +106,5 @@ export interface CreateAuditLogData {
   newValues?: any;
   ipAddress?: string;
   userAgent?: string;
-  environment?: string;
+  environmentId?: string;
 }

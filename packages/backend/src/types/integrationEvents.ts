@@ -137,7 +137,7 @@ export interface IntegrationSystemEvent {
   type: IntegrationEventType;
   createdBy?: string;
   createdByUserId?: string;
-  environment?: string;
+  environmentId?: string;
   data?: Record<string, any>;
   preData?: Record<string, any>;
   createdAt: Date;

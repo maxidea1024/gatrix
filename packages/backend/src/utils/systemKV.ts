@@ -71,8 +71,8 @@ export async function initializeAllSystemKV(): Promise<void> {
     logger.info('Initializing system-defined KV items for all environments...');
     const environments = await getAllEnvironments(knex);
 
-    for (const environment of environments) {
-      await initializeSystemKV(environment);
+    for (const environmentId of environments) {
+      await initializeSystemKV(environmentId);
     }
 
     logger.info(`Successfully initialized system KV items for ${environments.length} environments`);
@@ -85,27 +85,27 @@ export async function initializeAllSystemKV(): Promise<void> {
 /**
  * Initialize system-defined KV items for a specific environment
  */
-export async function initializeSystemKV(environment: string): Promise<void> {
+export async function initializeSystemKV(environmentId: string): Promise<void> {
   try {
-    logger.info(`Initializing system-defined KV items for environment ${environment}...`);
+    logger.info(`Initializing system-defined KV items for environmentId ${environmentId}...`);
 
     for (const def of SYSTEM_KV_DEFINITIONS) {
       await VarsModel.defineSystemKV(
         def.key,
         def.value,
         def.valueType,
-        environment,
+        environmentId,
         def.description,
         def.isCopyable
       );
-      logger.info(`System KV initialized for env ${environment}: ${def.key}`);
+      logger.info(`System KV initialized for env ${environmentId}: ${def.key}`);
     }
 
     logger.info(
-      `Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items for environment ${environment}`
+      `Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items for environmentId ${environmentId}`
     );
   } catch (error) {
-    logger.error(`Error initializing system KV items for environment ${environment}:`, error);
+    logger.error(`Error initializing system KV items for environmentId ${environmentId}:`, error);
     throw error;
   }
 }
@@ -124,14 +124,14 @@ export async function defineSystemKV(
   key: string,
   value: string | null,
   valueType: VarValueType,
-  environment: string,
+  environmentId: string,
   description: string
 ): Promise<void> {
   try {
-    await VarsModel.defineSystemKV(key, value, valueType, environment, description);
-    logger.info(`System KV defined: ${key} in ${environment}`);
+    await VarsModel.defineSystemKV(key, value, valueType, environmentId, description);
+    logger.info(`System KV defined: ${key} in ${environmentId}`);
   } catch (error) {
-    logger.error(`Error defining system KV ${key} in ${environment}:`, error);
+    logger.error(`Error defining system KV ${key} in ${environmentId}:`, error);
     throw error;
   }
 }

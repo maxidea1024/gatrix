@@ -39,7 +39,7 @@ export class DebugAddon extends Addon {
       integrationId,
       eventType: event.type,
       eventData: event.data,
-      environment: event.environment,
+      environmentId: event.environmentId,
       createdAt: event.createdAt,
       parameters: { ...parameters, sensitive: '***' }, // conceal sensitive if any
     };

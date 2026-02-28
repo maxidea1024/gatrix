@@ -39,7 +39,7 @@ const ENV_KEY_CACHE_TTL = 300; // 5 minutes
 
 export interface EnvironmentKeyRequest extends Request {
   envKey?: EnvironmentKeyRecord;
-  environment?: string;
+  environmentId?: string;
   environmentModel?: Environment;
   projectId?: string;
   orgId?: string;
@@ -129,11 +129,11 @@ export const authenticateEnvironmentKey = async (
       const envName =
         (req.headers[HEADERS.X_ENVIRONMENT] as string) ||
         (req.params.env as string) ||
-        (req.params.environment as string) ||
-        (req.query.environment as string);
+        (req.params.environmentId as string) ||
+        (req.query.environmentId as string);
 
       if (envName) {
-        req.environment = envName;
+        req.environmentId = envName;
         const envModel = await Environment.getByName(envName);
         if (envModel) {
           req.environmentModel = envModel;
@@ -164,10 +164,10 @@ export const authenticateEnvironmentKey = async (
     // 4. Set request context
     req.envKey = keyData;
     req.keyType = keyData.keyType;
-    req.environment = keyData.environment;
+    req.environmentId = keyData.environmentId;
 
     // 5. Resolve environment → project → org chain
-    const envModel = await Environment.getByName(keyData.environment);
+    const envModel = await Environment.getByName(keyData.environmentId);
     if (!envModel) {
       return res.status(404).json({
         success: false,

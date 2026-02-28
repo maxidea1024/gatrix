@@ -100,7 +100,7 @@ export const requireProjectPermission = (perm: string) => {
 
 /**
  * Require an environment-level permission.
- * Resolves environment from: req.params.environment ??req.environment ??X-Environment header
+ * Resolves environment from: req.params.environmentId ??req.environmentId ??X-Environment header
  * Auto-resolves the full chain: environment ??project ??organisation
  */
 export const requireEnvPermission = (perm: string) => {
@@ -112,16 +112,16 @@ export const requireEnvPermission = (perm: string) => {
       }
 
       const { id: userId, orgId } = req.user;
-      const environment =
-        req.params.environment || req.environment || (req.headers['x-environment'] as string);
+      const environmentId =
+        req.params.environmentId || req.environmentId || (req.headers['x-environment'] as string);
 
-      if (!environment) {
+      if (!environmentId) {
         next(new GatrixError('Environment context required', 400));
         return;
       }
 
       // Resolve full chain: environment ??project ??org
-      const chain = await permissionService.resolveEnvironmentChain(environment);
+      const chain = await permissionService.resolveEnvironmentChain(environmentId);
       if (!chain) {
         next(new GatrixError('Environment not found', 404));
         return;
@@ -134,14 +134,14 @@ export const requireEnvPermission = (perm: string) => {
       }
 
       // Set resolved context on request
-      req.environment = environment;
+      req.environmentId = environmentId;
       req.projectId = chain.projectId;
 
       const allowed = await permissionService.hasEnvPermission(
         userId,
         orgId,
         chain.projectId,
-        environment,
+        environmentId,
         perm
       );
       if (!allowed) {
@@ -149,7 +149,7 @@ export const requireEnvPermission = (perm: string) => {
           userId,
           orgId,
           projectId: chain.projectId,
-          environment,
+          environmentId,
           perm,
           path: req.path,
         });

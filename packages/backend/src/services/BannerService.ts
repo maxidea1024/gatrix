@@ -16,7 +16,7 @@ const CACHE_PREFIX = 'banners';
 const CACHE_TTL = 300; // 5 minutes
 
 export interface CreateBannerInput {
-  environment: string;
+  environmentId: string;
   name: string;
   description?: string;
   width: number;
@@ -41,7 +41,7 @@ export interface UpdateBannerInput {
 }
 
 export interface GetBannersParams {
-  environment: string;
+  environmentId: string;
   page?: number;
   limit?: number;
   search?: string;
@@ -78,7 +78,7 @@ class BannerService {
 
     try {
       const filters: BannerFilters = {
-        environment: params.environment,
+        environmentId: params.environmentId,
         search: params.search,
         status: params.status,
         limit,
@@ -104,9 +104,9 @@ class BannerService {
   /**
    * Get banner by ID
    */
-  static async getBannerById(bannerId: string, environment: string): Promise<BannerAttributes> {
+  static async getBannerById(bannerId: string, environmentId: string): Promise<BannerAttributes> {
     try {
-      const banner = await BannerModel.findById(bannerId, environment);
+      const banner = await BannerModel.findById(bannerId, environmentId);
 
       if (!banner) {
         throw new GatrixError('Banner not found', 404);
@@ -115,7 +115,7 @@ class BannerService {
       return banner;
     } catch (error) {
       if (error instanceof GatrixError) throw error;
-      logger.error('Failed to get banner', { error, bannerId, environment });
+      logger.error('Failed to get banner', { error, bannerId, environmentId });
       throw new GatrixError('Failed to get banner', 500);
     }
   }
@@ -135,7 +135,7 @@ class BannerService {
     }
 
     // Check for duplicate name
-    const existing = await BannerModel.findByName(input.name, input.environment);
+    const existing = await BannerModel.findByName(input.name, input.environmentId);
     if (existing) {
       throw new GatrixError('A banner with this name already exists', 409, true, 'DUPLICATE_NAME');
     }
@@ -145,7 +145,7 @@ class BannerService {
 
       const banner = await BannerModel.create({
         bannerId,
-        environment: input.environment,
+        environmentId: input.environmentId,
         name: input.name,
         description: input.description,
         width: input.width || 1024,
@@ -161,16 +161,16 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        const environment = banner.environment;
+        const environmentId = banner.environmentId;
 
         // Invalidate cache (including ETag cache for SDK)
-        await this.invalidateCache(banner.environment);
+        await this.invalidateCache(banner.environmentId);
 
         await pubSubService.publishSDKEvent({
           type: 'banner.created',
           data: {
             id: banner.bannerId,
-            environment,
+            environmentId,
             status: banner.status,
             timestamp: Date.now(),
           },
@@ -191,7 +191,7 @@ class BannerService {
    */
   static async updateBanner(
     bannerId: string,
-    environment: string,
+    environmentId: string,
     input: UpdateBannerInput
   ): Promise<BannerAttributes> {
     // If name is being updated, validate format and check for duplicates
@@ -205,7 +205,7 @@ class BannerService {
         );
       }
 
-      const existing = await BannerModel.findByName(input.name, environment, bannerId);
+      const existing = await BannerModel.findByName(input.name, environmentId, bannerId);
       if (existing) {
         throw new GatrixError(
           'A banner with this name already exists',
@@ -218,12 +218,12 @@ class BannerService {
 
     try {
       // Check if banner exists
-      await this.getBannerById(bannerId, environment);
+      await this.getBannerById(bannerId, environmentId);
 
-      const banner = await BannerModel.update(bannerId, input, environment);
+      const banner = await BannerModel.update(bannerId, input, environmentId);
 
       // Invalidate cache (including ETag cache for SDK)
-      await this.invalidateCache(banner.environment);
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -238,7 +238,7 @@ class BannerService {
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environment: banner.environment,
+            environmentId: banner.environmentId,
             status: banner.status,
             timestamp: Date.now(),
           },
@@ -253,7 +253,7 @@ class BannerService {
       logger.error('Failed to update banner', {
         error,
         bannerId,
-        environment,
+        environmentId,
         input,
       });
       throw new GatrixError('Failed to update banner', 500);
@@ -263,15 +263,15 @@ class BannerService {
   /**
    * Delete a banner
    */
-  static async deleteBanner(bannerId: string, environment: string): Promise<void> {
+  static async deleteBanner(bannerId: string, environmentId: string): Promise<void> {
     try {
       // Check if banner exists
-      const banner = await this.getBannerById(bannerId, environment);
+      const banner = await this.getBannerById(bannerId, environmentId);
 
-      await BannerModel.delete(bannerId, environment);
+      await BannerModel.delete(bannerId, environmentId);
 
       // Invalidate cache (including ETag cache for SDK)
-      await this.invalidateCache(banner.environment);
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -286,7 +286,7 @@ class BannerService {
           type: 'banner.deleted',
           data: {
             id: bannerId,
-            environment: banner.environment,
+            environmentId: banner.environmentId,
             timestamp: Date.now(),
           },
         });
@@ -295,7 +295,7 @@ class BannerService {
       }
     } catch (error) {
       if (error instanceof GatrixError) throw error;
-      logger.error('Failed to delete banner', { error, bannerId, environment });
+      logger.error('Failed to delete banner', { error, bannerId, environmentId });
       throw new GatrixError('Failed to delete banner', 500);
     }
   }
@@ -305,14 +305,19 @@ class BannerService {
    */
   static async publishBanner(
     bannerId: string,
-    environment: string,
+    environmentId: string,
     updatedBy?: string
   ): Promise<BannerAttributes> {
     try {
-      const banner = await BannerModel.updateStatus(bannerId, 'published', environment, updatedBy);
+      const banner = await BannerModel.updateStatus(
+        bannerId,
+        'published',
+        environmentId,
+        updatedBy
+      );
 
       // Invalidate cache (including ETag cache for SDK)
-      await this.invalidateCache(banner.environment);
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -327,7 +332,7 @@ class BannerService {
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environment: banner.environment,
+            environmentId: banner.environmentId,
             status: banner.status,
             timestamp: Date.now(),
           },
@@ -341,7 +346,7 @@ class BannerService {
       logger.error('Failed to publish banner', {
         error,
         bannerId,
-        environment,
+        environmentId,
       });
       throw new GatrixError('Failed to publish banner', 500);
     }
@@ -352,14 +357,14 @@ class BannerService {
    */
   static async archiveBanner(
     bannerId: string,
-    environment: string,
+    environmentId: string,
     updatedBy?: string
   ): Promise<BannerAttributes> {
     try {
-      const banner = await BannerModel.updateStatus(bannerId, 'archived', environment, updatedBy);
+      const banner = await BannerModel.updateStatus(bannerId, 'archived', environmentId, updatedBy);
 
       // Invalidate cache (including ETag cache for SDK)
-      await this.invalidateCache(banner.environment);
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -374,7 +379,7 @@ class BannerService {
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environment: banner.environment,
+            environmentId: banner.environmentId,
             status: banner.status,
             timestamp: Date.now(),
           },
@@ -388,7 +393,7 @@ class BannerService {
       logger.error('Failed to archive banner', {
         error,
         bannerId,
-        environment,
+        environmentId,
       });
       throw new GatrixError('Failed to archive banner', 500);
     }
@@ -399,22 +404,22 @@ class BannerService {
    */
   static async duplicateBanner(
     bannerId: string,
-    environment: string,
+    environmentId: string,
     createdBy?: string
   ): Promise<BannerAttributes> {
     try {
       const newBannerId = ulid();
-      const banner = await BannerModel.duplicate(bannerId, newBannerId, environment, createdBy);
+      const banner = await BannerModel.duplicate(bannerId, newBannerId, environmentId, createdBy);
 
       // Invalidate cache (including ETag cache for SDK)
-      await this.invalidateCache(banner.environment);
+      await this.invalidateCache(banner.environmentId);
 
       return banner;
     } catch (error) {
       logger.error('Failed to duplicate banner', {
         error,
         bannerId,
-        environment,
+        environmentId,
       });
       throw new GatrixError('Failed to duplicate banner', 500);
     }
@@ -425,24 +430,24 @@ class BannerService {
   /**
    * Get published banners for client
    */
-  static async getPublishedBanners(environment: string): Promise<BannerAttributes[]> {
+  static async getPublishedBanners(environmentId: string): Promise<BannerAttributes[]> {
     try {
       // Try cache first
-      const cacheKey = `${CACHE_PREFIX}:published:${environment}`;
+      const cacheKey = `${CACHE_PREFIX}:published:${environmentId}`;
       const cached = await cacheService.get<BannerAttributes[]>(cacheKey);
 
       if (cached) {
         return cached;
       }
 
-      const banners = await BannerModel.findPublished(environment);
+      const banners = await BannerModel.findPublished(environmentId);
 
       // Cache the result
       await cacheService.set(cacheKey, banners, CACHE_TTL);
 
       return banners;
     } catch (error) {
-      logger.error('Failed to get published banners', { error, environment });
+      logger.error('Failed to get published banners', { error, environmentId });
       throw new GatrixError('Failed to get published banners', 500);
     }
   }
@@ -452,17 +457,17 @@ class BannerService {
    */
   static async getPublishedBannerById(
     bannerId: string,
-    environment: string
+    environmentId: string
   ): Promise<BannerAttributes> {
     try {
-      const cacheKey = `${CACHE_PREFIX}:published:${bannerId}:${environment}`;
+      const cacheKey = `${CACHE_PREFIX}:published:${bannerId}:${environmentId}`;
       const cached = await cacheService.get<BannerAttributes>(cacheKey);
 
       if (cached) {
         return cached;
       }
 
-      const banner = await BannerModel.findById(bannerId, environment);
+      const banner = await BannerModel.findById(bannerId, environmentId);
 
       if (!banner || banner.status !== 'published') {
         throw new GatrixError('Banner not found', 404);
@@ -477,7 +482,7 @@ class BannerService {
       logger.error('Failed to get published banner', {
         error,
         bannerId,
-        environment,
+        environmentId,
       });
       throw new GatrixError('Failed to get published banner', 500);
     }
@@ -486,19 +491,19 @@ class BannerService {
   /**
    * Invalidate banner cache
    */
-  static async invalidateCache(environment?: string): Promise<void> {
+  static async invalidateCache(environmentId?: string): Promise<void> {
     try {
       await cacheService.deleteByPattern(`${CACHE_PREFIX}:*`);
 
       // Also invalidate ETag cache for SDK
-      if (environment) {
-        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.BANNERS}:${environment}`);
+      if (environmentId) {
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.BANNERS}:${environmentId}`);
       } else {
         // Invalidate all banner ETag caches
         await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.BANNERS}:*`);
       }
 
-      logger.info('Banner cache invalidated', { environment });
+      logger.info('Banner cache invalidated', { environmentId });
     } catch (error) {
       logger.error('Failed to invalidate banner cache', { error });
     }

@@ -384,15 +384,15 @@ router.get(
 
 // Helper function to validate environment
 const requireEnvironment = (req: AuthenticatedRequest, res: Response): string | null => {
-  const environment = req.environment;
-  if (!environment) {
+  const environmentId = req.environmentId;
+  if (!environmentId) {
     res.status(400).json({
       success: false,
       error: 'Environment is required (x-environment header)',
     });
     return null;
   }
-  return environment;
+  return environmentId;
 };
 
 // Helper to extract request context for audit logs
@@ -405,14 +405,14 @@ const getRequestContext = (req: AuthenticatedRequest): RequestContext => ({
 router.get(
   '/',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder } =
       req.query;
 
     const result = await featureFlagService.listFlags({
-      environment,
+      environmentId,
       search: search as string,
       flagType: flagType as string,
       isEnabled: isEnabled === 'true' ? true : isEnabled === 'false' ? false : undefined,
@@ -432,13 +432,13 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const flag = await featureFlagService.createFlag(
-      { ...req.body, environment },
+      { ...req.body, environmentId },
       userId!,
       getRequestContext(req)
     );
@@ -451,10 +451,10 @@ router.post(
 router.get(
   '/:flagName',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
-    const flag = await featureFlagService.getFlag(environment, req.params.flagName);
+    const flag = await featureFlagService.getFlag(environmentId, req.params.flagName);
 
     if (!flag) {
       return res.status(404).json({ success: false, error: 'Flag not found' });
@@ -468,13 +468,13 @@ router.get(
 router.put(
   '/:flagName',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const flag = await featureFlagService.updateFlag(
-      environment,
+      environmentId,
       req.params.flagName,
       req.body,
       userId!,
@@ -490,12 +490,12 @@ router.post(
   '/:flagName/toggle',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     // Allow environment from body, otherwise use request environment (header)
-    const environment = req.body.environment || req.environment;
+    const environmentId = req.body.environmentId || req.environmentId;
     const userId = req.user?.id;
     const { isEnabled } = req.body;
 
     const flag = await featureFlagService.toggleFlag(
-      environment,
+      environmentId,
       req.params.flagName,
       isEnabled,
       userId!,
@@ -510,13 +510,13 @@ router.post(
 router.post(
   '/:flagName/archive',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const flag = await featureFlagService.archiveFlag(
-      environment,
+      environmentId,
       req.params.flagName,
       userId!,
       getRequestContext(req)
@@ -530,13 +530,13 @@ router.post(
 router.post(
   '/:flagName/revive',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const flag = await featureFlagService.reviveFlag(
-      environment,
+      environmentId,
       req.params.flagName,
       userId!,
       getRequestContext(req)
@@ -550,14 +550,14 @@ router.post(
 router.post(
   '/:flagName/favorite',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
     const { isFavorite } = req.body;
 
     const flag = await featureFlagService.toggleFavorite(
-      environment,
+      environmentId,
       req.params.flagName,
       isFavorite,
       userId!,
@@ -572,13 +572,13 @@ router.post(
 router.post(
   '/:flagName/mark-stale',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const flag = await featureFlagService.markAsStale(
-      environment,
+      environmentId,
       req.params.flagName,
       userId!,
       getRequestContext(req)
@@ -592,13 +592,13 @@ router.post(
 router.post(
   '/:flagName/unmark-stale',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const flag = await featureFlagService.markAsNotStale(
-      environment,
+      environmentId,
       req.params.flagName,
       userId!,
       getRequestContext(req)
@@ -612,13 +612,13 @@ router.post(
 router.delete(
   '/:flagName',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     await featureFlagService.deleteFlag(
-      environment,
+      environmentId,
       req.params.flagName,
       userId!,
       getRequestContext(req)
@@ -634,13 +634,13 @@ router.delete(
 router.post(
   '/:flagName/strategies',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const strategy = await featureFlagService.addStrategy(
-      environment,
+      environmentId,
       req.params.flagName,
       req.body,
       userId!
@@ -654,13 +654,13 @@ router.post(
 router.put(
   '/:flagName/strategies',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const strategies = await featureFlagService.updateStrategies(
-      environment,
+      environmentId,
       req.params.flagName,
       req.body.strategies || [],
       userId!
@@ -704,13 +704,13 @@ router.delete(
 router.put(
   '/:flagName/variants',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
 
     const variants = await featureFlagService.updateVariants(
-      environment,
+      environmentId,
       req.params.flagName,
       req.body.variants || [],
       userId!,
@@ -730,8 +730,8 @@ router.put(
 router.get(
   '/:flagName/metrics',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const { startDate, endDate, appName } = req.query;
 
@@ -744,7 +744,7 @@ router.get(
     }
 
     const metrics = await featureFlagService.getMetrics(
-      environment,
+      environmentId,
       req.params.flagName,
       new Date((startDate as string) || Date.now() - 7 * 24 * 60 * 60 * 1000),
       new Date((endDate as string) || Date.now()),
@@ -759,13 +759,13 @@ router.get(
 router.get(
   '/:flagName/metrics/apps',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const { startDate, endDate } = req.query;
 
     const appNames = await featureFlagService.getMetricsAppNames(
-      environment,
+      environmentId,
       req.params.flagName,
       new Date((startDate as string) || Date.now() - 7 * 24 * 60 * 60 * 1000),
       new Date((endDate as string) || Date.now())
@@ -779,12 +779,17 @@ router.get(
 router.post(
   '/:flagName/metrics',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const { enabled, variantName } = req.body;
 
-    await featureFlagService.recordMetrics(environment, req.params.flagName, enabled, variantName);
+    await featureFlagService.recordMetrics(
+      environmentId,
+      req.params.flagName,
+      enabled,
+      variantName
+    );
 
     res.json({ success: true });
   })
@@ -1022,7 +1027,7 @@ router.post(
     if (environments.length > 0) {
       try {
         const scanFlagsResult = await featureFlagService.listFlags({
-          environment: environments[0],
+          environmentId: environments[0],
           isArchived: false,
           page: 1,
           limit: 10000,
@@ -1085,7 +1090,7 @@ router.post(
       try {
         // Load all flags for this environment
         const flagsResult = await featureFlagService.listFlags({
-          environment: env,
+          environmentId: env,
           isArchived: false,
           page: 1,
           limit: 10000,
@@ -1115,18 +1120,22 @@ router.post(
           // Manual override if variant is somehow missing (already handled in evaluateFlagWithDetails now)
           // But kept for safety
           if (!evalResult.variant) {
-            const envSettings = (flag as any).environments?.find((e: any) => e.environment === env);
+            const envSettings = (flag as any).environments?.find(
+              (e: any) => e.environmentId === env
+            );
             let value = (flag as any).isEnabled
               ? (envSettings?.enabledValue ?? (flag as any).enabledValue)
               : (envSettings?.disabledValue ?? (flag as any).disabledValue);
-            let valueSource: 'environment' | 'flag' | undefined;
+            let valueSource: 'environmentId' | 'flag' | undefined;
 
             // Check overrides
-            const envOverride = (flag as any).environments?.find((e: any) => e.environment === env);
+            const envOverride = (flag as any).environments?.find(
+              (e: any) => e.environmentId === env
+            );
             if ((flag as any).isEnabled) {
               if (envOverride?.enabledValue !== undefined) {
                 value = envOverride.enabledValue;
-                valueSource = 'environment';
+                valueSource = 'environmentId';
               } else if ((flag as any).enabledValue !== undefined) {
                 value = (flag as any).enabledValue;
                 valueSource = 'flag';
@@ -1134,7 +1143,7 @@ router.post(
             } else {
               if (envOverride?.disabledValue !== undefined) {
                 value = envOverride.disabledValue;
-                valueSource = 'environment';
+                valueSource = 'environmentId';
               } else if ((flag as any).disabledValue !== undefined) {
                 value = (flag as any).disabledValue;
                 valueSource = 'flag';
@@ -1148,12 +1157,12 @@ router.post(
             let variantName: string;
             if (evalResult.enabled) {
               variantName =
-                valueSource === 'environment'
+                valueSource === 'environmentId'
                   ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
                   : VALUE_SOURCE.FLAG_DEFAULT_ENABLED;
             } else {
               variantName =
-                valueSource === 'environment'
+                valueSource === 'environmentId'
                   ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
                   : VALUE_SOURCE.FLAG_DEFAULT_DISABLED;
             }
@@ -1207,7 +1216,7 @@ router.post(
         envResults.sort((a, b) => a.flagName.localeCompare(b.flagName));
         results[env] = envResults;
       } catch (error: any) {
-        console.error(`Playground evaluation failed for environment '${env}':`, error);
+        console.error(`Playground evaluation failed for environmentId '${env}':`, error);
         results[env] = [];
       }
     }
@@ -1239,7 +1248,7 @@ function evaluateFlagWithDetails(
   flag: any,
   context: Record<string, any>,
   segmentsMap: Map<string, any>,
-  environment?: string,
+  environmentId?: string,
   contextWarnings?: any[]
 ): {
   enabled: boolean;
@@ -1290,7 +1299,7 @@ function evaluateFlagWithDetails(
       message: 'Flag is disabled in this environment',
     });
     const envDisabledValue = flag.environments?.find(
-      (e: any) => e.environment === environment
+      (e: any) => e.environmentId === environmentId
     )?.disabledValue;
     const isEnvSource = envDisabledValue !== undefined;
     return {
@@ -1300,7 +1309,7 @@ function evaluateFlagWithDetails(
         name: isEnvSource ? VALUE_SOURCE.ENV_DEFAULT_DISABLED : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(envDisabledValue ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
-        valueSource: isEnvSource ? 'environment' : 'flag',
+        valueSource: isEnvSource ? 'environmentId' : 'flag',
       },
       evaluationSteps,
     };
@@ -1325,7 +1334,7 @@ function evaluateFlagWithDetails(
     });
     if (contextFailed) {
       const ctxEnvDisVal = flag.environments?.find(
-        (e: any) => e.environment === environment
+        (e: any) => e.environmentId === environmentId
       )?.disabledValue;
       return {
         enabled: false,
@@ -1337,7 +1346,7 @@ function evaluateFlagWithDetails(
               : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
           value: getFallbackValue(ctxEnvDisVal ?? flag.disabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
-          valueSource: ctxEnvDisVal !== undefined ? 'environment' : 'flag',
+          valueSource: ctxEnvDisVal !== undefined ? 'environmentId' : 'flag',
         },
         evaluationSteps,
       };
@@ -1347,7 +1356,7 @@ function evaluateFlagWithDetails(
       flag.variants || [],
       context,
       undefined,
-      environment
+      environmentId
     );
     return {
       enabled: true,
@@ -1490,7 +1499,7 @@ function evaluateFlagWithDetails(
         flag.variants || [],
         context,
         strategy,
-        environment
+        environmentId
       );
       return {
         enabled: true,
@@ -1510,7 +1519,7 @@ function evaluateFlagWithDetails(
   // Context validation failed - return after full evaluation
   if (contextFailed) {
     const ctxFailEnvDisVal = flag.environments?.find(
-      (e: any) => e.environment === environment
+      (e: any) => e.environmentId === environmentId
     )?.disabledValue;
     return {
       enabled: false,
@@ -1522,7 +1531,7 @@ function evaluateFlagWithDetails(
             : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(ctxFailEnvDisVal ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
-        valueSource: ctxFailEnvDisVal !== undefined ? 'environment' : 'flag',
+        valueSource: ctxFailEnvDisVal !== undefined ? 'environmentId' : 'flag',
       },
       evaluationSteps,
     };
@@ -1538,7 +1547,7 @@ function evaluateFlagWithDetails(
       flag.variants || [],
       context,
       undefined,
-      environment
+      environmentId
     );
     return {
       enabled: true,
@@ -1549,7 +1558,7 @@ function evaluateFlagWithDetails(
   }
 
   const noMatchEnvDisVal = flag.environments?.find(
-    (e: any) => e.environment === environment
+    (e: any) => e.environmentId === environmentId
   )?.disabledValue;
   const noMatchIsEnvSource = noMatchEnvDisVal !== undefined;
   return {
@@ -1566,7 +1575,7 @@ function evaluateFlagWithDetails(
         : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
       value: noMatchEnvDisVal ?? flag.disabledValue ?? null,
       valueType: flag.valueType || 'string',
-      valueSource: noMatchIsEnvSource ? 'environment' : 'flag',
+      valueSource: noMatchIsEnvSource ? 'environmentId' : 'flag',
     },
   };
 }
@@ -1785,19 +1794,19 @@ function selectVariantForFlag(
   variants: any[],
   context: Record<string, any>,
   matchedStrategy?: any,
-  environment?: string
+  environmentId?: string
 ): { name: string; value?: any; valueType?: string; valueSource?: string } {
-  const envSettings = environment
-    ? flag.environments?.find((e: any) => e.environment === environment)
+  const envSettings = environmentId
+    ? flag.environments?.find((e: any) => e.environmentId === environmentId)
     : undefined;
 
   const resolvedEnabledValue = envSettings?.enabledValue ?? flag.enabledValue;
-  const valueSource = envSettings?.enabledValue !== undefined ? 'environment' : 'flag';
+  const valueSource = envSettings?.enabledValue !== undefined ? 'environmentId' : 'flag';
 
   if (variants.length === 0) {
     return {
       name:
-        valueSource === 'environment'
+        valueSource === 'environmentId'
           ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
           : VALUE_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
@@ -1810,7 +1819,7 @@ function selectVariantForFlag(
   if (totalWeight <= 0) {
     return {
       name:
-        valueSource === 'environment'
+        valueSource === 'environmentId'
           ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
           : VALUE_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
@@ -1829,7 +1838,7 @@ function selectVariantForFlag(
     if (targetWeight <= cumulativeWeight) {
       // Determine value and its source
       let value = variant.value;
-      let actualValueSource: 'variant' | 'environment' | 'flag' = 'variant';
+      let actualValueSource: 'variant' | 'environmentId' | 'flag' = 'variant';
       if (value === undefined || value === null) {
         value = resolvedEnabledValue;
         actualValueSource = valueSource as any;
@@ -1844,7 +1853,7 @@ function selectVariantForFlag(
   }
   const lastVariant = variants[variants.length - 1];
   let value = lastVariant.value;
-  let actualValueSource: 'variant' | 'environment' | 'flag' = 'variant';
+  let actualValueSource: 'variant' | 'environmentId' | 'flag' = 'variant';
   if (value === undefined || value === null) {
     value = resolvedEnabledValue;
     actualValueSource = valueSource as any;
@@ -1863,8 +1872,8 @@ function selectVariantForFlag(
 router.post(
   '/clone',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
     const { sourceFlagName, newFlagName } = req.body;
@@ -1884,7 +1893,7 @@ router.post(
     }
 
     // Check if source flag exists
-    const sourceFlag = await featureFlagService.getFlag(environment, sourceFlagName);
+    const sourceFlag = await featureFlagService.getFlag(environmentId, sourceFlagName);
     if (!sourceFlag) {
       return res.status(404).json({
         success: false,
@@ -1893,7 +1902,7 @@ router.post(
     }
 
     // Check if new flag name already exists
-    const existingFlag = await featureFlagService.getFlag(environment, newFlagName);
+    const existingFlag = await featureFlagService.getFlag(environmentId, newFlagName);
     if (existingFlag) {
       return res.status(409).json({
         success: false,
@@ -1904,7 +1913,7 @@ router.post(
     // Create new flag with same settings but different name
     const newFlag = await featureFlagService.createFlag(
       {
-        environment,
+        environmentId,
         flagName: newFlagName,
         displayName: sourceFlag.displayName ? `${sourceFlag.displayName} (Copy)` : undefined,
         description: sourceFlag.description,
@@ -1944,8 +1953,8 @@ router.post(
 router.post(
   '/import',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = requireEnvironment(req, res);
-    if (!environment) return;
+    const environmentId = requireEnvironment(req, res);
+    if (!environmentId) return;
 
     const userId = req.user?.id;
     const { segments = [], flags = [] } = req.body;
@@ -2000,7 +2009,7 @@ router.post(
     for (const flagData of flags) {
       try {
         // Check if flag exists
-        const existingFlag = await featureFlagService.getFlag(environment, flagData.flagName);
+        const existingFlag = await featureFlagService.getFlag(environmentId, flagData.flagName);
 
         if (existingFlag) {
           result.flags.skipped++;
@@ -2011,7 +2020,7 @@ router.post(
         // Create new flag with strategies and variants
         await featureFlagService.createFlag(
           {
-            environment,
+            environmentId,
             flagName: flagData.flagName,
             displayName: flagData.displayName,
             description: flagData.description,

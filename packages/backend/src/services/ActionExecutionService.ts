@@ -218,29 +218,29 @@ export class ActionExecutionService {
     params: Record<string, any>,
     actionSet: ActionSet
   ): Promise<any> {
-    const { flagName, environment } = params;
+    const { flagName, environmentId } = params;
 
-    if (!flagName || !environment) {
+    if (!flagName || !environmentId) {
       throw new Error('flagName and environment are required for TOGGLE_FLAG');
     }
 
     // Dynamic import to avoid circular dependency
     const { featureFlagService } = await import('./FeatureFlagService');
 
-    const flag = await featureFlagService.getFlag(environment, flagName);
+    const flag = await featureFlagService.getFlag(environmentId, flagName);
     if (!flag) {
-      throw new Error(`Feature flag "${flagName}" not found in environment "${environment}"`);
+      throw new Error(`Feature flag "${flagName}" not found in environmentId "${environmentId}"`);
     }
 
-    const envConfig = flag.environments?.[environment];
+    const envConfig = flag.environments?.[environmentId];
     const currentEnabled = envConfig?.isEnabled ?? false;
     const newEnabled = !currentEnabled;
 
-    await featureFlagService.toggleFlag(environment, flagName, newEnabled, actionSet.actorId!);
+    await featureFlagService.toggleFlag(environmentId, flagName, newEnabled, actionSet.actorId!);
 
     return {
       flagName,
-      environment,
+      environmentId,
       previousEnabled: currentEnabled,
       newEnabled,
     };
@@ -254,26 +254,26 @@ export class ActionExecutionService {
     actionSet: ActionSet,
     enabled: boolean
   ): Promise<any> {
-    const { flagName, environment } = params;
+    const { flagName, environmentId } = params;
 
-    if (!flagName || !environment) {
+    if (!flagName || !environmentId) {
       throw new Error(
-        `flagName and environment are required for ${enabled ? 'ENABLE_FLAG' : 'DISABLE_FLAG'}`
+        `flagName and environmentId are required for ${enabled ? 'ENABLE_FLAG' : 'DISABLE_FLAG'}`
       );
     }
 
     const { featureFlagService } = await import('./FeatureFlagService');
 
-    const flag = await featureFlagService.getFlag(environment, flagName);
+    const flag = await featureFlagService.getFlag(environmentId, flagName);
     if (!flag) {
-      throw new Error(`Feature flag "${flagName}" not found in environment "${environment}"`);
+      throw new Error(`Feature flag "${flagName}" not found in environmentId "${environmentId}"`);
     }
 
-    await featureFlagService.toggleFlag(environment, flagName, enabled, actionSet.actorId!);
+    await featureFlagService.toggleFlag(environmentId, flagName, enabled, actionSet.actorId!);
 
     return {
       flagName,
-      environment,
+      environmentId,
       isEnabled: enabled,
     };
   }

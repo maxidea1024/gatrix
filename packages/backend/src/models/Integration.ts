@@ -174,7 +174,10 @@ export class IntegrationModel {
   /**
    * Find enabled integrations for a specific event
    */
-  static async findEnabledByEvent(eventType: string, environment?: string): Promise<Integration[]> {
+  static async findEnabledByEvent(
+    eventType: string,
+    environmentId?: string
+  ): Promise<Integration[]> {
     try {
       const integrations = await this.findAll({ isEnabled: true });
 
@@ -197,9 +200,9 @@ export class IntegrationModel {
         if (!eventMatch) return false;
 
         // Then check environment
-        if (environment && integration.environments.length > 0) {
+        if (environmentId && integration.environments.length > 0) {
           if (
-            !integration.environments.includes(environment) &&
+            !integration.environments.includes(environmentId) &&
             !integration.environments.includes('*')
           ) {
             return false;

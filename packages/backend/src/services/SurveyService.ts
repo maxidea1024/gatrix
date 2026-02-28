@@ -24,7 +24,7 @@ export interface ChannelSubchannelData {
  */
 export interface Survey {
   id: string;
-  environment: string;
+  environmentId: string;
   platformSurveyId: string;
   surveyTitle: string;
   surveyContent?: string;
@@ -74,7 +74,7 @@ export interface CreateSurveyInput {
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
   createdBy?: string;
-  environment: string;
+  environmentId: string;
 }
 
 export interface UpdateSurveyInput {
@@ -108,7 +108,7 @@ export class SurveyService {
     limit?: number;
     isActive?: boolean;
     search?: string;
-    environment: string;
+    environmentId: string;
   }): Promise<{
     surveys: Survey[];
     total: number;
@@ -118,10 +118,10 @@ export class SurveyService {
     const page = params.page || 1;
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
-    const environment = params.environment;
+    const environmentId = params.environmentId;
 
-    let query = db('g_surveys').where('environment', environment);
-    let countQuery = db('g_surveys').where('environment', environment);
+    let query = db('g_surveys').where('environmentId', environmentId);
+    let countQuery = db('g_surveys').where('environmentId', environmentId);
 
     if (params.isActive !== undefined) {
       query = query.where('isActive', params.isActive);
@@ -191,8 +191,8 @@ export class SurveyService {
   /**
    * Get survey by ID
    */
-  static async getSurveyById(id: string, environment: string): Promise<Survey> {
-    const row = await db('g_surveys').where('id', id).where('environment', environment).first();
+  static async getSurveyById(id: string, environmentId: string): Promise<Survey> {
+    const row = await db('g_surveys').where('id', id).where('environmentId', environmentId).first();
 
     if (!row) {
       throw new GatrixError('Survey not found', 404);
@@ -239,11 +239,11 @@ export class SurveyService {
    */
   static async getSurveyByPlatformId(
     platformSurveyId: string,
-    environment: string
+    environmentId: string
   ): Promise<Survey> {
     const row = await db('g_surveys')
       .where('platformSurveyId', platformSurveyId)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .first();
 
     if (!row) {
@@ -290,7 +290,7 @@ export class SurveyService {
    * Create a new survey
    */
   static async createSurvey(input: CreateSurveyInput): Promise<Survey> {
-    const environment = input.environment;
+    const environmentId = input.environmentId;
 
     // Validate trigger conditions
     if (!input.triggerConditions || input.triggerConditions.length === 0) {
@@ -305,7 +305,7 @@ export class SurveyService {
     // Check if platformSurveyId already exists in this environment
     const existing = await db('g_surveys')
       .where('platformSurveyId', input.platformSurveyId)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .first();
 
     if (existing) {
@@ -317,7 +317,7 @@ export class SurveyService {
 
     await db('g_surveys').insert({
       id,
-      environment: environment,
+      environmentId: environmentId,
       platformSurveyId: input.platformSurveyId,
       surveyTitle: input.surveyTitle,
       surveyContent: input.surveyContent || null,
@@ -344,7 +344,7 @@ export class SurveyService {
       createdBy: input.createdBy || null,
     });
 
-    const survey = await this.getSurveyById(id, environment);
+    const survey = await this.getSurveyById(id, environmentId);
 
     // Publish SDK event
     try {
@@ -354,7 +354,7 @@ export class SurveyService {
           id: survey.id,
           timestamp: Date.now(),
           isActive: survey.isActive,
-          environment: environment,
+          environmentId: environmentId,
         },
       });
     } catch (err) {
@@ -370,16 +370,16 @@ export class SurveyService {
   static async updateSurvey(
     id: string,
     input: UpdateSurveyInput,
-    environment: string
+    environmentId: string
   ): Promise<Survey> {
     // Check if survey exists
-    await this.getSurveyById(id, environment);
+    await this.getSurveyById(id, environmentId);
 
     // If platformSurveyId is being updated, check for duplicates in this environment
     if (input.platformSurveyId) {
       const existing = await db('g_surveys')
         .where('platformSurveyId', input.platformSurveyId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .whereNot('id', id)
         .first();
 
@@ -445,9 +445,9 @@ export class SurveyService {
       throw new GatrixError('No fields to update', 400);
     }
 
-    await db('g_surveys').where('id', id).where('environment', environment).update(updateData);
+    await db('g_surveys').where('id', id).where('environmentId', environmentId).update(updateData);
 
-    const survey = await this.getSurveyById(id, environment);
+    const survey = await this.getSurveyById(id, environmentId);
 
     // Publish SDK event
     try {
@@ -457,7 +457,7 @@ export class SurveyService {
           id: survey.id,
           timestamp: Date.now(),
           isActive: survey.isActive,
-          environment: environment,
+          environmentId: environmentId,
         },
       });
     } catch (err) {
@@ -470,8 +470,11 @@ export class SurveyService {
   /**
    * Delete a survey
    */
-  static async deleteSurvey(id: string, environment: string): Promise<void> {
-    const result = await db('g_surveys').where('id', id).where('environment', environment).del();
+  static async deleteSurvey(id: string, environmentId: string): Promise<void> {
+    const result = await db('g_surveys')
+      .where('id', id)
+      .where('environmentId', environmentId)
+      .del();
 
     if (result === 0) {
       throw new GatrixError('Survey not found', 404);
@@ -484,7 +487,7 @@ export class SurveyService {
         data: {
           id,
           timestamp: Date.now(),
-          environment: environment,
+          environmentId: environmentId,
         },
       });
     } catch (err) {
@@ -495,9 +498,9 @@ export class SurveyService {
   /**
    * Get survey configuration from g_vars
    */
-  static async getSurveyConfig(environment: string): Promise<SurveyConfig> {
+  static async getSurveyConfig(environmentId: string): Promise<SurveyConfig> {
     const rows = await db('g_vars')
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .whereIn('varKey', [
         'survey.baseSurveyUrl',
         'survey.baseJoinedUrl',
@@ -525,7 +528,7 @@ export class SurveyService {
    */
   static async updateSurveyConfig(
     input: Partial<SurveyConfig>,
-    environment: string
+    environmentId: string
   ): Promise<SurveyConfig> {
     const updates: Array<{ key: string; value: string }> = [];
 
@@ -552,10 +555,10 @@ export class SurveyService {
     // Update each var using raw query for ON DUPLICATE KEY UPDATE
     for (const update of updates) {
       await db.raw(
-        `INSERT INTO g_vars (environment, varKey, varValue, description, createdBy)
+        `INSERT INTO g_vars (environmentId, varKey, varValue, description, createdBy)
          VALUES (?, ?, ?, ?, 1)
          ON DUPLICATE KEY UPDATE varValue = VALUES(varValue), updatedBy = 1`,
-        [environment, update.key, update.value, `Survey configuration: ${update.key}`]
+        [environmentId, update.key, update.value, `Survey configuration: ${update.key}`]
       );
     }
 
@@ -566,13 +569,13 @@ export class SurveyService {
         data: {
           id: 0,
           timestamp: Date.now(),
-          environment: environment,
+          environmentId: environmentId,
         },
       });
     } catch (err) {
       // ignore
     }
 
-    return await this.getSurveyConfig(environment);
+    return await this.getSurveyConfig(environmentId);
   }
 }

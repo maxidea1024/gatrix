@@ -9,7 +9,7 @@ import { Environment } from '../models/Environment';
 import logger from '../config/logger';
 
 export interface EnvironmentRequest extends SDKRequest {
-  environment?: string;
+  environmentId?: string;
   environmentModel?: Environment;
 }
 
@@ -36,9 +36,9 @@ export const resolveEnvironment = async (
 
   try {
     // Find environment by name
-    const environment = await Environment.getByName(envParam);
+    const env = await Environment.getByName(envParam);
 
-    if (!environment) {
+    if (!env) {
       logger.warn(`Environment not found: ${envParam}`);
       return res.status(404).json({
         success: false,
@@ -50,8 +50,8 @@ export const resolveEnvironment = async (
     }
 
     // Attach environment to request
-    req.environment = environment.environment;
-    req.environmentModel = environment;
+    req.environmentId = env.id;
+    req.environmentModel = env;
 
     next();
   } catch (error) {

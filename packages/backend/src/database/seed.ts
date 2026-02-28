@@ -49,10 +49,9 @@ async function createDefaultProject(orgId: string, createdBy: string): Promise<s
 }
 
 async function createDefaultEnvironments(projectId: string, createdBy: string) {
-  const existing = await database.query(
-    'SELECT environment FROM g_environments WHERE projectId = ?',
-    [projectId]
-  );
+  const existing = await database.query('SELECT name FROM g_environments WHERE projectId = ?', [
+    projectId,
+  ]);
   if (existing.length > 0) {
     logger.info('Default environments already exist, skipping creation');
     return;
@@ -88,7 +87,7 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
 
   for (const e of environments) {
     await database.query(
-      `INSERT INTO g_environments (environment, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
+      `INSERT INTO g_environments (name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
        VALUES (?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
       [
         e.env,
@@ -263,7 +262,7 @@ async function createDefaultContextFields(projectId: string) {
 async function createDefaultEnvironmentKeys(projectId: string, createdBy: string) {
   const existing = await database.query(
     `SELECT ek.id FROM g_environment_keys ek
-     JOIN g_environments e ON ek.environment = e.environment
+     JOIN g_environments e ON ek.environmentId = e.id
      WHERE e.projectId = ? LIMIT 1`,
     [projectId]
   );
@@ -273,7 +272,7 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
   }
 
   const environments = await database.query(
-    'SELECT environment FROM g_environments WHERE projectId = ?',
+    'SELECT id, name FROM g_environments WHERE projectId = ?',
     [projectId]
   );
 
@@ -282,20 +281,20 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
     // Create client key
     const clientKey = `gx_client_${crypto.randomBytes(24).toString('hex')}`;
     await database.query(
-      `INSERT INTO g_environment_keys (id, environment, keyType, keyValue, keyName, isActive, createdBy, createdAt)
+      `INSERT INTO g_environment_keys (id, environmentId, keyType, keyValue, keyName, isActive, createdBy, createdAt)
        VALUES (?, ?, 'client', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
-      [ulid(), env.environment, clientKey, `${env.environment} Client Key`, createdBy]
+      [ulid(), env.id, clientKey, `${env.name} Client Key`, createdBy]
     );
 
     // Create server key
     const serverKey = `gx_server_${crypto.randomBytes(24).toString('hex')}`;
     await database.query(
-      `INSERT INTO g_environment_keys (id, environment, keyType, keyValue, keyName, isActive, createdBy, createdAt)
+      `INSERT INTO g_environment_keys (id, environmentId, keyType, keyValue, keyName, isActive, createdBy, createdAt)
        VALUES (?, ?, 'server', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
-      [ulid(), env.environment, serverKey, `${env.environment} Server Key`, createdBy]
+      [ulid(), env.id, serverKey, `${env.name} Server Key`, createdBy]
     );
 
-    logger.info(`  Environment keys created for: ${env.environment}`);
+    logger.info(`  Environment keys created for: ${env.name}`);
   }
 }
 

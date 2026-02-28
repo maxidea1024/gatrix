@@ -25,20 +25,20 @@ export class MaintenanceController {
   static async getStatus(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
       // Get environment from request (set by resolveEnvironment middleware)
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({ success: false, message: 'Environment is required.' });
       }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.MAINTENANCE}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.MAINTENANCE}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.MAINTENANCE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           // Pass environment explicitly to avoid AsyncLocalStorage context issues
-          const is = await VarsModel.get(KEY, environment);
-          const detailRaw = await VarsModel.get(KEY_DETAIL, environment);
+          const is = await VarsModel.get(KEY, environmentId);
+          const detailRaw = await VarsModel.get(KEY_DETAIL, environmentId);
           const detail = detailRaw ? JSON.parse(detailRaw) : null;
           // Return the actual isMaintenance flag value (not computed active status)
           // Frontend will compute the status (active/scheduled/inactive) based on current time
@@ -78,9 +78,9 @@ export class MaintenanceController {
     try {
       const payload = req.body as MaintenancePayload;
       // Get environment from request (set by environmentContextMiddleware)
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({ success: false, message: 'Environment is required.' });
       }
 
@@ -99,7 +99,7 @@ export class MaintenanceController {
         const now = new Date();
 
         logger.info(
-          `[Maintenance Validation] startsAt: ${startsAt}, endsAt: ${endsAt}, now: ${now}, environment: ${environment}`
+          `[Maintenance Validation] startsAt: ${startsAt}, endsAt: ${endsAt}, now: ${now}, environmentId: ${environmentId}`
         );
 
         // If both times are set, endsAt must be after startsAt
@@ -158,7 +158,7 @@ export class MaintenanceController {
 
       const userId = req.user?.userId || '';
       // Pass environment explicitly to avoid AsyncLocalStorage context issues
-      await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId, environment);
+      await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId, environmentId);
 
       const detail: any = {
         type: payload.type || 'regular',
@@ -177,9 +177,9 @@ export class MaintenanceController {
       if (payload.kickDelayMinutes !== undefined) {
         detail.kickDelayMinutes = payload.kickDelayMinutes;
       }
-      await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId, environment);
+      await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId, environmentId);
 
-      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.MAINTENANCE}:${environment}`);
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.MAINTENANCE}:${environmentId}`);
 
       // Return true if maintenance is being set (regardless of whether it's currently active)
       // The actual active status will be computed by computeActive() when needed
@@ -188,7 +188,7 @@ export class MaintenanceController {
       // Publish maintenance.settings.updated event to SDK
       await pubSubService.publishEvent({
         type: 'maintenance.settings.updated',
-        data: { id: 'maintenance', environment, timestamp: Date.now() },
+        data: { id: 'maintenance', environmentId, timestamp: Date.now() },
       });
 
       // Broadcast via PubSub so all instances fan-out to their SSE clients
@@ -221,11 +221,11 @@ export class MaintenanceController {
 
   static async templatesGet(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const environment = req.environment;
-      if (!environment) {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
         return res.status(400).json({ success: false, message: 'Environment is required.' });
       }
-      const raw = await VarsModel.get('maintenanceTemplates', environment);
+      const raw = await VarsModel.get('maintenanceTemplates', environmentId);
       const templates = raw ? JSON.parse(raw) : [];
       res.json({ success: true, data: { templates } });
     } catch (e) {
@@ -235,14 +235,14 @@ export class MaintenanceController {
 
   static async templatesSave(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const environment = req.environment;
-      if (!environment) {
+      const environmentId = req.environmentId;
+      if (!environmentId) {
         return res.status(400).json({ success: false, message: 'Environment is required.' });
       }
       // Each template: { message?: string, messages?: { ko?: string, en?: string, zh?: string } }
       const templates = Array.isArray(req.body?.templates) ? req.body.templates : [];
       const userId = req.user?.userId || '';
-      await VarsModel.set('maintenanceTemplates', JSON.stringify(templates), userId, environment);
+      await VarsModel.set('maintenanceTemplates', JSON.stringify(templates), userId, environmentId);
       res.json({
         success: true,
         message: 'Templates saved',

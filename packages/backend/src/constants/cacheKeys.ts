@@ -8,7 +8,7 @@
 /**
  * Environment-scoped cache key prefix
  * Used for data that varies by environment (game worlds, client versions, etc.)
- * Format: env:{environment}:{originalKey}
+ * Format: env:{ environmentId }:{originalKey}
  */
 export const ENV_PREFIX = 'env';
 
@@ -18,8 +18,8 @@ export const ENV_PREFIX = 'env';
  * @param key - The original cache key
  * @returns Environment-prefixed cache key
  */
-export function withEnvironment(environment: string, key: string): string {
-  return `${ENV_PREFIX}:${environment}:${key}`;
+export function withEnvironment(environmentId: string, key: string): string {
+  return `${ENV_PREFIX}:${environmentId}:${key}`;
 }
 
 /**

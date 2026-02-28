@@ -118,7 +118,7 @@ class PermissionService {
     userId: string,
     orgId: string,
     projectId: string,
-    environment: string,
+    environmentId: string,
     perm: string
   ): Promise<boolean> {
     // 1. Org Admin ??all permissions
@@ -138,7 +138,7 @@ class PermissionService {
     // 3. Env Admin ??all env permissions for this environment
     const isEnvAdmin = await db('g_role_environment_permissions')
       .whereIn('roleId', roleIds)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where('isAdmin', true)
       .first();
     if (isEnvAdmin) return true;
@@ -146,7 +146,7 @@ class PermissionService {
     // 4. Check exact permission
     const hasExact = await db('g_role_environment_permissions')
       .whereIn('roleId', roleIds)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where('permission', perm)
       .first();
     if (hasExact) return true;
@@ -156,7 +156,7 @@ class PermissionService {
       const writePerm = perm.replace('.read', '.write');
       const hasWrite = await db('g_role_environment_permissions')
         .whereIn('roleId', roleIds)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where('permission', writePerm)
         .first();
       if (hasWrite) return true;
@@ -246,10 +246,10 @@ class PermissionService {
    * Resolve environment ??projectId ??orgId chain
    */
   async resolveEnvironmentChain(
-    environment: string
+    environmentId: string
   ): Promise<{ projectId: string; orgId: string } | null> {
     const env = await db('g_environments')
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .select('projectId')
       .first();
 

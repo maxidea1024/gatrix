@@ -17,8 +17,8 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { jobTypeId, isEnabled, search, limit = 20, offset = 0, page } = req.query;
 
-    const environment = req.environment || 'development';
-    const filters: any = { environment };
+    const environmentId = req.environmentId || 'development';
+    const filters: any = { environmentId };
     if (jobTypeId) filters.jobTypeId = parseInt(jobTypeId as string);
     if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
     if (search) filters.search = search as string;
@@ -63,8 +63,8 @@ export const getJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
-    const environment = req.environment || 'development';
-    const job = await JobModel.findById(jobId, environment);
+    const environmentId = req.environmentId || 'development';
+    const job = await JobModel.findById(jobId, environmentId);
 
     if (!job) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -94,10 +94,10 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job type', { field: 'jobTypeId' });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Job 이름 중복 검증
-    const existingJob = await JobModel.findByName(name, environment);
+    const existingJob = await JobModel.findByName(name, environmentId);
     if (existingJob) {
       return sendConflict(
         res,
@@ -118,7 +118,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       tagIds,
       createdBy: userId,
       updatedBy: userId,
-      environment,
+      environmentId,
     };
 
     const createdJob = await JobModel.create(jobData);
@@ -139,10 +139,10 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Job 존재 여부 확인
-    const existingJob = await JobModel.findById(jobId, environment);
+    const existingJob = await JobModel.findById(jobId, environmentId);
     if (!existingJob) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
     }
@@ -153,7 +153,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
     const userId = (req as any).user?.userId;
 
     // Job 이름 중복 검증 (이름이 변경되는 경우에만)
-    const existingJobByName = await JobModel.findByName(name, environment);
+    const existingJobByName = await JobModel.findByName(name, environmentId);
     if (existingJobByName && existingJobByName.id !== jobId) {
       return sendConflict(
         res,
@@ -172,7 +172,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
       updatedBy: userId,
     };
 
-    const updatedJob = await JobModel.update(jobId, updateData, environment);
+    const updatedJob = await JobModel.update(jobId, updateData, environmentId);
 
     return sendSuccessResponse(res, updatedJob, 'Job updated successfully');
   } catch (error) {
@@ -190,15 +190,15 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Job 존재 여부 확인
-    const existingJob = await JobModel.findById(jobId, environment);
+    const existingJob = await JobModel.findById(jobId, environmentId);
     if (!existingJob) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
     }
 
-    await JobModel.delete(jobId, environment);
+    await JobModel.delete(jobId, environmentId);
 
     return sendSuccessResponse(res, undefined, 'Job deleted successfully');
   } catch (error) {

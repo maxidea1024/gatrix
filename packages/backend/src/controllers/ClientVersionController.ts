@@ -300,8 +300,8 @@ export class ClientVersionController {
   // 사용 가능한 버전 목록 조회 (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
-      const environment = req.environment || 'development';
-      const versions = await ClientVersionService.getAvailableVersions(environment);
+      const environmentId = req.environmentId || 'development';
+      const versions = await ClientVersionService.getAvailableVersions(environmentId);
       res.json({
         success: true,
         data: versions,
@@ -361,9 +361,9 @@ export class ClientVersionController {
       }
     });
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const result = await ClientVersionService.getAllClientVersions(
-      environment,
+      environmentId,
       filters,
       pagination
     );
@@ -384,8 +384,8 @@ export class ClientVersionController {
       });
     }
 
-    const environment = req.environment || 'development';
-    const clientVersion = await ClientVersionService.getClientVersionById(id, environment);
+    const environmentId = req.environmentId || 'development';
+    const clientVersion = await ClientVersionService.getClientVersionById(id, environmentId);
     if (!clientVersion) {
       return res.status(404).json({
         success: false,
@@ -426,16 +426,16 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       userId,
-      environment,
+      environmentId,
       'g_client_versions',
       clientVersionData,
       async () => {
-        return await ClientVersionService.createClientVersion(clientVersionData, environment);
+        return await ClientVersionService.createClientVersion(clientVersionData, environmentId);
       }
     );
 
@@ -475,7 +475,7 @@ export class ClientVersionController {
       });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const bulkCreateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
@@ -483,17 +483,17 @@ export class ClientVersionController {
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
-      environment,
+      environmentId,
     };
 
     // Check if CR is required
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environmentId);
 
     if (requiresApproval) {
       let lastResult;
       for (const platform of value.platforms) {
         const itemData = {
-          environment,
+          environmentId,
           platform: platform.platform,
           clientVersion: value.clientVersion,
           clientStatus: value.clientStatus,
@@ -514,7 +514,7 @@ export class ClientVersionController {
 
         lastResult = await UnifiedChangeGateway.requestCreation(
           userId,
-          environment,
+          environmentId,
           'g_client_versions',
           itemData,
           async () => {
@@ -536,7 +536,7 @@ export class ClientVersionController {
       try {
         clientVersions = await ClientVersionService.bulkCreateClientVersions(
           bulkCreateData,
-          environment
+          environmentId
         );
       } catch (error: any) {
         if (error.message && error.message.includes('Duplicate client versions found')) {
@@ -588,17 +588,17 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
-      environment,
+      environmentId,
       'g_client_versions',
       id,
       updateData,
       async (processedData: any) => {
-        return await ClientVersionService.updateClientVersion(id, processedData, environment);
+        return await ClientVersionService.updateClientVersion(id, processedData, environmentId);
       }
     );
 
@@ -606,7 +606,7 @@ export class ClientVersionController {
       const clientVersion = await ClientVersionService.updateClientVersion(
         id,
         updateData,
-        environment
+        environmentId
       );
       if (!clientVersion) {
         return res.status(404).json({
@@ -642,7 +642,7 @@ export class ClientVersionController {
       });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = (req as any).user?.userId;
     if (!userId) {
       return res.status(401).json({
@@ -654,11 +654,11 @@ export class ClientVersionController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       userId,
-      environment,
+      environmentId,
       'g_client_versions',
       id,
       async () => {
-        await ClientVersionService.deleteClientVersion(id, environment);
+        await ClientVersionService.deleteClientVersion(id, environmentId);
       }
     );
 
@@ -705,10 +705,10 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Check if CR is required
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environmentId);
 
     if (requiresApproval) {
       let lastResult;
@@ -727,7 +727,7 @@ export class ClientVersionController {
 
         lastResult = await UnifiedChangeGateway.requestModification(
           userId,
-          environment,
+          environmentId,
           'g_client_versions',
           id,
           updateDataAttrs
@@ -743,7 +743,10 @@ export class ClientVersionController {
         message: 'Change request created. The bulk status update will be applied after approval.',
       });
     } else {
-      const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData, environment);
+      const updatedCount = await ClientVersionService.bulkUpdateStatus(
+        bulkUpdateData,
+        environmentId
+      );
       res.json({
         success: true,
         data: {
@@ -755,8 +758,8 @@ export class ClientVersionController {
 
   // 채널 목록 조회
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
-    const environment = req.environment || 'development';
-    const platforms = await ClientVersionService.getPlatforms(environment);
+    const environmentId = req.environmentId || 'development';
+    const platforms = await ClientVersionService.getPlatforms(environmentId);
 
     res.json({
       success: true,
@@ -822,9 +825,9 @@ export class ClientVersionController {
     }
 
     try {
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
       // 모든 데이터를 가져오기 위해 매우 큰 limit 사용
-      const result = await ClientVersionService.getAllClientVersions(environment, value, {
+      const result = await ClientVersionService.getAllClientVersions(environmentId, value, {
         page: 1,
         limit: 50000, // 충분히 큰 값
         sortBy: 'createdAt',

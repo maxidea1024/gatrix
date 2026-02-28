@@ -13,7 +13,7 @@ export class ClientCrash extends Model {
   id!: string; // ULID
   chash!: string; // MD5 hash of stack trace
   branch!: string; // Branch name
-  environment!: string; // Environment
+  environmentId!: string; // Environment
   platform!: string; // Platform
   marketType?: string; // Market type
   isEditor!: boolean; // Whether crash occurred in editor
@@ -40,12 +40,12 @@ export class ClientCrash extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['id', 'chash', 'branch', 'environment', 'platform'],
+      required: ['id', 'chash', 'branch', 'environmentId', 'platform'],
       properties: {
         id: { type: 'string', maxLength: 26 }, // ULID
         chash: { type: 'string', maxLength: 32 }, // MD5 hash
         branch: { type: 'string', maxLength: 50 },
-        environment: { type: 'string', maxLength: 50 },
+        environmentId: { type: 'string', maxLength: 50 },
         platform: { type: 'string', maxLength: 50 },
         marketType: { type: ['string', 'null'], maxLength: 50 },
         isEditor: { type: 'boolean', default: false },
@@ -156,8 +156,8 @@ export class ClientCrash extends Model {
     }
 
     // Environment filter
-    if (filters.environment) {
-      query.where('environment', filters.environment);
+    if (filters.environmentId) {
+      query.where('environmentId', filters.environmentId);
     }
 
     // Branch filter

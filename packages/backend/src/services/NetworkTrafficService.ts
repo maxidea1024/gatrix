@@ -7,7 +7,7 @@ import db from '../config/knex';
 
 export interface TrafficRecord {
   id: string;
-  environment: string;
+  environmentId: string;
   appName: string;
   endpoint: string;
   trafficBucket: Date;
@@ -19,7 +19,7 @@ export interface TrafficRecord {
 export interface TrafficData {
   bucket: string;
   displayTime: string;
-  environment: string;
+  environmentId: string;
   appName: string;
   endpoint: string;
   requestCount: number;
@@ -48,7 +48,7 @@ class NetworkTrafficService {
    * Uses INSERT ON DUPLICATE KEY UPDATE for atomic upsert
    */
   async recordTraffic(
-    environment: string,
+    environmentId: string,
     appName: string,
     endpoint: 'features' | 'segments'
   ): Promise<void> {
@@ -56,10 +56,10 @@ class NetworkTrafficService {
 
     try {
       await db.raw(
-        `INSERT INTO NetworkTraffic (environment, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
+        `INSERT INTO NetworkTraffic (environmentId, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
                  VALUES (?, ?, ?, ?, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
                  ON DUPLICATE KEY UPDATE requestCount = requestCount + 1, updatedAt = UTC_TIMESTAMP()`,
-        [environment, appName || 'unknown', endpoint, bucket]
+        [environmentId, appName || 'unknown', endpoint, bucket]
       );
     } catch (error) {
       // Log but don't throw - this is fire-and-forget
@@ -100,7 +100,7 @@ class NetworkTrafficService {
       .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -130,7 +130,7 @@ class NetworkTrafficService {
     {
       bucket: string;
       displayTime: string;
-      environment: string;
+      environmentId: string;
       appName: string;
       featuresCount: number;
       segmentsCount: number;
@@ -141,7 +141,7 @@ class NetworkTrafficService {
       .select(
         'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
-        'environment',
+        'environmentId',
         'appName',
         db.raw(
           "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount"
@@ -155,7 +155,7 @@ class NetworkTrafficService {
       .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -163,13 +163,13 @@ class NetworkTrafficService {
     }
 
     const rows = await query
-      .groupBy('trafficBucket', 'environment', 'appName')
+      .groupBy('trafficBucket', 'environmentId', 'appName')
       .orderBy('trafficBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
       displayTime: row.displayTime,
-      environment: row.environment,
+      environmentId: row.environmentId,
       appName: row.appName,
       featuresCount: Number(row.featuresCount) || 0,
       segmentsCount: Number(row.segmentsCount) || 0,
@@ -189,7 +189,7 @@ class NetworkTrafficService {
     {
       bucket: string;
       displayTime: string;
-      environment: string;
+      environmentId: string;
       appName: string;
       featuresCount: number;
       segmentsCount: number;
@@ -200,7 +200,7 @@ class NetworkTrafficService {
       .select(
         'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
-        'environment',
+        'environmentId',
         'appName',
         db.raw(
           "SUM(CASE WHEN endpoint = 'features' THEN requestCount ELSE 0 END) as featuresCount"
@@ -214,7 +214,7 @@ class NetworkTrafficService {
       .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -222,13 +222,13 @@ class NetworkTrafficService {
     }
 
     const rows = await query
-      .groupBy('trafficBucket', 'environment', 'appName')
+      .groupBy('trafficBucket', 'environmentId', 'appName')
       .orderBy('trafficBucket', 'desc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
       displayTime: row.displayTime,
-      environment: row.environment,
+      environmentId: row.environmentId,
       appName: row.appName,
       featuresCount: Number(row.featuresCount) || 0,
       segmentsCount: Number(row.segmentsCount) || 0,
@@ -250,7 +250,7 @@ class NetworkTrafficService {
       .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     const rows = await query.orderBy('appName', 'asc');
@@ -283,7 +283,7 @@ class NetworkTrafficService {
       .where('trafficBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -342,7 +342,7 @@ class NetworkTrafficService {
       .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -388,7 +388,7 @@ class NetworkTrafficService {
       .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -418,7 +418,7 @@ class NetworkTrafficService {
     {
       bucket: string;
       displayTime: string;
-      environment: string;
+      environmentId: string;
       appName: string;
       evaluations: number;
       yesCount: number;
@@ -429,7 +429,7 @@ class NetworkTrafficService {
       .select(
         'metricsBucket as bucket',
         db.raw("DATE_FORMAT(metricsBucket, '%m/%d %H:00') as displayTime"),
-        'environment',
+        'environmentId',
         'appName',
         db.raw('COALESCE(SUM(yesCount + noCount), 0) as evaluations'),
         db.raw('COALESCE(SUM(yesCount), 0) as yesCount'),
@@ -439,7 +439,7 @@ class NetworkTrafficService {
       .where('metricsBucket', '<=', params.endDate);
 
     if (params.environments && params.environments.length > 0) {
-      query = query.whereIn('environment', params.environments);
+      query = query.whereIn('environmentId', params.environments);
     }
 
     if (params.appNames && params.appNames.length > 0) {
@@ -447,13 +447,13 @@ class NetworkTrafficService {
     }
 
     const rows = await query
-      .groupBy('metricsBucket', 'environment', 'appName')
+      .groupBy('metricsBucket', 'environmentId', 'appName')
       .orderBy('metricsBucket', 'asc');
 
     return rows.map((row: any) => ({
       bucket: row.bucket,
       displayTime: row.displayTime,
-      environment: row.environment,
+      environmentId: row.environmentId,
       appName: row.appName,
       evaluations: Number(row.evaluations) || 0,
       yesCount: Number(row.yesCount) || 0,

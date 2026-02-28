@@ -152,7 +152,7 @@ export class ReleaseFlowService {
    */
   async applyTemplateToFlag(
     flagId: string,
-    environment: string,
+    environmentId: string,
     templateId: string,
     userId: string
   ): Promise<ReleaseFlowAttributes> {
@@ -161,7 +161,7 @@ export class ReleaseFlowService {
       throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
     }
 
-    const existingPlan = await ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environment);
+    const existingPlan = await ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environmentId);
     if (existingPlan) {
       throw new GatrixError(
         'A release flow is already active for this flag and environment',
@@ -179,7 +179,7 @@ export class ReleaseFlowService {
         description: template.description,
         discriminator: 'plan',
         flagId,
-        environment,
+        environmentId,
         createdBy: userId,
         isArchived: false,
         status: 'draft',
@@ -213,12 +213,12 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.apply_plan',
-        description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environment}]`,
+        description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environmentId}]`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId,
-        environment,
-        newValues: { flagId, environment, templateId },
+        environmentId,
+        newValues: { flagId, environmentId, templateId },
       });
 
       return (await ReleaseFlowModel.findById(plan.id))!;
@@ -272,7 +272,7 @@ export class ReleaseFlowService {
       // This is a design choice: a release flow milestone OVERWRITES existing strategies
       await db('g_feature_strategies')
         .where('flagId', plan.flagId)
-        .where('environment', plan.environment)
+        .where('environmentId', plan.environmentId)
         .del();
 
       // 3. CRITICAL: Promote milestone strategies to feature strategies
@@ -281,7 +281,7 @@ export class ReleaseFlowService {
         await db('g_feature_strategies').insert({
           id: strategyId,
           flagId: plan.flagId,
-          environment: plan.environment,
+          environmentId: plan.environmentId,
           strategyName: ms.strategyName,
           parameters: ms.parameters ? JSON.stringify(ms.parameters) : null,
           constraints: ms.constraints ? JSON.stringify(ms.constraints) : '[]',
@@ -315,14 +315,14 @@ export class ReleaseFlowService {
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId: userId ?? undefined,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
         newValues: { milestoneId, milestoneName: milestone.name },
       });
 
       // 4. CRITICAL: Bump flag version and notify SDKs about strategy changes
       // Without this, SDKs will not detect the new strategies from the milestone
       const flag = await db('g_feature_flags').where('id', plan.flagId).select('flagName').first();
-      if (flag && plan.environment) {
+      if (flag && plan.environmentId) {
         await db('g_feature_flags')
           .where('id', plan.flagId)
           .update({
@@ -330,7 +330,7 @@ export class ReleaseFlowService {
             updatedAt: new Date(),
           });
         const { featureFlagService } = await import('./FeatureFlagService');
-        await featureFlagService.invalidateCache(plan.environment, [flag.flagName]);
+        await featureFlagService.invalidateCache(plan.environmentId, [flag.flagName]);
       }
 
       // 5. Schedule delayed job for automatic progression
@@ -348,7 +348,7 @@ export class ReleaseFlowService {
         data: {
           planId: plan.id,
           flagId: plan.flagId,
-          environment: plan.environment,
+          environmentId: plan.environmentId,
           activeMilestoneId: milestone.id,
           milestoneName: milestone.name,
           status: 'active',
@@ -417,7 +417,7 @@ export class ReleaseFlowService {
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
-      environment: plan.environment,
+      environmentId: plan.environmentId,
     });
 
     // Broadcast SSE event for UI real-time update
@@ -426,7 +426,7 @@ export class ReleaseFlowService {
       data: {
         planId,
         flagId: plan.flagId,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
         status: 'paused',
       },
     });
@@ -487,7 +487,7 @@ export class ReleaseFlowService {
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
-      environment: plan.environment,
+      environmentId: plan.environmentId,
     });
 
     // Broadcast SSE event for UI real-time update
@@ -496,7 +496,7 @@ export class ReleaseFlowService {
       data: {
         planId,
         flagId: plan.flagId,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
         status: 'active',
       },
     });
@@ -540,7 +540,7 @@ export class ReleaseFlowService {
         resourceType: 'ReleaseFlow',
         resourceId: planId,
         userId: userId ?? undefined,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
       });
 
       // Broadcast SSE event for UI real-time update
@@ -549,7 +549,7 @@ export class ReleaseFlowService {
         data: {
           planId,
           flagId: plan.flagId,
-          environment: plan.environment,
+          environmentId: plan.environmentId,
           status: 'completed',
         },
       });
@@ -740,8 +740,11 @@ export class ReleaseFlowService {
     return ReleaseFlowModel.listTemplates();
   }
 
-  async getPlanForFlag(flagId: string, environment: string): Promise<ReleaseFlowAttributes | null> {
-    return ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environment);
+  async getPlanForFlag(
+    flagId: string,
+    environmentId: string
+  ): Promise<ReleaseFlowAttributes | null> {
+    return ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environmentId);
   }
 
   /**
@@ -764,11 +767,11 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.plan_delete',
-      description: `Release flow plan '${plan.flowName}' removed from flag '${plan.flagId}' in [${plan.environment}]`,
+      description: `Release flow plan '${plan.flowName}' removed from flag '${plan.flagId}' in [${plan.environmentId}]`,
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
-      environment: plan.environment,
+      environmentId: plan.environmentId,
     });
   }
 }

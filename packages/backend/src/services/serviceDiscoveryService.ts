@@ -74,7 +74,7 @@ class ServiceDiscoveryService {
     }
 
     const labels = instance.labels;
-    const envName = labels.environment || labels.env || 'development';
+    const envName = labels.environmentId || labels.env || 'development';
 
     // Update last seen status if we're going to record
     this.lastSeenStatus.set(instanceId, currentStatus);
@@ -104,7 +104,7 @@ class ServiceDiscoveryService {
     }
 
     await ServerLifecycleEvent.recordEvent({
-      environment: envName,
+      environmentId: envName,
       instanceId: instance.instanceId,
       serviceType: labels.service,
       serviceGroup: labels.group,

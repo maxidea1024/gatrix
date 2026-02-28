@@ -80,8 +80,8 @@ const updateSchema = Joi.object({
 export class CouponSettingsController {
   static list = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, type, status } = req.query;
-    const environment = req.environment;
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    const environmentId = req.environmentId;
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
     const result = await CouponSettingsService.listSettings({
       page: page ? parseInt(page as string) : undefined,
@@ -89,7 +89,7 @@ export class CouponSettingsController {
       search: search as string,
       type: type as any,
       status: status as any,
-      environment,
+      environmentId,
     });
 
     res.json({ success: true, data: result });
@@ -97,17 +97,17 @@ export class CouponSettingsController {
 
   static getById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
     if (!id) throw new GatrixError('id is required', 400);
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
-    const setting = await CouponSettingsService.getSettingById(id, environment);
+    const setting = await CouponSettingsService.getSettingById(id, environmentId);
     res.json({ success: true, data: { setting } });
   });
 
   static create = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    const environmentId = req.environmentId;
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
     const { error, value } = createSchema.validate(req.body);
     if (error) {
@@ -119,13 +119,13 @@ export class CouponSettingsController {
 
     const result = await UnifiedChangeGateway.requestCreation(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_coupon_settings',
       { ...value },
       async () => {
         return CouponSettingsService.createSetting(
           { ...value, createdBy: authenticatedUserId },
-          environment
+          environmentId
         );
       }
     );
@@ -145,9 +145,9 @@ export class CouponSettingsController {
 
   static update = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
     if (!id) throw new GatrixError('id is required', 400);
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
     const { error, value } = updateSchema.validate(req.body);
     if (error) throw new GatrixError(error.message, 400);
@@ -157,7 +157,7 @@ export class CouponSettingsController {
 
     const result = await UnifiedChangeGateway.processChange(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_coupon_settings',
       id,
       { ...value },
@@ -165,7 +165,7 @@ export class CouponSettingsController {
         const setting = await CouponSettingsService.updateSetting(
           id,
           { ...processedData, updatedBy: authenticatedUserId },
-          environment
+          environmentId
         );
         return { setting };
       }
@@ -188,20 +188,20 @@ export class CouponSettingsController {
 
   static remove = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
     if (!id) throw new GatrixError('id is required', 400);
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
     const authenticatedUserId = req.user?.userId;
     if (!authenticatedUserId) throw new GatrixError('User authentication required', 401);
 
     const result = await UnifiedChangeGateway.requestDeletion(
       authenticatedUserId,
-      environment,
+      environmentId,
       'g_coupon_settings',
       id,
       async () => {
-        await CouponSettingsService.deleteSetting(id, environment);
+        await CouponSettingsService.deleteSetting(id, environmentId);
       }
     );
 
@@ -217,8 +217,8 @@ export class CouponSettingsController {
 
   static usage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const environment = req.environment;
-    if (!environment) throw new GatrixError('Environment is required', 400);
+    const environmentId = req.environmentId;
+    if (!environmentId) throw new GatrixError('Environment is required', 400);
 
     const {
       page,
@@ -247,7 +247,7 @@ export class CouponSettingsController {
         from: from as string,
         to: to as string,
       },
-      environment
+      environmentId
     );
     res.json({ success: true, data });
   });

@@ -19,11 +19,11 @@ class ServiceNoticeController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
@@ -67,7 +67,7 @@ class ServiceNoticeController {
         search: req.query.search as string,
         sortBy: req.query.sortBy as string,
         sortOrder: req.query.sortOrder as 'asc' | 'desc' | undefined,
-        environment,
+        environmentId,
       };
 
       const result = await ServiceNoticeService.getServiceNotices(page, limit, filters);
@@ -89,15 +89,15 @@ class ServiceNoticeController {
   getServiceNoticeById = async (req: AuthenticatedRequest, res: Response, _next: any) => {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
-      const notice = await ServiceNoticeService.getServiceNoticeById(id, environment);
+      const notice = await ServiceNoticeService.getServiceNoticeById(id, environmentId);
 
       if (!notice) {
         return sendNotFound(res, 'Service notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -120,12 +120,12 @@ class ServiceNoticeController {
   createServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const data = req.body;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
@@ -157,11 +157,11 @@ class ServiceNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.requestCreation(
         userId!,
-        environment,
+        environmentId,
         'g_service_notices',
-        { ...data, environment },
+        { ...data, environmentId },
         async () => {
-          const notice = await ServiceNoticeService.createServiceNotice(data, environment);
+          const notice = await ServiceNoticeService.createServiceNotice(data, environmentId);
           return notice;
         }
       );
@@ -200,12 +200,12 @@ class ServiceNoticeController {
     try {
       const id = req.params.id;
       const data = req.body;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
@@ -223,7 +223,7 @@ class ServiceNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.processChange(
         userId!,
-        environment,
+        environmentId,
         'g_service_notices',
         id,
         data,
@@ -231,7 +231,7 @@ class ServiceNoticeController {
           const notice = await ServiceNoticeService.updateServiceNotice(
             id,
             processedData,
-            environment
+            environmentId
           );
           return { notice };
         }
@@ -275,23 +275,23 @@ class ServiceNoticeController {
   deleteServiceNotice = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.requestDeletion(
         userId!,
-        environment,
+        environmentId,
         'g_service_notices',
         id,
         async () => {
-          await ServiceNoticeService.deleteServiceNotice(id, environment);
+          await ServiceNoticeService.deleteServiceNotice(id, environmentId);
         }
       );
 
@@ -333,12 +333,12 @@ class ServiceNoticeController {
   deleteMultipleServiceNotices = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { ids } = req.body;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
@@ -347,7 +347,7 @@ class ServiceNoticeController {
       }
 
       // For bulk delete, check if CR is required
-      const requiresCR = await UnifiedChangeGateway.requiresApproval(environment);
+      const requiresCR = await UnifiedChangeGateway.requiresApproval(environmentId);
 
       if (requiresCR) {
         // Create individual CRs for each item
@@ -355,11 +355,11 @@ class ServiceNoticeController {
         for (const id of ids) {
           const gatewayResult = await UnifiedChangeGateway.requestDeletion(
             userId!,
-            environment,
+            environmentId,
             'g_service_notices',
             id,
             async () => {
-              await ServiceNoticeService.deleteServiceNotice(id, environment);
+              await ServiceNoticeService.deleteServiceNotice(id, environmentId);
             }
           );
           results.push({ id, changeRequestId: gatewayResult.changeRequestId });
@@ -371,7 +371,7 @@ class ServiceNoticeController {
           message: `Change requests created for ${ids.length} service notice(s). Deletions will be applied after approval.`,
         });
       } else {
-        await ServiceNoticeService.deleteMultipleServiceNotices(ids, environment);
+        await ServiceNoticeService.deleteMultipleServiceNotices(ids, environmentId);
         return sendSuccessResponse(
           res,
           undefined,
@@ -404,17 +404,17 @@ class ServiceNoticeController {
   toggleActive = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const id = req.params.id;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const userId = req.user?.userId;
 
-      if (!environment) {
+      if (!environmentId) {
         return sendBadRequest(res, 'Environment is required', {
-          field: 'environment',
+          field: 'environmentId',
         });
       }
 
       // Get current state
-      const currentNotice = await ServiceNoticeService.getServiceNoticeById(id, environment);
+      const currentNotice = await ServiceNoticeService.getServiceNoticeById(id, environmentId);
       if (!currentNotice) {
         return sendNotFound(res, 'Service notice not found', ErrorCodes.RESOURCE_NOT_FOUND);
       }
@@ -422,7 +422,7 @@ class ServiceNoticeController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.processChange(
         userId!,
-        environment,
+        environmentId,
         'g_service_notices',
         id,
         async (currentData: any) => {
@@ -432,7 +432,7 @@ class ServiceNoticeController {
           const notice = await ServiceNoticeService.updateServiceNotice(
             id,
             processedData,
-            environment
+            environmentId
           );
           return { notice };
         }

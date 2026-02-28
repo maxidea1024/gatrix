@@ -16,9 +16,9 @@ export class ServerGameWorldController {
    * Returns all visible game worlds sorted by displayOrder with tags and all maintenance messages
    */
   static async getGameWorlds(req: EnvironmentRequest, res: Response) {
-    const environment = req.environment;
+    const environmentId = req.environmentId;
     try {
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -51,13 +51,13 @@ export class ServerGameWorldController {
       };
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.GAME_WORLDS}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.GAME_WORLDS}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           // Fetch visible game worlds sorted by displayOrder ASC for this environment
           const allWorlds = await GameWorldService.getAllGameWorlds({
-            environment: environment,
+            environmentId: environmentId,
             isVisible: true,
           });
 
@@ -111,7 +111,7 @@ export class ServerGameWorldController {
           );
 
           logger.info(
-            `Server SDK: Retrieved ${worldsWithTags.length} visible game worlds for environment ${environment}`
+            `Server SDK: Retrieved ${worldsWithTags.length} visible game worlds for environmentId ${environmentId}`
           );
 
           return {
@@ -141,10 +141,10 @@ export class ServerGameWorldController {
   static async getGameWorldById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const worldId = id;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -165,9 +165,9 @@ export class ServerGameWorldController {
         });
       }
 
-      const world = await GameWorldService.getGameWorldById(worldId, environment);
+      const world = await GameWorldService.getGameWorldById(worldId, environmentId);
 
-      logger.info(`Server SDK: Retrieved game world ${worldId} for environment ${environment}`);
+      logger.info(`Server SDK: Retrieved game world ${worldId} for environmentId ${environmentId}`);
 
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
@@ -256,9 +256,9 @@ export class ServerGameWorldController {
   static async getGameWorldByWorldId(req: EnvironmentRequest, res: Response) {
     try {
       const { worldId } = req.params;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -279,10 +279,10 @@ export class ServerGameWorldController {
         });
       }
 
-      const world = await GameWorldService.getGameWorldByWorldId(worldId, environment);
+      const world = await GameWorldService.getGameWorldByWorldId(worldId, environmentId);
 
       logger.info(
-        `Server SDK: Retrieved game world by worldId: ${worldId} for environment ${environment}`
+        `Server SDK: Retrieved game world by worldId: ${worldId} for environmentId ${environmentId}`
       );
 
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean

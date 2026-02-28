@@ -10,7 +10,7 @@ export const SYSTEM_DEFINED_ENVIRONMENTS = ['development', 'qa', 'production'] a
 export type SystemDefinedEnvironment = (typeof SYSTEM_DEFINED_ENVIRONMENTS)[number];
 
 export interface EnvironmentData {
-  environment: string;
+  name: string;
   displayName: string;
   description?: string;
   environmentType: EnvironmentType;
@@ -37,7 +37,7 @@ export class Environment extends Model implements EnvironmentData {
 
   id!: string;
 
-  environment!: string;
+  name!: string;
   displayName!: string;
   description?: string;
   environmentType!: EnvironmentType;
@@ -65,10 +65,10 @@ export class Environment extends Model implements EnvironmentData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environment', 'displayName'],
+      required: ['name', 'displayName'],
 
       properties: {
-        environment: {
+        name: {
           type: 'string',
           minLength: 1,
           maxLength: 100,
@@ -152,15 +152,15 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Get environment by name
    */
-  static async getByName(environment: string): Promise<Environment | undefined> {
-    return await this.query().where('environment', environment).first();
+  static async getByName(name: string): Promise<Environment | undefined> {
+    return await this.query().where('name', name).first();
   }
 
   /**
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
-    const query = this.query().orderBy('displayOrder', 'asc').orderBy('environment');
+    const query = this.query().orderBy('displayOrder', 'asc').orderBy('name');
 
     if (!includeHidden) {
       query.where('isHidden', false);
@@ -212,16 +212,16 @@ export class Environment extends Model implements EnvironmentData {
     data: Omit<EnvironmentData, 'createdAt' | 'updatedAt'>
   ): Promise<Environment> {
     // Validate environment name
-    if (!this.isValidEnvironmentName(data.environment)) {
+    if (!this.isValidEnvironmentName(data.name)) {
       throw new Error(
         'Invalid environment name. Use only lowercase letters, numbers, underscore, and hyphen.'
       );
     }
 
     // Check if environment already exists
-    const existing = await this.getByName(data.environment);
+    const existing = await this.getByName(data.name);
     if (existing) {
-      throw new Error(`Environment '${data.environment}' already exists`);
+      throw new Error(`Environment '${data.name}' already exists`);
     }
 
     // If this is set as default, unset other defaults
@@ -321,12 +321,12 @@ export class Environment extends Model implements EnvironmentData {
     ): Promise<{ count: number; items: T[] }> => {
       try {
         // Check if table has environment column
-        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environment'`);
+        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
         if (columns[0].length === 0) {
           return { count: 0, items: [] };
         }
 
-        const query = knex(tableName).where('environment', this.environment);
+        const query = knex(tableName).where('environmentId', this.id);
         if (modifyQuery) {
           modifyQuery(query);
         }
@@ -636,12 +636,12 @@ export class Environment extends Model implements EnvironmentData {
 
     // If force delete, remove all related data in correct order
     if (force && relatedData.total > 0) {
-      const environment = this.environment;
+      const environment = this.name;
 
       // Helper to safely delete from a table if it has environment column
       const safeDelete = async (trx: any, tableName: string): Promise<void> => {
         try {
-          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environment'`);
+          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
           if (columns[0].length > 0) {
             await trx(tableName).where('environment', environment).del();
           }

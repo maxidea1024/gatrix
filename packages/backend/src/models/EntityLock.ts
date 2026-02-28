@@ -23,7 +23,7 @@ export class EntityLock extends Model {
   id!: string;
   entityType!: string;
   entityId!: string;
-  environment!: string;
+  environmentId!: string;
   lockedBy!: string;
   lockType!: LockType;
   expiresAt?: Date;
@@ -35,12 +35,12 @@ export class EntityLock extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['entityType', 'entityId', 'environment', 'lockedBy', 'lockType'],
+      required: ['entityType', 'entityId', 'environmentId', 'lockedBy', 'lockType'],
       properties: {
         id: { type: 'string' },
         entityType: { type: 'string', maxLength: 100 },
         entityId: { type: 'string', maxLength: 255 },
-        environment: { type: 'string', maxLength: 100 },
+        environmentId: { type: 'string', maxLength: 100 },
         lockedBy: { type: 'integer' },
         lockType: {
           type: 'string',

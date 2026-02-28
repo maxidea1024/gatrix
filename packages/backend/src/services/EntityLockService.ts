@@ -26,8 +26,8 @@ class EntityLockService {
   /**
    * Generate Redis key for entity lock
    */
-  private getLockKey(table: string, entityId: string, environment: string): string {
-    return `${LOCK_KEY_PREFIX}:${environment}:${table}:${entityId}`;
+  private getLockKey(table: string, entityId: string, environmentId: string): string {
+    return `${LOCK_KEY_PREFIX}:${environmentId}:${table}:${entityId}`;
   }
 
   /**
@@ -37,13 +37,13 @@ class EntityLockService {
   async acquireLock(
     table: string,
     entityId: string,
-    environment: string,
+    environmentId: string,
     userId: string,
     userName: string,
     userEmail: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<{ success: boolean; existingLock?: LockInfo }> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       // Check if already locked
@@ -94,13 +94,13 @@ class EntityLockService {
   async forceAcquireLock(
     table: string,
     entityId: string,
-    environment: string,
+    environmentId: string,
     userId: string,
     userName: string,
     userEmail: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       // Get the previous lock owner before overwriting
@@ -129,7 +129,7 @@ class EntityLockService {
             data: {
               table,
               entityId: entityId,
-              environment,
+              environmentId,
               previousOwner: {
                 userId: previousOwner.userId,
                 userName: previousOwner.userName,
@@ -160,10 +160,10 @@ class EntityLockService {
   async releaseLock(
     table: string,
     entityId: string,
-    environment: string,
+    environmentId: string,
     userId: string
   ): Promise<boolean> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       // Only release if locked by the same user
@@ -186,7 +186,7 @@ class EntityLockService {
           data: {
             table,
             entityId: entityId,
-            environment,
+            environmentId,
             releasedBy: userId,
           },
         });
@@ -204,8 +204,12 @@ class EntityLockService {
   /**
    * Check if an entity is locked
    */
-  async checkLock(table: string, entityId: string, environment: string): Promise<LockInfo | null> {
-    const key = this.getLockKey(table, entityId, environment);
+  async checkLock(
+    table: string,
+    entityId: string,
+    environmentId: string
+  ): Promise<LockInfo | null> {
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       const lockStr = await redisClient.get(key);
@@ -225,11 +229,11 @@ class EntityLockService {
   async extendLock(
     table: string,
     entityId: string,
-    environment: string,
+    environmentId: string,
     userId: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       const existingLockStr = await redisClient.get(key);
@@ -259,7 +263,7 @@ class EntityLockService {
   async checkPendingCR(
     table: string,
     entityId: string,
-    environment: string
+    environmentId: string
   ): Promise<{ hasPending: boolean; crId?: string; crTitle?: string }> {
     // Import dynamically to avoid circular dependency
     const { ChangeRequest } = await import('../models/ChangeRequest');
@@ -274,7 +278,7 @@ class EntityLockService {
         .whereExists(
           ChangeRequest.query()
             .whereRaw('g_change_requests.id = g_change_items.changeRequestId')
-            .where('environment', environment)
+            .where('environmentId', environmentId)
             .whereIn('status', ['open', 'approved'])
         )
         .first();

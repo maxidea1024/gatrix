@@ -15,7 +15,7 @@ export interface AppUser {
 
 export interface AuthenticatedRequest extends Request {
   user?: AppUser;
-  environment?: string;
+  environmentId?: string;
   orgId?: string;
   projectId?: string;
 }

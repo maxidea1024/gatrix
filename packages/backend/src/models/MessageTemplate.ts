@@ -3,7 +3,7 @@ import { generateULID } from '../utils/ulid';
 import logger from '../config/logger';
 
 export interface MessageTemplateFilters {
-  environment: string;
+  environmentId: string;
   createdBy?: string[];
   createdBy_operator?: 'any_of' | 'include_all';
   isEnabled?: boolean | boolean[];
@@ -22,7 +22,7 @@ export interface MessageTemplateListResult {
 
 export interface MessageTemplate {
   id?: string;
-  environment: string;
+  environmentId: string;
   name: string;
   type: string;
   isEnabled: boolean;
@@ -42,13 +42,13 @@ export class MessageTemplateModel {
       // 기본값 설정
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
-      const environment = filters.environment;
+      const environmentId = filters.environmentId;
 
       logger.debug('🔍 MessageTemplate query filters:', { filters });
 
       // 테스트: 테이블에 데이터가 있는지 확인
       const testCount = await db('g_message_templates')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .count('* as count')
         .first();
       logger.debug('🔍 Total records in g_message_templates:', { testCount });
@@ -58,7 +58,7 @@ export class MessageTemplateModel {
         db('g_message_templates as mt')
           .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
-          .where('mt.environment', environment);
+          .where('mt.environmentId', environmentId);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -181,14 +181,14 @@ export class MessageTemplateModel {
     }
   }
 
-  static async findById(id: string, environment: string): Promise<any | null> {
+  static async findById(id: string, environmentId: string): Promise<any | null> {
     try {
       const template = await db('g_message_templates as mt')
         .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
         .select(['mt.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .where('mt.id', id)
-        .where('mt.environment', environment)
+        .where('mt.environmentId', environmentId)
         .first();
 
       if (!template) {
@@ -212,14 +212,14 @@ export class MessageTemplateModel {
     }
   }
 
-  static async create(data: any, environment: string): Promise<any> {
+  static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 생성
         const id = generateULID();
         await trx('g_message_templates').insert({
           id,
-          environment: environment,
+          environmentId: environmentId,
           name: data.name,
           type: data.type,
           defaultMessage: data.defaultMessage || data.default_message || data.content || '',
@@ -252,7 +252,7 @@ export class MessageTemplateModel {
           await trx('g_message_template_locales').insert(localeInserts);
         }
 
-        const created = await this.findById(id, environment);
+        const created = await this.findById(id, environmentId);
 
         if (!created) {
           // 직접 ID와 기본 정보를 반환
@@ -279,13 +279,13 @@ export class MessageTemplateModel {
     }
   }
 
-  static async update(id: string, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 업데이트
         await trx('g_message_templates')
           .where('id', id)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .update({
             name: data.name,
             type: data.type,
@@ -315,7 +315,7 @@ export class MessageTemplateModel {
           await trx('g_message_template_locales').insert(localeInserts);
         }
 
-        return await this.findById(id, environment);
+        return await this.findById(id, environmentId);
       });
     } catch (error) {
       logger.error('Error updating message template:', error);
@@ -323,9 +323,9 @@ export class MessageTemplateModel {
     }
   }
 
-  static async delete(id: string, environment: string): Promise<void> {
+  static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_message_templates').where('id', id).where('environment', environment).del();
+      await db('g_message_templates').where('id', id).where('environmentId', environmentId).del();
     } catch (error) {
       logger.error('Error deleting message template:', error);
       throw error;

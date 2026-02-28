@@ -61,7 +61,7 @@ export class UnifiedChangeGateway {
       // 3. CR Required - Create a change request for the new item
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
@@ -148,7 +148,7 @@ export class UnifiedChangeGateway {
 
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
@@ -250,7 +250,7 @@ export class UnifiedChangeGateway {
       // CASE B: Change Request Required
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
