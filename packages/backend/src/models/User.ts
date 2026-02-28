@@ -576,11 +576,38 @@ export class UserModel {
    */
   static async getPermissions(userId: string): Promise<string[]> {
     try {
-      const permissions = await db('g_user_permissions')
-        .select('permission')
-        .where('userId', userId);
+      // Check if user is org admin (gets all permissions)
+      const membership = await db('g_organisation_members')
+        .where('userId', userId)
+        .first();
+      if (membership?.orgRole === 'admin') {
+        return ['*'];
+      }
 
-      return permissions.map((p: any) => p.permission);
+      // Get all role IDs for the user (direct + group-based)
+      const directRoleIds = await db('g_user_roles')
+        .where('userId', userId)
+        .select('roleId');
+      const groupRoleIds = await db('g_group_members')
+        .where('g_group_members.userId', userId)
+        .join('g_group_roles', 'g_group_members.groupId', 'g_group_roles.groupId')
+        .select('g_group_roles.roleId');
+      const roleIds = [...new Set([
+        ...directRoleIds.map((r: any) => r.roleId),
+        ...groupRoleIds.map((r: any) => r.roleId),
+      ])];
+
+      if (roleIds.length === 0) {
+        return [];
+      }
+
+      // Get org-level permissions from all roles
+      const perms = await db('g_role_org_permissions')
+        .whereIn('roleId', roleIds)
+        .select('permission')
+        .distinct();
+
+      return perms.map((p: any) => p.permission);
     } catch (error) {
       logger.error('Error getting user permissions:', error);
       throw error;
@@ -593,15 +620,8 @@ export class UserModel {
    */
   static async hasPermission(userId: string, permission: string): Promise<boolean> {
     try {
-      // Check for wildcard permission or exact match
-      const result = await db('g_user_permissions')
-        .where('userId', userId)
-        .where(function () {
-          this.where('permission', permission).orWhere('permission', '*');
-        })
-        .first();
-
-      return !!result;
+      const permissions = await this.getPermissions(userId);
+      return permissions.includes('*') || permissions.includes(permission);
     } catch (error) {
       logger.error('Error checking user permission:', error);
       return false;
@@ -614,15 +634,9 @@ export class UserModel {
    */
   static async hasAnyPermission(userId: string, permissions: string[]): Promise<boolean> {
     try {
-      // Check for wildcard permission or any of the specified permissions
-      const result = await db('g_user_permissions')
-        .where('userId', userId)
-        .where(function () {
-          this.whereIn('permission', permissions).orWhere('permission', '*');
-        })
-        .first();
-
-      return !!result;
+      const userPerms = await this.getPermissions(userId);
+      if (userPerms.includes('*')) return true;
+      return permissions.some((p) => userPerms.includes(p));
     } catch (error) {
       logger.error('Error checking user permissions:', error);
       return false;
@@ -630,54 +644,26 @@ export class UserModel {
   }
 
   /**
-   * Set permissions for a user (replaces all existing permissions)
+   * Set permissions for a user
+   * @deprecated Permissions are now managed via roles in the RBAC system
    */
-  static async setPermissions(userId: string, permissions: string[]): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Delete all existing permissions
-        await trx('g_user_permissions').where('userId', userId).del();
-
-        // Insert new permissions
-        if (permissions.length > 0) {
-          const permissionsToInsert = permissions.map((permission) => ({
-            userId,
-            permission,
-          }));
-
-          await trx('g_user_permissions').insert(permissionsToInsert);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting user permissions:', error);
-      throw error;
-    }
+  static async setPermissions(userId: string, _permissions: string[]): Promise<void> {
+    logger.warn('UserModel.setPermissions is deprecated. Use role-based permissions instead.', { userId });
   }
 
   /**
    * Add a permission to a user
+   * @deprecated Permissions are now managed via roles in the RBAC system
    */
-  static async addPermission(userId: string, permission: string): Promise<void> {
-    try {
-      await db('g_user_permissions')
-        .insert({ userId, permission })
-        .onConflict(['userId', 'permission'])
-        .ignore();
-    } catch (error) {
-      logger.error('Error adding user permission:', error);
-      throw error;
-    }
+  static async addPermission(userId: string, _permission: string): Promise<void> {
+    logger.warn('UserModel.addPermission is deprecated. Use role-based permissions instead.', { userId });
   }
 
   /**
    * Remove a permission from a user
+   * @deprecated Permissions are now managed via roles in the RBAC system
    */
-  static async removePermission(userId: string, permission: string): Promise<void> {
-    try {
-      await db('g_user_permissions').where('userId', userId).where('permission', permission).del();
-    } catch (error) {
-      logger.error('Error removing user permission:', error);
-      throw error;
-    }
+  static async removePermission(userId: string, _permission: string): Promise<void> {
+    logger.warn('UserModel.removePermission is deprecated. Use role-based permissions instead.', { userId });
   }
 }
