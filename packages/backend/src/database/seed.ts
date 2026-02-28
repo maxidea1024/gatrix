@@ -87,9 +87,10 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
 
   for (const e of environments) {
     await database.query(
-      `INSERT INTO g_environments (name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
-       VALUES (?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      `INSERT INTO g_environments (id, name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
       [
+        ulid(),
         e.env,
         e.displayName,
         e.type,
@@ -385,6 +386,80 @@ async function createSampleReleaseFlows(createdBy: string) {
   }
 }
 
+// ==================== Internal Gatrix Setup ====================
+
+/**
+ * Create internal 'gatrix' organisation, project, and 'gatrix-env' environment.
+ * These are used by backend/edge servers for service discovery and metrics.
+ */
+async function createInternalGatrixSetup(adminUserId: string) {
+  // 1. Create 'gatrix' organisation (internal)
+  const existingOrg = await database.query(
+    "SELECT id FROM g_organisations WHERE orgName = 'gatrix'"
+  );
+  let gatrixOrgId: string;
+  if (existingOrg.length > 0) {
+    gatrixOrgId = existingOrg[0].id;
+    logger.info('Internal gatrix organisation already exists');
+  } else {
+    gatrixOrgId = ulid();
+    await database.query(
+      `INSERT INTO g_organisations (id, orgName, displayName, description, isActive, createdAt, updatedAt)
+       VALUES (?, 'gatrix', 'Gatrix Internal', 'Internal organisation for system services', TRUE, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [gatrixOrgId]
+    );
+    logger.info(`Internal gatrix organisation created: ${gatrixOrgId}`);
+  }
+
+  // Add admin as org member if not already
+  const existingMember = await database.query(
+    'SELECT id FROM g_organisation_members WHERE orgId = ? AND userId = ?',
+    [gatrixOrgId, adminUserId]
+  );
+  if (existingMember.length === 0) {
+    await database.query(
+      `INSERT INTO g_organisation_members (id, orgId, userId, orgRole, joinedAt)
+       VALUES (?, ?, ?, 'admin', UTC_TIMESTAMP())`,
+      [ulid(), gatrixOrgId, adminUserId]
+    );
+  }
+
+  // 2. Create 'gatrix' project (internal)
+  const existingProject = await database.query(
+    "SELECT id FROM g_projects WHERE orgId = ? AND projectName = 'gatrix'",
+    [gatrixOrgId]
+  );
+  let gatrixProjectId: string;
+  if (existingProject.length > 0) {
+    gatrixProjectId = existingProject[0].id;
+    logger.info('Internal gatrix project already exists');
+  } else {
+    gatrixProjectId = ulid();
+    await database.query(
+      `INSERT INTO g_projects (id, orgId, projectName, displayName, isDefault, isActive, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, 'gatrix', 'Gatrix System', FALSE, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [gatrixProjectId, gatrixOrgId, adminUserId]
+    );
+    logger.info(`Internal gatrix project created: ${gatrixProjectId}`);
+  }
+
+  // 3. Create 'gatrix-env' environment (internal)
+  const existingEnv = await database.query(
+    "SELECT id FROM g_environments WHERE name = 'gatrix-env' AND projectId = ?",
+    [gatrixProjectId]
+  );
+  if (existingEnv.length === 0) {
+    await database.query(
+      `INSERT INTO g_environments (id, name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, isHidden, createdBy, createdAt, updatedAt)
+       VALUES (?, 'gatrix-env', 'Gatrix Internal', 'production', TRUE, 999, '#9E9E9E', ?, FALSE, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [ulid(), gatrixProjectId, adminUserId]
+    );
+    logger.info('Internal gatrix-env environment created');
+  } else {
+    logger.info('Internal gatrix-env environment already exists');
+  }
+}
+
 // ==================== Main Seed / Clear Functions ====================
 
 async function seedDatabase() {
@@ -397,19 +472,22 @@ async function seedDatabase() {
     // 2. Create admin user with org membership
     const adminUserId = await createAdminUser(orgId);
 
-    // 3. Create default project under the organisation
+    // 3. Create internal gatrix setup (for backend/edge service discovery)
+    await createInternalGatrixSetup(adminUserId);
+
+    // 4. Create default project under the organisation
     const projectId = await createDefaultProject(orgId, adminUserId);
 
-    // 4. Create default environments under the project
+    // 5. Create default environments under the project
     await createDefaultEnvironments(projectId, adminUserId);
 
-    // 5. Create default context fields for the project
+    // 6. Create default context fields for the project
     await createDefaultContextFields(projectId);
 
-    // 6. Create default environment keys
+    // 7. Create default environment keys
     await createDefaultEnvironmentKeys(projectId, adminUserId);
 
-    // 7. Create sample release flow templates
+    // 8. Create sample release flow templates
     await createSampleReleaseFlows(adminUserId);
 
     logger.info('Database seeding completed successfully');
