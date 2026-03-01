@@ -23,6 +23,8 @@ import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useChangeRequestToast } from '@/utils/changeRequestToast';
 import { PERMISSIONS } from '@/types/permissions';
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -58,6 +60,8 @@ const MaintenancePage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { user, hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.MAINTENANCE_MANAGE]);
+  const navigate = useNavigate();
+  const { showCreated } = useChangeRequestToast();
 
   // Set dayjs locale based on current language
   React.useEffect(() => {
@@ -419,7 +423,7 @@ const MaintenancePage: React.FC = () => {
     const response = await maintenanceService.setStatus(payload as any);
 
     if (response.isChangeRequest) {
-      showChangeRequestCreatedToast();
+      // showChangeRequestCreatedToast();
     } else {
       setIsMaintenance(true);
       enqueueSnackbar(t('maintenance.startSuccess'), { variant: 'success' });
@@ -479,7 +483,7 @@ const MaintenancePage: React.FC = () => {
     const result = await maintenanceService.setStatus(payload);
 
     if (result.isChangeRequest) {
-      showChangeRequestCreatedToast();
+      showCreated(navigate);
     } else {
       setEditMode(false);
       enqueueSnackbar(t('maintenance.updateSuccess'), { variant: 'success' });

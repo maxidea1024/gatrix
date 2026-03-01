@@ -388,7 +388,7 @@ const requireEnvironment = (req: AuthenticatedRequest, res: Response): string | 
   if (!environmentId) {
     res.status(400).json({
       success: false,
-      error: 'Environment is required (x-environment header)',
+      error: 'Environment is required (x-environment-id header)',
     });
     return null;
   }

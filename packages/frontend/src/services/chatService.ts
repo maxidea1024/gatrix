@@ -25,9 +25,9 @@ export class ChatService {
       { params }
     );
     console.log('🔍 ChatService.getChannels response:', response);
-    // API 응답 구조: { success: true, data: [...] }
-    // apiService는 이미 response.data를 반환하므로 response.data가 실제 데이터
-    return response.data || [];
+    // API response structure: { success: true, data: [...] }
+    // apiService already returns response.data, so response.data is the actual data
+    return (response as any).data || [];
   }
 
   static async getChannel(channelId: number): Promise<Channel> {
@@ -99,15 +99,15 @@ export class ChatService {
     const data = response;
     const messages: Message[] = Array.isArray(data.data) ? data.data : data.data?.messages || [];
     const total: number =
-      typeof data.pagination?.total === 'number'
-        ? data.pagination.total
+      typeof (data as any).pagination?.total === 'number'
+        ? (data as any).pagination.total
         : Array.isArray(data.data)
           ? data.data.length
           : data.data?.total || 0;
     const hasMore: boolean =
-      typeof data.pagination?.hasMore === 'boolean'
-        ? data.pagination.hasMore
-        : !!data.pagination?.hasNext;
+      typeof (data as any).pagination?.hasMore === 'boolean'
+        ? (data as any).pagination.hasMore
+        : !!(data as any).pagination?.hasNext;
 
     return { messages, hasMore, total };
   }
@@ -124,7 +124,7 @@ export class ChatService {
       url: `${this.BASE_URL}/channels/${channelId}/messages`,
     });
 
-    // 첨부파일이 있으면 FormData 사용, 없으면 JSON 사용
+    // Use FormData if attachments exist, otherwise use JSON
     if (data.attachments && data.attachments.length > 0) {
       const formData = new FormData();
 
@@ -153,7 +153,7 @@ export class ChatService {
       );
       return response.data;
     } else {
-      // 첨부파일이 없으면 JSON으로 전송
+      // Send as JSON if there are no attachments
       const requestData = {
         content: data.content,
         contentType: data.type || 'text',
@@ -230,10 +230,10 @@ export class ChatService {
     });
 
     try {
-      // 토큰 만료 체크 및 갱신
+      // Check and refresh token expiration
       await this.ensureValidToken();
 
-      // 백엔드를 통해 요청 (직접 라우트 사용)
+      // Request via backend (using direct route)
       const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
         timeout: 10000,
       });
@@ -242,7 +242,7 @@ export class ChatService {
     } catch (error: any) {
       console.error(`❌ ChatService.markAsRead failed:`, error);
 
-      // 401 오류인 경우 토큰 갱신 후 재시도
+      // Retry after refreshing token on 401 error
       if (error.response?.status === 401) {
         try {
           console.log(`🔄 Token expired, refreshing and retrying markAsRead...`);
@@ -267,7 +267,7 @@ export class ChatService {
     }
   }
 
-  // 토큰 유효성 확인 및 갱신
+  // Check and refresh token validity
   private static async ensureValidToken(): Promise<void> {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -275,23 +275,23 @@ export class ChatService {
     }
 
     try {
-      // JWT 페이로드 디코딩하여 만료 시간 확인
+      // Decode JWT payload to check expiration time
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Date.now() / 1000;
 
-      // 토큰이 5분 이내에 만료되면 미리 갱신
+      // Proactively refresh token if it expires in less than 5 minutes
       if (payload.exp && payload.exp < currentTime + 300) {
         console.log(`🔄 Token expires soon, refreshing...`);
         await this.refreshTokenAndRetry();
       }
     } catch (error) {
       console.warn('Failed to check token expiry:', error);
-      // 토큰 파싱 실패 시에도 갱신 시도
+      // Attempt to refresh even if token parsing fails
       await this.refreshTokenAndRetry();
     }
   }
 
-  // 토큰 갱신
+  // Token refresh
   private static async refreshTokenAndRetry(): Promise<void> {
     await AuthService.refreshToken();
   }
@@ -346,7 +346,7 @@ export class ChatService {
       const response = await apiService.get<{ success: boolean; data: User[] }>(
         `/users/search?q=${encodeURIComponent(query)}`
       );
-      return response.data || [];
+      return (response as any).data || [];
     } catch (error) {
       console.error('Failed to search users:', error);
       return [];
@@ -415,7 +415,7 @@ export class ChatService {
     return response.data;
   }
 
-  // 사용자 초대
+  // Invite user
   static async inviteUser(channelId: number, userId: number, message?: string): Promise<void> {
     console.log(`🔄 ChatService.inviteUser called:`, {
       channelId,
@@ -425,7 +425,7 @@ export class ChatService {
     });
 
     try {
-      // 토큰 만료 체크 및 갱신
+      // Check and refresh token expiration
       await this.ensureValidToken();
 
       const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/invite`, {
@@ -436,7 +436,7 @@ export class ChatService {
     } catch (error: any) {
       console.error(`❌ ChatService.inviteUser failed:`, error);
 
-      // 401 오류인 경우 토큰 갱신 후 재시도
+      // Retry after refreshing token on 401 error
       if (error.status === 401) {
         try {
           console.log(`🔄 Token expired, refreshing and retrying inviteUser...`);
@@ -467,8 +467,8 @@ export class ChatService {
       ? response.data
       : response.data?.messages || [];
     const total: number =
-      response.pagination && typeof response.pagination.total === 'number'
-        ? response.pagination.total
+      (response as any).pagination && typeof (response as any).pagination.total === 'number'
+        ? (response as any).pagination.total
         : Array.isArray(response.data)
           ? response.data.length
           : response.data?.total || 0;

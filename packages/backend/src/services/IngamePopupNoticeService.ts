@@ -87,7 +87,7 @@ class IngamePopupNoticeService {
 
     // Environment filter (always applied)
     const environmentId = filters.environmentId;
-    whereClauses.push('environment = ?');
+    whereClauses.push('environmentId = ?');
     queryParams.push(environmentId);
 
     // Apply filters
@@ -200,7 +200,7 @@ class IngamePopupNoticeService {
   ): Promise<IngamePopupNotice | null> {
     const pool = database.getPool();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_ingame_popup_notices WHERE id = ? AND environment = ?',
+      'SELECT * FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?',
       [id, environmentId]
     );
 
@@ -405,7 +405,7 @@ class IngamePopupNoticeService {
   async deleteIngamePopupNotice(id: string, environmentId: string): Promise<void> {
     const pool = database.getPool();
 
-    await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environment = ?', [
+    await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?', [
       id,
       environmentId,
     ]);
@@ -452,7 +452,7 @@ class IngamePopupNoticeService {
   async toggleActive(id: string, environmentId: string): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     await pool.execute(
-      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',
+      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
       [id, environmentId]
     );
 

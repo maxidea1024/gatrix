@@ -51,11 +51,6 @@ export interface TargetSelectorConfig {
   type?: 'simple' | 'channel' | 'userIds';
 }
 
-interface ChannelSubchannelData {
-  channel: string;
-  subchannels: string[];
-}
-
 const TargetSelector: React.FC<TargetSelectorConfig> = ({
   title,
   helperText,
@@ -85,14 +80,14 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
   };
 
   const handleChipDelete = (value: string) => {
-    onSelectionChange(selectedValues.filter((v) => v !== value));
+    onSelectionChange((selectedValues as any[]).filter((v) => v !== value));
   };
 
   const handleOptionChange = (value: string, checked: boolean) => {
     if (checked) {
-      onSelectionChange([...selectedValues, value]);
+      onSelectionChange([...(selectedValues as any[]), value] as any);
     } else {
-      onSelectionChange(selectedValues.filter((v) => v !== value));
+      onSelectionChange((selectedValues as any[]).filter((v) => v !== value));
     }
   };
 
@@ -129,7 +124,7 @@ const TargetSelector: React.FC<TargetSelectorConfig> = ({
     return (
       <Box sx={{ p: 1 }}>
         {options.map((option) => {
-          const isSelected = selectedValues.includes(option.value);
+          const isSelected = (selectedValues as any[]).includes(option.value);
           return (
             <FormControlLabel
               key={option.value}

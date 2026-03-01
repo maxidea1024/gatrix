@@ -382,8 +382,8 @@ const GroupsPage: React.FC = () => {
           ) : filteredGroups.length === 0 ? (
             <EmptyPagePlaceholder
               icon={<GroupIcon sx={{ fontSize: 48 }} />}
-              title={t('rbac.groups.emptyTitle')}
-              description={t('rbac.groups.emptyDescription')}
+              message={t('rbac.groups.emptyTitle')}
+              subtitle={t('rbac.groups.emptyDescription')}
             />
           ) : (
             <TableContainer>

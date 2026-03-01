@@ -46,7 +46,7 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
     try {
       setIsLoading(true);
       setError(null);
-      const result = await gameWorldService.getGameWorlds({ limit: 1000 });
+      const result = await gameWorldService.getGameWorlds({ limit: 1000 } as any);
       const worldOptions: GameWorldOption[] = (result.worlds || []).map((world: any) => ({
         label: world.name,
         value: world.worldId,

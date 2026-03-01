@@ -61,9 +61,9 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [invitingUsers, setInvitingUsers] = useState<Set<number>>(new Set());
-  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set());
-  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(new Set());
+  const [invitingUsers, setInvitingUsers] = useState<Set<number>>(new Set<number>());
+  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set<number>());
+  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(new Set<number>());
 
   // 검색 입력창 ref
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -84,7 +84,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
         console.log('Channel data response:', data); // 디버깅용
         if (data.success && data.data) {
           // members 배열에서 userId 추출
-          const memberIds = new Set((data.data.members || []).map((member: any) => member.userId));
+          const memberIds = new Set<number>((data.data.members || []).map((member: any) => member.userId));
           console.log('Channel member IDs:', memberIds); // 디버깅용
           setChannelMemberIds(memberIds);
         }
@@ -111,7 +111,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
         const data = await response.json();
         console.log('Pending invitations response:', data); // 디버깅용
         if (data.success && data.data) {
-          const invitedUserIds = new Set(data.data.map((invitation: any) => invitation.inviteeId));
+          const invitedUserIds = new Set<number>(data.data.map((invitation: any) => invitation.inviteeId));
           console.log('Pending invited user IDs:', invitedUserIds); // 디버깅용
           setPendingInvitedUsers(invitedUserIds);
         }
@@ -227,14 +227,14 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       setSearchQuery('');
       setSearchResults([]);
       setInvitingUsers(new Set());
-      setPendingInvitedUsers(new Set());
-      setChannelMemberIds(new Set());
+      setPendingInvitedUsers(new Set<number>());
+      setChannelMemberIds(new Set<number>());
     }
   }, [open]);
 
   // 사용자 초대 처리
   const handleInviteUser = async (userId: number) => {
-    setInvitingUsers((prev) => new Set(prev).add(userId));
+    setInvitingUsers((prev) => new Set<number>(prev).add(userId));
 
     try {
       await onInviteUser(userId);

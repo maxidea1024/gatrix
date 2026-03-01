@@ -56,7 +56,7 @@ class NetworkTrafficService {
 
     try {
       await db.raw(
-        `INSERT INTO NetworkTraffic (environmentId, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
+        `INSERT INTO g_feature_network_traffic (environmentId, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
                  VALUES (?, ?, ?, ?, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
                  ON DUPLICATE KEY UPDATE requestCount = requestCount + 1, updatedAt = UTC_TIMESTAMP()`,
         [environmentId, appName || 'unknown', endpoint, bucket]
@@ -84,7 +84,7 @@ class NetworkTrafficService {
       totalCount: number;
     }[]
   > {
-    let query = db('NetworkTraffic')
+    let query = db('g_feature_network_traffic')
       .select(
         'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
@@ -137,7 +137,7 @@ class NetworkTrafficService {
       totalCount: number;
     }[]
   > {
-    let query = db('NetworkTraffic')
+    let query = db('g_feature_network_traffic')
       .select(
         'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
@@ -196,7 +196,7 @@ class NetworkTrafficService {
       totalCount: number;
     }[]
   > {
-    let query = db('NetworkTraffic')
+    let query = db('g_feature_network_traffic')
       .select(
         'trafficBucket as bucket',
         db.raw("DATE_FORMAT(trafficBucket, '%m/%d %H:00') as displayTime"),
@@ -244,7 +244,7 @@ class NetworkTrafficService {
     startDate: Date;
     endDate: Date;
   }): Promise<string[]> {
-    let query = db('NetworkTraffic')
+    let query = db('g_feature_network_traffic')
       .distinct('appName')
       .where('trafficBucket', '>=', params.startDate)
       .where('trafficBucket', '<=', params.endDate);
@@ -267,7 +267,7 @@ class NetworkTrafficService {
     startDate: Date;
     endDate: Date;
   }): Promise<TrafficSummary> {
-    let query = db('NetworkTraffic')
+    let query = db('g_feature_network_traffic')
       .select(
         db.raw('COALESCE(SUM(requestCount), 0) as totalRequests'),
         db.raw(
@@ -318,7 +318,7 @@ class NetworkTrafficService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 
-    const result = await db('NetworkTraffic').where('trafficBucket', '<', cutoffDate).del();
+    const result = await db('g_feature_network_traffic').where('trafficBucket', '<', cutoffDate).del();
 
     return result;
   }

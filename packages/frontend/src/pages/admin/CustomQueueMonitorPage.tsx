@@ -38,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
-import { apiClient } from '@/services/api';
+import apiClient from '@/services/api';
 
 interface QueueStats {
   name: string;

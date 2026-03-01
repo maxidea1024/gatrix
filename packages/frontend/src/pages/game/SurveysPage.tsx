@@ -608,7 +608,7 @@ const SurveysPage: React.FC = () => {
                                     } else if (condition.type === 'joinDays') {
                                       label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
                                     } else {
-                                      label = `${t(`surveys.condition.${condition.type}`)}: ${condition.value}`;
+                                      label = `${t(`surveys.condition.${condition.type}` as any)}: ${condition.value}`;
                                     }
 
                                     return (

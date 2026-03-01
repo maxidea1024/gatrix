@@ -57,7 +57,7 @@ const LandingPage: React.FC = () => {
   // Apply language immediately when changed
   useEffect(() => {
     if (selectedLanguage !== language) {
-      changeLanguage(selectedLanguage);
+      changeLanguage(selectedLanguage as any);
       i18n.changeLanguage(selectedLanguage);
     }
   }, [selectedLanguage, language, changeLanguage, i18n]);

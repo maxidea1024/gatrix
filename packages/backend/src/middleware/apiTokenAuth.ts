@@ -250,11 +250,11 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
 
 /**
  * Resolves environment from token (token determines everything).
- * Falls back to X-Environment header or :env path param for backward compatibility.
+ * Falls back to X-Environment-Id header or :env path param for backward compatibility.
  */
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
-    // Token determines environment — no more X-Environment header needed
+    // Token determines environment — no more X-Environment-Id header needed
     const environmentId =
       req.apiToken?.environmentId ||
       req.environmentId || // Already set by unsecured token handler

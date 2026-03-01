@@ -87,7 +87,7 @@ class SignalEndpointService {
     });
     return {
       data: response.data,
-      pagination: (response as Record<string, unknown>).pagination as {
+      pagination: (response as any).pagination as {
         total: number;
         limit: number;
         offset: number;

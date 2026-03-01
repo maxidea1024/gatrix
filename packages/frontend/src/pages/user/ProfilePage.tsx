@@ -553,7 +553,7 @@ const ProfilePage: React.FC = () => {
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
 
-                {permissions.includes('*') ? (
+                {permissions.includes('*' as any) ? (
                   <Box
                     sx={{
                       p: 2,

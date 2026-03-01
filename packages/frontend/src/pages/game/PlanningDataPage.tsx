@@ -419,8 +419,7 @@ const PlanningDataPage: React.FC = () => {
       const loadItems = async () => {
         try {
           setLoadingCategory(currentCategory);
-          const language = i18n.language === 'zh' ? 'cn' : i18n.language === 'en' ? 'en' : 'kr';
-          const items = await planningDataService.getUIListItems(currentCategory, language);
+          const items = await planningDataService.getUIListItems(currentCategory);
           setCategoryItems((prev) => ({ ...prev, [currentCategory]: items }));
         } catch (error: any) {
           // Extract user-friendly error message
@@ -628,7 +627,7 @@ const PlanningDataPage: React.FC = () => {
       const searchLower = debouncedHotTimeBuffSearchTerm.toLowerCase();
       items = items.filter((item: HotTimeBuffItem) => {
         const idMatch = item.id.toString().includes(searchLower);
-        const iconMatch = item.icon?.toLowerCase().includes(searchLower);
+        const iconMatch = (item as any).icon?.toLowerCase().includes(searchLower);
         const startDateMatch = item.startDate?.toLowerCase().includes(searchLower);
         const endDateMatch = item.endDate?.toLowerCase().includes(searchLower);
         return idMatch || iconMatch || startDateMatch || endDateMatch;
@@ -1848,33 +1847,8 @@ const PlanningDataPage: React.FC = () => {
                                         >
                                           {item.worldBuffId && item.worldBuffId.length > 0
                                             ? item.worldBuffId.map((buffId, index) => {
-                                                // Get localized world buff name based on current language
-                                                let buffName = buffId;
-                                                const lang = i18n.language;
-                                                const krName =
-                                                  item.worldBuffNamesKr?.[index] ||
-                                                  item.worldBuffNames?.[index];
-                                                const enName = item.worldBuffNamesEn?.[index];
-                                                const cnName = item.worldBuffNamesCn?.[index];
-
-                                                if (lang === 'en') {
-                                                  // If English name exists and is different from Korean (i.e., real translation)
-                                                  if (enName && enName !== krName) {
-                                                    buffName = enName;
-                                                  } else {
-                                                    buffName = krName || buffId;
-                                                  }
-                                                } else if (lang === 'zh') {
-                                                  // If Chinese name exists and is different from Korean (i.e., real translation)
-                                                  if (cnName && cnName !== krName) {
-                                                    buffName = cnName;
-                                                  } else {
-                                                    buffName = krName || buffId;
-                                                  }
-                                                } else {
-                                                  // Korean or default
-                                                  buffName = krName || buffId;
-                                                }
+                                                // worldBuffNames is already localized by the backend service
+                                                const buffName = item.worldBuffNames?.[index] || String(buffId);
                                                 return (
                                                   <Chip
                                                     key={buffId}

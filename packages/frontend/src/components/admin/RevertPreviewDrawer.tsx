@@ -49,6 +49,7 @@ interface RevertPreviewDrawerProps {
   onClose: () => void;
   changeRequestId: string | null;
   onRevertCreated?: (newCrId: string) => void;
+  onRollbackCreated?: (newCrId?: string) => void;
 }
 
 const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({

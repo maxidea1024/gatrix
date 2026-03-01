@@ -475,7 +475,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     type="number"
                     value={price}
                     onChange={(e) =>
-                      setPrice(e.target.value === '' ? '' : parseFloat(e.target.value) || 0)
+                      setPrice(parseFloat(e.target.value) || 0)
                     }
                     fullWidth
                     size="small"

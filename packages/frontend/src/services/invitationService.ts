@@ -16,8 +16,8 @@ class InvitationService {
     const response = await apiService.get(`${this.ADMIN_BASE_URL}/current`);
 
     // Backend now returns 200 with data: null when no invitation exists
-    // apiService는 이미 response.data를 반환하므로
-    // response는 백엔드에서 보낸 { success: true, data: {...} | null } 구조
+    // apiService already returns response.data
+    // response is the { success: true, data: {...} | null } structure sent from backend
     if (response?.success && response?.data) {
       return response.data;
     }

@@ -59,7 +59,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check permission-based access
   if (requiredPermissions && requiredPermissions.length > 0) {
-    if (!hasPermission(requiredPermissions)) {
+    if (!hasPermission(requiredPermissions as any)) {
       return (
         <Navigate
           to="/unauthorized"

@@ -60,7 +60,7 @@ export const API_HEADERS = {
   /**
    * 환경 이름 헤더 (SDK용)
    */
-  X_ENVIRONMENT: 'x-environment',
+  X_ENVIRONMENT: 'x-environment-id',
 
   /**
    * 사용자 ID 헤더 (Chat Server용)

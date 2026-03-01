@@ -363,13 +363,13 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
           </Tooltip>
         );
       case 'user':
-        return log.user_name ? (
+        return log.userName ? (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {log.user_name}
+              {log.userName}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {log.user_email}
+              {log.userEmail}
             </Typography>
           </Box>
         ) : (

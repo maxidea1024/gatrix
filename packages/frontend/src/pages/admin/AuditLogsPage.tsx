@@ -461,20 +461,20 @@ const AuditLogsPage: React.FC = () => {
     switch (columnId) {
       case 'createdAt':
         return (
-          <Tooltip title={formatDateTimeDetailed((log as any).createdAt || log.created_at)}>
+          <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
             <Typography variant="body2">
-              {formatRelativeTime((log as any).createdAt || log.created_at, undefined, language)}
+              {formatRelativeTime(log.createdAt, undefined, language)}
             </Typography>
           </Tooltip>
         );
       case 'user':
-        return log.user_name ? (
+        return log.userName ? (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {log.user_name}
+              {log.userName}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {log.user_email}
+              {log.userEmail}
             </Typography>
           </Box>
         ) : (
@@ -496,7 +496,7 @@ const AuditLogsPage: React.FC = () => {
         return resourceType ? (
           <Box>
             <Typography variant="body2" fontWeight="medium">
-              {t(`auditLogs.resources.${resourceType}`, resourceType)}
+              {String(t(`auditLogs.resources.${resourceType}`, resourceType))}
             </Typography>
             {(() => {
               const oldVals = (log as any).oldValues || (log as any).old_values;
@@ -530,7 +530,7 @@ const AuditLogsPage: React.FC = () => {
       case 'ipAddress':
         return (
           <Typography variant="body2" fontFamily="monospace">
-            {(log as any).ipAddress || log.ip_address || '-'}
+            {log.ipAddress || '-'}
           </Typography>
         );
       case 'description':
@@ -842,12 +842,12 @@ const AuditLogsPage: React.FC = () => {
                                     (log as any).resource_type ||
                                     (log as any).entityType) && (
                                       <Chip
-                                        label={t(
+                                        label={String(t(
                                           `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
                                           (log as any).resourceType ||
                                           (log as any).resource_type ||
                                           (log as any).entityType
-                                        )}
+                                        ))}
                                         variant="outlined"
                                         size="small"
                                       />
@@ -882,12 +882,12 @@ const AuditLogsPage: React.FC = () => {
                                     >
                                       <Tooltip
                                         title={formatDateTimeDetailed(
-                                          (log as any).createdAt || log.created_at
+                                          log.createdAt
                                         )}
                                       >
                                         <span>
                                           {formatRelativeTime(
-                                            (log as any).createdAt || log.created_at,
+                                            log.createdAt,
                                             undefined,
                                             language
                                           )}
@@ -912,10 +912,10 @@ const AuditLogsPage: React.FC = () => {
                                       {t('auditLogs.user')}
                                     </Typography>
                                     <Box sx={{ mt: 0.5 }}>
-                                      {log.user_name ? (
+                                      {log.userName ? (
                                         <>
                                           <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                            {log.user_name}
+                                            {log.userName}
                                           </Typography>
                                           <Typography
                                             variant="body2"
@@ -925,7 +925,7 @@ const AuditLogsPage: React.FC = () => {
                                               fontSize: '0.8rem',
                                             }}
                                           >
-                                            {log.user_email}
+                                            {log.userEmail}
                                           </Typography>
                                         </>
                                       ) : (
@@ -1023,12 +1023,12 @@ const AuditLogsPage: React.FC = () => {
                                       variant="body1"
                                       sx={{ mt: 0.5, fontFamily: 'monospace' }}
                                     >
-                                      {log.ip_address || log.ipAddress || '-'}
+                                      {log.ipAddress || '-'}
                                     </Typography>
                                   </Box>
 
                                   {/* User Agent */}
-                                  {(log.user_agent || log.userAgent) && (
+                                  {log.userAgent && (
                                     <>
                                       <Divider />
                                       <Box>
@@ -1053,7 +1053,7 @@ const AuditLogsPage: React.FC = () => {
                                             color: 'text.secondary',
                                           }}
                                         >
-                                          {log.user_agent || log.userAgent}
+                                          {log.userAgent}
                                         </Typography>
                                       </Box>
                                     </>

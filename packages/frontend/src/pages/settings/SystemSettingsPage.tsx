@@ -186,7 +186,7 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) =>
                     setSdConfig({
                       ...sdConfig,
-                      defaultTtl: e.target.value === '' ? '' : parseInt(e.target.value, 10) || 30,
+                      defaultTtl: parseInt(e.target.value, 10) || 30,
                     })
                   }
                   helperText={t('settings.serviceDiscovery.defaultTtlHelp')}
@@ -200,8 +200,7 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) =>
                     setSdConfig({
                       ...sdConfig,
-                      heartbeatInterval:
-                        e.target.value === '' ? '' : parseInt(e.target.value, 10) || 15,
+                      heartbeatInterval: parseInt(e.target.value, 10) || 15,
                     })
                   }
                   helperText={t('settings.serviceDiscovery.heartbeatIntervalHelp')}

@@ -28,7 +28,7 @@ export class ChatWebSocketService {
 
     this.connectionPromise = new Promise(async (resolve, reject) => {
       try {
-        // 기존 JWT 토큰 사용 (별도 채팅 토큰 불필요)
+        // Use existing JWT token (no separate chat token needed)
         const backendToken = localStorage.getItem('accessToken');
         if (!backendToken) {
           throw new Error('No authentication token found');
@@ -70,12 +70,12 @@ export class ChatWebSocketService {
           });
           this.isConnecting = false;
 
-          // 의도적인 연결 해제가 아닌 경우에만 connection_lost 이벤트 발생
+          // Trigger connection_lost event only if not intentionally disconnected
           if (reason !== 'io client disconnect') {
             this.emit('connection_lost', { reason });
           }
 
-          // 서버 종료나 네트워크 문제로 인한 연결 끊김만 재연결 시도
+          // Only attempt reconnect for disconnects caused by server shutdown or network issues
           if (this.shouldReconnect && reason !== 'io client disconnect') {
             console.log('🔄 Attempting to reconnect...');
             this.scheduleReconnect();
@@ -96,12 +96,12 @@ export class ChatWebSocketService {
             console.log('🔄 WebSocket auth failed, attempting token refresh...');
 
             try {
-              // 토큰 갱신 시도
+              // Attempt to refresh token
               await AuthService.refreshToken();
 
               console.log('✅ Token refreshed, reconnecting WebSocket...');
 
-              // 새 토큰으로 재연결 시도
+              // Attempt to reconnect with new token
               setTimeout(() => {
                 this.reconnect();
               }, 1000);
@@ -207,11 +207,11 @@ export class ChatWebSocketService {
   private setupSocketEventListeners(): void {
     if (!this.socket) return;
 
-    // 채팅 관련 이벤트들
+    // Chat related events
     this.socket.on('message', (data) => {
       console.log('WebSocket message received:', data);
 
-      // 메시지 타입에 따라 적절한 이벤트로 변환
+      // Convert to appropriate event based on message type
       if (data.type === 'message_created') {
         console.log('Emitting message_created event:', data.data);
         this.emit('message_created', data.data);
@@ -229,17 +229,17 @@ export class ChatWebSocketService {
         this.emit('thread_updated', data);
       } else {
         console.log('Emitting generic message event:', data);
-        // 기본 메시지 이벤트
+        // Default message event
         this.emit('message', data);
       }
     });
 
-    // 백엔드에서 실제로 보내는 이벤트들만 처리
+    // Only handle events actually sent from backend
     this.socket.on('user_left', (data) => {
       this.emit('user_left', data);
     });
 
-    // 서버에서 보내는 타이핑 이벤트 (user_typing, user_stop_typing)
+    // Typing events sent from server (user_typing, user_stop_typing)
     this.socket.on('user_typing', (data) => {
       this.emit('user_typing', data);
     });
@@ -248,7 +248,7 @@ export class ChatWebSocketService {
       this.emit('user_stop_typing', data);
     });
 
-    // 스레드 타이핑 이벤트
+    // Thread typing events
     this.socket.on('user_typing_thread', (data) => {
       this.emit('user_typing_thread', data);
     });
@@ -257,19 +257,19 @@ export class ChatWebSocketService {
       this.emit('user_stop_typing_thread', data);
     });
 
-    // 메시지 전송 완료 이벤트
+    // Message send complete event
     this.socket.on('message_sent', (data) => {
       console.log('WebSocket message_sent received:', data);
       this.emit('message_sent', data);
     });
 
-    // 새 메시지 이벤트 (BroadcastService에서)
+    // New message event (from BroadcastService)
     this.socket.on('new_message', (data) => {
       console.log('WebSocket new_message received:', data);
       this.emit('new_message', data);
     });
 
-    // 초대 관련 이벤트들
+    // Invitation related events
     this.socket.on('channel_invitation', (data) => {
       console.log('WebSocket channel_invitation received:', data);
       this.emit('channel_invitation', data);
@@ -290,19 +290,19 @@ export class ChatWebSocketService {
       this.emit('user_joined_channel', data);
     });
 
-    // 메시지 리액션 관련 이벤트들
+    // Message reaction related events
     this.socket.on('message_reaction_updated', (data) => {
       console.log('WebSocket message_reaction_updated received:', data);
       this.emit('message_reaction_updated', data);
     });
 
-    // 사용자 상태 변경 이벤트
+    // User status change events
     this.socket.on('user_status_changed', (data) => {
       console.log('WebSocket user_status_changed received:', data);
       this.emit('presence_update', data);
     });
 
-    // 연결 관련 이벤트
+    // Connection related events
     this.socket.on('connected', (data) => {
       console.log('WebSocket connected event received:', data);
       this.emit('connection_established', data);
@@ -385,8 +385,8 @@ export class ChatWebSocketService {
       return;
     }
 
-    // 지수 백오프: 1초, 2초, 4초, 8초, 16초
-    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000); // 최대 30초
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000); // Max 30 seconds
     console.log(`Scheduling reconnection attempt ${this.reconnectAttempts + 1} in ${delay}ms`);
 
     setTimeout(() => {
@@ -398,7 +398,7 @@ export class ChatWebSocketService {
       this.reconnectAttempts++;
       this.connect().catch((error) => {
         console.error('Reconnection failed:', error);
-        // 재연결 실패 시 다시 스케줄링
+        // Reschedule upon reconnect failure
         if (this.shouldReconnect) {
           this.scheduleReconnect();
         }
@@ -406,7 +406,7 @@ export class ChatWebSocketService {
     }, delay);
   }
 
-  // 사용자 상태 업데이트
+  // Update user status
   updateStatus(status: string, customStatus?: string): void {
     if (!this.socket) {
       console.error('❌ Cannot update status: WebSocket not connected');

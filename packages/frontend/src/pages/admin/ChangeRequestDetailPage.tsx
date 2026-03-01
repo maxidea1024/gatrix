@@ -73,6 +73,11 @@ const STATUS_CONFIG: Record<
     bgColor: '#a371f7',
   },
   rejected: {
+    color: 'error' as const,
+    labelKey: 'changeRequests.statuses.rejected',
+    bgColor: 'rgba(244, 67, 54, 0.08)',
+  },
+  conflict: {
     color: 'error',
     labelKey: 'changeRequest.status.rejected',
     bgColor: '#f85149',
@@ -866,7 +871,7 @@ const ChangeRequestDetailPage: React.FC = () => {
 
               {/* Status Banners */}
               {cr.status === 'rejected' &&
-                (cr.requesterId === user?.id || user?.role === 'admin' || user?.role === 0) && (
+                (cr.requesterId === user?.id || user?.role === 'admin' || Number(user?.role) === 0) && (
                   <Paper
                     sx={{
                       p: 2,

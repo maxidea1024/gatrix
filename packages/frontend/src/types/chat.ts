@@ -2,12 +2,16 @@
 
 export interface User {
   id: number;
+  userId?: number;
   username: string;
   name?: string;
   email: string;
   avatarUrl?: string;
   isOnline: boolean;
   lastSeen?: string;
+  lastSeenAt?: string;
+  status?: UserStatus;
+  role?: string;
 }
 
 export interface Channel {
@@ -23,6 +27,7 @@ export interface Channel {
   lastMessage?: Message;
   isArchived: boolean;
   settings: ChannelSettings;
+  members?: ChannelMember[];
 }
 
 export interface ChannelSettings {
@@ -65,6 +70,10 @@ export interface Message {
   attachments: MessageAttachment[];
   mentions: MessageMention[];
   hashtags: string[];
+  isEdited?: boolean;
+  readBy?: any[];
+  status?: MessageStatus;
+  location?: LocationData;
 }
 
 export type MessageType =
@@ -103,6 +112,7 @@ export interface LocationData {
   longitude: number;
   address?: string;
   placeName?: string;
+  name?: string;
 }
 
 export interface EditHistory {
@@ -132,6 +142,7 @@ export interface MessageAttachment {
   messageId: number;
   fileName: string;
   originalName: string;
+  name?: string;
   mimeType: string;
   size: number;
   url: string;
@@ -346,3 +357,8 @@ export interface RichTextElement {
   content: string;
   data?: any; // additional data for specific types
 }
+
+// Status types
+export type UserStatus = 'online' | 'away' | 'busy' | 'offline' | 'invisible';
+export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+

@@ -74,7 +74,7 @@ class RewardTemplateService {
     const offset = (page - 1) * limit;
 
     try {
-      const whereConditions: string[] = ['environment = ?'];
+      const whereConditions: string[] = ['environmentId = ?'];
       const queryParams: (string | number | boolean | null)[] = [environmentId];
 
       if (search) {
@@ -139,7 +139,7 @@ class RewardTemplateService {
     const pool = database.getPool();
     try {
       const [templates] = await pool.execute<RowDataPacket[]>(
-        'SELECT * FROM g_reward_templates WHERE id = ? AND environment = ?',
+        'SELECT * FROM g_reward_templates WHERE id = ? AND environmentId = ?',
         [id, environmentId]
       );
 
@@ -297,7 +297,7 @@ class RewardTemplateService {
       // Check if template exists
       await this.getRewardTemplateById(id, environmentId);
 
-      await pool.execute('DELETE FROM g_reward_templates WHERE id = ? AND environment = ?', [
+      await pool.execute('DELETE FROM g_reward_templates WHERE id = ? AND environmentId = ?', [
         id,
         environmentId,
       ]);

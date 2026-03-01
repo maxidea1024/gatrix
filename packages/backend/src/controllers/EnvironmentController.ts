@@ -22,7 +22,7 @@ export class EnvironmentController {
         const stats = await env.getStats();
         return {
           ...env,
-          environmentName: env.name, // Also provide as environmentName
+          // environmentName removed - use env.id
           stats,
         };
       })
@@ -94,7 +94,7 @@ export class EnvironmentController {
 
     try {
       const newEnv = await Environment.createEnvironment({
-        name: environmentId,
+        // name field removed
         displayName,
         description,
         environmentType: environmentType || 'development',
@@ -112,7 +112,7 @@ export class EnvironmentController {
       // Note: Segments will be created by new remote config system when implemented
       if (!baseEnvironment) {
         // Initialize system-defined KV items ($channels, $platforms, $clientVersionPassiveData)
-        await initializeSystemKV(newEnv.name);
+        await initializeSystemKV(newEnv.id);
         logger.info(`System KV items initialized for new environmentId: ${environmentId}`);
       }
 
@@ -120,7 +120,7 @@ export class EnvironmentController {
       let copyResult = null;
       if (baseEnvironment) {
         logger.info(
-          `Copying data from base environmentId ${baseEnvironment} to new environmentId ${newEnv.name}`
+          `Copying data from base environmentId ${baseEnvironment} to new environmentId ${newEnv.id}`
         );
 
         const copyOptions: CopyOptions = {
@@ -148,7 +148,7 @@ export class EnvironmentController {
 
         copyResult = await EnvironmentCopyService.copyEnvironmentData(
           baseEnvironment,
-          newEnv.name,
+          newEnv.id,
           copyOptions,
           userId
         );
@@ -165,7 +165,7 @@ export class EnvironmentController {
         await pubSubService.publishSDKEvent({
           type: 'environment.created',
           data: {
-            environmentId: newEnv.name,
+            environmentId: newEnv.id,
             timestamp: Date.now(),
           },
         });
@@ -219,7 +219,7 @@ export class EnvironmentController {
     }
 
     // Prevent modifying hidden status for system environments like gatrix-env
-    if (isHidden !== undefined && env.name === 'gatrix-env') {
+    if (isHidden !== undefined && env.displayName === 'gatrix-env') {
       return res.status(400).json({
         success: false,
         code: 'CANNOT_MODIFY_SYSTEM_ENVIRONMENT',
@@ -242,7 +242,7 @@ export class EnvironmentController {
         userId
       );
 
-      logger.info(`Environment updated: ${env.name} by user ${userId}`);
+      logger.info(`Environment updated: ${env.id} by user ${userId}`);
 
       res.json({
         success: true,
@@ -278,7 +278,7 @@ export class EnvironmentController {
       success: true,
       data: {
         environmentId: {
-          environmentId: env.name,
+          environmentId: env.id,
           displayName: env.displayName,
           isSystemDefined: env.isSystemDefined,
           isDefault: env.isDefault,
@@ -314,7 +314,7 @@ export class EnvironmentController {
     }
 
     try {
-      const environmentName = env.name;
+      const environmentName = env.id;
       await env.deleteEnvironment(force === true);
 
       logger.info(`Environment deleted: ${environmentName} by user ${userId}`, {
@@ -472,7 +472,7 @@ export class EnvironmentController {
       });
     }
 
-    const existing = await Environment.getByName(environmentId);
+    const existing = await Environment.query().where('displayName', req.body.name).first();
     if (existing) {
       return res.status(409).json({
         success: false,
@@ -535,7 +535,7 @@ export class EnvironmentController {
       );
 
       logger.info(
-        `Environment data copied from ${sourceEnv.name} to ${targetEnv.name} by user ${userId}`,
+        `Environment data copied from ${sourceEnv.displayName} to ${targetEnv.displayName} by user ${userId}`,
         {
           result,
         }
@@ -587,12 +587,12 @@ export class EnvironmentController {
 
       // Fill in environment info
       preview.source = {
-        environmentId: sourceEnv.name,
-        name: sourceEnv.displayName,
+        environmentId: sourceEnv.id,
+        displayName: sourceEnv.displayName,
       };
       preview.target = {
-        environmentId: targetEnv.name,
-        name: targetEnv.displayName,
+        environmentId: targetEnv.id,
+        displayName: targetEnv.displayName,
       };
 
       res.json({

@@ -147,7 +147,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>(
+  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string; description?: string }[]>(
     []
   );
 
@@ -188,7 +188,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     watch,
     setError,
   } = useForm<BulkCreateFormData>({
-    resolver: yupResolver(createValidationSchema(t)),
+    resolver: yupResolver(createValidationSchema(t)) as any,
     defaultValues,
   });
 
@@ -433,7 +433,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit as any)}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -508,7 +508,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       *
                     </Typography>
                   </InputLabel>
-                  <Select
+                  <Select<string[]>
                     labelId="bulk-platform-label"
                     multiple
                     value={selectedPlatforms}

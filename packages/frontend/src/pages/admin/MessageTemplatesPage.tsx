@@ -172,7 +172,7 @@ const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.REMOTE_CONFIG_MANAGE]);
+  const canManage = hasPermission([PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE]);
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -1223,7 +1223,6 @@ const MessageTemplatesPage: React.FC = () => {
             {/* 태그 선택 */}
             <TextField
               select
-              multiple
               label={t('common.tags')}
               value={form.tags?.map((tag) => tag.id) || []}
               onChange={(e) => {
@@ -1406,7 +1405,6 @@ const MessageTemplatesPage: React.FC = () => {
           <Box sx={{ mt: 2 }}>
             <TextField
               select
-              multiple
               label={t('common.selectTags')}
               value={templateTags.map((tag) => tag.id)}
               onChange={(e) => {

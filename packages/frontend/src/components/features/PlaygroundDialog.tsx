@@ -332,7 +332,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   const loadEnvironments = async () => {
     try {
-      const envs = await environmentService.getEnvironments();
+      const envs = await environmentService.getEnvironments('' as any);
       const filteredEnvs = envs
         .filter((e) => !e.isHidden)
         .sort((a, b) => a.displayOrder - b.displayOrder);

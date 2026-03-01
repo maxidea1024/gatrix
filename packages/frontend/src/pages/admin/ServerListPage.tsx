@@ -179,7 +179,7 @@ const getStatusColor = (status: string): string => {
       return '#4caf50';
     case 'initializing':
       return '#ffc107';
-    case 'busy':
+    case 'busy' as any:
       return '#ff9800';
     case 'full':
       return '#f44336';
@@ -3576,26 +3576,6 @@ const ServerListPage: React.FC = () => {
         label: t('serverList.status.noResponse'),
         tooltipKey: 'noResponse',
       },
-      busy: {
-        color: 'warning' as const,
-        icon: (
-          <SearchIcon
-            sx={{
-              fontSize: 16,
-              animation: 'searchingAnimSmall 2s ease-in-out infinite',
-              '@keyframes searchingAnimSmall': {
-                '0%': { transform: 'translate(0, 0) rotate(0deg)' },
-                '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
-                '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
-                '75%': { transform: 'translate(1px, 1px) rotate(10deg)' },
-                '100%': { transform: 'translate(0, 0) rotate(0deg)' },
-              },
-            }}
-          />
-        ),
-        label: t('serverList.status.busy') || 'Busy',
-        tooltipKey: 'busy',
-      },
     };
 
     const config = statusConfig[status];
@@ -3677,8 +3657,6 @@ const ServerListPage: React.FC = () => {
         return t('serverList.status.terminated');
       case 'no-response':
         return t('serverList.status.noResponse');
-      case 'busy':
-        return t('serverList.status.busy');
       default:
         return status;
     }

@@ -39,13 +39,13 @@ export const messageTemplateService = {
     );
     const d: any = res.data;
 
-    // 백워드 호환성: 배열이면 기존 형식, 객체면 새 형식
+    // Backward compatibility: existing format if array, new format if object
     if (Array.isArray(d)) {
       return { templates: d, total: d.length };
     }
 
-    // 서버 응답 구조: { success: true, data: { items: ..., total: ... } }
-    // data.data가 있으면 중첩된 구조
+    // Server response structure: { success: true, data: { items: ..., total: ... } }
+    // Nested structure if data.data exists
     const actualData = d?.data || d;
 
     return {
@@ -60,23 +60,23 @@ export const messageTemplateService = {
   async create(data: MessageTemplate): Promise<MessageTemplate> {
     const res = await apiService.post<any>('/admin/message-templates', data);
 
-    // 서버 응답 구조: { success: true, data: created }
+    // Server response structure: { success: true, data: created }
     if (res?.data?.success && res?.data?.data) {
       return res.data.data;
     }
 
-    // 백워드 호환성을 위한 다른 구조들
+    // Other structures for backward compatibility
     return res?.data?.data || res?.data || res;
   },
   async update(id: number, data: MessageTemplate): Promise<MessageTemplate> {
     const res = await apiService.put<any>(`/admin/message-templates/${id}`, data);
 
-    // 서버 응답 구조: { success: true, data: updated }
+    // Server response structure: { success: true, data: updated }
     if (res?.data?.success && res?.data?.data) {
       return res.data.data;
     }
 
-    // 백워드 호환성을 위한 다른 구조들
+    // Other structures for backward compatibility
     return res?.data?.data || res?.data || res;
   },
   async remove(id: number): Promise<void> {
@@ -89,7 +89,7 @@ export const messageTemplateService = {
     await apiService.post('/admin/message-templates/bulk-delete', { ids });
   },
 
-  // 태그 관련 메서드
+  // Tag related methods
   async getTags(id: number): Promise<any[]> {
     const response = await apiService.get(`/admin/message-templates/${id}/tags`);
     return response.data?.data || [];

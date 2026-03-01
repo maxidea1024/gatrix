@@ -588,7 +588,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isInitializedRef.current = true;
 
       // 현재 사용자 정보를 설정
-      dispatch({ type: 'SET_CURRENT_USER', payload: user });
+      dispatch({ type: 'SET_CURRENT_USER', payload: user as any });
 
       // WebSocket 연결 함수는 이제 위에서 useCallback으로 정의됨
 
@@ -858,7 +858,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isEdited: false,
           };
 
-          dispatch({ type: 'ADD_MESSAGE', payload: systemMessage });
+          dispatch({ type: 'ADD_MESSAGE', payload: systemMessage as any });
         }
 
         // 채널 목록 새로고침 (멤버 수 업데이트)
@@ -936,14 +936,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       });
                       // 채널 목록 새로고침 후 해당 채널로 이동
                       await loadChannels();
-                      if (response.channelId) {
+                      if ((response as any).channelId) {
                         console.log(
                           '🎉 Invitation accepted, switching to channel:',
-                          response.channelId
+                          (response as any).channelId
                         );
                         dispatch({
                           type: 'SET_CURRENT_CHANNEL',
-                          payload: response.channelId,
+                          payload: (response as any).channelId,
                         });
                       }
                     } else {
@@ -1032,7 +1032,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dispatch({ type: 'SET_CONNECTED', payload: false });
       };
     }
-  }, [user?.userId]); // user 객체 전체가 아닌 userId만 의존성으로 사용
+  }, [user?.id]); // user 객체 전체가 아닌 id만 의존성으로 사용
 
   // Load messages for a channel - 깜빡임 방지를 위해 로딩 상태 설정 제거
   const loadMessages = useCallback(

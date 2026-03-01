@@ -1,4 +1,4 @@
-import { ServiceInstance } from '../../../services/serviceDiscoveryService';
+import { ServiceInstance } from '@/services/serviceDiscoveryService';
 
 // Service status type
 export type ServiceStatus =

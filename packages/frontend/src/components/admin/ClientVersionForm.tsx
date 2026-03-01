@@ -158,7 +158,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>(
+  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string; description?: string }[]>(
     []
   );
 
@@ -203,7 +203,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     setValue,
     getValues,
   } = useForm<ClientVersionFormData>({
-    resolver: yupResolver(createValidationSchema(t)),
+    resolver: yupResolver(createValidationSchema(t)) as any,
     defaultValues,
   });
 
@@ -650,7 +650,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
+        onSubmit={handleSubmit(onSubmit as any, (errors) => {
           console.log('Form validation failed:', errors);
         })}
         style={{

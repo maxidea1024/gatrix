@@ -36,7 +36,7 @@ export const resolveEnvironment = async (
 
   try {
     // Find environment by name
-    const env = await Environment.getByName(envParam);
+    const env = await Environment.getById(envParam);
 
     if (!env) {
       logger.warn(`Environment not found: ${envParam}`);

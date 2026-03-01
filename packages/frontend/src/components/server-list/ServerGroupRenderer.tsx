@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Paper, Chip, Typography, alpha } from '@mui/material';
-import { ServiceInstance } from '../../../services/serviceDiscoveryService';
+import { ServiceInstance } from '@/services/serviceDiscoveryService';
 import { ServerGroup, GroupingField, collectAllInstances, ServiceStatus } from './types';
 
 interface StatusStatsProps {
@@ -23,10 +23,10 @@ export const StatusStatsDisplay: React.FC<StatusStatsProps> = ({ services, t }) 
       const status = service.status;
       if (status === 'initializing') counts.initializing++;
       else if (status === 'ready') counts.ready++;
-      else if (status === 'shuttingDown' || status === 'shutting_down') counts.shuttingDown++;
+      else if (status === 'shutting_down') counts.shuttingDown++;
       else if (status === 'terminated') counts.terminated++;
       else if (status === 'error') counts.error++;
-      else if (status === 'noResponse' || status === 'no_response') counts.noResponse++;
+      else if (status === 'no-response' || status === 'no-response') counts.noResponse++;
     });
     return counts;
   }, [services]);

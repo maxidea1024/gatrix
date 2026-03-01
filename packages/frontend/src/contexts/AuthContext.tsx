@@ -203,7 +203,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Check for wildcard permission '*' that grants all permissions
-      if (permissions.includes('*')) {
+      if (permissions.includes('*' as Permission)) {
         return true;
       }
 

@@ -143,7 +143,7 @@ const JobsPage: React.FC = () => {
           jobTypeId: selectedJobType || undefined,
           isEnabled: enabledFilter !== '' ? enabledFilter : undefined,
           search: searchTerm || undefined,
-          tags: tagIds.length > 0 ? tagIds : undefined,
+          tags: tagIds.length > 0 ? tagIds.map(Number) : undefined,
           limit: rowsPerPage,
           offset: page * rowsPerPage,
         }),
@@ -510,8 +510,8 @@ const JobsPage: React.FC = () => {
                   }}
                 >
                   <MenuItem value="">{t('common.all')}</MenuItem>
-                  <MenuItem value={true}>{t('common.usable')}</MenuItem>
-                  <MenuItem value={false}>{t('common.unavailable')}</MenuItem>
+                  <MenuItem value={'true' as any}>{t('common.usable')}</MenuItem>
+                  <MenuItem value={'false' as any}>{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

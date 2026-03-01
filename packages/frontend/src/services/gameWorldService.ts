@@ -21,13 +21,13 @@ export const gameWorldService = {
     try {
       const response = await api.get('/admin/game-worlds', { params });
 
-      // 응답 구조 확인 - 두 가지 경우 모두 처리
+      // Verify response structure - handle both cases
       let data: any;
       if (response.data?.data) {
-        // 표준 응답 구조: { success: true, data: { worlds: [], total: 0 } }
+        // Standard response structure: { success: true, data: { worlds: [], total: 0 } }
         data = response.data.data;
       } else if (response.data?.worlds !== undefined) {
-        // 직접 응답 구조: { worlds: [], total: 0 }
+        // Direct response structure: { worlds: [], total: 0 }
         data = response.data;
       } else {
         console.error('Invalid response structure:', response.data);

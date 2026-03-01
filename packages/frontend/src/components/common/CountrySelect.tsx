@@ -143,7 +143,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
               <CountryChip
                 key={key}
                 code={option.code}
-                onDelete={restTagProps.onDelete}
+                onDelete={restTagProps.onDelete as any}
                 disabled={disabled}
               />
             );

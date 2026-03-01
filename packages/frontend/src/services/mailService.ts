@@ -54,7 +54,7 @@ export class MailService {
       params.limit = filters.limit;
     }
 
-    return apiService.get('/mails', { params });
+    return apiService.get('/mails', { params }) as any;
   }
 
   /**
@@ -62,21 +62,21 @@ export class MailService {
    */
   async getSentMails(page: number = 1, limit: number = 20): Promise<MailListResponse> {
     const params = { page, limit };
-    return apiService.get('/mails/sent', { params });
+    return apiService.get('/mails/sent', { params }) as any;
   }
 
   /**
    * Get a single mail by ID
    */
   async getMailById(mailId: number): Promise<MailResponse> {
-    return apiService.get(`/mails/${mailId}`);
+    return apiService.get(`/mails/${mailId}`) as any;
   }
 
   /**
    * Get unread mail count
    */
   async getUnreadCount(): Promise<number> {
-    const response: UnreadCountResponse = await apiService.get('/mails/unread-count');
+    const response: any = await apiService.get('/mails/unread-count');
     return response.count;
   }
 
@@ -84,7 +84,7 @@ export class MailService {
    * Get mail statistics
    */
   async getMailStats(): Promise<MailStats> {
-    const response: MailStatsResponse = await apiService.get('/mails/stats');
+    const response: any = await apiService.get('/mails/stats');
     return response.data;
   }
 
@@ -92,7 +92,7 @@ export class MailService {
    * Send a new mail
    */
   async sendMail(mailData: SendMailRequest): Promise<MailResponse> {
-    return apiService.post('/mails', mailData);
+    return apiService.post('/mails', mailData) as any;
   }
 
   /**

@@ -34,6 +34,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   InputLabel,
+  LinearProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -231,6 +232,7 @@ const SchedulerPage: React.FC = () => {
     setSelectedDate(selectInfo.start);
     setEditingEvent(null);
     setFormData({
+      ...formData,
       title: '',
       start: selectInfo.start,
       end: selectInfo.end,
@@ -253,6 +255,7 @@ const SchedulerPage: React.FC = () => {
       borderColor: event.borderColor,
     });
     setFormData({
+      ...formData,
       title: event.title,
       start: event.start,
       end: event.end,
@@ -266,6 +269,7 @@ const SchedulerPage: React.FC = () => {
     setEditingEvent(null);
     setSelectedDate(new Date());
     setFormData({
+      ...formData,
       title: '',
       start: new Date(),
       end: undefined,
@@ -465,7 +469,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="Start Date/Time"
-                  value={formData.start ? moment(formData.start) : null}
+                  value={formData.start ? moment(formData.start) as any : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,
@@ -484,7 +488,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="End Date/Time"
-                  value={formData.end ? moment(formData.end) : null}
+                  value={formData.end ? moment(formData.end) as any : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,
@@ -575,7 +579,7 @@ const SchedulerPage: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      intervalMinutes: e.target.value === '' ? '' : Number(e.target.value) || 1,
+                      intervalMinutes: e.target.value === '' ? 1 : Number(e.target.value) || 1,
                     })
                   }
                   inputProps={{ min: 1 }}

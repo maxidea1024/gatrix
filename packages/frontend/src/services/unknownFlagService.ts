@@ -28,19 +28,13 @@ export const unknownFlagService = {
     }
     const queryString = params.toString();
     const url = `/admin/unknown-flags${queryString ? `?${queryString}` : ''}`;
-    const response = await apiService.get<{
-      success: boolean;
-      data: { flags: UnknownFlag[]; total: number };
-    }>(url);
+    const response = await apiService.get<any>(url);
     return response.data;
   },
 
   async getUnresolvedCount(): Promise<number> {
-    const response = await apiService.get<{
-      success: boolean;
-      data: { count: number };
-    }>('/admin/unknown-flags/count');
-    return response.data.count;
+    const response = await apiService.get<any>('/admin/unknown-flags/count');
+    return response.data?.count || 0;
   },
 
   async resolveUnknownFlag(id: number): Promise<void> {

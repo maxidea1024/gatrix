@@ -2260,7 +2260,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Box>
       </Zoom>
       {/* SSE Notifications */}
-      {sseConnection.connected === false && (
+      {sseConnection.isConnected === false && (
         <Tooltip title={t('common.connectionLost')}>
           <Box
             sx={{

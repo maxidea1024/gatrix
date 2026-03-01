@@ -83,7 +83,7 @@ export interface Frame {
   meta?: Record<string, any>;
   // Frame targeting/filtering
   targeting?: FrameTargeting;
-  link?: string;
+  clickUrl?: string;
 }
 
 export interface SequenceTransition {

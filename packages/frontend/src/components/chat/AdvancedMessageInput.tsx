@@ -387,7 +387,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
 
       {/* Mention Autocomplete */}
       <MentionAutocomplete
-        users={channelUsers}
+        users={channelUsers.map((m: any) => m.user || m)}
         query={mentionQuery}
         position={mentionPosition}
         visible={showMentions}

@@ -583,7 +583,7 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
           )}
         </Box>
 
-        {/* Action Info Overlay - shown on hover when clickUrl or action exists */}
+        {/* Action Info Overlay - shown on hover when link or action exists */}
         {isHovering &&
           (currentFrame?.clickUrl ||
             (currentFrame?.action?.type && currentFrame.action.type !== 'none')) && (

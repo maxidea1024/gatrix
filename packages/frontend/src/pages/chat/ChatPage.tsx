@@ -60,7 +60,7 @@ import PrivacySettings from '../../components/chat/PrivacySettings';
 import ThreadView from '../../components/chat/ThreadView';
 import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
 import ChatSkeleton from '../../components/chat/ChatSkeleton';
-import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
+import { CreateChannelRequest, SendMessageRequest, Message } from '../../types/chat';
 import { getChatWebSocketService } from '../../services/chatWebSocketService';
 
 const ChatPageContent: React.FC = () => {
@@ -183,7 +183,7 @@ const ChatPageContent: React.FC = () => {
   // });
 
   // 스레드 관련 상태
-  const [threadMessage, setThreadMessage] = useState<Message | null>(null);
+  const [threadMessage, setThreadMessage] = useState<any>(null);
   const [isThreadOpen, setIsThreadOpen] = useState(false);
 
   // 스레드 뷰 모드 결정 (큰 화면: 사이드바이사이드, 작은 화면: 스택)
@@ -416,7 +416,7 @@ const ChatPageContent: React.FC = () => {
   const handleStatusChange = async (status: UserStatus, message?: string) => {
     try {
       // WebSocket을 통해 서버에 상태 업데이트
-      const wsService = getChatWebSocketService();
+      const wsService = getChatWebSocketService(() => localStorage.getItem('accessToken'));
       if (wsService.isConnected()) {
         wsService.updateStatus(status, message);
         setUserStatus(status);
@@ -914,9 +914,9 @@ const ChatPageContent: React.FC = () => {
 
         {selectedChannel && (
           <List>
-            {selectedChannel.members?.map((user) => (
-              <ListItem key={user.id}>
-                <UserPresence user={user} variant="list" showStatus={true} showLastSeen={true} />
+            {selectedChannel.members?.map((member) => (
+              <ListItem key={member.id}>
+                <UserPresence user={member.user} variant="list" showStatus={true} showLastSeen={true} />
               </ListItem>
             ))}
           </List>
@@ -960,8 +960,8 @@ const ChatPageContent: React.FC = () => {
           );
 
           try {
-            // 채널 목록 새로고침
-            await actions.loadChannels();
+            // Channel list will be refreshed via WebSocket events
+            // No explicit loadChannels needed
 
             // 채널 전환
             actions.setCurrentChannel(channelId);

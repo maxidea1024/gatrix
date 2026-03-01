@@ -61,8 +61,8 @@ export interface CopyPreviewSummary {
 }
 
 export interface CopyPreview {
-  source: { environmentId: string; name: string };
-  target: { environmentId: string; name: string };
+  source: { environmentId: string; displayName: string };
+  target: { environmentId: string; displayName: string };
   summary: {
     templates: CopyPreviewSummary;
     gameWorlds: CopyPreviewSummary;
@@ -203,8 +203,8 @@ export class EnvironmentCopyService {
     const existingJobName = new Set(existingJobs.map((j: { name: string }) => j.name));
 
     return {
-      source: { environmentId: '', name: '' }, // Will be filled by controller
-      target: { environmentId: '', name: '' },
+      source: { environmentId: '', displayName: '' }, // Will be filled by controller
+      target: { environmentId: '', displayName: '' },
       summary: {
         templates: { total: 0, conflicts: 0 }, // Remote config templates removed - will be reimplemented
         gameWorlds: {

@@ -612,7 +612,7 @@ const ApiTokensPage: React.FC = () => {
       resetForm();
 
       // 백엔드 응답 구조 확인 및 토큰 값 추출
-      const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
+      const tokenValue = (response as any)?.data?.tokenValue || (response as any)?.tokenValue || '';
       console.log('Create response structure:', response); // 디버깅용
       console.log('Extracted token value:', tokenValue); // 디버깅용
 
@@ -641,7 +641,7 @@ const ApiTokensPage: React.FC = () => {
     if (!selectedToken) return;
 
     try {
-      await apiTokenService.updateToken(selectedToken.id, {
+      await apiTokenService.updateToken(selectedToken.id as any, {
         tokenName: formData.tokenName,
         description: formData.description,
         allowAllEnvironments: formData.allowAllEnvironments,
@@ -674,7 +674,7 @@ const ApiTokensPage: React.FC = () => {
     }
 
     try {
-      await apiTokenService.deleteToken(selectedToken.id, projectApiPath);
+      await apiTokenService.deleteToken(selectedToken.id as any, projectApiPath);
       await loadTokens();
       setDeleteDialogOpen(false);
       setSelectedToken(null);
@@ -692,11 +692,11 @@ const ApiTokensPage: React.FC = () => {
     if (!selectedToken) return;
 
     try {
-      const response = await apiTokenService.regenerateToken(selectedToken.id, projectApiPath);
+      const response = await apiTokenService.regenerateToken(selectedToken.id as any, projectApiPath);
       console.log('Regenerate token response:', response); // 디버깅용
 
       // 백엔드 응답 구조 확인 및 토큰 값 추출
-      const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
+      const tokenValue = (response as any)?.data?.tokenValue || (response as any)?.tokenValue || '';
       console.log('Regenerate response structure:', response); // 디버깅용
       console.log('Extracted token value:', tokenValue); // 디버깅용
 
@@ -847,7 +847,7 @@ const ApiTokensPage: React.FC = () => {
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
-      setSelectedTokenIds(tokens.map((token) => token.id));
+      setSelectedTokenIds(tokens.map((token) => token.id) as any);
     } else {
       setSelectedTokenIds([]);
     }
@@ -910,7 +910,7 @@ const ApiTokensPage: React.FC = () => {
 
   const getTokenTypeColor = (type: TokenType) => {
     switch (type) {
-      case 'admin':
+      case 'admin' as any:
         return 'error';
       case 'server':
         return 'warning';
@@ -1127,12 +1127,12 @@ const ApiTokensPage: React.FC = () => {
                   </TableRow>
                 ) : (
                   filteredTokens.map((token) => (
-                    <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
+                    <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id as any)}>
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={selectedTokenIds.includes(token.id)}
-                            onChange={(e) => handleSelectToken(token.id, e.target.checked)}
+                            checked={selectedTokenIds.includes(token.id as any)}
+                            onChange={(e) => handleSelectToken(token.id as any, e.target.checked)}
                           />
                         </TableCell>
                       )}
@@ -2148,7 +2148,7 @@ const ApiTokensPage: React.FC = () => {
               }}
             >
               {tokens
-                .filter((token) => selectedTokenIds.includes(token.id))
+                .filter((token) => selectedTokenIds.includes(token.id as any))
                 .map((token) => (
                   <Box
                     key={token.id}
@@ -2322,7 +2322,7 @@ const ApiTokensPage: React.FC = () => {
                     {t('apiTokens.tokenType')}
                   </Typography>
                   <Chip
-                    label={t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)}
+                    label={String(t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType))}
                     color="primary"
                     size="small"
                   />

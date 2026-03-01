@@ -134,7 +134,7 @@ export const authenticateEnvironmentKey = async (
 
       if (envName) {
         req.environmentId = envName;
-        const envModel = await Environment.getByName(envName);
+        const envModel = await Environment.getById(envName);
         if (envModel) {
           req.environmentModel = envModel;
           req.projectId = (envModel as any).projectId;
@@ -167,7 +167,7 @@ export const authenticateEnvironmentKey = async (
     req.environmentId = keyData.environmentId;
 
     // 5. Resolve environment → project → org chain
-    const envModel = await Environment.getByName(keyData.environmentId);
+    const envModel = await Environment.getById(keyData.environmentId);
     if (!envModel) {
       return res.status(404).json({
         success: false,

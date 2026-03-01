@@ -6,6 +6,7 @@ export interface JobType {
   displayName: string;
   description?: string;
   jobSchema?: JobSchema;
+  schema?: JobSchema;
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
@@ -25,6 +26,7 @@ export interface JobSchemaField {
   type: 'string' | 'number' | 'boolean' | 'text' | 'password' | 'select' | 'array' | 'object';
   required: boolean;
   description: string;
+  label?: string;
   default?: any;
   options?: string[];
   validation?: {
@@ -52,6 +54,9 @@ export interface Job {
   updatedByEmail?: string;
   jobTypeName?: string;
   jobTypeDisplayName?: string;
+  cronExpression?: string;
+  lastExecutedAt?: string;
+  nextExecutionAt?: string;
 }
 
 export interface CreateJobData {
@@ -105,6 +110,7 @@ export interface JobFilters {
   limit?: number;
   offset?: number;
   page?: number;
+  tags?: number[];
 }
 
 export interface JobListResponse {

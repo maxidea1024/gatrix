@@ -56,6 +56,7 @@ import Editor from '@monaco-editor/react';
 import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
 import { RelativeTime } from '../../components/common/RelativeTime';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
@@ -117,6 +118,7 @@ interface RequestStats {
 const GatrixEdgesPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
   // States
   const [initialLoading, setInitialLoading] = useState(true);
@@ -651,7 +653,11 @@ const GatrixEdgesPage: React.FC = () => {
   const handleCopyJson = () => {
     if (jsonDialogData) {
       const text = JSON.stringify(jsonDialogData, null, 2);
-      copyToClipboardWithNotification(text, t('common.copiedToClipboard'));
+      copyToClipboardWithNotification(
+        text,
+        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
     }
   };
 

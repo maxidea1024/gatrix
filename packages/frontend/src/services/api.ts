@@ -252,7 +252,7 @@ class ApiService {
   setAccessToken(token: string) {
     this.accessToken = token;
 
-    // 토큰 정보 디버깅
+    // Token information debugging
     // try {
     //   const payload = JSON.parse(atob(token.split('.')[1]));
     //   console.log('Token set:', {
@@ -297,7 +297,7 @@ class ApiService {
         throw errorData;
       }
 
-      // 네트워크 오류 구분
+      // Network error classification
       const isNetworkError =
         !error.response &&
         (error.code === 'NETWORK_ERROR' ||

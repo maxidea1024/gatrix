@@ -37,7 +37,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     // Request notification permission
     useEffect(() => {
       if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+        Notification.requestPermission('' as any);
       }
     }, []);
 
@@ -206,7 +206,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
     // Handle WebSocket invitation events
     useEffect(() => {
-      const webSocketService = getChatWebSocketService();
+      const webSocketService = getChatWebSocketService(() => localStorage.getItem('accessToken'));
 
       // Channel invitation handling is now done in ChatContext to avoid duplicates
 

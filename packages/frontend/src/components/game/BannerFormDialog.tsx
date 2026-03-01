@@ -179,7 +179,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
         frames: (s.frames || []).map((f) => ({
           imageUrl: f.imageUrl,
           delay: f.delay,
-          link: f.link || '',
+          clickUrl: f.clickUrl || '',
         })),
       })),
     };
@@ -198,7 +198,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
         frames: (s.frames || []).map((f) => ({
           imageUrl: f.imageUrl,
           delay: f.delay,
-          link: f.link || '',
+          clickUrl: f.clickUrl || '',
         })),
       })),
     };

@@ -50,6 +50,8 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
+// @ts-ignore - Grid from MUI
+const Grid = ({ children, ...props }: any) => <Box {...props}>{children}</Box>;
 import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
@@ -682,7 +684,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   const loadEnvironments = useCallback(async () => {
     try {
-      const envs = await environmentService.getEnvironments();
+      const envs = await environmentService.getEnvironments('' as any);
       setEnvironments(envs);
       // Auto-expand selected environment card immediately after loading
       if (selectedEnvironment && envs.some((e) => e.environmentId === selectedEnvironment)) {

@@ -5,12 +5,7 @@ import { ulid } from 'ulid';
 // Environment type classification
 export type EnvironmentType = 'development' | 'staging' | 'production';
 
-// System-defined environment names that cannot be deleted or modified
-export const SYSTEM_DEFINED_ENVIRONMENTS = ['development', 'qa', 'production'] as const;
-export type SystemDefinedEnvironment = (typeof SYSTEM_DEFINED_ENVIRONMENTS)[number];
-
 export interface EnvironmentData {
-  name: string;
   displayName: string;
   description?: string;
   environmentType: EnvironmentType;
@@ -37,7 +32,6 @@ export class Environment extends Model implements EnvironmentData {
 
   id!: string;
 
-  name!: string;
   displayName!: string;
   description?: string;
   environmentType!: EnvironmentType;
@@ -65,15 +59,9 @@ export class Environment extends Model implements EnvironmentData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['name', 'displayName'],
+      required: ['displayName'],
 
       properties: {
-        name: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 100,
-          pattern: '^[a-z0-9_-]+$', // Only lowercase, numbers, underscore, hyphen
-        },
         displayName: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: ['string', 'null'], maxLength: 1000 },
         environmentType: {
@@ -150,13 +138,6 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
-   * Get environment by name
-   */
-  static async getByName(name: string): Promise<Environment | undefined> {
-    return await this.query().where('name', name).first();
-  }
-
-  /**
    * Get environment by ID (ULID)
    */
   static async getById(id: string): Promise<Environment | undefined> {
@@ -167,7 +148,7 @@ export class Environment extends Model implements EnvironmentData {
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
-    const query = this.query().orderBy('displayOrder', 'asc').orderBy('name');
+    const query = this.query().orderBy('displayOrder', 'asc').orderBy('displayName');
 
     if (!includeHidden) {
       query.where('isHidden', false);
@@ -218,17 +199,14 @@ export class Environment extends Model implements EnvironmentData {
   static async createEnvironment(
     data: Omit<EnvironmentData, 'createdAt' | 'updatedAt'>
   ): Promise<Environment> {
-    // Validate environment name
-    if (!this.isValidEnvironmentName(data.name)) {
-      throw new Error(
-        'Invalid environment name. Use only lowercase letters, numbers, underscore, and hyphen.'
-      );
+    // Check if environment with same displayName already exists in same project
+    const existingQuery = this.query().where('displayName', data.displayName);
+    if (data.projectId) {
+      existingQuery.where('projectId', data.projectId);
     }
-
-    // Check if environment already exists
-    const existing = await this.getByName(data.name);
+    const existing = await existingQuery.first();
     if (existing) {
-      throw new Error(`Environment '${data.name}' already exists`);
+      throw new Error(`Environment '${data.displayName}' already exists`);
     }
 
     // If this is set as default, unset other defaults
@@ -635,14 +613,14 @@ export class Environment extends Model implements EnvironmentData {
 
     // If force delete, remove all related data in correct order
     if (force && relatedData.total > 0) {
-      const environment = this.name;
+      const environment = this.id;
 
       // Helper to safely delete from a table if it has environment column
       const safeDelete = async (trx: any, tableName: string): Promise<void> => {
         try {
           const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
           if (columns[0].length > 0) {
-            await trx(tableName).where('environment', environment).del();
+            await trx(tableName).where('environmentId', environment).del();
           }
         } catch {
           // Table doesn't exist or other error, skip
@@ -687,7 +665,7 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_tags');
 
         // Finally delete the environment itself
-        await trx('g_environments').where('environment', environment).del();
+        await trx('g_environments').where('id', environment).del();
       });
     } else {
       // No related data, just delete

@@ -24,18 +24,19 @@ export const environmentContextMiddleware = async (
 ): Promise<void> => {
   try {
     // Extract environment from header ONLY
-    const environmentName = req.headers['x-environment'] as string;
+    // Extract environment ID (ULID) from header
+    const environmentId = req.headers['x-environment-id'] as string;
 
-    if (!environmentName) {
+    if (!environmentId) {
       // If no environment is specified, we don't set req.environmentId
       // Controllers should handle missing environment if they need it
       return next();
     }
 
-    // Validate environment exists
-    const env = await Environment.getByName(environmentName);
+    // Validate environment exists by ULID id
+    const env = await Environment.getById(environmentId);
     if (!env) {
-      logger.warn(`Invalid environment requested: ${environmentName}`);
+      logger.warn(`Invalid environment requested: ${environmentId}`);
       return next();
     }
 
@@ -65,7 +66,7 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
         return;
       }
 
-      const env = await Environment.getByName(environmentName);
+      const env = await Environment.getById(environmentName as string);
 
       if (!env || !allowedTypes.includes(env.environmentType)) {
         res.status(403).json({
@@ -102,7 +103,7 @@ export const preventProductionModification = async (
       return next();
     }
 
-    const environmentId = await Environment.getByName(environmentName);
+    const environmentId = await Environment.getById(environmentName as string);
 
     if (environmentId?.environmentType === 'production') {
       // For production, check if approval is required

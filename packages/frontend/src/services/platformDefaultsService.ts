@@ -19,7 +19,7 @@ export class PlatformDefaultsService {
   private static readonly BASE_URL = '/admin/platform-defaults';
 
   /**
-   * 모든 플랫폼의 기본값 조회
+   * Get default values of all platforms
    */
   static async getAllDefaults(): Promise<PlatformDefaultsMap> {
     const response = await apiService.get<PlatformDefaultsMap>(this.BASE_URL);
@@ -27,7 +27,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 특정 플랫폼의 기본값 조회
+   * Get default values of specific platform
    */
   static async getPlatformDefaults(platform: string): Promise<PlatformDefaults> {
     const response = await apiService.get<{
@@ -38,28 +38,28 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 특정 플랫폼의 기본값 설정
+   * Set default values of specific platform
    */
   static async setPlatformDefaults(platform: string, defaults: PlatformDefaults): Promise<void> {
     await apiService.put(`${this.BASE_URL}/${encodeURIComponent(platform)}`, defaults);
   }
 
   /**
-   * 모든 플랫폼의 기본값 일괄 설정
+   * Bulk set default values of all platforms
    */
   static async setAllDefaults(defaultsMap: PlatformDefaultsMap): Promise<void> {
     await apiService.put(this.BASE_URL, defaultsMap);
   }
 
   /**
-   * 특정 플랫폼의 기본값 삭제
+   * Delete default values of specific platform
    */
   static async deletePlatformDefaults(platform: string): Promise<void> {
     await apiService.delete(`${this.BASE_URL}/${encodeURIComponent(platform)}`);
   }
 
   /**
-   * 클라이언트 버전 데이터에 기본값 적용
+   * Apply default values to client version data
    */
   static applyDefaultsToClientVersion(
     platform: string,
@@ -74,7 +74,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 간편 추가용 플랫폼 데이터에 기본값 적용
+   * Apply default values to platform data for quick add
    */
   static applyDefaultsToPlatformData(
     platform: string,

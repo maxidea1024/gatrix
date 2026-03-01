@@ -80,10 +80,7 @@ const JobForm: React.FC<JobFormProps> = ({
       console.log('Has jobDataMap:', hasJobDataMap);
 
       if (!hasJobDataMap && job.id) {
-        console.log('JobDataMap is empty, fetching detailed job info...');
-        // 상세 정보 조회
-        fetchJobDetails(job.id);
-        return;
+        console.log('JobDataMap is empty, but no fetcher is defined.');
       }
 
       const newFormData = {
@@ -255,8 +252,7 @@ const JobForm: React.FC<JobFormProps> = ({
                     },
                   }}
                 >
-                  {console.log('JobForm - Rendering job types:', jobTypes) ||
-                    jobTypes
+                  {jobTypes
                       .filter((jt) => jt.isEnabled)
                       .map((jobType) => (
                         <MenuItem key={jobType.id} value={jobType.id.toString()}>

@@ -257,7 +257,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
               lineNumbersMinChars: 3,
               renderLineHighlight: 'none',
               selectionHighlight: false,
-              occurrencesHighlight: false,
+              occurrencesHighlight: 'off',
               overviewRulerLanes: 0,
               hideCursorInOverviewRuler: true,
               overviewRulerBorder: false,

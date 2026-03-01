@@ -22,6 +22,9 @@ export interface IngamePopupNotice {
   messageTemplateId: number | null;
   useTemplate: boolean;
   description: string | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
   createdAt: string;
   updatedAt: string;
   createdBy: number;

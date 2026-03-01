@@ -104,7 +104,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
       try {
         const [flagResult, envResult] = await Promise.all([
           featureFlagService.getFeatureFlags({ limit: 1000, isArchived: false }, projectApiPath),
-          environmentService.getEnvironments(),
+          environmentService.getEnvironments('' as any),
         ]);
         setFlagOptions(flagResult.flags.map((f) => f.flagName));
         setEnvironments(envResult);

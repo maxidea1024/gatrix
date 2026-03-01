@@ -167,7 +167,11 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   // Copy settings to clipboard
   const handleCopySettings = () => {
     const settings = infraSettingsText.trim() || '{}';
-    copyToClipboardWithNotification(settings, t('gameWorlds.form.settingsCopied'), enqueueSnackbar);
+    copyToClipboardWithNotification(
+      settings,
+      () => enqueueSnackbar(t('gameWorlds.form.settingsCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   return (
@@ -408,10 +412,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     message: l.message,
                   }));
                   onMaintenanceLocalesChange(newLocales);
-                  onFormDataChange((prev) => ({
-                    ...prev,
+                  onFormDataChange({
+                    ...formData,
                     maintenanceLocales: newLocales,
-                  }));
+                  });
                   const hasNonEmptyLocales = locales.some(
                     (l) => l.message && l.message.trim() !== ''
                   );

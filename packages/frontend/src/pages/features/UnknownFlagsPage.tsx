@@ -151,7 +151,7 @@ const UnknownFlagsPage: React.FC = () => {
       });
       setFlags(result.flags);
     } catch {
-      enqueueSnackbar(t('common.loadError'), { variant: 'error' });
+      enqueueSnackbar(String(t('common.loadError')), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -174,7 +174,7 @@ const UnknownFlagsPage: React.FC = () => {
       if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
         return prev;
       }
-      return [...prev, { key, value }];
+      return [...prev, { key, value, label: key }];
     });
   }, []);
 
@@ -299,7 +299,11 @@ const UnknownFlagsPage: React.FC = () => {
   const dialogContent = getDialogContent();
 
   const handleCopyFlagName = (flagName: string) => {
-    copyToClipboardWithNotification(flagName, t('common.copiedToClipboard'), enqueueSnackbar);
+    copyToClipboardWithNotification(
+      flagName,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   return (
@@ -598,12 +602,11 @@ const UnknownFlagsPage: React.FC = () => {
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
-        open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         columns={columns}
-        defaultColumns={defaultColumns}
         onColumnsChange={handleColumnsChange}
         onClose={() => setColumnSettingsAnchor(null)}
+        onReset={() => handleColumnsChange(defaultColumns)}
       />
 
       {/* Confirmation Dialog */}

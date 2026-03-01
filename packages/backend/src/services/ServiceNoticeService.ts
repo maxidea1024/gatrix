@@ -76,7 +76,7 @@ class ServiceNoticeService {
 
     // Environment filter (always applied)
     const environmentId = filters.environmentId;
-    whereClauses.push('environment = ?');
+    whereClauses.push('environmentId = ?');
     queryParams.push(environmentId);
 
     // Apply filters
@@ -247,7 +247,7 @@ class ServiceNoticeService {
   async getServiceNoticeById(id: string, environmentId: string): Promise<ServiceNotice | null> {
     const pool = database.getPool();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_service_notices WHERE id = ? AND environment = ?',
+      'SELECT * FROM g_service_notices WHERE id = ? AND environmentId = ?',
       [id, environmentId]
     );
 
@@ -466,7 +466,7 @@ class ServiceNoticeService {
    */
   async deleteServiceNotice(id: string, environmentId: string): Promise<void> {
     const pool = database.getPool();
-    await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environment = ?', [
+    await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?', [
       id,
       environmentId,
     ]);
@@ -522,7 +522,7 @@ class ServiceNoticeService {
   async toggleActive(id: string, environmentId: string): Promise<ServiceNotice> {
     const pool = database.getPool();
     await pool.execute(
-      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',
+      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
       [id, environmentId]
     );
 

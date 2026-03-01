@@ -319,7 +319,7 @@ const DashboardPage: React.FC = () => {
     total: statsData?.totalUsers ?? 0,
     active: statsData?.activeUsers ?? 0,
     pending: statsData?.pendingUsers ?? 0,
-    suspended: statsData?.suspendedUsers ?? 0,
+    suspended: (statsData as any)?.suspendedUsers ?? 0,
     admins: statsData?.adminUsers ?? 0,
   };
 
@@ -628,7 +628,7 @@ const DashboardPage: React.FC = () => {
         const response = await crashService.getCrashEvents({
           limit: 10,
           sortBy: 'createdAt',
-          sortOrder: 'desc',
+          sortOrder: 'DESC',
         });
         if (isMounted) {
           setRecentCrashEvents(response.data || []);
@@ -1146,7 +1146,7 @@ const DashboardPage: React.FC = () => {
             <Grid size={{ xs: 12, sm: 4 }}>
               <StatsCard
                 title={t('dashboard.monitoringGrafanaCardTitle')}
-                value={<OpenInNewIcon sx={{ fontSize: 28 }} />}
+                value={'→' as any}
                 icon={<TimelineIcon />}
                 color="secondary"
                 onClick={() => navigate('/admin/grafana-dashboard')}
@@ -1712,7 +1712,7 @@ const DashboardPage: React.FC = () => {
                                 <ListItemText
                                   primary={
                                     <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                                      {event.firstLine || event.crashId}
+                                      {(event as any).firstLine || event.crashId}
                                     </Typography>
                                   }
                                   secondary={

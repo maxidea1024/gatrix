@@ -52,12 +52,15 @@ import {
 } from '../../services/environmentService';
 import EnvironmentCopyDialog from '../../components/EnvironmentCopyDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
 const EnvironmentsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { refresh: refreshEnvironments } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
 
@@ -95,7 +98,7 @@ const EnvironmentsPage: React.FC = () => {
     setError(null);
     try {
       // Include hidden environments in management page so they can be unhidden
-      const data = await environmentService.getEnvironments(true);
+      const data = await environmentService.getEnvironments(projectApiPath, true);
       setEnvironments(data);
     } catch (err) {
       setError(t('common.loadError'));
@@ -103,7 +106,7 @@ const EnvironmentsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, projectApiPath]);
 
   useEffect(() => {
     loadEnvironments();
@@ -146,7 +149,7 @@ const EnvironmentsPage: React.FC = () => {
     setCreating(true);
     try {
       // Create the environment with optional base environment for data copy
-      await environmentService.createEnvironment({
+      await environmentService.createEnvironment(projectApiPath, {
         ...newEnv,
         baseEnvironment: baseEnvironment || undefined,
       });
@@ -184,7 +187,7 @@ const EnvironmentsPage: React.FC = () => {
     setLoadingRelatedData(true);
 
     try {
-      const data = await environmentService.getRelatedData(env.environmentId);
+      const data = await environmentService.getRelatedData(projectApiPath, env.environmentId);
       setRelatedData(data);
     } catch (err) {
       console.error('Failed to load related data:', err);
@@ -208,7 +211,7 @@ const EnvironmentsPage: React.FC = () => {
 
     setDeleting(true);
     try {
-      await environmentService.deleteEnvironment(selectedEnvForDelete.environmentId, forceDelete);
+      await environmentService.deleteEnvironment(projectApiPath, selectedEnvForDelete.environmentId, forceDelete);
       enqueueSnackbar(t('environments.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setSelectedEnvForDelete(null);
@@ -409,7 +412,7 @@ const EnvironmentsPage: React.FC = () => {
 
     setUpdating(true);
     try {
-      await environmentService.updateEnvironment(selectedEnvForEdit.environmentId, editEnv);
+      await environmentService.updateEnvironment(projectApiPath, selectedEnvForEdit.environmentId, editEnv);
       enqueueSnackbar(t('environments.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       setSelectedEnvForEdit(null);
@@ -426,7 +429,7 @@ const EnvironmentsPage: React.FC = () => {
   // Handle toggle visibility
   const handleToggleVisibility = async (env: Environment) => {
     try {
-      await environmentService.updateEnvironment(env.environmentId, {
+      await environmentService.updateEnvironment(projectApiPath, env.environmentId, {
         isHidden: !env.isHidden,
       });
       enqueueSnackbar(

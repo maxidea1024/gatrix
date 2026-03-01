@@ -471,7 +471,6 @@ const FeatureFlagsPage: React.FC = () => {
         isArchived,
         sortBy: orderBy,
         sortOrder: order,
-        projectId: currentProjectId || undefined,
       }, projectApiPath);
 
       if (

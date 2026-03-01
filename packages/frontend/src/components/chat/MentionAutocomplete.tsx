@@ -119,7 +119,7 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
       </Box>
 
       <List
-        ref={listRef}
+        ref={listRef as any}
         dense
         sx={{
           maxHeight: 160,

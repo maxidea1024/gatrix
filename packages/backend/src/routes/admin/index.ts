@@ -70,7 +70,7 @@ router.use('/rbac', rbacRoutes);
 router.use(authenticate as any);
 // Note: requireAdmin removed - each route uses its own requirePermission via RBAC
 
-// Apply environment context middleware to set current environment from X-Environment header
+// Apply environment context middleware to set current environment from X-Environment-Id header
 router.use(environmentContextMiddleware as any);
 
 // Mount all other admin routes with permission checks
@@ -357,11 +357,9 @@ router.use(
 
 // Feature Flags — MOVED to project-scoped router above
 
-// Environments — already moved above
-
 // Release Flows — MOVED to project-scoped router above
 
-// Change Requests — MOVED to project-scoped router above
+// Tags — MOVED to project-scoped router above
 
 // Integrations - requires security.view or security.manage permission
 router.use(
@@ -370,7 +368,6 @@ router.use(
   integrationRoutes
 );
 
-// Release Flows — MOVED to project-scoped router above
 
 // Service Accounts - requires service-accounts.view or service-accounts.manage permission
 router.use(

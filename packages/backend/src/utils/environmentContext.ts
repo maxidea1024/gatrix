@@ -27,7 +27,7 @@ export function isValidEnvironment(environmentId: string): boolean {
 
   // Validate environment: lowercase, numbers, underscore, hyphen
   if (environmentId.length < 1 || environmentId.length > 100) return false;
-  const envRegex = /^[a-z0-9_-]+$/;
+  const envRegex = /^[a-zA-Z0-9_-]+$/;
   return envRegex.test(environmentId);
 }
 
@@ -37,7 +37,7 @@ export function isValidEnvironment(environmentId: string): boolean {
  */
 export function getEnvironmentFromRequest(req: any): string {
   // Check header first
-  const headerEnv = req.headers?.['x-environment'];
+  const headerEnv = req.headers?.['x-environment-id'];
   if (headerEnv && isValidEnvironment(headerEnv)) {
     return headerEnv;
   }

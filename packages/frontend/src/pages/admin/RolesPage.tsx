@@ -417,8 +417,8 @@ const RolesPage: React.FC = () => {
           ) : filteredRoles.length === 0 ? (
             <EmptyPagePlaceholder
               icon={<ShieldIcon sx={{ fontSize: 48 }} />}
-              title={t('rbac.roles.emptyTitle')}
-              description={t('rbac.roles.emptyDescription')}
+              message={t('rbac.roles.emptyTitle')}
+              subtitle={t('rbac.roles.emptyDescription')}
             />
           ) : (
             <TableContainer>

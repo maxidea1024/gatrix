@@ -100,7 +100,7 @@ export const requireProjectPermission = (perm: string) => {
 
 /**
  * Require an environment-level permission.
- * Resolves environment from: req.params.environmentId ??req.environmentId ??X-Environment header
+ * Resolves environment from: req.params.environmentId ??req.environmentId ??X-Environment-Id header
  * Auto-resolves the full chain: environment ??project ??organisation
  */
 export const requireEnvPermission = (perm: string) => {
@@ -113,7 +113,7 @@ export const requireEnvPermission = (perm: string) => {
 
       const { id: userId, orgId } = req.user;
       const environmentId =
-        req.params.environmentId || req.environmentId || (req.headers['x-environment'] as string);
+        req.params.environmentId || req.environmentId || (req.headers['x-environment-id'] as string);
 
       if (!environmentId) {
         next(new GatrixError('Environment context required', 400));

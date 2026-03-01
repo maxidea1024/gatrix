@@ -97,7 +97,7 @@ export interface GetStoreProductsResponse {
  */
 export interface CmsCashShopProduct {
   id: number;
-  name: string; // Formatted and localized name (e.g., "레드젬 600")
+  name: string; // Formatted and localized name (e.g., "Red Gem 600")
   productCode: string; // SDO product code
   price: number; // China price (CNY)
   productCategory: number;

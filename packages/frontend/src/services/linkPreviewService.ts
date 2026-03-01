@@ -1,4 +1,4 @@
-import { apiClient } from './api';
+import api from './api';
 
 export interface LinkPreviewData {
   url: string;
@@ -24,44 +24,44 @@ class LinkPreviewService {
   private pendingRequests = new Map<string, Promise<LinkPreviewData | null>>();
 
   /**
-   * 링크 미리보기 데이터를 가져옵니다
+   * Fetch link preview data
    */
   async getPreview(url: string): Promise<LinkPreviewData | null> {
-    // 캐시에서 확인
+    // Check in cache
     if (this.cache.has(url)) {
       return this.cache.get(url)!;
     }
 
-    // 이미 요청 중인지 확인
+    // Check if already requesting
     if (this.pendingRequests.has(url)) {
       return this.pendingRequests.get(url)!;
     }
 
-    // 새로운 요청 생성
+    // Create new request
     const request = this.fetchPreview(url);
     this.pendingRequests.set(url, request);
 
     try {
       const result = await request;
 
-      // 성공한 경우 캐시에 저장
+      // Save to cache if successful
       if (result) {
         this.cache.set(url, result);
       }
 
       return result;
     } finally {
-      // 요청 완료 후 pending 목록에서 제거
+      // Remove from pending list after request completes
       this.pendingRequests.delete(url);
     }
   }
 
   /**
-   * 실제 API 호출을 수행합니다
+   * Perform actual API call
    */
   private async fetchPreview(url: string): Promise<LinkPreviewData | null> {
     try {
-      const response = await apiClient.post<LinkPreviewResponse>('/link-preview', {
+      const response = await api.post<LinkPreviewResponse>('/link-preview', {
         url,
       });
 
@@ -77,52 +77,52 @@ class LinkPreviewService {
   }
 
   /**
-   * 캐시를 지웁니다
+   * Clear cache
    */
   clearCache(): void {
     this.cache.clear();
   }
 
   /**
-   * 특정 URL의 캐시를 제거합니다
+   * Remove cache for specific URL
    */
   removeCacheEntry(url: string): void {
     this.cache.delete(url);
   }
 
   /**
-   * 캐시 크기를 반환합니다
+   * Return cache size
    */
   getCacheSize(): number {
     return this.cache.size;
   }
 
   /**
-   * URL이 링크 미리보기를 지원하는지 확인합니다
+   * Check if URL supports link preview
    */
   isPreviewableUrl(url: string): boolean {
     try {
       const parsedUrl = new URL(url);
 
-      // HTTP/HTTPS만 지원
+      // Support only HTTP/HTTPS
       if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
         return false;
       }
 
-      // 이미지 파일은 제외
+      // Exclude image files
       const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
       const pathname = parsedUrl.pathname.toLowerCase();
       if (imageExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
-      // 동영상 파일은 제외
+      // Exclude video files
       const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov', '.wmv', '.flv'];
       if (videoExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
       }
 
-      // 문서 파일은 제외
+      // Exclude document files
       const docExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
       if (docExtensions.some((ext) => pathname.endsWith(ext))) {
         return false;
@@ -135,7 +135,7 @@ class LinkPreviewService {
   }
 
   /**
-   * 텍스트에서 URL을 추출합니다
+   * Extract URL from text
    */
   extractUrls(text: string): string[] {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -144,15 +144,15 @@ class LinkPreviewService {
   }
 
   /**
-   * 여러 URL의 미리보기를 동시에 가져옵니다
+   * Fetch previews for multiple URLs concurrently
    */
   async getMultiplePreviews(urls: string[]): Promise<Map<string, LinkPreviewData | null>> {
     const results = new Map<string, LinkPreviewData | null>();
 
-    // 미리보기 가능한 URL만 필터링
+    // Filter only preview-supported URLs
     const previewableUrls = urls.filter((url) => this.isPreviewableUrl(url));
 
-    // 동시에 모든 미리보기 요청
+    // Request all previews concurrently
     const promises = previewableUrls.map(async (url) => {
       const preview = await this.getPreview(url);
       results.set(url, preview);
@@ -163,7 +163,7 @@ class LinkPreviewService {
   }
 
   /**
-   * 발행 시간을 상대적 시간으로 변환합니다
+   * Convert published time to relative time
    */
   formatPublishedTime(publishedTime: string): string {
     try {

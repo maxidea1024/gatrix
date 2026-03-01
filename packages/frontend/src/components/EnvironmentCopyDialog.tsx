@@ -130,7 +130,7 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const previewData = await environmentService.getCopyPreview(sourceId, targetId);
+      const previewData = await environmentService.getCopyPreview(null, sourceId, targetId);
       setPreview(previewData);
     } catch (err) {
       setError(t('environments.copyFailed'));
@@ -150,7 +150,7 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setCopying(true);
     setError(null);
     try {
-      const copyResult = await environmentService.copyEnvironmentData(sourceId, targetId, options);
+      const copyResult = await environmentService.copyEnvironmentData(null, sourceId, targetId, options);
       setResult(copyResult);
       enqueueSnackbar(t('environments.copyCompleted'), { variant: 'success' });
       onCopyComplete?.();

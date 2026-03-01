@@ -91,7 +91,7 @@ export class WhitelistService {
     const params = new URLSearchParams({
       page: validPage.toString(),
       limit: validLimit.toString(),
-      // 캐시 방지를 위한 타임스탬프 추가 (개발 환경)
+      // Add timestamp to prevent caching (dev environment)
       _t: Date.now().toString(),
     });
 
@@ -103,17 +103,14 @@ export class WhitelistService {
       filters.tags.forEach((tag) => params.append('tags', tag));
     }
 
-    const response = await apiService.get<{
-      success: boolean;
-      data: WhitelistListResponse;
-    }>(`/admin/whitelist?${params}`);
+    const response = await apiService.get<any>(`/admin/whitelist?${params}`);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    // 응답이 올바르지 않은 경우 기본값 반환
+    // Return default value if response is invalid
     prodLogger.warn('Unexpected getWhitelists response structure:', response);
     return {
       whitelists: [],
@@ -125,16 +122,13 @@ export class WhitelistService {
   }
 
   static async getWhitelistById(id: number): Promise<Whitelist> {
-    const response = await apiService.get<{
-      success: boolean;
-      data: { whitelist: Whitelist };
-    }>(`/admin/whitelist/${id}`);
+    const response = await apiService.get<any>(`/admin/whitelist/${id}`);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data?.whitelist) {
       return response.data.whitelist;
-    } else if (response?.whitelist) {
-      return response.whitelist;
+    } else if ((response as any)?.whitelist) {
+      return (response as any).whitelist;
     }
 
     console.error('Unexpected getById response structure:', response);
@@ -142,22 +136,19 @@ export class WhitelistService {
   }
 
   static async createWhitelist(data: CreateWhitelistData): Promise<Whitelist> {
-    const response = await apiService.post<{
-      success: boolean;
-      data: { whitelist: Whitelist };
-    }>('/admin/whitelist', data);
+    const response = await apiService.post<any>('/admin/whitelist', data);
 
     console.log('Create whitelist response:', response);
     console.log('Response structure:', JSON.stringify(response, null, 2));
 
-    // ApiService.request()가 이미 response.data를 반환하므로
-    // response는 백엔드에서 보낸 { success: true, data: { whitelist: ... }, message: ... } 구조
+    // ApiService.request() already returns response.data
+    // response is the { success: true, data: { whitelist: ... }, message: ... } structure sent from backend
     if (response?.success && response?.data?.whitelist) {
       return response.data.whitelist;
-    } else if (response?.whitelist) {
-      // 혹시 다른 구조일 경우
+    } else if ((response as any)?.whitelist) {
+      // In case of different structure
       console.log('Using direct whitelist response structure');
-      return response.whitelist;
+      return (response as any).whitelist;
     }
 
     console.error('Unexpected response structure:', response);
@@ -165,19 +156,16 @@ export class WhitelistService {
   }
 
   static async updateWhitelist(id: number, data: UpdateWhitelistData): Promise<Whitelist> {
-    const response = await apiService.put<{
-      success: boolean;
-      data: { whitelist: Whitelist };
-    }>(`/admin/whitelist/${id}`, data);
+    const response = await apiService.put<any>(`/admin/whitelist/${id}`, data);
 
     console.log('Update whitelist response:', response);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data?.whitelist) {
       return response.data.whitelist;
-    } else if (response?.whitelist) {
+    } else if ((response as any)?.whitelist) {
       console.log('Using direct whitelist response structure for update');
-      return response.whitelist;
+      return (response as any).whitelist;
     }
 
     console.error('Unexpected update response structure:', response);
@@ -189,10 +177,7 @@ export class WhitelistService {
   }
 
   static async toggleWhitelistStatus(id: number): Promise<Whitelist> {
-    const response = await apiService.patch<{
-      success: boolean;
-      data: Whitelist;
-    }>(`/admin/whitelist/${id}/toggle`);
+    const response = await apiService.patch<any>(`/admin/whitelist/${id}/toggle`);
 
     if (response?.success && response?.data) {
       return response.data;
@@ -204,12 +189,9 @@ export class WhitelistService {
   static async bulkCreateWhitelists(
     entries: BulkCreateEntry[]
   ): Promise<{ createdCount: number; requestedCount: number }> {
-    const response = await apiService.post<{
-      success: boolean;
-      data: { createdCount: number; requestedCount: number };
-    }>('/admin/whitelist/bulk', { entries });
+    const response = await apiService.post<any>('/admin/whitelist/bulk', { entries });
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
       return response.data;
     }
@@ -219,10 +201,7 @@ export class WhitelistService {
   }
 
   static async testWhitelist(request: WhitelistTestRequest): Promise<WhitelistTestResult> {
-    const response = await apiService.post<{
-      success: boolean;
-      data: WhitelistTestResult;
-    }>('/admin/whitelist/test', request);
+    const response = await apiService.post<any>('/admin/whitelist/test', request);
 
     if (response?.success && response?.data) {
       return response.data;

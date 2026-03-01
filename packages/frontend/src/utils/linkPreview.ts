@@ -25,14 +25,14 @@ export const extractLinkPreview = async (url: string): Promise<LinkPreview | nul
       url,
     });
 
-    if (response.success && response.data) {
-      // 캐시에 저장
+    if ((response as any).success && (response as any).data) {
+      // Cache result
       previewCache.set(url, {
-        data: response.data,
+        data: (response as any).data,
         timestamp: Date.now(),
       });
 
-      return response.data;
+      return (response as any).data;
     }
 
     // API 실패 시 클라이언트 사이드 폴백
@@ -138,8 +138,8 @@ export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkP
         urls: uncachedUrls,
       });
 
-      if (response.success && response.data) {
-        response.data.forEach((result) => {
+      if ((response as any).success && (response as any).data) {
+        ((response as any).data as any[]).forEach((result: any) => {
           if (result.success && result.data) {
             // 캐시에 저장
             previewCache.set(result.url, {

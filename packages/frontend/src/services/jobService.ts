@@ -57,14 +57,14 @@ export const jobService = {
     const url = queryString ? `/admin/jobs?${queryString}` : '/admin/jobs';
     const response = await api.get(url);
 
-    // 백엔드 응답 구조에 맞게 처리
+    // Process according to backend response structure
     if (response.data?.pagination) {
       return {
         jobs: response.data.data || [],
         pagination: response.data.pagination,
       };
     } else {
-      // 페이지네이션이 없는 경우 기본값 반환
+      // Return default value when pagination is missing
       const jobs = response.data?.data || response.data || [];
       return {
         jobs,

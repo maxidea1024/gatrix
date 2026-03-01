@@ -32,7 +32,7 @@ export interface LanguageDetectionResponse {
 
 class TranslationService {
   /**
-   * 단일 언어로 번역
+   * Translate to single language
    */
   async translateText(request: TranslationRequest): Promise<TranslationResponse> {
     try {
@@ -47,7 +47,7 @@ class TranslationService {
   }
 
   /**
-   * 여러 언어로 동시 번역
+   * Translate to multiple languages concurrently
    */
   async translateToMultipleLanguages(
     request: MultipleTranslationRequest
@@ -68,7 +68,7 @@ class TranslationService {
   }
 
   /**
-   * 언어 감지
+   * Detect language
    */
   async detectLanguage(request: LanguageDetectionRequest): Promise<LanguageDetectionResponse> {
     try {
@@ -86,7 +86,7 @@ class TranslationService {
   }
 
   /**
-   * 게임월드 점검 메시지 자동 번역
+   * Automatically translate game world maintenance messages
    */
   async translateMaintenanceMessage(
     baseMessage: string,
@@ -103,13 +103,13 @@ class TranslationService {
         sourceLanguage: 'auto',
       });
 
-      // 응답을 그대로 반환 (객체 형태 유지)
+      // Return response as is (keep object format)
 
       return response;
     } catch (error: any) {
       console.error('Maintenance message translation error:', error);
 
-      // 번역 실패 시 원본 메시지를 모든 언어에 반환
+      // Return original message in all languages upon translation failure
       const fallbackTranslations: MultipleTranslationResponse = {};
       targetLanguages.forEach((lang) => {
         fallbackTranslations[lang] = {
@@ -124,7 +124,7 @@ class TranslationService {
   }
 
   /**
-   * 언어 코드를 한국어 이름으로 변환
+   * Convert language code to Korean name
    */
   getLanguageName(languageCode: string): string {
     const languageNames: Record<string, string> = {
@@ -140,7 +140,7 @@ class TranslationService {
   }
 
   /**
-   * 번역 가능한 언어 목록
+   * List of translatable languages
    */
   getSupportedLanguages(): Array<{ code: 'ko' | 'en' | 'zh'; name: string }> {
     return [

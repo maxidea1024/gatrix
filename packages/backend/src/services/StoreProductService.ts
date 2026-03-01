@@ -118,7 +118,7 @@ class StoreProductService {
     const offset = (page - 1) * limit;
 
     // Build WHERE clause
-    const conditions: string[] = ['environment = ?'];
+    const conditions: string[] = ['environmentId = ?'];
     const queryParams: (string | number | boolean | null)[] = [environmentId];
 
     if (search) {
@@ -263,7 +263,7 @@ class StoreProductService {
 
     try {
       const [products] = await pool.execute<RowDataPacket[]>(
-        'SELECT * FROM g_store_products WHERE id = ? AND environment = ?',
+        'SELECT * FROM g_store_products WHERE id = ? AND environmentId = ?',
         [id, environmentId]
       );
 
@@ -542,7 +542,7 @@ class StoreProductService {
       await TagService.setTagsForEntity('store_product', id, []);
 
       const [result] = await pool.execute<ResultSetHeader>(
-        'DELETE FROM g_store_products WHERE id = ? AND environment = ?',
+        'DELETE FROM g_store_products WHERE id = ? AND environmentId = ?',
         [id, environmentId]
       );
 
@@ -713,7 +713,7 @@ class StoreProductService {
 
     try {
       // Build WHERE clause
-      const conditions: string[] = ['environment = ?'];
+      const conditions: string[] = ['environmentId = ?'];
       const queryParams: (string | number | boolean | null)[] = [environmentId];
 
       if (params.search) {
@@ -800,7 +800,7 @@ class StoreProductService {
 
     try {
       // Build WHERE clause
-      const conditions: string[] = ['environment = ?'];
+      const conditions: string[] = ['environmentId = ?'];
       const queryParams: (string | number | boolean | null)[] = [environmentId];
 
       if (params.search) {
@@ -842,7 +842,7 @@ class StoreProductService {
 
       // Get current DB products
       const pool = database.getPool();
-      const [rows] = await pool.execute('SELECT * FROM g_store_products WHERE environment = ?', [
+      const [rows] = await pool.execute('SELECT * FROM g_store_products WHERE environmentId = ?', [
         environmentId,
       ]);
       const dbProducts = rows as StoreProduct[];

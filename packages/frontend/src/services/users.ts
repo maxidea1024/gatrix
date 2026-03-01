@@ -150,7 +150,7 @@ export class UserService {
     throw new Error(response.error?.message || 'Failed to fetch user statistics');
   }
 
-  // 태그 관련 메서드들
+  // Tag related methods
   static async getUserTags(userId: number): Promise<Tag[]> {
     const response = await apiService.get<Tag[]>(`/admin/users/${userId}/tags`);
 
@@ -189,7 +189,7 @@ export class UserService {
     }
   }
 
-  // 관리자가 사용자 이메일을 강제 인증 처리
+  // Administrator forcibly verifies user email
   static async verifyUserEmail(userId: number): Promise<void> {
     const response = await apiService.post(`/admin/users/${userId}/verify-email`);
 
@@ -198,7 +198,7 @@ export class UserService {
     }
   }
 
-  // 사용자에게 이메일 인증 메일 재전송
+  // Resend email verification email to user
   static async resendVerificationEmail(userId: number): Promise<void> {
     const response = await apiService.post(`/admin/users/${userId}/resend-verification`);
 
@@ -207,7 +207,7 @@ export class UserService {
     }
   }
 
-  // 사용자 언어 설정 업데이트
+  // Update user language settings
   static async updateLanguage(preferredLanguage: string): Promise<void> {
     const response = await apiService.put('/users/me/language', {
       preferredLanguage,

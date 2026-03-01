@@ -74,7 +74,7 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ chil
       setRewardTypes(types);
 
       // Load reward lookup data
-      const lookup = await planningDataService.getRewardLookup(language);
+      const lookup = await planningDataService.getRewardLookup();
       setRewardLookup(lookup);
     } catch (err: any) {
       const errorMessage = err?.message || 'Failed to load planning data';

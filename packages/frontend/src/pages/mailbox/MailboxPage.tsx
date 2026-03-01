@@ -716,14 +716,6 @@ const MailboxPage: React.FC = () => {
             }}
           >
             {/* Debug log */}
-            {console.log(
-              '[MailboxPage] loading:',
-              loading,
-              'mails:',
-              mails,
-              'mails.length:',
-              mails?.length
-            )}
             {loading ? (
               <Box
                 sx={{
