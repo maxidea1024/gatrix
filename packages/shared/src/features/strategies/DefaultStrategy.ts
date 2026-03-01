@@ -7,18 +7,18 @@ import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from 
 import { Strategy } from './Strategy';
 
 export class DefaultStrategy extends Strategy {
-    constructor() {
-        super('default');
-    }
+  constructor() {
+    super('default');
+  }
 
-    isEnabled(_parameters: StrategyParameters, _context: EvaluationContext): boolean {
-        return true;
-    }
+  isEnabled(_parameters: StrategyParameters, _context: EvaluationContext): boolean {
+    return true;
+  }
 
-    isEnabledWithDetails(
-        _parameters: StrategyParameters,
-        _context: EvaluationContext
-    ): StrategyEvaluationResult {
-        return { enabled: true, reason: 'Default strategy always enabled' };
-    }
+  isEnabledWithDetails(
+    _parameters: StrategyParameters,
+    _context: EvaluationContext
+  ): StrategyEvaluationResult {
+    return { enabled: true, reason: 'Default strategy always enabled' };
+  }
 }

@@ -180,11 +180,7 @@ router.get('/banners/:bannerId', serverSDKAuth, ServerBannerController.getBanner
 
 // Store product routes
 router.get('/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
-router.get(
-  '/store-products/:id',
-  serverSDKAuth,
-  ServerStoreProductController.getStoreProductById
-);
+router.get('/store-products/:id', serverSDKAuth, ServerStoreProductController.getStoreProductById);
 
 // Planning data upload route (for external CLI uploads)
 router.post(
@@ -195,11 +191,7 @@ router.post(
 );
 
 // Feature flag routes
-router.get(
-  '/features',
-  serverSDKAuth as any,
-  ServerFeatureFlagController.getFeatureFlags as any
-);
+router.get('/features', serverSDKAuth as any, ServerFeatureFlagController.getFeatureFlags as any);
 router.get(
   '/features/:flagName',
   serverSDKAuth as any,

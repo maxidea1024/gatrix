@@ -474,9 +474,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   <TextField
                     type="number"
                     value={price}
-                    onChange={(e) =>
-                      setPrice(parseFloat(e.target.value) || 0)
-                    }
+                    onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
                     fullWidth
                     size="small"
                     inputProps={{ min: 0, step: 0.01, readOnly: isEditMode }}

@@ -50,7 +50,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const onDisconnectRef = useRef<typeof onDisconnect>();
   const onErrorRef = useRef<typeof onError>();
   const onEventRef = useRef<typeof onEvent>();
-  const connectRef = useRef<() => void>(() => { });
+  const connectRef = useRef<() => void>(() => {});
   const isConnectingRef = useRef(false);
 
   useEffect(() => {
@@ -311,9 +311,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         case 'release_flow.plan_resumed':
         case 'release_flow.plan_completed':
           // Dispatch custom event for release flow updates
-          window.dispatchEvent(
-            new CustomEvent('release-flow-updated', { detail: event.data })
-          );
+          window.dispatchEvent(new CustomEvent('release-flow-updated', { detail: event.data }));
           break;
 
         default:

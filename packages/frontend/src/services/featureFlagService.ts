@@ -192,7 +192,8 @@ export async function toggleFeatureFlag(
   projectApiPath: string | null = null
 ): Promise<FeatureFlag> {
   const response = await api.post(`${basePath(projectApiPath)}/${flagName}/toggle`, {
-    isEnabled, environmentId,
+    isEnabled,
+    environmentId,
   });
   return response.data.flag;
 }

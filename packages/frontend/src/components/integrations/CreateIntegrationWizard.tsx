@@ -223,7 +223,10 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const { environments: envList } = useEnvironments();
-  const environments = envList.map((e) => ({ environmentId: e.environmentId, displayName: e.displayName }));
+  const environments = envList.map((e) => ({
+    environmentId: e.environmentId,
+    displayName: e.displayName,
+  }));
 
   const STEPS = ['selectProvider', 'configure', 'selectEvents'];
 
@@ -274,7 +277,6 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
       setLoading(false);
     }
   };
-
 
   const currentProvider = providers.find((p) => p.name === selectedProvider);
 

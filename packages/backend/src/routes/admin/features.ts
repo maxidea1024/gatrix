@@ -294,7 +294,10 @@ router.get(
   '/context-fields',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { search, projectId } = req.query;
-    const fields = await featureFlagService.listContextFields(search as string | undefined, projectId as string | undefined);
+    const fields = await featureFlagService.listContextFields(
+      search as string | undefined,
+      projectId as string | undefined
+    );
 
     res.json({ success: true, data: { contextFields: fields } });
   })
@@ -408,8 +411,18 @@ router.get(
     const environmentId = requireEnvironment(req, res);
     if (!environmentId) return;
 
-    const { search, flagType, isEnabled, isArchived, tags, page, limit, sortBy, sortOrder, projectId } =
-      req.query;
+    const {
+      search,
+      flagType,
+      isEnabled,
+      isArchived,
+      tags,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      projectId,
+    } = req.query;
 
     const result = await featureFlagService.listFlags({
       environmentId,

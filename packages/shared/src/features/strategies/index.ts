@@ -32,7 +32,7 @@ export { normalizedStrategyValue } from './util';
 const strategies: Map<string, Strategy> = new Map();
 
 function registerStrategy(strategy: Strategy): void {
-    strategies.set(strategy.name, strategy);
+  strategies.set(strategy.name, strategy);
 }
 
 // Register all built-in strategies
@@ -50,7 +50,7 @@ registerStrategy(new ApplicationHostnameStrategy());
  * Returns undefined if no strategy found.
  */
 export function getStrategy(name: string): Strategy | undefined {
-    return strategies.get(name);
+  return strategies.get(name);
 }
 
 /**
@@ -58,15 +58,15 @@ export function getStrategy(name: string): Strategy | undefined {
  * Returns { enabled: false, strategyFound: false } if strategy is unknown.
  */
 export function evaluateStrategyIsEnabled(
-    strategyName: string,
-    parameters: StrategyParameters,
-    context: EvaluationContext
+  strategyName: string,
+  parameters: StrategyParameters,
+  context: EvaluationContext
 ): { enabled: boolean; strategyFound: boolean } {
-    const strategy = strategies.get(strategyName);
-    if (!strategy) {
-        return { enabled: false, strategyFound: false };
-    }
-    return { enabled: strategy.isEnabled(parameters, context), strategyFound: true };
+  const strategy = strategies.get(strategyName);
+  if (!strategy) {
+    return { enabled: false, strategyFound: false };
+  }
+  return { enabled: strategy.isEnabled(parameters, context), strategyFound: true };
 }
 
 /**
@@ -74,18 +74,18 @@ export function evaluateStrategyIsEnabled(
  * Returns detailed reason for playground / debugging purposes.
  */
 export function evaluateStrategyWithDetails(
-    strategyName: string,
-    parameters: StrategyParameters,
-    context: EvaluationContext
+  strategyName: string,
+  parameters: StrategyParameters,
+  context: EvaluationContext
 ): StrategyEvaluationResult & { strategyFound: boolean } {
-    const strategy = strategies.get(strategyName);
-    if (!strategy) {
-        return {
-            enabled: false,
-            strategyFound: false,
-            reason: `Unknown strategy type: ${strategyName}`,
-        };
-    }
-    const result = strategy.isEnabledWithDetails(parameters, context);
-    return { ...result, strategyFound: true };
+  const strategy = strategies.get(strategyName);
+  if (!strategy) {
+    return {
+      enabled: false,
+      strategyFound: false,
+      reason: `Unknown strategy type: ${strategyName}`,
+    };
+  }
+  const result = strategy.isEnabledWithDetails(parameters, context);
+  return { ...result, strategyFound: true };
 }

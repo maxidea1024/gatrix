@@ -545,9 +545,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
             label={t('ingamePopupNotices.displayPriority')}
             type="number"
             value={displayPriority}
-            onChange={(e) =>
-              setDisplayPriority(parseInt(e.target.value) || 100)
-            }
+            onChange={(e) => setDisplayPriority(parseInt(e.target.value) || 100)}
             fullWidth
             helperText={t('ingamePopupNotices.displayPriorityHelp')}
           />

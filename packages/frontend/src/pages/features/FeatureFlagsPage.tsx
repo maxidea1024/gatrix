@@ -196,8 +196,8 @@ const FeatureFlagsPage: React.FC = () => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [flagTypes, setFlagTypes] = useState<FlagTypeInfo[]>([]);
   const { environments: envListRaw, currentEnvironmentId } = useEnvironment();
-  const environments: Environment[] = useMemo(() =>
-    envListRaw.filter((e) => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder),
+  const environments: Environment[] = useMemo(
+    () => envListRaw.filter((e) => !e.isHidden).sort((a, b) => a.displayOrder - b.displayOrder),
     [envListRaw]
   );
   const [selectedFlags, setSelectedFlags] = useState<Set<string>>(new Set());
@@ -463,15 +463,18 @@ const FeatureFlagsPage: React.FC = () => {
       const selectedFlagType =
         flagTypeFilter && flagTypeFilter.length > 0 ? (flagTypeFilter[0] as FlagType) : undefined;
 
-      const result = await featureFlagService.getFeatureFlags({
-        page: page + 1,
-        limit: rowsPerPage,
-        search: debouncedSearchTerm || undefined,
-        flagType: selectedFlagType,
-        isArchived,
-        sortBy: orderBy,
-        sortOrder: order,
-      }, projectApiPath);
+      const result = await featureFlagService.getFeatureFlags(
+        {
+          page: page + 1,
+          limit: rowsPerPage,
+          search: debouncedSearchTerm || undefined,
+          flagType: selectedFlagType,
+          isArchived,
+          sortBy: orderBy,
+          sortOrder: order,
+        },
+        projectApiPath
+      );
 
       if (
         result &&
@@ -593,11 +596,14 @@ const FeatureFlagsPage: React.FC = () => {
   const handleExport = async (environmentId: string) => {
     try {
       // Get list of all flags first
-      const result = await featureFlagService.getFeatureFlags({
-        page: 1,
-        limit: 10000, // Get all flags
-        isArchived: false,
-      }, projectApiPath);
+      const result = await featureFlagService.getFeatureFlags(
+        {
+          page: 1,
+          limit: 10000, // Get all flags
+          isArchived: false,
+        },
+        projectApiPath
+      );
 
       if (result && result.flags && result.flags.length > 0) {
         // Fetch detailed info for each flag (includes strategies)
@@ -641,11 +647,14 @@ const FeatureFlagsPage: React.FC = () => {
         }
 
         const exportData = {
-          exportedAt: new Date().toISOString(), environmentId,
+          exportedAt: new Date().toISOString(),
+          environmentId,
           segments,
           flags: detailedFlags.map((flag) => {
             // Strategies/variants are already filtered by environment in getFeatureFlag
-            const envData = flag.environments?.find((env: any) => env.environmentId === environmentId);
+            const envData = flag.environments?.find(
+              (env: any) => env.environmentId === environmentId
+            );
 
             // Clean strategies - remove unnecessary metadata
             const strategies = ((flag as any).strategies ?? []).map((s: any) => ({
@@ -689,7 +698,7 @@ const FeatureFlagsPage: React.FC = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `feature-flags-${ environmentId }-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `feature-flags-${environmentId}-${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -869,7 +878,11 @@ const FeatureFlagsPage: React.FC = () => {
   };
 
   // Toggle flag for a specific environment
-  const handleToggle = async (flag: FeatureFlag, environmentId: string, currentEnabled: boolean) => {
+  const handleToggle = async (
+    flag: FeatureFlag,
+    environmentId: string,
+    currentEnabled: boolean
+  ) => {
     const newEnabled = !currentEnabled;
 
     // Optimistic update - ensure environments array exists
@@ -899,7 +912,12 @@ const FeatureFlagsPage: React.FC = () => {
     );
 
     try {
-      await featureFlagService.toggleFeatureFlag(flag.flagName, newEnabled, environmentId, projectApiPath);
+      await featureFlagService.toggleFeatureFlag(
+        flag.flagName,
+        newEnabled,
+        environmentId,
+        projectApiPath
+      );
       const envDisplayName =
         environments.find((e) => e.environmentId === environmentId)?.displayName || environmentId;
       enqueueSnackbar(
@@ -1261,7 +1279,12 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of targetFlags) {
-        await featureFlagService.toggleFeatureFlag(flag.flagName, enable, environmentId, projectApiPath);
+        await featureFlagService.toggleFeatureFlag(
+          flag.flagName,
+          enable,
+          environmentId,
+          projectApiPath
+        );
       }
       enqueueSnackbar(
         enable
@@ -2200,8 +2223,14 @@ const FeatureFlagsPage: React.FC = () => {
                                             e.stopPropagation();
                                             copyToClipboardWithNotification(
                                               flag.flagName,
-                                              () => enqueueSnackbar(t('common.copySuccess'), { variant: 'success' }),
-                                              () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                              () =>
+                                                enqueueSnackbar(t('common.copySuccess'), {
+                                                  variant: 'success',
+                                                }),
+                                              () =>
+                                                enqueueSnackbar(t('common.copyFailed'), {
+                                                  variant: 'error',
+                                                })
                                             );
                                           }}
                                           sx={{

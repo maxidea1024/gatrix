@@ -361,4 +361,3 @@ export interface RichTextElement {
 // Status types
 export type UserStatus = 'online' | 'away' | 'busy' | 'offline' | 'invisible';
 export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
-

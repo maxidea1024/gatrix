@@ -150,7 +150,12 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setCopying(true);
     setError(null);
     try {
-      const copyResult = await environmentService.copyEnvironmentData(null, sourceId, targetId, options);
+      const copyResult = await environmentService.copyEnvironmentData(
+        null,
+        sourceId,
+        targetId,
+        options
+      );
       setResult(copyResult);
       enqueueSnackbar(t('environments.copyCompleted'), { variant: 'success' });
       onCopyComplete?.();

@@ -171,7 +171,10 @@ export const CreateIntegrationPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const { environments: envList } = useEnvironments();
-  const environments = envList.map((e) => ({ environmentId: e.environmentId, displayName: e.displayName }));
+  const environments = envList.map((e) => ({
+    environmentId: e.environmentId,
+    displayName: e.displayName,
+  }));
 
   useEffect(() => {
     fetchProviders();
@@ -201,7 +204,6 @@ export const CreateIntegrationPage: React.FC = () => {
       setLoading(false);
     }
   };
-
 
   const currentProvider = providers.find((p) => p.name === selectedProvider);
 

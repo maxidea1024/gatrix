@@ -916,7 +916,12 @@ const ChatPageContent: React.FC = () => {
           <List>
             {selectedChannel.members?.map((member) => (
               <ListItem key={member.id}>
-                <UserPresence user={member.user} variant="list" showStatus={true} showLastSeen={true} />
+                <UserPresence
+                  user={member.user}
+                  variant="list"
+                  showStatus={true}
+                  showLastSeen={true}
+                />
               </ListItem>
             ))}
           </List>

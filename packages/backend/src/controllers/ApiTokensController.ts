@@ -89,7 +89,6 @@ class ApiTokensController {
         .limit(Number(limit))
         .offset(Number(offset));
 
-
       // Format tokens (mask token for display, keep original for copying)
       const formattedTokens = tokens.map((token: any) => {
         // Mask the token: show first 4 and last 4 characters
@@ -149,13 +148,7 @@ class ApiTokensController {
         });
       }
 
-      const {
-        tokenName,
-        description,
-        tokenType,
-        expiresAt,
-        environmentId,
-      } = req.body;
+      const { tokenName, description, tokenType, expiresAt, environmentId } = req.body;
       const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
 
@@ -182,7 +175,6 @@ class ApiTokensController {
           createdAt: trx.fn.now(),
           updatedAt: trx.fn.now(),
         });
-
 
         return { id: tokenId };
       });
@@ -271,7 +263,6 @@ class ApiTokensController {
         .leftJoin('g_users as creator', 'g_api_access_tokens.createdBy', 'creator.id')
         .where('g_api_access_tokens.id', id)
         .first();
-
 
       // Format response
       const formattedToken = {

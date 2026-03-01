@@ -43,12 +43,7 @@ import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { formatRelativeTime } from '@/utils/dateFormat';
-import {
-  rbacService,
-  Role,
-  RoleWithDetails,
-  RolePermissions,
-} from '@/services/rbacService';
+import { rbacService, Role, RoleWithDetails, RolePermissions } from '@/services/rbacService';
 
 // ==================== Permission Editor ====================
 
@@ -117,16 +112,12 @@ const PermissionEditor: React.FC<PermissionEditorProps> = ({
               size="small"
             />
           }
-          label={
-            <Typography variant="body2">{t('rbac.selectAll')}</Typography>
-          }
+          label={<Typography variant="body2">{t('rbac.selectAll')}</Typography>}
         />
       </Box>
 
       {Object.entries(permissionCategories).map(([key, category]) => {
-        const catPerms = category.permissions.filter((p) =>
-          availablePermissions.includes(p)
-        );
+        const catPerms = category.permissions.filter((p) => availablePermissions.includes(p));
         if (catPerms.length === 0) return null;
         const allCatChecked = catPerms.every((p) => permissions.org.includes(p));
         const someCatChecked = catPerms.some((p) => permissions.org.includes(p)) && !allCatChecked;
@@ -335,8 +326,7 @@ const RolesPage: React.FC = () => {
       setDialogOpen(false);
       loadRoles();
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message || t('rbac.roles.saveFailed');
+      const message = error?.response?.data?.message || t('rbac.roles.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -353,8 +343,7 @@ const RolesPage: React.FC = () => {
       setSelectedRole(null);
       loadRoles();
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message || t('rbac.roles.deleteFailed');
+      const message = error?.response?.data?.message || t('rbac.roles.deleteFailed');
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setSaving(false);
@@ -380,11 +369,7 @@ const RolesPage: React.FC = () => {
             {t('rbac.roles.description')}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={openCreateDialog}
-        >
+        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
           {t('rbac.roles.create')}
         </Button>
       </Box>
@@ -436,11 +421,7 @@ const RolesPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {filteredRoles.map((role) => (
-                    <TableRow
-                      key={role.id}
-                      hover
-                      sx={{ '&:last-child td': { borderBottom: 0 } }}
-                    >
+                    <TableRow key={role.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                       <TableCell>
                         <Typography
                           variant="body2"
@@ -598,12 +579,7 @@ const RolesPage: React.FC = () => {
           <Button onClick={() => setDeleteDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleDelete}
-            disabled={saving}
-          >
+          <Button variant="contained" color="error" onClick={handleDelete} disabled={saving}>
             {saving ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>

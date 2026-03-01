@@ -5,7 +5,10 @@ import { parseJsonField } from '../../utils/dbUtils';
 import { ValidationRules, FeatureContextFieldAttributes, Constraint } from './types';
 
 export class FeatureContextFieldModel {
-  static async findAll(search?: string, projectId?: string): Promise<FeatureContextFieldAttributes[]> {
+  static async findAll(
+    search?: string,
+    projectId?: string
+  ): Promise<FeatureContextFieldAttributes[]> {
     try {
       let query = db('g_feature_context_fields')
         .select(

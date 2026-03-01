@@ -41,7 +41,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { RelativeTime } from '@/components/common/RelativeTime';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
-import changeRequestService, { ActionGroup, ChangeItem, ChangeRequestStatus } from '@/services/changeRequestService';
+import changeRequestService, {
+  ActionGroup,
+  ChangeItem,
+  ChangeRequestStatus,
+} from '@/services/changeRequestService';
 import { formatChangeRequestTitle, formatChangeItemTitle } from '@/utils/changeRequestFormatter';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import SubmitPreviewDrawer from './SubmitPreviewDrawer';

@@ -469,7 +469,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="Start Date/Time"
-                  value={formData.start ? moment(formData.start) as any : null}
+                  value={formData.start ? (moment(formData.start) as any) : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,
@@ -488,7 +488,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="End Date/Time"
-                  value={formData.end ? moment(formData.end) as any : null}
+                  value={formData.end ? (moment(formData.end) as any) : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,

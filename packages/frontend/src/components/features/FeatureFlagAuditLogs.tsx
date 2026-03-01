@@ -393,7 +393,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
             </Typography>
             {(() => {
               const resourceName =
-                log.oldValues?.name || log.newValues?.name || log.oldValues?.worldId || log.newValues?.worldId;
+                log.oldValues?.name ||
+                log.newValues?.name ||
+                log.oldValues?.worldId ||
+                log.newValues?.worldId;
               return resourceName ? (
                 <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
                   {resourceName}

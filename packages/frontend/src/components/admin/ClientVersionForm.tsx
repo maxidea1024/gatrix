@@ -158,9 +158,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string; description?: string }[]>(
-    []
-  );
+  const [selectedTags, setSelectedTags] = useState<
+    { id: number; name: string; color: string; description?: string }[]
+  >([]);
 
   // 점검 관련 상태
   const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>(

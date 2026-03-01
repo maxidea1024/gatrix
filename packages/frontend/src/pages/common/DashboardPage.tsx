@@ -766,7 +766,9 @@ const DashboardPage: React.FC = () => {
         // Fetch counts for each environment
         const countsPromises = displayEnvs.map(async (env: Environment) => {
           try {
-            const res = await api.get(`${projectApiPath}/environments/${env.environmentId}/related-data`);
+            const res = await api.get(
+              `${projectApiPath}/environments/${env.environmentId}/related-data`
+            );
             const rawData = res?.data?.relatedData;
             // Extract count from each { count, items } object
             const counts = rawData

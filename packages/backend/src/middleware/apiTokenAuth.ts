@@ -103,10 +103,7 @@ function handleSpecialTokens(token: string): {
  * Validates if token has access to specific environment.
  * With single environmentId, this is a simple string comparison.
  */
-function checkEnvironmentAccess(
-  apiToken: ApiAccessToken,
-  environmentId: string
-): boolean {
+function checkEnvironmentAccess(apiToken: ApiAccessToken, environmentId: string): boolean {
   if (typeof apiToken.hasEnvironmentAccess === 'function') {
     return apiToken.hasEnvironmentAccess(environmentId);
   }
@@ -269,7 +266,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
       });
       return res.status(400).json({
         success: false,
-        error: { code: ErrorCodes.ENV_INVALID, message: 'Environment could not be determined from token' },
+        error: {
+          code: ErrorCodes.ENV_INVALID,
+          message: 'Environment could not be determined from token',
+        },
       });
     }
 
@@ -308,7 +308,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
         });
         return res.status(403).json({
           success: false,
-          error: { code: ErrorCodes.ENV_ACCESS_DENIED, message: 'Token does not have access to this environment' },
+          error: {
+            code: ErrorCodes.ENV_ACCESS_DENIED,
+            message: 'Token does not have access to this environment',
+          },
         });
       }
     }

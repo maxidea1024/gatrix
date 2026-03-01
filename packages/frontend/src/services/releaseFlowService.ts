@@ -113,7 +113,7 @@ export async function getPlan(
   flagId: string,
   environmentId: string
 ): Promise<ReleaseFlowPlan | null> {
-  const response = await api.get(`/admin/release-flows/plans/${flagId}/${ environmentId }`);
+  const response = await api.get(`/admin/release-flows/plans/${flagId}/${environmentId}`);
   return response.data;
 }
 

@@ -113,7 +113,9 @@ export const requireEnvPermission = (perm: string) => {
 
       const { id: userId, orgId } = req.user;
       const environmentId =
-        req.params.environmentId || req.environmentId || (req.headers['x-environment-id'] as string);
+        req.params.environmentId ||
+        req.environmentId ||
+        (req.headers['x-environment-id'] as string);
 
       if (!environmentId) {
         next(new GatrixError('Environment context required', 400));

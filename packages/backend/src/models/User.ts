@@ -57,7 +57,7 @@ export class UserModel {
           'g_users.createdBy',
           'creator.name as createdByName',
           'creator.email as createdByEmail',
-          db.raw('COALESCE(om.orgRole, \'user\') as role'),
+          db.raw("COALESCE(om.orgRole, 'user') as role"),
         ])
         .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
         .leftJoin('g_organisation_members as om', 'g_users.id', 'om.userId')
@@ -291,7 +291,7 @@ export class UserModel {
           'g_users.createdAt',
           'g_users.updatedAt',
           'g_users.createdBy',
-          db.raw('COALESCE(om.orgRole, \'user\') as role'),
+          db.raw("COALESCE(om.orgRole, 'user') as role"),
           'creator.name as createdByName',
           'creator.email as createdByEmail',
         ])
@@ -577,25 +577,23 @@ export class UserModel {
   static async getPermissions(userId: string): Promise<string[]> {
     try {
       // Check if user is org admin (gets all permissions)
-      const membership = await db('g_organisation_members')
-        .where('userId', userId)
-        .first();
+      const membership = await db('g_organisation_members').where('userId', userId).first();
       if (membership?.orgRole === 'admin') {
         return ['*'];
       }
 
       // Get all role IDs for the user (direct + group-based)
-      const directRoleIds = await db('g_user_roles')
-        .where('userId', userId)
-        .select('roleId');
+      const directRoleIds = await db('g_user_roles').where('userId', userId).select('roleId');
       const groupRoleIds = await db('g_group_members')
         .where('g_group_members.userId', userId)
         .join('g_group_roles', 'g_group_members.groupId', 'g_group_roles.groupId')
         .select('g_group_roles.roleId');
-      const roleIds = [...new Set([
-        ...directRoleIds.map((r: any) => r.roleId),
-        ...groupRoleIds.map((r: any) => r.roleId),
-      ])];
+      const roleIds = [
+        ...new Set([
+          ...directRoleIds.map((r: any) => r.roleId),
+          ...groupRoleIds.map((r: any) => r.roleId),
+        ]),
+      ];
 
       if (roleIds.length === 0) {
         return [];
@@ -648,7 +646,9 @@ export class UserModel {
    * @deprecated Permissions are now managed via roles in the RBAC system
    */
   static async setPermissions(userId: string, _permissions: string[]): Promise<void> {
-    logger.warn('UserModel.setPermissions is deprecated. Use role-based permissions instead.', { userId });
+    logger.warn('UserModel.setPermissions is deprecated. Use role-based permissions instead.', {
+      userId,
+    });
   }
 
   /**
@@ -656,7 +656,9 @@ export class UserModel {
    * @deprecated Permissions are now managed via roles in the RBAC system
    */
   static async addPermission(userId: string, _permission: string): Promise<void> {
-    logger.warn('UserModel.addPermission is deprecated. Use role-based permissions instead.', { userId });
+    logger.warn('UserModel.addPermission is deprecated. Use role-based permissions instead.', {
+      userId,
+    });
   }
 
   /**
@@ -664,6 +666,8 @@ export class UserModel {
    * @deprecated Permissions are now managed via roles in the RBAC system
    */
   static async removePermission(userId: string, _permission: string): Promise<void> {
-    logger.warn('UserModel.removePermission is deprecated. Use role-based permissions instead.', { userId });
+    logger.warn('UserModel.removePermission is deprecated. Use role-based permissions instead.', {
+      userId,
+    });
   }
 }

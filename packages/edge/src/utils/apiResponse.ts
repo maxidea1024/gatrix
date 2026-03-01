@@ -11,64 +11,64 @@ export type { ErrorCode } from '@gatrix/shared';
  * Format: { success: false, error: { code, message, details? } }
  */
 export function sendErrorResponse(
-    res: Response,
-    statusCode: number,
-    code: ErrorCode | string,
-    message: string,
-    details?: Record<string, any>,
-    logError?: unknown
+  res: Response,
+  statusCode: number,
+  code: ErrorCode | string,
+  message: string,
+  details?: Record<string, any>,
+  logError?: unknown
 ): Response {
-    if (statusCode >= 500 && logError) {
-        logger.error(`[${code}] ${message}`, {
-            errorCode: code,
-            statusCode,
-            details,
-            error: logError instanceof Error ? logError.message : logError,
-            stack: logError instanceof Error ? logError.stack : undefined,
-        });
-    }
+  if (statusCode >= 500 && logError) {
+    logger.error(`[${code}] ${message}`, {
+      errorCode: code,
+      statusCode,
+      details,
+      error: logError instanceof Error ? logError.message : logError,
+      stack: logError instanceof Error ? logError.stack : undefined,
+    });
+  }
 
-    const response: any = {
-        success: false,
-        error: { code, message },
-    };
+  const response: any = {
+    success: false,
+    error: { code, message },
+  };
 
-    if (details) {
-        response.error.details = details;
-    }
+  if (details) {
+    response.error.details = details;
+  }
 
-    return res.status(statusCode).json(response);
+  return res.status(statusCode).json(response);
 }
 
 export function sendBadRequest(
-    res: Response,
-    message: string,
-    details?: Record<string, any>
+  res: Response,
+  message: string,
+  details?: Record<string, any>
 ): Response {
-    return sendErrorResponse(res, 400, ErrorCodes.BAD_REQUEST, message, details);
+  return sendErrorResponse(res, 400, ErrorCodes.BAD_REQUEST, message, details);
 }
 
 export function sendUnauthorized(
-    res: Response,
-    message: string,
-    code: ErrorCode | string = ErrorCodes.UNAUTHORIZED
+  res: Response,
+  message: string,
+  code: ErrorCode | string = ErrorCodes.UNAUTHORIZED
 ): Response {
-    return sendErrorResponse(res, 401, code, message);
+  return sendErrorResponse(res, 401, code, message);
 }
 
 export function sendNotFound(
-    res: Response,
-    message: string,
-    code: ErrorCode | string = ErrorCodes.NOT_FOUND
+  res: Response,
+  message: string,
+  code: ErrorCode | string = ErrorCodes.NOT_FOUND
 ): Response {
-    return sendErrorResponse(res, 404, code, message);
+  return sendErrorResponse(res, 404, code, message);
 }
 
 export function sendInternalError(
-    res: Response,
-    message: string,
-    error?: unknown,
-    code: ErrorCode | string = ErrorCodes.INTERNAL_SERVER_ERROR
+  res: Response,
+  message: string,
+  error?: unknown,
+  code: ErrorCode | string = ErrorCodes.INTERNAL_SERVER_ERROR
 ): Response {
-    return sendErrorResponse(res, 500, code, message, undefined, error);
+  return sendErrorResponse(res, 500, code, message, undefined, error);
 }

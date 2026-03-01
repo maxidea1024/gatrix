@@ -38,18 +38,21 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
           // Convert from backend format (rewardType, itemId) to frontend format (type, id)
           const convertedRewards: Reward[] = rewards.map((reward: any) => ({
             rewardType: String(reward.type !== undefined ? reward.type : reward.rewardType),
-            itemId: String(reward.id !== undefined
-              ? reward.id
-              : reward.itemId
-                ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
-                : 0),
+            itemId: String(
+              reward.id !== undefined
+                ? reward.id
+                : reward.itemId
+                  ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
+                  : 0
+            ),
             quantity: reward.quantity,
             type: reward.type !== undefined ? reward.type : reward.rewardType,
-            id: reward.id !== undefined
-              ? reward.id
-              : reward.itemId
-                ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
-                : 0,
+            id:
+              reward.id !== undefined
+                ? reward.id
+                : reward.itemId
+                  ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
+                  : 0,
           }));
           setDisplayRewards(convertedRewards);
           return;

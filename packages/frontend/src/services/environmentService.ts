@@ -200,7 +200,10 @@ class EnvironmentService {
   /**
    * Get all environments
    */
-  async getEnvironments(projectApiPath: string | null, includeHidden: boolean = false): Promise<Environment[]> {
+  async getEnvironments(
+    projectApiPath: string | null,
+    includeHidden: boolean = false
+  ): Promise<Environment[]> {
     try {
       const response = await api.get(envBasePath(projectApiPath), {
         params: includeHidden ? { includeHidden: 'true' } : undefined,
@@ -228,7 +231,10 @@ class EnvironmentService {
   /**
    * Create new environment
    */
-  async createEnvironment(projectApiPath: string | null, data: CreateEnvironmentData): Promise<Environment> {
+  async createEnvironment(
+    projectApiPath: string | null,
+    data: CreateEnvironmentData
+  ): Promise<Environment> {
     try {
       const response = await api.post(envBasePath(projectApiPath), data);
       return response.data;
@@ -241,7 +247,11 @@ class EnvironmentService {
   /**
    * Update an existing environment
    */
-  async updateEnvironment(projectApiPath: string | null, environmentId: string, data: UpdateEnvironmentData): Promise<Environment> {
+  async updateEnvironment(
+    projectApiPath: string | null,
+    environmentId: string,
+    data: UpdateEnvironmentData
+  ): Promise<Environment> {
     try {
       const response = await api.put(`${envBasePath(projectApiPath)}/${environmentId}`, data);
       return response.data;
@@ -254,7 +264,11 @@ class EnvironmentService {
   /**
    * Get copy preview between two environments
    */
-  async getCopyPreview(projectApiPath: string | null, sourceEnvironment: string, targetEnvironment: string): Promise<CopyPreview> {
+  async getCopyPreview(
+    projectApiPath: string | null,
+    sourceEnvironment: string,
+    targetEnvironment: string
+  ): Promise<CopyPreview> {
     try {
       const response = await api.get(
         `${envBasePath(projectApiPath)}/${sourceEnvironment}/copy/${targetEnvironment}/preview`
@@ -290,9 +304,14 @@ class EnvironmentService {
   /**
    * Get related data counts for an environment (for delete confirmation)
    */
-  async getRelatedData(projectApiPath: string | null, environmentId: string): Promise<EnvironmentRelatedData> {
+  async getRelatedData(
+    projectApiPath: string | null,
+    environmentId: string
+  ): Promise<EnvironmentRelatedData> {
     try {
-      const response = await api.get(`${envBasePath(projectApiPath)}/${environmentId}/related-data`);
+      const response = await api.get(
+        `${envBasePath(projectApiPath)}/${environmentId}/related-data`
+      );
       return response.data;
     } catch (error) {
       console.error('Error fetching related data:', error);
@@ -303,7 +322,11 @@ class EnvironmentService {
   /**
    * Delete an environment
    */
-  async deleteEnvironment(projectApiPath: string | null, environmentId: string, force: boolean = false): Promise<void> {
+  async deleteEnvironment(
+    projectApiPath: string | null,
+    environmentId: string,
+    force: boolean = false
+  ): Promise<void> {
     try {
       await api.delete(`${envBasePath(projectApiPath)}/${environmentId}`, {
         data: { force },

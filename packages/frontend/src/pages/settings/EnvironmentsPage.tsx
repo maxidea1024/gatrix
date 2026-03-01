@@ -211,7 +211,11 @@ const EnvironmentsPage: React.FC = () => {
 
     setDeleting(true);
     try {
-      await environmentService.deleteEnvironment(projectApiPath, selectedEnvForDelete.environmentId, forceDelete);
+      await environmentService.deleteEnvironment(
+        projectApiPath,
+        selectedEnvForDelete.environmentId,
+        forceDelete
+      );
       enqueueSnackbar(t('environments.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setSelectedEnvForDelete(null);
@@ -412,7 +416,11 @@ const EnvironmentsPage: React.FC = () => {
 
     setUpdating(true);
     try {
-      await environmentService.updateEnvironment(projectApiPath, selectedEnvForEdit.environmentId, editEnv);
+      await environmentService.updateEnvironment(
+        projectApiPath,
+        selectedEnvForEdit.environmentId,
+        editEnv
+      );
       enqueueSnackbar(t('environments.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       setSelectedEnvForEdit(null);

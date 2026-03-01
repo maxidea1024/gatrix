@@ -368,7 +368,6 @@ router.use(
   integrationRoutes
 );
 
-
 // Service Accounts - requires service-accounts.view or service-accounts.manage permission
 router.use(
   '/service-accounts',

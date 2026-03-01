@@ -253,21 +253,21 @@ const JobForm: React.FC<JobFormProps> = ({
                   }}
                 >
                   {jobTypes
-                      .filter((jt) => jt.isEnabled)
-                      .map((jobType) => (
-                        <MenuItem key={jobType.id} value={jobType.id.toString()}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                            }}
-                          >
-                            {jobType.displayName}
-                            <Chip label={jobType.name} size="small" variant="outlined" />
-                          </Box>
-                        </MenuItem>
-                      ))}
+                    .filter((jt) => jt.isEnabled)
+                    .map((jobType) => (
+                      <MenuItem key={jobType.id} value={jobType.id.toString()}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          {jobType.displayName}
+                          <Chip label={jobType.name} size="small" variant="outlined" />
+                        </Box>
+                      </MenuItem>
+                    ))}
                 </Select>
                 {errors.jobTypeId && (
                   <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>

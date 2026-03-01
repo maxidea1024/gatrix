@@ -213,9 +213,7 @@ const ProjectsPage: React.FC = () => {
                       <Chip label={t('common.inactive')} size="small" variant="outlined" />
                     )}
                   </TableCell>
-                  <TableCell>
-                    {dayjs(proj.createdAt).format('YYYY-MM-DD HH:mm')}
-                  </TableCell>
+                  <TableCell>{dayjs(proj.createdAt).format('YYYY-MM-DD HH:mm')}</TableCell>
                   <TableCell align="right">
                     <Tooltip title={t('common.edit')}>
                       <IconButton size="small" onClick={() => handleEdit(proj)}>
@@ -288,7 +286,9 @@ const ProjectsPage: React.FC = () => {
         <DialogTitle>{t('rbac.projects.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            {t('rbac.projects.deleteConfirm', { name: deleteTarget?.displayName || deleteTarget?.projectName })}
+            {t('rbac.projects.deleteConfirm', {
+              name: deleteTarget?.displayName || deleteTarget?.projectName,
+            })}
           </Typography>
         </DialogContent>
         <DialogActions>

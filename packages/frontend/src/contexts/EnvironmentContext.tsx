@@ -11,7 +11,7 @@ import { apiService } from '../services/api';
 import { useAuth } from './AuthContext';
 import { useOrgProject } from './OrgProjectContext';
 
-const STORAGE_KEY = 'gatrix_selected_environment';
+const STORAGE_KEY = 'gatrix_selected_environment_id';
 const STORAGE_KEY_NAME = 'gatrix_selected_environment_name';
 
 interface UserEnvironmentAccess {

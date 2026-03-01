@@ -177,17 +177,17 @@ interface FeatureContextField {
   displayName: string;
   description: string;
   fieldType:
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'date'
-  | 'semver'
-  | 'array'
-  | 'country'
-  | 'countryCode3'
-  | 'languageCode'
-  | 'localeCode'
-  | 'timezone';
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'semver'
+    | 'array'
+    | 'country'
+    | 'countryCode3'
+    | 'languageCode'
+    | 'localeCode'
+    | 'timezone';
   validationRules?: ValidationRules;
   isEnabled: boolean;
   tags: string[];
@@ -526,7 +526,10 @@ const FeatureContextFieldsPage: React.FC = () => {
           variant: 'success',
         });
       } else {
-        await api.post('/admin/features/context-fields', { ...editingField, projectId: currentProjectId });
+        await api.post('/admin/features/context-fields', {
+          ...editingField,
+          projectId: currentProjectId,
+        });
         enqueueSnackbar(t('contextFields.createSuccess'), {
           variant: 'success',
         });
@@ -544,9 +547,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   const handleDelete = async (field: FeatureContextField) => {
     setDeletingField(field);
     try {
-      const result = await api.get(
-        `/admin/features/context-fields/${field.fieldName}/references`
-      );
+      const result = await api.get(`/admin/features/context-fields/${field.fieldName}/references`);
       const refs = result.data?.references;
       if (
         refs &&
@@ -566,9 +567,7 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   const handleViewReferences = async (field: FeatureContextField) => {
     try {
-      const result = await api.get(
-        `/admin/features/context-fields/${field.fieldName}/references`
-      );
+      const result = await api.get(`/admin/features/context-fields/${field.fieldName}/references`);
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);
@@ -590,8 +589,7 @@ const FeatureContextFieldsPage: React.FC = () => {
       const errorCode = extractErrorCode(error?.response?.data);
       if (errorCode === 'RESOURCE_IN_USE') {
         const payload =
-          error?.response?.data?.error?.details?.payload ||
-          error?.response?.data?.error?.payload;
+          error?.response?.data?.error?.details?.payload || error?.response?.data?.error?.payload;
         setReferences(payload?.references || null);
         setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);
@@ -877,8 +875,14 @@ const FeatureContextFieldsPage: React.FC = () => {
                                               e.stopPropagation();
                                               copyToClipboardWithNotification(
                                                 field.fieldName,
-                                                () => enqueueSnackbar(t('common.copySuccess'), { variant: 'success' }),
-                                                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                () =>
+                                                  enqueueSnackbar(t('common.copySuccess'), {
+                                                    variant: 'success',
+                                                  }),
+                                                () =>
+                                                  enqueueSnackbar(t('common.copyFailed'), {
+                                                    variant: 'error',
+                                                  })
                                               );
                                             }}
                                             sx={{
@@ -975,8 +979,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                                           {expandedLegalValues.has(field.id)
                                             ? t('featureFlags.showLess')
                                             : t('featureFlags.showMore', {
-                                              count: legalVals.length - 3,
-                                            })}
+                                                count: legalVals.length - 3,
+                                              })}
                                         </Typography>
                                       )}
                                     </Box>
@@ -1250,7 +1254,9 @@ const FeatureContextFieldsPage: React.FC = () => {
                   value.map((option, idx) => {
                     const { key, ...chipProps } = getTagProps({ index: idx });
                     const tagData =
-                      typeof option === 'string' ? { name: option, color: '#888888', description: '' } : option;
+                      typeof option === 'string'
+                        ? { name: option, color: '#888888', description: '' }
+                        : option;
                     return (
                       <Tooltip key={key} title={tagData.description || ''} arrow>
                         <Chip

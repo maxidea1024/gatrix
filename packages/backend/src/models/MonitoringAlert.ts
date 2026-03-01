@@ -17,7 +17,7 @@ export class MonitoringAlert extends Model {
   updatedAt?: Date | null;
 
   static get tableName() {
-    return 'monitoring_alerts';
+    return 'g_monitoring_alerts';
   }
 
   $beforeInsert() {

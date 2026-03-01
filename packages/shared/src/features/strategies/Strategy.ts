@@ -8,19 +8,16 @@
 import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
 
 export abstract class Strategy {
-    public readonly name: string;
+  public readonly name: string;
 
-    constructor(name: string) {
-        this.name = name;
-    }
+  constructor(name: string) {
+    this.name = name;
+  }
 
-    abstract isEnabled(
-        parameters: StrategyParameters,
-        context: EvaluationContext
-    ): boolean;
+  abstract isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean;
 
-    abstract isEnabledWithDetails(
-        parameters: StrategyParameters,
-        context: EvaluationContext
-    ): StrategyEvaluationResult;
+  abstract isEnabledWithDetails(
+    parameters: StrategyParameters,
+    context: EvaluationContext
+  ): StrategyEvaluationResult;
 }

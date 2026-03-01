@@ -160,7 +160,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   } = useReleaseFlowPlan(flagId, selectedEnv);
 
   const [applying, setApplying] = useState(false);
-  const [actionLoadingType, setActionLoadingType] = useState<'pause' | 'resume' | 'jump' | 'delete' | null>(null);
+  const [actionLoadingType, setActionLoadingType] = useState<
+    'pause' | 'resume' | 'jump' | 'delete' | null
+  >(null);
   const [autoControlling, setAutoControlling] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(initialShowTemplates);
 
@@ -747,7 +749,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   if (plan?.status === 'paused') {
-                    const activeMilestone = milestones.find((m: any) => m.id === plan.activeMilestoneId);
+                    const activeMilestone = milestones.find(
+                      (m: any) => m.id === plan.activeMilestoneId
+                    );
                     const pausedTime = activeMilestone?.pausedAt;
                     const pausedLabel = pausedTime
                       ? `${t('releaseFlow.statusPaused')}: ${formatRelativeTime(pausedTime)}`
@@ -765,13 +769,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       />
                     );
                   }
-                  const statusMap: Record<
-                    string,
-                    { label: string; color: 'default' | 'primary' }
-                  > = {
-                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                  };
+                  const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
+                    {
+                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                    };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -973,9 +975,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : 'rgba(0,0,0,0.015)'
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1084,10 +1086,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           </Box>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-
                             <Box
                               onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                              sx={{ flexShrink: 0, minHeight: 32, display: 'flex', alignItems: 'center' }}
+                              sx={{
+                                flexShrink: 0,
+                                minHeight: 32,
+                                display: 'flex',
+                                alignItems: 'center',
+                              }}
                             >
                               {renderMilestoneControls(milestone.id, index, isScheduled)}
                             </Box>
@@ -1223,9 +1229,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                            borderColor: 'primary.main',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          }
+                              borderColor: 'primary.main',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            }
                           : {},
                     }}
                   >

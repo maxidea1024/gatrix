@@ -1848,7 +1848,8 @@ const PlanningDataPage: React.FC = () => {
                                           {item.worldBuffId && item.worldBuffId.length > 0
                                             ? item.worldBuffId.map((buffId, index) => {
                                                 // worldBuffNames is already localized by the backend service
-                                                const buffName = item.worldBuffNames?.[index] || String(buffId);
+                                                const buffName =
+                                                  item.worldBuffNames?.[index] || String(buffId);
                                                 return (
                                                   <Chip
                                                     key={buffId}

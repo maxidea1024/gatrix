@@ -107,11 +107,14 @@ const TagsPage: React.FC = () => {
     const name = newName.trim();
     if (!name) return;
     try {
-      const tag = await tagService.create({
-        name,
-        color: newColor,
-        description: newDescription || null,
-      }, projectApiPath);
+      const tag = await tagService.create(
+        {
+          name,
+          color: newColor,
+          description: newDescription || null,
+        },
+        projectApiPath
+      );
       setTags((prev) => [...prev, tag]);
       setNewName('');
       setNewDescription('');
@@ -171,11 +174,15 @@ const TagsPage: React.FC = () => {
     }
 
     try {
-      const updated = await tagService.update(id, {
-        name,
-        color: editColor,
-        description: editDescription || null,
-      }, projectApiPath);
+      const updated = await tagService.update(
+        id,
+        {
+          name,
+          color: editColor,
+          description: editDescription || null,
+        },
+        projectApiPath
+      );
       setTags((prev) => prev.map((t) => (t.id === id ? updated : t)));
       setEditingId(null);
       enqueueSnackbar(t('common.success'), { variant: 'success' });

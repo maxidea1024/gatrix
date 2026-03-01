@@ -871,7 +871,9 @@ const ChangeRequestDetailPage: React.FC = () => {
 
               {/* Status Banners */}
               {cr.status === 'rejected' &&
-                (cr.requesterId === user?.id || user?.role === 'admin' || Number(user?.role) === 0) && (
+                (cr.requesterId === user?.id ||
+                  user?.role === 'admin' ||
+                  Number(user?.role) === 0) && (
                   <Paper
                     sx={{
                       p: 2,

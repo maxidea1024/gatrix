@@ -81,7 +81,7 @@ export const varsService = {
       const parsed = typeof item.varValue === 'string' ? JSON.parse(item.varValue) : item.varValue;
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
-      console.error('Failed to load platforms:', error);
+      console.warn('Failed to load platforms:', error);
       return [];
     }
   },
@@ -98,7 +98,7 @@ export const varsService = {
       const parsed = typeof item.varValue === 'string' ? JSON.parse(item.varValue) : item.varValue;
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
-      console.error('Failed to load channels:', error);
+      console.warn('Failed to load channels:', error);
       return [];
     }
   },

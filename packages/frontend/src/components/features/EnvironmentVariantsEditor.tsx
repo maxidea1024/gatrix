@@ -158,7 +158,8 @@ const distributeWeights = (variants: Variant[]): Variant[] => {
   }));
 };
 
-const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({ environmentId,
+const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
+  environmentId,
   variants: initialVariants,
   valueType,
   flagType = 'flag',
@@ -608,13 +609,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({ e
 
     const viewOnlyStyle = !isActuallyEditable
       ? {
-        bgcolor: (theme: any) =>
-          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-        borderRadius: 1,
-      }
+          bgcolor: (theme: any) =>
+            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+          borderRadius: 1,
+        }
       : {};
 
     if (valueType === 'boolean') {
@@ -998,8 +999,6 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({ e
                 );
               })}
             </Stack>
-
-
 
             {canManage && !isArchived && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>

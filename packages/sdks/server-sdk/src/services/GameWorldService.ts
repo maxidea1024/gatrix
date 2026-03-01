@@ -57,9 +57,7 @@ export class GameWorldService extends BaseEnvironmentService<
   async getById(id: number, environment: string): Promise<GameWorld> {
     this.logger.debug('Fetching game world by ID', { id, environment });
 
-    const response = await this.apiClient.get<GameWorld>(
-      `/api/v1/server/game-worlds/${id}`
-    );
+    const response = await this.apiClient.get<GameWorld>(`/api/v1/server/game-worlds/${id}`);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch game world');

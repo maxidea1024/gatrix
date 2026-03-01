@@ -318,7 +318,9 @@ class NetworkTrafficService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 
-    const result = await db('g_feature_network_traffic').where('trafficBucket', '<', cutoffDate).del();
+    const result = await db('g_feature_network_traffic')
+      .where('trafficBucket', '<', cutoffDate)
+      .del();
 
     return result;
   }

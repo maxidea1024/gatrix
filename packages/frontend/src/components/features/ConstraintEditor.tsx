@@ -67,17 +67,17 @@ export interface ContextField {
   displayName: string;
   description?: string;
   fieldType:
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'date'
-  | 'semver'
-  | 'array'
-  | 'country'
-  | 'countryCode3'
-  | 'languageCode'
-  | 'localeCode'
-  | 'timezone';
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'semver'
+    | 'array'
+    | 'country'
+    | 'countryCode3'
+    | 'languageCode'
+    | 'localeCode'
+    | 'timezone';
   validationRules?: any;
 }
 
@@ -417,7 +417,8 @@ const SortableConstraintCard: React.FC<SortableConstraintCardProps> = ({
                     )}
                     <Typography component="span">
                       {t(
-                        `featureFlags.operators.${selected}${constraint.inverted ? '_inverted' : ''
+                        `featureFlags.operators.${selected}${
+                          constraint.inverted ? '_inverted' : ''
                         }`,
                         label
                       )}

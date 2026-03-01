@@ -72,9 +72,7 @@ export async function validateEnvironment(db: any, environmentId: string): Promi
  * Get all available environments
  */
 export async function getAllEnvironments(db: any): Promise<string[]> {
-  const environments = await db('g_environments')
-    .select('id')
-    .orderBy('displayOrder', 'asc');
+  const environments = await db('g_environments').select('id').orderBy('displayOrder', 'asc');
   return environments.map((e: any) => e.id);
 }
 

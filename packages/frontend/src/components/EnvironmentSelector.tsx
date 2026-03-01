@@ -336,7 +336,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
           );
         })}
         {canManageEnvironments && (
-          <>
+          <React.Fragment key="__manage__">
             <Divider sx={{ my: 0.5 }} />
             <MenuItem value="__manage__" onClick={handleManageClick}>
               <ListItemIcon sx={{ minWidth: 28 }}>
@@ -344,7 +344,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
               </ListItemIcon>
               <Typography variant="body2">{t('environments.manage')}</Typography>
             </MenuItem>
-          </>
+          </React.Fragment>
         )}
       </Select>
     </Box>

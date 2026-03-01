@@ -379,8 +379,6 @@ const ApiTokensPage: React.FC = () => {
     loadTokens();
   }, [page, rowsPerPage, sortBy, sortOrder, activeFilters, projectApiPath]);
 
-
-
   const loadTokens = async () => {
     try {
       setLoading(true);
@@ -393,13 +391,16 @@ const ApiTokensPage: React.FC = () => {
         }
       });
 
-      const response = await apiTokenService.getTokens({
-        page: page + 1,
-        limit: rowsPerPage,
-        sortBy,
-        sortOrder,
-        ...filterParams,
-      }, projectApiPath);
+      const response = await apiTokenService.getTokens(
+        {
+          page: page + 1,
+          limit: rowsPerPage,
+          sortBy,
+          sortOrder,
+          ...filterParams,
+        },
+        projectApiPath
+      );
       setTokens(response.data || []);
       setTotal(response.total || 0);
     } catch (error) {
@@ -591,9 +592,12 @@ const ApiTokensPage: React.FC = () => {
 
   const handleCreate = async () => {
     try {
-      const response = await apiTokenService.createToken({
-        ...formData,
-      }, projectApiPath);
+      const response = await apiTokenService.createToken(
+        {
+          ...formData,
+        },
+        projectApiPath
+      );
       console.log('Create token response:', response); // 디버깅용
 
       // 토큰 정보를 먼저 설정
@@ -641,13 +645,17 @@ const ApiTokensPage: React.FC = () => {
     if (!selectedToken) return;
 
     try {
-      await apiTokenService.updateToken(selectedToken.id as any, {
-        tokenName: formData.tokenName,
-        description: formData.description,
-        allowAllEnvironments: formData.allowAllEnvironments,
-        environments: formData.allowAllEnvironments ? [] : formData.environments,
-        expiresAt: formData.expiresAt,
-      }, projectApiPath);
+      await apiTokenService.updateToken(
+        selectedToken.id as any,
+        {
+          tokenName: formData.tokenName,
+          description: formData.description,
+          allowAllEnvironments: formData.allowAllEnvironments,
+          environments: formData.allowAllEnvironments ? [] : formData.environments,
+          expiresAt: formData.expiresAt,
+        },
+        projectApiPath
+      );
       await loadTokens();
       setEditDialogOpen(false);
       setSelectedToken(null);
@@ -692,7 +700,10 @@ const ApiTokensPage: React.FC = () => {
     if (!selectedToken) return;
 
     try {
-      const response = await apiTokenService.regenerateToken(selectedToken.id as any, projectApiPath);
+      const response = await apiTokenService.regenerateToken(
+        selectedToken.id as any,
+        projectApiPath
+      );
       console.log('Regenerate token response:', response); // 디버깅용
 
       // 백엔드 응답 구조 확인 및 토큰 값 추출
@@ -1127,7 +1138,11 @@ const ApiTokensPage: React.FC = () => {
                   </TableRow>
                 ) : (
                   filteredTokens.map((token) => (
-                    <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id as any)}>
+                    <TableRow
+                      key={token.id}
+                      hover
+                      selected={selectedTokenIds.includes(token.id as any)}
+                    >
                       {canManage && (
                         <TableCell padding="checkbox">
                           <Checkbox
@@ -2322,7 +2337,9 @@ const ApiTokensPage: React.FC = () => {
                     {t('apiTokens.tokenType')}
                   </Typography>
                   <Chip
-                    label={String(t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType))}
+                    label={String(
+                      t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)
+                    )}
                     color="primary"
                     size="small"
                   />

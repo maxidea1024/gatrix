@@ -42,7 +42,8 @@ class EntityLockService {
     try {
       const response = await api.post('/entity-locks/acquire', {
         table,
-        entityId: String(entityId), environmentId,
+        entityId: String(entityId),
+        environmentId,
       });
       // api.post returns response.data from axios, which is the actual API response
       // The response is { success: true, message: 'Lock acquired' }
@@ -74,7 +75,8 @@ class EntityLockService {
     try {
       const response = await api.post('/entity-locks/force-acquire', {
         table,
-        entityId: String(entityId), environmentId,
+        entityId: String(entityId),
+        environmentId,
       });
       return (response as any).success;
     } catch (error) {
@@ -94,7 +96,8 @@ class EntityLockService {
     try {
       const response = await api.post('/entity-locks/release', {
         table,
-        entityId: String(entityId), environmentId,
+        entityId: String(entityId),
+        environmentId,
       });
       return (response as any).success;
     } catch (error) {
@@ -114,7 +117,8 @@ class EntityLockService {
     try {
       const response = await api.post('/entity-locks/extend', {
         table,
-        entityId: String(entityId), environmentId,
+        entityId: String(entityId),
+        environmentId,
       });
       return (response as any).success;
     } catch (error) {
@@ -135,7 +139,8 @@ class EntityLockService {
       const response = await api.get('/entity-locks/check', {
         params: {
           table,
-          entityId: String(entityId), environmentId,
+          entityId: String(entityId),
+          environmentId,
         },
       });
       return response as any as LockCheckResult;

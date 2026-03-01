@@ -232,9 +232,7 @@ export class SurveyService {
   async getById(id: string, environment: string): Promise<Survey> {
     this.logger.debug('Fetching survey by ID', { id, environment });
 
-    const response = await this.apiClient.get<{ survey: Survey }>(
-      `/api/v1/server/surveys/${id}`
-    );
+    const response = await this.apiClient.get<{ survey: Survey }>(`/api/v1/server/surveys/${id}`);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch survey');

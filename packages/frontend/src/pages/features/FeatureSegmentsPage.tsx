@@ -412,7 +412,10 @@ const FeatureSegmentsPage: React.FC = () => {
           variant: 'success',
         });
       } else {
-        await api.post('/admin/features/segments', { ...editingSegment, projectId: currentProjectId });
+        await api.post('/admin/features/segments', {
+          ...editingSegment,
+          projectId: currentProjectId,
+        });
         enqueueSnackbar(t('featureFlags.createSuccess'), {
           variant: 'success',
         });
@@ -469,8 +472,7 @@ const FeatureSegmentsPage: React.FC = () => {
       const errorCode = extractErrorCode(error?.response?.data);
       if (errorCode === 'RESOURCE_IN_USE') {
         const payload =
-          error?.response?.data?.error?.details?.payload ||
-          error?.response?.data?.error?.payload;
+          error?.response?.data?.error?.details?.payload || error?.response?.data?.error?.payload;
         setReferences(payload?.references || null);
         setReferenceDialogMode('delete');
         setReferenceDialogOpen(true);

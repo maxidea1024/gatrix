@@ -372,7 +372,8 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 }}
               >
                 {environments.map((env) => {
-                  const isSelected = allowAllEnvs || selectedEnvironments.includes(env.environmentId);
+                  const isSelected =
+                    allowAllEnvs || selectedEnvironments.includes(env.environmentId);
                   const displayName = env.displayName || env.environmentName || env.name;
                   return (
                     <Tooltip

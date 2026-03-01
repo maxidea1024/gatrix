@@ -10,34 +10,34 @@ import { Strategy } from './Strategy';
 import { normalizedStrategyValue } from './util';
 
 export class GradualRolloutSessionIdStrategy extends Strategy {
-    constructor() {
-        super('gradualRolloutSessionId');
+  constructor() {
+    super('gradualRolloutSessionId');
+  }
+
+  isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean {
+    return this.isEnabledWithDetails(parameters, context).enabled;
+  }
+
+  isEnabledWithDetails(
+    parameters: StrategyParameters,
+    context: EvaluationContext
+  ): StrategyEvaluationResult {
+    const { sessionId } = context;
+    if (!sessionId) {
+      return { enabled: false, reason: 'No sessionId in context' };
     }
 
-    isEnabled(parameters: StrategyParameters, context: EvaluationContext): boolean {
-        return this.isEnabledWithDetails(parameters, context).enabled;
-    }
+    const percentage = Number(parameters.percentage ?? 0);
+    const groupId = parameters.groupId || '';
+    const normalizedValue = normalizedStrategyValue(sessionId, groupId);
+    const enabled = percentage > 0 && normalizedValue <= percentage;
 
-    isEnabledWithDetails(
-        parameters: StrategyParameters,
-        context: EvaluationContext
-    ): StrategyEvaluationResult {
-        const { sessionId } = context;
-        if (!sessionId) {
-            return { enabled: false, reason: 'No sessionId in context' };
-        }
-
-        const percentage = Number(parameters.percentage ?? 0);
-        const groupId = parameters.groupId || '';
-        const normalizedValue = normalizedStrategyValue(sessionId, groupId);
-        const enabled = percentage > 0 && normalizedValue <= percentage;
-
-        return {
-            enabled,
-            reason: enabled
-                ? `Percentage ${percentage}%: normalized(sessionId="${sessionId}") = ${normalizedValue} <= ${percentage}`
-                : `Percentage ${percentage}%: normalized(sessionId="${sessionId}") = ${normalizedValue} > ${percentage}`,
-            details: { sessionId, percentage, groupId, normalizedValue },
-        };
-    }
+    return {
+      enabled,
+      reason: enabled
+        ? `Percentage ${percentage}%: normalized(sessionId="${sessionId}") = ${normalizedValue} <= ${percentage}`
+        : `Percentage ${percentage}%: normalized(sessionId="${sessionId}") = ${normalizedValue} > ${percentage}`,
+      details: { sessionId, percentage, groupId, normalizedValue },
+    };
+  }
 }

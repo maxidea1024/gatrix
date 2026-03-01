@@ -38,18 +38,20 @@ class SDKManager {
       if (envResponse.data?.success && envResponse.data?.data?.environments) {
         const envList = envResponse.data.data.environments;
         // Find environment by name match
-        const matched = envList.find(
-          (e: any) => e.name === config.environment
-        );
+        const matched = envList.find((e: any) => e.name === config.environment);
         if (matched) {
           resolvedEnvironmentId = matched.environmentId;
-          logger.info(`Resolved environment '${config.environment}' -> ID: ${resolvedEnvironmentId}`);
+          logger.info(
+            `Resolved environment '${config.environment}' -> ID: ${resolvedEnvironmentId}`
+          );
         } else {
           logger.warn(`Environment '${config.environment}' not found in backend, using as-is`);
         }
       }
     } catch (error: any) {
-      logger.warn(`Failed to resolve environment from backend: ${error.message}, using '${config.environment}' as-is`);
+      logger.warn(
+        `Failed to resolve environment from backend: ${error.message}, using '${config.environment}' as-is`
+      );
     }
 
     const sdkConfig: GatrixSDKConfig = {

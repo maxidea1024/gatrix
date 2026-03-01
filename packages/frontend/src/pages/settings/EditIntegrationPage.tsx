@@ -466,7 +466,10 @@ export const EditIntegrationPage: React.FC = () => {
   const [tabValue, setTabValue] = useState(parseInt(searchParams.get('tab') || '0', 10));
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
   const { environments: envList } = useEnvironments();
-  const environments = envList.map((e) => ({ environmentId: e.environmentId, displayName: e.displayName }));
+  const environments = envList.map((e) => ({
+    environmentId: e.environmentId,
+    displayName: e.displayName,
+  }));
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [description, setDescription] = useState('');
   const [isEnabled, setIsEnabled] = useState(true);
@@ -545,7 +548,6 @@ export const EditIntegrationPage: React.FC = () => {
       setLoading(false);
     }
   };
-
 
   const fetchEventLogs = async (isRefresh = false) => {
     try {

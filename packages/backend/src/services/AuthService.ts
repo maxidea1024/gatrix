@@ -75,11 +75,7 @@ export class AuthService {
         logger.warn('Failed to lookup org membership during login:', err);
       }
 
-      const accessToken = JwtUtils.generateToken(
-        userWithoutPassword as any,
-        orgId,
-        orgRole
-      );
+      const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId, orgRole);
       const refreshToken = JwtUtils.generateRefreshToken(
         userWithoutPassword as any,
         orgId,

@@ -16,7 +16,8 @@ export function useReleaseFlowTemplates(search?: string) {
  * Hook for a specific release flow plan for a flag and environment
  */
 export function useReleaseFlowPlan(flagId: string | null, environmentId: string | null) {
-  const url = flagId && environmentId ? `/admin/release-flows/plans/${flagId}/${ environmentId }` : null;
+  const url =
+    flagId && environmentId ? `/admin/release-flows/plans/${flagId}/${environmentId}` : null;
 
   return useApi<ReleaseFlowPlan>(url);
 }
@@ -29,7 +30,8 @@ export function useConditionalReleaseFlowPlan(
   environmentId: string | null,
   condition: boolean
 ) {
-  const url = flagId && environmentId ? `/admin/release-flows/plans/${flagId}/${ environmentId }` : null;
+  const url =
+    flagId && environmentId ? `/admin/release-flows/plans/${flagId}/${environmentId}` : null;
 
   return useConditionalApi<ReleaseFlowPlan>(url, condition);
 }

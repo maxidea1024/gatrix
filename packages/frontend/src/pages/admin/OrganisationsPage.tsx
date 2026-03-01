@@ -27,11 +27,7 @@ import {
   ListItemText,
   ListItemSecondaryAction,
 } from '@mui/material';
-import {
-  Edit as EditIcon,
-  Business as OrgIcon,
-  People as PeopleIcon,
-} from '@mui/icons-material';
+import { Edit as EditIcon, Business as OrgIcon, People as PeopleIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
@@ -185,12 +181,16 @@ const OrganisationsPage: React.FC = () => {
                       <Chip label={t('common.inactive')} size="small" variant="outlined" />
                     )}
                   </TableCell>
-                  <TableCell>
-                    {dayjs(org.createdAt).format('YYYY-MM-DD HH:mm')}
-                  </TableCell>
+                  <TableCell>{dayjs(org.createdAt).format('YYYY-MM-DD HH:mm')}</TableCell>
                   <TableCell align="right">
                     <Tooltip title={t('common.edit')}>
-                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleEdit(org); }}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(org);
+                        }}
+                      >
                         <EditIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -203,7 +203,12 @@ const OrganisationsPage: React.FC = () => {
       )}
 
       {/* Edit Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>{t('rbac.orgs.editTitle')}</DialogTitle>
         <DialogContent>
           <TextField

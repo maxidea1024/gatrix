@@ -108,7 +108,9 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
     if (existingIndex >= 0) {
       // Update existing var's value
       const updatedItems = items.map((item) =>
-        item.varKey === key ? { ...item, varValue: value, updatedAt: new Date().toISOString() } : item
+        item.varKey === key
+          ? { ...item, varValue: value, updatedAt: new Date().toISOString() }
+          : item
       );
       this.updateCache(updatedItems, environment);
     } else {

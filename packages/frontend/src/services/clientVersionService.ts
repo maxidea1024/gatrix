@@ -86,9 +86,7 @@ export class ClientVersionService {
       }
     });
 
-    const response = await apiService.get<any>(
-      `${this.BASE_URL}?${params}`
-    );
+    const response = await apiService.get<any>(`${this.BASE_URL}?${params}`);
 
     // ApiService.request() already returns response.data
     // response is the { success: true, data: {...} } structure sent from backend
@@ -194,10 +192,7 @@ export class ClientVersionService {
    * Quick create client version
    */
   static async bulkCreateClientVersions(data: BulkCreateFormData): Promise<ClientVersion[]> {
-    const response = await apiService.post<any>(
-      `${this.BASE_URL}/bulk`,
-      data
-    );
+    const response = await apiService.post<any>(`${this.BASE_URL}/bulk`, data);
 
     // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
@@ -220,10 +215,7 @@ export class ClientVersionService {
     id: number,
     data: Partial<ClientVersionFormData>
   ): Promise<ClientVersionMutationResult> {
-    const response: any = await apiService.put<any>(
-      `${this.BASE_URL}/${id}`,
-      data
-    );
+    const response: any = await apiService.put<any>(`${this.BASE_URL}/${id}`, data);
 
     // Check if this is a change request response
     // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
@@ -269,10 +261,7 @@ export class ClientVersionService {
   static async bulkUpdateStatus(
     data: BulkStatusUpdateRequest
   ): Promise<{ updatedCount: number; message: string }> {
-    const response = await apiService.patch<any>(
-      `${this.BASE_URL}/bulk-status`,
-      data
-    );
+    const response = await apiService.patch<any>(`${this.BASE_URL}/bulk-status`, data);
 
     console.log('🔍 Bulk update response:', response);
 
@@ -290,9 +279,7 @@ export class ClientVersionService {
    */
   static async getPlatforms(): Promise<string[]> {
     try {
-      const response = await apiService.get<any>(
-        `${this.BASE_URL}/meta/platforms`
-      );
+      const response = await apiService.get<any>(`${this.BASE_URL}/meta/platforms`);
       return response?.data || [];
     } catch (error) {
       console.error('Error fetching platforms:', error);

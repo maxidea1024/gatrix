@@ -92,7 +92,9 @@ const GroupsPage: React.FC = () => {
 
   // Selected group
   const [selectedGroup, setSelectedGroup] = useState<GroupDetail | null>(null);
-  const [selectedGroupForDelete, setSelectedGroupForDelete] = useState<GroupWithCounts | null>(null);
+  const [selectedGroupForDelete, setSelectedGroupForDelete] = useState<GroupWithCounts | null>(
+    null
+  );
 
   // Form
   const [formData, setFormData] = useState({
@@ -323,24 +325,18 @@ const GroupsPage: React.FC = () => {
 
   // Available members (not already in group)
   const availableUsers = selectedGroup
-    ? allUsers.filter(
-        (u) => !selectedGroup.members.some((m) => m.userId === u.id)
-      )
+    ? allUsers.filter((u) => !selectedGroup.members.some((m) => m.userId === u.id))
     : allUsers;
 
   // Available roles (not already assigned)
   const availableRoles = selectedGroup
-    ? allRoles.filter(
-        (r) => !selectedGroup.roles.some((gr) => gr.roleId === r.id)
-      )
+    ? allRoles.filter((r) => !selectedGroup.roles.some((gr) => gr.roleId === r.id))
     : allRoles;
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 600 }}>
             {t('rbac.groups.title')}
@@ -610,10 +606,7 @@ const GroupsPage: React.FC = () => {
               <List dense>
                 {selectedGroup?.members.map((member) => (
                   <ListItem key={member.userId} divider>
-                    <ListItemText
-                      primary={member.name || member.userId}
-                      secondary={member.email}
-                    />
+                    <ListItemText primary={member.name || member.userId} secondary={member.email} />
                     <ListItemSecondaryAction>
                       <Tooltip title={t('rbac.groups.removeMember')}>
                         <IconButton

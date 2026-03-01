@@ -1747,8 +1747,7 @@ export class FeaturesClient implements VariationProvider {
     this.streamingAbortController = new AbortController();
 
     const streamUrl =
-      this.featuresConfig.streaming?.sse?.url ??
-      `${this.config.apiUrl}/client/features/stream/sse`;
+      this.featuresConfig.streaming?.sse?.url ?? `${this.config.apiUrl}/client/features/stream/sse`;
 
     const headers = this.buildHeaders();
 

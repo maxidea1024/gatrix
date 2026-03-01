@@ -5,7 +5,11 @@
 export { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
 export { VALUE_SOURCE } from './valueSource';
 export { EvaluationUtils, truncateToMinute, buildContextQueryParams } from './EvaluationUtils';
-export { getStrategy, evaluateStrategyIsEnabled, evaluateStrategyWithDetails } from './strategies/index';
+export {
+  getStrategy,
+  evaluateStrategyIsEnabled,
+  evaluateStrategyWithDetails,
+} from './strategies/index';
 export type { ValueSourceName } from './valueSource';
 export type {
   FeatureFlag,

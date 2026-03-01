@@ -178,11 +178,7 @@ export const rbacService = {
 
   // ─── Group Members ─────────────────────────
 
-  async addGroupMember(
-    groupId: string,
-    userId: string,
-    isGroupAdmin?: boolean
-  ): Promise<void> {
+  async addGroupMember(groupId: string, userId: string, isGroupAdmin?: boolean): Promise<void> {
     await api.post(`${BASE}/groups/${groupId}/members`, {
       userId,
       isGroupAdmin: isGroupAdmin || false,
