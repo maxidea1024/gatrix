@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Typography,
@@ -54,6 +55,8 @@ const FeatureFlagTypesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
 
   // State
@@ -67,7 +70,7 @@ const FeatureFlagTypesPage: React.FC = () => {
   const loadTypes = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get('/admin/features/types');
+      const response = await api.get(`${projectApiPath}/features/types`);
       setTypes(response.data?.types || []);
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, t('common.loadFailed')), {
@@ -94,7 +97,7 @@ const FeatureFlagTypesPage: React.FC = () => {
 
     setSaving(true);
     try {
-      await api.put(`/admin/features/types/${editingType.flagType}`, {
+      await api.put(`${projectApiPath}/features/types/${editingType.flagType}`, {
         lifetimeDays: editingType.lifetimeDays,
       });
       enqueueSnackbar(t('common.saveSuccess'), { variant: 'success' });

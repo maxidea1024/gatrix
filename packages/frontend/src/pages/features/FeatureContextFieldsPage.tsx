@@ -203,6 +203,8 @@ const FeatureContextFieldsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
   const { currentProjectId } = useOrgProject();
 
@@ -265,7 +267,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   const loadFields = async () => {
     setLoading(true);
     try {
-      const result = await api.get('/admin/features/context-fields', {
+      const result = await api.get(`${projectApiPath}/features/context-fields`, {
         params: {
           search: debouncedSearchTerm || undefined,
           projectId: currentProjectId || undefined,
@@ -521,12 +523,12 @@ const FeatureContextFieldsPage: React.FC = () => {
     if (!editingField) return;
     try {
       if (editingField.id) {
-        await api.put(`/admin/features/context-fields/${editingField.fieldName}`, editingField);
+        await api.put(`${projectApiPath}/features/context-fields/${editingField.fieldName}`, editingField);
         enqueueSnackbar(t('contextFields.updateSuccess'), {
           variant: 'success',
         });
       } else {
-        await api.post('/admin/features/context-fields', {
+        await api.post(`${projectApiPath}/features/context-fields`, {
           ...editingField,
           projectId: currentProjectId,
         });
@@ -547,7 +549,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   const handleDelete = async (field: FeatureContextField) => {
     setDeletingField(field);
     try {
-      const result = await api.get(`/admin/features/context-fields/${field.fieldName}/references`);
+      const result = await api.get(`${projectApiPath}/features/context-fields/${field.fieldName}/references`);
       const refs = result.data?.references;
       if (
         refs &&
@@ -567,7 +569,7 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   const handleViewReferences = async (field: FeatureContextField) => {
     try {
-      const result = await api.get(`/admin/features/context-fields/${field.fieldName}/references`);
+      const result = await api.get(`${projectApiPath}/features/context-fields/${field.fieldName}/references`);
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);
@@ -582,7 +584,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingField) return;
     try {
-      await api.delete(`/admin/features/context-fields/${deletingField.fieldName}`);
+      await api.delete(`${projectApiPath}/features/context-fields/${deletingField.fieldName}`);
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       loadFields();
     } catch (error: any) {
@@ -810,7 +812,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                                       );
                                       try {
                                         await api.put(
-                                          `/admin/features/context-fields/${field.fieldName}`,
+                                          `${projectApiPath}/features/context-fields/${field.fieldName}`,
                                           { isEnabled: newEnabled }
                                         );
                                       } catch (error: any) {

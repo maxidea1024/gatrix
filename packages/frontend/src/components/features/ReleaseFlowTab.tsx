@@ -61,6 +61,7 @@ import SafeguardPanel from './SafeguardPanel';
 import StrategyListReadonly from './StrategyListReadonly';
 import { ContextFieldInfo } from './ConstraintDisplay';
 import { ReleaseFlowTemplate } from '../../services/releaseFlowService';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import ConfirmDialog from '../common/ConfirmDialog';
 
 interface ReleaseFlowTabProps {
@@ -148,6 +149,8 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [selectedEnv, setSelectedEnv] = useState<string>(
     environments.length > 0 ? environments[0].environmentId : ''
   );
@@ -203,7 +206,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         if (!envEnabled && plan.status === 'active') {
           // Environment disabled -> auto-pause
           try {
-            await pausePlan(plan.id);
+            await pausePlan(plan.id, projectApiPath);
             enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
             mutatePlan();
             if (onPlanChange) onPlanChange();
@@ -213,7 +216,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         } else if (envEnabled && plan.status === 'paused') {
           // Environment re-enabled -> auto-resume
           try {
-            await resumePlan(plan.id);
+            await resumePlan(plan.id, projectApiPath);
             enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
             mutatePlan();
             if (onPlanChange) onPlanChange();
@@ -223,7 +226,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         } else if (envEnabled && plan.status === 'draft') {
           // Environment enabled with draft plan -> auto-start
           try {
-            await startPlan(plan.id);
+            await startPlan(plan.id, projectApiPath);
             enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
             mutatePlan();
             if (onPlanChange) onPlanChange();
@@ -263,9 +266,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       setApplying(true);
       // If a plan already exists, archive it first before applying a new template
       if (plan) {
-        await deletePlan(plan.id);
+        await deletePlan(plan.id, projectApiPath);
       }
-      const newPlan = await applyTemplate({ flagId, environmentId: selectedEnv, templateId });
+      const newPlan = await applyTemplate({ flagId, environmentId: selectedEnv, templateId }, projectApiPath);
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
 
       // Auto-start the plan if the environment is already enabled
@@ -273,7 +276,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       // when a new plan is applied while the environment is already active)
       if (envEnabled && newPlan?.id && canManage) {
         try {
-          await startPlan(newPlan.id);
+          await startPlan(newPlan.id, projectApiPath);
           enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
         } catch (startError) {
           // Plan was applied successfully but auto-start failed — not critical
@@ -295,7 +298,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan) return;
     try {
       setActionLoadingType('delete');
-      await deletePlan(plan.id);
+      await deletePlan(plan.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), { variant: 'success' });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
@@ -317,11 +320,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan || !targetMilestoneId) return;
     try {
       setActionLoadingType('jump');
-      await startMilestone(plan.id, targetMilestoneId);
+      await startMilestone(plan.id, targetMilestoneId, projectApiPath);
 
       // If environment is disabled, immediately pause so it doesn't run
       if (!envEnabled) {
-        await pausePlan(plan.id);
+        await pausePlan(plan.id, projectApiPath);
       }
 
       enqueueSnackbar(t('releaseFlow.milestoneStartSuccess'), { variant: 'success' });
@@ -340,7 +343,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan) return;
     try {
       setActionLoadingType('pause');
-      await pausePlan(plan.id);
+      await pausePlan(plan.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'success' });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
@@ -355,7 +358,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan || !envEnabled) return;
     try {
       setActionLoadingType('resume');
-      await resumePlan(plan.id);
+      await resumePlan(plan.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'success' });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
@@ -388,7 +391,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     try {
       setTransitionSaving(true);
       const totalMinutes = toMinutes(transitionValue, transitionUnit);
-      await setTransitionCondition(editingTransitionId, totalMinutes);
+      await setTransitionCondition(editingTransitionId, totalMinutes, projectApiPath);
       await mutatePlan();
       if (onPlanChange) onPlanChange();
       setEditingTransitionId(null);
@@ -403,7 +406,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     async (milestoneId: string) => {
       try {
         setTransitionSaving(true);
-        await removeTransitionCondition(milestoneId);
+        await removeTransitionCondition(milestoneId, projectApiPath);
         await mutatePlan();
         if (onPlanChange) onPlanChange();
         setEditingTransitionId(null);
@@ -770,10 +773,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
-                    {
-                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                    };
+                  {
+                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                  };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -975,9 +978,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.015)'
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1229,9 +1232,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                              borderColor: 'primary.main',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            }
+                            borderColor: 'primary.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          }
                           : {},
                     }}
                   >

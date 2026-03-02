@@ -42,6 +42,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import { unknownFlagService, UnknownFlag } from '../../services/unknownFlagService';
 import RelativeTime from '../../components/common/RelativeTime';
 import DynamicFilterBar, {
@@ -57,6 +58,8 @@ const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { currentEnvironmentId } = useEnvironment();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [flags, setFlags] = useState<UnknownFlag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +151,7 @@ const UnknownFlagsPage: React.FC = () => {
       const result = await unknownFlagService.getUnknownFlags({
         includeResolved,
         environmentId: currentEnvironmentId || undefined,
-      });
+      }, projectApiPath);
       setFlags(result.flags);
     } catch {
       enqueueSnackbar(String(t('common.loadError')), { variant: 'error' });
@@ -252,15 +255,15 @@ const UnknownFlagsPage: React.FC = () => {
     try {
       switch (confirmDialog.type) {
         case 'resolve':
-          await unknownFlagService.resolveUnknownFlag(confirmDialog.flag.id);
+          await unknownFlagService.resolveUnknownFlag(confirmDialog.flag.id, projectApiPath);
           enqueueSnackbar(t('featureFlags.resolvedSuccessfully'), { variant: 'success' });
           break;
         case 'unresolve':
-          await unknownFlagService.unresolveUnknownFlag(confirmDialog.flag.id);
+          await unknownFlagService.unresolveUnknownFlag(confirmDialog.flag.id, projectApiPath);
           enqueueSnackbar(t('featureFlags.unresolvedSuccessfully'), { variant: 'success' });
           break;
         case 'delete':
-          await unknownFlagService.deleteUnknownFlag(confirmDialog.flag.id);
+          await unknownFlagService.deleteUnknownFlag(confirmDialog.flag.id, projectApiPath);
           enqueueSnackbar(t('common.deleted'), { variant: 'success' });
           break;
       }

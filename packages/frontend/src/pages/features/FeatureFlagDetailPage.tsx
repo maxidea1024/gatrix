@@ -9,6 +9,7 @@
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Card,
@@ -393,6 +394,8 @@ const FeatureFlagDetailPage: React.FC = () => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { currentEnvironmentId: selectedEnvironment } = useEnvironment();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
 
@@ -526,7 +529,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   useEffect(() => {
     if (flagName) {
       api
-        .get(`/admin/features/${flagName}/code-references`)
+        .get(`${projectApiPath}/features/${flagName}/code-references`)
         .then((response) => {
           if (response.success && response.data?.references) {
             setCodeReferenceCount(response.data.references.length);
@@ -603,7 +606,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       if (isCreating || !name) return;
       try {
         if (showLoading) setLoading(true);
-        const response = await api.get(`/admin/features/${name}`);
+        const response = await api.get(`${projectApiPath}/features/${name}`);
         // Backend returns { success: true, data: { flag } }
         // api.request() returns response.data, so we get { flag }
         const data = response.data?.flag || response.data;
@@ -631,7 +634,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   const loadContextFields = useCallback(async () => {
     try {
-      const response = await api.get('/admin/features/context-fields');
+      const response = await api.get(`${projectApiPath}/features/context-fields`);
       // API returns { success: true, data: { contextFields } }
       const fields = response.data?.contextFields || response.data?.data?.contextFields || [];
 
@@ -664,7 +667,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   const loadSegments = useCallback(async () => {
     try {
-      const response = await api.get('/admin/features/segments');
+      const response = await api.get(`${projectApiPath}/features/segments`);
       // API returns { success: true, data: { segments } }
       const segmentsData = response.data?.segments || response.data?.data?.segments || [];
       setSegments(segmentsData);
@@ -711,7 +714,7 @@ const FeatureFlagDetailPage: React.FC = () => {
       try {
         const response = await api.get<{
           metrics: Array<{ yesCount: number; noCount: number }>;
-        }>(`/admin/features/${targetFlagName}/metrics`, {
+        }>(`${projectApiPath}/features/${targetFlagName}/metrics`, {
           params: {
             startDate: startDate.toISOString(),
             endDate: endDate.toISOString(),
@@ -746,7 +749,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     const variantsMap: Record<string, Variant[]> = {};
     for (const env of envList) {
       try {
-        const response = await api.get(`/admin/features/${targetFlagName}`, {
+        const response = await api.get(`${projectApiPath}/features/${targetFlagName}`, {
           headers: { 'x-environment': env.environmentId },
         });
         const data = response.data?.flag || response.data;
@@ -893,7 +896,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     }
 
     try {
-      await api.post(`/admin/features/${flag.flagName}/toggle`, {
+      await api.post(`${projectApiPath}/features/${flag.flagName}/toggle`, {
         isEnabled: !flag.isEnabled,
       });
       setFlag({ ...flag, isEnabled: !flag.isEnabled });
@@ -928,7 +931,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     setFlag({ ...flag, environments: updatedEnvironments });
 
     try {
-      await api.post(`/admin/features/${flag.flagName}/toggle`, {
+      await api.post(`${projectApiPath}/features/${flag.flagName}/toggle`, {
         isEnabled: !currentEnabled,
         environmentId: envKey,
       });
@@ -955,13 +958,13 @@ const FeatureFlagDetailPage: React.FC = () => {
     setSaving(true);
     try {
       if (isCreating) {
-        await api.post('/admin/features', flag);
+        await api.post(`${projectApiPath}/features`, flag);
         enqueueSnackbar(t('featureFlags.createSuccess'), {
           variant: 'success',
         });
         navigate('/feature-flags');
       } else {
-        await api.put(`/admin/features/${flag.flagName}`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
           displayName: flag.displayName,
           description: flag.description,
           impressionDataEnabled: flag.impressionDataEnabled,
@@ -990,7 +993,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (!flag || !canManage) return;
     try {
       const endpoint = flag.isArchived ? 'revive' : 'archive';
-      await api.post(`/admin/features/${flag.flagName}/${endpoint}`);
+      await api.post(`${projectApiPath}/features/${flag.flagName}/${endpoint}`);
       setFlag({ ...flag, isArchived: !flag.isArchived });
       enqueueSnackbar(t(`featureFlags.${!flag.isArchived ? 'archived' : 'revived'}`), {
         variant: 'success',
@@ -1011,7 +1014,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     if (!flag || !canManage) return;
     try {
       const endpoint = flag.stale ? 'unmark-stale' : 'mark-stale';
-      await api.post(`/admin/features/${flag.flagName}/${endpoint}`);
+      await api.post(`${projectApiPath}/features/${flag.flagName}/${endpoint}`);
       setFlag({ ...flag, stale: !flag.stale });
       enqueueSnackbar(t(`featureFlags.${!flag.stale ? 'markedAsStale' : 'unmarkedAsStale'}`), {
         variant: 'success',
@@ -1026,7 +1029,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const handleDelete = async () => {
     if (!flag || !canManage) return;
     try {
-      await api.delete(`/admin/features/${flag.flagName}`);
+      await api.delete(`${projectApiPath}/features/${flag.flagName}`);
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       navigate('/feature-flags');
     } catch (error: any) {
@@ -1065,7 +1068,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`/admin/features/${flag.flagName}`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
           links: updatedLinks,
         });
       }
@@ -1086,7 +1089,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`/admin/features/${flag.flagName}`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
           links: updatedLinks,
         });
       }
@@ -1239,7 +1242,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         }));
         // Save strategies to the environment
         await api.put(
-          `/admin/features/${flag.flagName}/strategies`,
+          `${projectApiPath}/features/${flag.flagName}/strategies`,
           { strategies: apiStrategies },
           {
             headers: { 'x-environment': editingEnv },
@@ -1247,7 +1250,7 @@ const FeatureFlagDetailPage: React.FC = () => {
         );
         // Save global properties (only valueType, NOT enabledValue/disabledValue
         // which would overwrite environment-specific overrides)
-        await api.put(`/admin/features/${flag.flagName}`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
           valueType: flag.valueType,
           isGlobal: true,
         });
@@ -1296,7 +1299,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           isEnabled: !s.disabled,
         }));
         await api.put(
-          `/admin/features/${flag.flagName}/strategies`,
+          `${projectApiPath}/features/${flag.flagName}/strategies`,
           { strategies: apiStrategies },
           {
             headers: { 'x-environment': envName },
@@ -1334,7 +1337,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           stickiness: v.stickiness || 'default',
         }));
         await api.put(
-          `/admin/features/${flag.flagName}/variants`,
+          `${projectApiPath}/features/${flag.flagName}/variants`,
           { variants: apiVariants },
           {
             headers: { 'x-environment': envName },
@@ -1365,7 +1368,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`/admin/features/${flag.flagName}`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
           useFixedWeightVariants: value,
           isGlobal: true,
         });
@@ -1394,7 +1397,7 @@ const FeatureFlagDetailPage: React.FC = () => {
     try {
       // Update flag with environment-specific enabledValue/disabledValue and override flags
       await api.put(
-        `/admin/features/${flag.flagName}`,
+        `${projectApiPath}/features/${flag.flagName}`,
         {
           enabledValue,
           disabledValue,
@@ -1472,7 +1475,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           isEnabled: !s.disabled,
         }));
         await api.put(
-          `/admin/features/${flag.flagName}/strategies`,
+          `${projectApiPath}/features/${flag.flagName}/strategies`,
           { strategies: apiStrategies },
           {
             headers: { 'x-environment': envName },
@@ -1617,7 +1620,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`/admin/features/${flag.flagName}/variants`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}/variants`, {
           variants: updatedVariants.map((v) => ({
             variantName: v.name,
             weight: v.weight,
@@ -1645,7 +1648,7 @@ const FeatureFlagDetailPage: React.FC = () => {
 
     try {
       if (!isCreating) {
-        await api.put(`/admin/features/${flag.flagName}/variants`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}/variants`, {
           variants: updatedVariants,
         });
       }
@@ -3129,7 +3132,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     if (!flag) return;
                     try {
                       setSaving(true);
-                      await api.put(`/admin/features/${flag.flagName}`, {
+                      await api.put(`${projectApiPath}/features/${flag.flagName}`, {
                         enabledValue: flag.enabledValue,
                         disabledValue: flag.disabledValue,
                         validationRules: flag.validationRules ?? null,
@@ -3406,7 +3409,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   if (!flag || !editingFlagData) return;
                   try {
                     setSaving(true);
-                    await api.put(`/admin/features/${flag.flagName}`, {
+                    await api.put(`${projectApiPath}/features/${flag.flagName}`, {
                       displayName: editingFlagData.displayName,
                       description: editingFlagData.description,
                       impressionDataEnabled: editingFlagData.impressionDataEnabled,

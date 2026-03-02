@@ -348,7 +348,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   const loadContextFields = async () => {
     try {
-      const response = await api.get('/admin/features/context-fields');
+      const response = await api.get(`${projectApiPath}/features/context-fields`);
       setContextFields(response.data?.contextFields || []);
     } catch {
       setContextFields([]);
@@ -357,7 +357,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   const loadAvailableFlags = async () => {
     try {
-      const response = await api.get('/admin/features', {
+      const response = await api.get(`${projectApiPath}/features`, {
         params: { page: 1, limit: 1000, isArchived: false },
       });
       const flags = response.data?.data || [];
@@ -555,7 +555,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       for (const flagName of flagNames) {
         for (const env of envsToCheck) {
           try {
-            const response = await api.get(`/admin/features/${flagName}`, {
+            const response = await api.get(`${projectApiPath}/features/${flagName}`, {
               headers: { 'x-environment': env.environmentId },
             });
             const data = response.data?.flag || response.data;
@@ -601,7 +601,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     // Fetch segment constraints if any segments are used
     if (segmentNames.size > 0) {
       try {
-        const response = await api.get('/admin/features/segments');
+        const response = await api.get(`${projectApiPath}/features/segments`);
         const segments = response.data?.segments || response.data?.data?.segments || [];
         for (const segment of segments) {
           if (segmentNames.has(segment.name) && segment.constraints) {
@@ -750,7 +750,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         requestBody.flagNames = selectedFlags;
       }
 
-      const response = await api.post('/admin/features/playground', requestBody);
+      const response = await api.post(`${projectApiPath}/features/playground`, requestBody);
 
       setResults(response.data?.results || {});
       setContextWarnings(response.data?.contextWarnings || []);

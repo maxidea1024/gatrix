@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Paper,
@@ -229,7 +230,7 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         params.groupBy = config.groupBy;
       }
 
-      const response = await api.get<TimeSeriesResponse>('/admin/impact-metrics', { params });
+      const response = await api.get<TimeSeriesResponse>(`${projectApiPath}/impact-metrics`, { params });
       setSeriesData(response.data);
       hasLoadedRef.current = true;
     } catch (err: any) {
@@ -676,7 +677,7 @@ const ChartConfigDialog: React.FC<{
     const timer = setTimeout(async () => {
       setLoadingLabels(true);
       try {
-        const response = await api.get<string[]>('/admin/impact-metrics/labels', {
+        const response = await api.get<string[]>(`${projectApiPath}/impact-metrics/labels`, {
           params: { metric: metricName },
         });
         setAvailableLabels(response.data || []);
@@ -840,6 +841,8 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   hideTitle = false,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -988,8 +991,8 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     setLoading(true);
     try {
       const url = flagId
-        ? `/admin/impact-metrics/configs/${flagId}`
-        : '/admin/impact-metrics/configs/all';
+        ? `${projectApiPath}/impact-metrics/configs/${flagId}`
+        : `${projectApiPath}/impact-metrics/configs/all`;
       const response = await api.get<MetricConfig[]>(url);
       setConfigs(response.data || []);
     } catch (err) {
@@ -1015,7 +1018,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
       }
       layoutSaveTimerRef.current = setTimeout(async () => {
         try {
-          await api.put('/admin/impact-metrics/configs/layouts', {
+          await api.put(`${projectApiPath}/impact-metrics/configs/layouts`, {
             layouts: newLayout.map((l) => ({
               id: l.i,
               x: l.x,
@@ -1087,7 +1090,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     if (availableMetrics.length === 0) {
       setLoadingMetrics(true);
       try {
-        const response = await api.get<AvailableMetric[]>('/admin/impact-metrics/available');
+        const response = await api.get<AvailableMetric[]>(`${projectApiPath}/impact-metrics/available`);
         setAvailableMetrics(response.data || []);
       } catch (err) {
         console.error('Failed to fetch available metrics:', err);
@@ -1103,7 +1106,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     if (availableMetrics.length === 0) {
       setLoadingMetrics(true);
       try {
-        const response = await api.get<AvailableMetric[]>('/admin/impact-metrics/available');
+        const response = await api.get<AvailableMetric[]>(`${projectApiPath}/impact-metrics/available`);
         setAvailableMetrics(response.data || []);
       } catch (err) {
         console.error('Failed to fetch available metrics:', err);
@@ -1122,12 +1125,12 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   }) => {
     try {
       if (editingConfig) {
-        await api.put(`/admin/impact-metrics/configs/${editingConfig.id}`, { ...data });
+        await api.put(`${projectApiPath}/impact-metrics/configs/${editingConfig.id}`, { ...data });
         enqueueSnackbar(t('impactMetrics.chartUpdated'), { variant: 'success' });
       } else {
         // Find the next available position
         const maxY = configs.reduce((max, c) => Math.max(max, c.layoutY + c.layoutH), 0);
-        await api.post('/admin/impact-metrics/configs', {
+        await api.post(`${projectApiPath}/impact-metrics/configs`, {
           flagId,
           ...data,
           displayOrder: configs.length,
@@ -1149,7 +1152,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
 
   const handleChartTypeChange = async (configId: string, chartType: ChartType) => {
     try {
-      await api.put(`/admin/impact-metrics/configs/${configId}`, { chartType });
+      await api.put(`${projectApiPath}/impact-metrics/configs/${configId}`, { chartType });
       setConfigs((prev) => prev.map((c) => (c.id === configId ? { ...c, chartType } : c)));
     } catch (err) {
       console.error('Failed to update chart type:', err);
@@ -1163,7 +1166,7 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
   const handleConfirmDelete = async () => {
     if (!deleteId) return;
     try {
-      await api.delete(`/admin/impact-metrics/configs/${deleteId}`);
+      await api.delete(`${projectApiPath}/impact-metrics/configs/${deleteId}`);
       enqueueSnackbar(t('impactMetrics.chartDeleted'), { variant: 'success' });
       setConfigs((prev) => prev.filter((c) => c.id !== deleteId));
     } catch (err) {

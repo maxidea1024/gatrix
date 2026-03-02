@@ -272,7 +272,20 @@ export class EnvironmentController {
       });
     }
 
-    const relatedData = await env.getRelatedDataDetails();
+    let relatedData;
+    try {
+      relatedData = await env.getRelatedDataDetails();
+    } catch (err) {
+      logger.error('getRelatedDataDetails failed:', {
+        environmentId: envParam,
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to load related data',
+      });
+    }
 
     res.json({
       success: true,

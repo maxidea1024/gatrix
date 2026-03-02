@@ -88,6 +88,8 @@ const FeatureSegmentsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
   const { currentProjectId } = useOrgProject();
 
@@ -145,7 +147,7 @@ const FeatureSegmentsPage: React.FC = () => {
   // Load context fields for constraint editor
   const loadContextFields = async () => {
     try {
-      const result = await api.get('/admin/features/context-fields');
+      const result = await api.get(`${projectApiPath}/features/context-fields`);
       const fields = result.data?.contextFields || [];
       setContextFields(
         fields
@@ -192,7 +194,7 @@ const FeatureSegmentsPage: React.FC = () => {
   const loadSegments = async () => {
     setLoading(true);
     try {
-      const result = await api.get('/admin/features/segments', {
+      const result = await api.get(`${projectApiPath}/features/segments`, {
         params: {
           search: debouncedSearchTerm || undefined,
           projectId: currentProjectId || undefined,
@@ -407,12 +409,12 @@ const FeatureSegmentsPage: React.FC = () => {
     if (!editingSegment) return;
     try {
       if (editingSegment.id) {
-        await api.put(`/admin/features/segments/${editingSegment.id}`, editingSegment);
+        await api.put(`${projectApiPath}/features/segments/${editingSegment.id}`, editingSegment);
         enqueueSnackbar(t('featureFlags.updateSuccess'), {
           variant: 'success',
         });
       } else {
-        await api.post('/admin/features/segments', {
+        await api.post(`${projectApiPath}/features/segments`, {
           ...editingSegment,
           projectId: currentProjectId,
         });
@@ -433,7 +435,7 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDelete = async (segment: FeatureSegment) => {
     setDeletingSegment(segment);
     try {
-      const result = await api.get(`/admin/features/segments/${segment.id}/references`);
+      const result = await api.get(`${projectApiPath}/features/segments/${segment.id}/references`);
       const refs = result.data?.references;
       if (refs && (refs.flags?.length > 0 || refs.templates?.length > 0)) {
         setReferences(refs);
@@ -450,7 +452,7 @@ const FeatureSegmentsPage: React.FC = () => {
 
   const handleViewReferences = async (segment: FeatureSegment) => {
     try {
-      const result = await api.get(`/admin/features/segments/${segment.id}/references`);
+      const result = await api.get(`${projectApiPath}/features/segments/${segment.id}/references`);
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);
@@ -465,7 +467,7 @@ const FeatureSegmentsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingSegment) return;
     try {
-      await api.delete(`/admin/features/segments/${deletingSegment.id}`);
+      await api.delete(`${projectApiPath}/features/segments/${deletingSegment.id}`);
       enqueueSnackbar(t('featureFlags.deleteSuccess'), { variant: 'success' });
       loadSegments();
     } catch (error: any) {
@@ -667,7 +669,7 @@ const FeatureSegmentsPage: React.FC = () => {
                                         )
                                       );
                                       try {
-                                        await api.put(`/admin/features/segments/${segment.id}`, {
+                                        await api.put(`${projectApiPath}/features/segments/${segment.id}`, {
                                           isActive: newActive,
                                         });
                                       } catch (error: any) {

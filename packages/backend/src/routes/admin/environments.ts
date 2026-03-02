@@ -18,15 +18,15 @@ const viewPermission = requirePermission([
   PERMISSIONS.ENVIRONMENTS_VIEW,
   PERMISSIONS.ENVIRONMENTS_MANAGE,
 ]) as any;
-router.get('/:environment', requireAdmin, viewPermission, EnvironmentController.getEnvironment);
+router.get('/:environmentId', requireAdmin, viewPermission, EnvironmentController.getEnvironment);
 router.get(
-  '/:environment/stats',
+  '/:environmentId/stats',
   requireAdmin,
   viewPermission,
   EnvironmentController.getEnvironmentStats
 );
 router.get(
-  '/:environment/related-data',
+  '/:environmentId/related-data',
   requireAdmin,
   viewPermission,
   EnvironmentController.getEnvironmentRelatedData
@@ -36,13 +36,13 @@ router.get(
 const managePermission = requirePermission(PERMISSIONS.ENVIRONMENTS_MANAGE) as any;
 router.post('/', requireAdmin, managePermission, EnvironmentController.createEnvironment);
 router.put(
-  '/:environment',
+  '/:environmentId',
   requireAdmin,
   managePermission,
   EnvironmentController.updateEnvironment
 );
 router.delete(
-  '/:environment',
+  '/:environmentId',
   requireAdmin,
   managePermission,
   EnvironmentController.deleteEnvironment

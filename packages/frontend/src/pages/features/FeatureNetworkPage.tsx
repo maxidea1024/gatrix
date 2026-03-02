@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Typography,
@@ -194,6 +195,8 @@ const spin = keyframes`
 
 const FeatureNetworkPage: React.FC = () => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { currentEnvironment, allEnvironments } = useEnvironment();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -292,7 +295,7 @@ const FeatureNetworkPage: React.FC = () => {
       }
 
       const appsRes = await api.get<{ applications: string[] }>(
-        `/admin/features/network/applications?${params}`
+        `${projectApiPath}/features/network/applications?${params}`
       );
       const appsList = appsRes.data?.applications || [];
       setApplications(appsList);
@@ -362,22 +365,22 @@ const FeatureNetworkPage: React.FC = () => {
         evalTimeSeriesRes,
         evalTimeSeriesByAppRes,
       ] = await Promise.all([
-        api.get<{ traffic: TrafficDataPoint[] }>(`/admin/features/network/traffic?${params}`),
+        api.get<{ traffic: TrafficDataPoint[] }>(`${projectApiPath}/features/network/traffic?${params}`),
         api.get<{ traffic: ChartDataPoint[] }>(
-          `/admin/features/network/traffic/aggregated?${params}`
+          `${projectApiPath}/features/network/traffic/aggregated?${params}`
         ),
         api.get<{ traffic: ChartDataPointByApp[] }>(
-          `/admin/features/network/traffic/aggregated/by-app?${params}`
+          `${projectApiPath}/features/network/traffic/aggregated/by-app?${params}`
         ),
-        api.get<{ summary: TrafficSummary }>(`/admin/features/network/summary?${params}`),
+        api.get<{ summary: TrafficSummary }>(`${projectApiPath}/features/network/summary?${params}`),
         api.get<{ evaluations: EvaluationSummary }>(
-          `/admin/features/network/evaluations?${params}`
+          `${projectApiPath}/features/network/evaluations?${params}`
         ),
         api.get<{ timeseries: EvaluationTimeSeriesPoint[] }>(
-          `/admin/features/network/evaluations/timeseries?${params}`
+          `${projectApiPath}/features/network/evaluations/timeseries?${params}`
         ),
         api.get<{ timeseries: EvaluationTimeSeriesPointByApp[] }>(
-          `/admin/features/network/evaluations/timeseries/by-app?${params}`
+          `${projectApiPath}/features/network/evaluations/timeseries/by-app?${params}`
         ),
       ]);
 

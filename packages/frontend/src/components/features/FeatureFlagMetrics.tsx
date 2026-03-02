@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Paper,
@@ -116,6 +117,8 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
   environments,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const theme = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -167,7 +170,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
       // Fetch app names from all selected environments
       const appPromises = selectedEnvs.map((env) =>
         api
-          .get<{ appNames: string[] }>(`/admin/features/${flagName}/metrics/apps`, {
+          .get<{ appNames: string[] }>(`${projectApiPath}/features/${flagName}/metrics/apps`, {
             params: {
               startDate: startDate.toISOString(),
               endDate: endDate.toISOString(),
@@ -229,7 +232,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           // Fetch all metrics (no app filter)
           metricsPromises.push(
             api
-              .get<{ metrics: MetricsBucket[] }>(`/admin/features/${flagName}/metrics`, {
+              .get<{ metrics: MetricsBucket[] }>(`${projectApiPath}/features/${flagName}/metrics`, {
                 params: {
                   startDate: startDate.toISOString(),
                   endDate: endDate.toISOString(),
@@ -250,7 +253,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           for (const appName of selectedApps) {
             metricsPromises.push(
               api
-                .get<{ metrics: MetricsBucket[] }>(`/admin/features/${flagName}/metrics`, {
+                .get<{ metrics: MetricsBucket[] }>(`${projectApiPath}/features/${flagName}/metrics`, {
                   params: {
                     startDate: startDate.toISOString(),
                     endDate: endDate.toISOString(),

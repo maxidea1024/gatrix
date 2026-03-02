@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { config } from '../config';
 import logger from '../config/logger';
 import database from '../config/database';
+import { initializeSystemKV } from '../utils/systemKV';
 
 const { ulid } = require('ulid');
 
@@ -49,7 +50,7 @@ async function createDefaultProject(orgId: string, createdBy: string): Promise<s
 }
 
 async function createDefaultEnvironments(projectId: string, createdBy: string) {
-  const existing = await database.query('SELECT name FROM g_environments WHERE projectId = ?', [
+  const existing = await database.query('SELECT id FROM g_environments WHERE projectId = ?', [
     projectId,
   ]);
   if (existing.length > 0) {
@@ -87,11 +88,10 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
 
   for (const e of environments) {
     await database.query(
-      `INSERT INTO g_environments (id, name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      `INSERT INTO g_environments (id, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
       [
         ulid(),
-        e.env,
         e.displayName,
         e.type,
         e.order,
@@ -102,7 +102,17 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
         createdBy,
       ]
     );
-    logger.info(`  Environment created: ${e.env}`);
+
+    // Initialize system KV items ($platforms, $channels, etc.)
+    const [envRow] = await database.query(
+      'SELECT id FROM g_environments WHERE displayName = ? AND projectId = ? ORDER BY createdAt DESC LIMIT 1',
+      [e.displayName, projectId]
+    );
+    if (envRow) {
+      await initializeSystemKV(envRow.id);
+    }
+
+    logger.info(`  Environment created: ${e.displayName}`);
   }
 }
 
@@ -273,7 +283,7 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
   }
 
   const environments = await database.query(
-    'SELECT id, name FROM g_environments WHERE projectId = ?',
+    'SELECT id, displayName FROM g_environments WHERE projectId = ?',
     [projectId]
   );
 
@@ -284,7 +294,7 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
     await database.query(
       `INSERT INTO g_environment_keys (id, environmentId, keyType, keyValue, keyName, isActive, createdBy, createdAt)
        VALUES (?, ?, 'client', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
-      [ulid(), env.id, clientKey, `${env.name} Client Key`, createdBy]
+      [ulid(), env.id, clientKey, `${env.displayName} Client Key`, createdBy]
     );
 
     // Create server key
@@ -292,10 +302,10 @@ async function createDefaultEnvironmentKeys(projectId: string, createdBy: string
     await database.query(
       `INSERT INTO g_environment_keys (id, environmentId, keyType, keyValue, keyName, isActive, createdBy, createdAt)
        VALUES (?, ?, 'server', ?, ?, TRUE, ?, UTC_TIMESTAMP())`,
-      [ulid(), env.id, serverKey, `${env.name} Server Key`, createdBy]
+      [ulid(), env.id, serverKey, `${env.displayName} Server Key`, createdBy]
     );
 
-    logger.info(`  Environment keys created for: ${env.name}`);
+    logger.info(`  Environment keys created for: ${env.displayName}`);
   }
 }
 
@@ -445,13 +455,13 @@ async function createInternalGatrixSetup(adminUserId: string) {
 
   // 3. Create 'gatrix-env' environment (internal)
   const existingEnv = await database.query(
-    "SELECT id FROM g_environments WHERE name = 'gatrix-env' AND projectId = ?",
+    "SELECT id FROM g_environments WHERE displayName = 'Gatrix Internal' AND projectId = ?",
     [gatrixProjectId]
   );
   if (existingEnv.length === 0) {
     await database.query(
-      `INSERT INTO g_environments (id, name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, isHidden, createdBy, createdAt, updatedAt)
-       VALUES (?, 'gatrix-env', 'Gatrix Internal', 'production', TRUE, 999, '#9E9E9E', ?, FALSE, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      `INSERT INTO g_environments (id, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, isHidden, createdBy, createdAt, updatedAt)
+       VALUES (?, 'Gatrix Internal', 'production', TRUE, 999, '#9E9E9E', ?, FALSE, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
       [ulid(), gatrixProjectId, adminUserId]
     );
     logger.info('Internal gatrix-env environment created');

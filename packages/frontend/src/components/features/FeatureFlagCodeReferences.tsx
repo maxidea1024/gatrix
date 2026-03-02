@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
   Typography,
@@ -90,6 +91,8 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
   onLoad,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [isRefetching, setIsRefetching] = useState(false);
@@ -110,7 +113,7 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
       }
       setError(null);
       try {
-        const response = await api.get(`/admin/features/${flagName}/code-references`);
+        const response = await api.get(`${projectApiPath}/features/${flagName}/code-references`);
         if (response.success) {
           const refs = response.data.references || [];
           setReferences(refs);

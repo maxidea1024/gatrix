@@ -93,6 +93,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import changeRequestService from '@/services/changeRequestService';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import {
   computeMaintenanceStatus,
@@ -218,6 +219,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     currentEnvironmentId,
     currentEnvironment,
   } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
 
   // Pending CR count for banner
   const [pendingCRCount, setPendingCRCount] = useState(0);
@@ -495,7 +497,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Load pending CR count and my draft count
   const loadPendingCRCount = useCallback(async () => {
     try {
-      const response = await changeRequestService.getMyRequests();
+      const projectApiPath = getProjectApiPath();
+      const response = await changeRequestService.getMyRequests(projectApiPath);
       setPendingCRCount(response?.pendingApproval?.length || 0);
       setMyDraftCount(response?.myDrafts?.length || 0);
       // Count my own CRs that are in 'open' status (pending review)
@@ -1107,9 +1110,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         transition: 'background-color 0.2s ease',
         '&:hover': sidebarCollapsed
           ? {
-              backgroundColor:
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-            }
+            backgroundColor:
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+          }
           : {},
       }}
       onClick={(e) => {

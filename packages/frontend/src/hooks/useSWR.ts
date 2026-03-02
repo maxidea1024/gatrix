@@ -206,8 +206,9 @@ export function useConditionalApi<T = any>(
 }
 
 // Hook for tags
-export function useTags(config?: SWRConfiguration) {
-  const { data, ...rest } = useApi<{ tags: any[] }>('/admin/tags', config);
+export function useTags(projectApiPath: string | null = null, config?: SWRConfiguration) {
+  const url = projectApiPath ? `${projectApiPath}/tags` : '/admin/tags';
+  const { data, ...rest } = useApi<{ tags: any[] }>(url, config);
   return {
     data: data?.tags,
     ...rest,
@@ -314,6 +315,7 @@ export function mutateMessageTemplates() {
   return mutate((key) => typeof key === 'string' && key.startsWith('/admin/message-templates'));
 }
 
-export function mutateTags() {
-  return mutate('/admin/tags');
+export function mutateTags(projectApiPath: string | null = null) {
+  const url = projectApiPath ? `${projectApiPath}/tags` : '/admin/tags';
+  return mutate(url);
 }

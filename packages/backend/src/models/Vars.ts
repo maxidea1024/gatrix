@@ -1,4 +1,5 @@
 import db from '../config/knex';
+import { ulid } from 'ulid';
 
 export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
 
@@ -118,6 +119,7 @@ export default class VarsModel {
     const key = data.varKey.startsWith('kv:') ? data.varKey : `kv:${data.varKey}`;
 
     await db('g_vars').insert({
+      id: ulid(),
       varKey: key,
       varValue: data.varValue,
       valueType: data.valueType,
@@ -226,13 +228,14 @@ export default class VarsModel {
     } else {
       // Item doesn't exist: create it with initial value
       await db('g_vars').insert({
+        id: ulid(),
         varKey: fullKey,
         varValue: value,
         valueType,
         description: description || null,
         isSystemDefined: true,
         isCopyable,
-        createdBy: 1, // System user
+        createdBy: 'system',
         environmentId: environmentId,
       });
     }

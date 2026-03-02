@@ -56,9 +56,9 @@ export const environmentContextMiddleware = async (
 export const requireEnvironmentType = (allowedTypes: string[]) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const environmentName = req.environmentId;
+      const environmenId = req.environmentId;
 
-      if (!environmentName) {
+      if (!environmenId) {
         res.status(400).json({
           success: false,
           message: 'Environment context is required for this operation',
@@ -66,7 +66,7 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
         return;
       }
 
-      const env = await Environment.getById(environmentName as string);
+      const env = await Environment.getById(environmenId as string);
 
       if (!env || !allowedTypes.includes(env.environmentType)) {
         res.status(403).json({
@@ -97,17 +97,17 @@ export const preventProductionModification = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const environmentName = req.environmentId;
+    const environmentId = req.environmentId;
 
-    if (!environmentName) {
+    if (!environmentId) {
       return next();
     }
 
-    const environmentId = await Environment.getById(environmentName as string);
+    const environment = await Environment.getById(environmentId as string);
 
-    if (environmentId?.environmentType === 'production') {
+    if (environment?.environmentType === 'production') {
       // For production, check if approval is required
-      if (environmentId.requiresApproval) {
+      if (environment.requiresApproval) {
         // TODO: Implement approval workflow
         // For now, just log a warning
         logger.warn(`Production modification attempted without approval workflow`);
