@@ -30,6 +30,7 @@ import { Tag, tagService } from '../../services/tagService';
 import { jobService } from '../../services/jobService';
 import DynamicJobDataForm from './DynamicJobDataForm';
 import { getContrastColor } from '@/utils/colorUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface JobFormProps {
   job?: Job | null;
@@ -47,6 +48,8 @@ const JobForm: React.FC<JobFormProps> = ({
   isDrawer = false,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   console.log('JobForm - Component rendered with jobTypes:', jobTypes);
   console.log('JobForm - jobTypes length:', jobTypes?.length);
@@ -107,7 +110,7 @@ const JobForm: React.FC<JobFormProps> = ({
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);

@@ -108,9 +108,12 @@ export const varsService = {
     }
   },
 
-  async getPlatformConfig(): Promise<PlatformConfig> {
+  async getPlatformConfig(projectApiPath: string): Promise<PlatformConfig> {
     try {
-      const [platforms, channels] = await Promise.all([this.getPlatforms(), this.getChannels()]);
+      const [platforms, channels] = await Promise.all([
+        this.getPlatforms(projectApiPath),
+        this.getChannels(projectApiPath),
+      ]);
       return { platforms, channels };
     } catch (error) {
       console.error('Failed to load platform config:', error);

@@ -20,6 +20,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { User, Tag } from '@/types';
 import { tagService } from '@/services/tagService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface UserFormProps {
   open: boolean;
@@ -40,6 +41,8 @@ export interface UserFormData {
 }
 
 const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, loading = false }) => {
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [tagsLoading, setTagsLoading] = useState(false);
@@ -97,7 +100,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
   const loadTags = async () => {
     try {
       setTagsLoading(true);
-      const tags = await tagService.list();
+      const tags = await tagService.list(projectApiPath);
       setAllTags(tags);
     } catch (error) {
       console.error('Failed to load tags:', error);

@@ -80,7 +80,7 @@ export class UnknownFlagService {
    */
   private async directDbReport(input: ReportUnknownFlagInput): Promise<void> {
     const count = input.count || 1;
-    const updated = await db('unknown_flags')
+    const updated = await db('g_unknown_flags')
       .where({
         flagName: input.flagName,
         environmentId: input.environmentId,
@@ -93,7 +93,7 @@ export class UnknownFlagService {
       });
 
     if (updated === 0) {
-      await db('unknown_flags').insert({
+      await db('g_unknown_flags').insert({
         flagName: input.flagName,
         environmentId: input.environmentId,
         appName: input.appName || null,
@@ -182,7 +182,7 @@ export class UnknownFlagService {
     sdkVersion: string | null;
     count: number;
   }): Promise<void> {
-    const updated = await db('unknown_flags')
+    const updated = await db('g_unknown_flags')
       .where({
         flagName: data.flagName,
         environmentId: data.environmentId,
@@ -195,7 +195,7 @@ export class UnknownFlagService {
       });
 
     if (updated === 0) {
-      await db('unknown_flags').insert({
+      await db('g_unknown_flags').insert({
         flagName: data.flagName,
         environmentId: data.environmentId,
         appName: data.appName,
@@ -218,7 +218,7 @@ export class UnknownFlagService {
       limit?: number;
     } = {}
   ): Promise<UnknownFlag[]> {
-    let query = db('unknown_flags').select('*');
+    let query = db('g_unknown_flags').select('*');
 
     if (!options.includeResolved) {
       query = query.where('isResolved', false);
@@ -241,7 +241,7 @@ export class UnknownFlagService {
    * Resolve an unknown flag (mark as handled)
    */
   async resolveUnknownFlag(id: string, resolvedBy: string): Promise<void> {
-    await db('unknown_flags')
+    await db('g_unknown_flags')
       .where({ id })
       .update({
         isResolved: true,
@@ -254,7 +254,7 @@ export class UnknownFlagService {
    * Unresolve an unknown flag (mark as unresolved again)
    */
   async unresolveUnknownFlag(id: string): Promise<void> {
-    await db('unknown_flags').where({ id }).update({
+    await db('g_unknown_flags').where({ id }).update({
       isResolved: false,
       resolvedAt: null,
       resolvedBy: null,
@@ -265,14 +265,14 @@ export class UnknownFlagService {
    * Delete an unknown flag record
    */
   async deleteUnknownFlag(id: string): Promise<void> {
-    await db('unknown_flags').where({ id }).delete();
+    await db('g_unknown_flags').where({ id }).delete();
   }
 
   /**
    * Get count of unresolved unknown flags
    */
   async getUnresolvedCount(): Promise<number> {
-    const result = await db('unknown_flags')
+    const result = await db('g_unknown_flags')
       .where('isResolved', false)
       .count('id as count')
       .first();

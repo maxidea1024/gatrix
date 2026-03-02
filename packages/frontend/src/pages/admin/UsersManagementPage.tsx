@@ -101,6 +101,7 @@ import { tagService } from '@/services/tagService';
 import { UserService } from '@/services/users';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { PERMISSIONS } from '@/types/permissions';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
@@ -288,6 +289,8 @@ const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user: currentUser, isLoading: authLoading, hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { environments } = useEnvironments();
   const canManage = hasPermission([PERMISSIONS.USERS_MANAGE]);
 
@@ -610,7 +613,7 @@ const UsersManagementPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);

@@ -269,22 +269,22 @@ const RewardTemplatesPage: React.FC = () => {
           const tagsCopy =
             t.tags && Array.isArray(t.tags)
               ? t.tags.map((tag) => {
-                  if (typeof tag === 'object' && tag !== null) {
-                    return { ...tag };
-                  }
-                  return tag;
-                })
+                if (typeof tag === 'object' && tag !== null) {
+                  return { ...tag };
+                }
+                return tag;
+              })
               : [];
 
           // Deep copy rewardItems array
           const rewardItemsCopy =
             t.rewardItems && Array.isArray(t.rewardItems)
               ? t.rewardItems.map((item) => {
-                  if (typeof item === 'object' && item !== null) {
-                    return { ...item };
-                  }
-                  return item;
-                })
+                if (typeof item === 'object' && item !== null) {
+                  return { ...item };
+                }
+                return item;
+              })
               : [];
 
           return {
@@ -334,7 +334,7 @@ const RewardTemplatesPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAllRegistryTags(tags);
         console.log('[RewardTemplatesPage] Registry tags loaded:', tags.length);
       } catch (error) {

@@ -203,7 +203,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
 
     const commonMappings: Record<string, string> = {
       id: 'ID',
-      environmentId: t('common.environmentId'),
+      environmentId: t('common.environment'),
       createdAt: t('common.createdAt'),
       updatedAt: t('common.updatedAt'),
       createdBy: t('common.createdBy'),

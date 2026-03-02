@@ -376,7 +376,7 @@ const StoreProductsPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAllRegistryTags(tags);
       } catch (error) {
         console.error('Failed to load registry tags:', error);

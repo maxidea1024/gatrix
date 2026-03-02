@@ -149,6 +149,11 @@ class ImpactMetricsController {
           : await ImpactMetricConfigModel.findByFlag(flagId);
       res.json({ success: true, data: configs });
     } catch (error: any) {
+      // Table may not exist yet - return empty results gracefully
+      if (error.code === 'ER_NO_SUCH_TABLE') {
+        res.json({ success: true, data: [] });
+        return;
+      }
       logger.error('[ImpactMetrics] Failed to get configs', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to get configs' } });
     }

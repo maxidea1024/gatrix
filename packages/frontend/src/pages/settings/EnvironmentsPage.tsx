@@ -268,98 +268,98 @@ const EnvironmentsPage: React.FC = () => {
       });
     };
 
-    if (rd.templates.count > 0)
+    if (rd.templates?.count > 0)
       items.push({
         key: 'templates',
         label: t('environments.relatedData.templates'),
         count: rd.templates.count,
         items: formatItems(rd.templates, 'name'),
       });
-    if (rd.gameWorlds.count > 0)
+    if (rd.gameWorlds?.count > 0)
       items.push({
         key: 'gameWorlds',
         label: t('environments.relatedData.gameWorlds'),
         count: rd.gameWorlds.count,
         items: formatItems(rd.gameWorlds, 'worldId'),
       });
-    if (rd.segments.count > 0)
+    if (rd.segments?.count > 0)
       items.push({
         key: 'segments',
         label: t('environments.relatedData.segments'),
         count: rd.segments.count,
         items: formatItems(rd.segments, 'name'),
       });
-    if (rd.tags.count > 0)
+    if (rd.tags?.count > 0)
       items.push({
         key: 'tags',
         label: t('environments.relatedData.tags'),
         count: rd.tags.count,
         items: formatItems(rd.tags, 'name'),
       });
-    if (rd.vars.count > 0)
+    if (rd.vars?.count > 0)
       items.push({
         key: 'vars',
         label: t('environments.relatedData.vars'),
         count: rd.vars.count,
         items: formatItems(rd.vars, 'varKey'),
       });
-    if (rd.messageTemplates.count > 0)
+    if (rd.messageTemplates?.count > 0)
       items.push({
         key: 'messageTemplates',
         label: t('environments.relatedData.messageTemplates'),
         count: rd.messageTemplates.count,
         items: formatItems(rd.messageTemplates, 'name'),
       });
-    if (rd.serviceNotices.count > 0)
+    if (rd.serviceNotices?.count > 0)
       items.push({
         key: 'serviceNotices',
         label: t('environments.relatedData.serviceNotices'),
         count: rd.serviceNotices.count,
         items: formatItems(rd.serviceNotices, 'title'),
       });
-    if (rd.ingamePopups.count > 0)
+    if (rd.ingamePopups?.count > 0)
       items.push({
         key: 'ingamePopups',
         label: t('environments.relatedData.ingamePopups'),
         count: rd.ingamePopups.count,
         items: formatItems(rd.ingamePopups, 'title'),
       });
-    if (rd.surveys.count > 0)
+    if (rd.surveys?.count > 0)
       items.push({
         key: 'surveys',
         label: t('environments.relatedData.surveys'),
         count: rd.surveys.count,
         items: formatItems(rd.surveys, 'name'),
       });
-    if (rd.coupons.count > 0)
+    if (rd.coupons?.count > 0)
       items.push({
         key: 'coupons',
         label: t('environments.relatedData.coupons'),
         count: rd.coupons.count,
         items: formatItems(rd.coupons, 'name'),
       });
-    if (rd.banners.count > 0)
+    if (rd.banners?.count > 0)
       items.push({
         key: 'banners',
         label: t('environments.relatedData.banners'),
         count: rd.banners.count,
         items: formatItems(rd.banners, 'name'),
       });
-    if (rd.jobs.count > 0)
+    if (rd.jobs?.count > 0)
       items.push({
         key: 'jobs',
         label: t('environments.relatedData.jobs'),
         count: rd.jobs.count,
         items: formatItems(rd.jobs, 'jobName'),
       });
-    if (rd.clientVersions.count > 0)
+    if (rd.clientVersions?.count > 0)
       items.push({
         key: 'clientVersions',
         label: t('environments.relatedData.clientVersions'),
         count: rd.clientVersions.count,
         items: formatItems(rd.clientVersions, 'version'),
       });
-    if (rd.apiTokens.count > 0)
+    if (rd.apiTokens?.count > 0)
       items.push({
         key: 'apiTokens',
         label: t('environments.relatedData.apiTokens'),

@@ -101,7 +101,7 @@ const ResourceReferenceList: React.FC<ResourceReferenceListProps> = ({
                     {t('featureFlags.flagName')}
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, py: 0.75 }}>
-                    {t('featureFlags.environmentId')}
+                    {t('common.environment')}
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, py: 0.75 }}>
                     {t('featureFlags.strategy')}

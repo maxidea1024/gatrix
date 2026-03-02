@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { varsService } from '../services/varsService';
 import { PlatformOption, ChannelOption, PlatformConfigContextType } from '../types/platformConfig';
 import { useAuth } from './AuthContext';
+import { useOrgProject } from './OrgProjectContext';
 
 const PlatformConfigContext = createContext<PlatformConfigContextType | undefined>(undefined);
 
@@ -11,16 +12,25 @@ interface PlatformConfigProviderProps {
 
 export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
+  const { getProjectApiPath, currentProjectId } = useOrgProject();
   const [platforms, setPlatforms] = useState<PlatformOption[]>([]);
   const [channels, setChannels] = useState<ChannelOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadPlatformConfig = async () => {
+    const projectApiPath = getProjectApiPath();
+    if (!projectApiPath) {
+      // No org/project selected yet — skip loading
+      setPlatforms([]);
+      setChannels([]);
+      setIsLoading(false);
+      return;
+    }
     try {
       setIsLoading(true);
       setError(null);
-      const config = await varsService.getPlatformConfig();
+      const config = await varsService.getPlatformConfig(projectApiPath);
       setPlatforms(config.platforms);
       setChannels(config.channels);
     } catch (err) {
@@ -33,18 +43,18 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ 
     }
   };
 
-  // Fetch only when authenticated
+  // Fetch when authenticated and project is selected
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentProjectId) {
       loadPlatformConfig();
     } else {
-      // Reset and stop loading when unauthenticated
+      // Reset and stop loading when unauthenticated or no project
       setPlatforms([]);
       setChannels([]);
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentProjectId]);
 
   // Listen for platform/channel updates from backend (only when authenticated)
   useEffect(() => {

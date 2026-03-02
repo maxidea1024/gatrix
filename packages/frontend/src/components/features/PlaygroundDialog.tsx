@@ -556,7 +556,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         for (const env of envsToCheck) {
           try {
             const response = await api.get(`${projectApiPath}/features/${flagName}`, {
-              headers: { 'x-environment': env.environmentId },
+              headers: { 'x-environment-id': env.environmentId },
             });
             const data = response.data?.flag || response.data;
             const strategies = data.strategies || [];

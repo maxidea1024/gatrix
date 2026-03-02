@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
@@ -75,6 +76,8 @@ const JobsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const { hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
 
   // Column settings state
@@ -167,7 +170,7 @@ const JobsPage: React.FC = () => {
   // 태그 로딩
   const loadTags = useCallback(async () => {
     try {
-      const tags = await tagService.list();
+      const tags = await tagService.list(projectApiPath);
       setAllTags(tags);
     } catch (error) {
       console.error('Failed to load tags:', error);

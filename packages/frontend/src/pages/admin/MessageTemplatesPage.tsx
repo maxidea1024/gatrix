@@ -401,7 +401,7 @@ const MessageTemplatesPage: React.FC = () => {
   // 태그 로딩
   const loadTags = useCallback(async () => {
     try {
-      const tags = await tagService.list();
+      const tags = await tagService.list(projectApiPath);
       setAllTags(tags);
     } catch (error) {
       // Error handling

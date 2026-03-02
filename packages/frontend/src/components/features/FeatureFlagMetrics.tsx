@@ -176,7 +176,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
               endDate: endDate.toISOString(),
             },
             headers: {
-              'x-environment': env,
+              'x-environment-id': env,
             },
           })
           .then((response) => response.data.appNames || [])
@@ -238,7 +238,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                   endDate: endDate.toISOString(),
                 },
                 headers: {
-                  'x-environment': env,
+                  'x-environment-id': env,
                 },
               })
               .then((response) =>
@@ -262,7 +262,7 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
                       appName,
                     },
                     headers: {
-                      'x-environment': env,
+                      'x-environment-id': env,
                     },
                   }
                 )

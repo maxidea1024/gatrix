@@ -113,7 +113,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     const loadTags = async () => {
       try {
         setLoadingTags(true);
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { gameWorldService } from '../services/gameWorldService';
 import { useAuth } from './AuthContext';
 import { useEnvironment } from './EnvironmentContext';
+import { useOrgProject } from './OrgProjectContext';
 import { PERMISSIONS } from '@/types/permissions';
 
 export interface GameWorldOption {
@@ -25,6 +26,7 @@ interface GameWorldProviderProps {
 export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
   const { isAuthenticated, hasPermission, permissionsLoading } = useAuth();
   const { currentEnvironment, isLoading: environmentLoading } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,10 +45,17 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
       return;
     }
 
+    const projectApiPath = getProjectApiPath();
+    if (!projectApiPath) {
+      setWorlds([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
-      const result = await gameWorldService.getGameWorlds({ limit: 1000 } as any);
+      const result = await gameWorldService.getGameWorlds(projectApiPath);
       const worldOptions: GameWorldOption[] = (result.worlds || []).map((world: any) => ({
         label: world.name,
         value: world.worldId,

@@ -134,7 +134,7 @@ const EnvironmentSettingsCard: React.FC<EnvironmentSettingsCardProps> = ({
             {/* Environment name and info */}
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('featureFlags.environmentId')}
+                {t('common.environment')}
               </Typography>
               <Typography variant="subtitle1" fontWeight={600}>
                 {envData.displayName}

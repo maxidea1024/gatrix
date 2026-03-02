@@ -82,7 +82,7 @@ const UnknownFlagsPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
-    { id: 'environment', labelKey: 'featureFlags.environmentId', visible: true },
+    { id: 'environment', labelKey: 'common.environment', visible: true },
     { id: 'appName', labelKey: 'featureFlags.appName', visible: true },
     { id: 'sdkVersion', labelKey: 'featureFlags.sdkVersion', visible: true },
     { id: 'accessCount', labelKey: 'featureFlags.accessCount', visible: true },

@@ -786,9 +786,9 @@ const FeatureNetworkPage: React.FC = () => {
         label: t('network.avgEvaluationsPerHour'),
         value: evaluations
           ? Math.round(
-              evaluations.totalEvaluations /
-                (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours || 24)
-            ).toLocaleString()
+            evaluations.totalEvaluations /
+            (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours || 24)
+          ).toLocaleString()
           : '0',
         color: '#9c27b0',
       },
@@ -842,7 +842,7 @@ const FeatureNetworkPage: React.FC = () => {
           {/* Environment Toggle */}
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-              {t('network.environmentId')}
+              {t('network.environment')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
               {envList.map((env) => (
@@ -1052,7 +1052,7 @@ const FeatureNetworkPage: React.FC = () => {
                     >
                       <TableRow>
                         <TableCell>{t('network.time')}</TableCell>
-                        <TableCell>{t('common.environmentId')}</TableCell>
+                        <TableCell>{t('common.environment')}</TableCell>
                         <TableCell>{t('network.application')}</TableCell>
                         <TableCell align="right">{t('network.features')}</TableCell>
                         <TableCell align="right">{t('network.segments')}</TableCell>
@@ -1228,7 +1228,7 @@ const FeatureNetworkPage: React.FC = () => {
                     >
                       <TableRow>
                         <TableCell>{t('network.time')}</TableCell>
-                        <TableCell>{t('common.environmentId')}</TableCell>
+                        <TableCell>{t('common.environment')}</TableCell>
                         <TableCell>{t('network.application')}</TableCell>
                         <TableCell align="right">{t('network.flagEvaluations')}</TableCell>
                       </TableRow>

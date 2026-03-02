@@ -219,9 +219,9 @@ router.put(
 router.get(
   '/segments',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { search, projectId } = req.query;
+    const { search } = req.query;
 
-    const segments = await featureFlagService.listSegments(search as string, projectId as string);
+    const segments = await featureFlagService.listSegments(search as string, req.projectId);
 
     res.json({ success: true, data: { segments } });
   })
@@ -293,10 +293,10 @@ router.delete(
 router.get(
   '/context-fields',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { search, projectId } = req.query;
+    const { search } = req.query;
     const fields = await featureFlagService.listContextFields(
       search as string | undefined,
-      projectId as string | undefined
+      req.projectId
     );
 
     res.json({ success: true, data: { contextFields: fields } });
@@ -361,25 +361,37 @@ router.get(
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { repository, branch } = req.query;
 
-    const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
+    try {
+      const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
 
-    const summary = await FeatureCodeReferenceModel.getSummary({
-      repository: repository as string,
-      branch: branch as string,
-    });
+      const summary = await FeatureCodeReferenceModel.getSummary({
+        repository: repository as string,
+        branch: branch as string,
+      });
 
-    const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
-      repository: repository as string,
-      branch: branch as string,
-    });
+      const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
+        repository: repository as string,
+        branch: branch as string,
+      });
 
-    res.json({
-      success: true,
-      data: {
-        summary,
-        scanInfo,
-      },
-    });
+      res.json({
+        success: true,
+        data: {
+          summary,
+          scanInfo,
+        },
+      });
+    } catch (error: any) {
+      // Code references are non-critical - return empty on any error
+      console.warn('Code references summary error:', error.message || error.code);
+      res.json({
+        success: true,
+        data: {
+          summary: [],
+          scanInfo: null,
+        },
+      });
+    }
   })
 );
 
@@ -435,7 +447,7 @@ router.get(
       limit: parseInt(limit as string) || 50,
       sortBy: sortBy as string,
       sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
-      projectId: projectId as string,
+      projectId: req.projectId,
     });
 
     res.json({ success: true, data: result });
@@ -452,7 +464,7 @@ router.post(
     const userId = req.user?.id;
 
     const flag = await featureFlagService.createFlag(
-      { ...req.body, environmentId },
+      { ...req.body, environmentId, projectId: req.projectId },
       userId!,
       getRequestContext(req)
     );
@@ -1243,14 +1255,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-                const fieldDef = fieldDefMap?.get(name);
-                const rules = fieldDef?.validationRules as any;
-                return {
-                  name,
-                  isRequired: rules?.isRequired === true,
-                  fieldType: (fieldDef?.fieldType as string) || 'string',
-                };
-              })
+              const fieldDef = fieldDefMap?.get(name);
+              const rules = fieldDef?.validationRules as any;
+              return {
+                name,
+                isRequired: rules?.isRequired === true,
+                fieldType: (fieldDef?.fieldType as string) || 'string',
+              };
+            })
             : undefined,
       },
     });
@@ -2142,27 +2154,40 @@ router.get(
     const { flagName } = req.params;
     const { repository, branch, limit } = req.query;
 
-    const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
+    try {
+      const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
 
-    const references = await FeatureCodeReferenceModel.findByFlagName(flagName, {
-      repository: repository as string,
-      branch: branch as string,
-      limit: limit ? parseInt(limit as string, 10) : undefined,
-    });
+      const references = await FeatureCodeReferenceModel.findByFlagName(flagName, {
+        repository: repository as string,
+        branch: branch as string,
+        limit: limit ? parseInt(limit as string, 10) : undefined,
+      });
 
-    const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
-      repository: repository as string,
-      branch: branch as string,
-    });
+      const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
+        repository: repository as string,
+        branch: branch as string,
+      });
 
-    res.json({
-      success: true,
-      data: {
-        references,
-        scanInfo,
-        total: references.length,
-      },
-    });
+      res.json({
+        success: true,
+        data: {
+          references,
+          scanInfo,
+          total: references.length,
+        },
+      });
+    } catch (error: any) {
+      // Code references are non-critical - return empty on any error
+      console.warn('Code references error:', error.message || error.code);
+      res.json({
+        success: true,
+        data: {
+          references: [],
+          scanInfo: null,
+          total: 0,
+        },
+      });
+    }
   })
 );
 
