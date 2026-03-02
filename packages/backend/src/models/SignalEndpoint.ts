@@ -39,6 +39,7 @@ export interface Signal {
 export interface CreateSignalEndpointData {
   name: string;
   description?: string;
+  projectId: string;
   createdBy: string;
 }
 
@@ -63,6 +64,7 @@ export class SignalEndpointModel {
         id,
         name: data.name,
         description: data.description || null,
+        projectId: data.projectId,
         createdBy: data.createdBy,
       });
 
@@ -109,19 +111,25 @@ export class SignalEndpointModel {
     }
   }
 
-  static async findAll(): Promise<SignalEndpoint[]> {
+  static async findAll(projectId?: string): Promise<SignalEndpoint[]> {
     try {
-      const rows = await db(this.TABLE)
+      let query = db(this.TABLE)
         .select([`${this.TABLE}.*`, 'creator.name as createdByName'])
         .leftJoin('g_users as creator', `${this.TABLE}.createdBy`, 'creator.id')
         .orderBy(`${this.TABLE}.createdAt`, 'desc');
+
+      if (projectId) {
+        query = query.where(`${this.TABLE}.projectId`, projectId);
+      }
+
+      const rows = await query;
 
       // Batch load tokens
       const endpointIds = rows.map((r: any) => r.id);
       const allTokens =
         endpointIds.length > 0
           ? await db(this.TOKENS_TABLE)
-              .select('id', 'signalEndpointId', 'name', 'createdBy', 'createdAt')
+              .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
               .whereIn('signalEndpointId', endpointIds)
               .orderBy('createdAt', 'desc')
           : [];
@@ -190,7 +198,7 @@ export class SignalEndpointModel {
   static async findTokens(endpointId: string): Promise<SignalEndpointToken[]> {
     try {
       return db(this.TOKENS_TABLE)
-        .select('id', 'signalEndpointId', 'name', 'createdBy', 'createdAt')
+        .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
         .where('signalEndpointId', endpointId)
         .orderBy('createdAt', 'desc');
     } catch (error) {
@@ -210,13 +218,13 @@ export class SignalEndpointModel {
       await db(this.TOKENS_TABLE).insert({
         id,
         signalEndpointId: endpointId,
-        name,
+        tokenName: name,
         tokenHash,
         createdBy,
       });
 
       return db(this.TOKENS_TABLE)
-        .select('id', 'signalEndpointId', 'name', 'createdBy', 'createdAt')
+        .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
         .where('id', id)
         .first();
     } catch (error) {

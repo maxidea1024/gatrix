@@ -7,6 +7,8 @@
 import { Router, Request, Response } from 'express';
 import { SignalEndpointModel } from '../../models/SignalEndpoint';
 import { createLogger } from '../../config/logger';
+import { sendConflict, sendBadRequest, sendNotFound, sendInternalError } from '../../utils/apiResponse';
+import { ErrorCodes } from '@gatrix/shared';
 import crypto from 'crypto';
 
 const router = Router();
@@ -18,7 +20,7 @@ const logger = createLogger('SignalEndpointRoutes');
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const endpoints = await SignalEndpointModel.findAll();
+    const endpoints = await SignalEndpointModel.findAll((req as any).projectId);
     res.json({ data: endpoints });
   } catch (error) {
     logger.error('Error getting signal endpoints:', error);
@@ -54,22 +56,29 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, description } = req.body;
     const user = req.user as { id: string; name: string };
+    const projectId = (req as any).projectId;
 
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'Name is required' });
+      return sendBadRequest(res, 'Name is required');
+    }
+
+    // Check for duplicate name within the same project
+    const existing = await SignalEndpointModel.findByName(name.trim());
+    if (existing) {
+      return sendConflict(res, 'A signal endpoint with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
     }
 
     const endpoint = await SignalEndpointModel.create({
       name: name.trim(),
       description,
+      projectId,
       createdBy: user.id,
     });
 
     res.status(201).json({ data: endpoint });
   } catch (error) {
     logger.error('Error creating signal endpoint:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create signal endpoint';
-    res.status(400).json({ error: message });
+    return sendInternalError(res, 'Failed to create signal endpoint', error);
   }
 });
 
@@ -83,6 +92,14 @@ router.put('/:id', async (req: Request, res: Response) => {
     const { name, description, isEnabled } = req.body;
     const user = req.user as { id: string; name: string };
 
+    // Check for duplicate name if name is being changed
+    if (name && name.trim()) {
+      const existing = await SignalEndpointModel.findByName(name.trim());
+      if (existing && existing.id !== id) {
+        return sendConflict(res, 'A signal endpoint with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
+      }
+    }
+
     const endpoint = await SignalEndpointModel.update(id, {
       name,
       description,
@@ -91,14 +108,13 @@ router.put('/:id', async (req: Request, res: Response) => {
     });
 
     if (!endpoint) {
-      return res.status(404).json({ error: 'Signal endpoint not found' });
+      return sendNotFound(res, 'Signal endpoint not found');
     }
 
     res.json({ data: endpoint });
   } catch (error) {
     logger.error('Error updating signal endpoint:', error);
-    const message = error instanceof Error ? error.message : 'Failed to update signal endpoint';
-    res.status(400).json({ error: message });
+    return sendInternalError(res, 'Failed to update signal endpoint', error);
   }
 });
 

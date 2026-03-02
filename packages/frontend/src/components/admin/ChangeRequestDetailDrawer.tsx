@@ -913,13 +913,14 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                 borderTop: '6px solid transparent',
                                 borderBottom: '6px solid transparent',
                                 borderLeft: (theme) =>
-                                  `6px solid ${event.type === 'rejected'
-                                    ? theme.palette.error.main
-                                    : event.type === 'approved'
-                                      ? theme.palette.success.main
-                                      : event.type === 'executed'
-                                        ? theme.palette.info.main
-                                        : theme.palette.primary.main
+                                  `6px solid ${
+                                    event.type === 'rejected'
+                                      ? theme.palette.error.main
+                                      : event.type === 'approved'
+                                        ? theme.palette.success.main
+                                        : event.type === 'executed'
+                                          ? theme.palette.info.main
+                                          : theme.palette.primary.main
                                   }`,
                               }}
                             />
@@ -1410,229 +1411,353 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                   {/* ActionGroup-based UI (when available) */}
                   {groupedChanges
                     ? groupedChanges.map((group) => {
-                      const config = getActionTypeConfig(group.actionType);
-                      const isExpanded = expandedGroups[group.id] === true; // Default collapsed
+                        const config = getActionTypeConfig(group.actionType);
+                        const isExpanded = expandedGroups[group.id] === true; // Default collapsed
 
-                      return (
-                        <Paper
-                          key={group.id}
-                          variant="outlined"
-                          sx={{ mb: 2, overflow: 'hidden' }}
-                        >
-                          {/* ActionGroup Header - Clickable for expand/collapse */}
-                          <Box
-                            onClick={() => toggleGroup(group.id)}
-                            sx={{
-                              px: 2,
-                              py: 1.5,
-                              borderBottom: isExpanded ? 1 : 0,
-                              borderColor: 'divider',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1.5,
-                              cursor: 'pointer',
-                              transition: 'background-color 0.2s',
-                              '&:hover': { bgcolor: 'action.hover' },
-                            }}
+                        return (
+                          <Paper
+                            key={group.id}
+                            variant="outlined"
+                            sx={{ mb: 2, overflow: 'hidden' }}
                           >
-                            <ExpandMoreIcon
+                            {/* ActionGroup Header - Clickable for expand/collapse */}
+                            <Box
+                              onClick={() => toggleGroup(group.id)}
                               sx={{
-                                fontSize: 20,
-                                transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                transition: 'transform 0.2s',
-                                color: 'text.secondary',
-                              }}
-                            />
-                            <Avatar
-                              sx={{
-                                width: 28,
-                                height: 28,
-                                bgcolor: config.color,
+                                px: 2,
+                                py: 1.5,
+                                borderBottom: isExpanded ? 1 : 0,
+                                borderColor: 'divider',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s',
+                                '&:hover': { bgcolor: 'action.hover' },
                               }}
                             >
-                              {config.icon}
-                            </Avatar>
-                            <Box sx={{ flex: 1 }}>
-                              <Typography variant="body2" fontWeight={600}>
-                                {formatChangeRequestTitle(group.title, t)}
-                              </Typography>
-                              {group.description && (
-                                <Typography variant="caption" color="text.secondary">
-                                  {group.description}
+                              <ExpandMoreIcon
+                                sx={{
+                                  fontSize: 20,
+                                  transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                  transition: 'transform 0.2s',
+                                  color: 'text.secondary',
+                                }}
+                              />
+                              <Avatar
+                                sx={{
+                                  width: 28,
+                                  height: 28,
+                                  bgcolor: config.color,
+                                }}
+                              >
+                                {config.icon}
+                              </Avatar>
+                              <Box sx={{ flex: 1 }}>
+                                <Typography variant="body2" fontWeight={600}>
+                                  {formatChangeRequestTitle(group.title, t)}
                                 </Typography>
-                              )}
+                                {group.description && (
+                                  <Typography variant="caption" color="text.secondary">
+                                    {group.description}
+                                  </Typography>
+                                )}
+                              </Box>
+                              <Chip
+                                label={`${group.items.length} ${t('changeRequest.items')}`}
+                                size="small"
+                                sx={{ height: 20, fontSize: 11 }}
+                              />
                             </Box>
-                            <Chip
-                              label={`${group.items.length} ${t('changeRequest.items')}`}
-                              size="small"
-                              sx={{ height: 20, fontSize: 11 }}
-                            />
-                          </Box>
 
-                          {/* Collapsible content */}
-                          <Collapse in={isExpanded} timeout="auto">
-                            <Box sx={{ pl: 3 }}>
-                              {group.items.map((item, idx) => {
-                                const itemKey = `${group.id}-${idx}`;
-                                const isItemExpanded = expandedItems[itemKey] === true; // Default collapsed
+                            {/* Collapsible content */}
+                            <Collapse in={isExpanded} timeout="auto">
+                              <Box sx={{ pl: 3 }}>
+                                {group.items.map((item, idx) => {
+                                  const itemKey = `${group.id}-${idx}`;
+                                  const isItemExpanded = expandedItems[itemKey] === true; // Default collapsed
 
-                                return (
-                                  <Box
-                                    key={idx}
-                                    sx={{
-                                      borderBottom: idx < group.items.length - 1 ? 1 : 0,
-                                      borderColor: 'divider',
-                                    }}
-                                  >
-                                    {/* Item header - clickable */}
+                                  return (
                                     <Box
-                                      onClick={() => toggleItem(itemKey)}
+                                      key={idx}
                                       sx={{
-                                        px: 2,
-                                        py: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        cursor: 'pointer',
-                                        transition: 'background-color 0.2s',
-                                        '&:hover': {
-                                          bgcolor: 'action.hover',
-                                        },
+                                        borderBottom: idx < group.items.length - 1 ? 1 : 0,
+                                        borderColor: 'divider',
                                       }}
                                     >
-                                      <ExpandMoreIcon
+                                      {/* Item header - clickable */}
+                                      <Box
+                                        onClick={() => toggleItem(itemKey)}
                                         sx={{
-                                          fontSize: 16,
-                                          transform: isItemExpanded
-                                            ? 'rotate(0deg)'
-                                            : 'rotate(-90deg)',
-                                          transition: 'transform 0.2s',
-                                          color: 'text.secondary',
-                                        }}
-                                      />
-                                      <Typography
-                                        variant="caption"
-                                        sx={{
-                                          fontFamily: 'monospace',
-                                          fontWeight: 600,
+                                          px: 2,
+                                          py: 1,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                          cursor: 'pointer',
+                                          transition: 'background-color 0.2s',
+                                          '&:hover': {
+                                            bgcolor: 'action.hover',
+                                          },
                                         }}
                                       >
-                                        {formatChangeItemTitle(
-                                          item.table,
-                                          item.targetId,
-                                          item?.afterData,
-                                          t
-                                        )}
-                                      </Typography>
-                                      <Chip
-                                        label={item.operation}
-                                        size="small"
-                                        sx={{
-                                          height: 18,
-                                          fontSize: 10,
-                                          bgcolor:
-                                            item.operation === 'create'
-                                              ? 'success.main'
-                                              : item.operation === 'delete'
-                                                ? 'error.main'
-                                                : 'primary.main',
-                                          color: '#fff',
-                                        }}
-                                      />
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{ ml: 'auto' }}
-                                      >
-                                        {item.changes.length} ops
-                                      </Typography>
-                                    </Box>
-                                    {/* Op-based changes - different display based on operation type */}
-                                    <Collapse in={isItemExpanded} timeout="auto">
-                                      <Box sx={{ px: 2, py: 1 }}>
-                                        {/* DELETE: No ops detail needed */}
-                                        {item.operation === 'delete' && (
-                                          <Typography
-                                            variant="body2"
-                                            color="error"
-                                            sx={{
-                                              textAlign: 'center',
-                                              py: 2,
-                                              fontStyle: 'italic',
-                                            }}
-                                          >
-                                            {t('changeRequest.opDelete')}
-                                          </Typography>
-                                        )}
-
-                                        {/* CREATE: Table format (Field | Value) */}
-                                        {item.operation === 'create' &&
-                                          item.changes.length > 0 && (
-                                            <Table
-                                              size="small"
+                                        <ExpandMoreIcon
+                                          sx={{
+                                            fontSize: 16,
+                                            transform: isItemExpanded
+                                              ? 'rotate(0deg)'
+                                              : 'rotate(-90deg)',
+                                            transition: 'transform 0.2s',
+                                            color: 'text.secondary',
+                                          }}
+                                        />
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            fontWeight: 600,
+                                          }}
+                                        >
+                                          {formatChangeItemTitle(
+                                            item.table,
+                                            item.targetId,
+                                            item?.afterData,
+                                            t
+                                          )}
+                                        </Typography>
+                                        <Chip
+                                          label={item.operation}
+                                          size="small"
+                                          sx={{
+                                            height: 18,
+                                            fontSize: 10,
+                                            bgcolor:
+                                              item.operation === 'create'
+                                                ? 'success.main'
+                                                : item.operation === 'delete'
+                                                  ? 'error.main'
+                                                  : 'primary.main',
+                                            color: '#fff',
+                                          }}
+                                        />
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                          sx={{ ml: 'auto' }}
+                                        >
+                                          {item.changes.length} ops
+                                        </Typography>
+                                      </Box>
+                                      {/* Op-based changes - different display based on operation type */}
+                                      <Collapse in={isItemExpanded} timeout="auto">
+                                        <Box sx={{ px: 2, py: 1 }}>
+                                          {/* DELETE: No ops detail needed */}
+                                          {item.operation === 'delete' && (
+                                            <Typography
+                                              variant="body2"
+                                              color="error"
                                               sx={{
-                                                '& td, & th': {
-                                                  py: 0.75,
-                                                  px: 1.5,
-                                                  border: 'none',
-                                                },
+                                                textAlign: 'center',
+                                                py: 2,
+                                                fontStyle: 'italic',
                                               }}
                                             >
-                                              <TableBody>
-                                                {item.changes
-                                                  .filter(
-                                                    (c) =>
-                                                      ![
-                                                        'updatedBy',
-                                                        'createdBy',
-                                                        'updatedAt',
-                                                        'createdAt',
-                                                        'id',
-                                                        'version',
-                                                        'environment',
-                                                      ].includes(c.field)
-                                                  )
-                                                  .map((change, i) => (
-                                                    <TableRow
-                                                      key={i}
-                                                      sx={{
-                                                        '&:nth-of-type(odd)': {
-                                                          bgcolor: 'action.hover',
-                                                        },
-                                                      }}
-                                                    >
-                                                      <TableCell
-                                                        sx={{
-                                                          fontWeight: 600,
-                                                          color: 'text.secondary',
-                                                          width: '35%',
-                                                          fontSize: '0.875rem',
-                                                        }}
-                                                      >
-                                                        {formatFieldName(
-                                                          item.table,
-                                                          change.field
-                                                        )}
-                                                      </TableCell>
-                                                      <TableCell
-                                                        sx={{
-                                                          color: 'success.main',
-                                                          fontWeight: 500,
-                                                          fontSize: '0.875rem',
-                                                        }}
-                                                      >
-                                                        {formatValue(change.newValue)}
-                                                      </TableCell>
-                                                    </TableRow>
-                                                  ))}
-                                              </TableBody>
-                                            </Table>
+                                              {t('changeRequest.opDelete')}
+                                            </Typography>
                                           )}
 
-                                        {/* UPDATE: Original format with before/after */}
-                                        {item.operation === 'update' &&
-                                          item.changes
-                                            .filter(
+                                          {/* CREATE: Table format (Field | Value) */}
+                                          {item.operation === 'create' &&
+                                            item.changes.length > 0 && (
+                                              <Table
+                                                size="small"
+                                                sx={{
+                                                  '& td, & th': {
+                                                    py: 0.75,
+                                                    px: 1.5,
+                                                    border: 'none',
+                                                  },
+                                                }}
+                                              >
+                                                <TableBody>
+                                                  {item.changes
+                                                    .filter(
+                                                      (c) =>
+                                                        ![
+                                                          'updatedBy',
+                                                          'createdBy',
+                                                          'updatedAt',
+                                                          'createdAt',
+                                                          'id',
+                                                          'version',
+                                                          'environment',
+                                                        ].includes(c.field)
+                                                    )
+                                                    .map((change, i) => (
+                                                      <TableRow
+                                                        key={i}
+                                                        sx={{
+                                                          '&:nth-of-type(odd)': {
+                                                            bgcolor: 'action.hover',
+                                                          },
+                                                        }}
+                                                      >
+                                                        <TableCell
+                                                          sx={{
+                                                            fontWeight: 600,
+                                                            color: 'text.secondary',
+                                                            width: '35%',
+                                                            fontSize: '0.875rem',
+                                                          }}
+                                                        >
+                                                          {formatFieldName(
+                                                            item.table,
+                                                            change.field
+                                                          )}
+                                                        </TableCell>
+                                                        <TableCell
+                                                          sx={{
+                                                            color: 'success.main',
+                                                            fontWeight: 500,
+                                                            fontSize: '0.875rem',
+                                                          }}
+                                                        >
+                                                          {formatValue(change.newValue)}
+                                                        </TableCell>
+                                                      </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                              </Table>
+                                            )}
+
+                                          {/* UPDATE: Original format with before/after */}
+                                          {item.operation === 'update' &&
+                                            item.changes
+                                              .filter(
+                                                (c) =>
+                                                  ![
+                                                    'updatedBy',
+                                                    'createdBy',
+                                                    'updatedAt',
+                                                    'createdAt',
+                                                  ].includes(c.field)
+                                              )
+                                              .map((change, i) => (
+                                                <Box
+                                                  key={i}
+                                                  sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'flex-start',
+                                                    gap: 1,
+                                                    py: 0.75,
+                                                    borderBottom:
+                                                      i < item.changes.length - 1 ? 1 : 0,
+                                                    borderColor: 'divider',
+                                                    fontSize: 12,
+                                                    fontFamily: 'monospace',
+                                                  }}
+                                                >
+                                                  {/* Op icon */}
+                                                  <Chip
+                                                    label={
+                                                      change.operation === 'added'
+                                                        ? 'SET'
+                                                        : change.operation === 'removed'
+                                                          ? 'DEL'
+                                                          : 'MOD'
+                                                    }
+                                                    size="small"
+                                                    sx={{
+                                                      height: 18,
+                                                      fontSize: 9,
+                                                      fontWeight: 700,
+                                                      minWidth: 36,
+                                                      bgcolor:
+                                                        change.operation === 'added'
+                                                          ? 'success.main'
+                                                          : change.operation === 'removed'
+                                                            ? 'error.main'
+                                                            : 'primary.main',
+                                                      color: '#fff',
+                                                    }}
+                                                  />
+                                                  {/* Field name */}
+                                                  <Typography
+                                                    component="span"
+                                                    sx={{
+                                                      fontWeight: 600,
+                                                      color: 'text.primary',
+                                                      fontSize: 12,
+                                                    }}
+                                                  >
+                                                    {formatFieldName(item.table, change.field)}
+                                                  </Typography>
+                                                  {/* Op description */}
+                                                  <Box
+                                                    sx={{
+                                                      flex: 1,
+                                                      color: 'text.secondary',
+                                                    }}
+                                                  >
+                                                    {change.operation === 'added' ? (
+                                                      <Typography
+                                                        component="span"
+                                                        sx={{ fontSize: 12 }}
+                                                      >
+                                                        ={' '}
+                                                        <Box
+                                                          component="span"
+                                                          sx={{
+                                                            color: 'success.main',
+                                                            fontWeight: 500,
+                                                          }}
+                                                        >
+                                                          {formatValue(change.newValue)}
+                                                        </Box>
+                                                      </Typography>
+                                                    ) : change.operation === 'removed' ? (
+                                                      <Typography
+                                                        component="span"
+                                                        sx={{
+                                                          fontSize: 12,
+                                                          color: 'error.main',
+                                                          textDecoration: 'line-through',
+                                                        }}
+                                                      >
+                                                        {formatValue(change.oldValue)}
+                                                      </Typography>
+                                                    ) : (
+                                                      <Typography
+                                                        component="span"
+                                                        sx={{ fontSize: 12 }}
+                                                      >
+                                                        <Box
+                                                          component="span"
+                                                          sx={{
+                                                            color: 'error.main',
+                                                            textDecoration: 'line-through',
+                                                          }}
+                                                        >
+                                                          {formatValue(change.oldValue)}
+                                                        </Box>
+                                                        {' → '}
+                                                        <Box
+                                                          component="span"
+                                                          sx={{
+                                                            color: 'success.main',
+                                                            fontWeight: 500,
+                                                          }}
+                                                        >
+                                                          {formatValue(change.newValue)}
+                                                        </Box>
+                                                      </Typography>
+                                                    )}
+                                                  </Box>
+                                                </Box>
+                                              ))}
+
+                                          {item.operation === 'update' &&
+                                            item.changes.filter(
                                               (c) =>
                                                 ![
                                                   'updatedBy',
@@ -1640,294 +1765,170 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                                   'updatedAt',
                                                   'createdAt',
                                                 ].includes(c.field)
-                                            )
-                                            .map((change, i) => (
-                                              <Box
-                                                key={i}
+                                            ).length === 0 && (
+                                              <Typography
+                                                variant="body2"
+                                                color="text.secondary"
                                                 sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'flex-start',
-                                                  gap: 1,
-                                                  py: 0.75,
-                                                  borderBottom:
-                                                    i < item.changes.length - 1 ? 1 : 0,
-                                                  borderColor: 'divider',
-                                                  fontSize: 12,
-                                                  fontFamily: 'monospace',
+                                                  textAlign: 'center',
+                                                  py: 2,
                                                 }}
                                               >
-                                                {/* Op icon */}
-                                                <Chip
-                                                  label={
-                                                    change.operation === 'added'
-                                                      ? 'SET'
-                                                      : change.operation === 'removed'
-                                                        ? 'DEL'
-                                                        : 'MOD'
-                                                  }
-                                                  size="small"
-                                                  sx={{
-                                                    height: 18,
-                                                    fontSize: 9,
-                                                    fontWeight: 700,
-                                                    minWidth: 36,
-                                                    bgcolor:
-                                                      change.operation === 'added'
-                                                        ? 'success.main'
-                                                        : change.operation === 'removed'
-                                                          ? 'error.main'
-                                                          : 'primary.main',
-                                                    color: '#fff',
-                                                  }}
-                                                />
-                                                {/* Field name */}
-                                                <Typography
-                                                  component="span"
-                                                  sx={{
-                                                    fontWeight: 600,
-                                                    color: 'text.primary',
-                                                    fontSize: 12,
-                                                  }}
-                                                >
-                                                  {formatFieldName(item.table, change.field)}
-                                                </Typography>
-                                                {/* Op description */}
-                                                <Box
-                                                  sx={{
-                                                    flex: 1,
-                                                    color: 'text.secondary',
-                                                  }}
-                                                >
-                                                  {change.operation === 'added' ? (
-                                                    <Typography
-                                                      component="span"
-                                                      sx={{ fontSize: 12 }}
-                                                    >
-                                                      ={' '}
-                                                      <Box
-                                                        component="span"
-                                                        sx={{
-                                                          color: 'success.main',
-                                                          fontWeight: 500,
-                                                        }}
-                                                      >
-                                                        {formatValue(change.newValue)}
-                                                      </Box>
-                                                    </Typography>
-                                                  ) : change.operation === 'removed' ? (
-                                                    <Typography
-                                                      component="span"
-                                                      sx={{
-                                                        fontSize: 12,
-                                                        color: 'error.main',
-                                                        textDecoration: 'line-through',
-                                                      }}
-                                                    >
-                                                      {formatValue(change.oldValue)}
-                                                    </Typography>
-                                                  ) : (
-                                                    <Typography
-                                                      component="span"
-                                                      sx={{ fontSize: 12 }}
-                                                    >
-                                                      <Box
-                                                        component="span"
-                                                        sx={{
-                                                          color: 'error.main',
-                                                          textDecoration: 'line-through',
-                                                        }}
-                                                      >
-                                                        {formatValue(change.oldValue)}
-                                                      </Box>
-                                                      {' → '}
-                                                      <Box
-                                                        component="span"
-                                                        sx={{
-                                                          color: 'success.main',
-                                                          fontWeight: 500,
-                                                        }}
-                                                      >
-                                                        {formatValue(change.newValue)}
-                                                      </Box>
-                                                    </Typography>
-                                                  )}
-                                                </Box>
-                                              </Box>
-                                            ))}
-
-                                        {item.operation === 'update' &&
-                                          item.changes.filter(
-                                            (c) =>
-                                              ![
-                                                'updatedBy',
-                                                'createdBy',
-                                                'updatedAt',
-                                                'createdAt',
-                                              ].includes(c.field)
-                                          ).length === 0 && (
-                                            <Typography
-                                              variant="body2"
-                                              color="text.secondary"
-                                              sx={{
-                                                textAlign: 'center',
-                                                py: 2,
-                                              }}
-                                            >
-                                              {t('changeRequest.noChanges')}
-                                            </Typography>
-                                          )}
-                                      </Box>
-                                    </Collapse>
-                                  </Box>
-                                );
-                              })}
-                            </Box>
-                          </Collapse>
-                        </Paper>
-                      );
-                    })
-                    : /* Fallback: Legacy view for items without ActionGroup - now using op-based list */
-                    allChanges.map((item, idx) => (
-                      <Paper key={idx} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
-                        <Box
-                          sx={{
-                            px: 2,
-                            py: 1,
-                            bgcolor: 'action.hover',
-                            borderBottom: 1,
-                            borderColor: 'divider',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: 'monospace', fontWeight: 600 }}
-                          >
-                            {item.table}/{item.targetId}
-                          </Typography>
-                          <Chip
-                            label={item.operation}
-                            size="small"
-                            sx={{
-                              height: 20,
-                              fontSize: 11,
-                              bgcolor:
-                                item.operation === 'create'
-                                  ? 'success.main'
-                                  : item.operation === 'delete'
-                                    ? 'error.main'
-                                    : 'primary.main',
-                              color: '#fff',
-                            }}
-                          />
-                        </Box>
-                        {/* Op-based changes list */}
-                        <Box sx={{ px: 2, py: 1 }}>
-                          {item.changes.map((change, i) => (
-                            <Box
-                              key={i}
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                gap: 1,
-                                py: 0.75,
-                                borderBottom: i < item.changes.length - 1 ? 1 : 0,
-                                borderColor: 'divider',
-                                fontSize: 13,
-                                fontFamily: 'monospace',
-                              }}
-                            >
-                              <Chip
-                                label={
-                                  change.operation === 'added'
-                                    ? 'SET'
-                                    : change.operation === 'removed'
-                                      ? 'DEL'
-                                      : 'MOD'
-                                }
-                                size="small"
-                                sx={{
-                                  height: 18,
-                                  fontSize: 9,
-                                  fontWeight: 700,
-                                  minWidth: 36,
-                                  bgcolor:
-                                    change.operation === 'added'
-                                      ? 'success.main'
-                                      : change.operation === 'removed'
-                                        ? 'error.main'
-                                        : 'primary.main',
-                                  color: '#fff',
-                                }}
-                              />
-                              <Typography component="span" sx={{ fontWeight: 600, fontSize: 13 }}>
-                                {formatFieldName(item.table, change.field)}
-                              </Typography>
-                              <Box sx={{ flex: 1, color: 'text.secondary' }}>
-                                {change.operation === 'added' ? (
-                                  <Typography component="span" sx={{ fontSize: 13 }}>
-                                    ={' '}
-                                    <Box
-                                      component="span"
-                                      sx={{
-                                        color: 'success.main',
-                                        fontWeight: 500,
-                                      }}
-                                    >
-                                      {formatValue(change.newValue)}
+                                                {t('changeRequest.noChanges')}
+                                              </Typography>
+                                            )}
+                                        </Box>
+                                      </Collapse>
                                     </Box>
-                                  </Typography>
-                                ) : change.operation === 'removed' ? (
-                                  <Typography
-                                    component="span"
-                                    sx={{
-                                      fontSize: 13,
-                                      color: 'error.main',
-                                      textDecoration: 'line-through',
-                                    }}
-                                  >
-                                    {formatValue(change.oldValue)}
-                                  </Typography>
-                                ) : (
-                                  <Typography component="span" sx={{ fontSize: 13 }}>
-                                    <Box
+                                  );
+                                })}
+                              </Box>
+                            </Collapse>
+                          </Paper>
+                        );
+                      })
+                    : /* Fallback: Legacy view for items without ActionGroup - now using op-based list */
+                      allChanges.map((item, idx) => (
+                        <Paper key={idx} variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
+                          <Box
+                            sx={{
+                              px: 2,
+                              py: 1,
+                              bgcolor: 'action.hover',
+                              borderBottom: 1,
+                              borderColor: 'divider',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{ fontFamily: 'monospace', fontWeight: 600 }}
+                            >
+                              {item.table}/{item.targetId}
+                            </Typography>
+                            <Chip
+                              label={item.operation}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: 11,
+                                bgcolor:
+                                  item.operation === 'create'
+                                    ? 'success.main'
+                                    : item.operation === 'delete'
+                                      ? 'error.main'
+                                      : 'primary.main',
+                                color: '#fff',
+                              }}
+                            />
+                          </Box>
+                          {/* Op-based changes list */}
+                          <Box sx={{ px: 2, py: 1 }}>
+                            {item.changes.map((change, i) => (
+                              <Box
+                                key={i}
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'flex-start',
+                                  gap: 1,
+                                  py: 0.75,
+                                  borderBottom: i < item.changes.length - 1 ? 1 : 0,
+                                  borderColor: 'divider',
+                                  fontSize: 13,
+                                  fontFamily: 'monospace',
+                                }}
+                              >
+                                <Chip
+                                  label={
+                                    change.operation === 'added'
+                                      ? 'SET'
+                                      : change.operation === 'removed'
+                                        ? 'DEL'
+                                        : 'MOD'
+                                  }
+                                  size="small"
+                                  sx={{
+                                    height: 18,
+                                    fontSize: 9,
+                                    fontWeight: 700,
+                                    minWidth: 36,
+                                    bgcolor:
+                                      change.operation === 'added'
+                                        ? 'success.main'
+                                        : change.operation === 'removed'
+                                          ? 'error.main'
+                                          : 'primary.main',
+                                    color: '#fff',
+                                  }}
+                                />
+                                <Typography component="span" sx={{ fontWeight: 600, fontSize: 13 }}>
+                                  {formatFieldName(item.table, change.field)}
+                                </Typography>
+                                <Box sx={{ flex: 1, color: 'text.secondary' }}>
+                                  {change.operation === 'added' ? (
+                                    <Typography component="span" sx={{ fontSize: 13 }}>
+                                      ={' '}
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: 'success.main',
+                                          fontWeight: 500,
+                                        }}
+                                      >
+                                        {formatValue(change.newValue)}
+                                      </Box>
+                                    </Typography>
+                                  ) : change.operation === 'removed' ? (
+                                    <Typography
                                       component="span"
                                       sx={{
+                                        fontSize: 13,
                                         color: 'error.main',
                                         textDecoration: 'line-through',
                                       }}
                                     >
                                       {formatValue(change.oldValue)}
-                                    </Box>
-                                    {' → '}
-                                    <Box
-                                      component="span"
-                                      sx={{
-                                        color: 'success.main',
-                                        fontWeight: 500,
-                                      }}
-                                    >
-                                      {formatValue(change.newValue)}
-                                    </Box>
-                                  </Typography>
-                                )}
+                                    </Typography>
+                                  ) : (
+                                    <Typography component="span" sx={{ fontSize: 13 }}>
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: 'error.main',
+                                          textDecoration: 'line-through',
+                                        }}
+                                      >
+                                        {formatValue(change.oldValue)}
+                                      </Box>
+                                      {' → '}
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: 'success.main',
+                                          fontWeight: 500,
+                                        }}
+                                      >
+                                        {formatValue(change.newValue)}
+                                      </Box>
+                                    </Typography>
+                                  )}
+                                </Box>
                               </Box>
-                            </Box>
-                          ))}
-                          {item.changes.length === 0 && (
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{ textAlign: 'center', py: 2 }}
-                            >
-                              {t('changeRequest.noChanges')}
-                            </Typography>
-                          )}
-                        </Box>
-                      </Paper>
-                    ))}
+                            ))}
+                            {item.changes.length === 0 && (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ textAlign: 'center', py: 2 }}
+                              >
+                                {t('changeRequest.noChanges')}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Paper>
+                      ))}
                 </Box>
               )}
             </Box>

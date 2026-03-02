@@ -54,6 +54,7 @@ import signalEndpointService, {
 } from '@/services/signalEndpointService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
@@ -457,34 +458,28 @@ const SignalEndpointsPage: React.FC = () => {
       </Box>
 
       {/* Content */}
-      {!loading && endpoints.length === 0 ? (
-        <EmptyPlaceholder
-          message={t('signalEndpoints.noEndpoints')}
-          onAddClick={() => setEditDialog({ open: true, endpoint: null })}
-          addButtonLabel={t('signalEndpoints.createEndpoint')}
-        />
-      ) : (
-        <TableContainer component={Paper} variant="outlined">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell width={40} />
-                <TableCell>{t('signalEndpoints.name')}</TableCell>
-                <TableCell>{t('signalEndpoints.description')}</TableCell>
-                <TableCell align="center">{t('signalEndpoints.status')}</TableCell>
-                <TableCell align="center">{t('signalEndpoints.tokens')}</TableCell>
-                <TableCell align="right">{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
+      <PageContentLoader loading={loading}>
+        {endpoints.length === 0 ? (
+          <EmptyPlaceholder
+            message={t('signalEndpoints.noEndpoints')}
+            onAddClick={() => setEditDialog({ open: true, endpoint: null })}
+            addButtonLabel={t('signalEndpoints.createEndpoint')}
+          />
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">{t('common.loading')}</Typography>
-                  </TableCell>
+                  <TableCell width={40} />
+                  <TableCell>{t('signalEndpoints.name')}</TableCell>
+                  <TableCell>{t('signalEndpoints.description')}</TableCell>
+                  <TableCell align="center">{t('signalEndpoints.status')}</TableCell>
+                  <TableCell align="center">{t('signalEndpoints.tokens')}</TableCell>
+                  <TableCell align="right">{t('common.actions')}</TableCell>
                 </TableRow>
-              ) : (
-                endpoints.map((endpoint) => (
+              </TableHead>
+              <TableBody>
+                {endpoints.map((endpoint) => (
                   <React.Fragment key={endpoint.id}>
                     <TableRow
                       hover
@@ -676,12 +671,12 @@ const SignalEndpointsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </React.Fragment>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </PageContentLoader>
 
       {/* Dialogs */}
       <EndpointDialog

@@ -55,6 +55,7 @@ export interface CreateActionSetData {
   sourceId?: number;
   filters?: Record<string, any>;
   actions: CreateActionData[];
+  projectId?: string;
   createdBy: string;
 }
 
@@ -97,12 +98,14 @@ export class ActionSetModel {
             source: data.source || 'signal-endpoint',
             sourceId: data.sourceId || null,
             filters: data.filters ? JSON.stringify(data.filters) : null,
+            projectId: data.projectId || null,
             createdBy: data.createdBy,
           });
 
           // Insert actions
           if (data.actions && data.actions.length > 0) {
             const actionsToInsert = data.actions.map((action) => ({
+              id: generateULID(),
               actionSetId: id,
               sortOrder: action.sortOrder,
               actionType: action.actionType,
@@ -153,9 +156,9 @@ export class ActionSetModel {
     }
   }
 
-  static async findAll(): Promise<ActionSet[]> {
+  static async findAll(projectId?: string): Promise<ActionSet[]> {
     try {
-      const rows = await db(this.TABLE)
+      let query = db(this.TABLE)
         .select([
           `${this.TABLE}.*`,
           'creator.name as createdByName',
@@ -166,6 +169,12 @@ export class ActionSetModel {
         .leftJoin('g_users as actor', `${this.TABLE}.actorId`, 'actor.id')
         .leftJoin('g_signal_endpoints as sep', `${this.TABLE}.sourceId`, 'sep.id')
         .orderBy(`${this.TABLE}.createdAt`, 'desc');
+
+      if (projectId) {
+        query = query.where(`${this.TABLE}.projectId`, projectId);
+      }
+
+      const rows = await query;
 
       // Batch load actions
       const setIds = rows.map((r: any) => r.id);
@@ -220,6 +229,7 @@ export class ActionSetModel {
 
           if (data.actions.length > 0) {
             const actionsToInsert = data.actions.map((action) => ({
+              id: generateULID(),
               actionSetId: id,
               sortOrder: action.sortOrder,
               actionType: action.actionType,
@@ -298,9 +308,7 @@ export class ActionSetModel {
       const rows = await db(this.TABLE)
         .where('isEnabled', true)
         .where('source', source)
-        .where(function () {
-          this.where('sourceId', sourceId).orWhereNull('sourceId');
-        })
+        .where('sourceId', sourceId)
         .whereNotNull('actorId');
 
       const results: ActionSet[] = [];

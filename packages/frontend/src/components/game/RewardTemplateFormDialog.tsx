@@ -107,11 +107,11 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
       const rewardItemsCopy =
         template.rewardItems && Array.isArray(template.rewardItems)
           ? template.rewardItems.map((item) => {
-            if (typeof item === 'object' && item !== null) {
-              return { ...item };
-            }
-            return item;
-          })
+              if (typeof item === 'object' && item !== null) {
+                return { ...item };
+              }
+              return item;
+            })
           : [];
       setRewardItems(rewardItemsCopy);
 

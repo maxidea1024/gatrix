@@ -24,13 +24,13 @@ router.post('/:endpointName', async (req: Request, res: Response) => {
   try {
     const { endpointName } = req.params;
 
-    // Extract Bearer token
+    // Extract token from Authorization header (Bearer prefix is optional)
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization token' });
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Missing authorization token' });
     }
 
-    const plainToken = authHeader.substring(7);
+    const plainToken = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
 
     // Hash the token and look it up
     const tokenHash = crypto.createHash('sha256').update(plainToken).digest('hex');

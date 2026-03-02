@@ -22,7 +22,7 @@ export interface Action {
   actionSetId: number;
   actionType: string;
   sortOrder: number;
-  params: Record<string, unknown>;
+  executionParams: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -59,7 +59,7 @@ class ActionSetService {
       actions: Array<{
         actionType: string;
         sortOrder: number;
-        params: Record<string, unknown>;
+        executionParams: Record<string, unknown>;
       }>;
     }
   ): Promise<ActionSet> {
@@ -81,7 +81,7 @@ class ActionSetService {
       actions?: Array<{
         actionType: string;
         sortOrder: number;
-        params: Record<string, unknown>;
+        executionParams: Record<string, unknown>;
       }>;
     }
   ): Promise<ActionSet> {

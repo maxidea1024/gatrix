@@ -206,10 +206,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                   placement="top"
                   arrow
                 >
-                  <IconButton
-                    size="small"
-                    onClick={handleOpenDialog}
-                  >
+                  <IconButton size="small" onClick={handleOpenDialog}>
                     <ExpandIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -250,10 +247,7 @@ const ValueEditorField: React.FC<ValueEditorFieldProps> = ({
                   placement="top"
                   arrow
                 >
-                  <IconButton
-                    size="small"
-                    onClick={handleOpenDialog}
-                  >
+                  <IconButton size="small" onClick={handleOpenDialog}>
                     <ExpandIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>

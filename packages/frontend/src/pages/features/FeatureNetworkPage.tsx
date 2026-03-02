@@ -786,9 +786,9 @@ const FeatureNetworkPage: React.FC = () => {
         label: t('network.avgEvaluationsPerHour'),
         value: evaluations
           ? Math.round(
-            evaluations.totalEvaluations /
-            (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours || 24)
-          ).toLocaleString()
+              evaluations.totalEvaluations /
+                (TIME_RANGE_OPTIONS.find((o) => o.value === timeRange)?.hours || 24)
+            ).toLocaleString()
           : '0',
         color: '#9c27b0',
       },

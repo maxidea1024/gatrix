@@ -49,9 +49,12 @@ import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
 import actionSetService, { ActionSet, ActionSetEvent } from '@/services/actionSetService';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import featureFlagService from '@/services/featureFlagService';
 import environmentService, { Environment } from '@/services/environmentService';
+import signalEndpointService, { SignalEndpoint } from '@/services/signalEndpointService';
+import { ErrorCodes, extractErrorCode } from '@gatrix/shared';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 // Action type options
@@ -69,7 +72,8 @@ interface ActionSetDialogProps {
   onSave: (data: {
     name: string;
     description?: string;
-    source?: string;
+    source: string;
+    sourceId: number;
     actions: Array<{
       actionType: string;
       sortOrder: number;
@@ -90,24 +94,27 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   const projectApiPath = getProjectApiPath();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [source, setSource] = useState('');
+  const [selectedEndpointId, setSelectedEndpointId] = useState<number | ''>('');
   const [actions, setActions] = useState<ActionItem[]>([
     { actionType: 'TOGGLE_FLAG', sortOrder: 0, params: { flagName: '', environmentId: '' } },
   ]);
   const [flagOptions, setFlagOptions] = useState<string[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
+  const [signalEndpoints, setSignalEndpoints] = useState<SignalEndpoint[]>([]);
 
   // Load flag options and environments when dialog opens
   useEffect(() => {
     if (!open) return;
     const loadData = async () => {
       try {
-        const [flagResult, envResult] = await Promise.all([
+        const [flagResult, envResult, endpointResult] = await Promise.all([
           featureFlagService.getFeatureFlags({ limit: 1000, isArchived: false }, projectApiPath),
-          environmentService.getEnvironments('' as any),
+          environmentService.getEnvironments(projectApiPath),
+          signalEndpointService.getAll(projectApiPath),
         ]);
         setFlagOptions(flagResult.flags.map((f) => f.flagName));
         setEnvironments(envResult);
+        setSignalEndpoints(endpointResult);
       } catch {
         // Silently fail - user can still type manually
       }
@@ -119,15 +126,15 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
     if (actionSet) {
       setName(actionSet.name);
       setDescription(actionSet.description || '');
-      setSource(actionSet.source || '');
+      setSelectedEndpointId(actionSet.sourceId || '');
       if (actionSet.actions && actionSet.actions.length > 0) {
         setActions(
           actionSet.actions.map((a) => ({
             actionType: a.actionType,
             sortOrder: a.sortOrder,
             params: {
-              flagName: (a.params as Record<string, string>).flagName || '',
-              environmentId: (a.params as Record<string, string>).environmentId || '',
+              flagName: (a.executionParams as Record<string, string>)?.flagName || '',
+              environmentId: (a.executionParams as Record<string, string>)?.environmentId || '',
             },
           }))
         );
@@ -143,7 +150,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
     } else {
       setName('');
       setDescription('');
-      setSource('');
+      setSelectedEndpointId('');
       setActions([
         {
           actionType: 'TOGGLE_FLAG',
@@ -182,6 +189,7 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
 
   const handleSave = () => {
     if (!name.trim()) return;
+    if (!selectedEndpointId) return;
     const validActions = actions.filter(
       (a) => a.params.flagName.trim() && a.params.environmentId.trim()
     );
@@ -190,7 +198,8 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
     onSave({
       name: name.trim(),
       description: description.trim() || undefined,
-      source: source.trim() || undefined,
+      source: 'signal-endpoint',
+      sourceId: selectedEndpointId as number,
       actions: validActions.map((a, i) => ({
         actionType: a.actionType,
         sortOrder: i,
@@ -200,7 +209,9 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
   };
 
   const isValid =
-    name.trim() && actions.some((a) => a.params.flagName.trim() && a.params.environmentId.trim());
+    name.trim() &&
+    selectedEndpointId &&
+    actions.some((a) => a.params.flagName.trim() && a.params.environmentId.trim());
 
   return (
     <ResizableDrawer
@@ -248,14 +259,21 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <TextField
-              label={t('actionSets.source')}
-              fullWidth
-              size="small"
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-              helperText={t('actionSets.sourceHelper')}
-            />
+            <FormControl size="small" fullWidth required>
+              <InputLabel>{t('actionSets.signalEndpoint')}</InputLabel>
+              <Select
+                value={selectedEndpointId}
+                label={t('actionSets.signalEndpoint')}
+                onChange={(e) => setSelectedEndpointId(e.target.value as number)}
+              >
+                {signalEndpoints.map((ep) => (
+                  <MenuItem key={ep.id} value={ep.id}>
+                    {ep.name}
+                    {!ep.isEnabled && ` (${t('signalEndpoints.disabled')})`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         </Paper>
 
@@ -314,11 +332,11 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
                 sx={{ flex: 1, minWidth: 150 }}
               />
               <FormControl size="small" sx={{ flex: 1, minWidth: 120 }}>
-                <InputLabel>{t('actionSets.environmentId')}</InputLabel>
+                <InputLabel>{t('common.environment')}</InputLabel>
                 <Select
                   value={action.params.environmentId}
-                  label={t('actionSets.environmentId')}
-                  onChange={(e) => handleActionChange(index, 'environment', e.target.value)}
+                  label={t('common.environment')}
+                  onChange={(e) => handleActionChange(index, 'environmentId', e.target.value)}
                 >
                   {environments.map((env) => (
                     <MenuItem key={env.environmentId} value={env.environmentId}>
@@ -458,28 +476,43 @@ const ActionSetsPage: React.FC = () => {
   const handleSaveActionSet = async (data: {
     name: string;
     description?: string;
-    source?: string;
+    source: string;
+    sourceId: number;
     actions: Array<{
       actionType: string;
       sortOrder: number;
       params: Record<string, unknown>;
     }>;
   }) => {
+    // Transform params -> executionParams for backend
+    const transformedData = {
+      ...data,
+      actions: data.actions.map((a) => ({
+        actionType: a.actionType,
+        sortOrder: a.sortOrder,
+        executionParams: a.params,
+      })),
+    };
     try {
       if (editDialog.actionSet) {
-        await actionSetService.update(projectApiPath, editDialog.actionSet.id, data);
+        await actionSetService.update(projectApiPath, editDialog.actionSet.id, transformedData);
         enqueueSnackbar(t('actionSets.updateSuccess'), { variant: 'success' });
       } else {
-        await actionSetService.create(projectApiPath, data);
+        await actionSetService.create(projectApiPath, transformedData);
         enqueueSnackbar(t('actionSets.createSuccess'), { variant: 'success' });
       }
       setEditDialog({ open: false, actionSet: null });
       fetchActionSets();
-    } catch (error) {
-      enqueueSnackbar(
-        editDialog.actionSet ? t('actionSets.updateFailed') : t('actionSets.createFailed'),
-        { variant: 'error' }
-      );
+    } catch (error: any) {
+      const errorCode = extractErrorCode(error);
+      if (errorCode === ErrorCodes.RESOURCE_ALREADY_EXISTS) {
+        enqueueSnackbar(t('actionSets.duplicateName'), { variant: 'error' });
+      } else {
+        enqueueSnackbar(
+          editDialog.actionSet ? t('actionSets.updateFailed') : t('actionSets.createFailed'),
+          { variant: 'error' }
+        );
+      }
     }
   };
 
@@ -553,34 +586,28 @@ const ActionSetsPage: React.FC = () => {
       </Box>
 
       {/* Content */}
-      {!loading && actionSets.length === 0 ? (
-        <EmptyPlaceholder
-          message={t('actionSets.noActionSets')}
-          onAddClick={() => setEditDialog({ open: true, actionSet: null })}
-          addButtonLabel={t('actionSets.createActionSet')}
-        />
-      ) : (
-        <TableContainer component={Paper} variant="outlined">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell width={40} />
-                <TableCell>{t('actionSets.name')}</TableCell>
-                <TableCell>{t('actionSets.source')}</TableCell>
-                <TableCell align="center">{t('actionSets.status')}</TableCell>
-                <TableCell align="center">{t('actionSets.actionCount')}</TableCell>
-                <TableCell align="right">{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
+      <PageContentLoader loading={loading}>
+        {actionSets.length === 0 ? (
+          <EmptyPlaceholder
+            message={t('actionSets.noActionSets')}
+            onAddClick={() => setEditDialog({ open: true, actionSet: null })}
+            addButtonLabel={t('actionSets.createActionSet')}
+          />
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">{t('common.loading')}</Typography>
-                  </TableCell>
+                  <TableCell width={40} />
+                  <TableCell>{t('actionSets.name')}</TableCell>
+                  <TableCell>{t('actionSets.source')}</TableCell>
+                  <TableCell align="center">{t('actionSets.status')}</TableCell>
+                  <TableCell align="center">{t('actionSets.actionCount')}</TableCell>
+                  <TableCell align="right">{t('common.actions')}</TableCell>
                 </TableRow>
-              ) : (
-                actionSets.map((actionSet) => (
+              </TableHead>
+              <TableBody>
+                {actionSets.map((actionSet) => (
                   <React.Fragment key={actionSet.id}>
                     <TableRow
                       hover
@@ -605,7 +632,7 @@ const ActionSetsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
-                          {actionSet.source || '-'}
+                          {(actionSet as any).sourceName || actionSet.source || '-'}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
@@ -687,10 +714,10 @@ const ActionSetsPage: React.FC = () => {
                                           size="small"
                                           color={
                                             getStateColor(event.eventState) as
-                                              | 'success'
-                                              | 'error'
-                                              | 'info'
-                                              | 'default'
+                                            | 'success'
+                                            | 'error'
+                                            | 'info'
+                                            | 'default'
                                           }
                                         />
                                       </TableCell>
@@ -708,12 +735,12 @@ const ActionSetsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </React.Fragment>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </PageContentLoader>
 
       {/* Dialogs */}
       <ActionSetDialog

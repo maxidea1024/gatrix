@@ -66,7 +66,7 @@ export class ActionExecutionService {
   /**
    * Process a single signal by finding matching action sets and executing their actions
    */
-  private static async processSignal(signal: Signal): Promise<void> {
+  static async processSignal(signal: Signal): Promise<void> {
     // Find matching action sets
     const matchingActionSets = await ActionSetModel.findMatchingActionSets(
       signal.source,

@@ -14,6 +14,7 @@ import linkPreviewRoutes from './linkPreview';
 import mailRoutes from './mails';
 import couponRoutes from './coupons';
 import entityLockRoutes from '../controllers/EntityLockController';
+import signalIngestionRoutes from './public/signals';
 
 const router = express.Router();
 
@@ -44,5 +45,6 @@ router.use('/mails', mailRoutes);
 router.use('/coupons', couponRoutes);
 router.use('/public', publicRoutes);
 router.use('/entity-locks', entityLockRoutes);
+router.use('/signals', signalIngestionRoutes);
 
 export default router;
