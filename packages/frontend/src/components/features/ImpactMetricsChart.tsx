@@ -186,6 +186,8 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -230,7 +232,9 @@ const ChartPanel: React.FC<ChartPanelProps> = ({
         params.groupBy = config.groupBy;
       }
 
-      const response = await api.get<TimeSeriesResponse>(`${projectApiPath}/impact-metrics`, { params });
+      const response = await api.get<TimeSeriesResponse>(`${projectApiPath}/impact-metrics`, {
+        params,
+      });
       setSeriesData(response.data);
       hasLoadedRef.current = true;
     } catch (err: any) {
@@ -643,6 +647,8 @@ const ChartConfigDialog: React.FC<{
   initialValues?: MetricConfig;
 }> = ({ open, onClose, onSave, availableMetrics, loadingMetrics, initialValues }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [title, setTitle] = useState('');
   const [metricName, setMetricName] = useState('');
   const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line');
@@ -1090,7 +1096,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     if (availableMetrics.length === 0) {
       setLoadingMetrics(true);
       try {
-        const response = await api.get<AvailableMetric[]>(`${projectApiPath}/impact-metrics/available`);
+        const response = await api.get<AvailableMetric[]>(
+          `${projectApiPath}/impact-metrics/available`
+        );
         setAvailableMetrics(response.data || []);
       } catch (err) {
         console.error('Failed to fetch available metrics:', err);
@@ -1106,7 +1114,9 @@ const ImpactMetricsChart: React.FC<ImpactMetricsChartProps> = ({
     if (availableMetrics.length === 0) {
       setLoadingMetrics(true);
       try {
-        const response = await api.get<AvailableMetric[]>(`${projectApiPath}/impact-metrics/available`);
+        const response = await api.get<AvailableMetric[]>(
+          `${projectApiPath}/impact-metrics/available`
+        );
         setAvailableMetrics(response.data || []);
       } catch (err) {
         console.error('Failed to fetch available metrics:', err);

@@ -61,6 +61,7 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
 import SearchTextField from '../../components/common/SearchTextField';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import {
   DndContext,
   closestCenter,
@@ -717,6 +718,8 @@ const ServerLifecyclePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -842,7 +845,7 @@ const ServerLifecyclePage: React.FC = () => {
     params.sortBy = sortBy;
     params.sortOrder = sortOrder;
 
-    return await serverLifecycleService.getEvents(params);
+    return await serverLifecycleService.getEvents(projectApiPath, params);
   }, [page, rowsPerPage, debouncedSearchQuery, debouncedActiveFilters, sortBy, sortOrder]);
 
   const { data, isLoading, mutate } = useSWR(

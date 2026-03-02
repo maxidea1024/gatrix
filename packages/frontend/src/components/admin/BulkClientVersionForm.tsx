@@ -51,6 +51,7 @@ import { MessageTemplate, messageTemplateService } from '../../services/messageT
 import ResizableDrawer from '../common/ResizableDrawer';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
 
 // 클라이언트 상태 라벨 매핑
@@ -139,6 +140,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
   const { currentEnvironment } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
@@ -208,7 +211,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     if (open) {
       const loadTags = async () => {
         try {
-          const tags = await tagService.list();
+          const tags = await tagService.list(projectApiPath);
           setAllTags(tags);
         } catch (error) {
           console.error('Failed to load tags:', error);
@@ -217,7 +220,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
       const loadTemplates = async () => {
         try {
-          const result = await messageTemplateService.list({
+          const result = await messageTemplateService.list(projectApiPath, {
             type: 'maintenance',
             isEnabled: true,
           });
@@ -286,7 +289,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       const newPlatforms: PlatformSpecificSettings[] = await Promise.all(
         selectedPlatforms.map(async (platform) => {
           try {
-            const defaults = await PlatformDefaultsService.getPlatformDefaults(platform);
+            const defaults = await PlatformDefaultsService.getPlatformDefaults(
+              projectApiPath,
+              platform
+            );
             return {
               platform,
               gameServerAddress: defaults.gameServerAddress || '',
@@ -380,7 +386,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             : [],
       };
 
-      const result = await ClientVersionService.bulkCreateClientVersions(cleanedData);
+      const result = await ClientVersionService.bulkCreateClientVersions(
+        projectApiPath,
+        cleanedData
+      );
 
       enqueueSnackbar(t('clientVersions.bulkCreateSuccess', { count: result?.length || 0 }), {
         variant: 'success',

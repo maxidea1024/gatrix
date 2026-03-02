@@ -1109,7 +1109,7 @@ const FeatureFlagsPage: React.FC = () => {
     if (!actionMenuFlag) return;
     try {
       const newStale = !actionMenuFlag.stale;
-      await api.put(`/admin/features/${actionMenuFlag.flagName}`, {
+      await api.put(`${projectApiPath}/features/${actionMenuFlag.flagName}`, {
         stale: newStale,
       });
       enqueueSnackbar(
@@ -1243,18 +1243,18 @@ const FeatureFlagsPage: React.FC = () => {
 
     try {
       for (const flag of targetFlags) {
-        await api.put(`/admin/features/${flag.flagName}`, {
+        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
           stale: markAsStale,
         });
       }
       enqueueSnackbar(
         markAsStale
           ? t('featureFlags.bulkMarkStaleSuccess', {
-            count: targetFlags.length,
-          })
+              count: targetFlags.length,
+            })
           : t('featureFlags.bulkClearStaleSuccess', {
-            count: targetFlags.length,
-          }),
+              count: targetFlags.length,
+            }),
         { variant: 'success' }
       );
       setSelectedFlags(new Set());
@@ -1289,13 +1289,13 @@ const FeatureFlagsPage: React.FC = () => {
       enqueueSnackbar(
         enable
           ? t('featureFlags.bulkEnableSuccess', {
-            count: targetFlags.length,
-            env: environmentId,
-          })
+              count: targetFlags.length,
+              env: environmentId,
+            })
           : t('featureFlags.bulkDisableSuccess', {
-            count: targetFlags.length,
-            env: environmentId,
-          }),
+              count: targetFlags.length,
+              env: environmentId,
+            }),
         { variant: enable ? 'success' : 'warning' }
       );
       setSelectedFlags(new Set());
@@ -1337,7 +1337,7 @@ const FeatureFlagsPage: React.FC = () => {
     setCreating(true);
     try {
       // Create flag with empty strategies - user can add strategies manually
-      await api.post('/admin/features', {
+      await api.post(`${projectApiPath}/features`, {
         flagName: newFlag.flagName.trim(),
         displayName: newFlag.displayName.trim() || undefined,
         description: newFlag.description.trim(),
@@ -1844,32 +1844,32 @@ const FeatureFlagsPage: React.FC = () => {
                       {/* Row 2: Display name + description (when available) */}
                       {((flag.displayName && flag.displayName !== flag.flagName) ||
                         flag.description) && (
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1.5,
-                              mt: 0.25,
-                              pl: 3.5,
-                            }}
-                          >
-                            {flag.displayName && flag.displayName !== flag.flagName && (
-                              <Typography variant="body2" color="text.secondary" noWrap>
-                                {flag.displayName}
-                              </Typography>
-                            )}
-                            {flag.description && (
-                              <Typography
-                                variant="body2"
-                                color="text.disabled"
-                                noWrap
-                                sx={{ flex: 1, minWidth: 0 }}
-                              >
-                                — {flag.description}
-                              </Typography>
-                            )}
-                          </Box>
-                        )}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            mt: 0.25,
+                            pl: 3.5,
+                          }}
+                        >
+                          {flag.displayName && flag.displayName !== flag.flagName && (
+                            <Typography variant="body2" color="text.secondary" noWrap>
+                              {flag.displayName}
+                            </Typography>
+                          )}
+                          {flag.description && (
+                            <Typography
+                              variant="body2"
+                              color="text.disabled"
+                              noWrap
+                              sx={{ flex: 1, minWidth: 0 }}
+                            >
+                              — {flag.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
 
                       {/* Row 3: Env switches + value info + tags + times */}
                       <Box

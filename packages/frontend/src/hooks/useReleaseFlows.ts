@@ -24,7 +24,9 @@ export function useReleaseFlowPlan(flagId: string | null, environmentId: string 
   const projectApiPath = getProjectApiPath();
 
   const url =
-    flagId && environmentId ? `${projectApiPath}/release-flows/plans/${flagId}/${environmentId}` : null;
+    flagId && environmentId
+      ? `${projectApiPath}/release-flows/plans/${flagId}/${environmentId}`
+      : null;
 
   return useApi<ReleaseFlowPlan>(url);
 }
@@ -41,7 +43,9 @@ export function useConditionalReleaseFlowPlan(
   const projectApiPath = getProjectApiPath();
 
   const url =
-    flagId && environmentId ? `${projectApiPath}/release-flows/plans/${flagId}/${environmentId}` : null;
+    flagId && environmentId
+      ? `${projectApiPath}/release-flows/plans/${flagId}/${environmentId}`
+      : null;
 
   return useConditionalApi<ReleaseFlowPlan>(url, condition);
 }

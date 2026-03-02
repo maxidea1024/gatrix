@@ -68,6 +68,7 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -76,6 +77,8 @@ const ServiceNoticesPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const { currentEnvironment } = useEnvironment();
   const canManage = hasPermission([PERMISSIONS.SERVICE_NOTICES_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [notices, setNotices] = useState<ServiceNotice[]>([]);
@@ -299,7 +302,12 @@ const ServiceNoticesPage: React.FC = () => {
         filters.sortOrder = order;
       }
 
-      const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
+      const result = await serviceNoticeService.getServiceNotices(
+        projectApiPath,
+        page + 1,
+        rowsPerPage,
+        filters
+      );
 
       // Validate response
       if (result && typeof result === 'object') {
@@ -428,7 +436,10 @@ const ServiceNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      const result = await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
+      const result = await serviceNoticeService.deleteServiceNotice(
+        projectApiPath,
+        deletingNotice.id
+      );
 
       if (result.isChangeRequest) {
         // CR was created, not immediately deleted
@@ -459,7 +470,10 @@ const ServiceNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      const result = await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
+      const result = await serviceNoticeService.deleteMultipleServiceNotices(
+        projectApiPath,
+        selectedIds
+      );
 
       if (result.isChangeRequest) {
         // CR was created, not immediately deleted
@@ -538,7 +552,7 @@ const ServiceNoticesPage: React.FC = () => {
 
   const handleToggleActive = async (notice: ServiceNotice) => {
     try {
-      await serviceNoticeService.toggleActive(notice.id);
+      await serviceNoticeService.toggleActive(projectApiPath, notice.id);
       enqueueSnackbar(t('serviceNotices.toggleSuccess'), {
         variant: 'success',
       });

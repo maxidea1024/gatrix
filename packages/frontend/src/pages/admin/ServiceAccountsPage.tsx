@@ -61,6 +61,7 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PermissionSelector from '@/components/common/PermissionSelector';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { Permission } from '@/types';
 
 // ==================== Create/Edit Dialog ====================
@@ -226,6 +227,8 @@ interface TokenDialogProps {
 
 const TokenDialog: React.FC<TokenDialogProps> = ({ open, accountId, onClose, onCreated }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [tokenName, setTokenName] = useState('');
   const [description, setDescription] = useState('');
   const [createdToken, setCreatedToken] = useState<string | null>(null);
@@ -243,7 +246,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, accountId, onClose, onC
     if (!accountId || !tokenName.trim()) return;
     setLoading(true);
     try {
-      const result = await serviceAccountService.createToken(accountId, {
+      const result = await serviceAccountService.createToken(projectApiPath, accountId, {
         name: tokenName.trim(),
         description: description.trim() || undefined,
       });
@@ -370,6 +373,8 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
 // ==================== Main Page ====================
 const ServiceAccountsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [accounts, setAccounts] = useState<ServiceAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -397,7 +402,7 @@ const ServiceAccountsPage: React.FC = () => {
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await serviceAccountService.getAll();
+      const data = await serviceAccountService.getAll(projectApiPath);
       setAccounts(data);
     } catch (error) {
       enqueueSnackbar(t('serviceAccounts.loadFailed'), { variant: 'error' });
@@ -413,7 +418,7 @@ const ServiceAccountsPage: React.FC = () => {
   const fetchTokens = useCallback(
     async (accountId: number) => {
       try {
-        const account = await serviceAccountService.getById(accountId);
+        const account = await serviceAccountService.getById(projectApiPath, accountId);
         if (account.tokens) {
           setAccountTokens((prev) => ({ ...prev, [accountId]: account.tokens! }));
         }
@@ -442,10 +447,10 @@ const ServiceAccountsPage: React.FC = () => {
   }) => {
     try {
       if (editDialog.account) {
-        await serviceAccountService.update(editDialog.account.id, data);
+        await serviceAccountService.update(projectApiPath, editDialog.account.id, data);
         enqueueSnackbar(t('serviceAccounts.updateSuccess'), { variant: 'success' });
       } else {
-        await serviceAccountService.create(data);
+        await serviceAccountService.create(projectApiPath, data);
         enqueueSnackbar(t('serviceAccounts.createSuccess'), { variant: 'success' });
       }
       setEditDialog({ open: false, account: null });
@@ -462,10 +467,14 @@ const ServiceAccountsPage: React.FC = () => {
     if (!deleteDialog) return;
     try {
       if (deleteDialog.type === 'account') {
-        await serviceAccountService.delete(deleteDialog.accountId);
+        await serviceAccountService.delete(projectApiPath, deleteDialog.accountId);
         enqueueSnackbar(t('serviceAccounts.deleteSuccess'), { variant: 'success' });
       } else if (deleteDialog.tokenId) {
-        await serviceAccountService.deleteToken(deleteDialog.accountId, deleteDialog.tokenId);
+        await serviceAccountService.deleteToken(
+          projectApiPath,
+          deleteDialog.accountId,
+          deleteDialog.tokenId
+        );
         enqueueSnackbar(t('serviceAccounts.tokenDeleteSuccess'), { variant: 'success' });
         fetchTokens(deleteDialog.accountId);
       }

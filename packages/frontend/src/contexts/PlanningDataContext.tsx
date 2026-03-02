@@ -5,6 +5,7 @@ import planningDataService, {
   RewardLookupData,
 } from '../services/planningDataService';
 import { useEnvironment } from './EnvironmentContext';
+import { useOrgProject } from './OrgProjectContext';
 
 interface PlanningDataContextType {
   rewardTypes: RewardTypeInfo[];
@@ -31,6 +32,8 @@ interface PlanningDataProviderProps {
 export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ children }) => {
   const { i18n } = useTranslation();
   const { currentEnvironmentId } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [rewardTypes, setRewardTypes] = useState<RewardTypeInfo[]>([]);
   const [rewardLookup, setRewardLookup] = useState<RewardLookupData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,11 +73,11 @@ export const PlanningDataProvider: React.FC<PlanningDataProviderProps> = ({ chil
       const language = languageMap[i18n.language] || 'kr';
 
       // Load reward types
-      const types = await planningDataService.getRewardTypeList();
+      const types = await planningDataService.getRewardTypeList(projectApiPath);
       setRewardTypes(types);
 
       // Load reward lookup data
-      const lookup = await planningDataService.getRewardLookup();
+      const lookup = await planningDataService.getRewardLookup(projectApiPath);
       setRewardLookup(lookup);
     } catch (err: any) {
       const errorMessage = err?.message || 'Failed to load planning data';

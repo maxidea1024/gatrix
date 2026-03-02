@@ -145,6 +145,7 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getContrastColor } from '@/utils/colorUtils';
 import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
@@ -341,6 +342,8 @@ const ClientVersionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.CLIENT_VERSIONS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // 페이지 상태 관리 (localStorage 연동)
   const { pageState, updatePage, updateLimit, updateSort, updateFilters } = usePageState({
@@ -509,7 +512,7 @@ const ClientVersionsPage: React.FC = () => {
   // 메시지 템플릿 로드 (SWR로 변경 예정이지만 일단 유지)
   useEffect(() => {
     messageTemplateService
-      .list({ isEnabled: true })
+      .list(projectApiPath, { isEnabled: true })
       .then((response) => {
         setMessageTemplates(response.templates || []);
       })
@@ -775,7 +778,10 @@ const ClientVersionsPage: React.FC = () => {
     if (!selectedClientVersion) return;
 
     try {
-      const result = await ClientVersionService.deleteClientVersion(selectedClientVersion.id);
+      const result = await ClientVersionService.deleteClientVersion(
+        projectApiPath,
+        selectedClientVersion.id
+      );
       if (result?.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -836,7 +842,7 @@ const ClientVersionsPage: React.FC = () => {
         }),
       };
 
-      const result = await ClientVersionService.bulkUpdateStatus(request);
+      const result = await ClientVersionService.bulkUpdateStatus(projectApiPath, request);
       console.log('🔍 Bulk update result:', result);
 
       // 로컬라이징된 메시지 생성
@@ -885,7 +891,9 @@ const ClientVersionsPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => ClientVersionService.deleteClientVersion(id)));
+      await Promise.all(
+        selectedIds.map((id) => ClientVersionService.deleteClientVersion(projectApiPath, id))
+      );
       enqueueSnackbar(t('clientVersions.bulkDeleteSuccess', { count: selectedIds.length }), {
         variant: 'success',
       });
@@ -912,11 +920,14 @@ const ClientVersionsPage: React.FC = () => {
         const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
 
         if (format === 'csv') {
-          blob = await ClientVersionService.exportToCSV(pageState.filters || {});
+          blob = await ClientVersionService.exportToCSV(projectApiPath, pageState.filters || {});
           filename = `client-versions-${dateTimeStr}.csv`;
         } else if (format === 'json') {
           // JSON 내보내기
-          const result = await ClientVersionService.exportToCSV(pageState.filters || {}); // 같은 데이터 사용
+          const result = await ClientVersionService.exportToCSV(
+            projectApiPath,
+            pageState.filters || {}
+          ); // 같은 데이터 사용
           const text = await result.text();
           const lines = text.split('\n');
           const headers = lines[0].split(',');
@@ -937,7 +948,10 @@ const ClientVersionsPage: React.FC = () => {
           filename = `client-versions-${dateTimeStr}.json`;
         } else if (format === 'xlsx') {
           // XLSX 내보내기
-          const result = await ClientVersionService.exportToCSV(pageState.filters || {});
+          const result = await ClientVersionService.exportToCSV(
+            projectApiPath,
+            pageState.filters || {}
+          );
           const text = await result.text();
           const lines = text.split('\n');
           const headers = lines[0].split(',').map((h) => h.replace(/"/g, ''));
@@ -1223,7 +1237,7 @@ const ClientVersionsPage: React.FC = () => {
     async (clientVersion: ClientVersion) => {
       try {
         setSelectedClientVersionForTags(clientVersion);
-        const tags = await ClientVersionService.getTags(clientVersion.id!);
+        const tags = await ClientVersionService.getTags(projectApiPath, clientVersion.id!);
         setClientVersionTags(tags);
         setTagDialogOpen(true);
       } catch (error) {
@@ -1239,7 +1253,7 @@ const ClientVersionsPage: React.FC = () => {
       if (!selectedClientVersionForTags?.id) return;
 
       try {
-        await ClientVersionService.setTags(selectedClientVersionForTags.id, tagIds);
+        await ClientVersionService.setTags(projectApiPath, selectedClientVersionForTags.id, tagIds);
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
         // 필요시 목록 새로고침

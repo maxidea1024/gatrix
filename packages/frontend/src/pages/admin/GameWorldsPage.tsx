@@ -99,6 +99,7 @@ import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
@@ -331,6 +332,8 @@ const GameWorldsPage: React.FC = () => {
   const { currentEnvironmentId, currentEnvironment } = useEnvironment();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.GAME_WORLDS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
 
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
@@ -527,7 +530,7 @@ const GameWorldsPage: React.FC = () => {
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const result = await messageTemplateService.list({ limit: 1000 });
+        const result = await messageTemplateService.list(projectApiPath, { limit: 1000 });
         console.log('[GameWorldsPage] Message templates loaded:', result);
         const enabledTemplates = result.templates.filter((t) => t.isEnabled);
         console.log('[GameWorldsPage] Enabled templates:', enabledTemplates);
@@ -788,7 +791,7 @@ const GameWorldsPage: React.FC = () => {
           : [];
       const tagOperator = tagFilter?.operator;
 
-      const result = await gameWorldService.getGameWorlds({
+      const result = await gameWorldService.getGameWorlds(projectApiPath, {
         // 서버 컨트롤러는 tagIds(쉼표구분)를 기대함
         search: debouncedSearch || undefined,
         tagIds: tagIds.length ? tagIds.join(',') : undefined,
@@ -1085,14 +1088,18 @@ const GameWorldsPage: React.FC = () => {
 
       let savedWorld: any;
       if (editingWorld) {
-        savedWorld = await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
+        savedWorld = await gameWorldService.updateGameWorld(
+          projectApiPath,
+          editingWorld.id,
+          dataToSend
+        );
         if (savedWorld.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
         }
       } else {
-        savedWorld = await gameWorldService.createGameWorld(dataToSend);
+        savedWorld = await gameWorldService.createGameWorld(projectApiPath, dataToSend);
         if (savedWorld.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
@@ -1146,7 +1153,10 @@ const GameWorldsPage: React.FC = () => {
       deleteConfirmDialog.inputValue === deleteConfirmDialog.world.name
     ) {
       try {
-        const result = await gameWorldService.deleteGameWorld(deleteConfirmDialog.world.id);
+        const result = await gameWorldService.deleteGameWorld(
+          projectApiPath,
+          deleteConfirmDialog.world.id
+        );
 
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
@@ -1169,7 +1179,7 @@ const GameWorldsPage: React.FC = () => {
     if (!world) return;
 
     try {
-      const result = await gameWorldService.toggleVisibility(world.id);
+      const result = await gameWorldService.toggleVisibility(projectApiPath, world.id);
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -1282,7 +1292,11 @@ const GameWorldsPage: React.FC = () => {
           );
         }
 
-        await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
+        await gameWorldService.updateMaintenance(
+          projectApiPath,
+          maintenanceToggleDialog.world.id,
+          updateData
+        );
         enqueueSnackbar(t('gameWorlds.maintenanceStarted'), {
           variant: 'success',
         });
@@ -1293,7 +1307,11 @@ const GameWorldsPage: React.FC = () => {
           maintenanceMessage: '',
           maintenanceLocales: [],
         };
-        await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
+        await gameWorldService.updateMaintenance(
+          projectApiPath,
+          maintenanceToggleDialog.world.id,
+          updateData
+        );
         enqueueSnackbar(t('gameWorlds.maintenanceEnded'), {
           variant: 'success',
         });
@@ -1353,7 +1371,7 @@ const GameWorldsPage: React.FC = () => {
       console.log('Order updates to send:', orderUpdates);
 
       try {
-        await gameWorldService.updateDisplayOrders(orderUpdates);
+        await gameWorldService.updateDisplayOrders(projectApiPath, orderUpdates);
         console.log('Display orders updated successfully');
         const movedWorld = worlds.find((w) => w.id === active.id);
         enqueueSnackbar(t('gameWorlds.orderUpdated', { name: movedWorld?.name || 'Unknown' }), {

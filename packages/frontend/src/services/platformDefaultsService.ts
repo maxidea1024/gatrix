@@ -16,46 +16,61 @@ export interface ApiResponse<T> {
 }
 
 export class PlatformDefaultsService {
-  private static readonly BASE_URL = '/admin/platform-defaults';
+  private static basePath(projectApiPath: string): string {
+    return `${projectApiPath}/platform-defaults`;
+  }
 
   /**
    * Get default values of all platforms
    */
-  static async getAllDefaults(): Promise<PlatformDefaultsMap> {
-    const response = await apiService.get<PlatformDefaultsMap>(this.BASE_URL);
+  static async getAllDefaults(projectApiPath: string): Promise<PlatformDefaultsMap> {
+    const response = await apiService.get<PlatformDefaultsMap>(this.basePath(projectApiPath));
     return response.data || {};
   }
 
   /**
    * Get default values of specific platform
    */
-  static async getPlatformDefaults(platform: string): Promise<PlatformDefaults> {
+  static async getPlatformDefaults(
+    projectApiPath: string,
+    platform: string
+  ): Promise<PlatformDefaults> {
     const response = await apiService.get<{
       platform: string;
       defaults: PlatformDefaults;
-    }>(`${this.BASE_URL}/${encodeURIComponent(platform)}`);
+    }>(`${this.basePath(projectApiPath)}/${encodeURIComponent(platform)}`);
     return response.data?.defaults || {};
   }
 
   /**
    * Set default values of specific platform
    */
-  static async setPlatformDefaults(platform: string, defaults: PlatformDefaults): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/${encodeURIComponent(platform)}`, defaults);
+  static async setPlatformDefaults(
+    projectApiPath: string,
+    platform: string,
+    defaults: PlatformDefaults
+  ): Promise<void> {
+    await apiService.put(
+      `${this.basePath(projectApiPath)}/${encodeURIComponent(platform)}`,
+      defaults
+    );
   }
 
   /**
    * Bulk set default values of all platforms
    */
-  static async setAllDefaults(defaultsMap: PlatformDefaultsMap): Promise<void> {
-    await apiService.put(this.BASE_URL, defaultsMap);
+  static async setAllDefaults(
+    projectApiPath: string,
+    defaultsMap: PlatformDefaultsMap
+  ): Promise<void> {
+    await apiService.put(this.basePath(projectApiPath), defaultsMap);
   }
 
   /**
    * Delete default values of specific platform
    */
-  static async deletePlatformDefaults(platform: string): Promise<void> {
-    await apiService.delete(`${this.BASE_URL}/${encodeURIComponent(platform)}`);
+  static async deletePlatformDefaults(projectApiPath: string, platform: string): Promise<void> {
+    await apiService.delete(`${this.basePath(projectApiPath)}/${encodeURIComponent(platform)}`);
   }
 
   /**

@@ -365,14 +365,18 @@ const FeatureNetworkPage: React.FC = () => {
         evalTimeSeriesRes,
         evalTimeSeriesByAppRes,
       ] = await Promise.all([
-        api.get<{ traffic: TrafficDataPoint[] }>(`${projectApiPath}/features/network/traffic?${params}`),
+        api.get<{ traffic: TrafficDataPoint[] }>(
+          `${projectApiPath}/features/network/traffic?${params}`
+        ),
         api.get<{ traffic: ChartDataPoint[] }>(
           `${projectApiPath}/features/network/traffic/aggregated?${params}`
         ),
         api.get<{ traffic: ChartDataPointByApp[] }>(
           `${projectApiPath}/features/network/traffic/aggregated/by-app?${params}`
         ),
-        api.get<{ summary: TrafficSummary }>(`${projectApiPath}/features/network/summary?${params}`),
+        api.get<{ summary: TrafficSummary }>(
+          `${projectApiPath}/features/network/summary?${params}`
+        ),
         api.get<{ evaluations: EvaluationSummary }>(
           `${projectApiPath}/features/network/evaluations?${params}`
         ),

@@ -51,12 +51,15 @@ import {
 } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // settings list
   const [settings, setSettings] = useState<CouponSetting[]>([]);
@@ -341,7 +344,7 @@ const CouponUsagePage: React.FC = () => {
   // fetch settings list once
   useEffect(() => {
     (async () => {
-      const res = await couponService.listSettings({ page: 1, limit: 100 });
+      const res = await couponService.listSettings(projectApiPath, { page: 1, limit: 100 });
       setSettings(res.settings || []);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -395,7 +398,7 @@ const CouponUsagePage: React.FC = () => {
       setExportMenuAnchor(null);
 
       // Call backend API to get data with timezone conversion
-      const exportResult = await couponService.exportUsage({
+      const exportResult = await couponService.exportUsage(projectApiPath, {
         ...(settingIdFilter && { settingId: settingIdFilter }),
         ...(couponCodeFilter && { couponCode: couponCodeFilter }),
         ...(platformFilter && { platform: platformFilter }),

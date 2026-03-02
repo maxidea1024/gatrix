@@ -188,188 +188,24 @@ projectRouter.delete(
   ImpactMetricsController.deleteConfig.bind(ImpactMetricsController) as any
 );
 
-// Mount project-scoped router
-router.use('/orgs/:orgId/projects/:projectId', projectRouter);
+// --- Project-Level routes (project.*) ---
 
-// Client versions - requires client-versions.view or client-versions.manage permission
-router.use(
-  '/client-versions',
-  requirePermission([PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE]) as any,
-  clientVersionRoutes
-);
-
-// Audit logs - requires audit-logs.view permission
-router.use('/audit-logs', requirePermission(PERMISSIONS.AUDIT_LOGS_VIEW) as any, auditLogRoutes);
-
-// Tags — MOVED to project-scoped router above
-
-// Message templates and translation - part of maintenance templates
-router.use(
-  '/message-templates',
-  requirePermission([
-    PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
-    PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
-  ]) as any,
-  messageTemplateRoutes
-);
-router.use(
-  '/translation',
-  requirePermission([
-    PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
-    PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
-  ]) as any,
-  translationRoutes
-);
-// vars (KV) - no permission required, used by many components for basic data like platform, channels
-router.use('/vars', varsRoutes);
-
-// Game worlds - requires game-worlds.view or game-worlds.manage permission
-router.use(
-  '/game-worlds',
-  requirePermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]) as any,
-  gameWorldRoutes
-);
-
-// Environments — MOVED to project-scoped router above
-
-// Jobs and scheduler - requires scheduler.view or scheduler.manage permission
-router.use(
-  '/jobs',
-  requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
-  jobRoutes
-);
-
-// Maintenance - requires maintenance.view or maintenance.manage permission
-router.use(
-  '/maintenance',
-  requirePermission([PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE]) as any,
-  maintenanceRoutes
-);
-
-// Invitations (part of user management)
-router.use(
-  '/invitations',
-  requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any,
-  invitationRoutes
-);
-
-// Crash events - requires crash-events.view permission
-router.use(
-  '/crash-events',
-  requirePermission(PERMISSIONS.CRASH_EVENTS_VIEW) as any,
-  crashEventRoutes
-);
-
-// Console - requires console.access permission
-router.use('/console', requirePermission(PERMISSIONS.CONSOLE_ACCESS) as any, consoleRoutes);
-
-// Surveys - requires surveys.view or surveys.manage permission
-router.use(
-  '/surveys',
-  requirePermission([PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.SURVEYS_MANAGE]) as any,
-  surveyRoutes
-);
-
-// Reward templates - requires reward-templates.view or reward-templates.manage permission
-router.use(
-  '/reward-templates',
-  requirePermission([
-    PERMISSIONS.REWARD_TEMPLATES_VIEW,
-    PERMISSIONS.REWARD_TEMPLATES_MANAGE,
-  ]) as any,
-  rewardTemplateRoutes
-);
-
-// Store products - requires store-products.view or store-products.manage permission
-router.use(
-  '/store-products',
-  requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any,
-  storeProductRoutes
-);
-
-// Service notices - requires service-notices.view or service-notices.manage permission
-router.use(
-  '/service-notices',
-  requirePermission([PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE]) as any,
-  serviceNoticeRoutes
-);
-
-// Ingame popup notices - requires ingame-popup-notices.view or ingame-popup-notices.manage permission
-router.use(
-  '/ingame-popup-notices',
-  requirePermission([
-    PERMISSIONS.INGAME_POPUP_NOTICES_VIEW,
-    PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE,
-  ]) as any,
-  ingamePopupNoticeRoutes
-);
-
-// Monitoring alerts - requires monitoring.view permission
-router.use(
-  '/monitoring/alerts',
-  requirePermission(PERMISSIONS.MONITORING_VIEW) as any,
-  monitoringAlertRoutes
-);
-
-// Planning data - requires planning-data.view or planning-data.manage permission
-router.use(
+// Planning Data
+projectRouter.use(
   '/planning-data',
   requirePermission([PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE]) as any,
   planningDataRoutes
 );
 
-// Coupon settings - requires coupons.view or coupons.manage permission
-router.use(
-  '/coupon-settings',
-  requirePermission([PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE]) as any,
-  couponSettingsRoutes
-);
-
-// Data management - requires data-management.view or data-management.manage permission
-router.use(
+// Data Management
+projectRouter.use(
   '/data-management',
   requirePermission([PERMISSIONS.DATA_MANAGEMENT_VIEW, PERMISSIONS.DATA_MANAGEMENT_MANAGE]) as any,
   dataManagementRoutes
 );
 
-// Banners - requires banners.view or banners.manage permission
-router.use(
-  '/banners',
-  requirePermission([PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE]) as any,
-  bannerRoutes
-);
-
-// CMS CashShop - requires store-products.view or store-products.manage permission
-router.use(
-  '/cms/cash-shop',
-  requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any,
-  cmsCashShopRoutes
-);
-
-// Server Lifecycle Events - requires servers.view permission
-router.use(
-  '/server-lifecycle',
-  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
-  serverLifecycleRoutes
-);
-
-// Unknown Flags — MOVED to project-scoped router above
-
-// Feature Flags — MOVED to project-scoped router above
-
-// Release Flows — MOVED to project-scoped router above
-
-// Tags — MOVED to project-scoped router above
-
-// Integrations - requires security.view or security.manage permission
-router.use(
-  '/integrations',
-  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
-  integrationRoutes
-);
-
-// Service Accounts - requires service-accounts.view or service-accounts.manage permission
-router.use(
+// Service Accounts
+projectRouter.use(
   '/service-accounts',
   requirePermission([
     PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
@@ -378,8 +214,8 @@ router.use(
   serviceAccountRoutes
 );
 
-// Signal Endpoints - requires signal-endpoints.view or signal-endpoints.manage permission
-router.use(
+// Signal Endpoints
+projectRouter.use(
   '/signal-endpoints',
   requirePermission([
     PERMISSIONS.SIGNAL_ENDPOINTS_VIEW,
@@ -388,20 +224,184 @@ router.use(
   signalEndpointRoutes
 );
 
-// Actions - requires actions.view or actions.manage permission
-router.use(
+// Actions
+projectRouter.use(
   '/actions',
   requirePermission([PERMISSIONS.ACTIONS_VIEW, PERMISSIONS.ACTIONS_MANAGE]) as any,
   actionSetRoutes
 );
 
-// Queue Monitor - requires scheduler.view or scheduler.manage permission
+// --- Environment-Level routes (env.*) ---
+
+// Client Versions
+projectRouter.use(
+  '/client-versions',
+  requirePermission([PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE]) as any,
+  clientVersionRoutes
+);
+
+// Game Worlds
+projectRouter.use(
+  '/game-worlds',
+  requirePermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]) as any,
+  gameWorldRoutes
+);
+
+// Maintenance
+projectRouter.use(
+  '/maintenance',
+  requirePermission([PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE]) as any,
+  maintenanceRoutes
+);
+
+// Message Templates
+projectRouter.use(
+  '/message-templates',
+  requirePermission([
+    PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
+    PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
+  ]) as any,
+  messageTemplateRoutes
+);
+
+// Vars (KV)
+projectRouter.use('/vars', varsRoutes);
+
+// Service Notices
+projectRouter.use(
+  '/service-notices',
+  requirePermission([PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE]) as any,
+  serviceNoticeRoutes
+);
+
+// Ingame Popup Notices
+projectRouter.use(
+  '/ingame-popup-notices',
+  requirePermission([
+    PERMISSIONS.INGAME_POPUP_NOTICES_VIEW,
+    PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE,
+  ]) as any,
+  ingamePopupNoticeRoutes
+);
+
+// Surveys
+projectRouter.use(
+  '/surveys',
+  requirePermission([PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.SURVEYS_MANAGE]) as any,
+  surveyRoutes
+);
+
+// Reward Templates
+projectRouter.use(
+  '/reward-templates',
+  requirePermission([
+    PERMISSIONS.REWARD_TEMPLATES_VIEW,
+    PERMISSIONS.REWARD_TEMPLATES_MANAGE,
+  ]) as any,
+  rewardTemplateRoutes
+);
+
+// Store Products
+projectRouter.use(
+  '/store-products',
+  requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any,
+  storeProductRoutes
+);
+
+// Banners
+projectRouter.use(
+  '/banners',
+  requirePermission([PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE]) as any,
+  bannerRoutes
+);
+
+// Coupon Settings
+projectRouter.use(
+  '/coupon-settings',
+  requirePermission([PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE]) as any,
+  couponSettingsRoutes
+);
+
+// CMS CashShop
+projectRouter.use(
+  '/cms/cash-shop',
+  requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any,
+  cmsCashShopRoutes
+);
+
+// Server Lifecycle Events
+projectRouter.use(
+  '/server-lifecycle',
+  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
+  serverLifecycleRoutes
+);
+
+// Platform Defaults
+projectRouter.use('/platform-defaults', platformDefaultsRoutes);
+
+// Mount project-scoped router
+router.use('/orgs/:orgId/projects/:projectId', projectRouter);
+
+// ========================================
+// Org-Level routes (flat /admin/*)
+// ========================================
+
+// Audit logs
+router.use('/audit-logs', requirePermission(PERMISSIONS.AUDIT_LOGS_VIEW) as any, auditLogRoutes);
+
+// Translation
+router.use(
+  '/translation',
+  requirePermission([
+    PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
+    PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
+  ]) as any,
+  translationRoutes
+);
+
+// Jobs and scheduler
+router.use(
+  '/jobs',
+  requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
+  jobRoutes
+);
+
+// Invitations
+router.use(
+  '/invitations',
+  requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any,
+  invitationRoutes
+);
+
+// Crash events
+router.use(
+  '/crash-events',
+  requirePermission(PERMISSIONS.CRASH_EVENTS_VIEW) as any,
+  crashEventRoutes
+);
+
+// Console
+router.use('/console', requirePermission(PERMISSIONS.CONSOLE_ACCESS) as any, consoleRoutes);
+
+// Monitoring alerts
+router.use(
+  '/monitoring/alerts',
+  requirePermission(PERMISSIONS.MONITORING_VIEW) as any,
+  monitoringAlertRoutes
+);
+
+// Integrations
+router.use(
+  '/integrations',
+  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  integrationRoutes
+);
+
+// Queue Monitor
 router.use(
   '/queue-monitor',
   requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
   queueMonitorRoutes
 );
-
-// Impact Metrics — MOVED to project-scoped router above
 
 export default router;

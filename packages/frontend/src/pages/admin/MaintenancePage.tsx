@@ -54,6 +54,7 @@ import {
   getMaintenanceStatusDisplay,
   MaintenanceStatusType,
 } from '@/utils/maintenanceStatusUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -62,6 +63,8 @@ const MaintenancePage: React.FC = () => {
   const canManage = hasPermission([PERMISSIONS.MAINTENANCE_MANAGE]);
   const navigate = useNavigate();
   const { showCreated } = useChangeRequestToast();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Set dayjs locale based on current language
   React.useEffect(() => {
@@ -149,7 +152,7 @@ const MaintenancePage: React.FC = () => {
 
   useEffect(() => {
     maintenanceService
-      .getStatus()
+      .getStatus(projectApiPath)
       .then(({ isUnderMaintenance, detail }) => {
         if (updatedBySSE.current) return; // keep SSE-updated status
         setIsMaintenance(isUnderMaintenance);
@@ -192,7 +195,7 @@ const MaintenancePage: React.FC = () => {
       });
 
     messageTemplateService
-      .list({ isEnabled: true })
+      .list(projectApiPath, { isEnabled: true })
       .then((response) => {
         setTpls(response.templates || []);
       })
@@ -420,7 +423,7 @@ const MaintenancePage: React.FC = () => {
               : {}),
           };
 
-    const response = await maintenanceService.setStatus(payload as any);
+    const response = await maintenanceService.setStatus(projectApiPath, payload as any);
 
     if (response.isChangeRequest) {
       // showChangeRequestCreatedToast();
@@ -431,7 +434,7 @@ const MaintenancePage: React.FC = () => {
   };
 
   const stopMaintenance = async () => {
-    await maintenanceService.setStatus({ isMaintenance: false, type });
+    await maintenanceService.setStatus(projectApiPath, { isMaintenance: false, type });
     setIsMaintenance(false);
   };
 
@@ -480,7 +483,7 @@ const MaintenancePage: React.FC = () => {
               : {}),
           };
 
-    const result = await maintenanceService.setStatus(payload);
+    const result = await maintenanceService.setStatus(projectApiPath, payload);
 
     if (result.isChangeRequest) {
       showCreated(navigate);

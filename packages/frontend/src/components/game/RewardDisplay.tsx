@@ -5,6 +5,7 @@ import { Reward } from '../../services/surveyService';
 import { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
 import rewardTemplateService from '../../services/rewardTemplateService';
 import { usePlanningData } from '../../contexts/PlanningDataContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface RewardDisplayProps {
   rewards?: any[];
@@ -23,6 +24,8 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 }) => {
   const { t } = useTranslation();
   const { rewardTypes, rewardLookup, isLoading: contextLoading } = usePlanningData();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -60,7 +63,10 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 
         // If no rewards but rewardTemplateId is provided, load from template
         if (rewardTemplateId) {
-          const template = await rewardTemplateService.getRewardTemplateById(rewardTemplateId);
+          const template = await rewardTemplateService.getRewardTemplateById(
+            projectApiPath,
+            rewardTemplateId
+          );
           if (template && template.rewardItems && Array.isArray(template.rewardItems)) {
             const convertedRewards: Reward[] = template.rewardItems.map((item: any) => ({
               rewardType: String(item.rewardType || item.type || 0),

@@ -59,6 +59,7 @@ import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../.
 import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import dayjs from 'dayjs';
 
 const IngamePopupNoticesPage: React.FC = () => {
@@ -68,6 +69,8 @@ const IngamePopupNoticesPage: React.FC = () => {
   const { platforms } = usePlatformConfig();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
@@ -225,6 +228,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       }
 
       const result = await ingamePopupNoticeService.getIngamePopupNotices(
+        projectApiPath,
         page + 1,
         rowsPerPage,
         filters
@@ -339,7 +343,7 @@ const IngamePopupNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(deletingNotice.id);
+      await ingamePopupNoticeService.deleteIngamePopupNotice(projectApiPath, deletingNotice.id);
       enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
         variant: 'success',
       });
@@ -360,7 +364,7 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(selectedIds);
+      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(projectApiPath, selectedIds);
       enqueueSnackbar(
         t('ingamePopupNotices.bulkDeleteSuccess', {
           count: selectedIds.length,
@@ -379,7 +383,7 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const handleToggleActive = async (notice: IngamePopupNotice) => {
     try {
-      await ingamePopupNoticeService.toggleActive(notice.id);
+      await ingamePopupNoticeService.toggleActive(projectApiPath, notice.id);
       enqueueSnackbar(t('ingamePopupNotices.toggleSuccess'), {
         variant: 'success',
       });

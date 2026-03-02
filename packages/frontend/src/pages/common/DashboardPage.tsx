@@ -100,9 +100,9 @@ const StatsCard: React.FC<StatsCardProps> = ({
         transition: 'all 0.2s ease-in-out',
         '&:hover': onClick
           ? {
-            transform: 'translateY(-4px)',
-            boxShadow: theme.shadows[8],
-          }
+              transform: 'translateY(-4px)',
+              boxShadow: theme.shadows[8],
+            }
           : {},
         position: 'relative',
         overflow: 'hidden',
@@ -657,7 +657,7 @@ const DashboardPage: React.FC = () => {
     const loadLifecycleEvents = async () => {
       try {
         setLifecycleEventsLoading(true);
-        const events = await serverLifecycleService.getSummary(10);
+        const events = await serverLifecycleService.getSummary(getProjectApiPath(), 10);
         if (isMounted) {
           setRecentLifecycleEvents(events || []);
         }
@@ -685,7 +685,7 @@ const DashboardPage: React.FC = () => {
     const loadMaintenanceStatus = async () => {
       try {
         setMaintenanceLoading(true);
-        const status = await maintenanceService.getStatus();
+        const status = await maintenanceService.getStatus(getProjectApiPath());
         if (isMounted) {
           setMaintenanceStatus(status);
         }
@@ -778,22 +778,22 @@ const DashboardPage: React.FC = () => {
             // Extract count from each { count, items } object
             const counts = rawData
               ? {
-                templates: rawData.templates?.count ?? 0,
-                gameWorlds: rawData.gameWorlds?.count ?? 0,
-                segments: rawData.segments?.count ?? 0,
-                tags: rawData.tags?.count ?? 0,
-                vars: rawData.vars?.count ?? 0,
-                messageTemplates: rawData.messageTemplates?.count ?? 0,
-                serviceNotices: rawData.serviceNotices?.count ?? 0,
-                ingamePopups: rawData.ingamePopups?.count ?? 0,
-                surveys: rawData.surveys?.count ?? 0,
-                coupons: rawData.coupons?.count ?? 0,
-                banners: rawData.banners?.count ?? 0,
-                jobs: rawData.jobs?.count ?? 0,
-                clientVersions: rawData.clientVersions?.count ?? 0,
-                apiTokens: rawData.apiTokens?.count ?? 0,
-                storeProducts: rawData.storeProducts?.count ?? 0,
-              }
+                  templates: rawData.templates?.count ?? 0,
+                  gameWorlds: rawData.gameWorlds?.count ?? 0,
+                  segments: rawData.segments?.count ?? 0,
+                  tags: rawData.tags?.count ?? 0,
+                  vars: rawData.vars?.count ?? 0,
+                  messageTemplates: rawData.messageTemplates?.count ?? 0,
+                  serviceNotices: rawData.serviceNotices?.count ?? 0,
+                  ingamePopups: rawData.ingamePopups?.count ?? 0,
+                  surveys: rawData.surveys?.count ?? 0,
+                  coupons: rawData.coupons?.count ?? 0,
+                  banners: rawData.banners?.count ?? 0,
+                  jobs: rawData.jobs?.count ?? 0,
+                  clientVersions: rawData.clientVersions?.count ?? 0,
+                  apiTokens: rawData.apiTokens?.count ?? 0,
+                  storeProducts: rawData.storeProducts?.count ?? 0,
+                }
               : null;
             return {
               ...env,

@@ -570,8 +570,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     });
 
     let cancelled = false;
+    const projectApiPath = getProjectApiPath();
     maintenanceService
-      .getStatus()
+      .getStatus(projectApiPath)
       .then(({ isUnderMaintenance, detail }) => {
         if (cancelled) return;
         if (maintenanceUpdatedBySSE.current) return; // keep SSE-updated status
@@ -1110,9 +1111,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         transition: 'background-color 0.2s ease',
         '&:hover': sidebarCollapsed
           ? {
-            backgroundColor:
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-          }
+              backgroundColor:
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+            }
           : {},
       }}
       onClick={(e) => {

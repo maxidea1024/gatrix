@@ -268,7 +268,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       if (plan) {
         await deletePlan(plan.id, projectApiPath);
       }
-      const newPlan = await applyTemplate({ flagId, environmentId: selectedEnv, templateId }, projectApiPath);
+      const newPlan = await applyTemplate(
+        { flagId, environmentId: selectedEnv, templateId },
+        projectApiPath
+      );
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
 
       // Auto-start the plan if the environment is already enabled
@@ -773,10 +776,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
-                  {
-                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                  };
+                    {
+                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                    };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -978,9 +981,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : 'rgba(0,0,0,0.015)'
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1232,9 +1235,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                            borderColor: 'primary.main',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          }
+                              borderColor: 'primary.main',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            }
                           : {},
                     }}
                   >

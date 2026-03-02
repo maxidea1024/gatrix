@@ -50,12 +50,15 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import BannerFormDialog from '../../components/game/BannerFormDialog';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.BANNERS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -124,7 +127,7 @@ const BannerManagementPage: React.FC = () => {
   const loadBanners = async () => {
     setLoading(true);
     try {
-      const result = await bannerService.getBanners({
+      const result = await bannerService.getBanners(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
@@ -222,7 +225,7 @@ const BannerManagementPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deletingBanner) return;
     try {
-      await bannerService.deleteBanner(deletingBanner.bannerId);
+      await bannerService.deleteBanner(projectApiPath, deletingBanner.bannerId);
       enqueueSnackbar(t('banners.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadBanners();
@@ -249,7 +252,7 @@ const BannerManagementPage: React.FC = () => {
   const handleBulkDeleteConfirm = async () => {
     if (selectedIds.length === 0) return;
     try {
-      await Promise.all(selectedIds.map((id) => bannerService.deleteBanner(id)));
+      await Promise.all(selectedIds.map((id) => bannerService.deleteBanner(projectApiPath, id)));
       enqueueSnackbar(t('banners.bulkDeleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadBanners();
@@ -280,7 +283,7 @@ const BannerManagementPage: React.FC = () => {
   const handleDuplicate = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.duplicateBanner(actionMenuBanner.bannerId);
+      await bannerService.duplicateBanner(projectApiPath, actionMenuBanner.bannerId);
       enqueueSnackbar(t('banners.duplicateSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
@@ -295,7 +298,7 @@ const BannerManagementPage: React.FC = () => {
   const handlePublish = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.publishBanner(actionMenuBanner.bannerId);
+      await bannerService.publishBanner(projectApiPath, actionMenuBanner.bannerId);
       enqueueSnackbar(t('banners.publishSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {
@@ -310,7 +313,7 @@ const BannerManagementPage: React.FC = () => {
   const handleArchive = async () => {
     if (!actionMenuBanner) return;
     try {
-      await bannerService.archiveBanner(actionMenuBanner.bannerId);
+      await bannerService.archiveBanner(projectApiPath, actionMenuBanner.bannerId);
       enqueueSnackbar(t('banners.archiveSuccess'), { variant: 'success' });
       loadBanners();
     } catch (error: any) {

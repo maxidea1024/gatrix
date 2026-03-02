@@ -129,27 +129,38 @@ export interface GenerationStatus {
 }
 
 export const couponService = {
-  async listSettings(params?: ListSettingsParams): Promise<ListSettingsResponse> {
-    const res = await api.get('/admin/coupon-settings', { params });
+  async listSettings(
+    projectApiPath: string,
+    params?: ListSettingsParams
+  ): Promise<ListSettingsResponse> {
+    const res = await api.get(`${projectApiPath}/coupon-settings`, { params });
     return res.data;
   },
-  async getSetting(id: string): Promise<{ setting: any }> {
-    const res = await api.get(`/admin/coupon-settings/${id}`);
+  async getSetting(projectApiPath: string, id: string): Promise<{ setting: any }> {
+    const res = await api.get(`${projectApiPath}/coupon-settings/${id}`);
     return res.data;
   },
-  async createSetting(data: CreateCouponSettingInput): Promise<MutationResult<any>> {
-    const res = await api.post('/admin/coupon-settings', data);
+  async createSetting(
+    projectApiPath: string,
+    data: CreateCouponSettingInput
+  ): Promise<MutationResult<any>> {
+    const res = await api.post(`${projectApiPath}/coupon-settings`, data);
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
-  async updateSetting(id: string, data: UpdateCouponSettingInput): Promise<MutationResult<any>> {
-    const res = await api.patch(`/admin/coupon-settings/${id}`, data);
+  async updateSetting(
+    projectApiPath: string,
+    id: string,
+    data: UpdateCouponSettingInput
+  ): Promise<MutationResult<any>> {
+    const res = await api.patch(`${projectApiPath}/coupon-settings/${id}`, data);
     return parseChangeRequestResponse<any>(res, (r) => r?.setting);
   },
-  async deleteSetting(id: string): Promise<MutationResult<void>> {
-    const res = await api.delete(`/admin/coupon-settings/${id}`);
+  async deleteSetting(projectApiPath: string, id: string): Promise<MutationResult<void>> {
+    const res = await api.delete(`${projectApiPath}/coupon-settings/${id}`);
     return parseChangeRequestResponse<void>(res, () => undefined);
   },
   async getUsage(
+    projectApiPath: string,
     settingId?: string,
     params?: {
       page?: number;
@@ -165,76 +176,89 @@ export const couponService = {
     }
   ): Promise<UsageListResponse> {
     const url = settingId
-      ? `/admin/coupon-settings/${settingId}/usage`
-      : '/admin/coupon-settings/usage';
+      ? `${projectApiPath}/coupon-settings/${settingId}/usage`
+      : `${projectApiPath}/coupon-settings/usage`;
     const res = await api.get(url, { params });
     return res.data;
   },
-  async getUsageForExport(params?: {
-    offset?: number;
-    limit?: number;
-    settingId?: string;
-    couponCode?: string;
-    platform?: string;
-    channel?: string;
-    subChannel?: string;
-    gameWorldId?: string;
-    characterId?: string;
-  }): Promise<{
+  async getUsageForExport(
+    projectApiPath: string,
+    params?: {
+      offset?: number;
+      limit?: number;
+      settingId?: string;
+      couponCode?: string;
+      platform?: string;
+      channel?: string;
+      subChannel?: string;
+      gameWorldId?: string;
+      characterId?: string;
+    }
+  ): Promise<{
     records: any[];
     total: number;
     offset: number;
     limit: number;
     hasMore: boolean;
   }> {
-    const res = await api.get('/admin/coupon-settings/usage/export-chunked', {
+    const res = await api.get(`${projectApiPath}/coupon-settings/usage/export-chunked`, {
       params,
     });
     return res.data;
   },
-  async exportUsage(params?: {
-    settingId?: string;
-    couponCode?: string;
-    platform?: string;
-    channel?: string;
-    subChannel?: string;
-    gameWorldId?: string;
-    characterId?: string;
-    timezone?: string;
-  }): Promise<{ records: any[]; filename: string }> {
-    const res = await api.get('/admin/coupon-settings/usage/export', {
+  async exportUsage(
+    projectApiPath: string,
+    params?: {
+      settingId?: string;
+      couponCode?: string;
+      platform?: string;
+      channel?: string;
+      subChannel?: string;
+      gameWorldId?: string;
+      characterId?: string;
+      timezone?: string;
+    }
+  ): Promise<{ records: any[]; filename: string }> {
+    const res = await api.get(`${projectApiPath}/coupon-settings/usage/export`, {
       params,
     });
     return res.data;
   },
-  async getIssuedCodesStats(settingId: string): Promise<IssuedCodesStats> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes-stats`);
+  async getIssuedCodesStats(projectApiPath: string, settingId: string): Promise<IssuedCodesStats> {
+    const res = await api.get(`${projectApiPath}/coupon-settings/${settingId}/issued-codes-stats`);
     console.log('[couponService] getIssuedCodesStats response:', res);
     // API service already unwraps response.data, so res = { success: true, data: { issued, used, unused } }
     return res.data;
   },
   async getIssuedCodesForExport(
+    projectApiPath: string,
     settingId: string,
     params?: { offset?: number; limit?: number; search?: string }
   ): Promise<IssuedCodesResponse> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes-export`, {
-      params,
-    });
+    const res = await api.get(
+      `${projectApiPath}/coupon-settings/${settingId}/issued-codes-export`,
+      {
+        params,
+      }
+    );
     console.log('[couponService] getIssuedCodesForExport response:', res);
     // API service already unwraps response.data, so res = { success: true, data: { codes, total, offset, limit, hasMore } }
     return res.data;
   },
   async getIssuedCodes(
+    projectApiPath: string,
     settingId: string,
     params?: { page?: number; limit?: number; search?: string }
   ): Promise<IssuedCodesResponse> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes`, { params });
+    const res = await api.get(`${projectApiPath}/coupon-settings/${settingId}/issued-codes`, {
+      params,
+    });
     console.log('[couponService] getIssuedCodes response:', res);
     // API service already unwraps response.data, so res = { success: true, data: { codes, total, page, limit } }
     return res.data;
   },
-  async getGenerationStatus(settingId: string): Promise<GenerationStatus> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/generation-status`);
+  async getGenerationStatus(projectApiPath: string, settingId: string): Promise<GenerationStatus> {
+    const res = await api.get(`${projectApiPath}/coupon-settings/${settingId}/generation-status`);
     return res.data.data;
   },
 };

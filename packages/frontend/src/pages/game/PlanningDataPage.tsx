@@ -61,12 +61,15 @@ import PlanningDataUpload from '../../components/planning-data/PlanningDataUploa
 import PlanningDataGuideDrawer, {
   PlanningDataGuideContent,
 } from '../../components/planning-data/PlanningDataGuideDrawer';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.PLANNING_DATA_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
@@ -233,8 +236,8 @@ const PlanningDataPage: React.FC = () => {
     try {
       setLoading(true);
       const [data, uploadData] = await Promise.all([
-        planningDataService.getStats(),
-        planningDataService.getLatestUpload(),
+        planningDataService.getStats(projectApiPath),
+        planningDataService.getLatestUpload(projectApiPath),
       ]);
       console.log('Stats data received:', data);
       if (!data) {
@@ -260,7 +263,7 @@ const PlanningDataPage: React.FC = () => {
   const loadHotTimeBuff = async () => {
     try {
       setLoadingHotTimeBuff(true);
-      const data = await planningDataService.getHotTimeBuffLookup();
+      const data = await planningDataService.getHotTimeBuffLookup(projectApiPath);
       console.log('HotTimeBuff data loaded:', data);
       if (data?.items?.[0]) {
         console.log('First HotTimeBuff item:', data.items[0]);
@@ -282,7 +285,7 @@ const PlanningDataPage: React.FC = () => {
   const loadEventPage = async () => {
     try {
       setLoadingEventPage(true);
-      const data = await planningDataService.getEventPageLookup();
+      const data = await planningDataService.getEventPageLookup(projectApiPath);
       console.log('EventPage data loaded:', data);
       if (data?.items?.[0]) {
         console.log('First EventPage item:', data.items[0]);
@@ -304,7 +307,7 @@ const PlanningDataPage: React.FC = () => {
   const loadLiveEvent = async () => {
     try {
       setLoadingLiveEvent(true);
-      const data = await planningDataService.getLiveEventLookup();
+      const data = await planningDataService.getLiveEventLookup(projectApiPath);
       console.log('LiveEvent data loaded:', data);
       if (data?.items?.[0]) {
         console.log('First LiveEvent item:', data.items[0]);
@@ -326,7 +329,7 @@ const PlanningDataPage: React.FC = () => {
   const loadMateRecruitingGroup = async () => {
     try {
       setLoadingMateRecruitingGroup(true);
-      const data = await planningDataService.getMateRecruitingGroupLookup();
+      const data = await planningDataService.getMateRecruitingGroupLookup(projectApiPath);
       setMateRecruitingGroupData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -344,7 +347,7 @@ const PlanningDataPage: React.FC = () => {
   const loadOceanNpcAreaSpawner = async () => {
     try {
       setLoadingOceanNpcAreaSpawner(true);
-      const data = await planningDataService.getOceanNpcAreaSpawnerLookup();
+      const data = await planningDataService.getOceanNpcAreaSpawnerLookup(projectApiPath);
       setOceanNpcAreaSpawnerData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -419,7 +422,7 @@ const PlanningDataPage: React.FC = () => {
       const loadItems = async () => {
         try {
           setLoadingCategory(currentCategory);
-          const items = await planningDataService.getUIListItems(currentCategory);
+          const items = await planningDataService.getUIListItems(projectApiPath, currentCategory);
           setCategoryItems((prev) => ({ ...prev, [currentCategory]: items }));
         } catch (error: any) {
           // Extract user-friendly error message
@@ -460,6 +463,7 @@ const PlanningDataPage: React.FC = () => {
           setLoadingRewardType(currentRewardType.value);
           const language = i18n.language === 'zh' ? 'zh' : i18n.language === 'en' ? 'en' : 'kr';
           const items = await planningDataService.getRewardTypeItems(
+            projectApiPath,
             currentRewardType.value,
             language
           );

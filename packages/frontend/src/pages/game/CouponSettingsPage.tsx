@@ -75,6 +75,7 @@ import {
 import { generateExampleCouponCode, CodePattern } from '@/utils/couponCodeGenerator';
 import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 import { useGameWorld } from '@/contexts/GameWorldContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 import DynamicFilterBar, {
   FilterDefinition,
@@ -109,6 +110,8 @@ const CouponSettingsPage: React.FC = () => {
   const { worlds } = useGameWorld();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.COUPONS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // list state
   const [items, setItems] = useState<CouponSetting[]>([]);
@@ -238,11 +241,15 @@ const CouponSettingsPage: React.FC = () => {
           }
 
           try {
-            const res = await couponService.getIssuedCodesForExport(codesSetting.id, {
-              offset,
-              limit: chunkSize,
-              search: debouncedCodesSearch || undefined,
-            });
+            const res = await couponService.getIssuedCodesForExport(
+              projectApiPath,
+              codesSetting.id,
+              {
+                offset,
+                limit: chunkSize,
+                search: debouncedCodesSearch || undefined,
+              }
+            );
             allCodes.push(...(res.codes || []));
             hasMore = (res as any).hasMore || false;
             offset += chunkSize;
@@ -789,7 +796,7 @@ const CouponSettingsPage: React.FC = () => {
     () => async () => {
       setLoading(true);
       try {
-        const res = await couponService.listSettings({
+        const res = await couponService.listSettings(projectApiPath, {
           page: page + 1,
           limit: rowsPerPage,
           search: debouncedSearchTerm || undefined,
@@ -821,7 +828,7 @@ const CouponSettingsPage: React.FC = () => {
         // Fetch only the in-progress items to update their progress
         const updatedItems = await Promise.all(
           inProgressItems.map(async (it) => {
-            const res = await couponService.getSetting(it.id);
+            const res = await couponService.getSetting(projectApiPath, it.id);
             return res.setting;
           })
         );
@@ -845,7 +852,7 @@ const CouponSettingsPage: React.FC = () => {
     if (!codesSetting) return;
     setCodesLoading(true);
     try {
-      const res = await couponService.getIssuedCodes(codesSetting.id, {
+      const res = await couponService.getIssuedCodes(projectApiPath, codesSetting.id, {
         page: codesPage + 1,
         limit: codesRowsPerPage,
         search: debouncedCodesSearch || undefined,
@@ -867,7 +874,7 @@ const CouponSettingsPage: React.FC = () => {
     console.log('[loadCodesStats] Loading stats for:', codesSetting.id);
     setCodesStatsLoading(true);
     try {
-      const stats = await couponService.getIssuedCodesStats(codesSetting.id);
+      const stats = await couponService.getIssuedCodesStats(projectApiPath, codesSetting.id);
       console.log('[loadCodesStats] Loaded stats:', stats);
       setCodesStats(stats);
     } catch (error) {
@@ -1013,7 +1020,7 @@ const CouponSettingsPage: React.FC = () => {
 
     try {
       if (editing) {
-        const result = await couponService.updateSetting(editing.id, payload);
+        const result = await couponService.updateSetting(projectApiPath, editing.id, payload);
         setOpenForm(false);
         resetForm();
         if (result.isChangeRequest) {
@@ -1026,7 +1033,7 @@ const CouponSettingsPage: React.FC = () => {
         await load();
       } else {
         // For create: close form immediately and load in background
-        const result = await couponService.createSetting(payload);
+        const result = await couponService.createSetting(projectApiPath, payload);
         setOpenForm(false);
         resetForm();
 
@@ -1069,7 +1076,7 @@ const CouponSettingsPage: React.FC = () => {
 
     try {
       // Fetch full coupon setting with targeting data
-      const res = await couponService.getSetting(it.id);
+      const res = await couponService.getSetting(projectApiPath, it.id);
       const fullSetting = res.setting;
 
       console.log('[CouponSettings] handleEdit - fetched full setting', fullSetting);
@@ -1170,7 +1177,7 @@ const CouponSettingsPage: React.FC = () => {
     if (!deleteTarget) return;
 
     try {
-      await couponService.deleteSetting(deleteTarget.id);
+      await couponService.deleteSetting(projectApiPath, deleteTarget.id);
       enqueueSnackbar(t('coupons.couponSettings.deleteSuccess'), {
         variant: 'success',
       });

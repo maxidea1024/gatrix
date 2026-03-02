@@ -63,6 +63,7 @@ import { parseApiErrorMessage } from '@/utils/errorUtils';
 import { showChangeRequestCreatedToast } from '@/utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '@/utils/changeRequestToast';
 
 interface ClientVersionFormProps {
@@ -144,6 +145,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms } = usePlatformConfig();
   const [loading, setLoading] = useState(false);
@@ -234,7 +237,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               (!source.maintenanceLocales || source.maintenanceLocales.length === 0) &&
               source.id
             ) {
-              const full = await ClientVersionService.getClientVersionById(source.id);
+              const full = await ClientVersionService.getClientVersionById(
+                projectApiPath,
+                source.id
+              );
               if (full) source = full as any;
             }
           } catch (e) {
@@ -292,7 +298,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           try {
             const initialPlatform = getValues('platform') || defaultValues.platform;
             if (initialPlatform) {
-              const defaults = await PlatformDefaultsService.getPlatformDefaults(initialPlatform);
+              const defaults = await PlatformDefaultsService.getPlatformDefaults(
+                projectApiPath,
+                initialPlatform
+              );
               const currentGame = getValues('gameServerAddress');
               const currentPatch = getValues('patchAddress');
               if (!currentGame && defaults.gameServerAddress) {
@@ -338,7 +347,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     if (open) {
       const loadTemplates = async () => {
         try {
-          const response = await messageTemplateService.list({
+          const response = await messageTemplateService.list(projectApiPath, {
             isEnabled: true,
           });
           setTemplates(response.templates || []);
@@ -433,6 +442,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       const checkDuplicate = async () => {
         try {
           const isDuplicate = await ClientVersionService.checkDuplicate(
+            projectApiPath,
             platform,
             version,
             isEdit ? clientVersion?.id : undefined
@@ -457,7 +467,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       // 새로 추가하는 경우에만 기본값 적용
       const applyDefaults = async () => {
         try {
-          const defaults = await PlatformDefaultsService.getPlatformDefaults(watchedPlatform);
+          const defaults = await PlatformDefaultsService.getPlatformDefaults(
+            projectApiPath,
+            watchedPlatform
+          );
 
           // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
           if (defaults.gameServerAddress) {
@@ -547,6 +560,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
         console.log('About to call updateClientVersion API...');
         const updateResult = await ClientVersionService.updateClientVersion(
+          projectApiPath,
           clientVersion.id,
           cleanedData
         );
@@ -570,7 +584,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           hasClientVersion: !!clientVersion,
         });
         console.log('About to call createClientVersion API...');
-        const createResult = await ClientVersionService.createClientVersion(cleanedData);
+        const createResult = await ClientVersionService.createClientVersion(
+          projectApiPath,
+          cleanedData
+        );
         console.log('createClientVersion API call completed');
 
         if (createResult.isChangeRequest) {
@@ -602,10 +619,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       // 태그 설정
       if (selectedTags && selectedTags.length > 0) {
         const tagIds = selectedTags.map((tag) => tag.id);
-        await ClientVersionService.setTags(clientVersionId, tagIds);
+        await ClientVersionService.setTags(projectApiPath, clientVersionId, tagIds);
       } else {
         // 태그가 없으면 기존 태그 모두 제거
-        await ClientVersionService.setTags(clientVersionId, []);
+        await ClientVersionService.setTags(projectApiPath, clientVersionId, []);
       }
 
       console.log('Form submission successful');
@@ -753,6 +770,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           if (!isEdit && e.target.value) {
                             try {
                               const defaults = await PlatformDefaultsService.getPlatformDefaults(
+                                projectApiPath,
                                 e.target.value as string
                               );
 

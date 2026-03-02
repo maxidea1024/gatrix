@@ -38,6 +38,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import planningDataService, { PreviewDiffResult } from '../../services/planningDataService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface PlanningDataUploadProps {
   onUploadSuccess?: () => void;
@@ -180,6 +181,8 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragOverRef = useRef<HTMLDivElement>(null);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -259,7 +262,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
 
       // Filter files to preview
       const filesToPreviewArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
-      const result = await planningDataService.previewDiff(filesToPreviewArray);
+      const result = await planningDataService.previewDiff(projectApiPath, filesToPreviewArray);
 
       // If no changes, show already up to date dialog
       if (result.changedFiles.length === 0) {
@@ -295,6 +298,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
       // Filter files to upload
       const filesToUploadArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
       const result = await planningDataService.uploadPlanningData(
+        projectApiPath,
         filesToUploadArray,
         uploadComment || undefined
       );
@@ -348,6 +352,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
       // Filter files to upload
       const filesToUploadArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
       const result = await planningDataService.uploadPlanningData(
+        projectApiPath,
         filesToUploadArray,
         uploadComment || undefined,
         true
@@ -395,7 +400,7 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({
 
       // Filter files to preview
       const filesToPreviewArray = selectedFiles.filter((file) => filesToUpload.has(file.name));
-      const result = await planningDataService.previewDiff(filesToPreviewArray);
+      const result = await planningDataService.previewDiff(projectApiPath, filesToPreviewArray);
 
       setPreviewResult(result);
       setShowPreviewDialog(true);

@@ -20,14 +20,16 @@ export interface ClientVersionMutationResult {
 }
 
 export class ClientVersionService {
-  private static readonly BASE_URL = '/admin/client-versions';
+  private static basePath(projectApiPath: string): string {
+    return `${projectApiPath}/client-versions`;
+  }
 
   /**
    * Get list of available versions
    */
-  static async getAvailableVersions(): Promise<string[]> {
+  static async getAvailableVersions(projectApiPath: string): Promise<string[]> {
     try {
-      const response = await apiService.get(`${this.BASE_URL}/meta/versions`);
+      const response = await apiService.get(`${this.basePath(projectApiPath)}/meta/versions`);
       // apiService.get() already returns response.data, so response.data is the actual data
       return response.data || [];
     } catch (error) {
@@ -40,6 +42,7 @@ export class ClientVersionService {
    * Get list of client versions
    */
   static async getClientVersions(
+    projectApiPath: string,
     page: number = 1,
     limit: number = CLIENT_VERSION_DEFAULTS.PAGE_SIZE,
     filters: ClientVersionFilters = {},
@@ -86,7 +89,7 @@ export class ClientVersionService {
       }
     });
 
-    const response = await apiService.get<any>(`${this.BASE_URL}?${params}`);
+    const response = await apiService.get<any>(`${this.basePath(projectApiPath)}?${params}`);
 
     // ApiService.request() already returns response.data
     // response is the { success: true, data: {...} } structure sent from backend
@@ -110,8 +113,8 @@ export class ClientVersionService {
   /**
    * Get client version details
    */
-  static async getClientVersionById(id: number): Promise<ClientVersion> {
-    const response = await apiService.get<any>(`${this.BASE_URL}/${id}`);
+  static async getClientVersionById(projectApiPath: string, id: number): Promise<ClientVersion> {
+    const response = await apiService.get<any>(`${this.basePath(projectApiPath)}/${id}`);
 
     // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
@@ -126,9 +129,10 @@ export class ClientVersionService {
    * Create client version
    */
   static async createClientVersion(
+    projectApiPath: string,
     data: ClientVersionFormData
   ): Promise<ClientVersionMutationResult> {
-    const response: any = await apiService.post<any>(this.BASE_URL, data);
+    const response: any = await apiService.post<any>(this.basePath(projectApiPath), data);
 
     // Check if this is a change request response
     // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
@@ -151,7 +155,11 @@ export class ClientVersionService {
     // Some servers may return only { success: true } without body upon creation
     if (response?.success && !response?.data) {
       try {
-        const found = await this.findByPlatformAndVersion(data.platform, data.clientVersion);
+        const found = await this.findByPlatformAndVersion(
+          projectApiPath,
+          data.platform,
+          data.clientVersion
+        );
         if (found) {
           return {
             clientVersion: found,
@@ -170,11 +178,12 @@ export class ClientVersionService {
    * Handle servers missing data body immediately after creation: re-fetch by platform/version
    */
   static async findByPlatformAndVersion(
+    projectApiPath: string,
     platform: string,
     clientVersion: string
   ): Promise<ClientVersion | null> {
     try {
-      const result = await this.getClientVersions(1, 100, {
+      const result = await this.getClientVersions(projectApiPath, 1, 100, {
         platform,
         search: clientVersion,
       });
@@ -191,8 +200,11 @@ export class ClientVersionService {
   /**
    * Quick create client version
    */
-  static async bulkCreateClientVersions(data: BulkCreateFormData): Promise<ClientVersion[]> {
-    const response = await apiService.post<any>(`${this.BASE_URL}/bulk`, data);
+  static async bulkCreateClientVersions(
+    projectApiPath: string,
+    data: BulkCreateFormData
+  ): Promise<ClientVersion[]> {
+    const response = await apiService.post<any>(`${this.basePath(projectApiPath)}/bulk`, data);
 
     // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
@@ -212,10 +224,11 @@ export class ClientVersionService {
    * Update client version
    */
   static async updateClientVersion(
+    projectApiPath: string,
     id: number,
     data: Partial<ClientVersionFormData>
   ): Promise<ClientVersionMutationResult> {
-    const response: any = await apiService.put<any>(`${this.BASE_URL}/${id}`, data);
+    const response: any = await apiService.put<any>(`${this.basePath(projectApiPath)}/${id}`, data);
 
     // Check if this is a change request response
     // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
@@ -243,9 +256,10 @@ export class ClientVersionService {
    * Delete client version
    */
   static async deleteClientVersion(
+    projectApiPath: string,
     id: number
   ): Promise<{ isChangeRequest: boolean; changeRequestId?: string }> {
-    const response = await apiService.delete<any>(`${this.BASE_URL}/${id}`);
+    const response = await apiService.delete<any>(`${this.basePath(projectApiPath)}/${id}`);
     const data = (response as any).data;
     // 202 response indicates CR creation
     const isChangeRequest = !!data?.changeRequestId;
@@ -259,9 +273,13 @@ export class ClientVersionService {
    * Bulk update status
    */
   static async bulkUpdateStatus(
+    projectApiPath: string,
     data: BulkStatusUpdateRequest
   ): Promise<{ updatedCount: number; message: string }> {
-    const response = await apiService.patch<any>(`${this.BASE_URL}/bulk-status`, data);
+    const response = await apiService.patch<any>(
+      `${this.basePath(projectApiPath)}/bulk-status`,
+      data
+    );
 
     console.log('🔍 Bulk update response:', response);
 
@@ -277,9 +295,9 @@ export class ClientVersionService {
   /**
    * Get list of channels
    */
-  static async getPlatforms(): Promise<string[]> {
+  static async getPlatforms(projectApiPath: string): Promise<string[]> {
     try {
-      const response = await apiService.get<any>(`${this.BASE_URL}/meta/platforms`);
+      const response = await apiService.get<any>(`${this.basePath(projectApiPath)}/meta/platforms`);
       return response?.data || [];
     } catch (error) {
       console.error('Error fetching platforms:', error);
@@ -290,8 +308,8 @@ export class ClientVersionService {
   /**
    * Get metadata (platform)
    */
-  static async getMetadata(): Promise<ClientVersionMetadata> {
-    const platforms = await this.getPlatforms();
+  static async getMetadata(projectApiPath: string): Promise<ClientVersionMetadata> {
+    const platforms = await this.getPlatforms(projectApiPath);
 
     return {
       platforms,
@@ -302,6 +320,7 @@ export class ClientVersionService {
    * Check for duplicate client version
    */
   static async checkDuplicate(
+    projectApiPath: string,
     platform: string,
     clientVersion: string,
     excludeId?: number
@@ -312,7 +331,7 @@ export class ClientVersionService {
         search: clientVersion,
       };
 
-      const result = await this.getClientVersions(1, 100, filters);
+      const result = await this.getClientVersions(projectApiPath, 1, 100, filters);
 
       // Check if exactly matching version exists
       const duplicate = result.clientVersions.find(
@@ -330,7 +349,10 @@ export class ClientVersionService {
   /**
    * Export client versions (CSV)
    */
-  static async exportToCSV(filters: ClientVersionFilters = {}): Promise<Blob> {
+  static async exportToCSV(
+    projectApiPath: string,
+    filters: ClientVersionFilters = {}
+  ): Promise<Blob> {
     // Use endpoint dedicated for export
     const params: Record<string, any> = {};
 
@@ -354,7 +376,7 @@ export class ClientVersionService {
     if (filters.tags && filters.tags.length > 0) params.tags = filters.tags;
 
     try {
-      const result = await apiService.get(`${this.BASE_URL}/export`, {
+      const result = await apiService.get(`${this.basePath(projectApiPath)}/export`, {
         params,
       });
 
@@ -506,16 +528,16 @@ export class ClientVersionService {
   /**
    * Get client version tags
    */
-  static async getTags(id: number): Promise<any[]> {
-    const response = await apiService.get<any>(`${this.BASE_URL}/${id}/tags`);
+  static async getTags(projectApiPath: string, id: number): Promise<any[]> {
+    const response = await apiService.get<any>(`${this.basePath(projectApiPath)}/${id}/tags`);
     return response?.data || [];
   }
 
   /**
    * Set client version tag
    */
-  static async setTags(id: number, tagIds: number[]): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/${id}/tags`, { tagIds });
+  static async setTags(projectApiPath: string, id: number, tagIds: number[]): Promise<void> {
+    await apiService.put(`${this.basePath(projectApiPath)}/${id}/tags`, { tagIds });
   }
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
-Box,
+  Box,
   Typography,
   Button,
   Table,
@@ -175,7 +175,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
           <Typography variant="subtitle2">
             {t(
               STRATEGY_TYPES.find((st) => st.name === strategy.strategyName)?.titleKey ||
-              'featureFlags.strategies.flexibleRollout.title'
+                'featureFlags.strategies.flexibleRollout.title'
             )}
           </Typography>
           {strategy.strategyName === 'flexibleRollout' && (
@@ -619,6 +619,8 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   const [saving, setSaving] = useState(false);
   const [segments, setSegments] = useState<any[]>([]);
   const [contextFields, setContextFields] = useState<ContextField[]>([]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Load segments and context fields
   useEffect(() => {
@@ -714,20 +716,20 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     const lastMilestone = milestones[milestones.length - 1];
     const copiedStrategies = lastMilestone
       ? lastMilestone.strategies.map((s) => ({
-        ...s,
-        id: generateId(),
-      }))
-      : [
-        {
+          ...s,
           id: generateId(),
-          strategyName: 'flexibleRollout' as const,
-          title: '',
-          parameters: { rollout: 100, stickiness: 'default', groupId: '' },
-          constraints: [] as any[],
-          sortOrder: 0,
-          segments: [] as string[],
-        },
-      ];
+        }))
+      : [
+          {
+            id: generateId(),
+            strategyName: 'flexibleRollout' as const,
+            title: '',
+            parameters: { rollout: 100, stickiness: 'default', groupId: '' },
+            constraints: [] as any[],
+            sortOrder: 0,
+            segments: [] as string[],
+          },
+        ];
 
     setMilestones((prev) => [
       ...prev,
@@ -765,20 +767,20 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
       prev.map((m, i) =>
         i === milestoneIndex
           ? {
-            ...m,
-            strategies: [
-              ...m.strategies,
-              {
-                id: generateId(),
-                strategyName: 'flexibleRollout',
-                title: '',
-                parameters: { rollout: 100, stickiness: 'default', groupId: '' },
-                constraints: [],
-                sortOrder: m.strategies.length,
-                segments: [],
-              },
-            ],
-          }
+              ...m,
+              strategies: [
+                ...m.strategies,
+                {
+                  id: generateId(),
+                  strategyName: 'flexibleRollout',
+                  title: '',
+                  parameters: { rollout: 100, stickiness: 'default', groupId: '' },
+                  constraints: [],
+                  sortOrder: m.strategies.length,
+                  segments: [],
+                },
+              ],
+            }
           : m
       )
     );
@@ -803,9 +805,9 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
       prev.map((m, i) =>
         i === milestoneIndex
           ? {
-            ...m,
-            strategies: m.strategies.map((s, si) => (si === strategyIndex ? updated : s)),
-          }
+              ...m,
+              strategies: m.strategies.map((s, si) => (si === strategyIndex ? updated : s)),
+            }
           : m
       )
     );
@@ -1110,7 +1112,10 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   const loadTemplates = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await releaseFlowService.getTemplates(debouncedSearchTerm || undefined, projectApiPath);
+      const data = await releaseFlowService.getTemplates(
+        debouncedSearchTerm || undefined,
+        projectApiPath
+      );
       const allItems = data || [];
 
       // Client-side sorting
@@ -1252,7 +1257,9 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
 
   const handleBulkDeleteConfirm = async () => {
     try {
-      await Promise.all(selectedIds.map((id) => releaseFlowService.deleteTemplate(id, projectApiPath)));
+      await Promise.all(
+        selectedIds.map((id) => releaseFlowService.deleteTemplate(id, projectApiPath))
+      );
       enqueueSnackbar(t('releaseFlow.templateDeleted'), { variant: 'success' });
       setSelectedIds([]);
       loadTemplates();

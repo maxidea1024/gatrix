@@ -65,6 +65,7 @@ import DynamicFilterBar, {
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -83,6 +84,8 @@ const StoreProductsPage: React.FC = () => {
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.STORE_PRODUCTS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [products, setProducts] = useState<StoreProduct[]>([]);
@@ -310,7 +313,7 @@ const StoreProductsPage: React.FC = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const result = await storeProductService.getStoreProducts({
+      const result = await storeProductService.getStoreProducts(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
@@ -357,7 +360,7 @@ const StoreProductsPage: React.FC = () => {
   // Load product statistics
   const loadStats = async () => {
     try {
-      const stats = await storeProductService.getStats();
+      const stats = await storeProductService.getStats(projectApiPath);
       setProductStats(stats);
     } catch (error) {
       console.error('Failed to load product stats:', error);
@@ -482,7 +485,7 @@ const StoreProductsPage: React.FC = () => {
   const handleSyncPreview = async () => {
     setSyncLoading(true);
     try {
-      const preview = await storeProductService.previewSync();
+      const preview = await storeProductService.previewSync(projectApiPath);
       setSyncPreview(preview);
       setSyncDialogOpen(true);
     } catch (error: any) {
@@ -498,7 +501,7 @@ const StoreProductsPage: React.FC = () => {
   const handleSyncApply = async (selected: SelectedSyncItems) => {
     setSyncLoading(true);
     try {
-      const result = await storeProductService.applySync(selected);
+      const result = await storeProductService.applySync(projectApiPath, selected);
       setSyncDialogOpen(false);
       setSyncPreview(null);
       enqueueSnackbar(
@@ -530,7 +533,7 @@ const StoreProductsPage: React.FC = () => {
     currentIsActive?: boolean;
     targetIsActive: boolean;
   }) => {
-    const result = await storeProductService.bulkUpdateActiveStatusByFilter(params);
+    const result = await storeProductService.bulkUpdateActiveStatusByFilter(projectApiPath, params);
     const actionLabel = params.targetIsActive
       ? t('storeProducts.bulkActivate')
       : t('storeProducts.bulkDeactivate');
@@ -545,7 +548,7 @@ const StoreProductsPage: React.FC = () => {
   };
 
   const handleBatchProcessGetCount = async (params: { search?: string; isActive?: boolean }) => {
-    return await storeProductService.getCountByFilter(params);
+    return await storeProductService.getCountByFilter(projectApiPath, params);
   };
 
   const handleDelete = (product: StoreProduct) => {
@@ -557,7 +560,7 @@ const StoreProductsPage: React.FC = () => {
     if (!deletingProduct) return;
 
     try {
-      await storeProductService.deleteStoreProduct(deletingProduct.id);
+      await storeProductService.deleteStoreProduct(projectApiPath, deletingProduct.id);
       enqueueSnackbar(t('storeProducts.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadProducts();
@@ -584,7 +587,7 @@ const StoreProductsPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await storeProductService.deleteStoreProducts(selectedIds);
+      await storeProductService.deleteStoreProducts(projectApiPath, selectedIds);
       enqueueSnackbar(t('storeProducts.bulkDeleteSuccess'), {
         variant: 'success',
       });
@@ -606,7 +609,11 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkActivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
+      const result = await storeProductService.bulkUpdateActiveStatus(
+        projectApiPath,
+        selectedIds,
+        true
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -625,7 +632,11 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkDeactivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
+      const result = await storeProductService.bulkUpdateActiveStatus(
+        projectApiPath,
+        selectedIds,
+        false
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -644,7 +655,11 @@ const StoreProductsPage: React.FC = () => {
   // Toggle active status
   const handleToggleActive = async (product: StoreProduct) => {
     try {
-      const result = await storeProductService.toggleActive(product.id, !product.isActive);
+      const result = await storeProductService.toggleActive(
+        projectApiPath,
+        product.id,
+        !product.isActive
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {

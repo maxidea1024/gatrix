@@ -27,28 +27,32 @@ export interface ServiceAccountToken {
 }
 
 class ServiceAccountService {
-  async getAll(): Promise<ServiceAccount[]> {
-    const response = await api.get('/admin/service-accounts');
+  async getAll(projectApiPath: string): Promise<ServiceAccount[]> {
+    const response = await api.get(`${projectApiPath}/service-accounts`);
     return response.data;
   }
 
-  async getById(id: number): Promise<ServiceAccount> {
-    const response = await api.get(`/admin/service-accounts/${id}`);
+  async getById(projectApiPath: string, id: number): Promise<ServiceAccount> {
+    const response = await api.get(`${projectApiPath}/service-accounts/${id}`);
     return response.data;
   }
 
-  async create(data: {
-    name: string;
-    role?: string;
-    permissions?: string[];
-    allowAllEnvironments?: boolean;
-    environments?: string[];
-  }): Promise<ServiceAccount> {
-    const response = await api.post('/admin/service-accounts', data);
+  async create(
+    projectApiPath: string,
+    data: {
+      name: string;
+      role?: string;
+      permissions?: string[];
+      allowAllEnvironments?: boolean;
+      environments?: string[];
+    }
+  ): Promise<ServiceAccount> {
+    const response = await api.post(`${projectApiPath}/service-accounts`, data);
     return response.data;
   }
 
   async update(
+    projectApiPath: string,
     id: number,
     data: {
       name?: string;
@@ -58,24 +62,25 @@ class ServiceAccountService {
       environments?: string[];
     }
   ): Promise<ServiceAccount> {
-    const response = await api.put(`/admin/service-accounts/${id}`, data);
+    const response = await api.put(`${projectApiPath}/service-accounts/${id}`, data);
     return response.data;
   }
 
-  async delete(id: number): Promise<void> {
-    await api.delete(`/admin/service-accounts/${id}`);
+  async delete(projectApiPath: string, id: number): Promise<void> {
+    await api.delete(`${projectApiPath}/service-accounts/${id}`);
   }
 
   async createToken(
+    projectApiPath: string,
     accountId: number,
     data: { name: string; description?: string; expiresAt?: string }
   ): Promise<ServiceAccountToken & { secret: string }> {
-    const response = await api.post(`/admin/service-accounts/${accountId}/tokens`, data);
+    const response = await api.post(`${projectApiPath}/service-accounts/${accountId}/tokens`, data);
     return response.data;
   }
 
-  async deleteToken(accountId: number, tokenId: number): Promise<void> {
-    await api.delete(`/admin/service-accounts/${accountId}/tokens/${tokenId}`);
+  async deleteToken(projectApiPath: string, accountId: number, tokenId: number): Promise<void> {
+    await api.delete(`${projectApiPath}/service-accounts/${accountId}/tokens/${tokenId}`);
   }
 }
 

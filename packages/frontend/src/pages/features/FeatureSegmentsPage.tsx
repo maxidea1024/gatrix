@@ -669,9 +669,12 @@ const FeatureSegmentsPage: React.FC = () => {
                                         )
                                       );
                                       try {
-                                        await api.put(`${projectApiPath}/features/segments/${segment.id}`, {
-                                          isActive: newActive,
-                                        });
+                                        await api.put(
+                                          `${projectApiPath}/features/segments/${segment.id}`,
+                                          {
+                                            isActive: newActive,
+                                          }
+                                        );
                                       } catch (error: any) {
                                         setAllSegments((prev) =>
                                           prev.map((s) =>

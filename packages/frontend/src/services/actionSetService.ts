@@ -36,35 +36,39 @@ export interface ActionSetEvent {
 }
 
 class ActionSetService {
-  async getAll(): Promise<ActionSet[]> {
-    const response = await api.get('/admin/actions');
+  async getAll(projectApiPath: string): Promise<ActionSet[]> {
+    const response = await api.get(`${projectApiPath}/actions`);
     return response.data;
   }
 
-  async getById(id: number): Promise<ActionSet> {
-    const response = await api.get(`/admin/actions/${id}`);
+  async getById(projectApiPath: string, id: number): Promise<ActionSet> {
+    const response = await api.get(`${projectApiPath}/actions/${id}`);
     return response.data;
   }
 
-  async create(data: {
-    name: string;
-    description?: string;
-    isEnabled?: boolean;
-    actorId?: number;
-    source?: string;
-    sourceId?: number;
-    filters?: Record<string, unknown>;
-    actions: Array<{
-      actionType: string;
-      sortOrder: number;
-      params: Record<string, unknown>;
-    }>;
-  }): Promise<ActionSet> {
-    const response = await api.post('/admin/actions', data);
+  async create(
+    projectApiPath: string,
+    data: {
+      name: string;
+      description?: string;
+      isEnabled?: boolean;
+      actorId?: number;
+      source?: string;
+      sourceId?: number;
+      filters?: Record<string, unknown>;
+      actions: Array<{
+        actionType: string;
+        sortOrder: number;
+        params: Record<string, unknown>;
+      }>;
+    }
+  ): Promise<ActionSet> {
+    const response = await api.post(`${projectApiPath}/actions`, data);
     return response.data;
   }
 
   async update(
+    projectApiPath: string,
     id: number,
     data: {
       name?: string;
@@ -81,20 +85,21 @@ class ActionSetService {
       }>;
     }
   ): Promise<ActionSet> {
-    const response = await api.put(`/admin/actions/${id}`, data);
+    const response = await api.put(`${projectApiPath}/actions/${id}`, data);
     return response.data;
   }
 
-  async delete(id: number): Promise<void> {
-    await api.delete(`/admin/actions/${id}`);
+  async delete(projectApiPath: string, id: number): Promise<void> {
+    await api.delete(`${projectApiPath}/actions/${id}`);
   }
 
-  async toggle(id: number): Promise<ActionSet> {
-    const response = await api.post(`/admin/actions/${id}/toggle`);
+  async toggle(projectApiPath: string, id: number): Promise<ActionSet> {
+    const response = await api.post(`${projectApiPath}/actions/${id}/toggle`);
     return response.data;
   }
 
   async getEvents(
+    projectApiPath: string,
     id: number,
     limit = 50,
     offset = 0
@@ -102,7 +107,7 @@ class ActionSetService {
     data: ActionSetEvent[];
     pagination: { total: number; limit: number; offset: number };
   }> {
-    const response = await api.get(`/admin/actions/${id}/events`, {
+    const response = await api.get(`${projectApiPath}/actions/${id}/events`, {
       params: { limit, offset },
     });
     return {

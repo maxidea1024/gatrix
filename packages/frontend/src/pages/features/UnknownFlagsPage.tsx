@@ -148,10 +148,13 @@ const UnknownFlagsPage: React.FC = () => {
       // Determine includeResolved based on filter
       const includeResolved =
         statusFilter?.includes('resolved') || statusFilter?.length === 2 || !statusFilter;
-      const result = await unknownFlagService.getUnknownFlags({
-        includeResolved,
-        environmentId: currentEnvironmentId || undefined,
-      }, projectApiPath);
+      const result = await unknownFlagService.getUnknownFlags(
+        {
+          includeResolved,
+          environmentId: currentEnvironmentId || undefined,
+        },
+        projectApiPath
+      );
       setFlags(result.flags);
     } catch {
       enqueueSnackbar(String(t('common.loadError')), { variant: 'error' });

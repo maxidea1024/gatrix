@@ -25,6 +25,7 @@ import rewardTemplateService, {
   RewardTemplate,
   ParticipationReward,
 } from '../../services/rewardTemplateService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface RewardSelectorProps {
   value: ParticipationReward[];
@@ -49,6 +50,8 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [mode, setMode] = useState<RewardMode>(initialMode);
@@ -87,7 +90,7 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
   const loadTemplates = async () => {
     try {
       setLoadingTemplates(true);
-      const response = await rewardTemplateService.getRewardTemplates({
+      const response = await rewardTemplateService.getRewardTemplates(projectApiPath, {
         limit: 100,
       });
       setTemplates(response.templates);

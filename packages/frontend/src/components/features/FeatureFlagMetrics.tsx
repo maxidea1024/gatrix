@@ -253,16 +253,19 @@ export const FeatureFlagMetrics: React.FC<FeatureFlagMetricsProps> = ({
           for (const appName of selectedApps) {
             metricsPromises.push(
               api
-                .get<{ metrics: MetricsBucket[] }>(`${projectApiPath}/features/${flagName}/metrics`, {
-                  params: {
-                    startDate: startDate.toISOString(),
-                    endDate: endDate.toISOString(),
-                    appName,
-                  },
-                  headers: {
-                    'x-environment': env,
-                  },
-                })
+                .get<{ metrics: MetricsBucket[] }>(
+                  `${projectApiPath}/features/${flagName}/metrics`,
+                  {
+                    params: {
+                      startDate: startDate.toISOString(),
+                      endDate: endDate.toISOString(),
+                      appName,
+                    },
+                    headers: {
+                      'x-environment': env,
+                    },
+                  }
+                )
                 .then((response) =>
                   (response.data.metrics || []).map((m) => ({
                     ...m,

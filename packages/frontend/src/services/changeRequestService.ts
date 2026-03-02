@@ -164,7 +164,11 @@ class ChangeRequestService {
   /**
    * Submit change request for review (Draft -> Open)
    */
-  async submit(id: string, data: { title: string; reason: string }, projectApiPath: string | null = null): Promise<ChangeRequest> {
+  async submit(
+    id: string,
+    data: { title: string; reason: string },
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
     const response = await api.post(`${basePath(projectApiPath)}/${id}/submit`, data);
     return response.data;
   }
@@ -172,7 +176,11 @@ class ChangeRequestService {
   /**
    * Approve change request
    */
-  async approve(id: string, comment?: string, projectApiPath: string | null = null): Promise<ChangeRequest> {
+  async approve(
+    id: string,
+    comment?: string,
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
     const response = await api.post(`${basePath(projectApiPath)}/${id}/approve`, {
       comment,
     });
@@ -182,7 +190,11 @@ class ChangeRequestService {
   /**
    * Reject change request
    */
-  async reject(id: string, comment: string, projectApiPath: string | null = null): Promise<ChangeRequest> {
+  async reject(
+    id: string,
+    comment: string,
+    projectApiPath: string | null = null
+  ): Promise<ChangeRequest> {
     const response = await api.post(`${basePath(projectApiPath)}/${id}/reject`, {
       comment,
     });
@@ -239,7 +251,11 @@ class ChangeRequestService {
   /**
    * Delete a specific change item from a change request
    */
-  async deleteChangeItem(changeRequestId: string, itemId: string, projectApiPath: string | null = null): Promise<void> {
+  async deleteChangeItem(
+    changeRequestId: string,
+    itemId: string,
+    projectApiPath: string | null = null
+  ): Promise<void> {
     await api.delete(`${basePath(projectApiPath)}/${changeRequestId}/items/${itemId}`);
   }
 

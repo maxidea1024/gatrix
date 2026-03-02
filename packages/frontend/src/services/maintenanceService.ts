@@ -21,7 +21,7 @@ export interface MaintenanceDetail {
 }
 
 export const maintenanceService = {
-  async getStatus(): Promise<{
+  async getStatus(projectApiPath: string): Promise<{
     isUnderMaintenance: boolean;
     detail: MaintenanceDetail | null;
   }> {
@@ -29,25 +29,28 @@ export const maintenanceService = {
     const res = await apiService.get<{
       isUnderMaintenance: boolean;
       detail: MaintenanceDetail | null;
-    }>(`/admin/maintenance/isUnderMaintenance`, {
+    }>(`${projectApiPath}/maintenance/isUnderMaintenance`, {
       headers: { 'Cache-Control': 'no-cache' },
     });
     return res.data as any;
   },
-  async setStatus(payload: {
-    isMaintenance: boolean;
-    type?: MaintenanceType;
-    startsAt?: string | null;
-    endsAt?: string | null;
-    kickExistingPlayers?: boolean;
-    kickDelayMinutes?: number;
-    message?: string;
-    messages?: MaintenanceDetail['messages'];
-  }): Promise<MutationResult<void>> {
-    const response = await apiService.post(`/admin/maintenance`, payload);
+  async setStatus(
+    projectApiPath: string,
+    payload: {
+      isMaintenance: boolean;
+      type?: MaintenanceType;
+      startsAt?: string | null;
+      endsAt?: string | null;
+      kickExistingPlayers?: boolean;
+      kickDelayMinutes?: number;
+      message?: string;
+      messages?: MaintenanceDetail['messages'];
+    }
+  ): Promise<MutationResult<void>> {
+    const response = await apiService.post(`${projectApiPath}/maintenance`, payload);
     return parseChangeRequestResponse<void>(response, () => undefined);
   },
-  async getTemplates(): Promise<{
+  async getTemplates(projectApiPath: string): Promise<{
     templates: Array<{
       message?: string;
       messages?: MaintenanceDetail['messages'];
@@ -58,15 +61,16 @@ export const maintenanceService = {
         message?: string;
         messages?: MaintenanceDetail['messages'];
       }>;
-    }>(`/admin/maintenance/templates`);
+    }>(`${projectApiPath}/maintenance/templates`);
     return res.data as any;
   },
   async saveTemplates(
+    projectApiPath: string,
     templates: Array<{
       message?: string;
       messages?: MaintenanceDetail['messages'];
     }>
   ) {
-    return apiService.post(`/admin/maintenance/templates`, { templates });
+    return apiService.post(`${projectApiPath}/maintenance/templates`, { templates });
   },
 };

@@ -54,6 +54,7 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -61,6 +62,8 @@ const SurveysPage: React.FC = () => {
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.SURVEYS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [surveys, setSurveys] = useState<Survey[]>([]);
@@ -167,7 +170,7 @@ const SurveysPage: React.FC = () => {
         filters.conditionType = conditionTypeFilter;
       }
 
-      const result = await surveyService.getSurveys({
+      const result = await surveyService.getSurveys(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         ...filters,
@@ -271,7 +274,7 @@ const SurveysPage: React.FC = () => {
     if (!deletingSurvey) return;
 
     try {
-      await surveyService.deleteSurvey(deletingSurvey.id);
+      await surveyService.deleteSurvey(projectApiPath, deletingSurvey.id);
       enqueueSnackbar(t('surveys.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadSurveys();
@@ -297,7 +300,7 @@ const SurveysPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => surveyService.deleteSurvey(id)));
+      await Promise.all(selectedIds.map((id) => surveyService.deleteSurvey(projectApiPath, id)));
       enqueueSnackbar(t('surveys.bulkDeleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadSurveys();
@@ -314,7 +317,7 @@ const SurveysPage: React.FC = () => {
 
   const handleToggleActive = async (survey: Survey) => {
     try {
-      const result = await surveyService.toggleActive(survey.id);
+      const result = await surveyService.toggleActive(projectApiPath, survey.id);
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {

@@ -46,6 +46,7 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { showChangeRequestCreatedToast, getActionLabel } from '../../utils/changeRequestToast';
 import { useEntityLock } from '../../hooks/useEntityLock';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -68,6 +69,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const { handleApiError, ErrorDialog } = useHandleApiError();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Entity Lock for edit mode
   const { hasLock, lockedBy, pendingCR, forceTakeover } = useEntityLock({
@@ -439,14 +442,14 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       };
 
       if (survey) {
-        const result = await surveyService.updateSurvey(survey.id, data);
+        const result = await surveyService.updateSurvey(projectApiPath, survey.id, data);
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
           enqueueSnackbar(t('surveys.updateSuccess'), { variant: 'success' });
         }
       } else {
-        const result = await surveyService.createSurvey(data);
+        const result = await surveyService.createSurvey(projectApiPath, data);
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {

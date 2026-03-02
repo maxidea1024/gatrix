@@ -105,6 +105,7 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '@/components/common/DynamicFilterBar';
 import { api } from '@/services/api';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // Column definition interface
 interface ColumnConfig {
@@ -173,6 +174,8 @@ const MessageTemplatesPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -369,7 +372,7 @@ const MessageTemplatesPage: React.FC = () => {
         if (tagOperator) params.tags_operator = tagOperator;
       }
 
-      const result = await messageTemplateService.list(params);
+      const result = await messageTemplateService.list(projectApiPath, params);
 
       setItems(result.templates);
       setTotal(result.total);
@@ -509,7 +512,7 @@ const MessageTemplatesPage: React.FC = () => {
 
   const confirmBulkDelete = useCallback(async () => {
     try {
-      await messageTemplateService.bulkDelete(selectedIds);
+      await messageTemplateService.bulkDelete(projectApiPath, selectedIds);
       enqueueSnackbar(t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), {
         variant: 'success',
       });
@@ -535,7 +538,7 @@ const MessageTemplatesPage: React.FC = () => {
           selectedIds.map(async (id) => {
             const template = items.find((item) => item.id === id);
             if (template) {
-              await messageTemplateService.update(id, {
+              await messageTemplateService.update(projectApiPath, id, {
                 ...template,
                 isEnabled,
               });
@@ -573,7 +576,7 @@ const MessageTemplatesPage: React.FC = () => {
     if (!deletingTemplate?.id) return;
 
     try {
-      await messageTemplateService.delete(deletingTemplate.id);
+      await messageTemplateService.delete(projectApiPath, deletingTemplate.id);
       enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setDeletingTemplate(null);
@@ -622,7 +625,7 @@ const MessageTemplatesPage: React.FC = () => {
     async (template: MessageTemplate) => {
       try {
         setSelectedTemplateForTags(template);
-        const tags = await messageTemplateService.getTags(template.id!);
+        const tags = await messageTemplateService.getTags(projectApiPath, template.id!);
         setTemplateTags(tags);
         setTagDialogOpen(true);
       } catch (error) {
@@ -638,7 +641,7 @@ const MessageTemplatesPage: React.FC = () => {
       if (!selectedTemplateForTags?.id) return;
 
       try {
-        await messageTemplateService.setTags(selectedTemplateForTags.id, tagIds);
+        await messageTemplateService.setTags(projectApiPath, selectedTemplateForTags.id, tagIds);
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
         // 필요시 목록 새로고침
@@ -678,11 +681,11 @@ const MessageTemplatesPage: React.FC = () => {
       let templateId: number;
 
       if (editing?.id) {
-        await messageTemplateService.update(editing.id, payload);
+        await messageTemplateService.update(projectApiPath, editing.id, payload);
         templateId = editing.id;
         enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
       } else {
-        const created = await messageTemplateService.create(payload);
+        const created = await messageTemplateService.create(projectApiPath, payload);
         templateId = created?.id || (created as any)?.data?.id || (created as any)?.insertId;
 
         if (!templateId) {
@@ -694,12 +697,13 @@ const MessageTemplatesPage: React.FC = () => {
       // 태그 설정
       if (form.tags && form.tags.length > 0) {
         await messageTemplateService.setTags(
+          projectApiPath,
           templateId,
           form.tags.map((tag) => tag.id)
         );
       } else {
         // 태그가 없으면 기존 태그 모두 제거
-        await messageTemplateService.setTags(templateId, []);
+        await messageTemplateService.setTags(projectApiPath, templateId, []);
       }
 
       setDialogOpen(false);

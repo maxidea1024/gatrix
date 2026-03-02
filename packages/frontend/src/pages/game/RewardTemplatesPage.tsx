@@ -51,12 +51,15 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const RewardTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.REWARD_TEMPLATES_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [templates, setTemplates] = useState<RewardTemplate[]>([]);
@@ -246,7 +249,7 @@ const RewardTemplatesPage: React.FC = () => {
   const loadTemplates = async () => {
     setLoading(true);
     try {
-      const result = await rewardTemplateService.getRewardTemplates({
+      const result = await rewardTemplateService.getRewardTemplates(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
@@ -452,7 +455,7 @@ const RewardTemplatesPage: React.FC = () => {
     if (!deletingTemplate) return;
 
     try {
-      await rewardTemplateService.deleteRewardTemplate(deletingTemplate.id);
+      await rewardTemplateService.deleteRewardTemplate(projectApiPath, deletingTemplate.id);
       enqueueSnackbar(t('rewardTemplates.deleteSuccess'), {
         variant: 'success',
       });
@@ -482,7 +485,9 @@ const RewardTemplatesPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => rewardTemplateService.deleteRewardTemplate(id)));
+      await Promise.all(
+        selectedIds.map((id) => rewardTemplateService.deleteRewardTemplate(projectApiPath, id))
+      );
       enqueueSnackbar(t('rewardTemplates.bulkDeleteSuccess'), {
         variant: 'success',
       });

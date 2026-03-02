@@ -55,6 +55,7 @@ import signalEndpointService, {
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // ==================== Create/Edit Dialog ====================
 interface EndpointDialogProps {
@@ -171,6 +172,8 @@ interface TokenDialogProps {
 
 const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, onCreated }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [tokenName, setTokenName] = useState('');
   const [createdToken, setCreatedToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -186,7 +189,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, on
     if (!endpointId || !tokenName.trim()) return;
     setLoading(true);
     try {
-      const result = await signalEndpointService.createToken(endpointId, {
+      const result = await signalEndpointService.createToken(projectApiPath, endpointId, {
         name: tokenName.trim(),
       });
       setCreatedToken(result.secret);
@@ -303,6 +306,8 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
 // ==================== Main Page ====================
 const SignalEndpointsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [endpoints, setEndpoints] = useState<SignalEndpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -330,7 +335,7 @@ const SignalEndpointsPage: React.FC = () => {
   const fetchEndpoints = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await signalEndpointService.getAll();
+      const data = await signalEndpointService.getAll(projectApiPath);
       setEndpoints(data);
     } catch (error) {
       enqueueSnackbar(t('signalEndpoints.loadFailed'), { variant: 'error' });
@@ -346,7 +351,7 @@ const SignalEndpointsPage: React.FC = () => {
   const fetchTokens = useCallback(
     async (endpointId: number) => {
       try {
-        const endpoint = await signalEndpointService.getById(endpointId);
+        const endpoint = await signalEndpointService.getById(projectApiPath, endpointId);
         if (endpoint.tokens) {
           setEndpointTokens((prev) => ({ ...prev, [endpointId]: endpoint.tokens! }));
         }
@@ -369,10 +374,10 @@ const SignalEndpointsPage: React.FC = () => {
   const handleSaveEndpoint = async (data: { name: string; description?: string }) => {
     try {
       if (editDialog.endpoint) {
-        await signalEndpointService.update(editDialog.endpoint.id, data);
+        await signalEndpointService.update(projectApiPath, editDialog.endpoint.id, data);
         enqueueSnackbar(t('signalEndpoints.updateSuccess'), { variant: 'success' });
       } else {
-        await signalEndpointService.create(data);
+        await signalEndpointService.create(projectApiPath, data);
         enqueueSnackbar(t('signalEndpoints.createSuccess'), { variant: 'success' });
       }
       setEditDialog({ open: false, endpoint: null });
@@ -387,7 +392,7 @@ const SignalEndpointsPage: React.FC = () => {
 
   const handleToggle = async (endpoint: SignalEndpoint) => {
     try {
-      await signalEndpointService.toggle(endpoint.id);
+      await signalEndpointService.toggle(projectApiPath, endpoint.id);
       fetchEndpoints();
     } catch (error) {
       enqueueSnackbar(t('signalEndpoints.toggleFailed'), { variant: 'error' });
@@ -398,10 +403,14 @@ const SignalEndpointsPage: React.FC = () => {
     if (!deleteDialog) return;
     try {
       if (deleteDialog.type === 'endpoint') {
-        await signalEndpointService.delete(deleteDialog.endpointId);
+        await signalEndpointService.delete(projectApiPath, deleteDialog.endpointId);
         enqueueSnackbar(t('signalEndpoints.deleteSuccess'), { variant: 'success' });
       } else if (deleteDialog.tokenId) {
-        await signalEndpointService.deleteToken(deleteDialog.endpointId, deleteDialog.tokenId);
+        await signalEndpointService.deleteToken(
+          projectApiPath,
+          deleteDialog.endpointId,
+          deleteDialog.tokenId
+        );
         enqueueSnackbar(t('signalEndpoints.tokenDeleteSuccess'), { variant: 'success' });
         fetchTokens(deleteDialog.endpointId);
       }

@@ -403,6 +403,8 @@ const ActionSetsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [events, setEvents] = useState<Record<number, ActionSetEvent[]>>({});
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Dialog states
   const [editDialog, setEditDialog] = useState<{
@@ -419,7 +421,7 @@ const ActionSetsPage: React.FC = () => {
   const fetchActionSets = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await actionSetService.getAll();
+      const data = await actionSetService.getAll(projectApiPath);
       setActionSets(data);
     } catch (error) {
       enqueueSnackbar(t('actionSets.loadFailed'), { variant: 'error' });
@@ -435,7 +437,7 @@ const ActionSetsPage: React.FC = () => {
   const fetchEvents = useCallback(
     async (id: number) => {
       try {
-        const result = await actionSetService.getEvents(id, 10);
+        const result = await actionSetService.getEvents(projectApiPath, id, 10);
         setEvents((prev) => ({ ...prev, [id]: result.data }));
       } catch (error) {
         enqueueSnackbar(t('actionSets.eventsLoadFailed'), { variant: 'error' });
@@ -465,10 +467,10 @@ const ActionSetsPage: React.FC = () => {
   }) => {
     try {
       if (editDialog.actionSet) {
-        await actionSetService.update(editDialog.actionSet.id, data);
+        await actionSetService.update(projectApiPath, editDialog.actionSet.id, data);
         enqueueSnackbar(t('actionSets.updateSuccess'), { variant: 'success' });
       } else {
-        await actionSetService.create(data);
+        await actionSetService.create(projectApiPath, data);
         enqueueSnackbar(t('actionSets.createSuccess'), { variant: 'success' });
       }
       setEditDialog({ open: false, actionSet: null });
@@ -483,7 +485,7 @@ const ActionSetsPage: React.FC = () => {
 
   const handleToggle = async (actionSet: ActionSet) => {
     try {
-      await actionSetService.toggle(actionSet.id);
+      await actionSetService.toggle(projectApiPath, actionSet.id);
       fetchActionSets();
     } catch (error) {
       enqueueSnackbar(t('actionSets.toggleFailed'), { variant: 'error' });
@@ -493,7 +495,7 @@ const ActionSetsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteDialog) return;
     try {
-      await actionSetService.delete(deleteDialog.id);
+      await actionSetService.delete(projectApiPath, deleteDialog.id);
       enqueueSnackbar(t('actionSets.deleteSuccess'), { variant: 'success' });
       setDeleteDialog(null);
       fetchActionSets();

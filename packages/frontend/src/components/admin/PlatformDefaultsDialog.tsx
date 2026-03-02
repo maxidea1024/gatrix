@@ -26,6 +26,7 @@ import {
   PlatformDefaultsMap,
 } from '@/services/platformDefaultsService';
 import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface PlatformDefaultsDialogProps {
   open: boolean;
@@ -36,6 +37,8 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { platforms, isLoading: platformsLoading } = usePlatformConfig();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -45,7 +48,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
   const loadDefaults = async () => {
     try {
       setLoading(true);
-      const data = await PlatformDefaultsService.getAllDefaults();
+      const data = await PlatformDefaultsService.getAllDefaults(projectApiPath);
       // Ensure all known platforms are present, even if not stored yet
       const merged: PlatformDefaultsMap = platforms.reduce((acc, p) => {
         acc[p.value] = {
@@ -90,7 +93,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
   const handleSave = async () => {
     try {
       setSaving(true);
-      await PlatformDefaultsService.setAllDefaults(defaults);
+      await PlatformDefaultsService.setAllDefaults(projectApiPath, defaults);
       enqueueSnackbar(t('platformDefaults.saveSuccess'), {
         variant: 'success',
       });

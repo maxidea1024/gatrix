@@ -128,9 +128,7 @@ export async function getPlan(
   environmentId: string,
   projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan | null> {
-  const response = await api.get(
-    `${basePath(projectApiPath)}/plans/${flagId}/${environmentId}`
-  );
+  const response = await api.get(`${basePath(projectApiPath)}/plans/${flagId}/${environmentId}`);
   return response.data;
 }
 
@@ -142,9 +140,7 @@ export async function startMilestone(
   milestoneId: string,
   projectApiPath: string | null = null
 ): Promise<void> {
-  await api.post(
-    `${basePath(projectApiPath)}/plans/${planId}/milestones/${milestoneId}/start`
-  );
+  await api.post(`${basePath(projectApiPath)}/plans/${planId}/milestones/${milestoneId}/start`);
 }
 
 /**
@@ -350,10 +346,7 @@ export async function updateSafeguard(
   data: UpdateSafeguardInput,
   projectApiPath: string | null = null
 ): Promise<Safeguard> {
-  const response = await api.put(
-    `${basePath(projectApiPath)}/safeguards/${safeguardId}`,
-    data
-  );
+  const response = await api.put(`${basePath(projectApiPath)}/safeguards/${safeguardId}`, data);
   return response.data;
 }
 

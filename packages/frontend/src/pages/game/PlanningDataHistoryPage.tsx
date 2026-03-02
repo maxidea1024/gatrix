@@ -46,6 +46,7 @@ import planningDataService, { UploadRecord } from '../../services/planningDataSe
 import SimplePagination from '../../components/common/SimplePagination';
 import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const PlanningDataHistoryPage: React.FC = () => {
   const { t } = useTranslation();
@@ -53,6 +54,8 @@ const PlanningDataHistoryPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const canView = hasPermission([PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE]);
   const canManage = hasPermission([PERMISSIONS.PLANNING_DATA_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [history, setHistory] = useState<UploadRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +78,7 @@ const PlanningDataHistoryPage: React.FC = () => {
   const loadHistory = async () => {
     try {
       setLoading(true);
-      const data = await planningDataService.getUploadHistory(100);
+      const data = await planningDataService.getUploadHistory(projectApiPath, 100);
       setHistory(data);
     } catch (error: any) {
       console.error('Error loading history:', error);
@@ -97,7 +100,7 @@ const PlanningDataHistoryPage: React.FC = () => {
 
   const handleReset = async () => {
     try {
-      const result = await planningDataService.resetUploadHistory();
+      const result = await planningDataService.resetUploadHistory(projectApiPath);
       enqueueSnackbar(t('planningData.history.resetSuccess', { count: result.deletedCount }), {
         variant: 'success',
       });

@@ -34,23 +34,26 @@ export interface EventsResponse {
 }
 
 class ServerLifecycleService {
-  async getEvents(params: {
-    page?: number;
-    limit?: number;
-    serviceType?: string;
-    instanceId?: string;
-    environmentId?: string;
-    eventType?: string;
-  }): Promise<EventsResponse> {
-    const response = await api.get('/admin/server-lifecycle/events', {
+  async getEvents(
+    projectApiPath: string,
+    params: {
+      page?: number;
+      limit?: number;
+      serviceType?: string;
+      instanceId?: string;
+      environmentId?: string;
+      eventType?: string;
+    }
+  ): Promise<EventsResponse> {
+    const response = await api.get(`${projectApiPath}/server-lifecycle/events`, {
       params,
     });
     // api.get returns { success, data: { data: [...], total, page, limit } }
     return response.data as EventsResponse;
   }
 
-  async getSummary(limit: number = 10): Promise<ServerLifecycleEvent[]> {
-    const response = await api.get('/admin/server-lifecycle/summary', {
+  async getSummary(projectApiPath: string, limit: number = 10): Promise<ServerLifecycleEvent[]> {
+    const response = await api.get(`${projectApiPath}/server-lifecycle/summary`, {
       params: { limit },
     });
     // api.get returns response.data (the body) which is { success, data: [...] }

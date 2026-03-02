@@ -416,7 +416,7 @@ const FeatureContextFieldsPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAllTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -523,7 +523,10 @@ const FeatureContextFieldsPage: React.FC = () => {
     if (!editingField) return;
     try {
       if (editingField.id) {
-        await api.put(`${projectApiPath}/features/context-fields/${editingField.fieldName}`, editingField);
+        await api.put(
+          `${projectApiPath}/features/context-fields/${editingField.fieldName}`,
+          editingField
+        );
         enqueueSnackbar(t('contextFields.updateSuccess'), {
           variant: 'success',
         });
@@ -549,7 +552,9 @@ const FeatureContextFieldsPage: React.FC = () => {
   const handleDelete = async (field: FeatureContextField) => {
     setDeletingField(field);
     try {
-      const result = await api.get(`${projectApiPath}/features/context-fields/${field.fieldName}/references`);
+      const result = await api.get(
+        `${projectApiPath}/features/context-fields/${field.fieldName}/references`
+      );
       const refs = result.data?.references;
       if (
         refs &&
@@ -569,7 +574,9 @@ const FeatureContextFieldsPage: React.FC = () => {
 
   const handleViewReferences = async (field: FeatureContextField) => {
     try {
-      const result = await api.get(`${projectApiPath}/features/context-fields/${field.fieldName}/references`);
+      const result = await api.get(
+        `${projectApiPath}/features/context-fields/${field.fieldName}/references`
+      );
       const refs = result.data?.references;
       if (refs) {
         setReferences(refs);

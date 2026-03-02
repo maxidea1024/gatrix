@@ -38,12 +38,15 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const KeyValuePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironmentId } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
 
   const [items, setItems] = useState<VarItem[]>([]);
@@ -63,7 +66,7 @@ const KeyValuePage: React.FC = () => {
   const loadItems = async () => {
     setLoading(true);
     try {
-      const data = await varsService.getAllKV();
+      const data = await varsService.getAllKV(projectApiPath);
       setItems(data);
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'settings.kv.loadFailed'), {
@@ -170,7 +173,7 @@ const KeyValuePage: React.FC = () => {
 
     const keyName = deleteConfirm.item.varKey.replace('kv:', '');
     try {
-      await varsService.deleteKV(keyName);
+      await varsService.deleteKV(projectApiPath, keyName);
       enqueueSnackbar(t('settings.kv.deleteSuccess', { key: keyName }), {
         variant: 'success',
       });
