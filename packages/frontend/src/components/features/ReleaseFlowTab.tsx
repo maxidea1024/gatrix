@@ -558,34 +558,29 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             <>
               <Box
                 sx={{
-                  width: 2,
+                  width: isCurrentActive && !isPaused ? 10 : 2,
                   flexGrow: 1,
-                  bgcolor: lineColor,
                   minHeight: 12,
                   position: 'relative',
                   overflow: 'hidden',
-                  // Flowing animation only on the active milestone's connector
-                  ...(isCurrentActive && !isPaused && {
-                    bgcolor: 'primary.main',
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: '-100%',
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      background:
-                        'linear-gradient(to bottom, transparent, rgba(255,255,255,0.6), transparent)',
-                      animation: 'flowDown 1.5s ease-in-out infinite',
-                    },
-                    '@keyframes flowDown': {
-                      '0%': { top: '-100%' },
-                      '100%': { top: '200%' },
-                    },
-                  }),
+                  ...(isCurrentActive && !isPaused
+                    ? {
+                      // Flowing chevron arrows animation
+                      background: (theme) =>
+                        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
+                      backgroundSize: '10px 12px',
+                      animation: 'chevronFlow 0.8s linear infinite',
+                      '@keyframes chevronFlow': {
+                        '0%': { backgroundPositionY: '0px' },
+                        '100%': { backgroundPositionY: '12px' },
+                      },
+                    }
+                    : {
+                      bgcolor: lineColor,
+                    }),
                 }}
               />
-              {/* CSS triangle arrow — perfectly matches line color */}
+              {/* CSS triangle arrow */}
               <Box
                 sx={{
                   width: 0,
@@ -606,26 +601,21 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
               />
               <Box
                 sx={{
-                  width: 2,
+                  width: isCurrentActive && !isPaused ? 10 : 2,
                   flexGrow: 1,
-                  bgcolor: isCurrentActive && !isPaused ? 'primary.main' : lineColor,
                   minHeight: 12,
                   position: 'relative',
                   overflow: 'hidden',
-                  ...(isCurrentActive && !isPaused && {
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: '-100%',
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      background:
-                        'linear-gradient(to bottom, transparent, rgba(255,255,255,0.6), transparent)',
-                      animation: 'flowDown 1.5s ease-in-out infinite',
-                      animationDelay: '0.3s',
-                    },
-                  }),
+                  ...(isCurrentActive && !isPaused
+                    ? {
+                      background: (theme) =>
+                        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
+                      backgroundSize: '10px 12px',
+                      animation: 'chevronFlow 0.8s linear infinite',
+                    }
+                    : {
+                      bgcolor: lineColor,
+                    }),
                 }}
               />
             </>
