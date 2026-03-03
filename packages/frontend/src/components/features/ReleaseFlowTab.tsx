@@ -552,7 +552,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             flexShrink: 0,
-            pl: 1.5,
+            pl: '14px',
           }}
         >
           {hasTransition ? (
