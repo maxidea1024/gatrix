@@ -576,22 +576,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       bgcolor: 'primary.main',
                       opacity: 0.3,
                     },
-                    // Flowing chevron arrows
-                    '&::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '200%',
-                      background: (theme: any) =>
-                        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
-                      backgroundSize: '10px 12px',
-                      animation: 'chevronFlow 0.8s linear infinite',
-                    },
+                    // Flowing chevron arrows via seamless background-position loop
+                    background: (theme: any) =>
+                      `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
+                    backgroundSize: '10px 12px',
+                    animation: 'chevronFlow 1.8s linear infinite',
                     '@keyframes chevronFlow': {
-                      '0%': { transform: 'translateY(-50%)' },
-                      '100%': { transform: 'translateY(0%)' },
+                      '0%': { backgroundPositionY: '0px' },
+                      '100%': { backgroundPositionY: '12px' },
                     },
                   }
                   : {
