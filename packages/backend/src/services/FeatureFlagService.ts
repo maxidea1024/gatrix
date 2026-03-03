@@ -525,7 +525,7 @@ class FeatureFlagService {
         const { releaseFlowService } = await import('./ReleaseFlowService');
         const plan = await releaseFlowService.getPlanForFlag(result.id, environmentId);
         if (plan) {
-          if (isEnabled && plan.status === 'draft') {
+          if (isEnabled && (plan.status === 'draft' || plan.status === 'pending')) {
             await releaseFlowService.startPlan(plan.id, userId);
             logger.info(
               `Auto-started release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`

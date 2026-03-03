@@ -7,7 +7,7 @@ import { parseJsonField } from '../utils/dbUtils';
 // ==================== Types ====================
 
 export type FlowDiscriminator = 'template' | 'plan';
-export type FlowStatus = 'draft' | 'active' | 'paused' | 'completed';
+export type FlowStatus = 'draft' | 'pending' | 'active' | 'paused' | 'completed';
 
 export interface TransitionCondition {
   intervalMinutes: number;
