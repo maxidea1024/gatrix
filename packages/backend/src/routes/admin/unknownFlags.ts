@@ -1,5 +1,8 @@
 import express from 'express';
 import { unknownFlagService } from '../../services/UnknownFlagService';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('UnknownFlagsRoutes');
 
 const router = express.Router();
 
@@ -19,7 +22,7 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data: { flags, total: flags.length } });
   } catch (error) {
-    console.error('Error fetching unknown flags:', error);
+    logger.error('Error fetching unknown flags:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch unknown flags' });
   }
 });
@@ -33,7 +36,7 @@ router.get('/count', async (req, res) => {
     const count = await unknownFlagService.getUnresolvedCount();
     res.json({ success: true, data: { count } });
   } catch (error) {
-    console.error('Error fetching unknown flag count:', error);
+    logger.error('Error fetching unknown flag count:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch count' });
   }
 });
@@ -51,7 +54,7 @@ router.post('/:id/resolve', async (req, res) => {
     await unknownFlagService.resolveUnknownFlag(id, resolvedBy);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
-    console.error('Error resolving unknown flag:', error);
+    logger.error('Error resolving unknown flag:', error);
     res.status(500).json({ success: false, message: 'Failed to resolve flag' });
   }
 });
@@ -66,7 +69,7 @@ router.post('/:id/unresolve', async (req, res) => {
     await unknownFlagService.unresolveUnknownFlag(id);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
-    console.error('Error unresolving unknown flag:', error);
+    logger.error('Error unresolving unknown flag:', error);
     res.status(500).json({ success: false, message: 'Failed to unresolve flag' });
   }
 });
@@ -81,7 +84,7 @@ router.delete('/:id', async (req, res) => {
     await unknownFlagService.deleteUnknownFlag(id);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
-    console.error('Error deleting unknown flag:', error);
+    logger.error('Error deleting unknown flag:', error);
     res.status(500).json({ success: false, message: 'Failed to delete flag' });
   }
 });

@@ -4,7 +4,9 @@ import { validationResult } from 'express-validator';
 import { Request, Response } from 'express';
 import { ulid } from 'ulid';
 import { pubSubService } from '../services/PubSubService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ApiTokensController');
 
 class ApiTokensController {
   /**
@@ -127,7 +129,7 @@ class ApiTokensController {
 
       res.json(responseData);
     } catch (error) {
-      console.error('Error fetching API tokens:', error);
+      logger.error('Error fetching API tokens:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to fetch API tokens' },
@@ -210,7 +212,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error creating API token:', error);
+      logger.error('Error creating API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to create API token' },
@@ -310,7 +312,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error updating API token:', error);
+      logger.error('Error updating API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to update API token' },
@@ -380,7 +382,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error regenerating API token:', error);
+      logger.error('Error regenerating API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to regenerate API token' },
@@ -436,7 +438,7 @@ class ApiTokensController {
         message: 'API token deleted successfully',
       });
     } catch (error) {
-      console.error('Error deleting API token:', error);
+      logger.error('Error deleting API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to delete API token' },
@@ -485,7 +487,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error fetching token stats:', error);
+      logger.error('Error fetching token stats:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to fetch token statistics' },

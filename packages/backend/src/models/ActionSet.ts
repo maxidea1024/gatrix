@@ -387,6 +387,7 @@ export class ActionSetModel {
       // Parse JSON fields
       const parsedEvents = events.map((e: any) => ({
         ...e,
+        eventState: e.state,
         eventSignal: parseJsonField(e.eventSignal),
         eventActionSet: parseJsonField(e.eventActionSet),
       }));

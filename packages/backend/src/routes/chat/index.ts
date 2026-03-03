@@ -3,7 +3,9 @@ import multer from 'multer';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
 import { ChatSyncController } from '../../controllers/ChatSyncController';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('ChatRoutes');
 import { HEADERS } from '../../constants/headers';
 import { UserModel } from '../../models/User';
 
@@ -185,7 +187,7 @@ const proxyOptions = {
       code: (err as any).code,
       stack: err.stack,
     });
-    console.error('🚨 Detailed proxy error:', err);
+    logger.error('Detailed proxy error:', err);
     if (!res.headersSent) {
       res.status(500).json({
         success: false,
@@ -199,8 +201,8 @@ const proxyOptions = {
 // 임시 테스트: 간단한 프록시 미들웨어
 router.use('/', async (req, res, next) => {
   try {
-    console.log('🔥 SIMPLE PROXY MIDDLEWARE REACHED:', req.method, req.url);
-    console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
+    logger.info('Simple proxy middleware reached:', { method: req.method, url: req.url });
+    logger.debug('Request body:', req.body);
 
     // 채팅서버로 직접 요청
     const axios = require('axios');
@@ -213,7 +215,7 @@ router.use('/', async (req, res, next) => {
 
     const targetUrl = `${CHAT_API_BASE}${targetPath}`;
 
-    console.log('🚀 Forwarding to:', targetUrl);
+    logger.info('Forwarding to:', { targetUrl });
 
     // 사용자 동기화 요청인 경우 사용자 정보 추가
     let requestData = req.body;
@@ -228,7 +230,7 @@ router.use('/', async (req, res, next) => {
           avatarUrl = dbUser.avatarUrl;
         }
       } catch (error) {
-        console.error('Failed to fetch user avatar from DB:', error);
+        logger.error('Failed to fetch user avatar from DB:', error);
       }
 
       requestData = {
@@ -238,7 +240,7 @@ router.use('/', async (req, res, next) => {
         email: user.email,
         avatarUrl: avatarUrl,
       };
-      console.log('📝 Adding user data for sync:', requestData);
+      logger.debug('Adding user data for sync:', requestData);
     }
 
     const response = await axios({
@@ -252,10 +254,10 @@ router.use('/', async (req, res, next) => {
       data: requestData,
     });
 
-    console.log('✅ Chat server response:', response.status);
+    logger.info('Chat server response:', { status: response.status });
     res.json(response.data);
   } catch (error: any) {
-    console.error('❌ Simple proxy error:', error.message);
+    logger.error('Simple proxy error:', error.message);
     res.status(error.response?.status || 500).json({
       success: false,
       error: error.message,

@@ -714,10 +714,10 @@ const ActionSetsPage: React.FC = () => {
                                           size="small"
                                           color={
                                             getStateColor(event.eventState) as
-                                            | 'success'
-                                            | 'error'
-                                            | 'info'
-                                            | 'default'
+                                              | 'success'
+                                              | 'error'
+                                              | 'info'
+                                              | 'default'
                                           }
                                         />
                                       </TableCell>

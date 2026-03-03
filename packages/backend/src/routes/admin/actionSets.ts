@@ -7,7 +7,12 @@
 import { Router, Request, Response } from 'express';
 import { ActionSetModel } from '../../models/ActionSet';
 import { createLogger } from '../../config/logger';
-import { sendConflict, sendBadRequest, sendNotFound, sendInternalError } from '../../utils/apiResponse';
+import {
+  sendConflict,
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+} from '../../utils/apiResponse';
 import { ErrorCodes } from '@gatrix/shared';
 
 const router = Router();
@@ -73,7 +78,11 @@ router.post('/', async (req: Request, res: Response) => {
     const allSets = await ActionSetModel.findAll(projectId);
     const duplicate = allSets.find((s) => s.name === name.trim());
     if (duplicate) {
-      return sendConflict(res, 'An action set with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
+      return sendConflict(
+        res,
+        'An action set with this name already exists',
+        ErrorCodes.RESOURCE_ALREADY_EXISTS
+      );
     }
 
     const actionSet = await ActionSetModel.create({
@@ -112,7 +121,11 @@ router.put('/:id', async (req: Request, res: Response) => {
       const allSets = await ActionSetModel.findAll(projectId);
       const duplicate = allSets.find((s) => s.name === name.trim() && s.id !== id);
       if (duplicate) {
-        return sendConflict(res, 'An action set with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
+        return sendConflict(
+          res,
+          'An action set with this name already exists',
+          ErrorCodes.RESOURCE_ALREADY_EXISTS
+        );
       }
     }
 

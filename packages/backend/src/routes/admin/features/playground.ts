@@ -1,831 +1,25 @@
 /**
- * Feature Flags Admin Routes
- * API endpoints for managing feature flags
+ * Playground Routes
+ * API endpoints for feature flag playground evaluation
+ * Includes evaluation engine helpers used exclusively by the playground
  */
 
 import { Router, Response } from 'express';
-import { AuthenticatedRequest } from '../../middleware/auth';
-import { asyncHandler } from '../../middleware/errorHandler';
-import { featureFlagService, RequestContext } from '../../services/FeatureFlagService';
-import { FeatureFlagTypeModel } from '../../models/FeatureFlagType';
-import { ValidationRules } from '../../models/FeatureFlag';
-import { networkTrafficService } from '../../services/NetworkTrafficService';
-import { validateFlagValue } from '../../utils/validateFlagValue';
+import { AuthenticatedRequest } from '../../../middleware/auth';
+import { asyncHandler } from '../../../middleware/errorHandler';
+import { featureFlagService } from '../../../services/FeatureFlagService';
+import { ValidationRules } from '../../../models/FeatureFlag';
+import { validateFlagValue } from '../../../utils/validateFlagValue';
 import { VALUE_SOURCE, evaluateStrategyWithDetails } from '@gatrix/shared';
+import { createLogger } from '../../../config/logger';
+import { getFallbackValue } from './_helpers';
 
+const logger = createLogger('PlaygroundRoutes');
 const router = Router();
-
-// ==================== Network Traffic ====================
-
-// Get detailed network traffic data (includes appName)
-router.get(
-  '/network/traffic',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    // Default to last 24 hours
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const traffic = await networkTrafficService.getDetailedTraffic({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { traffic } });
-  })
-);
-
-// Get aggregated network traffic data for charts
-router.get(
-  '/network/traffic/aggregated',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const traffic = await networkTrafficService.getAggregatedTraffic({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { traffic } });
-  })
-);
-
-// Get aggregated network traffic data by app for charts
-router.get(
-  '/network/traffic/aggregated/by-app',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const traffic = await networkTrafficService.getAggregatedTrafficByApp({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { traffic } });
-  })
-);
-
-// Get traffic summary
-router.get(
-  '/network/summary',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const summary = await networkTrafficService.getTrafficSummary({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { summary } });
-  })
-);
-
-// Get active applications
-router.get(
-  '/network/applications',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const applications = await networkTrafficService.getActiveApplications({
-      environments: environments ? (environments as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { applications } });
-  })
-);
-
-// Get flag evaluation summary (from g_feature_metrics)
-router.get(
-  '/network/evaluations',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const evaluations = await networkTrafficService.getFlagEvaluationSummary({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { evaluations } });
-  })
-);
-
-// Get flag evaluation time series (from g_feature_metrics)
-router.get(
-  '/network/evaluations/timeseries',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const timeseries = await networkTrafficService.getFlagEvaluationTimeSeries({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { timeseries } });
-  })
-);
-
-// Get flag evaluation time series by app (from g_feature_metrics)
-router.get(
-  '/network/evaluations/timeseries/by-app',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { environments, appNames, startDate, endDate } = req.query;
-
-    const end = endDate ? new Date(endDate as string) : new Date();
-    const start = startDate
-      ? new Date(startDate as string)
-      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
-
-    const timeseries = await networkTrafficService.getFlagEvaluationTimeSeriesByApp({
-      environments: environments ? (environments as string).split(',') : undefined,
-      appNames: appNames ? (appNames as string).split(',') : undefined,
-      startDate: start,
-      endDate: end,
-    });
-
-    res.json({ success: true, data: { timeseries } });
-  })
-);
-
-// ==================== Flag Types ====================
-
-// List all flag types
-router.get(
-  '/types',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const types = await FeatureFlagTypeModel.findAll();
-    res.json({ success: true, data: { types } });
-  })
-);
-
-// Update a flag type
-router.put(
-  '/types/:flagType',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const flagType = await FeatureFlagTypeModel.update(req.params.flagType, req.body);
-    res.json({ success: true, data: { flagType } });
-  })
-);
-
-// ==================== Segments (MUST be before /:flagName routes) ====================
-
-// List segments (segments are now global)
-router.get(
-  '/segments',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { search } = req.query;
-
-    const segments = await featureFlagService.listSegments(search as string, req.projectId);
-
-    res.json({ success: true, data: { segments } });
-  })
-);
-
-// Get segment by ID
-router.get(
-  '/segments/:id',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const segment = await featureFlagService.getSegment(req.params.id);
-
-    if (!segment) {
-      return res.status(404).json({ success: false, error: 'Segment not found' });
-    }
-
-    res.json({ success: true, data: { segment } });
-  })
-);
-
-// Create a segment (segments are now global)
-router.post(
-  '/segments',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    const segment = await featureFlagService.createSegment(req.body, userId!);
-
-    res.status(201).json({ success: true, data: { segment } });
-  })
-);
-
-// Update a segment
-router.put(
-  '/segments/:id',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    const segment = await featureFlagService.updateSegment(req.params.id, req.body, userId!);
-
-    res.json({ success: true, data: { segment } });
-  })
-);
-
-// Get segment references
-router.get(
-  '/segments/:id/references',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { FeatureSegmentModel } = await import('../../models/FeatureFlag');
-    const references = await FeatureSegmentModel.getReferences(req.params.id);
-    res.json({ success: true, data: { references } });
-  })
-);
-
-// Delete a segment
-router.delete(
-  '/segments/:id',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    await featureFlagService.deleteSegment(req.params.id, userId!);
-
-    res.json({ success: true, message: 'Segment deleted successfully' });
-  })
-);
-
-// ==================== Context Fields (MUST be before /:flagName routes) ====================
-
-// List context fields
-router.get(
-  '/context-fields',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { search } = req.query;
-    const fields = await featureFlagService.listContextFields(
-      search as string | undefined,
-      req.projectId
-    );
-
-    res.json({ success: true, data: { contextFields: fields } });
-  })
-);
-
-// Create a context field
-router.post(
-  '/context-fields',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    const field = await featureFlagService.createContextField(req.body, userId!);
-
-    res.status(201).json({ success: true, data: { field } });
-  })
-);
-
-// Update a context field
-router.put(
-  '/context-fields/:fieldName',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    const field = await featureFlagService.updateContextField(
-      req.params.fieldName,
-      req.body,
-      userId!
-    );
-
-    res.json({ success: true, data: { field } });
-  })
-);
-
-// Get context field references
-router.get(
-  '/context-fields/:fieldName/references',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { FeatureContextFieldModel } = await import('../../models/FeatureFlag');
-    const references = await FeatureContextFieldModel.getReferences(req.params.fieldName);
-    res.json({ success: true, data: { references } });
-  })
-);
-
-// Delete a context field
-router.delete(
-  '/context-fields/:fieldName',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    await featureFlagService.deleteContextField(req.params.fieldName, userId!);
-
-    res.json({ success: true, message: 'Context field deleted successfully' });
-  })
-);
-
-// ==================== Code References (MUST be before /:flagName routes) ====================
-
-// Get code references summary for all flags
-router.get(
-  '/code-references/summary',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { repository, branch } = req.query;
-
-    try {
-      const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
-
-      const summary = await FeatureCodeReferenceModel.getSummary({
-        repository: repository as string,
-        branch: branch as string,
-      });
-
-      const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
-        repository: repository as string,
-        branch: branch as string,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          summary,
-          scanInfo,
-        },
-      });
-    } catch (error: any) {
-      // Code references are non-critical - return empty on any error
-      console.warn('Code references summary error:', error.message || error.code);
-      res.json({
-        success: true,
-        data: {
-          summary: [],
-          scanInfo: null,
-        },
-      });
-    }
-  })
-);
-
-// ==================== Feature Flags ====================
-
-// Helper function to validate environment
-const requireEnvironment = (req: AuthenticatedRequest, res: Response): string | null => {
-  const environmentId = req.environmentId;
-  if (!environmentId) {
-    res.status(400).json({
-      success: false,
-      error: 'Environment is required (x-environment-id header)',
-    });
-    return null;
-  }
-  return environmentId;
-};
-
-// Helper to extract request context for audit logs
-const getRequestContext = (req: AuthenticatedRequest): RequestContext => ({
-  ipAddress: req.ip,
-  userAgent: req.get('User-Agent'),
-});
-
-// List feature flags
-router.get(
-  '/',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const {
-      search,
-      flagType,
-      isEnabled,
-      isArchived,
-      tags,
-      page,
-      limit,
-      sortBy,
-      sortOrder,
-      projectId,
-    } = req.query;
-
-    const result = await featureFlagService.listFlags({
-      environmentId,
-      search: search as string,
-      flagType: flagType as string,
-      isEnabled: isEnabled === 'true' ? true : isEnabled === 'false' ? false : undefined,
-      isArchived: isArchived === 'true' ? true : isArchived === 'false' ? false : undefined,
-      tags: tags ? (tags as string).split(',') : undefined,
-      page: parseInt(page as string) || 1,
-      limit: parseInt(limit as string) || 50,
-      sortBy: sortBy as string,
-      sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
-      projectId: req.projectId,
-    });
-
-    res.json({ success: true, data: result });
-  })
-);
-
-// Create a feature flag
-router.post(
-  '/',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const flag = await featureFlagService.createFlag(
-      { ...req.body, environmentId, projectId: req.projectId },
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.status(201).json({ success: true, data: { flag } });
-  })
-);
-
-// Get a single feature flag (MUST be after /segments and /context-fields)
-router.get(
-  '/:flagName',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const flag = await featureFlagService.getFlag(environmentId, req.params.flagName);
-
-    if (!flag) {
-      return res.status(404).json({ success: false, error: 'Flag not found' });
-    }
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Update a feature flag
-router.put(
-  '/:flagName',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const flag = await featureFlagService.updateFlag(
-      environmentId,
-      req.params.flagName,
-      req.body,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Toggle flag enabled state
-router.post(
-  '/:flagName/toggle',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    // Allow environment from body, otherwise use request environment (header)
-    const environmentId = req.body.environmentId || req.environmentId;
-    const userId = req.user?.id;
-    const { isEnabled } = req.body;
-
-    const flag = await featureFlagService.toggleFlag(
-      environmentId,
-      req.params.flagName,
-      isEnabled,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Archive a flag
-router.post(
-  '/:flagName/archive',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const flag = await featureFlagService.archiveFlag(
-      environmentId,
-      req.params.flagName,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Revive an archived flag
-router.post(
-  '/:flagName/revive',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const flag = await featureFlagService.reviveFlag(
-      environmentId,
-      req.params.flagName,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Toggle favorite status
-router.post(
-  '/:flagName/favorite',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-    const { isFavorite } = req.body;
-
-    const flag = await featureFlagService.toggleFavorite(
-      environmentId,
-      req.params.flagName,
-      isFavorite,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Mark flag as stale
-router.post(
-  '/:flagName/mark-stale',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const flag = await featureFlagService.markAsStale(
-      environmentId,
-      req.params.flagName,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Unmark flag as stale
-router.post(
-  '/:flagName/unmark-stale',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const flag = await featureFlagService.markAsNotStale(
-      environmentId,
-      req.params.flagName,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, data: { flag } });
-  })
-);
-
-// Delete a flag
-router.delete(
-  '/:flagName',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    await featureFlagService.deleteFlag(
-      environmentId,
-      req.params.flagName,
-      userId!,
-      getRequestContext(req)
-    );
-
-    res.json({ success: true, message: 'Flag deleted successfully' });
-  })
-);
-
-// ==================== Strategies ====================
-
-// Add a strategy to a flag
-router.post(
-  '/:flagName/strategies',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const strategy = await featureFlagService.addStrategy(
-      environmentId,
-      req.params.flagName,
-      req.body,
-      userId!
-    );
-
-    res.status(201).json({ success: true, data: { strategy } });
-  })
-);
-
-// Update all strategies for a flag (bulk replace)
-router.put(
-  '/:flagName/strategies',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const strategies = await featureFlagService.updateStrategies(
-      environmentId,
-      req.params.flagName,
-      req.body.strategies || [],
-      userId!
-    );
-
-    res.json({ success: true, data: { strategies } });
-  })
-);
-
-// Update a strategy
-router.put(
-  '/:flagName/strategies/:strategyId',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    const strategy = await featureFlagService.updateStrategy(
-      req.params.strategyId,
-      req.body,
-      userId!
-    );
-
-    res.json({ success: true, data: { strategy } });
-  })
-);
-
-// Delete a strategy
-router.delete(
-  '/:flagName/strategies/:strategyId',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.id;
-
-    await featureFlagService.deleteStrategy(req.params.strategyId, userId!);
-
-    res.json({ success: true, message: 'Strategy deleted successfully' });
-  })
-);
-
-// ==================== Variants ====================
-
-// Update variants for a flag (bulk replace)
-router.put(
-  '/:flagName/variants',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-
-    const variants = await featureFlagService.updateVariants(
-      environmentId,
-      req.params.flagName,
-      req.body.variants || [],
-      userId!,
-      req.body.valueType, // Pass valueType to service
-      req.body.enabledValue, // Pass enabledValue
-      req.body.disabledValue, // Pass disabledValue
-      req.body.clearVariantValues // Pass flag to clear existing variant values
-    );
-
-    res.json({ success: true, data: { variants } });
-  })
-);
-
-// ==================== Metrics ====================
-
-// Get metrics for a flag
-router.get(
-  '/:flagName/metrics',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const { startDate, endDate, appName } = req.query;
-
-    // Parse appName: undefined = all apps, 'null' = only null appName, otherwise specific app
-    let appNameFilter: string | null | undefined;
-    if (appName === 'null') {
-      appNameFilter = null;
-    } else if (appName && typeof appName === 'string') {
-      appNameFilter = appName;
-    }
-
-    const metrics = await featureFlagService.getMetrics(
-      environmentId,
-      req.params.flagName,
-      new Date((startDate as string) || Date.now() - 7 * 24 * 60 * 60 * 1000),
-      new Date((endDate as string) || Date.now()),
-      appNameFilter
-    );
-
-    res.json({ success: true, data: { metrics } });
-  })
-);
-
-// Get app names used in metrics for a flag
-router.get(
-  '/:flagName/metrics/apps',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const { startDate, endDate } = req.query;
-
-    const appNames = await featureFlagService.getMetricsAppNames(
-      environmentId,
-      req.params.flagName,
-      new Date((startDate as string) || Date.now() - 7 * 24 * 60 * 60 * 1000),
-      new Date((endDate as string) || Date.now())
-    );
-
-    res.json({ success: true, data: { appNames } });
-  })
-);
-
-// Record metrics for a flag evaluation
-router.post(
-  '/:flagName/metrics',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const { enabled, variantName } = req.body;
-
-    await featureFlagService.recordMetrics(
-      environmentId,
-      req.params.flagName,
-      enabled,
-      variantName
-    );
-
-    res.json({ success: true });
-  })
-);
-
-// ==================== Playground ====================
 
 // Evaluate all flags with custom context (for playground testing)
 router.post(
-  '/playground',
+  '/',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { environments, context, flagNames } = req.body;
 
@@ -890,7 +84,7 @@ router.post(
               contextWarnings.push({
                 field: key,
                 type: 'WHITESPACE',
-                message: `Value has ${parts.join(' and ')} whitespace: "${value}" ??trimmed: "${value.trim()}"`,
+                message: `Value has ${parts.join(' and ')} whitespace: "${value}" →trimmed: "${value.trim()}"`,
                 suggestion: value.trim(),
                 data: { value, trimmed: value.trim(), parts },
                 severity: isReject ? 'error' : 'warning',
@@ -1152,7 +346,7 @@ router.post(
             let value = (flag as any).isEnabled
               ? (envSettings?.enabledValue ?? (flag as any).enabledValue)
               : (envSettings?.disabledValue ?? (flag as any).disabledValue);
-            let valueSource: 'environmentId' | 'flag' | undefined;
+            let valueSource: 'environment' | 'flag' | undefined;
 
             // Check overrides
             const envOverride = (flag as any).environments?.find(
@@ -1161,7 +355,7 @@ router.post(
             if ((flag as any).isEnabled) {
               if (envOverride?.enabledValue !== undefined) {
                 value = envOverride.enabledValue;
-                valueSource = 'environmentId';
+                valueSource = 'environment';
               } else if ((flag as any).enabledValue !== undefined) {
                 value = (flag as any).enabledValue;
                 valueSource = 'flag';
@@ -1169,26 +363,23 @@ router.post(
             } else {
               if (envOverride?.disabledValue !== undefined) {
                 value = envOverride.disabledValue;
-                valueSource = 'environmentId';
+                valueSource = 'environment';
               } else if ((flag as any).disabledValue !== undefined) {
                 value = (flag as any).disabledValue;
                 valueSource = 'flag';
               }
             }
 
-            // Note: evalResult.variant structure might need update in playground response if defined locally
-            // But here we are constructing a response object.
-            // Let's assume we want to return 'value' and 'valueType' in the response.
             // Determine explicit variant name based on value source
             let variantName: string;
             if (evalResult.enabled) {
               variantName =
-                valueSource === 'environmentId'
+                valueSource === 'environment'
                   ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
                   : VALUE_SOURCE.FLAG_DEFAULT_ENABLED;
             } else {
               variantName =
-                valueSource === 'environmentId'
+                valueSource === 'environment'
                   ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
                   : VALUE_SOURCE.FLAG_DEFAULT_DISABLED;
             }
@@ -1242,7 +433,7 @@ router.post(
         envResults.sort((a, b) => a.flagName.localeCompare(b.flagName));
         results[env] = envResults;
       } catch (error: any) {
-        console.error(`Playground evaluation failed for environmentId '${env}':`, error);
+        logger.error(`Playground evaluation failed for environment '${env}':`, error);
         results[env] = [];
       }
     }
@@ -1268,6 +459,9 @@ router.post(
     });
   })
 );
+
+// ==================== Evaluation Helpers ====================
+// These functions are used exclusively by the playground evaluation
 
 // Helper function for detailed flag evaluation
 function evaluateFlagWithDetails(
@@ -1335,7 +529,7 @@ function evaluateFlagWithDetails(
         name: isEnvSource ? VALUE_SOURCE.ENV_DEFAULT_DISABLED : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(envDisabledValue ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
-        valueSource: isEnvSource ? 'environmentId' : 'flag',
+        valueSource: isEnvSource ? 'environment' : 'flag',
       },
       evaluationSteps,
     };
@@ -1372,7 +566,7 @@ function evaluateFlagWithDetails(
               : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
           value: getFallbackValue(ctxEnvDisVal ?? flag.disabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
-          valueSource: ctxEnvDisVal !== undefined ? 'environmentId' : 'flag',
+          valueSource: ctxEnvDisVal !== undefined ? 'environment' : 'flag',
         },
         evaluationSteps,
       };
@@ -1557,7 +751,7 @@ function evaluateFlagWithDetails(
             : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(ctxFailEnvDisVal ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
-        valueSource: ctxFailEnvDisVal !== undefined ? 'environmentId' : 'flag',
+        valueSource: ctxFailEnvDisVal !== undefined ? 'environment' : 'flag',
       },
       evaluationSteps,
     };
@@ -1601,7 +795,7 @@ function evaluateFlagWithDetails(
         : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
       value: noMatchEnvDisVal ?? flag.disabledValue ?? null,
       valueType: flag.valueType || 'string',
-      valueSource: noMatchIsEnvSource ? 'environmentId' : 'flag',
+      valueSource: noMatchIsEnvSource ? 'environment' : 'flag',
     },
   };
 }
@@ -1827,12 +1021,12 @@ function selectVariantForFlag(
     : undefined;
 
   const resolvedEnabledValue = envSettings?.enabledValue ?? flag.enabledValue;
-  const valueSource = envSettings?.enabledValue !== undefined ? 'environmentId' : 'flag';
+  const valueSource = envSettings?.enabledValue !== undefined ? 'environment' : 'flag';
 
   if (variants.length === 0) {
     return {
       name:
-        valueSource === 'environmentId'
+        valueSource === 'environment'
           ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
           : VALUE_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
@@ -1845,7 +1039,7 @@ function selectVariantForFlag(
   if (totalWeight <= 0) {
     return {
       name:
-        valueSource === 'environmentId'
+        valueSource === 'environment'
           ? VALUE_SOURCE.ENV_DEFAULT_ENABLED
           : VALUE_SOURCE.FLAG_DEFAULT_ENABLED,
       value: getFallbackValue(resolvedEnabledValue, flag.valueType),
@@ -1864,7 +1058,7 @@ function selectVariantForFlag(
     if (targetWeight <= cumulativeWeight) {
       // Determine value and its source
       let value = variant.value;
-      let actualValueSource: 'variant' | 'environmentId' | 'flag' = 'variant';
+      let actualValueSource: 'variant' | 'environment' | 'flag' = 'variant';
       if (value === undefined || value === null) {
         value = resolvedEnabledValue;
         actualValueSource = valueSource as any;
@@ -1879,7 +1073,7 @@ function selectVariantForFlag(
   }
   const lastVariant = variants[variants.length - 1];
   let value = lastVariant.value;
-  let actualValueSource: 'variant' | 'environmentId' | 'flag' = 'variant';
+  let actualValueSource: 'variant' | 'environment' | 'flag' = 'variant';
   if (value === undefined || value === null) {
     value = resolvedEnabledValue;
     actualValueSource = valueSource as any;
@@ -1891,304 +1085,5 @@ function selectVariantForFlag(
     valueSource: value !== undefined ? actualValueSource : 'default',
   };
 }
-
-// ==================== Clone ====================
-
-// Clone a feature flag to a new name
-router.post(
-  '/clone',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-    const { sourceFlagName, newFlagName } = req.body;
-
-    if (!sourceFlagName || !newFlagName) {
-      return res.status(400).json({
-        success: false,
-        error: 'sourceFlagName and newFlagName are required',
-      });
-    }
-
-    if (sourceFlagName === newFlagName) {
-      return res.status(400).json({
-        success: false,
-        error: 'newFlagName must be different from sourceFlagName',
-      });
-    }
-
-    // Check if source flag exists
-    const sourceFlag = await featureFlagService.getFlag(environmentId, sourceFlagName);
-    if (!sourceFlag) {
-      return res.status(404).json({
-        success: false,
-        error: 'Source flag not found',
-      });
-    }
-
-    // Check if new flag name already exists
-    const existingFlag = await featureFlagService.getFlag(environmentId, newFlagName);
-    if (existingFlag) {
-      return res.status(409).json({
-        success: false,
-        error: 'A flag with the new name already exists',
-      });
-    }
-
-    // Create new flag with same settings but different name
-    const newFlag = await featureFlagService.createFlag(
-      {
-        environmentId,
-        flagName: newFlagName,
-        displayName: sourceFlag.displayName ? `${sourceFlag.displayName} (Copy)` : undefined,
-        description: sourceFlag.description,
-        flagType: sourceFlag.flagType || 'release',
-        isEnabled: false, // New flags start disabled for safety
-        impressionDataEnabled: sourceFlag.impressionDataEnabled ?? false,
-        tags: sourceFlag.tags,
-        strategies: (sourceFlag.strategies || []).map((s: any) => ({
-          strategyName: s.strategyName || s.name,
-          parameters: s.parameters,
-          constraints: s.constraints,
-          segments: s.segments,
-          sortOrder: s.sortOrder,
-          isEnabled: s.isEnabled ?? true,
-        })),
-        valueType: (sourceFlag as any).valueType || 'boolean',
-        enabledValue: (sourceFlag as any).enabledValue,
-        disabledValue: (sourceFlag as any).disabledValue,
-        variants: (sourceFlag.variants || []).map((v: any) => ({
-          variantName: v.variantName || v.name,
-          weight: v.weight,
-          value: v.value,
-          valueType: v.valueType,
-          overrides: v.overrides,
-        })),
-      },
-      userId!
-    );
-
-    res.status(201).json({ success: true, data: { flag: newFlag } });
-  })
-);
-
-// ==================== Import ====================
-
-// Import feature flags from JSON
-router.post(
-  '/import',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = requireEnvironment(req, res);
-    if (!environmentId) return;
-
-    const userId = req.user?.id;
-    const { segments = [], flags = [] } = req.body;
-
-    const result = {
-      segments: { created: 0, skipped: 0, skippedNames: [] as string[] },
-      flags: {
-        created: 0,
-        skipped: 0,
-        skippedNames: [] as string[],
-        errors: [] as string[],
-      },
-    };
-
-    // 1. Import segments (global, skip if exists)
-    for (const segmentData of segments) {
-      try {
-        // Check if segment exists by name
-        const existingSegments = await featureFlagService.listSegments(segmentData.segmentName);
-        const exists = existingSegments.some((s) => s.segmentName === segmentData.segmentName);
-
-        if (exists) {
-          result.segments.skipped++;
-          result.segments.skippedNames.push(segmentData.segmentName);
-          continue;
-        }
-
-        // Create new segment
-        await featureFlagService.createSegment(
-          {
-            segmentName: segmentData.segmentName,
-            displayName: segmentData.displayName,
-            description: segmentData.description,
-            constraints: segmentData.constraints || [],
-            isActive: true,
-            tags: segmentData.tags,
-          },
-          userId!
-        );
-
-        result.segments.created++;
-      } catch (error: any) {
-        // If duplicate error, count as skipped
-        if (error.code === 'DUPLICATE_ENTRY') {
-          result.segments.skipped++;
-          result.segments.skippedNames.push(segmentData.segmentName);
-        }
-      }
-    }
-
-    // 2. Import flags (environment-specific, skip if exists)
-    for (const flagData of flags) {
-      try {
-        // Check if flag exists
-        const existingFlag = await featureFlagService.getFlag(environmentId, flagData.flagName);
-
-        if (existingFlag) {
-          result.flags.skipped++;
-          result.flags.skippedNames.push(flagData.flagName);
-          continue;
-        }
-
-        // Create new flag with strategies and variants
-        await featureFlagService.createFlag(
-          {
-            environmentId,
-            flagName: flagData.flagName,
-            displayName: flagData.displayName,
-            description: flagData.description,
-            flagType: flagData.flagType || 'release',
-            isEnabled: flagData.enabled ?? false,
-            impressionDataEnabled: flagData.impressionDataEnabled ?? false,
-            tags: flagData.tags,
-            valueType: flagData.valueType,
-            enabledValue: flagData.enabledValue,
-            disabledValue: flagData.disabledValue,
-            strategies: (flagData.strategies || []).map((s: any) => ({
-              strategyName: s.strategyName,
-              parameters: s.parameters,
-              constraints: s.constraints,
-              segments: s.segments,
-              sortOrder: s.sortOrder,
-              isEnabled: s.isEnabled ?? true,
-            })),
-            variants: (flagData.variants || []).map((v: any) => ({
-              variantName: v.variantName,
-              weight: v.weight,
-              value: v.value,
-              valueType: v.valueType || 'json',
-              overrides: v.overrides,
-            })),
-          },
-          userId!
-        );
-
-        result.flags.created++;
-      } catch (error: any) {
-        // If duplicate error, count as skipped
-        if (error.code === 'DUPLICATE_ENTRY') {
-          result.flags.skipped++;
-          result.flags.skippedNames.push(flagData.flagName);
-        } else {
-          result.flags.errors.push(`${flagData.flagName}: ${error.message}`);
-        }
-      }
-    }
-
-    res.json({
-      success: true,
-      data: {
-        summary: {
-          segmentsCreated: result.segments.created,
-          segmentsSkipped: result.segments.skipped,
-          flagsCreated: result.flags.created,
-          flagsSkipped: result.flags.skipped,
-          errors: result.flags.errors.length,
-        },
-        details: result,
-      },
-    });
-  })
-);
-
-function getFallbackValue(value: any, valueType?: string): any {
-  if (value === undefined || value === null) {
-    switch (valueType) {
-      case 'boolean':
-        return false;
-      case 'number':
-        return 0;
-      case 'json':
-        return {};
-      case 'string':
-      default:
-        return '';
-    }
-  }
-
-  // Coerce to match declared valueType (defense-in-depth)
-  switch (valueType) {
-    case 'string':
-      return typeof value === 'string' ? value : String(value);
-    case 'number': {
-      if (typeof value === 'number') return value;
-      const num = Number(value);
-      return Number.isNaN(num) ? 0 : num;
-    }
-    case 'boolean':
-      if (typeof value === 'boolean') return value;
-      if (value === 'true' || value === 1) return true;
-      if (value === 'false' || value === 0) return false;
-      return Boolean(value);
-    case 'json':
-      if (typeof value === 'object') return value;
-      try {
-        return JSON.parse(String(value));
-      } catch {
-        return {};
-      }
-    default:
-      return value;
-  }
-}
-
-// ==================== Code References ====================
-
-// Get code references for a specific flag
-router.get(
-  '/:flagName/code-references',
-  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { flagName } = req.params;
-    const { repository, branch, limit } = req.query;
-
-    try {
-      const { FeatureCodeReferenceModel } = await import('../../models/FeatureCodeReference');
-
-      const references = await FeatureCodeReferenceModel.findByFlagName(flagName, {
-        repository: repository as string,
-        branch: branch as string,
-        limit: limit ? parseInt(limit as string, 10) : undefined,
-      });
-
-      const scanInfo = await FeatureCodeReferenceModel.getLatestScanInfo({
-        repository: repository as string,
-        branch: branch as string,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          references,
-          scanInfo,
-          total: references.length,
-        },
-      });
-    } catch (error: any) {
-      // Code references are non-critical - return empty on any error
-      console.warn('Code references error:', error.message || error.code);
-      res.json({
-        success: true,
-        data: {
-          references: [],
-          scanInfo: null,
-          total: 0,
-        },
-      });
-    }
-  })
-);
 
 export default router;

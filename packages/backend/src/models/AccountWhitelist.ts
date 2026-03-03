@@ -2,6 +2,9 @@ import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
 import { GatrixError } from '../middleware/errorHandler';
 import TagAssignmentModel from './TagAssignment';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AccountWhitelist');
 
 export interface Whitelist {
   id: string;
@@ -151,7 +154,7 @@ export class WhitelistModel {
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      console.error('AccountWhitelist.findAll error:', error);
+      logger.error('findAll error:', error);
       throw new GatrixError('Failed to fetch whitelists', 500);
     }
   }
@@ -297,7 +300,7 @@ export class WhitelistModel {
           tags = JSON.parse(row.tags);
         } catch (error) {
           // JSON 파싱 실패 시 문자열을 배열로 변환
-          console.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
+          logger.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
           // 쉼표로 구분된 문자열을 배열로 변환
           tags = row.tags
             .split(',')

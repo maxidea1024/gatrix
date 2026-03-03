@@ -6,6 +6,9 @@ import { SERVER_SDK_ETAG, DEFAULT_CONFIG } from '../constants/cacheKeys';
 import { AuthenticatedRequest } from '../types/auth';
 import { SDKRequest } from '../middleware/apiTokenAuth';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('VarsController');
 
 export class VarsController {
   static async getVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -72,7 +75,7 @@ export class VarsController {
           });
         } catch (err) {
           // Log error but don't fail the request
-          console.error('Failed to broadcast client version update events', err);
+          logger.error('Failed to broadcast client version update events', err);
         }
       }
       res.json({
@@ -262,7 +265,7 @@ export class VarsController {
           });
         } catch (err) {
           // Log error but don't fail the request
-          console.error('Failed to broadcast client version update events', err);
+          logger.error('Failed to broadcast client version update events', err);
         }
       }
 

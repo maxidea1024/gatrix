@@ -18,6 +18,9 @@ import db from '../config/knex';
 import { featureMetricsService } from '../services/FeatureMetricsService';
 import { networkTrafficService } from '../services/NetworkTrafficService';
 import { ErrorCodes, sendBadRequest, sendInternalError } from '../utils/apiResponse';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerFeatureFlagController');
 
 // Type for minimal flag data needed for runtime evaluation
 interface EvaluationFlag {
@@ -303,7 +306,7 @@ export default class ServerFeatureFlagController {
         data: { flag: evaluationFlag },
       });
     } catch (error: any) {
-      console.error('Error fetching feature flag:', error);
+      logger.error('Error fetching feature flag:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch feature flag' });
     }
   }
@@ -383,7 +386,7 @@ export default class ServerFeatureFlagController {
 
       res.json({ success: true });
     } catch (error: any) {
-      console.error('Error processing metrics:', error);
+      logger.error('Error processing metrics:', error);
       res.status(500).json({ success: false, error: 'Failed to process metrics' });
     }
   }
@@ -415,7 +418,7 @@ export default class ServerFeatureFlagController {
 
       res.json({ success: true });
     } catch (error: any) {
-      console.error('Error reporting unknown flag:', error);
+      logger.error('Error reporting unknown flag:', error);
       res.status(500).json({ success: false, error: 'Failed to report unknown flag' });
     }
   }
@@ -456,7 +459,7 @@ export default class ServerFeatureFlagController {
         data: { flags },
       });
     } catch (error: any) {
-      console.error('Error fetching flag definitions:', error);
+      logger.error('Error fetching flag definitions:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch flag definitions' });
     }
   }
@@ -530,7 +533,7 @@ export default class ServerFeatureFlagController {
           userAgent: req.get('user-agent'),
         });
       } catch (logError) {
-        console.error('Failed to create audit log for code references:', logError);
+        logger.error('Failed to create audit log for code references:', logError);
       }
 
       res.json({
@@ -543,7 +546,7 @@ export default class ServerFeatureFlagController {
         },
       });
     } catch (error: any) {
-      console.error('Error receiving code references:', error.message, error.stack);
+      logger.error('Error receiving code references:', error.message, error.stack);
       res.status(500).json({ success: false, error: 'Failed to store code references' });
     }
   }

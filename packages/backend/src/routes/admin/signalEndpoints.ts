@@ -7,7 +7,12 @@
 import { Router, Request, Response } from 'express';
 import { SignalEndpointModel } from '../../models/SignalEndpoint';
 import { createLogger } from '../../config/logger';
-import { sendConflict, sendBadRequest, sendNotFound, sendInternalError } from '../../utils/apiResponse';
+import {
+  sendConflict,
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+} from '../../utils/apiResponse';
 import { ErrorCodes } from '@gatrix/shared';
 import crypto from 'crypto';
 
@@ -65,7 +70,11 @@ router.post('/', async (req: Request, res: Response) => {
     // Check for duplicate name within the same project
     const existing = await SignalEndpointModel.findByName(name.trim());
     if (existing) {
-      return sendConflict(res, 'A signal endpoint with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
+      return sendConflict(
+        res,
+        'A signal endpoint with this name already exists',
+        ErrorCodes.RESOURCE_ALREADY_EXISTS
+      );
     }
 
     const endpoint = await SignalEndpointModel.create({
@@ -96,7 +105,11 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (name && name.trim()) {
       const existing = await SignalEndpointModel.findByName(name.trim());
       if (existing && existing.id !== id) {
-        return sendConflict(res, 'A signal endpoint with this name already exists', ErrorCodes.RESOURCE_ALREADY_EXISTS);
+        return sendConflict(
+          res,
+          'A signal endpoint with this name already exists',
+          ErrorCodes.RESOURCE_ALREADY_EXISTS
+        );
       }
     }
 

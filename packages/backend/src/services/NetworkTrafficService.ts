@@ -4,6 +4,9 @@
  */
 
 import db from '../config/knex';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('NetworkTrafficService');
 
 export interface TrafficRecord {
   id: string;
@@ -63,7 +66,7 @@ class NetworkTrafficService {
       );
     } catch (error) {
       // Log but don't throw - this is fire-and-forget
-      console.error('[NetworkTrafficService] Failed to record traffic:', error);
+      logger.error('Failed to record traffic:', error);
     }
   }
 

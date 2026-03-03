@@ -8,7 +8,9 @@ import redisClient from '../../config/redis';
 // import { WeChatOAuthService } from '../../services/WeChatOAuth';
 // import { BaiduOAuthService } from '../../services/BaiduOAuth';
 import { UserModel } from '../../models/User';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('AuthRoutes');
 
 const router = Router();
 
@@ -287,7 +289,7 @@ router.get(
 // GitHub OAuth routes
 router.get('/github', (req, res, next) => {
   const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`;
-  console.log('🚀 GitHub OAuth initiated:', {
+  logger.info('GitHub OAuth initiated:', {
     callbackURL,
     host: req.get('host'),
     protocol: req.protocol,
@@ -300,7 +302,7 @@ router.get('/github', (req, res, next) => {
 });
 
 router.get('/github/callback', async (req, res, next) => {
-  console.log('🔍 GitHub callback received:', {
+  logger.info('GitHub callback received:', {
     url: req.url,
     originalUrl: req.originalUrl,
     path: req.path,
@@ -316,7 +318,7 @@ router.get('/github/callback', async (req, res, next) => {
   const code = req.query.code as string;
 
   if (!code) {
-    console.log('❌ No code in GitHub callback, redirecting to failure');
+    logger.warn('No code in GitHub callback, redirecting to failure');
     return res.redirect('/api/v1/auth/failure');
   }
 
@@ -325,7 +327,7 @@ router.get('/github/callback', async (req, res, next) => {
   const alreadyUsed = await redisClient.get(cacheKey);
 
   if (alreadyUsed) {
-    console.log('GitHub OAuth: Code already used, redirecting to failure');
+    logger.warn('GitHub OAuth: Code already used, redirecting to failure');
     return res.redirect('/api/v1/auth/failure');
   }
 
@@ -341,14 +343,14 @@ router.get('/github/callback', async (req, res, next) => {
     },
     (err: any, user: any, info: any) => {
       if (err) {
-        console.error('GitHub OAuth error:', err);
+        logger.error('GitHub OAuth error:', err);
         return res.redirect('/api/v1/auth/failure');
       }
       if (!user) {
-        console.error('GitHub OAuth: No user returned', info);
+        logger.error('GitHub OAuth: No user returned', info);
         return res.redirect('/api/v1/auth/failure');
       }
-      console.log('GitHub OAuth success:', user?.email);
+      logger.info('GitHub OAuth success:', { email: user?.email });
       (req as any).user = user;
       return (AuthController.oauthSuccess as any)(req, res, next);
     }
@@ -375,7 +377,7 @@ router.get('/qq/callback', async (req, res, next) => {
   const alreadyUsed = await redisClient.get(cacheKey);
 
   if (alreadyUsed) {
-    console.log('QQ OAuth: Code already used, redirecting to failure');
+    logger.warn('QQ OAuth: Code already used, redirecting to failure');
     return res.redirect('/api/v1/auth/failure');
   }
 
@@ -391,14 +393,14 @@ router.get('/qq/callback', async (req, res, next) => {
     },
     (err: any, user: any, info: any) => {
       if (err) {
-        console.error('QQ OAuth error:', err);
+        logger.error('QQ OAuth error:', err);
         return res.redirect('/api/v1/auth/failure');
       }
       if (!user) {
-        console.error('QQ OAuth: No user returned', info);
+        logger.error('QQ OAuth: No user returned', info);
         return res.redirect('/api/v1/auth/failure');
       }
-      console.log('QQ OAuth success:', user?.email);
+      logger.info('QQ OAuth success:', { email: user?.email });
       (req as any).user = user;
       return (AuthController.oauthSuccess as any)(req, res, next);
     }
@@ -544,7 +546,7 @@ router.get('/failure', AuthController.oauthFailure);
 
 // Catch-all route for debugging unknown auth routes
 router.all('*', (req, res) => {
-  console.log('❌ Unknown auth route accessed:', {
+  logger.warn('Unknown auth route accessed:', {
     method: req.method,
     url: req.url,
     originalUrl: req.originalUrl,

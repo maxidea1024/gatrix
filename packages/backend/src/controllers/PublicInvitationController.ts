@@ -6,6 +6,9 @@ import { UserModel } from '../models/User';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Knex } from 'knex';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PublicInvitationController');
 
 export class PublicInvitationController {
   // 초대 토큰 검증 (공개 API)
@@ -67,7 +70,7 @@ export class PublicInvitationController {
         },
       });
     } catch (error) {
-      console.error('Failed to validate invitation:', error);
+      logger.error('Failed to validate invitation:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -190,7 +193,7 @@ export class PublicInvitationController {
         message: 'User registered successfully through invitation',
       });
     } catch (error) {
-      console.error('Failed to accept invitation:', error);
+      logger.error('Failed to accept invitation:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',

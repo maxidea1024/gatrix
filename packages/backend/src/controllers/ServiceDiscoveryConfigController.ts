@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import VarsModel from '../models/Vars';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServiceDiscoveryConfigController');
 
 /**
  * Service Discovery Configuration Controller
@@ -29,7 +32,7 @@ export class ServiceDiscoveryConfigController {
         },
       });
     } catch (error: any) {
-      console.error('Failed to get service discovery config:', error);
+      logger.error('Failed to get service discovery config:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get service discovery configuration',
@@ -106,7 +109,7 @@ export class ServiceDiscoveryConfigController {
           'Service discovery configuration updated. Restart the server for changes to take effect.',
       });
     } catch (error: any) {
-      console.error('Failed to update service discovery config:', error);
+      logger.error('Failed to update service discovery config:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update service discovery configuration',
