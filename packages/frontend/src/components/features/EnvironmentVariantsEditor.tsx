@@ -569,6 +569,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
       preserveExpandedRef.current = true;
 
       await onSave(editingVariants);
+
+      // After successful save, sync prevVariantsJson to editingVariants
+      // so hasChanges becomes false immediately, even if the server response
+      // has subtle serialization differences (e.g. undefined vs null).
+      const savedJson = JSON.stringify(editingVariants);
+      setPrevVariantsJson(savedJson);
+
       isSavingRef.current = false;
     } catch (error) {
       isSavingRef.current = false;
@@ -609,13 +616,13 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
 
     const viewOnlyStyle = !isActuallyEditable
       ? {
-          bgcolor: (theme: any) =>
-            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
-          borderRadius: 1,
-        }
+        bgcolor: (theme: any) =>
+          theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        '&:hover .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 'none' },
+        borderRadius: 1,
+      }
       : {};
 
     if (valueType === 'boolean') {
