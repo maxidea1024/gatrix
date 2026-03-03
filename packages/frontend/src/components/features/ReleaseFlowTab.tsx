@@ -555,70 +555,50 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
           }}
         >
           {hasTransition ? (
-            <>
-              <Box
-                sx={{
-                  width: isCurrentActive && !isPaused ? 10 : 2,
-                  flexGrow: 1,
-                  minHeight: 12,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  ...(isCurrentActive && !isPaused
-                    ? {
-                      // Flowing chevron arrows animation
-                      background: (theme) =>
+            <Box
+              sx={{
+                width: isCurrentActive && !isPaused ? 10 : 2,
+                flexGrow: 1,
+                minHeight: 24,
+                position: 'relative',
+                overflow: 'hidden',
+                ...(isCurrentActive && !isPaused
+                  ? {
+                    // Center line behind chevrons
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      left: '50%',
+                      width: 2,
+                      transform: 'translateX(-50%)',
+                      bgcolor: 'primary.main',
+                      opacity: 0.3,
+                    },
+                    // Flowing chevron arrows
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '200%',
+                      background: (theme: any) =>
                         `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
                       backgroundSize: '10px 12px',
                       animation: 'chevronFlow 0.8s linear infinite',
-                      '@keyframes chevronFlow': {
-                        '0%': { backgroundPositionY: '0px' },
-                        '100%': { backgroundPositionY: '12px' },
-                      },
-                    }
-                    : {
-                      bgcolor: lineColor,
-                    }),
-                }}
-              />
-              {/* CSS triangle arrow */}
-              <Box
-                sx={{
-                  width: 0,
-                  height: 0,
-                  borderLeft: '5px solid transparent',
-                  borderRight: '5px solid transparent',
-                  borderTop: (theme) => {
-                    if (isCurrentActive && !isPaused) {
-                      return `7px solid ${theme.palette.primary.main}`;
-                    }
-                    const color =
-                      status === 'completed'
-                        ? theme.palette.success.main
-                        : theme.palette.divider;
-                    return `7px solid ${color}`;
-                  },
-                }}
-              />
-              <Box
-                sx={{
-                  width: isCurrentActive && !isPaused ? 10 : 2,
-                  flexGrow: 1,
-                  minHeight: 12,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  ...(isCurrentActive && !isPaused
-                    ? {
-                      background: (theme) =>
-                        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
-                      backgroundSize: '10px 12px',
-                      animation: 'chevronFlow 0.8s linear infinite',
-                    }
-                    : {
-                      bgcolor: lineColor,
-                    }),
-                }}
-              />
-            </>
+                    },
+                    '@keyframes chevronFlow': {
+                      '0%': { transform: 'translateY(-50%)' },
+                      '100%': { transform: 'translateY(0%)' },
+                    },
+                  }
+                  : {
+                    bgcolor: lineColor,
+                  }),
+              }}
+            />
           ) : (
             // No transition — just a simple short line, no arrow
             <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 12 }} />
