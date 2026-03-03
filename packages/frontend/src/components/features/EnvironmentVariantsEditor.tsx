@@ -414,6 +414,18 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
         ? ensureNonNull(toApiValue(editingDisabledValue))
         : toApiValue(editingDisabledValue);
       await onSaveValues(sendEnabled, sendDisabled, overrideEnabled, overrideDisabled);
+
+      // After successful save, sync prevPropsSnapshot to current state
+      // so valuesHasChanges becomes false immediately, even if the server
+      // response triggers a slightly different props snapshot.
+      setPrevPropsSnapshot(
+        JSON.stringify({
+          overrideEnabled: overrideEnabled,
+          overrideDisabled: overrideDisabled,
+          enabled: canonicalize(editingEnabledValue),
+          disabled: canonicalize(editingDisabledValue),
+        })
+      );
     } catch (error) {
       // Error handled by parent or snackbar
       isSavingRef.current = false;
@@ -429,6 +441,7 @@ const EnvironmentVariantsEditor: React.FC<EnvironmentVariantsEditorProps> = ({
     editingDisabledValue,
     toApiValue,
     valueJsonErrors,
+    canonicalize,
   ]);
 
   // Handle reset values

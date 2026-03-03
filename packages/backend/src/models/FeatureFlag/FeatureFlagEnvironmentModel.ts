@@ -119,6 +119,8 @@ export class FeatureFlagEnvironmentModel {
           flagId,
           environmentId,
           isEnabled: data.isEnabled ?? false,
+          overrideEnabledValue: data.overrideEnabledValue ?? false,
+          overrideDisabledValue: data.overrideDisabledValue ?? false,
           enabledValue:
             data.enabledValue !== undefined
               ? coerceValueByType(data.enabledValue, valueType)
