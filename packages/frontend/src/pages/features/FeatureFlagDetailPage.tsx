@@ -2927,10 +2927,6 @@ const FeatureFlagDetailPage: React.FC = () => {
               >
                 <Box
                   sx={{
-                    position: 'sticky',
-                    top: 80, // Account for top navigation bar
-                    maxHeight: 'calc(100vh - 100px)',
-                    overflow: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
                   }}
