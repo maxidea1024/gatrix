@@ -504,7 +504,11 @@ class FeatureFlagService {
   }
 
   /**
-   * Toggle flag enabled state
+   * Toggle flag enabled state.
+   * Automatically controls the release-flow plan lifecycle:
+   *  - Enabling with a draft plan  → auto-start
+   *  - Enabling with a paused plan → auto-resume
+   *  - Disabling with an active plan → auto-pause
    */
   async toggleFlag(
     environmentId: string,
@@ -513,7 +517,38 @@ class FeatureFlagService {
     userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    return this.updateFlag(environmentId, flagName, { isEnabled }, userId, requestContext);
+    const result = await this.updateFlag(environmentId, flagName, { isEnabled }, userId, requestContext);
+
+    // Auto-control release flow plan based on toggle direction
+    if (result) {
+      try {
+        const { releaseFlowService } = await import('./ReleaseFlowService');
+        const plan = await releaseFlowService.getPlanForFlag(result.id, environmentId);
+        if (plan) {
+          if (isEnabled && plan.status === 'draft') {
+            await releaseFlowService.startPlan(plan.id, userId);
+            logger.info(
+              `Auto-started release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`
+            );
+          } else if (isEnabled && plan.status === 'paused') {
+            await releaseFlowService.resumePlan(plan.id, userId);
+            logger.info(
+              `Auto-resumed release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`
+            );
+          } else if (!isEnabled && plan.status === 'active') {
+            await releaseFlowService.pausePlan(plan.id, userId);
+            logger.info(
+              `Auto-paused release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`
+            );
+          }
+        }
+      } catch (error) {
+        // Log but don't fail the toggle — release flow control is secondary
+        logger.error('Failed to auto-control release flow plan:', error);
+      }
+    }
+
+    return result;
   }
 
   async updateEnvironment(

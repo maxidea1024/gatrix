@@ -76,15 +76,15 @@ export default class ServerFeatureFlagController {
 
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
-      networkTrafficService.recordTraffic(environmentId, appName, 'features').catch(() => { });
+      networkTrafficService.recordTraffic(environmentId, appName, 'features').catch(() => {});
 
       // Parse optional flagNames filter (comma-separated query parameter)
       const flagNamesParam = req.query.flagNames as string | undefined;
       const flagNamesFilter = flagNamesParam
         ? flagNamesParam
-          .split(',')
-          .map((n) => n.trim())
-          .filter(Boolean)
+            .split(',')
+            .map((n) => n.trim())
+            .filter(Boolean)
         : undefined;
 
       // Parse compact option: strip strategies/variants/enabledValue from disabled flags
@@ -106,9 +106,7 @@ export default class ServerFeatureFlagController {
       // Get strategies and variants for each flag
       const flags: EvaluationFlag[] = await Promise.all(
         rawFlags.map(async (flag: FeatureFlagAttributes & { isEnabled: boolean }) => {
-          const envOverride = flag.environments?.find(
-            (e) => e.environmentId === environmentId
-          );
+          const envOverride = flag.environments?.find((e) => e.environmentId === environmentId);
 
           // In compact mode, skip DB queries for disabled flags entirely
           if (compact && !flag.isEnabled) {
@@ -118,7 +116,9 @@ export default class ServerFeatureFlagController {
               isEnabled: false,
               impressionDataEnabled: flag.impressionDataEnabled,
               valueType: flag.valueType,
-              disabledValue: envOverride?.overrideDisabledValue ? envOverride.disabledValue : flag.disabledValue,
+              disabledValue: envOverride?.overrideDisabledValue
+                ? envOverride.disabledValue
+                : flag.disabledValue,
               valueSource: envOverride?.overrideDisabledValue ? 'environment' : 'flag',
               version: flag.version,
               compact: true,
@@ -163,7 +163,8 @@ export default class ServerFeatureFlagController {
             })
           );
 
-          const hasEnvOverride = envOverride?.overrideEnabledValue || envOverride?.overrideDisabledValue;
+          const hasEnvOverride =
+            envOverride?.overrideEnabledValue || envOverride?.overrideDisabledValue;
 
           return {
             id: flag.id,
@@ -173,8 +174,12 @@ export default class ServerFeatureFlagController {
             strategies: evaluationStrategies,
             variants: evaluationVariants,
             valueType: flag.valueType,
-            enabledValue: envOverride?.overrideEnabledValue ? envOverride.enabledValue : flag.enabledValue,
-            disabledValue: envOverride?.overrideDisabledValue ? envOverride.disabledValue : flag.disabledValue,
+            enabledValue: envOverride?.overrideEnabledValue
+              ? envOverride.enabledValue
+              : flag.enabledValue,
+            disabledValue: envOverride?.overrideDisabledValue
+              ? envOverride.disabledValue
+              : flag.disabledValue,
             valueSource: hasEnvOverride ? 'environment' : 'flag',
             version: flag.version,
           };
@@ -255,7 +260,9 @@ export default class ServerFeatureFlagController {
               isEnabled: false,
               impressionDataEnabled: flag.impressionDataEnabled,
               valueType: flag.valueType,
-              disabledValue: envOverride?.overrideDisabledValue ? envOverride.disabledValue : flag.disabledValue,
+              disabledValue: envOverride?.overrideDisabledValue
+                ? envOverride.disabledValue
+                : flag.disabledValue,
               valueSource: envOverride?.overrideDisabledValue ? 'environment' : 'flag',
               version: flag.version,
               compact: true,
@@ -328,15 +335,15 @@ export default class ServerFeatureFlagController {
       // Record network traffic (fire-and-forget)
       const appName = (req.headers['x-application-name'] as string) || 'unknown';
       const environmentId = req.environmentId!;
-      networkTrafficService.recordTraffic(environmentId, appName, 'segments').catch(() => { });
+      networkTrafficService.recordTraffic(environmentId, appName, 'segments').catch(() => {});
 
       // Parse optional segmentNames filter (comma-separated query parameter)
       const segmentNamesParam = req.query.segmentNames as string | undefined;
       const segmentNamesFilter = segmentNamesParam
         ? segmentNamesParam
-          .split(',')
-          .map((n) => n.trim())
-          .filter(Boolean)
+            .split(',')
+            .map((n) => n.trim())
+            .filter(Boolean)
         : undefined;
 
       const rawSegments = segmentNamesFilter
@@ -442,12 +449,7 @@ export default class ServerFeatureFlagController {
       // Get projectId from API token for project-level scoping
       const projectId = req.apiToken?.projectId;
 
-      let query = db('g_feature_flags').select(
-        'flagName',
-        'flagType',
-        'valueType',
-        'isArchived'
-      );
+      let query = db('g_feature_flags').select('flagName', 'flagType', 'valueType', 'isArchived');
 
       if (projectId) {
         query = query.where('projectId', projectId);

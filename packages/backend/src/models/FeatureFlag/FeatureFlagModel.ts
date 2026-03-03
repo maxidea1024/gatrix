@@ -269,16 +269,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-            {
-              id: envSettings.id,
-              flagId: id,
-              environmentId,
-              isEnabled: Boolean(envSettings.isEnabled),
-              enabledValue: parseJsonField(envSettings.enabledValue),
-              disabledValue: parseJsonField(envSettings.disabledValue),
-              lastSeenAt: envSettings.lastSeenAt,
-            },
-          ]
+              {
+                id: envSettings.id,
+                flagId: id,
+                environmentId,
+                isEnabled: Boolean(envSettings.isEnabled),
+                enabledValue: parseJsonField(envSettings.enabledValue),
+                disabledValue: parseJsonField(envSettings.disabledValue),
+                lastSeenAt: envSettings.lastSeenAt,
+              },
+            ]
           : [],
       };
     } catch (error) {

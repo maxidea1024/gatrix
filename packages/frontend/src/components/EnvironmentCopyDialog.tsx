@@ -133,7 +133,11 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const previewData = await environmentService.getCopyPreview(projectApiPath, sourceId, targetId);
+      const previewData = await environmentService.getCopyPreview(
+        projectApiPath,
+        sourceId,
+        targetId
+      );
       setPreview(previewData);
     } catch (err) {
       setError(t('environments.copyFailed'));
