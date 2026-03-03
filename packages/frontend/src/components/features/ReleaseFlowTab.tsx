@@ -663,12 +663,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
   // ==================== Loading ====================
 
+  // Skip rendering during initial plan check to avoid layout jitter.
+  // The brief loading period resolves quickly and showing a spinner
+  // causes the container to shift visually.
   if (loadingPlan && !plan) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-        <CircularProgress size={28} />
-      </Box>
-    );
+    return null;
   }
 
   // ==================== Render ====================
@@ -776,10 +775,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
-                    {
-                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                    };
+                  {
+                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                  };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -981,9 +980,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.015)'
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1235,9 +1234,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                              borderColor: 'primary.main',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            }
+                            borderColor: 'primary.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          }
                           : {},
                     }}
                   >

@@ -9,6 +9,7 @@ export {
   getStrategy,
   evaluateStrategyIsEnabled,
   evaluateStrategyWithDetails,
+  normalizedStrategyValue,
 } from './strategies/index';
 export type { ValueSourceName } from './valueSource';
 export type {

@@ -3,6 +3,7 @@ import logger from '../config/logger';
 
 export interface FeatureFlagTypeAttributes {
   flagType: string;
+  projectId: string | null;
   displayName: string;
   description: string | null;
   lifetimeDays: number | null;
@@ -24,11 +25,20 @@ export class FeatureFlagTypeModel {
   private static tableName = 'g_feature_flag_types';
 
   /**
-   * Find all flag types
+   * Find all flag types for a project.
+   * Returns project-specific types + system default types (projectId IS NULL).
    */
-  static async findAll(): Promise<FeatureFlagTypeAttributes[]> {
+  static async findAll(projectId?: string): Promise<FeatureFlagTypeAttributes[]> {
     try {
-      const types = await db(this.tableName).orderBy('sortOrder', 'asc');
+      let query = db(this.tableName);
+
+      if (projectId) {
+        query = query.where(function () {
+          this.where('projectId', projectId).orWhereNull('projectId');
+        });
+      }
+
+      const types = await query.orderBy('sortOrder', 'asc');
       return types as FeatureFlagTypeAttributes[];
     } catch (error) {
       logger.error('Error finding flag types:', error);
@@ -37,11 +47,22 @@ export class FeatureFlagTypeModel {
   }
 
   /**
-   * Find by flag type
+   * Find by flag type with optional project scoping
    */
-  static async findByType(flagType: string): Promise<FeatureFlagTypeAttributes | null> {
+  static async findByType(
+    flagType: string,
+    projectId?: string
+  ): Promise<FeatureFlagTypeAttributes | null> {
     try {
-      const type = await db(this.tableName).where('flagType', flagType).first();
+      let query = db(this.tableName).where('flagType', flagType);
+
+      if (projectId) {
+        query = query.where(function () {
+          this.where('projectId', projectId).orWhereNull('projectId');
+        });
+      }
+
+      const type = await query.first();
       return type ? (type as FeatureFlagTypeAttributes) : null;
     } catch (error) {
       logger.error('Error finding flag type:', error);
@@ -57,7 +78,7 @@ export class FeatureFlagTypeModel {
     input: UpdateFlagTypeInput
   ): Promise<FeatureFlagTypeAttributes> {
     try {
-      const updateData: any = { updatedAt: new Date() };
+      const updateData: Record<string, unknown> = { updatedAt: new Date() };
 
       if (input.displayName !== undefined) updateData.displayName = input.displayName;
       if (input.description !== undefined) updateData.description = input.description;

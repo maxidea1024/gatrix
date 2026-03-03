@@ -163,18 +163,25 @@ export class FeatureFlagModel {
 
   /**
    * Find flag by name with environment-specific strategies and variants
+   * @param projectId - When provided, restricts lookup to this project only
    */
   static async findByName(
     environmentId: string,
-    flagName: string
+    flagName: string,
+    projectId?: string
   ): Promise<(FeatureFlagAttributes & { isEnabled: boolean }) | null> {
     try {
       // Get global flag with creator name
-      const flag = await db('g_feature_flags as f')
+      let query = db('g_feature_flags as f')
         .select('f.*', 'creator.name as createdByName')
         .leftJoin('g_users as creator', 'f.createdBy', 'creator.id')
-        .where('f.flagName', flagName)
-        .first();
+        .where('f.flagName', flagName);
+
+      if (projectId) {
+        query = query.where('f.projectId', projectId);
+      }
+
+      const flag = await query.first();
 
       if (!flag) return null;
 

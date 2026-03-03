@@ -169,7 +169,7 @@ var devWorlds = _sdk.GameWorld.GetCached("development");
 
 ## Feature Flags
 
-Local evaluation with no backend roundtrip per request:
+Local evaluation with no backend roundtrip per request. Flag definitions are cached locally and evaluated using an exact port of the shared `FeatureFlagEvaluator` with **MurmurHash3** for consistent percentage bucketing across all platforms.
 
 ```csharp
 public class GameController : ControllerBase
@@ -200,18 +200,48 @@ public class GameController : ControllerBase
 | `Variation(flag, fallback)`        | `string`           | Variant name                    |
 | `StringVariation(flag, fallback)`  | `string`           | String variant value            |
 | `IntVariation(flag, fallback)`     | `int`              | Integer variant value           |
+| `LongVariation(flag, fallback)`    | `long`             | Long variant value              |
+| `FloatVariation(flag, fallback)`   | `float`            | Float variant value             |
+| `DoubleVariation(flag, fallback)`  | `double`           | Double variant value            |
 | `BoolVariation(flag, fallback)`    | `bool`             | Boolean variant value           |
 | `JsonVariation<T>(flag, fallback)` | `T?`               | Deserialized JSON variant value |
 | `Evaluate(flag, context)`          | `EvaluationResult` | Full evaluation details         |
+
+### Detail Methods
+
+Returns value with evaluation metadata (reason, flagName, variantName):
+
+```csharp
+var detail = _flags.StringVariationDetails("feature_config", "default", context);
+// detail.Value, detail.Reason, detail.FlagName, detail.VariantName
+```
+
+### OrThrow Methods
+
+Throws `FeatureFlagException` if flag not found or has no value:
+
+```csharp
+try
+{
+    var value = _flags.StringVariationOrThrow("required_config");
+}
+catch (FeatureFlagException ex)
+{
+    // ex.ErrorCode: FlagNotFound, NoValue, InvalidValueType
+    logger.LogError(ex, "Flag error: {Code}", ex.ErrorCode);
+}
+```
 
 ### Evaluation Context
 
 ```csharp
 var context = new EvaluationContext
 {
+    UserId = "user-123",
+    SessionId = "session-456",
+    AppVersion = "1.2.3",
     Properties = new Dictionary<string, object?>
     {
-        ["userId"]   = "user-123",
         ["platform"] = "pc",
         ["country"]  = "KR",
     }
@@ -219,6 +249,33 @@ var context = new EvaluationContext
 
 var enabled = _flags.IsEnabled("new_feature", fallback: false, context: context);
 ```
+
+### Static Context
+
+Set default context applied to all evaluations. Configure via options or at runtime:
+
+```csharp
+// Via options
+options.Features.StaticContext = new Dictionary<string, string>
+{
+    ["platform"] = "pc",
+    ["region"] = "kr",
+};
+
+// At runtime
+_flags.SetStaticContext(new EvaluationContext
+{
+    Properties = new Dictionary<string, object?> { ["platform"] = "pc" }
+});
+```
+
+### Evaluation Algorithm
+
+- Uses **MurmurHash3** (32-bit, seed 0) for consistent percentage bucketing
+- Formula: `(murmurhash3(groupId + ':' + stickinessValue, 0) % 10001) / 100.0`
+- Range: `0.00` – `100.00`
+- Produces identical results to TypeScript (server-sdk)
+- Supports stickiness modes: `default`, `userId`, `sessionId`, `random`, or any custom context property
 
 ## Services
 

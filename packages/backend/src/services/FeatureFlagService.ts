@@ -200,9 +200,14 @@ class FeatureFlagService {
 
   /**
    * Get a single feature flag by name
+   * @param projectId - When provided, restricts lookup to this project only
    */
-  async getFlag(environmentId: string, flagName: string): Promise<FeatureFlagAttributes | null> {
-    return FeatureFlagModel.findByName(environmentId, flagName);
+  async getFlag(
+    environmentId: string,
+    flagName: string,
+    projectId?: string
+  ): Promise<FeatureFlagAttributes | null> {
+    return FeatureFlagModel.findByName(environmentId, flagName, projectId);
   }
 
   /**

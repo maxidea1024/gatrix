@@ -33,7 +33,7 @@ router.post(
 
 // Plans management
 router.get('/plans/flag/:flagId', ReleaseFlowController.getPlansByFlag as any);
-router.get('/plans/:flagId/:environment', ReleaseFlowController.getPlan as any);
+router.get('/plans/:flagId/:environmentId', ReleaseFlowController.getPlan as any);
 router.post(
   '/plans/:planId/milestones/:milestoneId/start',
   requirePermission(PERMISSIONS.FEATURE_FLAGS_MANAGE) as any,

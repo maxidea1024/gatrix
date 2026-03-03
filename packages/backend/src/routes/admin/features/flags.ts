@@ -78,7 +78,11 @@ router.get(
     const environmentId = requireEnvironment(req, res);
     if (!environmentId) return;
 
-    const flag = await featureFlagService.getFlag(environmentId, req.params.flagName);
+    const flag = await featureFlagService.getFlag(
+      environmentId,
+      req.params.flagName,
+      req.projectId
+    );
 
     if (!flag) {
       return res.status(404).json({ success: false, error: 'Flag not found' });

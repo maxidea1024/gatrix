@@ -14,7 +14,7 @@ const router = Router();
 router.get(
   '/',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const types = await FeatureFlagTypeModel.findAll();
+    const types = await FeatureFlagTypeModel.findAll(req.projectId);
     res.json({ success: true, data: { types } });
   })
 );

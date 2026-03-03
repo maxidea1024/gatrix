@@ -31,7 +31,11 @@ router.post(
     }
 
     // Get the source flag
-    const sourceFlag = await featureFlagService.getFlag(environmentId, sourceFlagName);
+    const sourceFlag = await featureFlagService.getFlag(
+      environmentId,
+      sourceFlagName,
+      req.projectId
+    );
     if (!sourceFlag) {
       return res.status(404).json({
         success: false,
@@ -40,7 +44,11 @@ router.post(
     }
 
     // Check if new flag name already exists
-    const existingFlag = await featureFlagService.getFlag(environmentId, newFlagName);
+    const existingFlag = await featureFlagService.getFlag(
+      environmentId,
+      newFlagName,
+      req.projectId
+    );
     if (existingFlag) {
       return res.status(409).json({
         success: false,
@@ -147,7 +155,11 @@ router.post(
     for (const flagData of flags) {
       try {
         // Check if flag exists
-        const existingFlag = await featureFlagService.getFlag(environmentId, flagData.flagName);
+        const existingFlag = await featureFlagService.getFlag(
+          environmentId,
+          flagData.flagName,
+          req.projectId
+        );
 
         if (existingFlag) {
           result.flags.skipped++;

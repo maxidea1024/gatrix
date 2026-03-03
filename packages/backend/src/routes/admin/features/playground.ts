@@ -10,7 +10,7 @@ import { asyncHandler } from '../../../middleware/errorHandler';
 import { featureFlagService } from '../../../services/FeatureFlagService';
 import { ValidationRules } from '../../../models/FeatureFlag';
 import { validateFlagValue } from '../../../utils/validateFlagValue';
-import { VALUE_SOURCE, evaluateStrategyWithDetails } from '@gatrix/shared';
+import { VALUE_SOURCE, evaluateStrategyWithDetails, normalizedStrategyValue } from '@gatrix/shared';
 import { createLogger } from '../../../config/logger';
 import { getFallbackValue } from './_helpers';
 
@@ -243,20 +243,30 @@ router.post(
       }
     };
 
-    // Scan first environment to find referenced fields (same flag structure across envs)
+    // Flags are project-scoped, so fetch the list once (using first environment for isEnabled join)
+    const flagsResult = await featureFlagService.listFlags({
+      environmentId: environments[0],
+      projectId: req.projectId,
+      isArchived: false,
+      page: 1,
+      limit: 10000,
+    });
+
+    // Filter to requested flag names if specified
+    const targetFlags = flagNamesSet
+      ? flagsResult.data.filter((f) => flagNamesSet.has(f.flagName))
+      : flagsResult.data;
+
+    // Scan flags to collect referenced context fields (strategies are env-scoped,
+    // but we use first env as representative for field discovery)
     if (environments.length > 0) {
       try {
-        const scanFlagsResult = await featureFlagService.listFlags({
-          environmentId: environments[0],
-          isArchived: false,
-          page: 1,
-          limit: 10000,
-        });
-
-        for (const flagSummary of scanFlagsResult.data) {
-          if (flagNamesSet && !flagNamesSet.has(flagSummary.flagName)) continue;
-
-          const flag = await featureFlagService.getFlag(environments[0], flagSummary.flagName);
+        for (const flagSummary of targetFlags) {
+          const flag = await featureFlagService.getFlag(
+            environments[0],
+            flagSummary.flagName,
+            req.projectId
+          );
           if (!flag) continue;
 
           // Collect from strategies
@@ -306,26 +316,14 @@ router.post(
       }
     }
 
+    // Evaluate flags per environment (flag list is shared, only env-specific state differs)
     for (const env of environments) {
       try {
-        // Load all flags for this environment
-        const flagsResult = await featureFlagService.listFlags({
-          environmentId: env,
-          isArchived: false,
-          page: 1,
-          limit: 10000,
-        });
-
         const envResults: any[] = [];
 
-        for (const flagSummary of flagsResult.data) {
-          // Skip if specific flags are requested and this flag is not in the list
-          if (flagNamesSet && !flagNamesSet.has(flagSummary.flagName)) {
-            continue;
-          }
-
-          // Get detailed flag info
-          const flag = await featureFlagService.getFlag(env, flagSummary.flagName);
+        for (const flagSummary of targetFlags) {
+          // Get detailed flag info with environment-specific state
+          const flag = await featureFlagService.getFlag(env, flagSummary.flagName, req.projectId);
           if (!flag) continue;
 
           // Evaluate the flag
@@ -446,14 +444,14 @@ router.post(
         referencedFields:
           referencedFields.size > 0
             ? Array.from(referencedFields).map((name) => {
-                const fieldDef = fieldDefMap?.get(name);
-                const rules = fieldDef?.validationRules as any;
-                return {
-                  name,
-                  isRequired: rules?.isRequired === true,
-                  fieldType: (fieldDef?.fieldType as string) || 'string',
-                };
-              })
+              const fieldDef = fieldDefMap?.get(name);
+              const rules = fieldDef?.validationRules as any;
+              return {
+                name,
+                isRequired: rules?.isRequired === true,
+                fieldType: (fieldDef?.fieldType as string) || 'string',
+              };
+            })
             : undefined,
       },
     });
@@ -998,15 +996,7 @@ function calculatePercentage(
     stickinessValue = String(getContextValue(stickiness, context) || Math.random());
   }
 
-  const seed = `${groupId}:${stickinessValue}`;
-  // Simple hash function (murmurhash would be better but this works for playground)
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    const char = seed.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash % 10000) / 100;
+  return normalizedStrategyValue(stickinessValue, groupId);
 }
 
 function selectVariantForFlag(

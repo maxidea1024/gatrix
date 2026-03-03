@@ -15,7 +15,15 @@ export function parseJsonField<T>(value: any): T | undefined {
   }
 
   if (typeof value === 'string') {
-    return JSON.parse(value);
+    if (value === '' || value.trim() === '') {
+      return undefined;
+    }
+    try {
+      return JSON.parse(value);
+    } catch {
+      // Malformed JSON in DB — return undefined instead of crashing
+      return undefined;
+    }
   }
 
   return value as T;

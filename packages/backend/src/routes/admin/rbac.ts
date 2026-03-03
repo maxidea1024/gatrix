@@ -658,8 +658,8 @@ router.delete(
 
 // ==================== Environment Keys ====================
 
-// GET /api/admin/rbac/environment-keys/:environment
-router.get('/environment-keys/:environment', async (req: any, res) => {
+// GET /api/admin/rbac/environment-keys/:environmentId
+router.get('/environment-keys/:environmentId', async (req: any, res) => {
   try {
     const keys = await EnvironmentKey.findByEnvironment(req.params.environmentId);
     // Mask key values

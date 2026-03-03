@@ -87,12 +87,20 @@ export class FeatureSegmentModel {
 
   /**
    * Find segments by names (for bulk fetch)
+   * @param projectId - When provided, restricts lookup to this project only
    */
-  static async findByNames(segmentNames: string[]): Promise<FeatureSegmentAttributes[]> {
+  static async findByNames(
+    segmentNames: string[],
+    projectId?: string
+  ): Promise<FeatureSegmentAttributes[]> {
     try {
       if (segmentNames.length === 0) return [];
 
-      const segments = await db('g_feature_segments').whereIn('segmentName', segmentNames);
+      let query = db('g_feature_segments').whereIn('segmentName', segmentNames);
+      if (projectId) {
+        query = query.where('projectId', projectId);
+      }
+      const segments = await query;
 
       return segments.map((s: any) => ({
         ...s,

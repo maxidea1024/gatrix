@@ -315,6 +315,114 @@ console.log(
 
 ## API Reference
 
+### Feature Flags
+
+Local evaluation with no backend roundtrip per request. Flag definitions are cached locally and evaluated using the shared `FeatureFlagEvaluator` with **MurmurHash3** for consistent percentage bucketing across all platforms.
+
+#### Basic Usage
+
+```typescript
+// Check if a flag is enabled (with explicit fallback)
+const enabled = sdk.featureFlag.isEnabled('new_battle_mode', false);
+
+// Get typed variation values
+const config = sdk.featureFlag.stringVariation('battle_config', 'default');
+const maxPlayers = sdk.featureFlag.numberVariation('max_players', 100);
+const premium = sdk.featureFlag.boolVariation('premium_mode', false);
+const settings = sdk.featureFlag.jsonVariation<GameSettings>('game_settings', defaultSettings);
+```
+
+#### Evaluation with Context
+
+```typescript
+const context = {
+  userId: 'user-123',
+  sessionId: 'session-456',
+  appVersion: '1.2.3',
+  properties: {
+    platform: 'pc',
+    country: 'KR',
+    level: 50,
+  },
+};
+
+const enabled = sdk.featureFlag.isEnabled('new_feature', false, context);
+const variant = sdk.featureFlag.stringVariation('feature_config', 'default', context);
+```
+
+#### Evaluation Methods
+
+| Method                                             | Returns            | Description                             |
+| -------------------------------------------------- | ------------------ | --------------------------------------- |
+| `isEnabled(flag, fallback, context?, env?)`        | `boolean`          | Whether the flag is enabled             |
+| `boolVariation(flag, fallback, context?, env?)`    | `boolean`          | Boolean variation (alias for isEnabled) |
+| `stringVariation(flag, fallback, context?, env?)`  | `string`           | String variant value                    |
+| `numberVariation(flag, fallback, context?, env?)`  | `number`           | Number variant value                    |
+| `jsonVariation<T>(flag, fallback, context?, env?)` | `T`                | Deserialized JSON variant value         |
+| `evaluate(flag, context?, env?)`                   | `EvaluationResult` | Full evaluation details                 |
+
+#### Detail Methods
+
+Returns the value along with evaluation metadata (reason, flagName, variantName):
+
+```typescript
+const detail = sdk.featureFlag.stringVariationDetail('feature_config', 'default', context);
+console.log('Value:', detail.value);
+console.log('Reason:', detail.reason); // 'strategy_match', 'default', 'disabled', 'not_found'
+console.log('Variant:', detail.variantName);
+```
+
+#### OrThrow Methods
+
+Throws `FeatureFlagError` if the flag is not found or has no value:
+
+```typescript
+try {
+  const value = sdk.featureFlag.stringVariationOrThrow('required_config', context);
+} catch (error) {
+  if (error instanceof FeatureFlagError) {
+    console.error('Flag error:', error.code, error.message);
+    // error.code: 'FLAG_NOT_FOUND' | 'NO_VALUE' | 'INVALID_VALUE_TYPE'
+  }
+}
+```
+
+#### Static Context
+
+Set default context applied to all evaluations. Per-evaluation context takes precedence:
+
+```typescript
+sdk.featureFlag.setStaticContext({
+  appName: 'my-game',
+  properties: {
+    platform: 'pc',
+    region: 'kr',
+  },
+});
+```
+
+#### Feature Flag Metrics
+
+Flag evaluation metrics are collected and sent to the backend periodically:
+
+```typescript
+// Metrics are auto-started on SDK initialization
+// Configure via constructor or at runtime:
+sdk.featureFlag.setMetricsConfig({
+  enabled: true,
+  flushIntervalMs: 60000, // Default: 1 minute
+  maxBufferSize: 1000, // Auto-flush threshold
+});
+```
+
+#### Evaluation Algorithm
+
+- Uses **MurmurHash3** (32-bit, seed 0) for consistent percentage bucketing
+- Formula: `(murmurhash3(groupId + ':' + stickinessValue, 0) % 10001) / 100.0`
+- Range: `0.00` – `100.00`
+- Produces identical results across TypeScript (server-sdk) and C# (dotnet-server-sdk)
+- Supports stickiness modes: `default` (userId → sessionId fallback), `userId`, `sessionId`, `random`, or any custom context property
+
 ### Coupon
 
 #### Redeem Coupon
@@ -580,9 +688,9 @@ The SDK supports three cache refresh methods:
 
 | Method    | TTL Used | Redis Required | Refresh Trigger                        |
 | --------- | -------- | -------------- | -------------------------------------- |
-| `polling` | ✅ Yes   | ❌ No          | Periodic interval based on `ttl`       |
-| `event`   | ❌ No    | ✅ Yes         | Redis PubSub events from backend       |
-| `manual`  | ❌ No    | ❌ No          | Manual `sdk.refreshCache()` calls only |
+| `polling` | ✅ Yes    | ❌ No           | Periodic interval based on `ttl`       |
+| `event`   | ❌ No     | ✅ Yes          | Redis PubSub events from backend       |
+| `manual`  | ❌ No     | ❌ No           | Manual `sdk.refreshCache()` calls only |
 
 **1. Polling (Default)**
 
@@ -686,8 +794,8 @@ await sdk.refreshSurveysCache();
 
 The SDK supports the following standard events that are automatically published by the Gatrix backend:
 
-| Event Type                | Trigger                          | Data                           | Auto-Refresh           |
-| ------------------------- | -------------------------------- | ------------------------------ | ---------------------- |
+| Event Type                | Trigger                          | Data                           | Auto-Refresh          |
+| ------------------------- | -------------------------------- | ------------------------------ | --------------------- |
 | `gameworld.created`       | New game world created           | `{ id, timestamp }`            | ✅ Game worlds cache   |
 | `gameworld.updated`       | Game world modified              | `{ id, timestamp, isVisible }` | ✅ Game worlds cache   |
 | `gameworld.deleted`       | Game world deleted               | `{ id, timestamp }`            | ✅ Game worlds cache   |
