@@ -552,6 +552,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             flexShrink: 0,
+            pl: 1.5,
           }}
         >
           {hasTransition ? (
@@ -1157,7 +1158,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             )}
 
                             {/* Strategies */}
-                            <Box sx={{ pl: 1.5, borderLeft: 2, borderColor: 'divider' }}>
+                            <Box>
                               <Typography
                                 variant="caption"
                                 fontWeight={600}
