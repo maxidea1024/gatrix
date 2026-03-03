@@ -38,7 +38,6 @@ import {
   Close as CloseIcon,
   Add as AddIcon,
   CheckCircle as CompletedIcon,
-  ArrowDownward as ArrowDownIcon,
   HelpOutline as HelpOutlineIcon,
   DeleteOutline as DeleteIcon,
   MoreVert as MoreVertIcon,
@@ -555,9 +554,85 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             flexShrink: 0,
           }}
         >
-          <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 16 }} />
-          <ArrowDownIcon sx={{ fontSize: 16, color: lineColor, my: -0.25 }} />
-          <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 16 }} />
+          {hasTransition ? (
+            <>
+              <Box
+                sx={{
+                  width: 2,
+                  flexGrow: 1,
+                  bgcolor: lineColor,
+                  minHeight: 12,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  // Flowing animation only on the active milestone's connector
+                  ...(isCurrentActive && !isPaused && {
+                    bgcolor: 'primary.main',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '-100%',
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      background:
+                        'linear-gradient(to bottom, transparent, rgba(255,255,255,0.6), transparent)',
+                      animation: 'flowDown 1.5s ease-in-out infinite',
+                    },
+                    '@keyframes flowDown': {
+                      '0%': { top: '-100%' },
+                      '100%': { top: '200%' },
+                    },
+                  }),
+                }}
+              />
+              {/* CSS triangle arrow — perfectly matches line color */}
+              <Box
+                sx={{
+                  width: 0,
+                  height: 0,
+                  borderLeft: '5px solid transparent',
+                  borderRight: '5px solid transparent',
+                  borderTop: (theme) => {
+                    if (isCurrentActive && !isPaused) {
+                      return `7px solid ${theme.palette.primary.main}`;
+                    }
+                    const color =
+                      status === 'completed'
+                        ? theme.palette.success.main
+                        : theme.palette.divider;
+                    return `7px solid ${color}`;
+                  },
+                }}
+              />
+              <Box
+                sx={{
+                  width: 2,
+                  flexGrow: 1,
+                  bgcolor: isCurrentActive && !isPaused ? 'primary.main' : lineColor,
+                  minHeight: 12,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  ...(isCurrentActive && !isPaused && {
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '-100%',
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      background:
+                        'linear-gradient(to bottom, transparent, rgba(255,255,255,0.6), transparent)',
+                      animation: 'flowDown 1.5s ease-in-out infinite',
+                      animationDelay: '0.3s',
+                    },
+                  }),
+                }}
+              />
+            </>
+          ) : (
+            // No transition — just a simple short line, no arrow
+            <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 12 }} />
+          )}
         </Box>
 
         {/* Transition content */}
@@ -566,7 +641,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            py: 0.5,
+            py: hasTransition ? 0.5 : 0,
             pl: 1,
           }}
         >
@@ -775,10 +850,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
-                    {
-                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                    };
+                  {
+                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                  };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -980,9 +1055,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.015)'
+                                  theme.palette.mode === 'dark'
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1234,9 +1309,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                              borderColor: 'primary.main',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            }
+                            borderColor: 'primary.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                          }
                           : {},
                     }}
                   >
