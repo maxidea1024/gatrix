@@ -32,6 +32,7 @@ import { pubSubService } from './PubSubService';
 import { ENV_SCOPED } from '../constants/cacheKeys';
 import db from '../config/knex';
 import { validateFlagValue } from '../utils/validateFlagValue';
+import { FeatureFlagTypeModel } from '../models/FeatureFlagType';
 
 // Types for service methods
 export interface CreateFlagInput {
@@ -45,7 +46,6 @@ export interface CreateFlagInput {
   disabledValue: any;
 
   impressionDataEnabled?: boolean;
-  staleAfterDays?: number;
   tags?: string[];
   links?: { url: string; title?: string }[];
   environmentId?: string; // Optional: initialize for specific environmentId
@@ -67,7 +67,6 @@ export interface UpdateFlagInput {
   isEnabled?: boolean;
   isArchived?: boolean;
   impressionDataEnabled?: boolean;
-  staleAfterDays?: number;
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
@@ -160,30 +159,43 @@ class FeatureFlagService {
   }
 
   /**
-   * Get stale flags (flags that haven't been seen for longer than their staleAfterDays setting)
+   * Get stale flags (flags that have exceeded their type's lifetimeDays)
    * A flag is considered stale if:
-   * - lastSeenAt is null (never been evaluated) OR
-   * - (now - lastSeenAt) > staleAfterDays
+   * - Its flag type has a non-null lifetimeDays AND
+   * - lastSeenAt exceeds lifetimeDays from now, or never evaluated and created more than lifetimeDays ago
+   * Flag types with lifetimeDays = null have infinite lifetime and are never stale.
    */
-  async getStaleFlags(environmentId: string): Promise<FeatureFlagAttributes[]> {
+  async getStaleFlags(environmentId: string, projectId?: string): Promise<FeatureFlagAttributes[]> {
+    // Load flag types to get lifetimeDays per type
+    const flagTypes = await FeatureFlagTypeModel.findAll(projectId);
+    const lifetimeMap = new Map<string, number | null>();
+    for (const ft of flagTypes) {
+      lifetimeMap.set(ft.flagType, ft.lifetimeDays);
+    }
+
     const result = await FeatureFlagModel.findAll({
       environmentId,
+      projectId,
       isArchived: false,
       limit: 10000,
     });
 
     const now = new Date();
     return result.flags.filter((flag) => {
+      const lifetimeDays = lifetimeMap.get(flag.flagType);
+      // null lifetimeDays = infinite lifetime, never stale
+      if (lifetimeDays === null || lifetimeDays === undefined) return false;
+
       if (!flag.lastSeenAt) {
-        // Never been evaluated - check if created more than staleAfterDays ago
+        // Never been evaluated - check if created more than lifetimeDays ago
         const createdAt = flag.createdAt ? new Date(flag.createdAt) : now;
         const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
-        return daysSinceCreation > flag.staleAfterDays;
+        return daysSinceCreation > lifetimeDays;
       }
 
       const lastSeen = new Date(flag.lastSeenAt);
       const daysSinceLastSeen = (now.getTime() - lastSeen.getTime()) / (1000 * 60 * 60 * 24);
-      return daysSinceLastSeen > flag.staleAfterDays;
+      return daysSinceLastSeen > lifetimeDays;
     });
   }
 
@@ -287,7 +299,6 @@ class FeatureFlagService {
       disabledValue: input.disabledValue,
       validationRules: input.validationRules,
       impressionDataEnabled: input.impressionDataEnabled ?? false,
-      staleAfterDays: input.staleAfterDays ?? 30,
       useFixedWeightVariants: false,
       tags: input.tags,
       links: input.links,

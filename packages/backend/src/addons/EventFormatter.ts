@@ -73,7 +73,7 @@ export function getEventEmoji(eventType: IntegrationEventType): string {
   if (eventType.includes('user')) return '👤';
   if (eventType.includes('whitelist')) return '✅';
   if (eventType.includes('tag')) return '🏷️';
-  if (eventType.includes('environmentId')) return '🌐';
+  if (eventType.includes('environment')) return '🌐';
   if (eventType.includes('change_request')) return '📝';
   if (eventType.includes('message_template')) return '💬';
   if (eventType.includes('job')) return '⏰';

@@ -40,6 +40,7 @@ import {
   CopyResult,
   environmentService,
 } from '../services/environmentService';
+import { useOrgProject } from '../contexts/OrgProjectContext';
 
 interface EnvironmentCopyDialogProps {
   open: boolean;
@@ -56,6 +57,8 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [sourceId, setSourceId] = useState<string>('');
   const [targetId, setTargetId] = useState<string>('');
@@ -130,7 +133,7 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const previewData = await environmentService.getCopyPreview(null, sourceId, targetId);
+      const previewData = await environmentService.getCopyPreview(projectApiPath, sourceId, targetId);
       setPreview(previewData);
     } catch (err) {
       setError(t('environments.copyFailed'));
@@ -151,7 +154,7 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setError(null);
     try {
       const copyResult = await environmentService.copyEnvironmentData(
-        null,
+        projectApiPath,
         sourceId,
         targetId,
         options

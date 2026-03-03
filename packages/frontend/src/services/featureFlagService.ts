@@ -52,7 +52,6 @@ export interface FeatureFlag {
   isArchived: boolean;
   isFavorite?: boolean;
   impressionDataEnabled: boolean;
-  staleAfterDays?: number;
   stale?: boolean;
   tags?: string[];
   valueType: 'string' | 'number' | 'boolean' | 'json';
@@ -105,7 +104,6 @@ export interface CreateFeatureFlagInput {
   disabledValue: any;
   isEnabled?: boolean;
   impressionDataEnabled?: boolean;
-  staleAfterDays?: number;
   tags?: string[];
   validationRules?: ValidationRules;
 }
@@ -118,7 +116,6 @@ export interface UpdateFeatureFlagInput {
   enabledValue?: any;
   disabledValue?: any;
   impressionDataEnabled?: boolean;
-  staleAfterDays?: number;
   tags?: string[];
   validationRules?: ValidationRules;
 }

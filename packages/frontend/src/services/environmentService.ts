@@ -189,10 +189,7 @@ export interface EnvironmentRelatedData {
  * All environment endpoints are project-scoped:
  *   /admin/orgs/:orgId/projects/:projectId/environments
  */
-function envBasePath(projectApiPath: string | null): string {
-  if (!projectApiPath) {
-    throw new Error('Project context required for environment operations');
-  }
+function envBasePath(projectApiPath: string): string {
   return `${projectApiPath}/environments`;
 }
 
@@ -214,7 +211,7 @@ class EnvironmentService {
    * Get all environments
    */
   async getEnvironments(
-    projectApiPath: string | null,
+    projectApiPath: string,
     includeHidden: boolean = false
   ): Promise<Environment[]> {
     try {
@@ -228,7 +225,7 @@ class EnvironmentService {
     }
   }
 
-  async getEnvironment(projectApiPath: string | null, environmentId: string): Promise<Environment> {
+  async getEnvironment(projectApiPath: string, environmentId: string): Promise<Environment> {
     try {
       const response = await api.get(`${envBasePath(projectApiPath)}/${environmentId}`);
       return mapEnvironment(response.data);
@@ -239,7 +236,7 @@ class EnvironmentService {
   }
 
   async createEnvironment(
-    projectApiPath: string | null,
+    projectApiPath: string,
     data: CreateEnvironmentData
   ): Promise<Environment> {
     try {
@@ -251,7 +248,7 @@ class EnvironmentService {
     }
   }
   async updateEnvironment(
-    projectApiPath: string | null,
+    projectApiPath: string,
     environmentId: string,
     data: UpdateEnvironmentData
   ): Promise<Environment> {
@@ -265,7 +262,7 @@ class EnvironmentService {
   }
 
   async getCopyPreview(
-    projectApiPath: string | null,
+    projectApiPath: string,
     sourceEnvironment: string,
     targetEnvironment: string
   ): Promise<CopyPreview> {
@@ -281,7 +278,7 @@ class EnvironmentService {
   }
 
   async copyEnvironmentData(
-    projectApiPath: string | null,
+    projectApiPath: string,
     sourceEnvironment: string,
     targetEnvironment: string,
     options: CopyOptions
@@ -299,7 +296,7 @@ class EnvironmentService {
   }
 
   async getRelatedData(
-    projectApiPath: string | null,
+    projectApiPath: string,
     environmentId: string
   ): Promise<EnvironmentRelatedData> {
     try {
@@ -314,7 +311,7 @@ class EnvironmentService {
   }
 
   async deleteEnvironment(
-    projectApiPath: string | null,
+    projectApiPath: string,
     environmentId: string,
     force: boolean = false
   ): Promise<void> {

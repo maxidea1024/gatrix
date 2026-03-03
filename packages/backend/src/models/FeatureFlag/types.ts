@@ -68,7 +68,6 @@ export interface FeatureFlagAttributes {
   isFavorite?: boolean;
   archivedAt?: Date;
   impressionDataEnabled: boolean;
-  staleAfterDays: number;
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];

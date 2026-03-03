@@ -269,16 +269,16 @@ export class FeatureFlagModel {
         variants,
         environments: envSettings
           ? [
-              {
-                id: envSettings.id,
-                flagId: id,
-                environmentId,
-                isEnabled: Boolean(envSettings.isEnabled),
-                enabledValue: parseJsonField(envSettings.enabledValue),
-                disabledValue: parseJsonField(envSettings.disabledValue),
-                lastSeenAt: envSettings.lastSeenAt,
-              },
-            ]
+            {
+              id: envSettings.id,
+              flagId: id,
+              environmentId,
+              isEnabled: Boolean(envSettings.isEnabled),
+              enabledValue: parseJsonField(envSettings.enabledValue),
+              disabledValue: parseJsonField(envSettings.disabledValue),
+              lastSeenAt: envSettings.lastSeenAt,
+            },
+          ]
           : [],
       };
     } catch (error) {
@@ -318,7 +318,6 @@ export class FeatureFlagModel {
 
         isArchived: false,
         impressionDataEnabled: data.impressionDataEnabled ?? false,
-        staleAfterDays: data.staleAfterDays ?? 30,
         tags: data.tags ? JSON.stringify(data.tags) : null,
         valueType: data.valueType,
         enabledValue: JSON.stringify(coerceValueByType(data.enabledValue, data.valueType)),
@@ -365,7 +364,6 @@ export class FeatureFlagModel {
         updateData.impressionDataEnabled = data.impressionDataEnabled;
       if (data.useFixedWeightVariants !== undefined)
         updateData.useFixedWeightVariants = data.useFixedWeightVariants;
-      if (data.staleAfterDays !== undefined) updateData.staleAfterDays = data.staleAfterDays;
       if (data.stale !== undefined) updateData.stale = data.stale;
       if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
       if (data.links !== undefined) updateData.links = JSON.stringify(data.links);

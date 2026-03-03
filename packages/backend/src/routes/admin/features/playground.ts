@@ -19,7 +19,7 @@ const router = Router();
 
 // Evaluate all flags with custom context (for playground testing)
 router.post(
-  '/',
+  '/playground',
   asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { environments, context, flagNames } = req.body;
 
