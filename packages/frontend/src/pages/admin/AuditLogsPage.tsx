@@ -722,7 +722,7 @@ const AuditLogsPage: React.FC = () => {
                   <TableBody>
                     {auditLogs.map((log, index) => (
                       <React.Fragment key={log.id}>
-                        <TableRow
+                        <TableRow hover
                           hover
                           sx={{
                             cursor: 'pointer',
@@ -757,7 +757,7 @@ const AuditLogsPage: React.FC = () => {
                         </TableRow>
 
                         {/* Expanded Detail Row */}
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             style={{ paddingBottom: 0, paddingTop: 0 }}
                             colSpan={columns.filter((col) => col.visible).length + 1}
@@ -1046,7 +1046,7 @@ const AuditLogsPage: React.FC = () => {
                                             >
                                               <Table size="small">
                                                 <TableHead>
-                                                  <TableRow
+                                                  <TableRow hover
                                                     sx={{
                                                       bgcolor: 'action.hover',
                                                     }}
@@ -1104,7 +1104,7 @@ const AuditLogsPage: React.FC = () => {
                                                     });
                                                     if (changedFields.length === 0) {
                                                       return (
-                                                        <TableRow>
+                                                        <TableRow hover>
                                                           <TableCell
                                                             colSpan={3}
                                                             align="center"
@@ -1120,7 +1120,7 @@ const AuditLogsPage: React.FC = () => {
                                                     }
                                                     return changedFields.map(
                                                       ({ key, oldVal, newVal }) => (
-                                                        <TableRow
+                                                        <TableRow hover
                                                           key={key}
                                                           sx={{
                                                             '&:nth-of-type(odd)': {

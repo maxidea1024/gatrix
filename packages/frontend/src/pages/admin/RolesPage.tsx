@@ -3,8 +3,7 @@ import {
   Box,
   Typography,
   Button,
-  Card,
-  CardContent,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -32,6 +31,9 @@ import {
   MenuItem,
   Switch,
   Divider,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -43,6 +45,8 @@ import {
   Group as GroupIcon,
   Folder as ProjectIcon,
   Cloud as EnvIcon,
+  MoreVert as MoreVertIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -55,6 +59,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 // ==================== Permission Editor ====================
 
@@ -674,6 +679,28 @@ const RolesPage: React.FC = () => {
     Record<string, Array<{ environmentId: string; name: string }>>
   >({});
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<Role | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, role: Role) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(role);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
+  const handleCopyText = (text: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
+  };
+
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -897,109 +924,134 @@ const RolesPage: React.FC = () => {
             subtitle={t('rbac.roles.emptyDescription')}
           />
         ) : (
-          <Card>
-            <CardContent sx={{ p: 0 }}>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('rbac.roles.name')}</TableCell>
-                      <TableCell>{t('rbac.roles.descriptionColumn')}</TableCell>
-                      <TableCell align="center">{t('rbac.roles.permissions')}</TableCell>
-                      <TableCell align="center">{t('rbac.roles.users')}</TableCell>
-                      <TableCell align="center">{t('rbac.roles.groups')}</TableCell>
-                      <TableCell>{t('common.createdAt')}</TableCell>
-                      <TableCell align="right">{t('common.actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredRoles.map((role) => (
-                      <TableRow key={role.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 500,
-                              cursor: 'pointer',
-                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
-                            }}
-                            onClick={() => openEditDialog(role)}
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('rbac.roles.name')}</TableCell>
+                  <TableCell>{t('rbac.roles.descriptionColumn')}</TableCell>
+                  <TableCell align="center">{t('rbac.roles.permissions')}</TableCell>
+                  <TableCell align="center">{t('rbac.roles.users')}</TableCell>
+                  <TableCell align="center">{t('rbac.roles.groups')}</TableCell>
+                  <TableCell>{t('common.createdAt')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredRoles.map((role) => (
+                  <TableRow key={role.id} hover>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                          }}
+                          onClick={() => openEditDialog(role)}
+                        >
+                          {role.roleName}
+                        </Typography>
+                        <Tooltip title={t('common.copy')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyText(role.roleName)}
+                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
                           >
-                            {role.roleName}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              maxWidth: 300,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {role.description || '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip
-                            icon={<ShieldIcon />}
-                            label={(role as any).permissionCount ?? '-'}
-                            size="small"
-                            variant="outlined"
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip
-                            icon={<PeopleIcon />}
-                            label={(role as any).userCount ?? '-'}
-                            size="small"
-                            variant="outlined"
-                            color={(role as any).userCount > 0 ? 'primary' : 'default'}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip
-                            icon={<GroupIcon />}
-                            label={(role as any).groupCount ?? '-'}
-                            size="small"
-                            variant="outlined"
-                            color={(role as any).groupCount > 0 ? 'primary' : 'default'}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={formatDateTimeDetailed(role.createdAt)}>
-                            <Typography variant="body2">
-                              {formatRelativeTime(role.createdAt)}
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="right">
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton size="small" onClick={() => openEditDialog(role)}>
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')}>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => openDeleteDialog(role)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
+                            <CopyIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          maxWidth: 300,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {role.description || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        icon={<ShieldIcon />}
+                        label={(role as any).permissionCount ?? '-'}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderRadius: '8px' }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        icon={<PeopleIcon />}
+                        label={(role as any).userCount ?? '-'}
+                        size="small"
+                        variant="outlined"
+                        color={(role as any).userCount > 0 ? 'primary' : 'default'}
+                        sx={{ borderRadius: '8px' }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        icon={<GroupIcon />}
+                        label={(role as any).groupCount ?? '-'}
+                        size="small"
+                        variant="outlined"
+                        color={(role as any).groupCount > 0 ? 'primary' : 'default'}
+                        sx={{ borderRadius: '8px' }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Tooltip title={formatDateTimeDetailed(role.createdAt)}>
+                        <Typography variant="body2">
+                          {formatRelativeTime(role.createdAt)}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, role)}>
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) openEditDialog(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) openDeleteDialog(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Create / Edit Drawer */}
       <ResizableDrawer

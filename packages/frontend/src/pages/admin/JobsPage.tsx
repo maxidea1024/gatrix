@@ -633,7 +633,7 @@ const JobsPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {jobs.map((job, index) => (
-                  <TableRow
+                  <TableRow hover
                     key={job.id}
                     sx={{
                       bgcolor:

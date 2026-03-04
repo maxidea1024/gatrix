@@ -2644,13 +2644,13 @@ const CouponSettingsPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {codesLoading ? (
-                    <TableRow>
+                    <TableRow hover>
                       <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
                         <Typography color="text.secondary">{t('common.loading')}</Typography>
                       </TableCell>
                     </TableRow>
                   ) : codesItems.length === 0 ? (
-                    <TableRow>
+                    <TableRow hover>
                       <TableCell colSpan={4} sx={{ p: 0 }}>
                         <EmptyPagePlaceholder message={t('common.noData')} />
                       </TableCell>

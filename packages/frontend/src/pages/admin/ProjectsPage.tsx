@@ -19,21 +19,28 @@ import {
   Button,
   TextField,
   CircularProgress,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Folder as ProjectIcon,
+  MoreVert as MoreVertIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import { orgProjectService, Project } from '@/services/orgProjectService';
+import { orgProjectService, Project, Organisation } from '@/services/orgProjectService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -41,6 +48,7 @@ const ProjectsPage: React.FC = () => {
   const { refreshProjects } = useOrgProject();
 
   const [projects, setProjects] = useState<Project[]>([]);
+  const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -63,12 +71,38 @@ const ProjectsPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<Project | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, proj: Project) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(proj);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
+  const handleCopyText = (text: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
+  };
+
   // Load projects
   const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await orgProjectService.getProjects();
-      setProjects(data);
+      const [projectData, orgData] = await Promise.all([
+        orgProjectService.getProjects(),
+        orgProjectService.getOrganisations(),
+      ]);
+      setProjects(projectData);
+      setOrganisations(orgData);
     } catch {
       enqueueSnackbar(t('rbac.projects.loadFailed'), { variant: 'error' });
     } finally {
@@ -184,25 +218,57 @@ const ProjectsPage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('rbac.projects.name')}</TableCell>
                   <TableCell>{t('rbac.projects.displayName')}</TableCell>
+                  <TableCell>{t('common.organisation')}</TableCell>
                   <TableCell>{t('rbac.projects.descriptionColumn')}</TableCell>
                   <TableCell align="center">{t('rbac.projects.default')}</TableCell>
                   <TableCell align="center">{t('rbac.orgs.status')}</TableCell>
                   <TableCell>{t('common.createdAt')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {projects.map((proj) => (
                   <TableRow key={proj.id} hover>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <ProjectIcon fontSize="small" sx={{ opacity: 0.6 }} />
                         <Typography variant="body2" fontWeight={600}>
                           {proj.projectName}
                         </Typography>
+                        <Tooltip title={t('common.copy')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyText(proj.projectName)}
+                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+                          >
+                            <CopyIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Tooltip>
                       </Box>
                     </TableCell>
-                    <TableCell>{proj.displayName}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="body2">
+                          {proj.displayName || '—'}
+                        </Typography>
+                        {proj.displayName && (
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleCopyText(proj.displayName)}
+                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+                            >
+                              <CopyIcon sx={{ fontSize: 14 }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {organisations.find((o) => o.id === proj.orgId)?.displayName || '-'}
+                      </Typography>
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300 }} noWrap>
                         {proj.description || '—'}
@@ -210,16 +276,16 @@ const ProjectsPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="center">
                       {proj.isDefault ? (
-                        <Chip label={t('common.yes')} size="small" color="primary" />
+                        <Chip label={t('common.yes')} size="small" color="primary" sx={{ borderRadius: '8px' }} />
                       ) : (
-                        <Chip label={t('common.no')} size="small" variant="outlined" />
+                        <Chip label={t('common.no')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
                       )}
                     </TableCell>
                     <TableCell align="center">
                       {proj.isActive ? (
-                        <Chip label={t('common.active')} size="small" color="success" />
+                        <Chip label={t('common.active')} size="small" color="success" sx={{ borderRadius: '8px' }} />
                       ) : (
-                        <Chip label={t('common.inactive')} size="small" variant="outlined" />
+                        <Chip label={t('common.inactive')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
                       )}
                     </TableCell>
                     <TableCell>
@@ -229,26 +295,10 @@ const ProjectsPage: React.FC = () => {
                         </Typography>
                       </Tooltip>
                     </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title={t('common.edit')}>
-                        <IconButton size="small" onClick={() => handleEdit(proj)}>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      {!proj.isDefault && (
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => {
-                              setDeleteTarget(proj);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                    <TableCell align="center">
+                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, proj)}>
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -257,6 +307,37 @@ const ProjectsPage: React.FC = () => {
           </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleEdit(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        {menuTarget && !menuTarget.isDefault && (
+          <MenuItem
+            onClick={() => {
+              if (menuTarget) {
+                setDeleteTarget(menuTarget);
+                setDeleteDialogOpen(true);
+              }
+              handleMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>{t('common.delete')}</ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
 
       {/* Create/Edit Drawer */}
       <ResizableDrawer

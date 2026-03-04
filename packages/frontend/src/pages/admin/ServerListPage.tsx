@@ -1597,7 +1597,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
 
                     <Table size="small" sx={{ '& td': { border: 0, py: 0.5, px: 0 } }}>
                       <TableBody>
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             sx={{
                               width: 100,
@@ -1619,7 +1619,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                             {service.instanceId}
                           </TableCell>
                         </TableRow>
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             sx={{
                               color: 'text.secondary',
@@ -1633,7 +1633,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                             {service.hostname}
                           </TableCell>
                         </TableRow>
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             sx={{
                               color: 'text.secondary',
@@ -1652,7 +1652,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                             {service.externalAddress}
                           </TableCell>
                         </TableRow>
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             sx={{
                               color: 'text.secondary',
@@ -1672,7 +1672,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           </TableCell>
                         </TableRow>
                         {service.labels.environmentId && (
-                          <TableRow>
+                          <TableRow hover>
                             <TableCell
                               sx={{
                                 color: 'text.secondary',
@@ -1699,7 +1699,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           </TableRow>
                         )}
                         {service.labels.region && (
-                          <TableRow>
+                          <TableRow hover>
                             <TableCell
                               sx={{
                                 color: 'text.secondary',
@@ -1726,7 +1726,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                           </TableRow>
                         )}
                         {service.labels.version && (
-                          <TableRow>
+                          <TableRow hover>
                             <TableCell
                               sx={{
                                 color: 'text.secondary',
@@ -5971,7 +5971,7 @@ const ServerListPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {bulkHealthCheckResults.map((item, index) => (
-                  <TableRow
+                  <TableRow hover
                     key={item.serviceKey}
                     id={`bulk-health-row-${index}`}
                     sx={{

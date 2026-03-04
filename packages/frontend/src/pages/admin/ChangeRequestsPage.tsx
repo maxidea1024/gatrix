@@ -180,7 +180,7 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({ before, after }
           </TableHead>
           <TableBody>
             {changes.map((change) => (
-              <TableRow key={change.field}>
+              <TableRow key={change.field} hover>
                 <TableCell sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
                   {change.field}
                 </TableCell>

@@ -30,9 +30,12 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  ListItemIcon,
   Tabs,
   Tab,
   Autocomplete,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -44,6 +47,7 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   Shield as ShieldIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -443,6 +447,10 @@ const ServiceAccountsPage: React.FC = () => {
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTargetAccount, setMenuTargetAccount] = useState<ServiceAccount | null>(null);
+
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
     try {
@@ -648,7 +656,7 @@ const ServiceAccountsPage: React.FC = () => {
                   <TableCell>{t('serviceAccounts.status')}</TableCell>
                   <TableCell align="center">{t('serviceAccounts.tokens')}</TableCell>
                   <TableCell>{t('serviceAccounts.createdAt')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -678,6 +686,7 @@ const ServiceAccountsPage: React.FC = () => {
                           size="small"
                           variant="outlined"
                           icon={<ShieldIcon sx={{ fontSize: 14 }} />}
+                          sx={{ borderRadius: '8px' }}
                         />
                       </TableCell>
                       <TableCell>
@@ -689,6 +698,7 @@ const ServiceAccountsPage: React.FC = () => {
                           }
                           size="small"
                           color={account.status === 'active' ? 'success' : 'default'}
+                          sx={{ borderRadius: '8px' }}
                         />
                       </TableCell>
                       <TableCell align="center">
@@ -697,6 +707,7 @@ const ServiceAccountsPage: React.FC = () => {
                           size="small"
                           variant="outlined"
                           icon={<TokenIcon sx={{ fontSize: 14 }} />}
+                          sx={{ borderRadius: '8px' }}
                         />
                       </TableCell>
                       <TableCell>
@@ -706,35 +717,17 @@ const ServiceAccountsPage: React.FC = () => {
                           </Typography>
                         </Tooltip>
                       </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditDialog({ open: true, account });
-                            }}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteDialog({
-                                open: true,
-                                type: 'account',
-                                accountId: account.id,
-                                name: account.name,
-                              });
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                      <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuAnchorEl(e.currentTarget);
+                            setMenuTargetAccount(account);
+                          }}
+                        >
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))
@@ -744,6 +737,45 @@ const ServiceAccountsPage: React.FC = () => {
           </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => { setMenuAnchorEl(null); setMenuTargetAccount(null); }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuTargetAccount) setEditDialog({ open: true, account: menuTargetAccount });
+            setMenuAnchorEl(null);
+            setMenuTargetAccount(null);
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTargetAccount) {
+              setDeleteDialog({
+                open: true,
+                type: 'account',
+                accountId: menuTargetAccount.id,
+                name: menuTargetAccount.name,
+              });
+            }
+            setMenuAnchorEl(null);
+            setMenuTargetAccount(null);
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Detail Drawer */}
       <ResizableDrawer

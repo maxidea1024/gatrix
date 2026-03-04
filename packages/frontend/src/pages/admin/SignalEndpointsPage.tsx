@@ -482,7 +482,7 @@ const SignalEndpointsPage: React.FC = () => {
               <TableBody>
                 {endpoints.map((endpoint) => (
                   <React.Fragment key={endpoint.id}>
-                    <TableRow
+                    <TableRow hover
                       hover
                       sx={{
                         '& > td': {
@@ -572,7 +572,7 @@ const SignalEndpointsPage: React.FC = () => {
                     </TableRow>
 
                     {/* Expanded Token List */}
-                    <TableRow>
+                    <TableRow hover>
                       <TableCell
                         colSpan={6}
                         sx={{

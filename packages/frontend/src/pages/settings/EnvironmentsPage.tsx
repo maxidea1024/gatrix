@@ -30,6 +30,9 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
@@ -40,6 +43,7 @@ import {
   Warning as WarningIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -54,12 +58,13 @@ import EnvironmentCopyDialog from '../../components/EnvironmentCopyDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import PageContentLoader from '../../components/common/PageContentLoader';
 
 const EnvironmentsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { refresh: refreshEnvironments } = useEnvironment();
-  const { getProjectApiPath } = useOrgProject();
+  const { getProjectApiPath, currentOrg, currentProject } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
@@ -92,6 +97,20 @@ const EnvironmentsPage: React.FC = () => {
   // Refs for focus management
   const addNameFieldRef = useRef<HTMLInputElement>(null);
   const editDisplayNameFieldRef = useRef<HTMLInputElement>(null);
+
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTargetEnv, setMenuTargetEnv] = useState<Environment | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, env: Environment) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTargetEnv(env);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTargetEnv(null);
+  };
 
   const loadEnvironments = useCallback(async () => {
     setLoading(true);
@@ -471,6 +490,24 @@ const EnvironmentsPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary">
             {t('environments.subtitle')}
           </Typography>
+          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+            {currentOrg && (
+              <Chip
+                label={`${t('common.organisation')}: ${currentOrg.displayName}`}
+                size="small"
+                variant="outlined"
+                sx={{ borderRadius: '8px' }}
+              />
+            )}
+            {currentProject && (
+              <Chip
+                label={`${t('common.project')}: ${currentProject.displayName}`}
+                size="small"
+                variant="outlined"
+                sx={{ borderRadius: '8px' }}
+              />
+            )}
+          </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Tooltip title={t('common.refresh')}>
@@ -504,12 +541,8 @@ const EnvironmentsPage: React.FC = () => {
         </Alert>
       )}
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper}>
+      <PageContentLoader loading={loading}>
+        <TableContainer component={Paper} variant="outlined">
           <Table>
             <TableHead>
               <TableRow>
@@ -528,7 +561,7 @@ const EnvironmentsPage: React.FC = () => {
               {environments
                 .filter((env) => env.environmentName !== 'gatrix-env')
                 .map((env) => (
-                  <TableRow key={env.environmentId}>
+                  <TableRow key={env.environmentId} hover>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -550,9 +583,9 @@ const EnvironmentsPage: React.FC = () => {
                                   })
                               );
                             }}
-                            sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
                           >
-                            <CopyIcon fontSize="small" sx={{ fontSize: 14 }} />
+                            <CopyIcon sx={{ fontSize: 14 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -577,18 +610,23 @@ const EnvironmentsPage: React.FC = () => {
                         label={t(`environments.types.${env.environmentType}`)}
                         color={getEnvironmentTypeColor(env.environmentType)}
                         size="small"
+                        sx={{ borderRadius: '8px' }}
                       />
                     </TableCell>
                     <TableCell>{env.description || '-'}</TableCell>
                     <TableCell align="center">
                       {(env as any).isDefault ? (
-                        <Chip label="✓" color="primary" size="small" />
+                        <Chip label="✓" color="primary" size="small" sx={{ borderRadius: '8px' }} />
                       ) : (
                         '-'
                       )}
                     </TableCell>
                     <TableCell align="center">
-                      {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
+                      {env.isSystemDefined ? (
+                        <Chip label="✓" color="default" size="small" sx={{ borderRadius: '8px' }} />
+                      ) : (
+                        '-'
+                      )}
                     </TableCell>
                     <TableCell align="center">
                       {env.requiresApproval ? (
@@ -596,6 +634,7 @@ const EnvironmentsPage: React.FC = () => {
                           label={`${env.requiredApprovers || 1}`}
                           color="warning"
                           size="small"
+                          sx={{ borderRadius: '8px' }}
                         />
                       ) : (
                         <Typography variant="body2" color="text.secondary">
@@ -626,42 +665,9 @@ const EnvironmentsPage: React.FC = () => {
                     )}
                     {canManage && (
                       <TableCell align="center">
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: 0.5,
-                          }}
-                        >
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() => handleOpenEditDialog(env)}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          {Boolean(env.isSystemDefined) ? (
-                            <Tooltip title={t('environments.cannotDeleteSystem')}>
-                              <span>
-                                <IconButton size="small" color="error" disabled>
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </span>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title={t('common.delete')}>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleOpenDeleteDialog(env)}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </Box>
+                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, env)}>
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
                       </TableCell>
                     )}
                   </TableRow>
@@ -669,7 +675,34 @@ const EnvironmentsPage: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTargetEnv) handleOpenEditDialog(menuTargetEnv);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTargetEnv) handleOpenDeleteDialog(menuTargetEnv);
+            handleMenuClose();
+          }}
+          disabled={Boolean(menuTargetEnv?.isSystemDefined)}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color={menuTargetEnv?.isSystemDefined ? 'disabled' : 'error'} />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       <EnvironmentCopyDialog
         open={copyDialogOpen}

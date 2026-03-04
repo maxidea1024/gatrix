@@ -3,8 +3,7 @@ import {
   Box,
   Typography,
   Button,
-  Card,
-  CardContent,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -26,10 +25,13 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  ListItemIcon,
   Autocomplete,
   Switch,
   FormControlLabel,
   Alert,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -40,6 +42,8 @@ import {
   Shield as ShieldIcon,
   PersonAdd as PersonAddIcon,
   PersonRemove as PersonRemoveIcon,
+  MoreVert as MoreVertIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -57,6 +61,7 @@ import api from '@/services/api';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 // ==================== Tab Panel ====================
 
@@ -179,10 +184,10 @@ const GroupsPage: React.FC = () => {
   // Filtered groups
   const filteredGroups = debouncedSearchTerm
     ? groups.filter(
-        (g) =>
-          g.groupName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-          (g.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      )
+      (g) =>
+        g.groupName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        (g.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    )
     : groups;
 
   // ─── Dialog handlers ─────────────────────────
@@ -363,17 +368,39 @@ const GroupsPage: React.FC = () => {
     pendingRoleAdds.length > 0 ||
     pendingRoleRemoves.length > 0;
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<GroupWithCounts | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, group: GroupWithCounts) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(group);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
+  const handleCopyText = (text: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
+  };
+
   // Available members: not already in group AND not pending add; also include pending removes as available again
   const effectiveMembers = selectedGroup
     ? [
-        ...selectedGroup.members.filter((m) => !pendingMemberRemoves.includes(m.userId)),
-        ...(pendingMemberAdds
-          .map((userId) => {
-            const u = allUsers.find((u) => u.id === userId);
-            return u ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember) : null;
-          })
-          .filter(Boolean) as GroupMember[]),
-      ]
+      ...selectedGroup.members.filter((m) => !pendingMemberRemoves.includes(m.userId)),
+      ...(pendingMemberAdds
+        .map((userId) => {
+          const u = allUsers.find((u) => u.id === userId);
+          return u ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember) : null;
+        })
+        .filter(Boolean) as GroupMember[]),
+    ]
     : [];
 
   const availableUsers = allUsers.filter((u) => !effectiveMembers.some((m) => m.userId === u.id));
@@ -381,16 +408,16 @@ const GroupsPage: React.FC = () => {
   // Available roles: not already assigned AND not pending add; also include pending removes
   const effectiveRoles = selectedGroup
     ? [
-        ...selectedGroup.roles.filter((r) => !pendingRoleRemoves.includes(r.roleId)),
-        ...(pendingRoleAdds
-          .map((roleId) => {
-            const r = allRoles.find((r) => r.id === roleId);
-            return r
-              ? ({ roleId: r.id, roleName: r.roleName, description: r.description } as GroupRole)
-              : null;
-          })
-          .filter(Boolean) as GroupRole[]),
-      ]
+      ...selectedGroup.roles.filter((r) => !pendingRoleRemoves.includes(r.roleId)),
+      ...(pendingRoleAdds
+        .map((roleId) => {
+          const r = allRoles.find((r) => r.id === roleId);
+          return r
+            ? ({ roleId: r.id, roleName: r.roleName, description: r.description } as GroupRole)
+            : null;
+        })
+        .filter(Boolean) as GroupRole[]),
+    ]
     : [];
 
   const availableRoles = allRoles.filter((r) => !effectiveRoles.some((er) => er.roleId === r.id));
@@ -431,108 +458,132 @@ const GroupsPage: React.FC = () => {
             subtitle={t('rbac.groups.emptyDescription')}
           />
         ) : (
-          <Card>
-            <CardContent sx={{ p: 0 }}>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('rbac.groups.name')}</TableCell>
-                      <TableCell>{t('rbac.groups.descriptionColumn')}</TableCell>
-                      <TableCell align="center">{t('rbac.groups.members')}</TableCell>
-                      <TableCell align="center">{t('rbac.groups.roles')}</TableCell>
-                      <TableCell align="center">{t('rbac.groups.autoAdd')}</TableCell>
-                      <TableCell>{t('common.createdAt')}</TableCell>
-                      <TableCell align="right">{t('common.actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredGroups.map((group) => (
-                      <TableRow key={group.id} hover>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: 500,
-                              cursor: 'pointer',
-                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
-                            }}
-                            onClick={() => openDetailDialog(group)}
-                          >
-                            {group.groupName}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              maxWidth: 300,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {group.description || '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip
-                            icon={<PeopleIcon />}
-                            label={group.memberCount}
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('rbac.groups.name')}</TableCell>
+                  <TableCell>{t('rbac.groups.descriptionColumn')}</TableCell>
+                  <TableCell align="center">{t('rbac.groups.members')}</TableCell>
+                  <TableCell align="center">{t('rbac.groups.roles')}</TableCell>
+                  <TableCell align="center">{t('rbac.groups.autoAdd')}</TableCell>
+                  <TableCell>{t('common.createdAt')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredGroups.map((group) => (
+                  <TableRow key={group.id} hover>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                          }}
+                          onClick={() => openDetailDialog(group)}
+                        >
+                          {group.groupName}
+                        </Typography>
+                        <Tooltip title={t('common.copy')}>
+                          <IconButton
                             size="small"
-                            variant="outlined"
-                            color={group.memberCount > 0 ? 'primary' : 'default'}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip
-                            icon={<ShieldIcon />}
-                            label={group.roleCount}
-                            size="small"
-                            variant="outlined"
-                            color={group.roleCount > 0 ? 'primary' : 'default'}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          {group.addNewUsersByDefault ? (
-                            <Chip label={t('common.yes')} size="small" color="success" />
-                          ) : (
-                            <Chip label={t('common.no')} size="small" variant="outlined" />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={formatDateTimeDetailed(group.createdAt)}>
-                            <Typography variant="body2">
-                              {formatRelativeTime(group.createdAt)}
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="right">
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton size="small" onClick={() => openEditDialog(group)}>
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')}>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => openDeleteDialog(group)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
+                            onClick={() => handleCopyText(group.groupName)}
+                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+                          >
+                            <CopyIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          maxWidth: 300,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {group.description || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        icon={<PeopleIcon />}
+                        label={group.memberCount}
+                        size="small"
+                        variant="outlined"
+                        color={group.memberCount > 0 ? 'primary' : 'default'}
+                        sx={{ borderRadius: '8px' }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        icon={<ShieldIcon />}
+                        label={group.roleCount}
+                        size="small"
+                        variant="outlined"
+                        color={group.roleCount > 0 ? 'primary' : 'default'}
+                        sx={{ borderRadius: '8px' }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      {group.addNewUsersByDefault ? (
+                        <Chip label={t('common.yes')} size="small" color="success" sx={{ borderRadius: '8px' }} />
+                      ) : (
+                        <Chip label={t('common.no')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Tooltip title={formatDateTimeDetailed(group.createdAt)}>
+                        <Typography variant="body2">
+                          {formatRelativeTime(group.createdAt)}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, group)}>
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) openEditDialog(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) openDeleteDialog(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Create / Edit Drawer */}
       <ResizableDrawer

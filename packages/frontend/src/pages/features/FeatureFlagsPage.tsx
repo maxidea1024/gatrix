@@ -2121,7 +2121,7 @@ const FeatureFlagsPage: React.FC = () => {
                       </TableHead>
                       <TableBody>
                         {flags.map((flag) => (
-                          <TableRow
+                          <TableRow hover
                             key={flag.id}
                             hover
                             selected={selectedFlags.has(flag.flagName)}

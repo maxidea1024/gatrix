@@ -85,7 +85,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     event.preventDefault();
     event.stopPropagation();
     setIsSelectOpen(false);
-    navigate('/settings/environments');
+    navigate('/admin/environments');
   };
 
   // Show nothing only if there are truly no environments (not just loading)

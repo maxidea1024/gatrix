@@ -610,7 +610,7 @@ const ActionSetsPage: React.FC = () => {
               <TableBody>
                 {actionSets.map((actionSet) => (
                   <React.Fragment key={actionSet.id}>
-                    <TableRow
+                    <TableRow hover
                       hover
                       sx={{
                         '& > td': {
@@ -679,7 +679,7 @@ const ActionSetsPage: React.FC = () => {
                     </TableRow>
 
                     {/* Expanded Events */}
-                    <TableRow>
+                    <TableRow hover>
                       <TableCell
                         colSpan={6}
                         sx={{
@@ -700,7 +700,7 @@ const ActionSetsPage: React.FC = () => {
                             ) : (
                               <Table size="small">
                                 <TableHead>
-                                  <TableRow>
+                                  <TableRow hover>
                                     <TableCell>{t('actionSets.eventState')}</TableCell>
                                     <TableCell>{t('actionSets.eventSignalId')}</TableCell>
                                     <TableCell>{t('actionSets.eventDate')}</TableCell>
@@ -708,7 +708,7 @@ const ActionSetsPage: React.FC = () => {
                                 </TableHead>
                                 <TableBody>
                                   {events[actionSet.id].map((event) => (
-                                    <TableRow key={event.id}>
+                                    <TableRow key={event.id} hover>
                                       <TableCell>
                                         <Chip
                                           label={t(`actionSets.states.${event.eventState}`)}

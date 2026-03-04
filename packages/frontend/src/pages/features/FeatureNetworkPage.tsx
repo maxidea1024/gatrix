@@ -1063,7 +1063,7 @@ const FeatureNetworkPage: React.FC = () => {
                       </TableHead>
                       <TableBody>
                         {trafficData.length === 0 ? (
-                          <TableRow>
+                          <TableRow hover>
                             <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                               <Typography color="text.secondary">{t('common.noData')}</Typography>
                             </TableCell>
@@ -1239,7 +1239,7 @@ const FeatureNetworkPage: React.FC = () => {
                       </TableHead>
                       <TableBody>
                         {evaluationTimeSeriesByApp.length === 0 ? (
-                          <TableRow>
+                          <TableRow hover>
                             <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
                               <Typography color="text.secondary">{t('common.noData')}</Typography>
                             </TableCell>

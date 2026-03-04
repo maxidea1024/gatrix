@@ -432,7 +432,7 @@ const UnknownFlagsPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {filteredFlags.map((flag) => (
-                    <TableRow key={flag.id}>
+                    <TableRow key={flag.id} hover>
                       {visibleColumns.map((col) => {
                         switch (col.id) {
                           case 'flagName':

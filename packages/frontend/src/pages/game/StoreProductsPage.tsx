@@ -1436,7 +1436,7 @@ const StoreProductsPage: React.FC = () => {
               {products
                 .filter((p) => selectedIds.includes(p.id))
                 .map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product.id} hover>
                     <TableCell>{product.cmsProductId || '-'}</TableCell>
                     <TableCell>{product.productId}</TableCell>
                     <TableCell>{product.productName}</TableCell>

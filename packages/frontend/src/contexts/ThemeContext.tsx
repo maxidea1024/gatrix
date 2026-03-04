@@ -346,7 +346,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: 0,
+            borderRadius: 8,
           },
         },
       },

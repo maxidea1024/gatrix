@@ -1772,7 +1772,7 @@ const ClientVersionsPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {clientVersions.map((clientVersion) => (
-                    <TableRow
+                    <TableRow hover
                       key={clientVersion.id}
                       selected={selectedIds.includes(clientVersion.id)}
                       hover

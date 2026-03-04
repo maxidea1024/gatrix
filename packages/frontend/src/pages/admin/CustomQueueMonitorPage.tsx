@@ -294,7 +294,7 @@ const CustomQueueMonitorPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {currentQueue.jobs?.slice(0, 20).map((job) => (
-                      <TableRow key={job.id}>
+                      <TableRow key={job.id} hover>
                         <TableCell>{job.id}</TableCell>
                         <TableCell>{job.name}</TableCell>
                         <TableCell>

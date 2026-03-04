@@ -151,12 +151,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     adminOnly: true,
     children: [
       {
-        text: 'sidebar.userManagement',
-        icon: 'People',
-        path: '/admin/users',
-        permission: 'users',
-      },
-      {
         text: 'sidebar.clientVersions',
         icon: 'Widgets',
         path: '/admin/client-versions',
@@ -242,6 +236,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         permission: 'security',
         children: [
           {
+            text: 'sidebar.userManagement',
+            icon: 'People',
+            path: '/admin/users',
+            permission: 'users',
+          },
+          {
             text: 'sidebar.apiAccessTokens',
             icon: 'VpnKey',
             path: '/admin/api-tokens',
@@ -282,6 +282,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
             icon: 'Group',
             path: '/admin/groups',
             permission: 'security',
+          },
+          {
+            text: 'environments.title',
+            icon: 'Layers',
+            path: '/admin/environments',
+            permission: 'environments',
           },
         ],
       },
@@ -591,12 +597,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'CloudSync',
         path: '/admin/data-management',
         permission: 'data-management',
-      },
-      {
-        text: 'environments.title',
-        icon: 'Layers',
-        path: '/settings/environments',
-        permission: 'environments',
       },
       {
         text: 'integrations.title',

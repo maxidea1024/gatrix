@@ -25,6 +25,9 @@ import {
   Autocomplete,
   Select,
   MenuItem,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -32,6 +35,8 @@ import {
   Business as OrgIcon,
   People as PeopleIcon,
   Delete as DeleteIcon,
+  MoreVert as MoreVertIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +53,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 interface SearchUser {
   id: string;
@@ -91,6 +97,29 @@ const OrganisationsPage: React.FC = () => {
   const [pendingMembers, setPendingMembers] = useState<OrgMember[]>([]);
   const [initialMembers, setInitialMembers] = useState<OrgMember[]>([]);
   const [applyingMembers, setApplyingMembers] = useState(false);
+
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<Organisation | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, org: Organisation) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(org);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
+  const handleCopyText = (text: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
+  };
 
   // Load organisations
   const loadOrganisations = useCallback(async () => {
@@ -328,7 +357,7 @@ const OrganisationsPage: React.FC = () => {
                   <TableCell>{t('rbac.orgs.descriptionColumn')}</TableCell>
                   <TableCell align="center">{t('rbac.orgs.status')}</TableCell>
                   <TableCell>{t('common.createdAt')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -340,14 +369,40 @@ const OrganisationsPage: React.FC = () => {
                     onClick={() => handleViewDetails(org)}
                   >
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <OrgIcon fontSize="small" sx={{ opacity: 0.6 }} />
                         <Typography variant="body2" fontWeight={600}>
                           {org.orgName}
                         </Typography>
+                        <Tooltip title={t('common.copy')}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => { e.stopPropagation(); handleCopyText(org.orgName); }}
+                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+                          >
+                            <CopyIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Tooltip>
                       </Box>
                     </TableCell>
-                    <TableCell>{org.displayName}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="body2">
+                          {org.displayName || '—'}
+                        </Typography>
+                        {org.displayName && (
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => { e.stopPropagation(); handleCopyText(org.displayName); }}
+                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
+                            >
+                              <CopyIcon sx={{ fontSize: 14 }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300 }} noWrap>
                         {org.description || '—'}
@@ -355,9 +410,9 @@ const OrganisationsPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="center">
                       {org.isActive ? (
-                        <Chip label={t('common.active')} size="small" color="success" />
+                        <Chip label={t('common.active')} size="small" color="success" sx={{ borderRadius: '8px' }} />
                       ) : (
-                        <Chip label={t('common.inactive')} size="small" variant="outlined" />
+                        <Chip label={t('common.inactive')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
                       )}
                     </TableCell>
                     <TableCell>
@@ -365,18 +420,13 @@ const OrganisationsPage: React.FC = () => {
                         <Typography variant="body2">{formatRelativeTime(org.createdAt)}</Typography>
                       </Tooltip>
                     </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title={t('common.edit')}>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(org);
-                          }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                    <TableCell align="center">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleMenuOpen(e, org)}
+                      >
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -385,6 +435,21 @@ const OrganisationsPage: React.FC = () => {
           </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleEdit(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Edit Drawer */}
       <ResizableDrawer

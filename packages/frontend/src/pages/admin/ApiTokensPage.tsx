@@ -30,11 +30,13 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   ClickAwayListener,
   InputAdornment,
   Select,
   MenuItem,
   InputLabel,
+  Menu,
 } from '@mui/material';
 import {
   DndContext,
@@ -71,6 +73,7 @@ import {
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
   Search as SearchIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -327,6 +330,10 @@ const ApiTokensPage: React.FC = () => {
   const regenerateConfirmRef = useRef<HTMLInputElement>(null);
   const regenerateConfirmInputRef = useRef<HTMLInputElement>(null);
 
+  // Action Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTargetToken, setMenuTargetToken] = useState<ApiAccessToken | null>(null);
+
   // Column handlers
   const handleToggleColumnVisibility = (columnId: string) => {
     const newColumns = columns.map((col) =>
@@ -473,6 +480,7 @@ const ApiTokensPage: React.FC = () => {
               size="small"
               color={token.tokenType === 'server' ? 'primary' : 'success'}
               variant="filled"
+              sx={{ borderRadius: '8px' }}
             />
           </Tooltip>
         );
@@ -484,6 +492,7 @@ const ApiTokensPage: React.FC = () => {
             size="small"
             variant="outlined"
             color="primary"
+            sx={{ borderRadius: '8px' }}
           />
         ) : (
           <Typography variant="body2" color="text.secondary">
@@ -1091,7 +1100,7 @@ const ApiTokensPage: React.FC = () => {
               addButtonLabel={t('apiTokens.createToken')}
             />
           ) : (
-            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            <Paper variant="outlined" sx={{ width: '100%', overflow: 'hidden' }}>
               <TableContainer>
                 <Table stickyHeader sx={{ tableLayout: 'auto' }}>
                   <TableHead>
@@ -1142,44 +1151,15 @@ const ApiTokensPage: React.FC = () => {
                             </TableCell>
                           ))}
                         <TableCell align="center">
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              gap: 0.5,
-                              justifyContent: 'center',
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              setMenuAnchorEl(e.currentTarget);
+                              setMenuTargetToken(token);
                             }}
                           >
-                            <Tooltip title={t('apiTokens.copyToken')}>
-                              <IconButton
-                                size="small"
-                                onClick={async () => await copyTokenValue(token)}
-                              >
-                                <CopyIcon />
-                              </IconButton>
-                            </Tooltip>
-                            {canManage && (
-                              <>
-                                <Tooltip title={t('common.edit')}>
-                                  <IconButton size="small" onClick={() => openEditDialog(token)}>
-                                    <EditIcon />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('apiTokens.regenerateToken')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => openRegenerateDialog(token)}
-                                  >
-                                    <RefreshIcon />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('common.delete')}>
-                                  <IconButton size="small" onClick={() => openDeleteDialog(token)}>
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </Tooltip>
-                              </>
-                            )}
-                          </Box>
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1205,6 +1185,67 @@ const ApiTokensPage: React.FC = () => {
           )}
         </PageContentLoader>
       </Box>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => { setMenuAnchorEl(null); setMenuTargetToken(null); }}
+      >
+        <MenuItem
+          onClick={async () => {
+            if (menuTargetToken) await copyTokenValue(menuTargetToken);
+            setMenuAnchorEl(null);
+            setMenuTargetToken(null);
+          }}
+        >
+          <ListItemIcon>
+            <CopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('apiTokens.copyToken')}</ListItemText>
+        </MenuItem>
+        {canManage && [
+          <MenuItem
+            key="edit"
+            onClick={() => {
+              if (menuTargetToken) openEditDialog(menuTargetToken);
+              setMenuAnchorEl(null);
+              setMenuTargetToken(null);
+            }}
+          >
+            <ListItemIcon>
+              <EditIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('common.edit')}</ListItemText>
+          </MenuItem>,
+          <MenuItem
+            key="regenerate"
+            onClick={() => {
+              if (menuTargetToken) openRegenerateDialog(menuTargetToken);
+              setMenuAnchorEl(null);
+              setMenuTargetToken(null);
+            }}
+          >
+            <ListItemIcon>
+              <RefreshIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('apiTokens.regenerateToken')}</ListItemText>
+          </MenuItem>,
+          <MenuItem
+            key="delete"
+            onClick={() => {
+              if (menuTargetToken) openDeleteDialog(menuTargetToken);
+              setMenuAnchorEl(null);
+              setMenuTargetToken(null);
+            }}
+          >
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>{t('common.delete')}</ListItemText>
+          </MenuItem>,
+        ]}
+      </Menu>
 
       {/* Create Token Side Panel */}
       <ResizableDrawer
@@ -1940,7 +1981,7 @@ const ApiTokensPage: React.FC = () => {
                   }
                   helperText={
                     regenerateConfirmText.length > 0 &&
-                    regenerateConfirmText !== selectedToken.tokenName
+                      regenerateConfirmText !== selectedToken.tokenName
                       ? t('apiTokens.regenerateConfirmMismatch')
                       : ''
                   }

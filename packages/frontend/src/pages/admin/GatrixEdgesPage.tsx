@@ -894,7 +894,7 @@ const GatrixEdgesPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {Object.entries(summary).map(([category, envCounts]) => (
-                  <TableRow
+                  <TableRow hover
                     key={category}
                     sx={{
                       '& td': { py: 0.75, fontSize: '0.75rem' },
@@ -964,7 +964,7 @@ const GatrixEdgesPage: React.FC = () => {
         </Box>
         <Table size="small" sx={{ mb: 2 }}>
           <TableBody>
-            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+            <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
               <TableCell sx={{ pl: 0, width: '40%', color: 'text.secondary' }}>
                 {t('gatrixEdges.instanceId')}
               </TableCell>
@@ -972,7 +972,7 @@ const GatrixEdgesPage: React.FC = () => {
                 {instance.instanceId}
               </TableCell>
             </TableRow>
-            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+            <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.hostname')}
               </TableCell>
@@ -980,7 +980,7 @@ const GatrixEdgesPage: React.FC = () => {
             </TableRow>
             {/* New version fields */}
             {labels?.appVersion && (
-              <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
                 <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                   {t('gatrixEdges.appVersion')}
                 </TableCell>
@@ -994,7 +994,7 @@ const GatrixEdgesPage: React.FC = () => {
               </TableRow>
             )}
             {labels?.sdkVersion && (
-              <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+              <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
                 <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                   {t('gatrixEdges.sdkVersion')}
                 </TableCell>
@@ -1007,7 +1007,7 @@ const GatrixEdgesPage: React.FC = () => {
                 </TableCell>
               </TableRow>
             )}
-            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+            <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.externalAddress')}
               </TableCell>
@@ -1015,7 +1015,7 @@ const GatrixEdgesPage: React.FC = () => {
                 {externalAddress}
               </TableCell>
             </TableRow>
-            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+            <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.internalAddress')}
               </TableCell>
@@ -1023,7 +1023,7 @@ const GatrixEdgesPage: React.FC = () => {
                 {internalAddress}
               </TableCell>
             </TableRow>
-            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+            <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.created')}
               </TableCell>
@@ -1031,7 +1031,7 @@ const GatrixEdgesPage: React.FC = () => {
                 <RelativeTime date={createdAt} />
               </TableCell>
             </TableRow>
-            <TableRow sx={{ '& td': { border: 0, py: 0.5 } }}>
+            <TableRow hover sx={{ '& td': { border: 0, py: 0.5 } }}>
               <TableCell sx={{ pl: 0, color: 'text.secondary' }}>
                 {t('gatrixEdges.lastUpdated')}
               </TableCell>
@@ -1366,7 +1366,7 @@ const GatrixEdgesPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
+              <TableRow hover sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
                 <TableCell sx={{ fontWeight: 'bold' }}>
                   {formatUptime(uptimeSeconds || 0)}
                 </TableCell>
@@ -1441,7 +1441,7 @@ const GatrixEdgesPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
+                <TableRow hover sx={{ '& td': { py: 0.75, fontSize: '0.75rem' } }}>
                   {Object.entries(statusCodes)
                     .sort(([a], [b]) => parseInt(a) - parseInt(b))
                     .map(([code, count]) => (
@@ -1495,7 +1495,7 @@ const GatrixEdgesPage: React.FC = () => {
                   .sort(([, a], [, b]) => b.count - a.count)
                   .slice(0, 20) // Show top 20 endpoints
                   .map(([endpoint, data]) => (
-                    <TableRow
+                    <TableRow hover
                       key={endpoint}
                       sx={{
                         '& td': { py: 0.5, fontSize: '0.7rem' },
@@ -2423,7 +2423,7 @@ const GatrixEdgesPage: React.FC = () => {
                           </TableHead>
                           <TableBody>
                             {entries.map(([endpoint, data]) => (
-                              <TableRow
+                              <TableRow hover
                                 key={endpoint}
                                 sx={{
                                   '&:nth-of-type(odd)': {
@@ -2525,7 +2525,7 @@ const GatrixEdgesPage: React.FC = () => {
                       >
                         <TableBody>
                           {entries.map(([key, val]) => (
-                            <TableRow key={key}>
+                            <TableRow key={key} hover>
                               <TableCell
                                 sx={{
                                   fontWeight: 'bold',
