@@ -1774,7 +1774,7 @@ const GameWorldsPage: React.FC = () => {
             addButtonLabel={t('gameWorlds.addGameWorld')}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <DndContext
                 sensors={sensors}
