@@ -49,7 +49,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
 import { useEnvironments } from '@/contexts/EnvironmentContext';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { formatRelativeTime, formatDateTimeUI } from '@/utils/dateFormat';
 
 // Provider icons
 import slackIcon from '@/assets/icons/integrations/slack.svg';
@@ -66,7 +66,7 @@ interface Integration {
   isEnabled: boolean;
   parameters: Record<string, any>;
   events: string[];
-  environments: string[];
+  environmentIds: string[];
 }
 
 interface ProviderDefinition {
@@ -376,7 +376,9 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
         </TableCell>
         <TableCell>{log.statusCode ?? '-'}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {formatRelativeTime(log.createdAt, { showSeconds: true })}
+          <Tooltip title={formatDateTimeUI(log.createdAt)} arrow>
+            <span>{formatRelativeTime(log.createdAt, { showSeconds: true })}</span>
+          </Tooltip>
         </TableCell>
       </TableRow>
       <TableRow
@@ -530,7 +532,7 @@ export const EditIntegrationPage: React.FC = () => {
         setIsEnabled(integrationData.isEnabled);
         setParameters(integrationData.parameters || {});
         setSelectedEvents(integrationData.events || []);
-        setSelectedEnvironments(integrationData.environments || []);
+        setSelectedEnvironments(integrationData.environmentIds || []);
 
         // Store initial values for dirty check
         setInitialValues({
@@ -538,7 +540,7 @@ export const EditIntegrationPage: React.FC = () => {
           isEnabled: integrationData.isEnabled,
           parameters: integrationData.parameters || {},
           events: integrationData.events || [],
-          environments: integrationData.environments || [],
+          environments: integrationData.environmentIds || [],
         });
       }
     } catch {
@@ -655,7 +657,7 @@ export const EditIntegrationPage: React.FC = () => {
         isEnabled,
         parameters,
         events: selectedEvents,
-        environments: selectedEnvironments,
+        environmentIds: selectedEnvironments,
       });
       enqueueSnackbar(t('integrations.saveSuccess'), { variant: 'success' });
       navigate('/settings/integrations');
@@ -704,24 +706,24 @@ export const EditIntegrationPage: React.FC = () => {
         slotProps={
           isSensitive
             ? {
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowSensitive((prev) => ({
-                            ...prev,
-                            [param.name]: !prev[param.name],
-                          }))
-                        }
-                        edge="end"
-                      >
-                        {isVisible ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setShowSensitive((prev) => ({
+                          ...prev,
+                          [param.name]: !prev[param.name],
+                        }))
+                      }
+                      edge="end"
+                    >
+                      {isVisible ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }
             : undefined
         }
       />
