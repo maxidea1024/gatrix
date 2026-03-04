@@ -110,6 +110,7 @@ import {
 } from '@/utils/maintenanceStatusUtils';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import translationService from '../../services/translationService';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -1730,75 +1731,75 @@ const GameWorldsPage: React.FC = () => {
       </Card>
 
       {/* Game Worlds Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : worlds.length === 0 ? (
-            <EmptyPagePlaceholder
-              message={t('gameWorlds.noWorldsFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAddWorld : undefined}
-              addButtonLabel={t('gameWorlds.addGameWorld')}
-            />
-          ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-              modifiers={[restrictToVerticalAxis]}
-            >
-              <TableContainer>
-                <Table sx={{ tableLayout: 'auto' }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell width="50px"></TableCell>
-                      {columns
-                        .filter((col) => col.visible)
-                        .map((column) => (
-                          <TableCell key={column.id} width={column.width}>
-                            {t(column.labelKey)}
-                          </TableCell>
+      <PageContentLoader loading={loading}>
+        <Card>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            {worlds.length === 0 ? (
+              <EmptyPagePlaceholder
+                message={t('gameWorlds.noWorldsFound')}
+                subtitle={canManage ? t('common.addFirstItem') : undefined}
+                onAddClick={canManage ? handleAddWorld : undefined}
+                addButtonLabel={t('gameWorlds.addGameWorld')}
+              />
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+                modifiers={[restrictToVerticalAxis]}
+              >
+                <TableContainer>
+                  <Table sx={{ tableLayout: 'auto' }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell width="50px"></TableCell>
+                        {columns
+                          .filter((col) => col.visible)
+                          .map((column) => (
+                            <TableCell key={column.id} width={column.width}>
+                              {t(column.labelKey)}
+                            </TableCell>
+                          ))}
+                        <TableCell>{t('gameWorlds.creator')}</TableCell>
+                        {canManage && (
+                          <TableCell align="center">{t('gameWorlds.actions')}</TableCell>
+                        )}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <SortableContext
+                        items={worlds.map((w) => w.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {worlds.map((world, idx) => (
+                          <SortableRow
+                            key={world.id}
+                            world={world}
+                            columns={columns}
+                            renderCellContent={renderCellContent}
+                            index={idx}
+                            total={worlds.length}
+                            highlight={recentlyMovedId === world.id}
+                            onEdit={handleEditWorld}
+                            onDelete={handleDeleteWorld}
+                            onToggleVisibility={handleToggleVisibility}
+                            onToggleMaintenance={handleToggleMaintenance}
+                            onCopy={handleCopy}
+                            onDuplicate={handleDuplicateWorld}
+                            canManage={canManage}
+                          />
                         ))}
-                      <TableCell>{t('gameWorlds.creator')}</TableCell>
-                      {canManage && <TableCell align="center">{t('gameWorlds.actions')}</TableCell>}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <SortableContext
-                      items={worlds.map((w) => w.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {worlds.map((world, idx) => (
-                        <SortableRow
-                          key={world.id}
-                          world={world}
-                          columns={columns}
-                          renderCellContent={renderCellContent}
-                          index={idx}
-                          total={worlds.length}
-                          highlight={recentlyMovedId === world.id}
-                          onEdit={handleEditWorld}
-                          onDelete={handleDeleteWorld}
-                          onToggleVisibility={handleToggleVisibility}
-                          onToggleMaintenance={handleToggleMaintenance}
-                          onCopy={handleCopy}
-                          onDuplicate={handleDuplicateWorld}
-                          canManage={canManage}
-                        />
-                      ))}
-                    </SortableContext>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </DndContext>
-          )}
+                      </SortableContext>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </DndContext>
+            )}
 
-          {/* Pagination removed (no server/client paging) */}
-        </CardContent>
-      </Card>
+            {/* Pagination removed (no server/client paging) */}
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       {/* Add/Edit Drawer */}
       <ResizableDrawer

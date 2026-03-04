@@ -76,6 +76,7 @@ import { generateExampleCouponCode, CodePattern } from '@/utils/couponCodeGenera
 import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 import { useGameWorld } from '@/contexts/GameWorldContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 import DynamicFilterBar, {
   FilterDefinition,
@@ -1341,126 +1342,86 @@ const CouponSettingsPage: React.FC = () => {
       )}
 
       {/* List */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow sx={{ height: 48 }}>
-                  {canManage && (
-                    <TableCell padding="checkbox" sx={{ width: 48 }}>
-                      <Checkbox
-                        indeterminate={
-                          sortedItems.some((it) => selectedIds.includes(it.id)) &&
-                          !sortedItems.every((it) => selectedIds.includes(it.id))
-                        }
-                        checked={
-                          sortedItems.length > 0 &&
-                          sortedItems.every((it) => selectedIds.includes(it.id))
-                        }
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                      />
-                    </TableCell>
-                  )}
-                  {visibleColumns.map((col) => (
-                    <TableCell
-                      key={col.id}
-                      sortDirection={orderBy === col.id ? order : (false as any)}
-                      sx={{ py: 1, px: 2 }}
-                      align={['type', 'status', 'usageRate'].includes(col.id) ? 'center' : 'left'}
-                    >
-                      <TableSortLabel
-                        active={orderBy === col.id}
-                        direction={orderBy === col.id ? order : 'asc'}
-                        onClick={() => handleSort(col.id)}
+      <PageContentLoader loading={loading}>
+        <Card>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ height: 48 }}>
+                    {canManage && (
+                      <TableCell padding="checkbox" sx={{ width: 48 }}>
+                        <Checkbox
+                          indeterminate={
+                            sortedItems.some((it) => selectedIds.includes(it.id)) &&
+                            !sortedItems.every((it) => selectedIds.includes(it.id))
+                          }
+                          checked={
+                            sortedItems.length > 0 &&
+                            sortedItems.every((it) => selectedIds.includes(it.id))
+                          }
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                        />
+                      </TableCell>
+                    )}
+                    {visibleColumns.map((col) => (
+                      <TableCell
+                        key={col.id}
+                        sortDirection={orderBy === col.id ? order : (false as any)}
+                        sx={{ py: 1, px: 2 }}
+                        align={['type', 'status', 'usageRate'].includes(col.id) ? 'center' : 'left'}
                       >
-                        {t(col.labelKey)}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-                  {canManage && (
-                    <TableCell align="center" sx={{ py: 1, px: 2 }}>
-                      {t('common.actions')}
-                    </TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={colCount} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">{t('common.loading')}</Typography>
-                    </TableCell>
+                        <TableSortLabel
+                          active={orderBy === col.id}
+                          direction={orderBy === col.id ? order : 'asc'}
+                          onClick={() => handleSort(col.id)}
+                        >
+                          {t(col.labelKey)}
+                        </TableSortLabel>
+                      </TableCell>
+                    ))}
+                    {canManage && (
+                      <TableCell align="center" sx={{ py: 1, px: 2 }}>
+                        {t('common.actions')}
+                      </TableCell>
+                    )}
                   </TableRow>
-                ) : items.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={colCount} sx={{ p: 0 }}>
-                      <EmptyPagePlaceholder
-                        message={t('coupons.couponSettings.noCoupons')}
-                        subtitle={canManage ? t('common.addFirstItem') : undefined}
-                        onAddClick={
-                          canManage
-                            ? () => {
-                                resetForm();
-                                setOpenForm(true);
-                              }
-                            : undefined
-                        }
-                        addButtonLabel={t('coupons.couponSettings.addCoupon')}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedItems.map((it) => (
-                    <TableRow key={it.id} hover sx={{ height: 48 }}>
-                      {canManage && (
-                        <TableCell padding="checkbox" sx={{ py: 1, px: 2 }}>
-                          <Checkbox
-                            checked={selectedIds.includes(it.id)}
-                            onChange={(e) => handleSelectOne(it.id, e.target.checked)}
-                          />
-                        </TableCell>
-                      )}
-                      {visibleColumns.map((col) => {
-                        switch (col.id) {
-                          case 'name':
-                            return (
-                              <TableCell key="name" sx={{ py: 1, px: 2 }}>
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 0.5,
-                                  }}
-                                >
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      cursor: 'pointer',
-                                      '&:hover': {
-                                        color: 'primary.main',
-                                        textDecoration: 'underline',
-                                      },
-                                    }}
-                                    onClick={() => handleEdit(it)}
-                                  >
-                                    {it.name}
-                                  </Typography>
-                                  <Tooltip title={t('coupons.couponSettings.copyName')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleCopyName(it.name)}
-                                    >
-                                      <ContentCopyIcon fontSize="inherit" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'code':
-                            return (
-                              <TableCell key="code" sx={{ py: 1, px: 2 }}>
-                                {it.type === 'SPECIAL' ? (
+                </TableHead>
+                <TableBody>
+                  {items.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={colCount} sx={{ p: 0 }}>
+                        <EmptyPagePlaceholder
+                          message={t('coupons.couponSettings.noCoupons')}
+                          subtitle={canManage ? t('common.addFirstItem') : undefined}
+                          onAddClick={
+                            canManage
+                              ? () => {
+                                  resetForm();
+                                  setOpenForm(true);
+                                }
+                              : undefined
+                          }
+                          addButtonLabel={t('coupons.couponSettings.addCoupon')}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    sortedItems.map((it) => (
+                      <TableRow key={it.id} hover sx={{ height: 48 }}>
+                        {canManage && (
+                          <TableCell padding="checkbox" sx={{ py: 1, px: 2 }}>
+                            <Checkbox
+                              checked={selectedIds.includes(it.id)}
+                              onChange={(e) => handleSelectOne(it.id, e.target.checked)}
+                            />
+                          </TableCell>
+                        )}
+                        {visibleColumns.map((col) => {
+                          switch (col.id) {
+                            case 'name':
+                              return (
+                                <TableCell key="name" sx={{ py: 1, px: 2 }}>
                                   <Box
                                     sx={{
                                       display: 'flex',
@@ -1469,377 +1430,425 @@ const CouponSettingsPage: React.FC = () => {
                                     }}
                                   >
                                     <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                      sx={{ fontFamily: 'monospace' }}
-                                    >
-                                      {it.code || '-'}
-                                    </Typography>
-                                    {it.code && (
-                                      <Tooltip title={t('coupons.couponSettings.copyCode')}>
-                                        <IconButton
-                                          size="small"
-                                          onClick={() => handleCopyCode(it.code!)}
-                                        >
-                                          <ContentCopyIcon fontSize="inherit" />
-                                        </IconButton>
-                                      </Tooltip>
-                                    )}
-                                  </Box>
-                                ) : (
-                                  <Box>
-                                    {it.generationStatus === 'IN_PROGRESS' ||
-                                    it.generationStatus === 'PENDING' ? (
-                                      <Box sx={{ width: '100%', minWidth: 200 }}>
-                                        <Box
-                                          sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 1,
-                                          }}
-                                        >
-                                          <HourglassEmptyIcon
-                                            fontSize="small"
-                                            sx={{
-                                              animation: 'spin 1s linear infinite',
-                                              '@keyframes spin': {
-                                                '0%': {
-                                                  transform: 'rotate(0deg)',
-                                                },
-                                                '100%': {
-                                                  transform: 'rotate(360deg)',
-                                                },
-                                              },
-                                              flexShrink: 0,
-                                              color: 'primary.main',
-                                            }}
-                                          />
-                                          <Box
-                                            sx={{
-                                              position: 'relative',
-                                              flex: 1,
-                                              minWidth: 220,
-                                            }}
-                                          >
-                                            <LinearProgress
-                                              variant="determinate"
-                                              value={
-                                                it.totalCount
-                                                  ? Math.round(
-                                                      ((it.generatedCount || 0) / it.totalCount) *
-                                                        100
-                                                    )
-                                                  : 0
-                                              }
-                                              sx={{
-                                                height: 28,
-                                                borderRadius: 1,
-                                                backgroundColor: 'action.hover',
-                                                border: '1px dashed',
-                                                borderColor: 'divider',
-                                                '& .MuiLinearProgress-bar': {
-                                                  backgroundColor: 'primary.main',
-                                                },
-                                              }}
-                                            />
-                                            <Typography
-                                              variant="caption"
-                                              sx={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                left: '50%',
-                                                transform: 'translate(-50%, -50%)',
-                                                fontSize: '0.75rem',
-                                                color: 'text.primary',
-                                                whiteSpace: 'nowrap',
-                                              }}
-                                            >
-                                              {t('coupons.couponSettings.generatingCodes')} (
-                                              {(it.generatedCount || 0).toLocaleString()} /{' '}
-                                              {(it.totalCount || 0).toLocaleString()})
-                                            </Typography>
-                                          </Box>
-                                        </Box>
-                                      </Box>
-                                    ) : (
-                                      <Tooltip title={t('coupons.couponSettings.viewIssuedCodes')}>
-                                        <Chip
-                                          size="small"
-                                          variant="outlined"
-                                          label={`${t('coupons.couponSettings.issuedCount')}: ${(it.generatedCount || it.issuedCount || 0).toLocaleString()}`}
-                                          onClick={() => handleOpenCodes(it)}
-                                          sx={{
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                              bgcolor: 'action.hover',
-                                              borderColor: 'primary.main',
-                                            },
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    )}
-                                  </Box>
-                                )}
-                              </TableCell>
-                            );
-                          case 'type':
-                            return (
-                              <TableCell key="type" align="center" sx={{ py: 1, px: 2 }}>
-                                <Chip
-                                  size="small"
-                                  label={it.type}
-                                  color={it.type === 'SPECIAL' ? 'primary' : 'info'}
-                                  variant="filled"
-                                />
-                              </TableCell>
-                            );
-                          case 'status': {
-                            // Display status based on actual database status and disabled reason
-                            let displayLabel =
-                              it.status === 'ACTIVE'
-                                ? t('common.active')
-                                : it.status === 'DISABLED'
-                                  ? t('common.disabled')
-                                  : t('status.deleted');
-                            let displayColor: 'success' | 'default' | 'warning' | 'error' =
-                              it.status === 'ACTIVE'
-                                ? 'success'
-                                : it.status === 'DISABLED'
-                                  ? 'default'
-                                  : 'warning';
-
-                            // If disabled, check the reason
-                            if (it.status === 'DISABLED') {
-                              if (it.disabledReason === 'All coupons have been used') {
-                                displayLabel = t('coupons.couponSettings.allUsed');
-                                displayColor = 'error';
-                              } else if (it.disabledReason === 'Expired by scheduler') {
-                                displayLabel = t('coupons.couponSettings.expired');
-                                displayColor = 'warning';
-                              }
-                            }
-
-                            return (
-                              <TableCell key="status" align="center" sx={{ py: 1, px: 2 }}>
-                                <Chip size="small" color={displayColor} label={displayLabel} />
-                              </TableCell>
-                            );
-                          }
-                          case 'usageRate': {
-                            let numerator = it.usedCount || 0;
-                            let denominator: number | string;
-                            let percentage: number = 0;
-                            let tooltipText = '';
-
-                            if (it.type === 'SPECIAL') {
-                              denominator =
-                                it.maxTotalUses ?? t('coupons.couponSettings.form.unlimited');
-                              if (it.maxTotalUses && it.maxTotalUses > 0) {
-                                percentage = Math.round((numerator / it.maxTotalUses) * 100);
-                                tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
-                              } else {
-                                tooltipText = `${numerator.toLocaleString()} / ${denominator}`;
-                              }
-                            } else {
-                              const totalIssued = it.generatedCount || it.issuedCount || 0;
-                              denominator = totalIssued;
-                              if (totalIssued > 0) {
-                                percentage = Math.round((numerator / totalIssued) * 100);
-                              }
-                              tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
-                            }
-
-                            // Determine color based on percentage
-                            let progressColor:
-                              | 'inherit'
-                              | 'primary'
-                              | 'secondary'
-                              | 'error'
-                              | 'warning'
-                              | 'info'
-                              | 'success' = 'primary';
-                            if (percentage >= 80) {
-                              progressColor = 'error';
-                            } else if (percentage >= 50) {
-                              progressColor = 'warning';
-                            }
-
-                            return (
-                              <TableCell key="usageRate" align="center" sx={{ py: 1, px: 2 }}>
-                                <Tooltip title={tooltipText}>
-                                  <Box
-                                    sx={{
-                                      position: 'relative',
-                                      width: '100%',
-                                      minWidth: 120,
-                                    }}
-                                  >
-                                    <LinearProgress
-                                      variant="determinate"
-                                      value={percentage}
+                                      variant="body2"
                                       sx={{
-                                        height: 24,
-                                        borderRadius: 1,
-                                        backgroundColor: 'action.hover',
-                                        border: '1px dashed',
-                                        borderColor: 'divider',
-                                        '& .MuiLinearProgress-bar': {
-                                          backgroundColor:
-                                            progressColor === 'error'
-                                              ? 'error.main'
-                                              : progressColor === 'warning'
-                                                ? 'warning.main'
-                                                : 'primary.main',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                          color: 'primary.main',
+                                          textDecoration: 'underline',
                                         },
                                       }}
-                                    />
-                                    <Typography
+                                      onClick={() => handleEdit(it)}
+                                    >
+                                      {it.name}
+                                    </Typography>
+                                    <Tooltip title={t('coupons.couponSettings.copyName')}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleCopyName(it.name)}
+                                      >
+                                        <ContentCopyIcon fontSize="inherit" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'code':
+                              return (
+                                <TableCell key="code" sx={{ py: 1, px: 2 }}>
+                                  {it.type === 'SPECIAL' ? (
+                                    <Box
                                       sx={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        fontWeight: 'bold',
-                                        fontSize: '0.75rem',
-                                        color: 'text.primary',
-                                        cursor: 'help',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.5,
                                       }}
                                     >
-                                      {percentage}%
-                                    </Typography>
-                                  </Box>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          }
-                          case 'start':
-                            return (
-                              <TableCell key="start" sx={{ py: 1, px: 2 }}>
-                                <Tooltip
-                                  title={
-                                    it.startsAt
-                                      ? formatDateTimeDetailed(it.startsAt)
-                                      : t('coupons.couponSettings.immediateStart')
-                                  }
-                                >
-                                  <Typography variant="caption">
-                                    {it.startsAt
-                                      ? formatRelativeTime(it.startsAt, undefined, language)
-                                      : t('coupons.couponSettings.immediateStart')}
-                                  </Typography>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'end':
-                            return (
-                              <TableCell key="end" sx={{ py: 1, px: 2 }}>
-                                <Tooltip
-                                  title={it.expiresAt ? formatDateTimeDetailed(it.expiresAt) : '-'}
-                                >
-                                  <Typography variant="caption">
-                                    {it.expiresAt
-                                      ? formatRelativeTime(it.expiresAt, undefined, language)
-                                      : '-'}
-                                  </Typography>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'createdAt':
-                            return (
-                              <TableCell key="createdAt" sx={{ py: 1, px: 2 }}>
-                                <Tooltip title={formatDateTimeDetailed((it as any).createdAt)}>
-                                  <Typography variant="caption">
-                                    {formatRelativeTime((it as any).createdAt, undefined, language)}
-                                  </Typography>
-                                </Tooltip>
-                              </TableCell>
-                            );
-                          case 'rewards':
-                            return (
-                              <TableCell key="rewards" sx={{ py: 1, px: 2 }}>
-                                <RewardDisplay
-                                  rewards={it.rewardData || []}
-                                  rewardTemplateId={it.rewardTemplateId}
-                                  maxDisplay={3}
-                                />
-                              </TableCell>
-                            );
-                          case 'description':
-                            return (
-                              <TableCell
-                                key="description"
-                                sx={{
-                                  maxWidth: 240,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  py: 1,
-                                  px: 2,
-                                }}
-                              >
-                                <Typography variant="body2">
-                                  {(it as any).description || '-'}
-                                </Typography>
-                              </TableCell>
-                            );
-                          default:
-                            return null;
-                        }
-                      })}
-                      {canManage && (
-                        <TableCell align="center" sx={{ py: 1, px: 2 }}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              gap: 0.5,
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <IconButton size="small" onClick={() => handleEdit(it)} color="primary">
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <Tooltip
-                              title={
-                                it.status === 'DELETED'
-                                  ? t('coupons.couponSettings.alreadyDeleted')
-                                  : ''
-                              }
-                            >
-                              <span>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDeleteClick(it)}
-                                  color="error"
-                                  disabled={it.status === 'DELETED'}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </span>
-                            </Tooltip>
-                          </Box>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                                      <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ fontFamily: 'monospace' }}
+                                      >
+                                        {it.code || '-'}
+                                      </Typography>
+                                      {it.code && (
+                                        <Tooltip title={t('coupons.couponSettings.copyCode')}>
+                                          <IconButton
+                                            size="small"
+                                            onClick={() => handleCopyCode(it.code!)}
+                                          >
+                                            <ContentCopyIcon fontSize="inherit" />
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
+                                    </Box>
+                                  ) : (
+                                    <Box>
+                                      {it.generationStatus === 'IN_PROGRESS' ||
+                                      it.generationStatus === 'PENDING' ? (
+                                        <Box sx={{ width: '100%', minWidth: 200 }}>
+                                          <Box
+                                            sx={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 1,
+                                            }}
+                                          >
+                                            <HourglassEmptyIcon
+                                              fontSize="small"
+                                              sx={{
+                                                animation: 'spin 1s linear infinite',
+                                                '@keyframes spin': {
+                                                  '0%': {
+                                                    transform: 'rotate(0deg)',
+                                                  },
+                                                  '100%': {
+                                                    transform: 'rotate(360deg)',
+                                                  },
+                                                },
+                                                flexShrink: 0,
+                                                color: 'primary.main',
+                                              }}
+                                            />
+                                            <Box
+                                              sx={{
+                                                position: 'relative',
+                                                flex: 1,
+                                                minWidth: 220,
+                                              }}
+                                            >
+                                              <LinearProgress
+                                                variant="determinate"
+                                                value={
+                                                  it.totalCount
+                                                    ? Math.round(
+                                                        ((it.generatedCount || 0) / it.totalCount) *
+                                                          100
+                                                      )
+                                                    : 0
+                                                }
+                                                sx={{
+                                                  height: 28,
+                                                  borderRadius: 1,
+                                                  backgroundColor: 'action.hover',
+                                                  border: '1px dashed',
+                                                  borderColor: 'divider',
+                                                  '& .MuiLinearProgress-bar': {
+                                                    backgroundColor: 'primary.main',
+                                                  },
+                                                }}
+                                              />
+                                              <Typography
+                                                variant="caption"
+                                                sx={{
+                                                  position: 'absolute',
+                                                  top: '50%',
+                                                  left: '50%',
+                                                  transform: 'translate(-50%, -50%)',
+                                                  fontSize: '0.75rem',
+                                                  color: 'text.primary',
+                                                  whiteSpace: 'nowrap',
+                                                }}
+                                              >
+                                                {t('coupons.couponSettings.generatingCodes')} (
+                                                {(it.generatedCount || 0).toLocaleString()} /{' '}
+                                                {(it.totalCount || 0).toLocaleString()})
+                                              </Typography>
+                                            </Box>
+                                          </Box>
+                                        </Box>
+                                      ) : (
+                                        <Tooltip
+                                          title={t('coupons.couponSettings.viewIssuedCodes')}
+                                        >
+                                          <Chip
+                                            size="small"
+                                            variant="outlined"
+                                            label={`${t('coupons.couponSettings.issuedCount')}: ${(it.generatedCount || it.issuedCount || 0).toLocaleString()}`}
+                                            onClick={() => handleOpenCodes(it)}
+                                            sx={{
+                                              cursor: 'pointer',
+                                              '&:hover': {
+                                                bgcolor: 'action.hover',
+                                                borderColor: 'primary.main',
+                                              },
+                                            }}
+                                          />
+                                        </Tooltip>
+                                      )}
+                                    </Box>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'type':
+                              return (
+                                <TableCell key="type" align="center" sx={{ py: 1, px: 2 }}>
+                                  <Chip
+                                    size="small"
+                                    label={it.type}
+                                    color={it.type === 'SPECIAL' ? 'primary' : 'info'}
+                                    variant="filled"
+                                  />
+                                </TableCell>
+                              );
+                            case 'status': {
+                              // Display status based on actual database status and disabled reason
+                              let displayLabel =
+                                it.status === 'ACTIVE'
+                                  ? t('common.active')
+                                  : it.status === 'DISABLED'
+                                    ? t('common.disabled')
+                                    : t('status.deleted');
+                              let displayColor: 'success' | 'default' | 'warning' | 'error' =
+                                it.status === 'ACTIVE'
+                                  ? 'success'
+                                  : it.status === 'DISABLED'
+                                    ? 'default'
+                                    : 'warning';
 
-          {!loading && items.length > 0 && (
-            <SimplePagination
-              count={total}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={(_, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(e: any) => {
-                setRowsPerPage(Number(e.target.value));
-                setPage(0);
-              }}
-            />
-          )}
-        </CardContent>
-      </Card>
+                              // If disabled, check the reason
+                              if (it.status === 'DISABLED') {
+                                if (it.disabledReason === 'All coupons have been used') {
+                                  displayLabel = t('coupons.couponSettings.allUsed');
+                                  displayColor = 'error';
+                                } else if (it.disabledReason === 'Expired by scheduler') {
+                                  displayLabel = t('coupons.couponSettings.expired');
+                                  displayColor = 'warning';
+                                }
+                              }
+
+                              return (
+                                <TableCell key="status" align="center" sx={{ py: 1, px: 2 }}>
+                                  <Chip size="small" color={displayColor} label={displayLabel} />
+                                </TableCell>
+                              );
+                            }
+                            case 'usageRate': {
+                              let numerator = it.usedCount || 0;
+                              let denominator: number | string;
+                              let percentage: number = 0;
+                              let tooltipText = '';
+
+                              if (it.type === 'SPECIAL') {
+                                denominator =
+                                  it.maxTotalUses ?? t('coupons.couponSettings.form.unlimited');
+                                if (it.maxTotalUses && it.maxTotalUses > 0) {
+                                  percentage = Math.round((numerator / it.maxTotalUses) * 100);
+                                  tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
+                                } else {
+                                  tooltipText = `${numerator.toLocaleString()} / ${denominator}`;
+                                }
+                              } else {
+                                const totalIssued = it.generatedCount || it.issuedCount || 0;
+                                denominator = totalIssued;
+                                if (totalIssued > 0) {
+                                  percentage = Math.round((numerator / totalIssued) * 100);
+                                }
+                                tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
+                              }
+
+                              // Determine color based on percentage
+                              let progressColor:
+                                | 'inherit'
+                                | 'primary'
+                                | 'secondary'
+                                | 'error'
+                                | 'warning'
+                                | 'info'
+                                | 'success' = 'primary';
+                              if (percentage >= 80) {
+                                progressColor = 'error';
+                              } else if (percentage >= 50) {
+                                progressColor = 'warning';
+                              }
+
+                              return (
+                                <TableCell key="usageRate" align="center" sx={{ py: 1, px: 2 }}>
+                                  <Tooltip title={tooltipText}>
+                                    <Box
+                                      sx={{
+                                        position: 'relative',
+                                        width: '100%',
+                                        minWidth: 120,
+                                      }}
+                                    >
+                                      <LinearProgress
+                                        variant="determinate"
+                                        value={percentage}
+                                        sx={{
+                                          height: 24,
+                                          borderRadius: 1,
+                                          backgroundColor: 'action.hover',
+                                          border: '1px dashed',
+                                          borderColor: 'divider',
+                                          '& .MuiLinearProgress-bar': {
+                                            backgroundColor:
+                                              progressColor === 'error'
+                                                ? 'error.main'
+                                                : progressColor === 'warning'
+                                                  ? 'warning.main'
+                                                  : 'primary.main',
+                                          },
+                                        }}
+                                      />
+                                      <Typography
+                                        sx={{
+                                          position: 'absolute',
+                                          top: '50%',
+                                          left: '50%',
+                                          transform: 'translate(-50%, -50%)',
+                                          fontWeight: 'bold',
+                                          fontSize: '0.75rem',
+                                          color: 'text.primary',
+                                          cursor: 'help',
+                                        }}
+                                      >
+                                        {percentage}%
+                                      </Typography>
+                                    </Box>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            }
+                            case 'start':
+                              return (
+                                <TableCell key="start" sx={{ py: 1, px: 2 }}>
+                                  <Tooltip
+                                    title={
+                                      it.startsAt
+                                        ? formatDateTimeDetailed(it.startsAt)
+                                        : t('coupons.couponSettings.immediateStart')
+                                    }
+                                  >
+                                    <Typography variant="caption">
+                                      {it.startsAt
+                                        ? formatRelativeTime(it.startsAt, undefined, language)
+                                        : t('coupons.couponSettings.immediateStart')}
+                                    </Typography>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            case 'end':
+                              return (
+                                <TableCell key="end" sx={{ py: 1, px: 2 }}>
+                                  <Tooltip
+                                    title={
+                                      it.expiresAt ? formatDateTimeDetailed(it.expiresAt) : '-'
+                                    }
+                                  >
+                                    <Typography variant="caption">
+                                      {it.expiresAt
+                                        ? formatRelativeTime(it.expiresAt, undefined, language)
+                                        : '-'}
+                                    </Typography>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            case 'createdAt':
+                              return (
+                                <TableCell key="createdAt" sx={{ py: 1, px: 2 }}>
+                                  <Tooltip title={formatDateTimeDetailed((it as any).createdAt)}>
+                                    <Typography variant="caption">
+                                      {formatRelativeTime(
+                                        (it as any).createdAt,
+                                        undefined,
+                                        language
+                                      )}
+                                    </Typography>
+                                  </Tooltip>
+                                </TableCell>
+                              );
+                            case 'rewards':
+                              return (
+                                <TableCell key="rewards" sx={{ py: 1, px: 2 }}>
+                                  <RewardDisplay
+                                    rewards={it.rewardData || []}
+                                    rewardTemplateId={it.rewardTemplateId}
+                                    maxDisplay={3}
+                                  />
+                                </TableCell>
+                              );
+                            case 'description':
+                              return (
+                                <TableCell
+                                  key="description"
+                                  sx={{
+                                    maxWidth: 240,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    py: 1,
+                                    px: 2,
+                                  }}
+                                >
+                                  <Typography variant="body2">
+                                    {(it as any).description || '-'}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                        {canManage && (
+                          <TableCell align="center" sx={{ py: 1, px: 2 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                gap: 0.5,
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEdit(it)}
+                                color="primary"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                              <Tooltip
+                                title={
+                                  it.status === 'DELETED'
+                                    ? t('coupons.couponSettings.alreadyDeleted')
+                                    : ''
+                                }
+                              >
+                                <span>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleDeleteClick(it)}
+                                    color="error"
+                                    disabled={it.status === 'DELETED'}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            </Box>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {!loading && items.length > 0 && (
+              <SimplePagination
+                count={total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(e: any) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setPage(0);
+                }}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

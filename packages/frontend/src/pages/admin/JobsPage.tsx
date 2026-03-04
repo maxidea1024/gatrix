@@ -57,6 +57,7 @@ import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { getContrastColor } from '@/utils/colorUtils';
 
@@ -597,102 +598,100 @@ const JobsPage: React.FC = () => {
       </Box>
 
       {/* Jobs Table */}
-      {loading ? (
-        <Paper sx={{ p: 6, textAlign: 'center' }}>
-          <Typography color="text.secondary">{t('common.loadingJobs')}</Typography>
-        </Paper>
-      ) : jobs.length === 0 ? (
-        <Paper sx={{ p: 0 }}>
-          <EmptyPagePlaceholder
-            message={t('jobs.noJobsFound')}
-            subtitle={canManage ? t('common.addFirstItem') : undefined}
-            onAddClick={canManage ? handleAddJob : undefined}
-            addButtonLabel={t('jobs.addJob')}
-          />
-        </Paper>
-      ) : (
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxWidth: '100%',
-            overflow: 'auto',
-          }}
-        >
-          <Table sx={{ tableLayout: 'auto' }}>
-            <TableHead>
-              <TableRow>
-                {columns
-                  .filter((col) => col.visible)
-                  .map((column) => (
-                    <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
-                  ))}
-                {canManage && (
-                  <TableCell align="right" sx={{ width: 150 }}>
-                    {t('common.actions')}
-                  </TableCell>
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {jobs.map((job, index) => (
-                <TableRow
-                  key={job.id}
-                  sx={{
-                    bgcolor:
-                      index % 2 === 0
-                        ? theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.02)'
-                          : 'rgba(0, 0, 0, 0.02)'
-                        : 'transparent',
-                  }}
-                >
+      <PageContentLoader loading={loading}>
+        {jobs.length === 0 ? (
+          <Paper sx={{ p: 0 }}>
+            <EmptyPagePlaceholder
+              message={t('jobs.noJobsFound')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+              onAddClick={canManage ? handleAddJob : undefined}
+              addButtonLabel={t('jobs.addJob')}
+            />
+          </Paper>
+        ) : (
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxWidth: '100%',
+              overflow: 'auto',
+            }}
+          >
+            <Table sx={{ tableLayout: 'auto' }}>
+              <TableHead>
+                <TableRow>
                   {columns
                     .filter((col) => col.visible)
                     .map((column) => (
-                      <TableCell key={column.id}>{renderCellContent(job, column.id)}</TableCell>
+                      <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
                     ))}
                   {canManage && (
-                    <TableCell align="right">
-                      <Tooltip title={t('jobs.execute')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleExecuteJob(job)}
-                          disabled={!job.isEnabled}
-                        >
-                          <ExecuteIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('jobs.viewHistory')}>
-                        <IconButton size="small" onClick={() => handleViewHistory(job)}>
-                          <HistoryIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('common.edit')}>
-                        <IconButton size="small" onClick={() => handleEditJob(job)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('common.delete')}>
-                        <IconButton size="small" onClick={() => handleDeleteJob(job)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
+                    <TableCell align="right" sx={{ width: 150 }}>
+                      {t('common.actions')}
                     </TableCell>
                   )}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {jobs.map((job, index) => (
+                  <TableRow
+                    key={job.id}
+                    sx={{
+                      bgcolor:
+                        index % 2 === 0
+                          ? theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.02)'
+                            : 'rgba(0, 0, 0, 0.02)'
+                          : 'transparent',
+                    }}
+                  >
+                    {columns
+                      .filter((col) => col.visible)
+                      .map((column) => (
+                        <TableCell key={column.id}>{renderCellContent(job, column.id)}</TableCell>
+                      ))}
+                    {canManage && (
+                      <TableCell align="right">
+                        <Tooltip title={t('jobs.execute')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleExecuteJob(job)}
+                            disabled={!job.isEnabled}
+                          >
+                            <ExecuteIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('jobs.viewHistory')}>
+                          <IconButton size="small" onClick={() => handleViewHistory(job)}>
+                            <HistoryIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('common.edit')}>
+                          <IconButton size="small" onClick={() => handleEditJob(job)}>
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('common.delete')}>
+                          <IconButton size="small" onClick={() => handleDeleteJob(job)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-          />
-        </TableContainer>
-      )}
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+          </TableContainer>
+        )}
+      </PageContentLoader>
 
       {/* Job Form Drawer */}
       <Drawer

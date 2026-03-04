@@ -107,6 +107,7 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
 import { getStoredTimezone, formatDateTimeDetailed } from '../../utils/dateFormat';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -930,781 +931,42 @@ const RealtimeEventsPage: React.FC = () => {
       </Paper>
 
       {/* Main Content */}
-      <Box
-        sx={{
-          flex: 1,
-          overflow: 'hidden',
-          display: 'flex',
-          gap: 2,
-          minHeight: 0,
-        }}
+      <PageContentLoader
+        loading={loading}
+        sx={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       >
-        {/* Left: Timeline View */}
-        <Paper
-          elevation={1}
-          sx={{
-            flex: '0 0 360px',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            bgcolor: 'background.paper',
-            position: 'relative',
-          }}
-        >
-          <Box
-            sx={{
-              p: 2,
-              borderBottom: 1,
-              borderColor: 'divider',
-              height: '72px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 700,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-              }}
-            >
-              Timeline
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('realtimeEvents.last30Minutes')}
-            </Typography>
-          </Box>
-
-          <Box
-            ref={timelineContainerRef}
-            sx={{
-              flex: 1,
-              overflowY: 'auto',
-            }}
-          >
-            {loading ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography variant="caption" color="text.secondary">
-                  {t('common.loading')}
-                </Typography>
-              </Box>
-            ) : timelineGroups.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <TimelineIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                  {t('realtimeEvents.noEventsYet')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {t('realtimeEvents.noEventsDescription')}
-                </Typography>
-              </Box>
-            ) : (
-              <Timeline
-                sx={{
-                  p: 2,
-                  m: 0,
-                  '& .MuiTimelineItem-root': {
-                    '&:before': {
-                      content: 'none',
-                    },
-                    minHeight: 80,
-                  },
-                  '& .MuiTimelineContent-root': {
-                    py: 0,
-                    px: 2,
-                  },
-                  '& .MuiTimelineDot-root': {
-                    margin: 0,
-                  },
-                  '& .MuiTimelineConnector-root': {
-                    bgcolor:
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.08)'
-                        : 'rgba(0, 0, 0, 0.08)',
-                    width: '2px',
-                  },
-                }}
-              >
-                {timelineGroups.map((group, index) => {
-                  const isChanged = changedGroupKeys.has(group.timestamp);
-
-                  return (
-                    <TimelineItem key={group.timestamp}>
-                      <TimelineSeparator>
-                        <TimelineDot
-                          sx={{
-                            bgcolor: 'transparent',
-                            boxShadow: 'none',
-                            p: 0,
-                            m: 0,
-                            position: 'relative',
-                          }}
-                        >
-                          {/* Outer glow ring */}
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              width: 56,
-                              height: 56,
-                              borderRadius: '50%',
-                              bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              animation: 'pulse 2s ease-in-out infinite',
-                              '@keyframes pulse': {
-                                '0%, 100%': {
-                                  transform: 'scale(1)',
-                                  opacity: 0.5,
-                                },
-                                '50%': {
-                                  transform: 'scale(1.1)',
-                                  opacity: 0.3,
-                                },
-                              },
-                            }}
-                          />
-                          {/* Main circle */}
-                          <Box
-                            sx={{
-                              position: 'relative',
-                              width: 48,
-                              height: 48,
-                              borderRadius: '50%',
-                              bgcolor: 'primary.main',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '0.875rem',
-                              fontWeight: 700,
-                              color: 'primary.contrastText',
-                              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
-                              border: 4,
-                              borderColor: 'background.paper',
-                              transition: 'all 0.3s ease',
-                              animation: isChanged ? 'rumble 0.6s ease-out' : 'none',
-                              '@keyframes rumble': {
-                                '0%, 100%': {
-                                  transform: 'translate(0, 0) scale(1)',
-                                },
-                                '10%': {
-                                  transform: 'translate(-2px, -1px) scale(1.05)',
-                                },
-                                '20%': {
-                                  transform: 'translate(2px, 1px) scale(1.05)',
-                                },
-                                '30%': {
-                                  transform: 'translate(-2px, 1px) scale(1.05)',
-                                },
-                                '40%': {
-                                  transform: 'translate(2px, -1px) scale(1.05)',
-                                },
-                                '50%': {
-                                  transform: 'translate(-1px, -1px) scale(1.03)',
-                                },
-                                '60%': {
-                                  transform: 'translate(1px, 1px) scale(1.03)',
-                                },
-                                '70%': {
-                                  transform: 'translate(-1px, 1px) scale(1.02)',
-                                },
-                                '80%': {
-                                  transform: 'translate(1px, -1px) scale(1.02)',
-                                },
-                                '90%': {
-                                  transform: 'translate(-1px, 0) scale(1.01)',
-                                },
-                              },
-                              '&:hover': {
-                                transform: 'scale(1.1)',
-                                boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
-                              },
-                            }}
-                          >
-                            {group.count}
-                          </Box>
-                        </TimelineDot>
-                        {index < timelineGroups.length - 1 && (
-                          <TimelineConnector sx={{ minHeight: 50 }} />
-                        )}
-                      </TimelineSeparator>
-                      <TimelineContent sx={{ pt: 1.5 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: 'block',
-                            mb: 1.5,
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            color: 'text.primary',
-                            letterSpacing: '0.5px',
-                          }}
-                        >
-                          {group.timeLabel}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
-                          {Array.from(new Set(group.events.map((e) => e.action)))
-                            .slice(0, 3)
-                            .map((action, idx) => (
-                              <Chip
-                                key={action}
-                                label={action}
-                                size="small"
-                                sx={{
-                                  height: 26,
-                                  fontSize: '0.7rem',
-                                  fontWeight: 500,
-                                  bgcolor:
-                                    theme.palette.mode === 'dark'
-                                      ? alpha(theme.palette.primary.main, 0.15)
-                                      : alpha(theme.palette.primary.main, 0.08),
-                                  color:
-                                    theme.palette.mode === 'dark'
-                                      ? 'primary.light'
-                                      : 'primary.dark',
-                                  border: 1,
-                                  borderColor:
-                                    theme.palette.mode === 'dark'
-                                      ? alpha(theme.palette.primary.main, 0.3)
-                                      : alpha(theme.palette.primary.main, 0.2),
-                                  '& .MuiChip-label': { px: 1.5 },
-                                  transition: 'all 0.2s ease',
-                                  '&:hover': {
-                                    bgcolor:
-                                      theme.palette.mode === 'dark'
-                                        ? alpha(theme.palette.primary.main, 0.25)
-                                        : alpha(theme.palette.primary.main, 0.15),
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: 1,
-                                  },
-                                }}
-                              />
-                            ))}
-                          {Array.from(new Set(group.events.map((e) => e.action))).length > 3 && (
-                            <Chip
-                              label={`+${Array.from(new Set(group.events.map((e) => e.action))).length - 3}`}
-                              size="small"
-                              sx={{
-                                height: 26,
-                                fontSize: '0.7rem',
-                                fontWeight: 600,
-                                bgcolor:
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.08)'
-                                    : 'rgba(0, 0, 0, 0.06)',
-                                color: 'text.secondary',
-                                '& .MuiChip-label': { px: 1 },
-                              }}
-                            />
-                          )}
-                        </Box>
-                      </TimelineContent>
-                    </TimelineItem>
-                  );
-                })}
-              </Timeline>
-            )}
-          </Box>
-        </Paper>
-
-        {/* Center: Event Stream */}
-        <Paper
-          elevation={1}
+        <Box
           sx={{
             flex: 1,
+            overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            bgcolor: 'background.paper',
-            position: 'relative',
+            gap: 2,
+            minHeight: 0,
           }}
         >
-          {/* New Events Notification Badge */}
-          {hasUnseenEvents && (
+          {/* Left: Timeline View */}
+          <Paper
+            elevation={1}
+            sx={{
+              flex: '0 0 360px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              bgcolor: 'background.paper',
+              position: 'relative',
+            }}
+          >
             <Box
-              onClick={scrollToTop}
               sx={{
-                position: 'absolute',
-                top: 16,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 10,
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                px: 2,
-                py: 1,
-                borderRadius: 3,
-                boxShadow: 3,
-                cursor: 'pointer',
+                p: 2,
+                borderBottom: 1,
+                borderColor: 'divider',
+                height: '72px',
                 display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                animation:
-                  'slideDownBounce 0.5s ease-out, gentleBounce 2s ease-in-out 0.5s infinite',
-                '@keyframes slideDownBounce': {
-                  '0%': {
-                    opacity: 0,
-                    transform: 'translateX(-50%) translateY(-20px)',
-                  },
-                  '60%': {
-                    opacity: 1,
-                    transform: 'translateX(-50%) translateY(2px)',
-                  },
-                  '80%': { transform: 'translateX(-50%) translateY(-1px)' },
-                  '100%': {
-                    opacity: 1,
-                    transform: 'translateX(-50%) translateY(0)',
-                  },
-                },
-                '@keyframes gentleBounce': {
-                  '0%, 100%': { transform: 'translateX(-50%) translateY(0)' },
-                  '15%': { transform: 'translateX(-50%) translateY(-4px)' },
-                  '30%': { transform: 'translateX(-50%) translateY(0)' },
-                  '45%, 100%': { transform: 'translateX(-50%) translateY(0)' },
-                },
-                '&:hover': {
-                  bgcolor: 'primary.dark',
-                  boxShadow: 4,
-                  animation: 'none', // Stop animation on hover
-                },
-                transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
               }}
             >
-              <DotIcon
-                sx={{
-                  fontSize: 12,
-                  animation: 'blink 1s ease-in-out infinite',
-                }}
-              />
-              <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                {unseenEventCount} {t('realtimeEvents.newEvents')}
-              </Typography>
-              <style>
-                {`
-                  @keyframes blink {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.3; }
-                  }
-                `}
-              </style>
-            </Box>
-          )}
-
-          <Box
-            sx={{
-              p: 2,
-              borderBottom: 1,
-              borderColor: 'divider',
-              height: '72px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 700,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-                mb: '20px',
-              }}
-            >
-              {t('realtimeEvents.eventStream')}
-            </Typography>
-          </Box>
-
-          <Box
-            ref={eventStreamRef}
-            sx={{
-              flex: 1,
-              overflowY: 'auto',
-              p: 2,
-            }}
-          >
-            {loading ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography color="text.secondary">
-                  {t('realtimeEvents.waitingForEvents')}
-                </Typography>
-              </Box>
-            ) : events.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <EventIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                  {t('realtimeEvents.noEventsYet')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  {t('realtimeEvents.noEventsDescription')}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: 'block', fontStyle: 'italic' }}
-                >
-                  {t('realtimeEvents.eventsGeneratedBy')}
-                </Typography>
-              </Box>
-            ) : (
-              <Stack spacing={0}>
-                {events.map((event, index) => {
-                  const timeDiff =
-                    index < events.length - 1
-                      ? getTimeDiff(event.createdAt, events[index + 1].createdAt)
-                      : '';
-                  const isNew = newEventIds.has(event.id);
-
-                  return (
-                    <React.Fragment key={event.id}>
-                      <Box
-                        ref={index === 0 ? firstEventRef : null}
-                        sx={{
-                          display: 'flex',
-                          gap: 1.5,
-                          py: 1.5,
-                          px: 2,
-                          cursor: 'pointer',
-                          transition: 'all 0.15s',
-                          borderLeft: '3px solid transparent',
-                          alignItems: 'center',
-                          bgcolor: isNew
-                            ? theme.palette.mode === 'dark'
-                              ? alpha(theme.palette.primary.main, 0.15)
-                              : alpha(theme.palette.primary.main, 0.08)
-                            : 'transparent',
-                          animation: isNew ? 'flashEffect 2s ease-out' : 'none',
-                          '@keyframes flashEffect': {
-                            '0%': {
-                              bgcolor:
-                                theme.palette.mode === 'dark'
-                                  ? alpha(theme.palette.primary.main, 0.25)
-                                  : alpha(theme.palette.primary.main, 0.15),
-                            },
-                            '100%': {
-                              bgcolor: 'transparent',
-                            },
-                          },
-                          '&:hover': {
-                            bgcolor:
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.03)'
-                                : 'rgba(0, 0, 0, 0.02)',
-                            borderLeftColor: getEventColor(event.action),
-                          },
-                        }}
-                        onClick={() => handleEventClick(event)}
-                      >
-                        {/* Time */}
-                        <Box
-                          sx={{
-                            flex: '0 0 80px',
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ fontWeight: 500, fontSize: '0.7rem' }}
-                          >
-                            {dayjs.utc(event.createdAt).tz(getStoredTimezone()).format('h:mm:ss A')}
-                          </Typography>
-                        </Box>
-
-                        {/* Icon */}
-                        <Box sx={{ flex: '0 0 auto' }}>
-                          <Avatar
-                            onClick={(e) => handleIconClick(event.action, e)}
-                            sx={{
-                              width: 28,
-                              height: 28,
-                              fontSize: '0.75rem',
-                              bgcolor: getEventColor(event.action),
-                              color: '#fff',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                              transition: 'all 0.2s',
-                              '&:hover': {
-                                transform: 'scale(1.1)',
-                                boxShadow: 2,
-                              },
-                            }}
-                          >
-                            {getEventIcon(event.action)}
-                          </Avatar>
-                        </Box>
-
-                        {/* Content */}
-                        <Box
-                          sx={{
-                            flex: 1,
-                            minWidth: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.25 }} noWrap>
-                              {event.action}
-                            </Typography>
-                            {event.user && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ display: 'block', fontSize: '0.7rem' }}
-                                noWrap
-                              >
-                                {event.user.name || event.user.email}
-                              </Typography>
-                            )}
-                          </Box>
-                        </Box>
-
-                        {/* Time diff indicator */}
-                        {timeDiff && (
-                          <Box sx={{ flex: '0 0 auto' }}>
-                            <Chip
-                              label={timeDiff}
-                              size="small"
-                              sx={{
-                                height: 18,
-                                fontSize: '0.65rem',
-                                bgcolor:
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(0, 0, 0, 0.05)',
-                                color: 'text.secondary',
-                                '& .MuiChip-label': { px: 0.75 },
-                              }}
-                            />
-                          </Box>
-                        )}
-                      </Box>
-
-                      {/* Divider between events */}
-                      {index < events.length - 1 && <Divider sx={{ opacity: 0.3 }} />}
-                    </React.Fragment>
-                  );
-                })}
-              </Stack>
-            )}
-          </Box>
-        </Paper>
-
-        {/* Right: Stats & Top Events OR Event Detail */}
-        <Paper
-          elevation={1}
-          sx={{
-            flex: '0 0 360px',
-            display: selectedEvent ? 'none' : 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Box
-            sx={{
-              p: 2,
-              borderBottom: 1,
-              borderColor: 'divider',
-              height: '72px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 700,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-              }}
-            >
-              {t('realtimeEvents.topEvents')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('realtimeEvents.last30Minutes')}
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              flex: 1,
-              overflowY: 'auto',
-            }}
-          >
-            {/* Stats Cards */}
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-              <Stack direction="row" spacing={1}>
-                <Box sx={{ flex: 1 }}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 1.5,
-                      textAlign: 'center',
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      border: 1,
-                      borderColor: alpha(theme.palette.primary.main, 0.3),
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                      {events.length}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: 'block', mt: 0.5 }}
-                    >
-                      {t('realtimeEvents.stats.events')}
-                    </Typography>
-                  </Paper>
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 1.5,
-                      textAlign: 'center',
-                      bgcolor: alpha(theme.palette.success.main, 0.1),
-                      border: 1,
-                      borderColor: alpha(theme.palette.success.main, 0.3),
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'success.main' }}>
-                      {uniqueUsers}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: 'block', mt: 0.5 }}
-                    >
-                      {t('realtimeEvents.stats.users')}
-                    </Typography>
-                  </Paper>
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 1.5,
-                      textAlign: 'center',
-                      bgcolor: alpha(theme.palette.info.main, 0.1),
-                      border: 1,
-                      borderColor: alpha(theme.palette.info.main, 0.3),
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'info.main' }}>
-                      {eventTypes}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: 'block', mt: 0.5 }}
-                    >
-                      {t('realtimeEvents.stats.types')}
-                    </Typography>
-                  </Paper>
-                </Box>
-              </Stack>
-            </Box>
-
-            {/* Top Events List */}
-            <Box sx={{ p: 2 }}>
-              <Stack spacing={1}>
-                {topEvents.map((stat, index) => (
-                  <Box
-                    key={stat.action}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 1,
-                      bgcolor:
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.02)'
-                          : 'rgba(0, 0, 0, 0.01)',
-                      borderLeft: 3,
-                      borderColor: getEventColor(stat.action),
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 0.5,
-                      }}
-                    >
-                      <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
-                        {stat.action}
-                      </Typography>
-                      <Chip
-                        label={stat.count}
-                        size="small"
-                        sx={{
-                          bgcolor: getEventColor(stat.action),
-                          color: '#fff',
-                          fontWeight: 700,
-                          minWidth: 32,
-                        }}
-                      />
-                    </Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {((stat.count / events.length) * 100).toFixed(1)}% of total
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
-          </Box>
-        </Paper>
-
-        {/* Right: Event Detail Panel */}
-        <Paper
-          elevation={1}
-          sx={{
-            flex: '0 0 360px',
-            display: selectedEvent ? 'flex' : 'none',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            bgcolor: 'background.paper',
-            position: 'relative',
-            animation: selectedEvent ? 'slideInRight 0.3s ease-out' : 'none',
-            '@keyframes slideInRight': {
-              from: {
-                opacity: 0,
-                transform: 'translateX(20px)',
-              },
-              to: {
-                opacity: 1,
-                transform: 'translateX(0)',
-              },
-            },
-          }}
-        >
-          {/* Header */}
-          <Box
-            sx={{
-              p: 2,
-              borderBottom: 1,
-              borderColor: 'divider',
-              height: '72px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor: selectedEvent ? getEventColor(selectedEvent.action) : 'grey',
-                }}
-              >
-                {selectedEvent ? getEventIcon(selectedEvent.action) : '?'}
-              </Avatar>
               <Typography
                 variant="subtitle2"
                 sx={{
@@ -1714,244 +976,991 @@ const RealtimeEventsPage: React.FC = () => {
                   fontSize: '0.75rem',
                 }}
               >
-                {t('realtimeEvents.eventDetails')}
+                Timeline
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('realtimeEvents.last30Minutes')}
               </Typography>
             </Box>
-            <IconButton
-              size="small"
-              onClick={() => setSelectedEvent(null)}
+
+            <Box
+              ref={timelineContainerRef}
               sx={{
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                },
+                flex: 1,
+                overflowY: 'auto',
               }}
             >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Box>
+              {loading ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('common.loading')}
+                  </Typography>
+                </Box>
+              ) : timelineGroups.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 8 }}>
+                  <TimelineIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    {t('realtimeEvents.noEventsYet')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('realtimeEvents.noEventsDescription')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Timeline
+                  sx={{
+                    p: 2,
+                    m: 0,
+                    '& .MuiTimelineItem-root': {
+                      '&:before': {
+                        content: 'none',
+                      },
+                      minHeight: 80,
+                    },
+                    '& .MuiTimelineContent-root': {
+                      py: 0,
+                      px: 2,
+                    },
+                    '& .MuiTimelineDot-root': {
+                      margin: 0,
+                    },
+                    '& .MuiTimelineConnector-root': {
+                      bgcolor:
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                      width: '2px',
+                    },
+                  }}
+                >
+                  {timelineGroups.map((group, index) => {
+                    const isChanged = changedGroupKeys.has(group.timestamp);
 
-          {/* Content */}
-          <Box
+                    return (
+                      <TimelineItem key={group.timestamp}>
+                        <TimelineSeparator>
+                          <TimelineDot
+                            sx={{
+                              bgcolor: 'transparent',
+                              boxShadow: 'none',
+                              p: 0,
+                              m: 0,
+                              position: 'relative',
+                            }}
+                          >
+                            {/* Outer glow ring */}
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                width: 56,
+                                height: 56,
+                                borderRadius: '50%',
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                animation: 'pulse 2s ease-in-out infinite',
+                                '@keyframes pulse': {
+                                  '0%, 100%': {
+                                    transform: 'scale(1)',
+                                    opacity: 0.5,
+                                  },
+                                  '50%': {
+                                    transform: 'scale(1.1)',
+                                    opacity: 0.3,
+                                  },
+                                },
+                              }}
+                            />
+                            {/* Main circle */}
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                width: 48,
+                                height: 48,
+                                borderRadius: '50%',
+                                bgcolor: 'primary.main',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.875rem',
+                                fontWeight: 700,
+                                color: 'primary.contrastText',
+                                boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                                border: 4,
+                                borderColor: 'background.paper',
+                                transition: 'all 0.3s ease',
+                                animation: isChanged ? 'rumble 0.6s ease-out' : 'none',
+                                '@keyframes rumble': {
+                                  '0%, 100%': {
+                                    transform: 'translate(0, 0) scale(1)',
+                                  },
+                                  '10%': {
+                                    transform: 'translate(-2px, -1px) scale(1.05)',
+                                  },
+                                  '20%': {
+                                    transform: 'translate(2px, 1px) scale(1.05)',
+                                  },
+                                  '30%': {
+                                    transform: 'translate(-2px, 1px) scale(1.05)',
+                                  },
+                                  '40%': {
+                                    transform: 'translate(2px, -1px) scale(1.05)',
+                                  },
+                                  '50%': {
+                                    transform: 'translate(-1px, -1px) scale(1.03)',
+                                  },
+                                  '60%': {
+                                    transform: 'translate(1px, 1px) scale(1.03)',
+                                  },
+                                  '70%': {
+                                    transform: 'translate(-1px, 1px) scale(1.02)',
+                                  },
+                                  '80%': {
+                                    transform: 'translate(1px, -1px) scale(1.02)',
+                                  },
+                                  '90%': {
+                                    transform: 'translate(-1px, 0) scale(1.01)',
+                                  },
+                                },
+                                '&:hover': {
+                                  transform: 'scale(1.1)',
+                                  boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
+                                },
+                              }}
+                            >
+                              {group.count}
+                            </Box>
+                          </TimelineDot>
+                          {index < timelineGroups.length - 1 && (
+                            <TimelineConnector sx={{ minHeight: 50 }} />
+                          )}
+                        </TimelineSeparator>
+                        <TimelineContent sx={{ pt: 1.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: 'block',
+                              mb: 1.5,
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              color: 'text.primary',
+                              letterSpacing: '0.5px',
+                            }}
+                          >
+                            {group.timeLabel}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                            {Array.from(new Set(group.events.map((e) => e.action)))
+                              .slice(0, 3)
+                              .map((action, idx) => (
+                                <Chip
+                                  key={action}
+                                  label={action}
+                                  size="small"
+                                  sx={{
+                                    height: 26,
+                                    fontSize: '0.7rem',
+                                    fontWeight: 500,
+                                    bgcolor:
+                                      theme.palette.mode === 'dark'
+                                        ? alpha(theme.palette.primary.main, 0.15)
+                                        : alpha(theme.palette.primary.main, 0.08),
+                                    color:
+                                      theme.palette.mode === 'dark'
+                                        ? 'primary.light'
+                                        : 'primary.dark',
+                                    border: 1,
+                                    borderColor:
+                                      theme.palette.mode === 'dark'
+                                        ? alpha(theme.palette.primary.main, 0.3)
+                                        : alpha(theme.palette.primary.main, 0.2),
+                                    '& .MuiChip-label': { px: 1.5 },
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                      bgcolor:
+                                        theme.palette.mode === 'dark'
+                                          ? alpha(theme.palette.primary.main, 0.25)
+                                          : alpha(theme.palette.primary.main, 0.15),
+                                      transform: 'translateY(-2px)',
+                                      boxShadow: 1,
+                                    },
+                                  }}
+                                />
+                              ))}
+                            {Array.from(new Set(group.events.map((e) => e.action))).length > 3 && (
+                              <Chip
+                                label={`+${Array.from(new Set(group.events.map((e) => e.action))).length - 3}`}
+                                size="small"
+                                sx={{
+                                  height: 26,
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600,
+                                  bgcolor:
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255, 255, 255, 0.08)'
+                                      : 'rgba(0, 0, 0, 0.06)',
+                                  color: 'text.secondary',
+                                  '& .MuiChip-label': { px: 1 },
+                                }}
+                              />
+                            )}
+                          </Box>
+                        </TimelineContent>
+                      </TimelineItem>
+                    );
+                  })}
+                </Timeline>
+              )}
+            </Box>
+          </Paper>
+
+          {/* Center: Event Stream */}
+          <Paper
+            elevation={1}
             sx={{
               flex: 1,
-              overflowY: 'auto',
-              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              bgcolor: 'background.paper',
+              position: 'relative',
             }}
           >
-            {selectedEvent && (
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('realtimeEvents.eventType')}
+            {/* New Events Notification Badge */}
+            {hasUnseenEvents && (
+              <Box
+                onClick={scrollToTop}
+                sx={{
+                  position: 'absolute',
+                  top: 16,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 10,
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 3,
+                  boxShadow: 3,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  animation:
+                    'slideDownBounce 0.5s ease-out, gentleBounce 2s ease-in-out 0.5s infinite',
+                  '@keyframes slideDownBounce': {
+                    '0%': {
+                      opacity: 0,
+                      transform: 'translateX(-50%) translateY(-20px)',
+                    },
+                    '60%': {
+                      opacity: 1,
+                      transform: 'translateX(-50%) translateY(2px)',
+                    },
+                    '80%': { transform: 'translateX(-50%) translateY(-1px)' },
+                    '100%': {
+                      opacity: 1,
+                      transform: 'translateX(-50%) translateY(0)',
+                    },
+                  },
+                  '@keyframes gentleBounce': {
+                    '0%, 100%': { transform: 'translateX(-50%) translateY(0)' },
+                    '15%': { transform: 'translateX(-50%) translateY(-4px)' },
+                    '30%': { transform: 'translateX(-50%) translateY(0)' },
+                    '45%, 100%': { transform: 'translateX(-50%) translateY(0)' },
+                  },
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: 4,
+                    animation: 'none', // Stop animation on hover
+                  },
+                  transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+                }}
+              >
+                <DotIcon
+                  sx={{
+                    fontSize: 12,
+                    animation: 'blink 1s ease-in-out infinite',
+                  }}
+                />
+                <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                  {unseenEventCount} {t('realtimeEvents.newEvents')}
+                </Typography>
+                <style>
+                  {`
+                  @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.3; }
+                  }
+                `}
+                </style>
+              </Box>
+            )}
+
+            <Box
+              sx={{
+                p: 2,
+                borderBottom: 1,
+                borderColor: 'divider',
+                height: '72px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: 'text.secondary',
+                  textTransform: 'uppercase',
+                  fontSize: '0.75rem',
+                  mb: '20px',
+                }}
+              >
+                {t('realtimeEvents.eventStream')}
+              </Typography>
+            </Box>
+
+            <Box
+              ref={eventStreamRef}
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+                p: 2,
+              }}
+            >
+              {loading ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography color="text.secondary">
+                    {t('realtimeEvents.waitingForEvents')}
                   </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      mt: 0.5,
-                    }}
+                </Box>
+              ) : events.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 8 }}>
+                  <EventIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    {t('realtimeEvents.noEventsYet')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    {t('realtimeEvents.noEventsDescription')}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', fontStyle: 'italic' }}
                   >
-                    <Chip
-                      label={selectedEvent.action}
+                    {t('realtimeEvents.eventsGeneratedBy')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Stack spacing={0}>
+                  {events.map((event, index) => {
+                    const timeDiff =
+                      index < events.length - 1
+                        ? getTimeDiff(event.createdAt, events[index + 1].createdAt)
+                        : '';
+                    const isNew = newEventIds.has(event.id);
+
+                    return (
+                      <React.Fragment key={event.id}>
+                        <Box
+                          ref={index === 0 ? firstEventRef : null}
+                          sx={{
+                            display: 'flex',
+                            gap: 1.5,
+                            py: 1.5,
+                            px: 2,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                            borderLeft: '3px solid transparent',
+                            alignItems: 'center',
+                            bgcolor: isNew
+                              ? theme.palette.mode === 'dark'
+                                ? alpha(theme.palette.primary.main, 0.15)
+                                : alpha(theme.palette.primary.main, 0.08)
+                              : 'transparent',
+                            animation: isNew ? 'flashEffect 2s ease-out' : 'none',
+                            '@keyframes flashEffect': {
+                              '0%': {
+                                bgcolor:
+                                  theme.palette.mode === 'dark'
+                                    ? alpha(theme.palette.primary.main, 0.25)
+                                    : alpha(theme.palette.primary.main, 0.15),
+                              },
+                              '100%': {
+                                bgcolor: 'transparent',
+                              },
+                            },
+                            '&:hover': {
+                              bgcolor:
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.03)'
+                                  : 'rgba(0, 0, 0, 0.02)',
+                              borderLeftColor: getEventColor(event.action),
+                            },
+                          }}
+                          onClick={() => handleEventClick(event)}
+                        >
+                          {/* Time */}
+                          <Box
+                            sx={{
+                              flex: '0 0 80px',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontWeight: 500, fontSize: '0.7rem' }}
+                            >
+                              {dayjs
+                                .utc(event.createdAt)
+                                .tz(getStoredTimezone())
+                                .format('h:mm:ss A')}
+                            </Typography>
+                          </Box>
+
+                          {/* Icon */}
+                          <Box sx={{ flex: '0 0 auto' }}>
+                            <Avatar
+                              onClick={(e) => handleIconClick(event.action, e)}
+                              sx={{
+                                width: 28,
+                                height: 28,
+                                fontSize: '0.75rem',
+                                bgcolor: getEventColor(event.action),
+                                color: '#fff',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                '&:hover': {
+                                  transform: 'scale(1.1)',
+                                  boxShadow: 2,
+                                },
+                              }}
+                            >
+                              {getEventIcon(event.action)}
+                            </Avatar>
+                          </Box>
+
+                          {/* Content */}
+                          <Box
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.25 }} noWrap>
+                                {event.action}
+                              </Typography>
+                              {event.user && (
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ display: 'block', fontSize: '0.7rem' }}
+                                  noWrap
+                                >
+                                  {event.user.name || event.user.email}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+
+                          {/* Time diff indicator */}
+                          {timeDiff && (
+                            <Box sx={{ flex: '0 0 auto' }}>
+                              <Chip
+                                label={timeDiff}
+                                size="small"
+                                sx={{
+                                  height: 18,
+                                  fontSize: '0.65rem',
+                                  bgcolor:
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255, 255, 255, 0.05)'
+                                      : 'rgba(0, 0, 0, 0.05)',
+                                  color: 'text.secondary',
+                                  '& .MuiChip-label': { px: 0.75 },
+                                }}
+                              />
+                            </Box>
+                          )}
+                        </Box>
+
+                        {/* Divider between events */}
+                        {index < events.length - 1 && <Divider sx={{ opacity: 0.3 }} />}
+                      </React.Fragment>
+                    );
+                  })}
+                </Stack>
+              )}
+            </Box>
+          </Paper>
+
+          {/* Right: Stats & Top Events OR Event Detail */}
+          <Paper
+            elevation={1}
+            sx={{
+              flex: '0 0 360px',
+              display: selectedEvent ? 'none' : 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              bgcolor: 'background.paper',
+            }}
+          >
+            <Box
+              sx={{
+                p: 2,
+                borderBottom: 1,
+                borderColor: 'divider',
+                height: '72px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: 'text.secondary',
+                  textTransform: 'uppercase',
+                  fontSize: '0.75rem',
+                }}
+              >
+                {t('realtimeEvents.topEvents')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('realtimeEvents.last30Minutes')}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+              }}
+            >
+              {/* Stats Cards */}
+              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+                <Stack direction="row" spacing={1}>
+                  <Box sx={{ flex: 1 }}>
+                    <Paper
+                      elevation={0}
                       sx={{
-                        bgcolor: alpha(getEventColor(selectedEvent.action), 0.1),
-                        color: getEventColor(selectedEvent.action),
-                        fontWeight: 600,
+                        p: 1.5,
+                        textAlign: 'center',
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        border: 1,
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
                       }}
-                    />
-                    {selectedEvent.entityType && (
-                      <Chip label={selectedEvent.entityType} variant="outlined" />
-                    )}
-                  </Box>
-                </Box>
-
-                <Divider />
-
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('realtimeEvents.timestamp')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ mt: 0.5 }}>
-                    {formatDateTimeDetailed(selectedEvent.createdAt)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    ({dayjs.utc(selectedEvent.createdAt).tz(getStoredTimezone()).fromNow()})
-                  </Typography>
-                </Box>
-
-                <Divider />
-
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('realtimeEvents.user')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ mt: 0.5 }}>
-                    {selectedEvent.user?.name || 'N/A'}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {selectedEvent.user?.email || 'System'}
-                  </Typography>
-                </Box>
-
-                <Divider />
-
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('realtimeEvents.ipAddress')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ mt: 0.5 }}>
-                    {selectedEvent.ipAddress || 'N/A'}
-                  </Typography>
-                </Box>
-
-                {selectedEvent.entityId && (
-                  <>
-                    <Divider />
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('realtimeEvents.resource')}
+                    >
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                        {events.length}
                       </Typography>
-                      <Typography variant="body1" sx={{ mt: 0.5 }}>
-                        {selectedEvent.entityType} #{selectedEvent.entityId}
-                      </Typography>
-                    </Box>
-                  </>
-                )}
-
-                {/* Show diff if both old and new values exist */}
-                {selectedEvent.oldValues && selectedEvent.newValues && (
-                  <>
-                    <Divider />
-                    <Box>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ mb: 1, display: 'block' }}
+                        sx={{ display: 'block', mt: 0.5 }}
                       >
-                        {t('realtimeEvents.changes')}
+                        {t('realtimeEvents.stats.events')}
                       </Typography>
-                      <Paper
+                    </Paper>
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 1.5,
+                        textAlign: 'center',
+                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        border: 1,
+                        borderColor: alpha(theme.palette.success.main, 0.3),
+                      }}
+                    >
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: 'success.main' }}>
+                        {uniqueUsers}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block', mt: 0.5 }}
+                      >
+                        {t('realtimeEvents.stats.users')}
+                      </Typography>
+                    </Paper>
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 1.5,
+                        textAlign: 'center',
+                        bgcolor: alpha(theme.palette.info.main, 0.1),
+                        border: 1,
+                        borderColor: alpha(theme.palette.info.main, 0.3),
+                      }}
+                    >
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: 'info.main' }}>
+                        {eventTypes}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block', mt: 0.5 }}
+                      >
+                        {t('realtimeEvents.stats.types')}
+                      </Typography>
+                    </Paper>
+                  </Box>
+                </Stack>
+              </Box>
+
+              {/* Top Events List */}
+              <Box sx={{ p: 2 }}>
+                <Stack spacing={1}>
+                  {topEvents.map((stat, index) => (
+                    <Box
+                      key={stat.action}
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 1,
+                        bgcolor:
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.02)'
+                            : 'rgba(0, 0, 0, 0.01)',
+                        borderLeft: 3,
+                        borderColor: getEventColor(stat.action),
+                      }}
+                    >
+                      <Box
                         sx={{
-                          mt: 0.5,
-                          bgcolor: 'background.default',
-                          overflow: 'hidden',
-                          '& pre': {
-                            fontSize: '0.75rem !important',
-                            fontFamily: 'monospace',
-                          },
-                          '& .diff-gutter': {
-                            minWidth: '30px',
-                          },
-                          '& .diff-code': {
-                            fontSize: '0.75rem',
-                          },
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          mb: 0.5,
                         }}
                       >
-                        <ReactDiffViewer
-                          oldValue={JSON.stringify(selectedEvent.oldValues, null, 2)}
-                          newValue={JSON.stringify(selectedEvent.newValues, null, 2)}
-                          splitView={false}
-                          compareMethod={DiffMethod.WORDS}
-                          useDarkTheme={theme.palette.mode === 'dark'}
-                          hideLineNumbers={false}
-                          showDiffOnly={true}
-                          styles={{
-                            variables: {
-                              dark: {
-                                diffViewerBackground: theme.palette.background.default,
-                                addedBackground: alpha(theme.palette.success.main, 0.2),
-                                addedColor: theme.palette.success.contrastText,
-                                removedBackground: alpha(theme.palette.error.main, 0.2),
-                                removedColor: theme.palette.error.contrastText,
-                                wordAddedBackground: alpha(theme.palette.success.main, 0.4),
-                                wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
-                                gutterBackground: theme.palette.background.paper,
-                                gutterColor: theme.palette.text.secondary,
-                              },
-                              light: {
-                                diffViewerBackground: theme.palette.background.default,
-                                addedBackground: alpha(theme.palette.success.main, 0.1),
-                                addedColor: theme.palette.text.primary,
-                                removedBackground: alpha(theme.palette.error.main, 0.1),
-                                removedColor: theme.palette.text.primary,
-                                wordAddedBackground: alpha(theme.palette.success.main, 0.3),
-                                wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
-                                gutterBackground: theme.palette.background.paper,
-                                gutterColor: theme.palette.text.secondary,
-                              },
-                            },
+                        <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                          {stat.action}
+                        </Typography>
+                        <Chip
+                          label={stat.count}
+                          size="small"
+                          sx={{
+                            bgcolor: getEventColor(stat.action),
+                            color: '#fff',
+                            fontWeight: 700,
+                            minWidth: 32,
                           }}
                         />
-                      </Paper>
-                    </Box>
-                  </>
-                )}
-
-                {/* Show only old values if new values don't exist */}
-                {selectedEvent.oldValues && !selectedEvent.newValues && (
-                  <>
-                    <Divider />
-                    <Box>
+                      </Box>
                       <Typography variant="caption" color="text.secondary">
-                        {t('realtimeEvents.oldValues')}
+                        {((stat.count / events.length) * 100).toFixed(1)}% of total
                       </Typography>
-                      <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
-                        <pre
-                          style={{
-                            margin: 0,
-                            fontSize: '0.75rem',
-                            overflow: 'auto',
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            </Box>
+          </Paper>
+
+          {/* Right: Event Detail Panel */}
+          <Paper
+            elevation={1}
+            sx={{
+              flex: '0 0 360px',
+              display: selectedEvent ? 'flex' : 'none',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              bgcolor: 'background.paper',
+              position: 'relative',
+              animation: selectedEvent ? 'slideInRight 0.3s ease-out' : 'none',
+              '@keyframes slideInRight': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateX(20px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateX(0)',
+                },
+              },
+            }}
+          >
+            {/* Header */}
+            <Box
+              sx={{
+                p: 2,
+                borderBottom: 1,
+                borderColor: 'divider',
+                height: '72px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: selectedEvent ? getEventColor(selectedEvent.action) : 'grey',
+                  }}
+                >
+                  {selectedEvent ? getEventIcon(selectedEvent.action) : '?'}
+                </Avatar>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 700,
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {t('realtimeEvents.eventDetails')}
+                </Typography>
+              </Box>
+              <IconButton
+                size="small"
+                onClick={() => setSelectedEvent(null)}
+                sx={{
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+            {/* Content */}
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+                p: 2,
+              }}
+            >
+              {selectedEvent && (
+                <Stack spacing={2}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('realtimeEvents.eventType')}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        mt: 0.5,
+                      }}
+                    >
+                      <Chip
+                        label={selectedEvent.action}
+                        sx={{
+                          bgcolor: alpha(getEventColor(selectedEvent.action), 0.1),
+                          color: getEventColor(selectedEvent.action),
+                          fontWeight: 600,
+                        }}
+                      />
+                      {selectedEvent.entityType && (
+                        <Chip label={selectedEvent.entityType} variant="outlined" />
+                      )}
+                    </Box>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('realtimeEvents.timestamp')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mt: 0.5 }}>
+                      {formatDateTimeDetailed(selectedEvent.createdAt)}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      ({dayjs.utc(selectedEvent.createdAt).tz(getStoredTimezone()).fromNow()})
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('realtimeEvents.user')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mt: 0.5 }}>
+                      {selectedEvent.user?.name || 'N/A'}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {selectedEvent.user?.email || 'System'}
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('realtimeEvents.ipAddress')}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mt: 0.5 }}>
+                      {selectedEvent.ipAddress || 'N/A'}
+                    </Typography>
+                  </Box>
+
+                  {selectedEvent.entityId && (
+                    <>
+                      <Divider />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('realtimeEvents.resource')}
+                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 0.5 }}>
+                          {selectedEvent.entityType} #{selectedEvent.entityId}
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+
+                  {/* Show diff if both old and new values exist */}
+                  {selectedEvent.oldValues && selectedEvent.newValues && (
+                    <>
+                      <Divider />
+                      <Box>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 1, display: 'block' }}
+                        >
+                          {t('realtimeEvents.changes')}
+                        </Typography>
+                        <Paper
+                          sx={{
+                            mt: 0.5,
+                            bgcolor: 'background.default',
+                            overflow: 'hidden',
+                            '& pre': {
+                              fontSize: '0.75rem !important',
+                              fontFamily: 'monospace',
+                            },
+                            '& .diff-gutter': {
+                              minWidth: '30px',
+                            },
+                            '& .diff-code': {
+                              fontSize: '0.75rem',
+                            },
                           }}
                         >
-                          {JSON.stringify(selectedEvent.oldValues, null, 2)}
-                        </pre>
-                      </Paper>
-                    </Box>
-                  </>
-                )}
+                          <ReactDiffViewer
+                            oldValue={JSON.stringify(selectedEvent.oldValues, null, 2)}
+                            newValue={JSON.stringify(selectedEvent.newValues, null, 2)}
+                            splitView={false}
+                            compareMethod={DiffMethod.WORDS}
+                            useDarkTheme={theme.palette.mode === 'dark'}
+                            hideLineNumbers={false}
+                            showDiffOnly={true}
+                            styles={{
+                              variables: {
+                                dark: {
+                                  diffViewerBackground: theme.palette.background.default,
+                                  addedBackground: alpha(theme.palette.success.main, 0.2),
+                                  addedColor: theme.palette.success.contrastText,
+                                  removedBackground: alpha(theme.palette.error.main, 0.2),
+                                  removedColor: theme.palette.error.contrastText,
+                                  wordAddedBackground: alpha(theme.palette.success.main, 0.4),
+                                  wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
+                                  gutterBackground: theme.palette.background.paper,
+                                  gutterColor: theme.palette.text.secondary,
+                                },
+                                light: {
+                                  diffViewerBackground: theme.palette.background.default,
+                                  addedBackground: alpha(theme.palette.success.main, 0.1),
+                                  addedColor: theme.palette.text.primary,
+                                  removedBackground: alpha(theme.palette.error.main, 0.1),
+                                  removedColor: theme.palette.text.primary,
+                                  wordAddedBackground: alpha(theme.palette.success.main, 0.3),
+                                  wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
+                                  gutterBackground: theme.palette.background.paper,
+                                  gutterColor: theme.palette.text.secondary,
+                                },
+                              },
+                            }}
+                          />
+                        </Paper>
+                      </Box>
+                    </>
+                  )}
 
-                {/* Show only new values if old values don't exist */}
-                {!selectedEvent.oldValues && selectedEvent.newValues && (
-                  <>
-                    <Divider />
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('realtimeEvents.newValues')}
-                      </Typography>
-                      <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
-                        <pre
-                          style={{
-                            margin: 0,
-                            fontSize: '0.75rem',
-                            overflow: 'auto',
-                          }}
-                        >
-                          {JSON.stringify(selectedEvent.newValues, null, 2)}
-                        </pre>
-                      </Paper>
-                    </Box>
-                  </>
-                )}
+                  {/* Show only old values if new values don't exist */}
+                  {selectedEvent.oldValues && !selectedEvent.newValues && (
+                    <>
+                      <Divider />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('realtimeEvents.oldValues')}
+                        </Typography>
+                        <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
+                          <pre
+                            style={{
+                              margin: 0,
+                              fontSize: '0.75rem',
+                              overflow: 'auto',
+                            }}
+                          >
+                            {JSON.stringify(selectedEvent.oldValues, null, 2)}
+                          </pre>
+                        </Paper>
+                      </Box>
+                    </>
+                  )}
 
-                {selectedEvent.userAgent && (
-                  <>
-                    <Divider />
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('realtimeEvents.userAgent')}
-                      </Typography>
-                      <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-all' }}>
-                        {selectedEvent.userAgent}
-                      </Typography>
-                    </Box>
-                  </>
-                )}
-              </Stack>
-            )}
-          </Box>
-        </Paper>
-      </Box>
+                  {/* Show only new values if old values don't exist */}
+                  {!selectedEvent.oldValues && selectedEvent.newValues && (
+                    <>
+                      <Divider />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('realtimeEvents.newValues')}
+                        </Typography>
+                        <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
+                          <pre
+                            style={{
+                              margin: 0,
+                              fontSize: '0.75rem',
+                              overflow: 'auto',
+                            }}
+                          >
+                            {JSON.stringify(selectedEvent.newValues, null, 2)}
+                          </pre>
+                        </Paper>
+                      </Box>
+                    </>
+                  )}
+
+                  {selectedEvent.userAgent && (
+                    <>
+                      <Divider />
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('realtimeEvents.userAgent')}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-all' }}>
+                          {selectedEvent.userAgent}
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                </Stack>
+              )}
+            </Box>
+          </Paper>
+        </Box>
+      </PageContentLoader>
 
       {/* Icon Customization Dialog */}
       <IconCustomizationDialog

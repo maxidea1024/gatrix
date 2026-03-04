@@ -57,6 +57,7 @@ import signalEndpointService, { SignalEndpoint } from '@/services/signalEndpoint
 import { ErrorCodes, extractErrorCode } from '@gatrix/shared';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 // Action type options
 const ACTION_TYPES = [
   { value: 'TOGGLE_FLAG', labelKey: 'actionSets.actionTypes.toggleFlag' },
@@ -723,7 +724,11 @@ const ActionSetsPage: React.FC = () => {
                                       </TableCell>
                                       <TableCell>{event.signalId || '-'}</TableCell>
                                       <TableCell>
-                                        {new Date(event.createdAt).toLocaleString()}
+                                        <Tooltip title={formatDateTimeDetailed(event.createdAt)}>
+                                          <Typography variant="body2">
+                                            {formatRelativeTime(event.createdAt)}
+                                          </Typography>
+                                        </Tooltip>
                                       </TableCell>
                                     </TableRow>
                                   ))}

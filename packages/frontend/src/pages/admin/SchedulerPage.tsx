@@ -65,6 +65,7 @@ import enLocale from '@fullcalendar/core/locales/en-gb';
 import zhLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 
@@ -417,40 +418,42 @@ const SchedulerPage: React.FC = () => {
       </Box>
 
       {/* Calendar */}
-      <Card>
-        <CardContent>
-          {loading && <LinearProgress sx={{ mb: 2 }} />}
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay',
-            }}
-            initialView="dayGridMonth"
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={true}
-            events={events}
-            select={handleDateSelect}
-            eventClick={handleEventClick}
-            height="auto"
-            locale={getCalendarLocale()}
-            buttonText={getButtonText()}
-            eventDisplay="block"
-            eventTimeFormat={{
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }}
-            nowIndicator={true}
-            scrollTime="09:00:00"
-          />
-        </CardContent>
-      </Card>
+      <PageContentLoader loading={loading}>
+        <Card>
+          <CardContent>
+            {loading && <LinearProgress sx={{ mb: 2 }} />}
+            <FullCalendar
+              ref={calendarRef}
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay',
+              }}
+              initialView="dayGridMonth"
+              editable={true}
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={true}
+              weekends={true}
+              events={events}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              height="auto"
+              locale={getCalendarLocale()}
+              buttonText={getButtonText()}
+              eventDisplay="block"
+              eventTimeFormat={{
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              }}
+              nowIndicator={true}
+              scrollTime="09:00:00"
+            />
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       {/* Add/Edit Event Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>

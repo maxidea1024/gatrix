@@ -31,7 +31,9 @@ import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { orgProjectService, Project } from '@/services/orgProjectService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import dayjs from 'dayjs';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import ResizableDrawer from '@/components/common/ResizableDrawer';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -46,6 +48,11 @@ const ProjectsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [formData, setFormData] = useState({
+    projectName: '',
+    displayName: '',
+    description: '',
+  });
+  const [initialFormData, setInitialFormData] = useState({
     projectName: '',
     displayName: '',
     description: '',
@@ -84,14 +91,19 @@ const ProjectsPage: React.FC = () => {
   // Open edit dialog
   const handleEdit = (proj: Project) => {
     setDialogMode('edit');
-    setFormData({
+    const data = {
       projectName: proj.projectName,
       displayName: proj.displayName || '',
       description: proj.description || '',
-    });
+    };
+    setFormData(data);
+    setInitialFormData(data);
     setEditId(proj.id);
     setDialogOpen(true);
   };
+
+  const isEditDirty =
+    dialogMode === 'create' || JSON.stringify(formData) !== JSON.stringify(initialFormData);
 
   // Save
   const handleSave = async () => {
@@ -159,127 +171,152 @@ const ProjectsPage: React.FC = () => {
         </Button>
       </Box>
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : projects.length === 0 ? (
-        <EmptyPlaceholder
-          message={t('rbac.projects.emptyTitle')}
-          description={t('rbac.projects.emptyDescription')}
-        />
-      ) : (
-        <TableContainer component={Paper} variant="outlined">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('rbac.projects.name')}</TableCell>
-                <TableCell>{t('rbac.projects.displayName')}</TableCell>
-                <TableCell>{t('rbac.projects.descriptionColumn')}</TableCell>
-                <TableCell align="center">{t('rbac.projects.default')}</TableCell>
-                <TableCell align="center">{t('rbac.orgs.status')}</TableCell>
-                <TableCell>{t('common.createdAt')}</TableCell>
-                <TableCell align="right">{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {projects.map((proj) => (
-                <TableRow key={proj.id} hover>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ProjectIcon fontSize="small" sx={{ opacity: 0.6 }} />
-                      <Typography variant="body2" fontWeight={600}>
-                        {proj.projectName}
+      <PageContentLoader loading={loading}>
+        {projects.length === 0 ? (
+          <EmptyPlaceholder
+            message={t('rbac.projects.emptyTitle')}
+            description={t('rbac.projects.emptyDescription')}
+          />
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('rbac.projects.name')}</TableCell>
+                  <TableCell>{t('rbac.projects.displayName')}</TableCell>
+                  <TableCell>{t('rbac.projects.descriptionColumn')}</TableCell>
+                  <TableCell align="center">{t('rbac.projects.default')}</TableCell>
+                  <TableCell align="center">{t('rbac.orgs.status')}</TableCell>
+                  <TableCell>{t('common.createdAt')}</TableCell>
+                  <TableCell align="right">{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {projects.map((proj) => (
+                  <TableRow key={proj.id} hover>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <ProjectIcon fontSize="small" sx={{ opacity: 0.6 }} />
+                        <Typography variant="body2" fontWeight={600}>
+                          {proj.projectName}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{proj.displayName}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300 }} noWrap>
+                        {proj.description || '—'}
                       </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>{proj.displayName}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300 }} noWrap>
-                      {proj.description || '—'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    {proj.isDefault ? (
-                      <Chip label={t('common.yes')} size="small" color="primary" />
-                    ) : (
-                      <Chip label={t('common.no')} size="small" variant="outlined" />
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    {proj.isActive ? (
-                      <Chip label={t('common.active')} size="small" color="success" />
-                    ) : (
-                      <Chip label={t('common.inactive')} size="small" variant="outlined" />
-                    )}
-                  </TableCell>
-                  <TableCell>{dayjs(proj.createdAt).format('YYYY-MM-DD HH:mm')}</TableCell>
-                  <TableCell align="right">
-                    <Tooltip title={t('common.edit')}>
-                      <IconButton size="small" onClick={() => handleEdit(proj)}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    {!proj.isDefault && (
-                      <Tooltip title={t('common.delete')}>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => {
-                            setDeleteTarget(proj);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <DeleteIcon fontSize="small" />
+                    </TableCell>
+                    <TableCell align="center">
+                      {proj.isDefault ? (
+                        <Chip label={t('common.yes')} size="small" color="primary" />
+                      ) : (
+                        <Chip label={t('common.no')} size="small" variant="outlined" />
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {proj.isActive ? (
+                        <Chip label={t('common.active')} size="small" color="success" />
+                      ) : (
+                        <Chip label={t('common.inactive')} size="small" variant="outlined" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Tooltip title={formatDateTimeDetailed(proj.createdAt)}>
+                        <Typography variant="body2">
+                          {formatRelativeTime(proj.createdAt)}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Tooltip title={t('common.edit')}>
+                        <IconButton size="small" onClick={() => handleEdit(proj)}>
+                          <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                      {!proj.isDefault && (
+                        <Tooltip title={t('common.delete')}>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => {
+                              setDeleteTarget(proj);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </PageContentLoader>
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {dialogMode === 'create' ? t('rbac.projects.createTitle') : t('rbac.projects.editTitle')}
-        </DialogTitle>
-        <DialogContent>
+      {/* Create/Edit Drawer */}
+      <ResizableDrawer
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={
+          dialogMode === 'create' ? t('rbac.projects.createTitle') : t('rbac.projects.editTitle')
+        }
+        storageKey="projectsDrawerWidth"
+        defaultWidth={450}
+        minWidth={380}
+      >
+        <Box
+          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
           <TextField
             fullWidth
-            margin="normal"
+            size="small"
             label={t('rbac.projects.name')}
             value={formData.projectName}
             onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
             disabled={dialogMode === 'edit'}
+            autoFocus
           />
           <TextField
             fullWidth
-            margin="normal"
+            size="small"
             label={t('rbac.projects.displayName')}
             value={formData.displayName}
             onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
           />
           <TextField
             fullWidth
-            margin="normal"
+            size="small"
             label={t('rbac.projects.descriptionColumn')}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             multiline
             rows={3}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving}>
+        </Box>
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button onClick={() => setDialogOpen(false)} disabled={saving}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="contained" onClick={handleSave} disabled={saving || !isEditDirty}>
             {saving ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </ResizableDrawer>
 
       {/* Delete Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>

@@ -73,6 +73,7 @@ import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatRelativeTime } from '../../utils/dateFormat';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 // ==================== Strategy Types ====================
 const STRATEGY_TYPES = [
@@ -1437,136 +1438,36 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading && isInitialLoad ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : templates.length === 0 ? (
-            <EmptyPlaceholder
-              message={t('releaseFlow.noTemplatesFound')}
-              description={canManage ? t('releaseFlow.templatesSubtitle') : undefined}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('releaseFlow.addTemplate')}
-            />
-          ) : (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      {visibleColumns.map((column) => {
-                        if (column.id === 'checkbox') {
-                          if (!canManage) return null;
-                          return (
-                            <TableCell key={column.id} padding="checkbox">
-                              <Checkbox
-                                indeterminate={
-                                  selectedIds.length > 0 && selectedIds.length < templates.length
-                                }
-                                checked={
-                                  templates.length > 0 && selectedIds.length === templates.length
-                                }
-                                onChange={handleSelectAll}
-                              />
-                            </TableCell>
-                          );
-                        }
-                        if (column.id === 'actions') {
-                          if (!canManage) return null;
-                          return (
-                            <TableCell key={column.id} align="center">
-                              {t(column.labelKey)}
-                            </TableCell>
-                          );
-                        }
-                        const isSortable = ['name', 'createdAt'].includes(column.id);
-                        return (
-                          <TableCell key={column.id}>
-                            {isSortable ? (
-                              <TableSortLabel
-                                active={orderBy === column.id}
-                                direction={orderBy === column.id ? order : 'asc'}
-                                onClick={() => handleSort(column.id)}
-                              >
-                                {t(column.labelKey)}
-                              </TableSortLabel>
-                            ) : (
-                              t(column.labelKey)
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {templates.map((template) => (
-                      <TableRow
-                        key={template.id}
-                        hover
-                        selected={selectedIds.includes(template.id)}
-                      >
+      <PageContentLoader loading={loading && isInitialLoad}>
+        <Card>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            {templates.length === 0 ? (
+              <EmptyPlaceholder
+                message={t('releaseFlow.noTemplatesFound')}
+                description={canManage ? t('releaseFlow.templatesSubtitle') : undefined}
+                onAddClick={canManage ? handleCreate : undefined}
+                addButtonLabel={t('releaseFlow.addTemplate')}
+              />
+            ) : (
+              <>
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
                         {visibleColumns.map((column) => {
                           if (column.id === 'checkbox') {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} padding="checkbox">
                                 <Checkbox
-                                  checked={selectedIds.includes(template.id)}
-                                  onChange={() => handleSelectOne(template.id)}
+                                  indeterminate={
+                                    selectedIds.length > 0 && selectedIds.length < templates.length
+                                  }
+                                  checked={
+                                    templates.length > 0 && selectedIds.length === templates.length
+                                  }
+                                  onChange={handleSelectAll}
                                 />
-                              </TableCell>
-                            );
-                          }
-                          if (column.id === 'name') {
-                            return (
-                              <TableCell key={column.id}>
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{
-                                    cursor: 'pointer',
-                                    '&:hover': { textDecoration: 'underline' },
-                                  }}
-                                  onClick={() => handleEdit(template)}
-                                >
-                                  {template.displayName || template.flowName}
-                                </Typography>
-                                {template.displayName &&
-                                  template.displayName !== template.flowName && (
-                                    <Typography variant="caption" color="text.secondary">
-                                      {template.flowName}
-                                    </Typography>
-                                  )}
-                              </TableCell>
-                            );
-                          }
-                          if (column.id === 'description') {
-                            return (
-                              <TableCell key={column.id}>
-                                <Typography variant="body2" color="text.secondary">
-                                  {template.description || '-'}
-                                </Typography>
-                              </TableCell>
-                            );
-                          }
-                          if (column.id === 'milestones') {
-                            return (
-                              <TableCell key={column.id}>
-                                <Chip
-                                  label={t('releaseFlow.milestonesCount', {
-                                    count: template.milestones?.length || 0,
-                                  })}
-                                  size="small"
-                                  variant="outlined"
-                                />
-                              </TableCell>
-                            );
-                          }
-                          if (column.id === 'createdAt') {
-                            return (
-                              <TableCell key={column.id}>
-                                {formatRelativeTime(template.createdAt)}
                               </TableCell>
                             );
                           }
@@ -1574,53 +1475,151 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
-                                  }}
-                                >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton size="small" onClick={() => handleEdit(template)}>
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleDeleteClick(template)}
-                                    >
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
+                                {t(column.labelKey)}
                               </TableCell>
                             );
                           }
-                          return null;
+                          const isSortable = ['name', 'createdAt'].includes(column.id);
+                          return (
+                            <TableCell key={column.id}>
+                              {isSortable ? (
+                                <TableSortLabel
+                                  active={orderBy === column.id}
+                                  direction={orderBy === column.id ? order : 'asc'}
+                                  onClick={() => handleSort(column.id)}
+                                >
+                                  {t(column.labelKey)}
+                                </TableSortLabel>
+                              ) : (
+                                t(column.labelKey)
+                              )}
+                            </TableCell>
+                          );
                         })}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {templates.map((template) => (
+                        <TableRow
+                          key={template.id}
+                          hover
+                          selected={selectedIds.includes(template.id)}
+                        >
+                          {visibleColumns.map((column) => {
+                            if (column.id === 'checkbox') {
+                              if (!canManage) return null;
+                              return (
+                                <TableCell key={column.id} padding="checkbox">
+                                  <Checkbox
+                                    checked={selectedIds.includes(template.id)}
+                                    onChange={() => handleSelectOne(template.id)}
+                                  />
+                                </TableCell>
+                              );
+                            }
+                            if (column.id === 'name') {
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': { textDecoration: 'underline' },
+                                    }}
+                                    onClick={() => handleEdit(template)}
+                                  >
+                                    {template.displayName || template.flowName}
+                                  </Typography>
+                                  {template.displayName &&
+                                    template.displayName !== template.flowName && (
+                                      <Typography variant="caption" color="text.secondary">
+                                        {template.flowName}
+                                      </Typography>
+                                    )}
+                                </TableCell>
+                              );
+                            }
+                            if (column.id === 'description') {
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    {template.description || '-'}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            }
+                            if (column.id === 'milestones') {
+                              return (
+                                <TableCell key={column.id}>
+                                  <Chip
+                                    label={t('releaseFlow.milestonesCount', {
+                                      count: template.milestones?.length || 0,
+                                    })}
+                                    size="small"
+                                    variant="outlined"
+                                  />
+                                </TableCell>
+                              );
+                            }
+                            if (column.id === 'createdAt') {
+                              return (
+                                <TableCell key={column.id}>
+                                  {formatRelativeTime(template.createdAt)}
+                                </TableCell>
+                              );
+                            }
+                            if (column.id === 'actions') {
+                              if (!canManage) return null;
+                              return (
+                                <TableCell key={column.id} align="center">
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      gap: 0.5,
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <Tooltip title={t('common.edit')}>
+                                      <IconButton size="small" onClick={() => handleEdit(template)}>
+                                        <EditIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title={t('common.delete')}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleDeleteClick(template)}
+                                      >
+                                        <DeleteIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </TableCell>
+                              );
+                            }
+                            return null;
+                          })}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
 
-              {/* Pagination */}
-              <SimplePagination
-                page={page}
-                rowsPerPage={rowsPerPage}
-                count={total}
-                onPageChange={(_event, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(event) => {
-                  setRowsPerPage(Number(event.target.value));
-                  setPage(0);
-                }}
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+                {/* Pagination */}
+                <SimplePagination
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  count={total}
+                  onPageChange={(_event, newPage) => setPage(newPage)}
+                  onRowsPerPageChange={(event) => {
+                    setRowsPerPage(Number(event.target.value));
+                    setPage(0);
+                  }}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

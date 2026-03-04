@@ -67,6 +67,7 @@ import { ConstraintList } from '../../components/features/ConstraintDisplay';
 import { tagService } from '../../services/tagService';
 import { getContrastColor } from '../../utils/colorUtils';
 import FeatureSwitch from '../../components/common/FeatureSwitch';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface FeatureSegment {
   id: string;
@@ -621,332 +622,332 @@ const FeatureSegmentsPage: React.FC = () => {
       </Card>
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : segments.length === 0 ? (
-            <EmptyPagePlaceholder
-              message={t('featureFlags.noSegmentsFound')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('featureFlags.addSegment')}
-            />
-          ) : (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      {visibleColumns.map((col) => (
-                        <TableCell
-                          key={col.id}
-                          align={col.id === 'references' ? 'center' : undefined}
-                        >
-                          {t(col.labelKey)}
-                        </TableCell>
-                      ))}
-                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {segments.map((segment) => (
-                      <TableRow key={segment.id} hover>
-                        {visibleColumns.map((col) => {
-                          switch (col.id) {
-                            case 'visibility':
-                              return (
-                                <TableCell key={col.id}>
-                                  <FeatureSwitch
-                                    size="small"
-                                    checked={segment.isActive !== false}
-                                    onChange={async () => {
-                                      const newActive = !segment.isActive;
-                                      setAllSegments((prev) =>
-                                        prev.map((s) =>
-                                          s.id === segment.id ? { ...s, isActive: newActive } : s
-                                        )
-                                      );
-                                      try {
-                                        await api.put(
-                                          `${projectApiPath}/features/segments/${segment.id}`,
-                                          {
-                                            isActive: newActive,
-                                          }
-                                        );
-                                      } catch (error: any) {
+      <PageContentLoader loading={loading}>
+        <Card>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            {segments.length === 0 ? (
+              <EmptyPagePlaceholder
+                message={t('featureFlags.noSegmentsFound')}
+                onAddClick={canManage ? handleCreate : undefined}
+                addButtonLabel={t('featureFlags.addSegment')}
+              />
+            ) : (
+              <>
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        {visibleColumns.map((col) => (
+                          <TableCell
+                            key={col.id}
+                            align={col.id === 'references' ? 'center' : undefined}
+                          >
+                            {t(col.labelKey)}
+                          </TableCell>
+                        ))}
+                        {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {segments.map((segment) => (
+                        <TableRow key={segment.id} hover>
+                          {visibleColumns.map((col) => {
+                            switch (col.id) {
+                              case 'visibility':
+                                return (
+                                  <TableCell key={col.id}>
+                                    <FeatureSwitch
+                                      size="small"
+                                      checked={segment.isActive !== false}
+                                      onChange={async () => {
+                                        const newActive = !segment.isActive;
                                         setAllSegments((prev) =>
                                           prev.map((s) =>
-                                            s.id === segment.id ? { ...s, isActive: !newActive } : s
+                                            s.id === segment.id ? { ...s, isActive: newActive } : s
                                           )
                                         );
-                                        enqueueSnackbar(
-                                          parseApiErrorMessage(error, t('common.saveFailed')),
-                                          { variant: 'error' }
-                                        );
-                                      }
-                                    }}
-                                    disabled={!canManage}
-                                  />
-                                </TableCell>
-                              );
-                            case 'segmentName':
-                              return (
-                                <TableCell key={col.id}>
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                    }}
-                                  >
-                                    <SegmentIcon
-                                      sx={{
-                                        fontSize: 20,
-                                        mr: 1,
-                                        color: 'primary.main',
-                                      }}
-                                    />
-                                    <Box>
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 0.5,
-                                        }}
-                                      >
-                                        <Typography
-                                          fontWeight={500}
-                                          sx={{
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                              textDecoration: 'underline',
-                                            },
-                                          }}
-                                          onClick={() => handleEdit(segment)}
-                                        >
-                                          {segment.segmentName}
-                                        </Typography>
-                                        <Tooltip title={t('common.copy')}>
-                                          <IconButton
-                                            size="small"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              copyToClipboardWithNotification(
-                                                segment.segmentName,
-                                                () =>
-                                                  enqueueSnackbar(t('common.copySuccess'), {
-                                                    variant: 'success',
-                                                  }),
-                                                () =>
-                                                  enqueueSnackbar(t('common.copyFailed'), {
-                                                    variant: 'error',
-                                                  })
-                                              );
-                                            }}
-                                            sx={{
-                                              opacity: 0.5,
-                                              '&:hover': { opacity: 1 },
-                                            }}
-                                          >
-                                            <CopyIcon sx={{ fontSize: 14 }} />
-                                          </IconButton>
-                                        </Tooltip>
-                                      </Box>
-                                      {segment.displayName &&
-                                        segment.displayName !== segment.segmentName && (
-                                          <Typography
-                                            variant="body2"
-                                            color="text.secondary"
-                                            sx={{ fontSize: '0.8rem' }}
-                                          >
-                                            {segment.displayName}
-                                          </Typography>
-                                        )}
-                                    </Box>
-                                  </Box>
-                                </TableCell>
-                              );
-                            case 'constraints':
-                              return (
-                                <TableCell key={col.id}>
-                                  {segment.constraints && segment.constraints.length > 0 ? (
-                                    <Box>
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 0.5,
-                                          cursor: 'pointer',
-                                        }}
-                                        onClick={() => {
-                                          setExpandedConstraints((prev) => {
-                                            const newSet = new Set(prev);
-                                            if (newSet.has(segment.id)) {
-                                              newSet.delete(segment.id);
-                                            } else {
-                                              newSet.add(segment.id);
+                                        try {
+                                          await api.put(
+                                            `${projectApiPath}/features/segments/${segment.id}`,
+                                            {
+                                              isActive: newActive,
                                             }
-                                            return newSet;
-                                          });
-                                        }}
-                                      >
-                                        <Chip label={segment.constraints.length} size="small" />
-                                        {expandedConstraints.has(segment.id) ? (
-                                          <ExpandLessIcon fontSize="small" />
-                                        ) : (
-                                          <ExpandMoreIcon fontSize="small" />
-                                        )}
-                                      </Box>
-                                      {expandedConstraints.has(segment.id) && (
-                                        <Box sx={{ mt: 1 }}>
-                                          <ConstraintList
-                                            constraints={segment.constraints}
-                                            contextFields={contextFields}
-                                          />
-                                        </Box>
-                                      )}
-                                    </Box>
-                                  ) : (
-                                    <Typography variant="body2" color="text.disabled">
-                                      -
-                                    </Typography>
-                                  )}
-                                </TableCell>
-                              );
-                            case 'tags':
-                              return (
-                                <TableCell key={col.id}>
-                                  {segment.tags && segment.tags.length > 0 ? (
+                                          );
+                                        } catch (error: any) {
+                                          setAllSegments((prev) =>
+                                            prev.map((s) =>
+                                              s.id === segment.id
+                                                ? { ...s, isActive: !newActive }
+                                                : s
+                                            )
+                                          );
+                                          enqueueSnackbar(
+                                            parseApiErrorMessage(error, t('common.saveFailed')),
+                                            { variant: 'error' }
+                                          );
+                                        }
+                                      }}
+                                      disabled={!canManage}
+                                    />
+                                  </TableCell>
+                                );
+                              case 'segmentName':
+                                return (
+                                  <TableCell key={col.id}>
                                     <Box
                                       sx={{
                                         display: 'flex',
-                                        flexWrap: 'wrap',
-                                        gap: 0.5,
+                                        alignItems: 'center',
                                       }}
                                     >
-                                      {segment.tags.map((tagName, idx) => {
-                                        const tagData = allTags.find((t) => t.name === tagName);
-                                        const color = tagData?.color || '#888888';
-                                        return (
-                                          <Tooltip
-                                            key={idx}
-                                            title={tagData?.description || ''}
-                                            arrow
-                                          >
-                                            <Chip
-                                              label={tagName}
-                                              size="small"
-                                              sx={{
-                                                bgcolor: color,
-                                                color: getContrastColor(color),
-                                                fontSize: '0.75rem',
-                                              }}
-                                            />
-                                          </Tooltip>
-                                        );
-                                      })}
-                                    </Box>
-                                  ) : (
-                                    <Typography variant="body2" color="text.disabled">
-                                      -
-                                    </Typography>
-                                  )}
-                                </TableCell>
-                              );
-                            case 'references':
-                              return (
-                                <TableCell key={col.id} align="center">
-                                  {(segment.referenceCount ?? 0) > 0 ? (
-                                    <Tooltip title={t('common.viewReferences')}>
-                                      <Chip
-                                        label={segment.referenceCount}
-                                        size="small"
-                                        color="primary"
-                                        variant="outlined"
-                                        onClick={() => handleViewReferences(segment)}
-                                        sx={{ cursor: 'pointer', minWidth: 32 }}
+                                      <SegmentIcon
+                                        sx={{
+                                          fontSize: 20,
+                                          mr: 1,
+                                          color: 'primary.main',
+                                        }}
                                       />
-                                    </Tooltip>
-                                  ) : (
-                                    <Typography variant="body2" color="text.disabled">
-                                      {t('common.noReferences')}
-                                    </Typography>
-                                  )}
-                                </TableCell>
-                              );
-                            case 'createdBy':
-                              return (
-                                <TableCell key={col.id}>
-                                  <Box>
-                                    <Typography variant="body2" fontWeight={500}>
-                                      {segment.createdByName || '-'}
-                                    </Typography>
-                                    {segment.createdByEmail && (
-                                      <Typography
-                                        variant="body2"
-                                        color="text.secondary"
-                                        sx={{ fontSize: '0.8rem' }}
-                                      >
-                                        {segment.createdByEmail}
+                                      <Box>
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                          }}
+                                        >
+                                          <Typography
+                                            fontWeight={500}
+                                            sx={{
+                                              cursor: 'pointer',
+                                              '&:hover': {
+                                                textDecoration: 'underline',
+                                              },
+                                            }}
+                                            onClick={() => handleEdit(segment)}
+                                          >
+                                            {segment.segmentName}
+                                          </Typography>
+                                          <Tooltip title={t('common.copy')}>
+                                            <IconButton
+                                              size="small"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                copyToClipboardWithNotification(
+                                                  segment.segmentName,
+                                                  () =>
+                                                    enqueueSnackbar(t('common.copySuccess'), {
+                                                      variant: 'success',
+                                                    }),
+                                                  () =>
+                                                    enqueueSnackbar(t('common.copyFailed'), {
+                                                      variant: 'error',
+                                                    })
+                                                );
+                                              }}
+                                              sx={{
+                                                opacity: 0.5,
+                                                '&:hover': { opacity: 1 },
+                                              }}
+                                            >
+                                              <CopyIcon sx={{ fontSize: 14 }} />
+                                            </IconButton>
+                                          </Tooltip>
+                                        </Box>
+                                        {segment.displayName &&
+                                          segment.displayName !== segment.segmentName && (
+                                            <Typography
+                                              variant="body2"
+                                              color="text.secondary"
+                                              sx={{ fontSize: '0.8rem' }}
+                                            >
+                                              {segment.displayName}
+                                            </Typography>
+                                          )}
+                                      </Box>
+                                    </Box>
+                                  </TableCell>
+                                );
+                              case 'constraints':
+                                return (
+                                  <TableCell key={col.id}>
+                                    {segment.constraints && segment.constraints.length > 0 ? (
+                                      <Box>
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                            cursor: 'pointer',
+                                          }}
+                                          onClick={() => {
+                                            setExpandedConstraints((prev) => {
+                                              const newSet = new Set(prev);
+                                              if (newSet.has(segment.id)) {
+                                                newSet.delete(segment.id);
+                                              } else {
+                                                newSet.add(segment.id);
+                                              }
+                                              return newSet;
+                                            });
+                                          }}
+                                        >
+                                          <Chip label={segment.constraints.length} size="small" />
+                                          {expandedConstraints.has(segment.id) ? (
+                                            <ExpandLessIcon fontSize="small" />
+                                          ) : (
+                                            <ExpandMoreIcon fontSize="small" />
+                                          )}
+                                        </Box>
+                                        {expandedConstraints.has(segment.id) && (
+                                          <Box sx={{ mt: 1 }}>
+                                            <ConstraintList
+                                              constraints={segment.constraints}
+                                              contextFields={contextFields}
+                                            />
+                                          </Box>
+                                        )}
+                                      </Box>
+                                    ) : (
+                                      <Typography variant="body2" color="text.disabled">
+                                        -
                                       </Typography>
                                     )}
-                                  </Box>
-                                </TableCell>
-                              );
-                            case 'createdAt':
-                              return (
-                                <TableCell key={col.id}>
-                                  <Tooltip title={formatDateTimeDetailed(segment.createdAt)}>
-                                    <span>{formatRelativeTime(segment.createdAt)}</span>
-                                  </Tooltip>
-                                </TableCell>
-                              );
-                            default:
-                              return <TableCell key={col.id}>-</TableCell>;
-                          }
-                        })}
-                        {canManage && (
-                          <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton size="small" onClick={() => handleEdit(segment)}>
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton size="small" onClick={() => handleDelete(segment)}>
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <SimplePagination
-                page={page}
-                rowsPerPage={rowsPerPage}
-                count={filteredTotal}
-                onPageChange={(_, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setPage(0);
-                }}
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+                                  </TableCell>
+                                );
+                              case 'tags':
+                                return (
+                                  <TableCell key={col.id}>
+                                    {segment.tags && segment.tags.length > 0 ? (
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          flexWrap: 'wrap',
+                                          gap: 0.5,
+                                        }}
+                                      >
+                                        {segment.tags.map((tagName, idx) => {
+                                          const tagData = allTags.find((t) => t.name === tagName);
+                                          const color = tagData?.color || '#888888';
+                                          return (
+                                            <Tooltip
+                                              key={idx}
+                                              title={tagData?.description || ''}
+                                              arrow
+                                            >
+                                              <Chip
+                                                label={tagName}
+                                                size="small"
+                                                sx={{
+                                                  bgcolor: color,
+                                                  color: getContrastColor(color),
+                                                  fontSize: '0.75rem',
+                                                }}
+                                              />
+                                            </Tooltip>
+                                          );
+                                        })}
+                                      </Box>
+                                    ) : (
+                                      <Typography variant="body2" color="text.disabled">
+                                        -
+                                      </Typography>
+                                    )}
+                                  </TableCell>
+                                );
+                              case 'references':
+                                return (
+                                  <TableCell key={col.id} align="center">
+                                    {(segment.referenceCount ?? 0) > 0 ? (
+                                      <Tooltip title={t('common.viewReferences')}>
+                                        <Chip
+                                          label={segment.referenceCount}
+                                          size="small"
+                                          color="primary"
+                                          variant="outlined"
+                                          onClick={() => handleViewReferences(segment)}
+                                          sx={{ cursor: 'pointer', minWidth: 32 }}
+                                        />
+                                      </Tooltip>
+                                    ) : (
+                                      <Typography variant="body2" color="text.disabled">
+                                        {t('common.noReferences')}
+                                      </Typography>
+                                    )}
+                                  </TableCell>
+                                );
+                              case 'createdBy':
+                                return (
+                                  <TableCell key={col.id}>
+                                    <Box>
+                                      <Typography variant="body2" fontWeight={500}>
+                                        {segment.createdByName || '-'}
+                                      </Typography>
+                                      {segment.createdByEmail && (
+                                        <Typography
+                                          variant="body2"
+                                          color="text.secondary"
+                                          sx={{ fontSize: '0.8rem' }}
+                                        >
+                                          {segment.createdByEmail}
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  </TableCell>
+                                );
+                              case 'createdAt':
+                                return (
+                                  <TableCell key={col.id}>
+                                    <Tooltip title={formatDateTimeDetailed(segment.createdAt)}>
+                                      <span>{formatRelativeTime(segment.createdAt)}</span>
+                                    </Tooltip>
+                                  </TableCell>
+                                );
+                              default:
+                                return <TableCell key={col.id}>-</TableCell>;
+                            }
+                          })}
+                          {canManage && (
+                            <TableCell align="center">
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  gap: 0.5,
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <Tooltip title={t('common.edit')}>
+                                  <IconButton size="small" onClick={() => handleEdit(segment)}>
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title={t('common.delete')}>
+                                  <IconButton size="small" onClick={() => handleDelete(segment)}>
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <SimplePagination
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  count={filteredTotal}
+                  onPageChange={(_, newPage) => setPage(newPage)}
+                  onRowsPerPageChange={(e) => {
+                    setRowsPerPage(Number(e.target.value));
+                    setPage(0);
+                  }}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       {/* Edit Drawer */}
       <ResizableDrawer

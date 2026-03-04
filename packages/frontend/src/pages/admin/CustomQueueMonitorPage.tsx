@@ -39,6 +39,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import apiClient from '@/services/api';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface QueueStats {
   name: string;
@@ -195,14 +196,6 @@ const CustomQueueMonitorPage: React.FC = () => {
     );
   }
 
-  if (loading) {
-    return (
-      <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ p: 3 }}>
       <Box
@@ -226,133 +219,135 @@ const CustomQueueMonitorPage: React.FC = () => {
         </Button>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+      <PageContentLoader loading={loading}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-      {/* 큐 통계 카드들 */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        {queues.map((queue) => (
-          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={queue.name}>
-            <Card
-              sx={{
-                cursor: 'pointer',
-                border: selectedQueue === queue.name ? 2 : 1,
-                borderColor: selectedQueue === queue.name ? 'primary.main' : 'divider',
-              }}
-              onClick={() => setSelectedQueue(queue.name)}
-            >
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {queue.name}
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  <Chip label={`대기: ${queue.counts?.waiting || 0}`} color="info" size="small" />
-                  <Chip
-                    label={`실행중: ${queue.counts?.active || 0}`}
-                    color="primary"
-                    size="small"
-                  />
-                  <Chip
-                    label={`완료: ${queue.counts?.completed || 0}`}
-                    color="success"
-                    size="small"
-                  />
-                  <Chip label={`실패: ${queue.counts?.failed || 0}`} color="error" size="small" />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+        {/* 큐 통계 카드들 */}
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          {queues.map((queue) => (
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={queue.name}>
+              <Card
+                sx={{
+                  cursor: 'pointer',
+                  border: selectedQueue === queue.name ? 2 : 1,
+                  borderColor: selectedQueue === queue.name ? 'primary.main' : 'divider',
+                }}
+                onClick={() => setSelectedQueue(queue.name)}
+              >
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {queue.name}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    <Chip label={`대기: ${queue.counts?.waiting || 0}`} color="info" size="small" />
+                    <Chip
+                      label={`실행중: ${queue.counts?.active || 0}`}
+                      color="primary"
+                      size="small"
+                    />
+                    <Chip
+                      label={`완료: ${queue.counts?.completed || 0}`}
+                      color="success"
+                      size="small"
+                    />
+                    <Chip label={`실패: ${queue.counts?.failed || 0}`} color="error" size="small" />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-      {/* 선택된 큐의 상세 정보 */}
-      {currentQueue && (
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              {currentQueue.name} 큐 상세
-            </Typography>
+        {/* 선택된 큐의 상세 정보 */}
+        {currentQueue && (
+          <Card>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                {currentQueue.name} 큐 상세
+              </Typography>
 
-            <Tabs
-              value={selectedTab}
-              onChange={(_, newValue) => setSelectedTab(newValue)}
-              sx={{ mb: 2 }}
-            >
-              {statusTabs.map((status, index) => (
-                <Tab key={status} label={status.toUpperCase()} />
-              ))}
-            </Tabs>
+              <Tabs
+                value={selectedTab}
+                onChange={(_, newValue) => setSelectedTab(newValue)}
+                sx={{ mb: 2 }}
+              >
+                {statusTabs.map((status, index) => (
+                  <Tab key={status} label={status.toUpperCase()} />
+                ))}
+              </Tabs>
 
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>이름</TableCell>
-                    <TableCell>상태</TableCell>
-                    <TableCell>생성시간</TableCell>
-                    <TableCell>진행률</TableCell>
-                    <TableCell>액션</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {currentQueue.jobs?.slice(0, 20).map((job) => (
-                    <TableRow key={job.id}>
-                      <TableCell>{job.id}</TableCell>
-                      <TableCell>{job.name}</TableCell>
-                      <TableCell>
-                        <Chip
-                          icon={getStatusIcon('waiting')}
-                          label="대기중"
-                          color={getStatusColor('waiting')}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>{formatTimestamp(job.timestamp)}</TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <LinearProgress
-                            variant="determinate"
-                            value={job.progress || 0}
-                            sx={{ flexGrow: 1 }}
-                          />
-                          <Typography variant="caption">{job.progress || 0}%</Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title="상세보기">
-                          <IconButton
-                            size="small"
-                            onClick={() => {
-                              setSelectedJob(job);
-                              setJobDialogOpen(true);
-                            }}
-                          >
-                            <ViewIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="재시도">
-                          <IconButton size="small" onClick={() => retryJob(job.id)}>
-                            <RetryIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="삭제">
-                          <IconButton size="small" onClick={() => deleteJob(job.id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ID</TableCell>
+                      <TableCell>이름</TableCell>
+                      <TableCell>상태</TableCell>
+                      <TableCell>생성시간</TableCell>
+                      <TableCell>진행률</TableCell>
+                      <TableCell>액션</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </CardContent>
-        </Card>
-      )}
+                  </TableHead>
+                  <TableBody>
+                    {currentQueue.jobs?.slice(0, 20).map((job) => (
+                      <TableRow key={job.id}>
+                        <TableCell>{job.id}</TableCell>
+                        <TableCell>{job.name}</TableCell>
+                        <TableCell>
+                          <Chip
+                            icon={getStatusIcon('waiting')}
+                            label="대기중"
+                            color={getStatusColor('waiting')}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>{formatTimestamp(job.timestamp)}</TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={job.progress || 0}
+                              sx={{ flexGrow: 1 }}
+                            />
+                            <Typography variant="caption">{job.progress || 0}%</Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip title="상세보기">
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setSelectedJob(job);
+                                setJobDialogOpen(true);
+                              }}
+                            >
+                              <ViewIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="재시도">
+                            <IconButton size="small" onClick={() => retryJob(job.id)}>
+                              <RetryIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="삭제">
+                            <IconButton size="small" onClick={() => deleteJob(job.id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* 작업 상세 다이얼로그 */}
       <Dialog open={jobDialogOpen} onClose={() => setJobDialogOpen(false)} maxWidth="md" fullWidth>

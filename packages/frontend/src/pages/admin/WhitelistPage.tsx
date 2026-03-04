@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -64,6 +64,7 @@ import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { useAuth } from '@/hooks/useAuth';
 import { PERMISSIONS } from '@/types/permissions';
 
@@ -587,88 +588,58 @@ const WhitelistPage: React.FC = () => {
             </Card>
 
             {/* Nickname Whitelist Table */}
-            <Card variant="outlined">
-              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                {loading ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                    <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
-                  </Box>
-                ) : whitelists.length === 0 ? (
-                  <EmptyPagePlaceholder
-                    message={t('whitelist.noEntries')}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleAdd : undefined}
-                    addButtonLabel={t('whitelist.addEntry')}
-                  />
-                ) : (
-                  <>
-                    <TableContainer>
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>
-                              <Checkbox
-                                checked={
-                                  selectedIds.length > 0 && selectedIds.length === whitelists.length
-                                }
-                                indeterminate={
-                                  selectedIds.length > 0 && selectedIds.length < whitelists.length
-                                }
-                                onChange={handleSelectAll}
-                              />
-                            </TableCell>
-                            <TableCell>{t('whitelist.form.accountId')}</TableCell>
-                            <TableCell>{t('whitelist.form.ipAddress')}</TableCell>
-                            <TableCell>{t('whitelist.allowedPeriod')}</TableCell>
-                            <TableCell>{t('whitelist.form.purpose')}</TableCell>
-                            <TableCell>{t('common.status')}</TableCell>
-                            <TableCell>{t('common.createdBy')}</TableCell>
-                            <TableCell>{t('common.createdAt')}</TableCell>
-                            <TableCell align="center">{t('common.actions')}</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {whitelists.map((whitelist) => (
-                            <TableRow
-                              key={whitelist.id}
-                              hover
-                              selected={selectedIds.includes(whitelist.id)}
-                            >
+            <PageContentLoader loading={loading}>
+              <Card variant="outlined">
+                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                  {whitelists.length === 0 ? (
+                    <EmptyPagePlaceholder
+                      message={t('whitelist.noEntries')}
+                      subtitle={canManage ? t('common.addFirstItem') : undefined}
+                      onAddClick={canManage ? handleAdd : undefined}
+                      addButtonLabel={t('whitelist.addEntry')}
+                    />
+                  ) : (
+                    <>
+                      <TableContainer>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
                               <TableCell>
                                 <Checkbox
-                                  checked={selectedIds.includes(whitelist.id)}
-                                  onChange={() => handleSelectOne(whitelist.id)}
+                                  checked={
+                                    selectedIds.length > 0 &&
+                                    selectedIds.length === whitelists.length
+                                  }
+                                  indeterminate={
+                                    selectedIds.length > 0 && selectedIds.length < whitelists.length
+                                  }
+                                  onChange={handleSelectAll}
                                 />
                               </TableCell>
-                              <TableCell>
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                  }}
-                                >
-                                  <Typography variant="body2" fontWeight="medium">
-                                    {whitelist.accountId}
-                                  </Typography>
-                                  <Tooltip title={t('whitelist.copyAccountId')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() =>
-                                        handleCopyToClipboard(
-                                          whitelist.accountId,
-                                          t('whitelist.form.accountId')
-                                        )
-                                      }
-                                      sx={{ p: 0.5 }}
-                                    >
-                                      <ContentCopyIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                {whitelist.ipAddress ? (
+                              <TableCell>{t('whitelist.form.accountId')}</TableCell>
+                              <TableCell>{t('whitelist.form.ipAddress')}</TableCell>
+                              <TableCell>{t('whitelist.allowedPeriod')}</TableCell>
+                              <TableCell>{t('whitelist.form.purpose')}</TableCell>
+                              <TableCell>{t('common.status')}</TableCell>
+                              <TableCell>{t('common.createdBy')}</TableCell>
+                              <TableCell>{t('common.createdAt')}</TableCell>
+                              <TableCell align="center">{t('common.actions')}</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {whitelists.map((whitelist) => (
+                              <TableRow
+                                key={whitelist.id}
+                                hover
+                                selected={selectedIds.includes(whitelist.id)}
+                              >
+                                <TableCell>
+                                  <Checkbox
+                                    checked={selectedIds.includes(whitelist.id)}
+                                    onChange={() => handleSelectOne(whitelist.id)}
+                                  />
+                                </TableCell>
+                                <TableCell>
                                   <Box
                                     sx={{
                                       display: 'flex',
@@ -676,14 +647,16 @@ const WhitelistPage: React.FC = () => {
                                       gap: 1,
                                     }}
                                   >
-                                    <Chip label={whitelist.ipAddress} size="small" />
-                                    <Tooltip title={t('whitelist.copyIpAddress')}>
+                                    <Typography variant="body2" fontWeight="medium">
+                                      {whitelist.accountId}
+                                    </Typography>
+                                    <Tooltip title={t('whitelist.copyAccountId')}>
                                       <IconButton
                                         size="small"
                                         onClick={() =>
                                           handleCopyToClipboard(
-                                            whitelist.ipAddress!,
-                                            t('whitelist.form.ipAddress')
+                                            whitelist.accountId,
+                                            t('whitelist.form.accountId')
                                           )
                                         }
                                         sx={{ p: 0.5 }}
@@ -692,93 +665,124 @@ const WhitelistPage: React.FC = () => {
                                       </IconButton>
                                     </Tooltip>
                                   </Box>
-                                ) : (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {t('whitelist.anyIp')}
-                                  </Typography>
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                {whitelist.startDate || whitelist.endDate ? (
-                                  <Box>
-                                    <Typography variant="body2">
-                                      {formatDate(whitelist.startDate)} -{' '}
-                                      {formatDate(whitelist.endDate)}
-                                    </Typography>
-                                  </Box>
-                                ) : (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {t('whitelist.permanent')}
-                                  </Typography>
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    maxWidth: 200,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                  }}
-                                >
-                                  {whitelist.purpose || '-'}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={
-                                    whitelist.isEnabled ? t('status.active') : t('status.inactive')
-                                  }
-                                  color={whitelist.isEnabled ? 'success' : 'default'}
-                                  size="small"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Box>
-                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                    {whitelist.createdByName || t('dashboard.unknown')}
-                                  </Typography>
-                                  {whitelist.createdByEmail && (
-                                    <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                      sx={{ display: 'block' }}
+                                </TableCell>
+                                <TableCell>
+                                  {whitelist.ipAddress ? (
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                      }}
                                     >
-                                      {whitelist.createdByEmail}
+                                      <Chip label={whitelist.ipAddress} size="small" />
+                                      <Tooltip title={t('whitelist.copyIpAddress')}>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() =>
+                                            handleCopyToClipboard(
+                                              whitelist.ipAddress!,
+                                              t('whitelist.form.ipAddress')
+                                            )
+                                          }
+                                          sx={{ p: 0.5 }}
+                                        >
+                                          <ContentCopyIcon fontSize="small" />
+                                        </IconButton>
+                                      </Tooltip>
+                                    </Box>
+                                  ) : (
+                                    <Typography variant="body2" color="text.secondary">
+                                      {t('whitelist.anyIp')}
                                     </Typography>
                                   )}
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body2">
-                                  {formatDateTimeDetailed(whitelist.createdAt)}
-                                </Typography>
-                              </TableCell>
-                              <TableCell align="center">
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => handleMenuOpen(e, whitelist)}
-                                >
-                                  <MoreVertIcon />
-                                </IconButton>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <SimplePagination
-                      count={total}
-                      page={pageState.page - 1}
-                      rowsPerPage={pageState.limit}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    />
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                                </TableCell>
+                                <TableCell>
+                                  {whitelist.startDate || whitelist.endDate ? (
+                                    <Box>
+                                      <Typography variant="body2">
+                                        {formatDate(whitelist.startDate)} -{' '}
+                                        {formatDate(whitelist.endDate)}
+                                      </Typography>
+                                    </Box>
+                                  ) : (
+                                    <Typography variant="body2" color="text.secondary">
+                                      {t('whitelist.permanent')}
+                                    </Typography>
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      maxWidth: 200,
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {whitelist.purpose || '-'}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell>
+                                  <Chip
+                                    label={
+                                      whitelist.isEnabled
+                                        ? t('status.active')
+                                        : t('status.inactive')
+                                    }
+                                    color={whitelist.isEnabled ? 'success' : 'default'}
+                                    size="small"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Box>
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                      {whitelist.createdByName || t('dashboard.unknown')}
+                                    </Typography>
+                                    {whitelist.createdByEmail && (
+                                      <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ display: 'block' }}
+                                      >
+                                        {whitelist.createdByEmail}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                </TableCell>
+                                <TableCell>
+                                  <Tooltip title={formatDateTimeDetailed(whitelist.createdAt)}>
+                                    <Typography variant="body2">
+                                      {formatRelativeTime(whitelist.createdAt)}
+                                    </Typography>
+                                  </Tooltip>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => handleMenuOpen(e, whitelist)}
+                                  >
+                                    <MoreVertIcon />
+                                  </IconButton>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      <SimplePagination
+                        count={total}
+                        page={pageState.page - 1}
+                        rowsPerPage={pageState.limit}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                      />
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </PageContentLoader>
 
             {/* Action Menu */}
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>

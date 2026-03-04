@@ -55,6 +55,7 @@ import {
   MaintenanceStatusType,
 } from '@/utils/maintenanceStatusUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -493,27 +494,6 @@ const MaintenancePage: React.FC = () => {
     }
   };
 
-  // Don't render content until initial status is loaded to prevent flicker
-  if (isLoading) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <BuildIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {t('maintenance.title')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('maintenance.description')}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
@@ -529,441 +509,377 @@ const MaintenancePage: React.FC = () => {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-        {/* 좌측 설정 영역 */}
-        <Card
-          sx={{
-            borderColor: (theme) =>
-              isMaintenance ? theme.palette.error.main : theme.palette.success.main,
-            borderWidth: 1,
-            borderStyle: 'solid',
-            flex: 1,
-            maxWidth: 800,
-          }}
-        >
-          <CardContent>
-            <Stack spacing={2} sx={{ mt: 1 }}>
-              {isMaintenance && !editMode ? (
-                <>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                      mb: 2,
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle1"
-                      sx={{
-                        fontWeight: 600,
-                        color: getMaintenanceStatusDisplay(maintenanceStatus).color,
-                      }}
-                    >
-                      {getMaintenanceStatusDisplay(maintenanceStatus).icon}{' '}
-                      {t(getMaintenanceStatusDisplay(maintenanceStatus).label)}
-                    </Typography>
-                  </Box>
-
-                  {/* Current Maintenance Summary */}
-                  <Box
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      backgroundColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(244, 67, 54, 0.08)'
-                          : 'rgba(244, 67, 54, 0.04)',
-                      border: '1px solid',
-                      borderColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(244, 67, 54, 0.3)'
-                          : 'rgba(244, 67, 54, 0.2)',
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'error.main' }}>
-                      {t('maintenance.currentSettingsTitle')}
-                    </Typography>
-
-                    <Box
-                      component="table"
-                      sx={{
-                        width: '100%',
-                        borderCollapse: 'separate',
-                        borderSpacing: '0 8px',
-                      }}
-                    >
-                      <Box component="tbody">
-                        <Box component="tr">
-                          <Box
-                            component="td"
-                            sx={{
-                              fontWeight: 500,
-                              fontSize: '0.875rem',
-                              width: '140px',
-                              verticalAlign: 'top',
-                              pr: 2,
-                            }}
-                          >
-                            {t('maintenance.type')}:
-                          </Box>
-                          <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                            {type === 'regular'
-                              ? t('maintenance.types.regular')
-                              : t('maintenance.types.emergency')}
-                          </Box>
-                        </Box>
-
-                        {/* 점검 기간 */}
-                        <Box component="tr">
-                          <Box
-                            component="td"
-                            sx={{
-                              fontWeight: 500,
-                              fontSize: '0.875rem',
-                              width: '140px',
-                              verticalAlign: 'top',
-                              pr: 2,
-                            }}
-                          >
-                            {t('maintenance.maintenancePeriodLabel')}:
-                          </Box>
-                          <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                            {(() => {
-                              if (startsAt && endsAt) {
-                                const duration = endsAt.diff(startsAt, 'minute');
-                                const hours = Math.floor(duration / 60);
-                                const minutes = duration % 60;
-                                const durationParts = [];
-                                if (hours > 0)
-                                  durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
-                                if (minutes > 0)
-                                  durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
-                                const durationText = durationParts.join(' ');
-                                return (
-                                  <Box component="span">
-                                    {startsAt.format('YYYY-MM-DD A h:mm')} ~{' '}
-                                    {endsAt.format('YYYY-MM-DD A h:mm')}
-                                    <Box
-                                      component="span"
-                                      sx={{
-                                        color: 'primary.main',
-                                        fontWeight: 600,
-                                        ml: 0.5,
-                                      }}
-                                    >
-                                      ({durationText})
-                                    </Box>
-                                  </Box>
-                                );
-                              } else if (startsAt && !endsAt) {
-                                return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('maintenance.manualStopLabel')}`;
-                              } else if (!startsAt && endsAt) {
-                                return `${t('maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
-                              } else {
-                                return `${t('maintenance.immediateStartLabel')} ~ ${t('maintenance.manualStopLabel')}`;
-                              }
-                            })()}
-                          </Box>
-                        </Box>
-
-                        {startsAt && (
-                          <Box component="tr">
-                            <Box
-                              component="td"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: '0.875rem',
-                                width: '140px',
-                                verticalAlign: 'top',
-                                pr: 2,
-                              }}
-                            >
-                              {t('maintenance.startsAt')}:
-                            </Box>
-                            <Box
-                              component="td"
-                              sx={{
-                                fontSize: '0.875rem',
-                                verticalAlign: 'top',
-                              }}
-                            >
-                              {startsAt.format('YYYY-MM-DD A h:mm')}
-                              <Box component="span" sx={{ color: 'text.secondary', ml: 0.5 }}>
-                                ({startsAt.toISOString()})
-                              </Box>
-                            </Box>
-                          </Box>
-                        )}
-
-                        {endsAt && (
-                          <Box component="tr">
-                            <Box
-                              component="td"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: '0.875rem',
-                                width: '140px',
-                                verticalAlign: 'top',
-                                pr: 2,
-                              }}
-                            >
-                              {t('maintenance.endsAt')}:
-                            </Box>
-                            <Box
-                              component="td"
-                              sx={{
-                                fontSize: '0.875rem',
-                                verticalAlign: 'top',
-                              }}
-                            >
-                              {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
-                            </Box>
-                          </Box>
-                        )}
-
-                        {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
-                          <Box component="tr">
-                            <Box
-                              component="td"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: '0.875rem',
-                                width: '140px',
-                                verticalAlign: 'top',
-                                pr: 2,
-                              }}
-                            >
-                              {t('clientVersions.maintenance.defaultMessage')}:
-                            </Box>
-                            <Box
-                              component="td"
-                              sx={{
-                                fontSize: '0.875rem',
-                                verticalAlign: 'top',
-                                maxWidth: 300,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
-                            </Box>
-                          </Box>
-                        )}
-
-                        {/* 강제종료 옵션 */}
-                        <Box component="tr">
-                          <Box
-                            component="td"
-                            sx={{
-                              fontWeight: 500,
-                              fontSize: '0.875rem',
-                              width: '140px',
-                              verticalAlign: 'top',
-                              pr: 2,
-                            }}
-                          >
-                            {t('maintenance.kickExistingPlayers')}:
-                          </Box>
-                          <Box
-                            component="td"
-                            sx={{
-                              fontSize: '0.875rem',
-                              verticalAlign: 'top',
-                              color: kickExistingPlayers ? 'warning.main' : 'success.main',
-                            }}
-                          >
-                            {kickExistingPlayers
-                              ? `${t('common.yes')} (${kickDelayMinutes}${t('maintenance.minutesUnit')})`
-                              : t('common.no')}
-                          </Box>
-                        </Box>
-
-                        {/* 설정자 정보 */}
-                        {currentMaintenanceDetail?.updatedBy && (
-                          <Box component="tr">
-                            <Box
-                              component="td"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: '0.875rem',
-                                width: '140px',
-                                verticalAlign: 'top',
-                                pr: 2,
-                              }}
-                            >
-                              {t('maintenance.updatedBy')}:
-                            </Box>
-                            <Box
-                              component="td"
-                              sx={{
-                                fontSize: '0.875rem',
-                                verticalAlign: 'top',
-                              }}
-                            >
-                              {currentMaintenanceDetail.updatedBy.name} (
-                              {currentMaintenanceDetail.updatedBy.email})
-                            </Box>
-                          </Box>
-                        )}
-
-                        {/* 설정 시간 */}
-                        {currentMaintenanceDetail?.updatedAt && (
-                          <Box component="tr">
-                            <Box
-                              component="td"
-                              sx={{
-                                fontWeight: 500,
-                                fontSize: '0.875rem',
-                                width: '140px',
-                                verticalAlign: 'top',
-                                pr: 2,
-                              }}
-                            >
-                              {t('maintenance.updatedAt')}:
-                            </Box>
-                            <Box
-                              component="td"
-                              sx={{
-                                fontSize: '0.875rem',
-                                verticalAlign: 'top',
-                              }}
-                            >
-                              {dayjs(currentMaintenanceDetail.updatedAt).format(
-                                'YYYY-MM-DD A h:mm'
-                              )}{' '}
-                              ({currentMaintenanceDetail.updatedAt})
-                            </Box>
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
-                  </Box>
-                </>
-              ) : (
-                <>
-                  {/* Type and schedule */}
-                  <Box sx={{ width: 320 }}>
-                    <TextField
-                      select
-                      label={t('maintenance.type')}
-                      value={type}
-                      onChange={(e) => setType(e.target.value as MaintenanceType)}
-                      fullWidth
-                    >
-                      <MenuItem value="regular">{t('maintenance.types.regular')}</MenuItem>
-                      <MenuItem value="emergency">{t('maintenance.types.emergency')}</MenuItem>
-                    </TextField>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        mt: 0.5,
-                        display: 'block',
-                        color: 'text.secondary',
-                      }}
-                    >
-                      {t('maintenance.typeHelp')}
-                    </Typography>
-                  </Box>
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    alignItems="flex-start"
-                    sx={{ flexWrap: 'wrap' }}
-                  >
-                    <Box sx={{ width: 320 }}>
-                      <DateTimePicker
-                        label={t('maintenance.startsAt')}
-                        value={startsAt}
-                        onChange={(newValue) => {
-                          setStartsAt(newValue);
-                        }}
-                        ampm={true}
-                        format="YYYY-MM-DD A hh:mm"
-                        views={['year', 'month', 'day', 'hours', 'minutes']}
-                        timeSteps={{ minutes: 1 }}
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
-                            placeholder: t('maintenance.selectDateTime'),
-                            inputRef: startsAtRef,
-                            slotProps: { input: { readOnly: true } },
-                          },
-                          actionBar: {
-                            actions: ['clear', 'cancel', 'accept'],
-                          },
-                        }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          mt: 0.5,
-                          display: 'block',
-                          color: 'text.secondary',
-                        }}
-                      >
-                        {t('maintenance.startsAtHelp')}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ width: 320 }}>
-                      <DateTimePicker
-                        label={t('maintenance.endsAt')}
-                        value={endsAt}
-                        onChange={(newValue) => {
-                          setEndsAt(newValue);
-                        }}
-                        ampm={true}
-                        format="YYYY-MM-DD A hh:mm"
-                        views={['year', 'month', 'day', 'hours', 'minutes']}
-                        timeSteps={{ minutes: 1 }}
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
-                            placeholder: t('maintenance.selectDateTime'),
-                            inputRef: endsAtRef,
-                            slotProps: { input: { readOnly: true } },
-                          },
-                          actionBar: {
-                            actions: ['clear', 'cancel', 'accept'],
-                          },
-                        }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          mt: 0.5,
-                          display: 'block',
-                          color: 'text.secondary',
-                        }}
-                      >
-                        {t('maintenance.endsAtHelp')}
-                      </Typography>
-                    </Box>
-                  </Stack>
-
-                  {/* Kick existing players option */}
-                  <Box sx={{ alignSelf: 'flex-start', width: '100%' }}>
+      <PageContentLoader loading={isLoading}>
+        <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
+          {/* 좌측 설정 영역 */}
+          <Card
+            sx={{
+              borderColor: (theme) =>
+                isMaintenance ? theme.palette.error.main : theme.palette.success.main,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              flex: 1,
+              maxWidth: 800,
+            }}
+          >
+            <CardContent>
+              <Stack spacing={2} sx={{ mt: 1 }}>
+                {isMaintenance && !editMode ? (
+                  <>
                     <Box
                       sx={{
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 3,
-                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        gap: 2,
+                        mb: 2,
                       }}
                     >
-                      {/* 체크박스 영역 */}
-                      <Box sx={{ flex: '0 0 auto' }}>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={kickExistingPlayers}
-                              onChange={(e) => setKickExistingPlayers(e.target.checked)}
-                              color="warning"
-                            />
-                          }
-                          label={t('maintenance.kickExistingPlayers')}
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 600,
+                          color: getMaintenanceStatusDisplay(maintenanceStatus).color,
+                        }}
+                      >
+                        {getMaintenanceStatusDisplay(maintenanceStatus).icon}{' '}
+                        {t(getMaintenanceStatusDisplay(maintenanceStatus).label)}
+                      </Typography>
+                    </Box>
+
+                    {/* Current Maintenance Summary */}
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(244, 67, 54, 0.08)'
+                            : 'rgba(244, 67, 54, 0.04)',
+                        border: '1px solid',
+                        borderColor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(244, 67, 54, 0.3)'
+                            : 'rgba(244, 67, 54, 0.2)',
+                        mb: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{ mb: 1.5, fontWeight: 600, color: 'error.main' }}
+                      >
+                        {t('maintenance.currentSettingsTitle')}
+                      </Typography>
+
+                      <Box
+                        component="table"
+                        sx={{
+                          width: '100%',
+                          borderCollapse: 'separate',
+                          borderSpacing: '0 8px',
+                        }}
+                      >
+                        <Box component="tbody">
+                          <Box component="tr">
+                            <Box
+                              component="td"
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: '0.875rem',
+                                width: '140px',
+                                verticalAlign: 'top',
+                                pr: 2,
+                              }}
+                            >
+                              {t('maintenance.type')}:
+                            </Box>
+                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                              {type === 'regular'
+                                ? t('maintenance.types.regular')
+                                : t('maintenance.types.emergency')}
+                            </Box>
+                          </Box>
+
+                          {/* 점검 기간 */}
+                          <Box component="tr">
+                            <Box
+                              component="td"
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: '0.875rem',
+                                width: '140px',
+                                verticalAlign: 'top',
+                                pr: 2,
+                              }}
+                            >
+                              {t('maintenance.maintenancePeriodLabel')}:
+                            </Box>
+                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                              {(() => {
+                                if (startsAt && endsAt) {
+                                  const duration = endsAt.diff(startsAt, 'minute');
+                                  const hours = Math.floor(duration / 60);
+                                  const minutes = duration % 60;
+                                  const durationParts = [];
+                                  if (hours > 0)
+                                    durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
+                                  if (minutes > 0)
+                                    durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
+                                  const durationText = durationParts.join(' ');
+                                  return (
+                                    <Box component="span">
+                                      {startsAt.format('YYYY-MM-DD A h:mm')} ~{' '}
+                                      {endsAt.format('YYYY-MM-DD A h:mm')}
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: 'primary.main',
+                                          fontWeight: 600,
+                                          ml: 0.5,
+                                        }}
+                                      >
+                                        ({durationText})
+                                      </Box>
+                                    </Box>
+                                  );
+                                } else if (startsAt && !endsAt) {
+                                  return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('maintenance.manualStopLabel')}`;
+                                } else if (!startsAt && endsAt) {
+                                  return `${t('maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
+                                } else {
+                                  return `${t('maintenance.immediateStartLabel')} ~ ${t('maintenance.manualStopLabel')}`;
+                                }
+                              })()}
+                            </Box>
+                          </Box>
+
+                          {startsAt && (
+                            <Box component="tr">
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '0.875rem',
+                                  width: '140px',
+                                  verticalAlign: 'top',
+                                  pr: 2,
+                                }}
+                              >
+                                {t('maintenance.startsAt')}:
+                              </Box>
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontSize: '0.875rem',
+                                  verticalAlign: 'top',
+                                }}
+                              >
+                                {startsAt.format('YYYY-MM-DD A h:mm')}
+                                <Box component="span" sx={{ color: 'text.secondary', ml: 0.5 }}>
+                                  ({startsAt.toISOString()})
+                                </Box>
+                              </Box>
+                            </Box>
+                          )}
+
+                          {endsAt && (
+                            <Box component="tr">
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '0.875rem',
+                                  width: '140px',
+                                  verticalAlign: 'top',
+                                  pr: 2,
+                                }}
+                              >
+                                {t('maintenance.endsAt')}:
+                              </Box>
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontSize: '0.875rem',
+                                  verticalAlign: 'top',
+                                }}
+                              >
+                                {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
+                              </Box>
+                            </Box>
+                          )}
+
+                          {(baseMsg ||
+                            (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
+                            <Box component="tr">
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '0.875rem',
+                                  width: '140px',
+                                  verticalAlign: 'top',
+                                  pr: 2,
+                                }}
+                              >
+                                {t('clientVersions.maintenance.defaultMessage')}:
+                              </Box>
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontSize: '0.875rem',
+                                  verticalAlign: 'top',
+                                  maxWidth: 300,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
+                              </Box>
+                            </Box>
+                          )}
+
+                          {/* 강제종료 옵션 */}
+                          <Box component="tr">
+                            <Box
+                              component="td"
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: '0.875rem',
+                                width: '140px',
+                                verticalAlign: 'top',
+                                pr: 2,
+                              }}
+                            >
+                              {t('maintenance.kickExistingPlayers')}:
+                            </Box>
+                            <Box
+                              component="td"
+                              sx={{
+                                fontSize: '0.875rem',
+                                verticalAlign: 'top',
+                                color: kickExistingPlayers ? 'warning.main' : 'success.main',
+                              }}
+                            >
+                              {kickExistingPlayers
+                                ? `${t('common.yes')} (${kickDelayMinutes}${t('maintenance.minutesUnit')})`
+                                : t('common.no')}
+                            </Box>
+                          </Box>
+
+                          {/* 설정자 정보 */}
+                          {currentMaintenanceDetail?.updatedBy && (
+                            <Box component="tr">
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '0.875rem',
+                                  width: '140px',
+                                  verticalAlign: 'top',
+                                  pr: 2,
+                                }}
+                              >
+                                {t('maintenance.updatedBy')}:
+                              </Box>
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontSize: '0.875rem',
+                                  verticalAlign: 'top',
+                                }}
+                              >
+                                {currentMaintenanceDetail.updatedBy.name} (
+                                {currentMaintenanceDetail.updatedBy.email})
+                              </Box>
+                            </Box>
+                          )}
+
+                          {/* 설정 시간 */}
+                          {currentMaintenanceDetail?.updatedAt && (
+                            <Box component="tr">
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '0.875rem',
+                                  width: '140px',
+                                  verticalAlign: 'top',
+                                  pr: 2,
+                                }}
+                              >
+                                {t('maintenance.updatedAt')}:
+                              </Box>
+                              <Box
+                                component="td"
+                                sx={{
+                                  fontSize: '0.875rem',
+                                  verticalAlign: 'top',
+                                }}
+                              >
+                                {dayjs(currentMaintenanceDetail.updatedAt).format(
+                                  'YYYY-MM-DD A h:mm'
+                                )}{' '}
+                                ({currentMaintenanceDetail.updatedAt})
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
+                      </Box>
+                    </Box>
+                  </>
+                ) : (
+                  <>
+                    {/* Type and schedule */}
+                    <Box sx={{ width: 320 }}>
+                      <TextField
+                        select
+                        label={t('maintenance.type')}
+                        value={type}
+                        onChange={(e) => setType(e.target.value as MaintenanceType)}
+                        fullWidth
+                      >
+                        <MenuItem value="regular">{t('maintenance.types.regular')}</MenuItem>
+                        <MenuItem value="emergency">{t('maintenance.types.emergency')}</MenuItem>
+                      </TextField>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          mt: 0.5,
+                          display: 'block',
+                          color: 'text.secondary',
+                        }}
+                      >
+                        {t('maintenance.typeHelp')}
+                      </Typography>
+                    </Box>
+                    <Stack
+                      direction="row"
+                      spacing={2}
+                      alignItems="flex-start"
+                      sx={{ flexWrap: 'wrap' }}
+                    >
+                      <Box sx={{ width: 320 }}>
+                        <DateTimePicker
+                          label={t('maintenance.startsAt')}
+                          value={startsAt}
+                          onChange={(newValue) => {
+                            setStartsAt(newValue);
+                          }}
+                          ampm={true}
+                          format="YYYY-MM-DD A hh:mm"
+                          views={['year', 'month', 'day', 'hours', 'minutes']}
+                          timeSteps={{ minutes: 1 }}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              placeholder: t('maintenance.selectDateTime'),
+                              inputRef: startsAtRef,
+                              slotProps: { input: { readOnly: true } },
+                            },
+                            actionBar: {
+                              actions: ['clear', 'cancel', 'accept'],
+                            },
+                          }}
                         />
                         <Typography
                           variant="caption"
@@ -971,29 +887,165 @@ const MaintenancePage: React.FC = () => {
                             mt: 0.5,
                             display: 'block',
                             color: 'text.secondary',
-                            maxWidth: 300,
                           }}
                         >
-                          {t('maintenance.kickExistingPlayersHelp')}
+                          {t('maintenance.startsAtHelp')}
                         </Typography>
                       </Box>
+                      <Box sx={{ width: 320 }}>
+                        <DateTimePicker
+                          label={t('maintenance.endsAt')}
+                          value={endsAt}
+                          onChange={(newValue) => {
+                            setEndsAt(newValue);
+                          }}
+                          ampm={true}
+                          format="YYYY-MM-DD A hh:mm"
+                          views={['year', 'month', 'day', 'hours', 'minutes']}
+                          timeSteps={{ minutes: 1 }}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              placeholder: t('maintenance.selectDateTime'),
+                              inputRef: endsAtRef,
+                              slotProps: { input: { readOnly: true } },
+                            },
+                            actionBar: {
+                              actions: ['clear', 'cancel', 'accept'],
+                            },
+                          }}
+                        />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            mt: 0.5,
+                            display: 'block',
+                            color: 'text.secondary',
+                          }}
+                        >
+                          {t('maintenance.endsAtHelp')}
+                        </Typography>
+                      </Box>
+                    </Stack>
 
-                      {/* 유예시간 설정 영역 */}
-                      {kickExistingPlayers && (
-                        <Box sx={{ flex: '0 0 auto', minWidth: 250 }}>
+                    {/* Kick existing players option */}
+                    <Box sx={{ alignSelf: 'flex-start', width: '100%' }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 3,
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        {/* 체크박스 영역 */}
+                        <Box sx={{ flex: '0 0 auto' }}>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={kickExistingPlayers}
+                                onChange={(e) => setKickExistingPlayers(e.target.checked)}
+                                color="warning"
+                              />
+                            }
+                            label={t('maintenance.kickExistingPlayers')}
+                          />
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              mt: 0.5,
+                              display: 'block',
+                              color: 'text.secondary',
+                              maxWidth: 300,
+                            }}
+                          >
+                            {t('maintenance.kickExistingPlayersHelp')}
+                          </Typography>
+                        </Box>
+
+                        {/* 유예시간 설정 영역 */}
+                        {kickExistingPlayers && (
+                          <Box sx={{ flex: '0 0 auto', minWidth: 250 }}>
+                            <TextField
+                              select
+                              label={t('maintenance.kickDelayMinutes')}
+                              value={kickDelayMinutes}
+                              onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
+                              fullWidth
+                              size="small"
+                            >
+                              <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
+                              <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
+                              <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
+                              <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
+                              <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
+                            </TextField>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                mt: 0.5,
+                                display: 'block',
+                                color: 'text.secondary',
+                              }}
+                            >
+                              {t('maintenance.kickDelayHelp')}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* 구분선 */}
+                    <Box sx={{ width: '100%', my: 5 }}>
+                      <Box
+                        sx={{
+                          height: '1px',
+                          backgroundColor: 'divider',
+                          width: '100%',
+                        }}
+                      />
+                    </Box>
+
+                    {/* Input mode */}
+                    <Box sx={{ width: 320 }}>
+                      <TextField
+                        select
+                        label={t('maintenance.messageSource')}
+                        value={inputMode}
+                        onChange={(e) => setInputMode(e.target.value as any)}
+                        fullWidth
+                      >
+                        <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
+                        <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
+                      </TextField>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          mt: 0.5,
+                          display: 'block',
+                          color: 'text.secondary',
+                        }}
+                      >
+                        {t('maintenance.messageSourceHelp')}
+                      </Typography>
+                    </Box>
+
+                    {inputMode === 'template' && (
+                      <Stack spacing={2}>
+                        <Box sx={{ width: 320 }}>
                           <TextField
                             select
-                            label={t('maintenance.kickDelayMinutes')}
-                            value={kickDelayMinutes}
-                            onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
+                            label={t('maintenance.selectTemplate')}
+                            value={selectedTplId}
+                            onChange={(e) => setSelectedTplId(Number(e.target.value))}
                             fullWidth
-                            size="small"
                           >
-                            <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
-                            <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
-                            <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
-                            <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
-                            <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
+                            <MenuItem value="">{t('common.select')}</MenuItem>
+                            {tpls.map((tpl) => (
+                              <MenuItem key={tpl.id} value={tpl.id}>
+                                {tpl.name}
+                              </MenuItem>
+                            ))}
                           </TextField>
                           <Typography
                             variant="caption"
@@ -1003,728 +1055,668 @@ const MaintenancePage: React.FC = () => {
                               color: 'text.secondary',
                             }}
                           >
-                            {t('maintenance.kickDelayHelp')}
+                            {t('maintenance.selectTemplateHelp')}
                           </Typography>
                         </Box>
-                      )}
-                    </Box>
-                  </Box>
-
-                  {/* 구분선 */}
-                  <Box sx={{ width: '100%', my: 5 }}>
-                    <Box
-                      sx={{
-                        height: '1px',
-                        backgroundColor: 'divider',
-                        width: '100%',
-                      }}
-                    />
-                  </Box>
-
-                  {/* Input mode */}
-                  <Box sx={{ width: 320 }}>
-                    <TextField
-                      select
-                      label={t('maintenance.messageSource')}
-                      value={inputMode}
-                      onChange={(e) => setInputMode(e.target.value as any)}
-                      fullWidth
-                    >
-                      <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
-                      <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
-                    </TextField>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        mt: 0.5,
-                        display: 'block',
-                        color: 'text.secondary',
-                      }}
-                    >
-                      {t('maintenance.messageSourceHelp')}
-                    </Typography>
-                  </Box>
-
-                  {inputMode === 'template' && (
-                    <Stack spacing={2}>
-                      <Box sx={{ width: 320 }}>
-                        <TextField
-                          select
-                          label={t('maintenance.selectTemplate')}
-                          value={selectedTplId}
-                          onChange={(e) => setSelectedTplId(Number(e.target.value))}
-                          fullWidth
-                        >
-                          <MenuItem value="">{t('common.select')}</MenuItem>
-                          {tpls.map((tpl) => (
-                            <MenuItem key={tpl.id} value={tpl.id}>
-                              {tpl.name}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            mt: 0.5,
-                            display: 'block',
-                            color: 'text.secondary',
-                          }}
-                        >
-                          {t('maintenance.selectTemplateHelp')}
-                        </Typography>
-                      </Box>
-                      {tpls.find((t) => t.id === selectedTplId) && (
-                        <Card variant="outlined">
-                          <CardContent>
-                            <Typography variant="subtitle2" gutterBottom>
-                              {t('clientVersions.maintenance.defaultMessage')}
-                            </Typography>
-                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                              {tpls.find((t) => t.id === selectedTplId)?.defaultMessage || '-'}
-                            </Typography>
-                            <Stack spacing={1} sx={{ mt: 2 }}>
-                              {(tpls.find((t) => t.id === selectedTplId)?.locales || []).map(
-                                (l) => {
-                                  const langLabels = {
-                                    ko: '한국어',
-                                    en: '영어',
-                                    zh: '중국어',
-                                  };
-                                  return (
-                                    <Box
-                                      key={l.lang}
-                                      sx={{
-                                        display: 'flex',
-                                        gap: 1,
-                                        alignItems: 'flex-start',
-                                      }}
-                                    >
-                                      <Chip
-                                        label={
-                                          langLabels[l.lang as keyof typeof langLabels] || l.lang
-                                        }
-                                        size="small"
+                        {tpls.find((t) => t.id === selectedTplId) && (
+                          <Card variant="outlined">
+                            <CardContent>
+                              <Typography variant="subtitle2" gutterBottom>
+                                {t('clientVersions.maintenance.defaultMessage')}
+                              </Typography>
+                              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                {tpls.find((t) => t.id === selectedTplId)?.defaultMessage || '-'}
+                              </Typography>
+                              <Stack spacing={1} sx={{ mt: 2 }}>
+                                {(tpls.find((t) => t.id === selectedTplId)?.locales || []).map(
+                                  (l) => {
+                                    const langLabels = {
+                                      ko: '한국어',
+                                      en: '영어',
+                                      zh: '중국어',
+                                    };
+                                    return (
+                                      <Box
+                                        key={l.lang}
                                         sx={{
-                                          width: 96,
-                                          justifyContent: 'flex-start',
+                                          display: 'flex',
+                                          gap: 1,
+                                          alignItems: 'flex-start',
                                         }}
-                                      />
-                                      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                                        {l.message}
-                                      </Typography>
-                                    </Box>
-                                  );
-                                }
-                              )}
-                            </Stack>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </Stack>
-                  )}
+                                      >
+                                        <Chip
+                                          label={
+                                            langLabels[l.lang as keyof typeof langLabels] || l.lang
+                                          }
+                                          size="small"
+                                          sx={{
+                                            width: 96,
+                                            justifyContent: 'flex-start',
+                                          }}
+                                        />
+                                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                          {l.message}
+                                        </Typography>
+                                      </Box>
+                                    );
+                                  }
+                                )}
+                              </Stack>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </Stack>
+                    )}
 
-                  {inputMode === 'direct' && (
-                    <MultiLanguageMessageInput
-                      defaultMessage={baseMsg}
-                      onDefaultMessageChange={setBaseMsg}
-                      defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
-                      defaultMessageHelperText={t('clientVersions.maintenance.defaultMessageHelp')}
-                      defaultMessageRequired={true}
-                      defaultMessageError={false}
-                      supportsMultiLanguage={supportsMultiLanguage}
-                      onSupportsMultiLanguageChange={(supports) => {
-                        setSupportsMultiLanguage(supports);
-                        if (supports) {
-                          // 모든 언어 자동 추가
-                          const allLangs = [
-                            { lang: 'ko' as const, message: '' },
-                            { lang: 'en' as const, message: '' },
-                            { lang: 'zh' as const, message: '' },
-                          ];
-                          setLocales(allLangs);
-                        } else {
-                          setLocales([]);
-                        }
-                      }}
-                      supportsMultiLanguageLabel={t('maintenance.useLanguageSpecificMessages')}
-                      supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
-                      locales={locales.map((l) => ({
-                        lang: l.lang as 'ko' | 'en' | 'zh',
-                        message: l.message,
-                      }))}
-                      onLocalesChange={(newLocales) => {
-                        setLocales(
-                          newLocales.map((l) => ({
-                            lang: l.lang,
-                            message: l.message,
-                          }))
-                        );
-                        // 번역 결과가 있으면 자동으로 다국어 지원 활성화
-                        const hasNonEmptyLocales = newLocales.some(
-                          (l) => l.message && l.message.trim() !== ''
-                        );
-                        if (hasNonEmptyLocales && !supportsMultiLanguage) {
-                          setSupportsMultiLanguage(true);
-                        }
-                      }}
-                      languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
-                      enableTranslation={true}
-                      translateButtonLabel={t('common.autoTranslate')}
-                      translateTooltip={t('maintenance.translateTooltip')}
-                      ref={messageInputRef}
-                    />
-                  )}
-                </>
-              )}
-
-              {/* Actions는 우측 영역으로 이동 */}
-            </Stack>
-          </CardContent>
-        </Card>
-
-        {/* 우측 액션 버튼 영역 */}
-        {canManage && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 2,
-              minWidth: 200,
-            }}
-          >
-            {!isMaintenance ? (
-              <Button
-                variant="contained"
-                color="error"
-                size="large"
-                startIcon={<PlayArrowIcon />}
-                onClick={() => {
-                  // 시간 검증 먼저 실행
-                  const validation = validateMaintenanceTime();
-                  if (!validation.valid) {
-                    return;
-                  }
-                  setConfirmMode('start');
-                  setConfirmInput('');
-                  setConfirmOpen(true);
-                }}
-                disabled={!hasMessageForStart}
-                sx={{
-                  width: 160,
-                  height: 160,
-                  borderRadius: '50%',
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
-                  flexDirection: 'column',
-                  gap: 1,
-                  '& .MuiButton-startIcon': {
-                    margin: 0,
-                    fontSize: '2rem',
-                  },
-                }}
-              >
-                <PlayArrowIcon sx={{ fontSize: '2.5rem' }} />
-                {t('maintenance.start')}
-              </Button>
-            ) : (
-              <>
-                {editMode ? (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    startIcon={<SaveIcon />}
-                    onClick={() => {
-                      // 시간 검증 먼저 실행
-                      const validation = validateMaintenanceTime();
-                      if (!validation.valid) {
-                        return;
-                      }
-                      setConfirmMode('update');
-                      setConfirmInput('');
-                      setConfirmOpen(true);
-                    }}
-                    disabled={!hasMessageForStart || !isDirty}
-                    sx={{
-                      width: 160,
-                      height: 160,
-                      borderRadius: '50%',
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      flexDirection: 'column',
-                      gap: 1,
-                      '& .MuiButton-startIcon': {
-                        margin: 0,
-                        fontSize: '2rem',
-                      },
-                    }}
-                  >
-                    <SaveIcon sx={{ fontSize: '2.5rem' }} />
-                    {t('maintenance.update')}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    size="large"
-                    startIcon={<StopIcon />}
-                    onClick={() => {
-                      setConfirmMode('stop');
-                      setConfirmInput('');
-                      setConfirmOpen(true);
-                    }}
-                    sx={{
-                      width: 160,
-                      height: 160,
-                      borderRadius: '50%',
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      flexDirection: 'column',
-                      gap: 1,
-                      '& .MuiButton-startIcon': {
-                        margin: 0,
-                        fontSize: '2rem',
-                      },
-                    }}
-                  >
-                    <StopIcon sx={{ fontSize: '2.5rem' }} />
-                    {t('maintenance.stop')}
-                  </Button>
+                    {inputMode === 'direct' && (
+                      <MultiLanguageMessageInput
+                        defaultMessage={baseMsg}
+                        onDefaultMessageChange={setBaseMsg}
+                        defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
+                        defaultMessageHelperText={t(
+                          'clientVersions.maintenance.defaultMessageHelp'
+                        )}
+                        defaultMessageRequired={true}
+                        defaultMessageError={false}
+                        supportsMultiLanguage={supportsMultiLanguage}
+                        onSupportsMultiLanguageChange={(supports) => {
+                          setSupportsMultiLanguage(supports);
+                          if (supports) {
+                            // 모든 언어 자동 추가
+                            const allLangs = [
+                              { lang: 'ko' as const, message: '' },
+                              { lang: 'en' as const, message: '' },
+                              { lang: 'zh' as const, message: '' },
+                            ];
+                            setLocales(allLangs);
+                          } else {
+                            setLocales([]);
+                          }
+                        }}
+                        supportsMultiLanguageLabel={t('maintenance.useLanguageSpecificMessages')}
+                        supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
+                        locales={locales.map((l) => ({
+                          lang: l.lang as 'ko' | 'en' | 'zh',
+                          message: l.message,
+                        }))}
+                        onLocalesChange={(newLocales) => {
+                          setLocales(
+                            newLocales.map((l) => ({
+                              lang: l.lang,
+                              message: l.message,
+                            }))
+                          );
+                          // 번역 결과가 있으면 자동으로 다국어 지원 활성화
+                          const hasNonEmptyLocales = newLocales.some(
+                            (l) => l.message && l.message.trim() !== ''
+                          );
+                          if (hasNonEmptyLocales && !supportsMultiLanguage) {
+                            setSupportsMultiLanguage(true);
+                          }
+                        }}
+                        languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
+                        enableTranslation={true}
+                        translateButtonLabel={t('common.autoTranslate')}
+                        translateTooltip={t('maintenance.translateTooltip')}
+                        ref={messageInputRef}
+                      />
+                    )}
+                  </>
                 )}
-                <Button
-                  variant="outlined"
-                  onClick={() => setEditMode((v) => !v)}
-                  sx={{ width: 140 }}
-                >
-                  {editMode ? t('common.cancel') : t('maintenance.edit')}
-                </Button>
-              </>
-            )}
-          </Box>
-        )}
 
-        {/* Confirm dialog */}
-        <Dialog
-          open={confirmOpen}
-          onClose={() => setConfirmOpen(false)}
-          maxWidth="md"
-          fullWidth
-          sx={{
-            '& .MuiBackdrop-root': {
-              backgroundColor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.3)',
-            },
-          }}
-        >
-          <DialogTitle sx={{ pb: 1 }}>
-            <Typography variant="h6" component="div">
-              {confirmMode === 'start'
-                ? t('maintenance.confirmStartTitle')
-                : confirmMode === 'update'
-                  ? t('maintenance.confirmUpdateTitle')
-                  : t('maintenance.confirmStopTitle')}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-              {confirmMode === 'start'
-                ? t('maintenance.confirmStartSubtitle')
-                : confirmMode === 'update'
-                  ? t('maintenance.confirmUpdateSubtitle')
-                  : t('maintenance.confirmStopSubtitle')}
-            </Typography>
-          </DialogTitle>
-          <DialogContent sx={{ pt: 2 }}>
-            {/* Settings Summary */}
+                {/* Actions는 우측 영역으로 이동 */}
+              </Stack>
+            </CardContent>
+          </Card>
+
+          {/* 우측 액션 버튼 영역 */}
+          {canManage && (
             <Box
               sx={{
-                mb: 3,
-                p: 2,
-                borderRadius: 2,
-                backgroundColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(144, 202, 249, 0.08)'
-                    : 'rgba(25, 118, 210, 0.04)',
-                border: '1px solid',
-                borderColor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(144, 202, 249, 0.3)'
-                    : 'rgba(25, 118, 210, 0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+                minWidth: 200,
               }}
             >
-              <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'primary.main' }}>
-                {confirmMode === 'start'
-                  ? t('maintenance.settingsSummaryTitle')
-                  : t('maintenance.currentSettingsTitle')}
-              </Typography>
+              {!isMaintenance ? (
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="large"
+                  startIcon={<PlayArrowIcon />}
+                  onClick={() => {
+                    // 시간 검증 먼저 실행
+                    const validation = validateMaintenanceTime();
+                    if (!validation.valid) {
+                      return;
+                    }
+                    setConfirmMode('start');
+                    setConfirmInput('');
+                    setConfirmOpen(true);
+                  }}
+                  disabled={!hasMessageForStart}
+                  sx={{
+                    width: 160,
+                    height: 160,
+                    borderRadius: '50%',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    flexDirection: 'column',
+                    gap: 1,
+                    '& .MuiButton-startIcon': {
+                      margin: 0,
+                      fontSize: '2rem',
+                    },
+                  }}
+                >
+                  <PlayArrowIcon sx={{ fontSize: '2.5rem' }} />
+                  {t('maintenance.start')}
+                </Button>
+              ) : (
+                <>
+                  {editMode ? (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      startIcon={<SaveIcon />}
+                      onClick={() => {
+                        // 시간 검증 먼저 실행
+                        const validation = validateMaintenanceTime();
+                        if (!validation.valid) {
+                          return;
+                        }
+                        setConfirmMode('update');
+                        setConfirmInput('');
+                        setConfirmOpen(true);
+                      }}
+                      disabled={!hasMessageForStart || !isDirty}
+                      sx={{
+                        width: 160,
+                        height: 160,
+                        borderRadius: '50%',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        flexDirection: 'column',
+                        gap: 1,
+                        '& .MuiButton-startIcon': {
+                          margin: 0,
+                          fontSize: '2rem',
+                        },
+                      }}
+                    >
+                      <SaveIcon sx={{ fontSize: '2.5rem' }} />
+                      {t('maintenance.update')}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      size="large"
+                      startIcon={<StopIcon />}
+                      onClick={() => {
+                        setConfirmMode('stop');
+                        setConfirmInput('');
+                        setConfirmOpen(true);
+                      }}
+                      sx={{
+                        width: 160,
+                        height: 160,
+                        borderRadius: '50%',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        flexDirection: 'column',
+                        gap: 1,
+                        '& .MuiButton-startIcon': {
+                          margin: 0,
+                          fontSize: '2rem',
+                        },
+                      }}
+                    >
+                      <StopIcon sx={{ fontSize: '2.5rem' }} />
+                      {t('maintenance.stop')}
+                    </Button>
+                  )}
+                  <Button
+                    variant="outlined"
+                    onClick={() => setEditMode((v) => !v)}
+                    sx={{ width: 140 }}
+                  >
+                    {editMode ? t('common.cancel') : t('maintenance.edit')}
+                  </Button>
+                </>
+              )}
+            </Box>
+          )}
 
+          {/* Confirm dialog */}
+          <Dialog
+            open={confirmOpen}
+            onClose={() => setConfirmOpen(false)}
+            maxWidth="md"
+            fullWidth
+            sx={{
+              '& .MuiBackdrop-root': {
+                backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.3)',
+              },
+            }}
+          >
+            <DialogTitle sx={{ pb: 1 }}>
+              <Typography variant="h6" component="div">
+                {confirmMode === 'start'
+                  ? t('maintenance.confirmStartTitle')
+                  : confirmMode === 'update'
+                    ? t('maintenance.confirmUpdateTitle')
+                    : t('maintenance.confirmStopTitle')}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                {confirmMode === 'start'
+                  ? t('maintenance.confirmStartSubtitle')
+                  : confirmMode === 'update'
+                    ? t('maintenance.confirmUpdateSubtitle')
+                    : t('maintenance.confirmStopSubtitle')}
+              </Typography>
+            </DialogTitle>
+            <DialogContent sx={{ pt: 2 }}>
+              {/* Settings Summary */}
               <Box
-                component="table"
                 sx={{
-                  width: '100%',
-                  borderCollapse: 'separate',
-                  borderSpacing: '0 8px',
+                  mb: 3,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(144, 202, 249, 0.08)'
+                      : 'rgba(25, 118, 210, 0.04)',
+                  border: '1px solid',
+                  borderColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(144, 202, 249, 0.3)'
+                      : 'rgba(25, 118, 210, 0.2)',
                 }}
               >
-                <Box component="tbody">
-                  <Box component="tr">
-                    <Box
-                      component="td"
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: '0.875rem',
-                        width: '140px',
-                        verticalAlign: 'top',
-                        pr: 2,
-                      }}
-                    >
-                      {t('maintenance.type')}:
-                    </Box>
-                    <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                      {type === 'regular'
-                        ? t('maintenance.types.regular')
-                        : t('maintenance.types.emergency')}
-                    </Box>
-                  </Box>
+                <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'primary.main' }}>
+                  {confirmMode === 'start'
+                    ? t('maintenance.settingsSummaryTitle')
+                    : t('maintenance.currentSettingsTitle')}
+                </Typography>
 
-                  {/* 점검 기간 */}
-                  <Box component="tr">
-                    <Box
-                      component="td"
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: '0.875rem',
-                        width: '140px',
-                        verticalAlign: 'top',
-                        pr: 2,
-                      }}
-                    >
-                      {t('maintenance.maintenancePeriodLabel')}:
+                <Box
+                  component="table"
+                  sx={{
+                    width: '100%',
+                    borderCollapse: 'separate',
+                    borderSpacing: '0 8px',
+                  }}
+                >
+                  <Box component="tbody">
+                    <Box component="tr">
+                      <Box
+                        component="td"
+                        sx={{
+                          fontWeight: 500,
+                          fontSize: '0.875rem',
+                          width: '140px',
+                          verticalAlign: 'top',
+                          pr: 2,
+                        }}
+                      >
+                        {t('maintenance.type')}:
+                      </Box>
+                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                        {type === 'regular'
+                          ? t('maintenance.types.regular')
+                          : t('maintenance.types.emergency')}
+                      </Box>
                     </Box>
-                    <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                      {(() => {
-                        if (startsAt && endsAt) {
-                          const duration = endsAt.diff(startsAt, 'minute');
-                          const hours = Math.floor(duration / 60);
-                          const minutes = duration % 60;
-                          const durationParts = [];
-                          if (hours > 0)
-                            durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
-                          if (minutes > 0)
-                            durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
-                          const durationText = durationParts.join(' ');
-                          return (
-                            <Box component="span">
-                              {startsAt.format('YYYY-MM-DD A h:mm')} ~{' '}
-                              {endsAt.format('YYYY-MM-DD A h:mm')}
-                              <Box
-                                component="span"
-                                sx={{
-                                  color: 'primary.main',
-                                  fontWeight: 600,
-                                  ml: 0.5,
-                                }}
-                              >
-                                ({durationText})
+
+                    {/* 점검 기간 */}
+                    <Box component="tr">
+                      <Box
+                        component="td"
+                        sx={{
+                          fontWeight: 500,
+                          fontSize: '0.875rem',
+                          width: '140px',
+                          verticalAlign: 'top',
+                          pr: 2,
+                        }}
+                      >
+                        {t('maintenance.maintenancePeriodLabel')}:
+                      </Box>
+                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                        {(() => {
+                          if (startsAt && endsAt) {
+                            const duration = endsAt.diff(startsAt, 'minute');
+                            const hours = Math.floor(duration / 60);
+                            const minutes = duration % 60;
+                            const durationParts = [];
+                            if (hours > 0)
+                              durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
+                            if (minutes > 0)
+                              durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
+                            const durationText = durationParts.join(' ');
+                            return (
+                              <Box component="span">
+                                {startsAt.format('YYYY-MM-DD A h:mm')} ~{' '}
+                                {endsAt.format('YYYY-MM-DD A h:mm')}
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    color: 'primary.main',
+                                    fontWeight: 600,
+                                    ml: 0.5,
+                                  }}
+                                >
+                                  ({durationText})
+                                </Box>
                               </Box>
-                            </Box>
-                          );
-                        } else if (startsAt && !endsAt) {
-                          return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('maintenance.manualStopLabel')}`;
-                        } else if (!startsAt && endsAt) {
-                          return `${t('maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
-                        } else {
-                          return `${t('maintenance.immediateStartLabel')} ~ ${t('maintenance.manualStopLabel')}`;
-                        }
-                      })()}
+                            );
+                          } else if (startsAt && !endsAt) {
+                            return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('maintenance.manualStopLabel')}`;
+                          } else if (!startsAt && endsAt) {
+                            return `${t('maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
+                          } else {
+                            return `${t('maintenance.immediateStartLabel')} ~ ${t('maintenance.manualStopLabel')}`;
+                          }
+                        })()}
+                      </Box>
                     </Box>
+
+                    {startsAt && (
+                      <Box component="tr">
+                        <Box
+                          component="td"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2,
+                          }}
+                        >
+                          {t('maintenance.startsAt')}:
+                        </Box>
+                        <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                          {startsAt.format('YYYY-MM-DD A h:mm')} (
+                          {startsAt.isValid() ? startsAt.toISOString() : '-'})
+                        </Box>
+                      </Box>
+                    )}
+
+                    {endsAt && (
+                      <Box component="tr">
+                        <Box
+                          component="td"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2,
+                          }}
+                        >
+                          {t('maintenance.endsAt')}:
+                        </Box>
+                        <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                          {endsAt.format('YYYY-MM-DD A h:mm')} (
+                          {endsAt.isValid() ? endsAt.toISOString() : '-'})
+                        </Box>
+                      </Box>
+                    )}
+
+                    {/* 강제종료 옵션 */}
+                    <Box component="tr">
+                      <Box
+                        component="td"
+                        sx={{
+                          fontWeight: 500,
+                          fontSize: '0.875rem',
+                          width: '140px',
+                          verticalAlign: 'top',
+                          pr: 2,
+                        }}
+                      >
+                        {t('maintenance.kickExistingPlayers')}:
+                      </Box>
+                      <Box
+                        component="td"
+                        sx={{
+                          fontSize: '0.875rem',
+                          verticalAlign: 'top',
+                          color: kickExistingPlayers ? 'warning.main' : 'success.main',
+                        }}
+                      >
+                        {kickExistingPlayers
+                          ? `${t('common.yes')} (${kickDelayMinutes}${t('maintenance.minutesUnit')})`
+                          : t('common.no')}
+                      </Box>
+                    </Box>
+
+                    {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
+                      <Box component="tr">
+                        <Box
+                          component="td"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2,
+                          }}
+                        >
+                          {t('clientVersions.maintenance.defaultMessage')}:
+                        </Box>
+                        <Box
+                          component="td"
+                          sx={{
+                            fontSize: '0.875rem',
+                            verticalAlign: 'top',
+                            maxWidth: '400px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
+                        </Box>
+                      </Box>
+                    )}
+
+                    {/* 설정자 정보 (Dialog에서는 현재 사용자) */}
+                    {user && (
+                      <Box component="tr">
+                        <Box
+                          component="td"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2,
+                          }}
+                        >
+                          {confirmMode === 'update'
+                            ? t('maintenance.updatedBy')
+                            : t('maintenance.setBy')}
+                          :
+                        </Box>
+                        <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                          {user.name} ({user.email})
+                        </Box>
+                      </Box>
+                    )}
                   </Box>
+                </Box>
+              </Box>
 
-                  {startsAt && (
-                    <Box component="tr">
-                      <Box
-                        component="td"
-                        sx={{
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                          width: '140px',
-                          verticalAlign: 'top',
-                          pr: 2,
-                        }}
-                      >
-                        {t('maintenance.startsAt')}:
-                      </Box>
-                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {startsAt.format('YYYY-MM-DD A h:mm')} (
-                        {startsAt.isValid() ? startsAt.toISOString() : '-'})
-                      </Box>
-                    </Box>
-                  )}
-
-                  {endsAt && (
-                    <Box component="tr">
-                      <Box
-                        component="td"
-                        sx={{
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                          width: '140px',
-                          verticalAlign: 'top',
-                          pr: 2,
-                        }}
-                      >
-                        {t('maintenance.endsAt')}:
-                      </Box>
-                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {endsAt.format('YYYY-MM-DD A h:mm')} (
-                        {endsAt.isValid() ? endsAt.toISOString() : '-'})
-                      </Box>
-                    </Box>
-                  )}
-
-                  {/* 강제종료 옵션 */}
-                  <Box component="tr">
-                    <Box
-                      component="td"
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: '0.875rem',
-                        width: '140px',
-                        verticalAlign: 'top',
-                        pr: 2,
-                      }}
-                    >
-                      {t('maintenance.kickExistingPlayers')}:
-                    </Box>
-                    <Box
-                      component="td"
-                      sx={{
-                        fontSize: '0.875rem',
-                        verticalAlign: 'top',
-                        color: kickExistingPlayers ? 'warning.main' : 'success.main',
-                      }}
-                    >
-                      {kickExistingPlayers
-                        ? `${t('common.yes')} (${kickDelayMinutes}${t('maintenance.minutesUnit')})`
-                        : t('common.no')}
-                    </Box>
-                  </Box>
-
-                  {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
-                    <Box component="tr">
-                      <Box
-                        component="td"
-                        sx={{
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                          width: '140px',
-                          verticalAlign: 'top',
-                          pr: 2,
-                        }}
-                      >
-                        {t('clientVersions.maintenance.defaultMessage')}:
-                      </Box>
-                      <Box
-                        component="td"
-                        sx={{
-                          fontSize: '0.875rem',
-                          verticalAlign: 'top',
-                          maxWidth: '400px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
-                      </Box>
-                    </Box>
-                  )}
-
-                  {/* 설정자 정보 (Dialog에서는 현재 사용자) */}
-                  {user && (
-                    <Box component="tr">
-                      <Box
-                        component="td"
-                        sx={{
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                          width: '140px',
-                          verticalAlign: 'top',
-                          pr: 2,
-                        }}
-                      >
-                        {confirmMode === 'update'
-                          ? t('maintenance.updatedBy')
-                          : t('maintenance.setBy')}
-                        :
-                      </Box>
-                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {user.name} ({user.email})
-                      </Box>
-                    </Box>
+              {/* Impact Warning */}
+              <Box
+                sx={{
+                  mb: 3,
+                  p: 2.5,
+                  borderRadius: 2,
+                  backgroundColor:
+                    confirmMode === 'start'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(244, 67, 54, 0.08)'
+                            : 'rgba(244, 67, 54, 0.04)'
+                      : (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(76, 175, 80, 0.08)'
+                            : 'rgba(76, 175, 80, 0.04)',
+                  border: '1px solid',
+                  borderColor:
+                    confirmMode === 'start'
+                      ? (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(244, 67, 54, 0.3)'
+                            : 'rgba(244, 67, 54, 0.2)'
+                      : (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(76, 175, 80, 0.3)'
+                            : 'rgba(76, 175, 80, 0.2)',
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  {confirmMode === 'start'
+                    ? t('maintenance.impactWarningTitle')
+                    : t('maintenance.impactRestoreTitle')}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  {confirmMode === 'start'
+                    ? t('maintenance.impactWarningDescription')
+                    : t('maintenance.impactRestoreDescription')}
+                </Typography>
+                <Box component="ul" sx={{ pl: 2, mb: 0 }}>
+                  {confirmMode === 'start' ? (
+                    <>
+                      {kickExistingPlayers ? (
+                        <>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('maintenance.impactItemKick1')}
+                          </Typography>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('maintenance.impactItemKick2')}
+                          </Typography>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('maintenance.impactItemKick3')}
+                          </Typography>
+                          <Typography component="li" variant="body2">
+                            {t('maintenance.impactItemKick4')}
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('maintenance.impactItemNoKick1')}
+                          </Typography>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('maintenance.impactItemNoKick2')}
+                          </Typography>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('maintenance.impactItemNoKick3')}
+                          </Typography>
+                          <Typography component="li" variant="body2">
+                            {t('maintenance.impactItemNoKick4')}
+                          </Typography>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                        {t('maintenance.restoreItem1')}
+                      </Typography>
+                      <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                        {t('maintenance.restoreItem2')}
+                      </Typography>
+                      <Typography component="li" variant="body2">
+                        {t('maintenance.restoreItem3')}
+                      </Typography>
+                    </>
                   )}
                 </Box>
               </Box>
-            </Box>
 
-            {/* Impact Warning */}
-            <Box
-              sx={{
-                mb: 3,
-                p: 2.5,
-                borderRadius: 2,
-                backgroundColor:
-                  confirmMode === 'start'
-                    ? (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(244, 67, 54, 0.08)'
-                          : 'rgba(244, 67, 54, 0.04)'
-                    : (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(76, 175, 80, 0.08)'
-                          : 'rgba(76, 175, 80, 0.04)',
-                border: '1px solid',
-                borderColor:
-                  confirmMode === 'start'
-                    ? (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(244, 67, 54, 0.3)'
-                          : 'rgba(244, 67, 54, 0.2)'
-                    : (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(76, 175, 80, 0.3)'
-                          : 'rgba(76, 175, 80, 0.2)',
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+              {/* Confirmation Input */}
+              <Typography sx={{ mb: 2, fontWeight: 500 }}>
                 {confirmMode === 'start'
-                  ? t('maintenance.impactWarningTitle')
-                  : t('maintenance.impactRestoreTitle')}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {confirmMode === 'start'
-                  ? t('maintenance.impactWarningDescription')
-                  : t('maintenance.impactRestoreDescription')}
-              </Typography>
-              <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                {confirmMode === 'start' ? (
-                  <>
-                    {kickExistingPlayers ? (
-                      <>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('maintenance.impactItemKick1')}
-                        </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('maintenance.impactItemKick2')}
-                        </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('maintenance.impactItemKick3')}
-                        </Typography>
-                        <Typography component="li" variant="body2">
-                          {t('maintenance.impactItemKick4')}
-                        </Typography>
-                      </>
-                    ) : (
-                      <>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('maintenance.impactItemNoKick1')}
-                        </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('maintenance.impactItemNoKick2')}
-                        </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('maintenance.impactItemNoKick3')}
-                        </Typography>
-                        <Typography component="li" variant="body2">
-                          {t('maintenance.impactItemNoKick4')}
-                        </Typography>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                      {t('maintenance.restoreItem1')}
-                    </Typography>
-                    <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                      {t('maintenance.restoreItem2')}
-                    </Typography>
-                    <Typography component="li" variant="body2">
-                      {t('maintenance.restoreItem3')}
-                    </Typography>
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            {/* Confirmation Input */}
-            <Typography sx={{ mb: 2, fontWeight: 500 }}>
-              {confirmMode === 'start'
-                ? t('maintenance.confirmStartMessage', {
-                    keyword: t('maintenance.confirmStartKeyword'),
-                  })
-                : confirmMode === 'update'
-                  ? t('maintenance.confirmUpdateMessage', {
-                      keyword: t('maintenance.confirmUpdateKeyword'),
+                  ? t('maintenance.confirmStartMessage', {
+                      keyword: t('maintenance.confirmStartKeyword'),
                     })
-                  : t('maintenance.confirmStopMessage', {
-                      keyword: t('maintenance.confirmStopKeyword'),
-                    })}
-            </Typography>
-            <TextField
-              autoFocus
-              fullWidth
-              size="medium"
-              value={confirmInput}
-              onChange={(e) => setConfirmInput(e.target.value)}
-              placeholder={
-                confirmMode === 'start'
-                  ? t('maintenance.confirmStartKeyword')
                   : confirmMode === 'update'
-                    ? t('maintenance.confirmUpdateKeyword')
-                    : t('maintenance.confirmStopKeyword')
-              }
-              sx={{ mb: 1 }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</Button>
-            <Button
-              color={
-                confirmMode === 'start' ? 'error' : confirmMode === 'update' ? 'primary' : 'success'
-              }
-              variant="contained"
-              onClick={async () => {
-                const expected =
+                    ? t('maintenance.confirmUpdateMessage', {
+                        keyword: t('maintenance.confirmUpdateKeyword'),
+                      })
+                    : t('maintenance.confirmStopMessage', {
+                        keyword: t('maintenance.confirmStopKeyword'),
+                      })}
+              </Typography>
+              <TextField
+                autoFocus
+                fullWidth
+                size="medium"
+                value={confirmInput}
+                onChange={(e) => setConfirmInput(e.target.value)}
+                placeholder={
                   confirmMode === 'start'
                     ? t('maintenance.confirmStartKeyword')
                     : confirmMode === 'update'
                       ? t('maintenance.confirmUpdateKeyword')
-                      : t('maintenance.confirmStopKeyword');
-                if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
-                setConfirmOpen(false);
-                if (confirmMode === 'start') await startMaintenance();
-                if (confirmMode === 'update') await updateMaintenance();
-                if (confirmMode === 'stop') await stopMaintenance();
-              }}
-              disabled={
-                confirmInput.trim().toLowerCase() !==
-                (confirmMode === 'start'
-                  ? t('maintenance.confirmStartKeyword')
+                      : t('maintenance.confirmStopKeyword')
+                }
+                sx={{ mb: 1 }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</Button>
+              <Button
+                color={
+                  confirmMode === 'start'
+                    ? 'error'
+                    : confirmMode === 'update'
+                      ? 'primary'
+                      : 'success'
+                }
+                variant="contained"
+                onClick={async () => {
+                  const expected =
+                    confirmMode === 'start'
+                      ? t('maintenance.confirmStartKeyword')
+                      : confirmMode === 'update'
+                        ? t('maintenance.confirmUpdateKeyword')
+                        : t('maintenance.confirmStopKeyword');
+                  if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
+                  setConfirmOpen(false);
+                  if (confirmMode === 'start') await startMaintenance();
+                  if (confirmMode === 'update') await updateMaintenance();
+                  if (confirmMode === 'stop') await stopMaintenance();
+                }}
+                disabled={
+                  confirmInput.trim().toLowerCase() !==
+                  (confirmMode === 'start'
+                    ? t('maintenance.confirmStartKeyword')
+                    : confirmMode === 'update'
+                      ? t('maintenance.confirmUpdateKeyword')
+                      : t('maintenance.confirmStopKeyword')
+                  ).toLowerCase()
+                }
+              >
+                {confirmMode === 'start'
+                  ? t('maintenance.start')
                   : confirmMode === 'update'
-                    ? t('maintenance.confirmUpdateKeyword')
-                    : t('maintenance.confirmStopKeyword')
-                ).toLowerCase()
-              }
-            >
-              {confirmMode === 'start'
-                ? t('maintenance.start')
-                : confirmMode === 'update'
-                  ? t('maintenance.update')
-                  : t('maintenance.stop')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+                    ? t('maintenance.update')
+                    : t('maintenance.stop')}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+      </PageContentLoader>
     </Box>
   );
 };

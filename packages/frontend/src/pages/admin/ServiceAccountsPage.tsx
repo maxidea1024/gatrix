@@ -2,6 +2,7 @@
  * Service Accounts Management Page
  *
  * Allows administrators to manage service accounts and their tokens.
+ * Uses RBAC system for role assignment.
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
@@ -24,16 +25,14 @@ import {
   TextField,
   Tooltip,
   Alert,
-  Collapse,
   Divider,
   List,
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Tabs,
+  Tab,
+  Autocomplete,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -41,14 +40,10 @@ import {
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
   ContentCopy as CopyIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
   VpnKey as TokenIcon,
-  ManageAccounts as AccountIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
-  Security as SecurityIcon,
-  Person as PersonIcon,
+  Shield as ShieldIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -56,64 +51,77 @@ import serviceAccountService, {
   ServiceAccount,
   ServiceAccountToken,
 } from '@/services/serviceAccountService';
+import { rbacService, Role, UserRole } from '@/services/rbacService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
-import PermissionSelector from '@/components/common/PermissionSelector';
-import { useEnvironments } from '@/contexts/EnvironmentContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import { Permission } from '@/types';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+
+// ==================== Tab Panel ====================
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => (
+  <Box role="tabpanel" hidden={value !== index} sx={{ pt: 2 }}>
+    {value === index && children}
+  </Box>
+);
 
 // ==================== Create/Edit Dialog ====================
 interface AccountDialogProps {
   open: boolean;
   account: ServiceAccount | null;
   onClose: () => void;
-  onSave: (data: {
-    name: string;
-    role: string;
-    permissions: string[];
-    allowAllEnvironments: boolean;
-    environments: string[];
-  }) => void;
+  onSave: (data: { name: string; roleIds: string[] }) => void;
 }
 
 const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, onSave }) => {
   const { t } = useTranslation();
-  const { environments } = useEnvironments();
   const [name, setName] = useState('');
-  const [role, setRole] = useState('user');
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [allowAllEnvs, setAllowAllEnvs] = useState(false);
-  const [selectedEnvs, setSelectedEnvs] = useState<string[]>([]);
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      if (account) {
-        setName(account.name);
-        setRole(account.role || 'user');
-        setPermissions((account.permissions || []) as Permission[]);
-        setAllowAllEnvs(account.allowAllEnvironments || false);
-        setSelectedEnvs(account.environments || []);
-      } else {
-        setName('');
-        setRole('user');
-        setPermissions([]);
-        setAllowAllEnvs(false);
-        setSelectedEnvs([]);
-      }
+      setName(account?.name || '');
+      setSelectedRoleIds([]);
+      setRolesLoading(true);
+
+      const loadData = async () => {
+        try {
+          const roles = await rbacService.getRoles();
+          setAllRoles(roles);
+
+          if (account) {
+            const userRoles = await rbacService.getUserRoles(String(account.id));
+            setSelectedRoleIds(userRoles.map((ur) => ur.roleId));
+          }
+        } catch {
+          // silent
+        } finally {
+          setRolesLoading(false);
+        }
+      };
+      loadData();
     }
   }, [account, open]);
 
+  const handleToggleRole = (roleId: string) => {
+    setSelectedRoleIds((prev) =>
+      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId]
+    );
+  };
+
   const handleSave = () => {
     if (!name.trim()) return;
-    onSave({
-      name: name.trim(),
-      role,
-      permissions: permissions as string[],
-      allowAllEnvironments: allowAllEnvs,
-      environments: selectedEnvs,
-    });
+    onSave({ name: name.trim(), roleIds: selectedRoleIds });
   };
 
   return (
@@ -138,6 +146,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
           gap: 3,
         }}
       >
+        {/* Basic Info */}
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
             {t('serviceAccounts.basicInfo')}
@@ -152,41 +161,69 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-
-            <FormControl fullWidth size="small">
-              <InputLabel id="role-select-label">{t('users.role')}</InputLabel>
-              <Select
-                labelId="role-select-label"
-                value={role}
-                label={t('users.role')}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-              </Select>
-            </FormControl>
           </Box>
         </Paper>
 
-        {/* Permissions & Environment Access */}
-        <Box>
-          <PermissionSelector
-            permissions={permissions}
-            onChange={setPermissions}
-            showEnvironments={true}
-            environments={environments.map((env) => ({
-              id: env.environmentId,
-              environmentId: env.environmentId,
-              name: env.environmentName,
-              displayName: env.displayName,
-              environmentName: env.environmentName,
-            }))}
-            allowAllEnvs={allowAllEnvs}
-            selectedEnvironments={selectedEnvs}
-            onAllowAllEnvsChange={setAllowAllEnvs}
-            onEnvironmentsChange={setSelectedEnvs}
-          />
-        </Box>
+        {/* RBAC Role Assignment */}
+        <Paper variant="outlined" sx={{ p: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+            {t('rbac.roles.title')}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+            {t('serviceAccounts.roleSelectionGuide')}
+          </Typography>
+
+          {rolesLoading ? (
+            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+              {t('common.loading')}
+            </Typography>
+          ) : allRoles.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+              {t('serviceAccounts.noRolesAvailable')}
+            </Typography>
+          ) : (
+            <List dense disablePadding>
+              {allRoles.map((role) => {
+                const isSelected = selectedRoleIds.includes(role.id);
+                return (
+                  <ListItem
+                    key={role.id}
+                    sx={{
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      mb: 0.5,
+                      cursor: 'pointer',
+                      bgcolor: isSelected ? 'action.selected' : 'transparent',
+                      '&:hover': { bgcolor: isSelected ? 'action.selected' : 'action.hover' },
+                    }}
+                    onClick={() => handleToggleRole(role.id)}
+                  >
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ShieldIcon
+                            sx={{
+                              fontSize: 16,
+                              color: isSelected ? 'primary.main' : 'text.disabled',
+                            }}
+                          />
+                          <Typography variant="body2" fontWeight={isSelected ? 600 : 400}>
+                            {role.roleName}
+                          </Typography>
+                          {isSelected && (
+                            <Chip label="✓" size="small" color="primary" sx={{ height: 20 }} />
+                          )}
+                        </Box>
+                      }
+                      secondary={role.description || null}
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+          )}
+        </Paper>
       </Box>
 
       {/* Footer Actions */}
@@ -253,7 +290,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, accountId, onClose, onC
       setCreatedToken(result.secret);
       onCreated();
       enqueueSnackbar(t('serviceAccounts.tokenCreatedSuccess'), { variant: 'success' });
-    } catch (error) {
+    } catch {
       enqueueSnackbar(t('serviceAccounts.tokenCreateFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
@@ -377,8 +414,6 @@ const ServiceAccountsPage: React.FC = () => {
   const projectApiPath = getProjectApiPath();
   const [accounts, setAccounts] = useState<ServiceAccount[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [accountTokens, setAccountTokens] = useState<Record<number, ServiceAccountToken[]>>({});
 
   // Dialog states
   const [editDialog, setEditDialog] = useState<{
@@ -399,63 +434,135 @@ const ServiceAccountsPage: React.FC = () => {
     name: string;
   } | null>(null);
 
+  // Detail drawer state
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailAccount, setDetailAccount] = useState<ServiceAccount | null>(null);
+  const [detailTab, setDetailTab] = useState(0);
+  const [detailTokens, setDetailTokens] = useState<ServiceAccountToken[]>([]);
+  const [detailRoles, setDetailRoles] = useState<UserRole[]>([]);
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
     try {
       const data = await serviceAccountService.getAll(projectApiPath);
       setAccounts(data);
-    } catch (error) {
+    } catch {
       enqueueSnackbar(t('serviceAccounts.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, projectApiPath]);
 
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
 
-  const fetchTokens = useCallback(
-    async (accountId: number) => {
-      try {
-        const account = await serviceAccountService.getById(projectApiPath, accountId);
-        if (account.tokens) {
-          setAccountTokens((prev) => ({ ...prev, [accountId]: account.tokens! }));
-        }
-      } catch (error) {
-        enqueueSnackbar(t('serviceAccounts.tokenLoadFailed'), { variant: 'error' });
-      }
-    },
-    [t]
-  );
+  // Detail drawer logic
+  const handleViewDetails = async (account: ServiceAccount) => {
+    setDetailAccount(account);
+    setDetailOpen(true);
+    setDetailTab(0);
+    setSelectedRoleId(null);
 
-  const handleExpand = (id: number) => {
-    if (expandedId === id) {
-      setExpandedId(null);
-    } else {
-      setExpandedId(id);
-      fetchTokens(id);
+    try {
+      // Load tokens and roles in parallel
+      const [accountDetail, userRoles, roles] = await Promise.all([
+        serviceAccountService.getById(projectApiPath, account.id),
+        rbacService.getUserRoles(String(account.id)),
+        rbacService.getRoles(),
+      ]);
+      setDetailTokens(accountDetail.tokens || []);
+      setDetailRoles(userRoles);
+      setAllRoles(roles);
+    } catch {
+      enqueueSnackbar(t('serviceAccounts.loadFailed'), { variant: 'error' });
     }
   };
 
-  const handleSaveAccount = async (data: {
-    name: string;
-    role: string;
-    permissions: string[];
-    allowAllEnvironments: boolean;
-    environments: string[];
-  }) => {
+  const refreshDetail = async () => {
+    if (!detailAccount) return;
+    try {
+      const [accountDetail, userRoles] = await Promise.all([
+        serviceAccountService.getById(projectApiPath, detailAccount.id),
+        rbacService.getUserRoles(String(detailAccount.id)),
+      ]);
+      setDetailTokens(accountDetail.tokens || []);
+      setDetailRoles(userRoles);
+    } catch {
+      // silent
+    }
+  };
+
+  // Role management
+  const handleAssignRole = async () => {
+    if (!detailAccount || !selectedRoleId) return;
+    try {
+      await rbacService.assignUserRole(String(detailAccount.id), selectedRoleId);
+      enqueueSnackbar(t('serviceAccounts.roleAssignSuccess'), { variant: 'success' });
+      setSelectedRoleId(null);
+      refreshDetail();
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || t('serviceAccounts.roleAssignFailed');
+      enqueueSnackbar(msg, { variant: 'error' });
+    }
+  };
+
+  const handleRemoveRole = async (roleId: string) => {
+    if (!detailAccount) return;
+    try {
+      await rbacService.removeUserRole(String(detailAccount.id), roleId);
+      enqueueSnackbar(t('serviceAccounts.roleRemoveSuccess'), { variant: 'success' });
+      refreshDetail();
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || t('serviceAccounts.roleRemoveFailed');
+      enqueueSnackbar(msg, { variant: 'error' });
+    }
+  };
+
+  // Account CRUD
+  const handleSaveAccount = async (data: { name: string; roleIds: string[] }) => {
     try {
       if (editDialog.account) {
-        await serviceAccountService.update(projectApiPath, editDialog.account.id, data);
+        // Update name
+        await serviceAccountService.update(projectApiPath, editDialog.account.id, {
+          name: data.name,
+        });
+
+        // Sync roles: get current roles, compute adds/removes
+        const currentRoles = await rbacService.getUserRoles(String(editDialog.account.id));
+        const currentRoleIds = currentRoles.map((r) => r.roleId);
+        const toAdd = data.roleIds.filter((id) => !currentRoleIds.includes(id));
+        const toRemove = currentRoleIds.filter((id) => !data.roleIds.includes(id));
+
+        await Promise.all([
+          ...toAdd.map((roleId) =>
+            rbacService.assignUserRole(String(editDialog.account!.id), roleId)
+          ),
+          ...toRemove.map((roleId) =>
+            rbacService.removeUserRole(String(editDialog.account!.id), roleId)
+          ),
+        ]);
+
         enqueueSnackbar(t('serviceAccounts.updateSuccess'), { variant: 'success' });
       } else {
-        await serviceAccountService.create(projectApiPath, data);
+        // Create account then assign roles
+        const created = await serviceAccountService.create(projectApiPath, {
+          name: data.name,
+        });
+
+        if (data.roleIds.length > 0) {
+          await Promise.all(
+            data.roleIds.map((roleId) => rbacService.assignUserRole(String(created.id), roleId))
+          );
+        }
+
         enqueueSnackbar(t('serviceAccounts.createSuccess'), { variant: 'success' });
       }
       setEditDialog({ open: false, account: null });
       fetchAccounts();
-    } catch (error) {
+    } catch {
       enqueueSnackbar(
         editDialog.account ? t('serviceAccounts.updateFailed') : t('serviceAccounts.createFailed'),
         { variant: 'error' }
@@ -476,14 +583,17 @@ const ServiceAccountsPage: React.FC = () => {
           deleteDialog.tokenId
         );
         enqueueSnackbar(t('serviceAccounts.tokenDeleteSuccess'), { variant: 'success' });
-        fetchTokens(deleteDialog.accountId);
+        refreshDetail();
       }
       setDeleteDialog(null);
       fetchAccounts();
-    } catch (error) {
+    } catch {
       enqueueSnackbar(t('serviceAccounts.deleteFailed'), { variant: 'error' });
     }
   };
+
+  // Compute available roles (exclude already assigned)
+  const availableRoles = allRoles.filter((r) => !detailRoles.some((ur) => ur.roleId === r.id));
 
   return (
     <Box sx={{ p: 3 }}>
@@ -521,95 +631,54 @@ const ServiceAccountsPage: React.FC = () => {
       </Box>
 
       {/* Content */}
-      {!loading && accounts.length === 0 ? (
-        <EmptyPlaceholder
-          message={t('serviceAccounts.noAccounts')}
-          onAddClick={() => setEditDialog({ open: true, account: null })}
-          addButtonLabel={t('serviceAccounts.createAccount')}
-        />
-      ) : (
-        <TableContainer component={Paper} variant="outlined">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell width={40} />
-                <TableCell>{t('serviceAccounts.accountName')}</TableCell>
-                <TableCell>{t('users.role')}</TableCell>
-                <TableCell align="center">{t('users.permissions')}</TableCell>
-                <TableCell>{t('serviceAccounts.status')}</TableCell>
-                <TableCell align="center">{t('serviceAccounts.tokens')}</TableCell>
-                <TableCell>{t('serviceAccounts.createdAt')}</TableCell>
-                <TableCell align="right">{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
+      <PageContentLoader loading={loading}>
+        {accounts.length === 0 ? (
+          <EmptyPlaceholder
+            message={t('serviceAccounts.noAccounts')}
+            onAddClick={() => setEditDialog({ open: true, account: null })}
+            addButtonLabel={t('serviceAccounts.createAccount')}
+          />
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">{t('common.loading')}</Typography>
-                  </TableCell>
+                  <TableCell>{t('serviceAccounts.accountName')}</TableCell>
+                  <TableCell align="center">{t('rbac.roles.title')}</TableCell>
+                  <TableCell>{t('serviceAccounts.status')}</TableCell>
+                  <TableCell align="center">{t('serviceAccounts.tokens')}</TableCell>
+                  <TableCell>{t('serviceAccounts.createdAt')}</TableCell>
+                  <TableCell align="right">{t('common.actions')}</TableCell>
                 </TableRow>
-              ) : (
-                accounts.map((account) => (
-                  <React.Fragment key={account.id}>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                      <Typography color="text.secondary">{t('common.loading')}</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  accounts.map((account) => (
                     <TableRow
+                      key={account.id}
                       hover
-                      sx={{
-                        '& > td': {
-                          borderBottom: expandedId === account.id ? 'none' : undefined,
-                        },
-                      }}
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => handleViewDetails(account)}
                     >
-                      <TableCell>
-                        <IconButton size="small" onClick={() => handleExpand(account.id)}>
-                          {expandedId === account.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                        </IconButton>
-                      </TableCell>
                       <TableCell>
                         <Typography fontWeight="medium">{account.name}</Typography>
                         <Typography variant="caption" color="text.secondary">
                           {account.email}
                         </Typography>
                       </TableCell>
-                      <TableCell>
-                        <Tooltip title={t(`users.roles.${account.role || 'user'}`)}>
-                          <Chip
-                            icon={
-                              account.role === 'admin' ? (
-                                <SecurityIcon sx={{ fontSize: '14px !important' }} />
-                              ) : (
-                                <PersonIcon sx={{ fontSize: '14px !important' }} />
-                              )
-                            }
-                            label={t(`users.roles.${account.role || 'user'}`)}
-                            size="small"
-                            color={account.role === 'admin' ? 'primary' : 'secondary'}
-                            variant="outlined"
-                          />
-                        </Tooltip>
-                      </TableCell>
                       <TableCell align="center">
-                        <Tooltip
-                          title={
-                            account.permissions?.length ? (
-                              <Box sx={{ p: 0.5 }}>
-                                {account.permissions.map((p) => (
-                                  <Typography key={p} variant="caption" sx={{ display: 'block' }}>
-                                    • {t(`permissions.${p.replace('.', '_')}`)}
-                                  </Typography>
-                                ))}
-                              </Box>
-                            ) : (
-                              t('users.noPermissionsAssigned')
-                            )
-                          }
-                        >
-                          <Chip
-                            label={account.permissions?.length || 0}
-                            size="small"
-                            variant="outlined"
-                          />
-                        </Tooltip>
+                        <Chip
+                          label={account.tokens?.length || '–'}
+                          size="small"
+                          variant="outlined"
+                          icon={<ShieldIcon sx={{ fontSize: 14 }} />}
+                        />
                       </TableCell>
                       <TableCell>
                         <Chip
@@ -631,23 +700,20 @@ const ServiceAccountsPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">
-                          {new Date(account.createdAt).toLocaleDateString()}
-                        </Typography>
+                        <Tooltip title={formatDateTimeDetailed(account.createdAt)}>
+                          <Typography variant="body2">
+                            {formatRelativeTime(account.createdAt)}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title={t('serviceAccounts.createToken')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => setTokenDialog({ open: true, accountId: account.id })}
-                          >
-                            <TokenIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
                         <Tooltip title={t('common.edit')}>
                           <IconButton
                             size="small"
-                            onClick={() => setEditDialog({ open: true, account })}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditDialog({ open: true, account });
+                            }}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
@@ -656,109 +722,214 @@ const ServiceAccountsPage: React.FC = () => {
                           <IconButton
                             size="small"
                             color="error"
-                            onClick={() =>
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setDeleteDialog({
                                 open: true,
                                 type: 'account',
                                 accountId: account.id,
                                 name: account.name,
-                              })
-                            }
+                              });
+                            }}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
                     </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </PageContentLoader>
 
-                    {/* Expanded Token List */}
-                    <TableRow>
-                      <TableCell
-                        colSpan={8}
-                        sx={{
-                          py: 0,
-                          borderBottom: expandedId === account.id ? undefined : 'none',
-                        }}
-                      >
-                        <Collapse in={expandedId === account.id}>
-                          <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1, my: 1 }}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                mb: 1,
-                              }}
-                            >
-                              <Typography variant="subtitle2">
-                                {t('serviceAccounts.tokensFor', { name: account.name })}
-                              </Typography>
-                              <Button
-                                size="small"
-                                startIcon={<AddIcon />}
-                                onClick={() =>
-                                  setTokenDialog({ open: true, accountId: account.id })
-                                }
-                              >
-                                {t('serviceAccounts.addToken')}
-                              </Button>
-                            </Box>
-                            <Divider sx={{ mb: 1 }} />
-                            {!accountTokens[account.id] ||
-                            accountTokens[account.id].length === 0 ? (
-                              <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
-                                {t('serviceAccounts.noTokens')}
-                              </Typography>
-                            ) : (
-                              <List dense disablePadding>
-                                {accountTokens[account.id].map((token) => (
-                                  <ListItem key={token.id} sx={{ px: 0 }}>
-                                    <ListItemText
-                                      primary={token.tokenName}
-                                      secondary={
-                                        <>
-                                          {token.description && `${token.description} · `}
-                                          {new Date(token.createdAt).toLocaleDateString()}
-                                          {token.expiresAt &&
-                                            ` · ${t('serviceAccounts.expiresAt')}: ${new Date(
-                                              token.expiresAt
-                                            ).toLocaleDateString()}`}
-                                        </>
-                                      }
-                                    />
-                                    <ListItemSecondaryAction>
-                                      <IconButton
-                                        edge="end"
-                                        size="small"
-                                        color="error"
-                                        onClick={() =>
-                                          setDeleteDialog({
-                                            open: true,
-                                            type: 'token',
-                                            accountId: account.id,
-                                            tokenId: token.id,
-                                            name: token.tokenName,
-                                          })
-                                        }
-                                      >
-                                        <DeleteIcon fontSize="small" />
-                                      </IconButton>
-                                    </ListItemSecondaryAction>
-                                  </ListItem>
-                                ))}
-                              </List>
+      {/* Detail Drawer */}
+      <ResizableDrawer
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        title={detailAccount?.name || ''}
+        subtitle={detailAccount?.email || ''}
+        storageKey="serviceAccountDetailWidth"
+        defaultWidth={550}
+        minWidth={450}
+      >
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
+            <Tabs value={detailTab} onChange={(_, v) => setDetailTab(v)}>
+              <Tab
+                icon={<TokenIcon sx={{ fontSize: 18 }} />}
+                iconPosition="start"
+                label={t('serviceAccounts.tokens')}
+              />
+              <Tab
+                icon={<ShieldIcon sx={{ fontSize: 18 }} />}
+                iconPosition="start"
+                label={t('rbac.roles.title')}
+              />
+            </Tabs>
+          </Box>
+
+          <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+            {/* Tokens Tab */}
+            <TabPanel value={detailTab} index={0}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() =>
+                    setTokenDialog({ open: true, accountId: detailAccount?.id || null })
+                  }
+                >
+                  {t('serviceAccounts.addToken')}
+                </Button>
+              </Box>
+
+              {detailTokens.length === 0 ? (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ py: 2, textAlign: 'center' }}
+                >
+                  {t('serviceAccounts.noTokens')}
+                </Typography>
+              ) : (
+                <List dense disablePadding>
+                  {detailTokens.map((token) => (
+                    <ListItem key={token.id} sx={{ px: 0 }}>
+                      <ListItemText
+                        primary={token.tokenName}
+                        secondary={
+                          <>
+                            {token.description && `${token.description} · `}
+                            <Tooltip title={formatDateTimeDetailed(token.createdAt)}>
+                              <span>{formatRelativeTime(token.createdAt)}</span>
+                            </Tooltip>
+                            {token.expiresAt && (
+                              <>
+                                {` · ${t('serviceAccounts.expiresAt')}: `}
+                                <Tooltip title={formatDateTimeDetailed(token.expiresAt)}>
+                                  <span>{formatRelativeTime(token.expiresAt)}</span>
+                                </Tooltip>
+                              </>
                             )}
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                ))
+                          </>
+                        }
+                      />
+                      <ListItemSecondaryAction>
+                        <IconButton
+                          edge="end"
+                          size="small"
+                          color="error"
+                          onClick={() => {
+                            if (detailAccount) {
+                              setDeleteDialog({
+                                open: true,
+                                type: 'token',
+                                accountId: detailAccount.id,
+                                tokenId: token.id,
+                                name: token.tokenName,
+                              });
+                            }
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
               )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+            </TabPanel>
+
+            {/* Roles Tab */}
+            <TabPanel value={detailTab} index={1}>
+              {/* Add Role */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Autocomplete
+                  fullWidth
+                  size="small"
+                  options={availableRoles}
+                  getOptionLabel={(opt) => opt.roleName}
+                  value={availableRoles.find((r) => r.id === selectedRoleId) || null}
+                  onChange={(_, val) => setSelectedRoleId(val?.id || null)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={t('serviceAccounts.selectRole')}
+                      size="small"
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option.id}>
+                      <Box>
+                        <Typography variant="body2">{option.roleName}</Typography>
+                        {option.description && (
+                          <Typography variant="caption" color="text.secondary">
+                            {option.description}
+                          </Typography>
+                        )}
+                      </Box>
+                    </li>
+                  )}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={!selectedRoleId}
+                  onClick={handleAssignRole}
+                  sx={{ minWidth: 80 }}
+                >
+                  {t('common.add')}
+                </Button>
+              </Box>
+
+              <Divider sx={{ mb: 1 }} />
+
+              {/* Role List */}
+              {detailRoles.length === 0 ? (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ py: 2, textAlign: 'center' }}
+                >
+                  {t('serviceAccounts.noRoles')}
+                </Typography>
+              ) : (
+                <List dense disablePadding>
+                  {detailRoles.map((ur) => (
+                    <ListItem key={ur.id} sx={{ px: 0 }}>
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <ShieldIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                            <Typography variant="body2" fontWeight="medium">
+                              {ur.roleName}
+                            </Typography>
+                          </Box>
+                        }
+                        secondary={ur.roleDescription || null}
+                      />
+                      <ListItemSecondaryAction>
+                        <IconButton
+                          edge="end"
+                          size="small"
+                          color="error"
+                          onClick={() => handleRemoveRole(ur.roleId)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </TabPanel>
+          </Box>
+        </Box>
+      </ResizableDrawer>
 
       {/* Dialogs */}
       <AccountDialog
@@ -773,9 +944,7 @@ const ServiceAccountsPage: React.FC = () => {
         accountId={tokenDialog.accountId}
         onClose={() => setTokenDialog({ open: false, accountId: null })}
         onCreated={() => {
-          if (tokenDialog.accountId) {
-            fetchTokens(tokenDialog.accountId);
-          }
+          refreshDetail();
           fetchAccounts();
         }}
       />

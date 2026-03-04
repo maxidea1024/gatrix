@@ -46,7 +46,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import {
   rbacService,
   GroupWithCounts,
@@ -56,6 +56,8 @@ import {
   Role,
 } from '@/services/rbacService';
 import api from '@/services/api';
+import ResizableDrawer from '@/components/common/ResizableDrawer';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 // ==================== Tab Panel ====================
 
@@ -102,9 +104,20 @@ const GroupsPage: React.FC = () => {
     description: '',
     addNewUsersByDefault: false,
   });
+  const [initialFormData, setInitialFormData] = useState({
+    groupName: '',
+    description: '',
+    addNewUsersByDefault: false,
+  });
 
   // Detail tab
   const [detailTab, setDetailTab] = useState(0);
+
+  // Pending changes for detail drawer (buffered)
+  const [pendingMemberAdds, setPendingMemberAdds] = useState<string[]>([]);
+  const [pendingMemberRemoves, setPendingMemberRemoves] = useState<string[]>([]);
+  const [pendingRoleAdds, setPendingRoleAdds] = useState<string[]>([]);
+  const [pendingRoleRemoves, setPendingRoleRemoves] = useState<string[]>([]);
 
   // Member/Role add state
   const [allUsers, setAllUsers] = useState<Array<{ id: string; name: string; email: string }>>([]);
@@ -183,14 +196,19 @@ const GroupsPage: React.FC = () => {
 
   const openEditDialog = (group: GroupWithCounts) => {
     setDialogMode('edit');
-    setFormData({
+    const data = {
       groupName: group.groupName,
       description: group.description || '',
       addNewUsersByDefault: group.addNewUsersByDefault,
-    });
+    };
+    setFormData(data);
+    setInitialFormData(data);
     setSelectedGroupForDelete(group);
     setDialogOpen(true);
   };
+
+  const isEditDirty =
+    dialogMode === 'create' || JSON.stringify(formData) !== JSON.stringify(initialFormData);
 
   const openDeleteDialog = (group: GroupWithCounts) => {
     setSelectedGroupForDelete(group);
@@ -203,6 +221,12 @@ const GroupsPage: React.FC = () => {
       setSelectedGroup(detail);
       setDetailTab(0);
       setDetailDialogOpen(true);
+      setPendingMemberAdds([]);
+      setPendingMemberRemoves([]);
+      setPendingRoleAdds([]);
+      setPendingRoleRemoves([]);
+      setSelectedUserId(null);
+      setSelectedRoleId(null);
       loadUsers();
       loadRoles();
     } catch (error) {
@@ -260,78 +284,117 @@ const GroupsPage: React.FC = () => {
     }
   };
 
-  // ─── Member management ─────────────────────────
+  // ─── Member management (buffered) ─────────────────────────
 
-  const handleAddMember = async () => {
-    if (!selectedGroup || !selectedUserId) return;
-    try {
-      await rbacService.addGroupMember(selectedGroup.id, selectedUserId);
-      enqueueSnackbar(t('rbac.groups.memberAdded'), { variant: 'success' });
-      // Refresh group detail
-      const detail = await rbacService.getGroup(selectedGroup.id);
-      setSelectedGroup(detail);
-      setSelectedUserId(null);
-      loadGroups();
-    } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.memberAddFailed');
-      enqueueSnackbar(message, { variant: 'error' });
+  const handleAddMember = () => {
+    if (!selectedUserId) return;
+    // If previously pending remove, just cancel the remove
+    if (pendingMemberRemoves.includes(selectedUserId)) {
+      setPendingMemberRemoves((prev) => prev.filter((id) => id !== selectedUserId));
+    } else {
+      setPendingMemberAdds((prev) => [...prev, selectedUserId]);
+    }
+    setSelectedUserId(null);
+  };
+
+  const handleRemoveMember = (userId: string) => {
+    // If previously pending add, just cancel the add
+    if (pendingMemberAdds.includes(userId)) {
+      setPendingMemberAdds((prev) => prev.filter((id) => id !== userId));
+    } else {
+      setPendingMemberRemoves((prev) => [...prev, userId]);
     }
   };
 
-  const handleRemoveMember = async (userId: string) => {
+  // ─── Role management (buffered) ─────────────────────────
+
+  const handleAddRole = () => {
+    if (!selectedRoleId) return;
+    if (pendingRoleRemoves.includes(selectedRoleId)) {
+      setPendingRoleRemoves((prev) => prev.filter((id) => id !== selectedRoleId));
+    } else {
+      setPendingRoleAdds((prev) => [...prev, selectedRoleId]);
+    }
+    setSelectedRoleId(null);
+  };
+
+  const handleRemoveRole = (roleId: string) => {
+    if (pendingRoleAdds.includes(roleId)) {
+      setPendingRoleAdds((prev) => prev.filter((id) => id !== roleId));
+    } else {
+      setPendingRoleRemoves((prev) => [...prev, roleId]);
+    }
+  };
+
+  // Save all pending detail changes
+  const handleSaveDetail = async () => {
     if (!selectedGroup) return;
     try {
-      await rbacService.removeGroupMember(selectedGroup.id, userId);
-      enqueueSnackbar(t('rbac.groups.memberRemoved'), { variant: 'success' });
-      const detail = await rbacService.getGroup(selectedGroup.id);
-      setSelectedGroup(detail);
+      setSaving(true);
+      // Process member adds
+      for (const userId of pendingMemberAdds) {
+        await rbacService.addGroupMember(selectedGroup.id, userId);
+      }
+      // Process member removes
+      for (const userId of pendingMemberRemoves) {
+        await rbacService.removeGroupMember(selectedGroup.id, userId);
+      }
+      // Process role adds
+      for (const roleId of pendingRoleAdds) {
+        await rbacService.addGroupRole(selectedGroup.id, roleId);
+      }
+      // Process role removes
+      for (const roleId of pendingRoleRemoves) {
+        await rbacService.removeGroupRole(selectedGroup.id, roleId);
+      }
+      enqueueSnackbar(t('rbac.groups.updateSuccess'), { variant: 'success' });
+      setDetailDialogOpen(false);
       loadGroups();
     } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.memberRemoveFailed');
+      const message = error?.response?.data?.message || t('rbac.groups.saveFailed');
       enqueueSnackbar(message, { variant: 'error' });
+    } finally {
+      setSaving(false);
     }
   };
 
-  // ─── Role management ─────────────────────────
+  const hasDetailChanges =
+    pendingMemberAdds.length > 0 ||
+    pendingMemberRemoves.length > 0 ||
+    pendingRoleAdds.length > 0 ||
+    pendingRoleRemoves.length > 0;
 
-  const handleAddRole = async () => {
-    if (!selectedGroup || !selectedRoleId) return;
-    try {
-      await rbacService.addGroupRole(selectedGroup.id, selectedRoleId);
-      enqueueSnackbar(t('rbac.groups.roleAdded'), { variant: 'success' });
-      const detail = await rbacService.getGroup(selectedGroup.id);
-      setSelectedGroup(detail);
-      setSelectedRoleId(null);
-      loadGroups();
-    } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.roleAddFailed');
-      enqueueSnackbar(message, { variant: 'error' });
-    }
-  };
+  // Available members: not already in group AND not pending add; also include pending removes as available again
+  const effectiveMembers = selectedGroup
+    ? [
+        ...selectedGroup.members.filter((m) => !pendingMemberRemoves.includes(m.userId)),
+        ...(pendingMemberAdds
+          .map((userId) => {
+            const u = allUsers.find((u) => u.id === userId);
+            return u ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember) : null;
+          })
+          .filter(Boolean) as GroupMember[]),
+      ]
+    : [];
 
-  const handleRemoveRole = async (roleId: string) => {
-    if (!selectedGroup) return;
-    try {
-      await rbacService.removeGroupRole(selectedGroup.id, roleId);
-      enqueueSnackbar(t('rbac.groups.roleRemoved'), { variant: 'success' });
-      const detail = await rbacService.getGroup(selectedGroup.id);
-      setSelectedGroup(detail);
-      loadGroups();
-    } catch (error: any) {
-      const message = error?.response?.data?.message || t('rbac.groups.roleRemoveFailed');
-      enqueueSnackbar(message, { variant: 'error' });
-    }
-  };
+  const availableUsers = allUsers.filter((u) => !effectiveMembers.some((m) => m.userId === u.id));
 
-  // Available members (not already in group)
-  const availableUsers = selectedGroup
-    ? allUsers.filter((u) => !selectedGroup.members.some((m) => m.userId === u.id))
-    : allUsers;
+  // Available roles: not already assigned AND not pending add; also include pending removes
+  const effectiveRoles = selectedGroup
+    ? [
+        ...selectedGroup.roles.filter((r) => !pendingRoleRemoves.includes(r.roleId)),
+        ...(pendingRoleAdds
+          .map((roleId) => {
+            const r = allRoles.find((r) => r.id === roleId);
+            return r
+              ? ({ roleId: r.id, roleName: r.roleName, description: r.description } as GroupRole)
+              : null;
+          })
+          .filter(Boolean) as GroupRole[]),
+      ]
+    : [];
 
-  // Available roles (not already assigned)
-  const availableRoles = selectedGroup
-    ? allRoles.filter((r) => !selectedGroup.roles.some((gr) => gr.roleId === r.id))
-    : allRoles;
+  const availableRoles = allRoles.filter((r) => !effectiveRoles.some((er) => er.roleId === r.id));
 
   return (
     <Box sx={{ p: 3 }}>
@@ -369,168 +432,182 @@ const GroupsPage: React.FC = () => {
       </Box>
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0 }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : filteredGroups.length === 0 ? (
-            <EmptyPagePlaceholder
-              icon={<GroupIcon sx={{ fontSize: 48 }} />}
-              message={t('rbac.groups.emptyTitle')}
-              subtitle={t('rbac.groups.emptyDescription')}
-            />
-          ) : (
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('rbac.groups.name')}</TableCell>
-                    <TableCell>{t('rbac.groups.descriptionColumn')}</TableCell>
-                    <TableCell align="center">{t('rbac.groups.members')}</TableCell>
-                    <TableCell align="center">{t('rbac.groups.roles')}</TableCell>
-                    <TableCell align="center">{t('rbac.groups.autoAdd')}</TableCell>
-                    <TableCell>{t('common.createdAt')}</TableCell>
-                    <TableCell align="right">{t('common.actions')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredGroups.map((group) => (
-                    <TableRow key={group.id} hover>
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: 500,
-                            cursor: 'pointer',
-                            '&:hover': { color: 'primary.main', textDecoration: 'underline' },
-                          }}
-                          onClick={() => openDetailDialog(group)}
-                        >
-                          {group.groupName}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            maxWidth: 300,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {group.description || '-'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          icon={<PeopleIcon />}
-                          label={group.memberCount}
-                          size="small"
-                          variant="outlined"
-                          color={group.memberCount > 0 ? 'primary' : 'default'}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          icon={<ShieldIcon />}
-                          label={group.roleCount}
-                          size="small"
-                          variant="outlined"
-                          color={group.roleCount > 0 ? 'primary' : 'default'}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        {group.addNewUsersByDefault ? (
-                          <Chip label={t('common.yes')} size="small" color="success" />
-                        ) : (
-                          <Chip label={t('common.no')} size="small" variant="outlined" />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {formatRelativeTime(group.createdAt)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton size="small" onClick={() => openEditDialog(group)}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => openDeleteDialog(group)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
+      <PageContentLoader loading={loading}>
+        <Card>
+          <CardContent sx={{ p: 0 }}>
+            {filteredGroups.length === 0 ? (
+              <EmptyPagePlaceholder
+                icon={<GroupIcon sx={{ fontSize: 48 }} />}
+                message={t('rbac.groups.emptyTitle')}
+                subtitle={t('rbac.groups.emptyDescription')}
+              />
+            ) : (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t('rbac.groups.name')}</TableCell>
+                      <TableCell>{t('rbac.groups.descriptionColumn')}</TableCell>
+                      <TableCell align="center">{t('rbac.groups.members')}</TableCell>
+                      <TableCell align="center">{t('rbac.groups.roles')}</TableCell>
+                      <TableCell align="center">{t('rbac.groups.autoAdd')}</TableCell>
+                      <TableCell>{t('common.createdAt')}</TableCell>
+                      <TableCell align="right">{t('common.actions')}</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </CardContent>
-      </Card>
+                  </TableHead>
+                  <TableBody>
+                    {filteredGroups.map((group) => (
+                      <TableRow key={group.id} hover>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 500,
+                              cursor: 'pointer',
+                              '&:hover': { color: 'primary.main', textDecoration: 'underline' },
+                            }}
+                            onClick={() => openDetailDialog(group)}
+                          >
+                            {group.groupName}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              maxWidth: 300,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {group.description || '-'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            icon={<PeopleIcon />}
+                            label={group.memberCount}
+                            size="small"
+                            variant="outlined"
+                            color={group.memberCount > 0 ? 'primary' : 'default'}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            icon={<ShieldIcon />}
+                            label={group.roleCount}
+                            size="small"
+                            variant="outlined"
+                            color={group.roleCount > 0 ? 'primary' : 'default'}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          {group.addNewUsersByDefault ? (
+                            <Chip label={t('common.yes')} size="small" color="success" />
+                          ) : (
+                            <Chip label={t('common.no')} size="small" variant="outlined" />
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip title={formatDateTimeDetailed(group.createdAt)}>
+                            <Typography variant="body2">
+                              {formatRelativeTime(group.createdAt)}
+                            </Typography>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Tooltip title={t('common.edit')}>
+                            <IconButton size="small" onClick={() => openEditDialog(group)}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.delete')}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => openDeleteDialog(group)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {dialogMode === 'create' ? t('rbac.groups.createTitle') : t('rbac.groups.editTitle')}
-        </DialogTitle>
-        <DialogContent dividers>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField
-              label={t('rbac.groups.name')}
-              value={formData.groupName}
-              onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
-              required
-              fullWidth
-              autoFocus
-              size="small"
-            />
-            <TextField
-              label={t('rbac.groups.descriptionColumn')}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={2}
-              size="small"
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.addNewUsersByDefault}
-                  onChange={(e) =>
-                    setFormData({ ...formData, addNewUsersByDefault: e.target.checked })
-                  }
-                />
-              }
-              label={t('rbac.groups.autoAddLabel')}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
+      {/* Create / Edit Drawer */}
+      <ResizableDrawer
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={dialogMode === 'create' ? t('rbac.groups.createTitle') : t('rbac.groups.editTitle')}
+        storageKey="groupsDrawerWidth"
+        defaultWidth={450}
+        minWidth={380}
+      >
+        <Box
+          sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
+          <TextField
+            label={t('rbac.groups.name')}
+            value={formData.groupName}
+            onChange={(e) => setFormData({ ...formData, groupName: e.target.value })}
+            required
+            fullWidth
+            autoFocus
+            size="small"
+          />
+          <TextField
+            label={t('rbac.groups.descriptionColumn')}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            fullWidth
+            multiline
+            rows={2}
+            size="small"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={!!formData.addNewUsersByDefault}
+                onChange={(e) =>
+                  setFormData({ ...formData, addNewUsersByDefault: e.target.checked })
+                }
+              />
+            }
+            label={t('rbac.groups.autoAddLabel')}
+          />
+        </Box>
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
           <Button onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
             onClick={handleSave}
-            disabled={saving || !formData.groupName.trim()}
+            disabled={saving || !formData.groupName.trim() || !isEditDirty}
           >
             {saving ? <CircularProgress size={20} /> : t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </ResizableDrawer>
 
       {/* Delete Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
@@ -552,135 +629,204 @@ const GroupsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Detail Dialog (Members & Roles tabs) */}
-      <Dialog
+      {/* Detail Drawer (Members & Roles tabs) */}
+      <ResizableDrawer
         open={detailDialogOpen}
         onClose={() => setDetailDialogOpen(false)}
-        maxWidth="md"
-        fullWidth
+        title={`${selectedGroup?.groupName || ''} — ${t('rbac.groups.detail')}`}
+        storageKey="groupDetailDrawerWidth"
+        defaultWidth={550}
+        minWidth={400}
       >
-        <DialogTitle>
-          {selectedGroup?.groupName} — {t('rbac.groups.detail')}
-        </DialogTitle>
-        <DialogContent dividers>
-          <Tabs value={detailTab} onChange={(_, v) => setDetailTab(v)}>
-            <Tab
-              label={`${t('rbac.groups.members')} (${selectedGroup?.members.length || 0})`}
-              icon={<PeopleIcon />}
-              iconPosition="start"
-            />
-            <Tab
-              label={`${t('rbac.groups.roles')} (${selectedGroup?.roles.length || 0})`}
-              icon={<ShieldIcon />}
-              iconPosition="start"
-            />
-          </Tabs>
-
-          {/* Members Tab */}
-          <TabPanel value={detailTab} index={0}>
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-              <Autocomplete
-                size="small"
-                sx={{ flex: 1 }}
-                options={availableUsers}
-                getOptionLabel={(opt) => `${opt.name} (${opt.email})`}
-                value={availableUsers.find((u) => u.id === selectedUserId) || null}
-                onChange={(_, val) => setSelectedUserId(val?.id || null)}
-                renderInput={(params) => (
-                  <TextField {...params} placeholder={t('rbac.groups.selectUser')} />
-                )}
+        <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
+            <Tabs value={detailTab} onChange={(_, v) => setDetailTab(v)}>
+              <Tab
+                label={`${t('rbac.groups.members')} (${selectedGroup?.members.length || 0})`}
+                icon={<PeopleIcon />}
+                iconPosition="start"
               />
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<PersonAddIcon />}
-                disabled={!selectedUserId}
-                onClick={handleAddMember}
-              >
-                {t('rbac.groups.addMember')}
-              </Button>
-            </Box>
-            {selectedGroup?.members.length === 0 ? (
-              <Alert severity="info">{t('rbac.groups.noMembers')}</Alert>
-            ) : (
-              <List dense>
-                {selectedGroup?.members.map((member) => (
-                  <ListItem key={member.userId} divider>
-                    <ListItemText primary={member.name || member.userId} secondary={member.email} />
-                    <ListItemSecondaryAction>
-                      <Tooltip title={t('rbac.groups.removeMember')}>
-                        <IconButton
-                          edge="end"
-                          size="small"
-                          color="error"
-                          onClick={() => handleRemoveMember(member.userId)}
-                        >
-                          <PersonRemoveIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </TabPanel>
-
-          {/* Roles Tab */}
-          <TabPanel value={detailTab} index={1}>
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-              <Autocomplete
-                size="small"
-                sx={{ flex: 1 }}
-                options={availableRoles}
-                getOptionLabel={(opt) => opt.roleName}
-                value={availableRoles.find((r) => r.id === selectedRoleId) || null}
-                onChange={(_, val) => setSelectedRoleId(val?.id || null)}
-                renderInput={(params) => (
-                  <TextField {...params} placeholder={t('rbac.groups.selectRole')} />
-                )}
+              <Tab
+                label={`${t('rbac.groups.roles')} (${selectedGroup?.roles.length || 0})`}
+                icon={<ShieldIcon />}
+                iconPosition="start"
               />
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<ShieldIcon />}
-                disabled={!selectedRoleId}
-                onClick={handleAddRole}
-              >
-                {t('rbac.groups.addRole')}
-              </Button>
-            </Box>
-            {selectedGroup?.roles.length === 0 ? (
-              <Alert severity="info">{t('rbac.groups.noRoles')}</Alert>
-            ) : (
-              <List dense>
-                {selectedGroup?.roles.map((role) => (
-                  <ListItem key={role.roleId} divider>
-                    <ListItemText
-                      primary={role.roleName || role.roleId}
-                      secondary={role.description}
-                    />
-                    <ListItemSecondaryAction>
-                      <Tooltip title={t('rbac.groups.removeRole')}>
-                        <IconButton
-                          edge="end"
-                          size="small"
-                          color="error"
-                          onClick={() => handleRemoveRole(role.roleId)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </TabPanel>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDetailDialogOpen(false)}>{t('common.close')}</Button>
-        </DialogActions>
-      </Dialog>
+            </Tabs>
+          </Box>
+
+          <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+            {/* Members Tab */}
+            <TabPanel value={detailTab} index={0}>
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Autocomplete
+                  size="small"
+                  sx={{ flex: 1 }}
+                  options={availableUsers}
+                  getOptionLabel={(opt) => `${opt.name} (${opt.email})`}
+                  value={availableUsers.find((u) => u.id === selectedUserId) || null}
+                  onChange={(_, val) => setSelectedUserId(val?.id || null)}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder={t('rbac.groups.selectUser')} />
+                  )}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<PersonAddIcon />}
+                  disabled={!selectedUserId}
+                  onClick={handleAddMember}
+                >
+                  {t('rbac.groups.addMember')}
+                </Button>
+              </Box>
+              {effectiveMembers.length === 0 ? (
+                <Alert severity="info">{t('rbac.groups.noMembers')}</Alert>
+              ) : (
+                <List dense>
+                  {effectiveMembers.map((member) => {
+                    const isPendingAdd = pendingMemberAdds.includes(member.userId);
+                    const isPendingRemove = pendingMemberRemoves.includes(member.userId);
+                    return (
+                      <ListItem
+                        key={member.userId}
+                        divider
+                        sx={{
+                          opacity: isPendingRemove ? 0.4 : 1,
+                          bgcolor: isPendingAdd ? 'action.selected' : 'transparent',
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {member.name || member.userId}
+                              {isPendingAdd && (
+                                <Chip
+                                  label={t('common.new')}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                  sx={{ height: 20 }}
+                                />
+                              )}
+                            </Box>
+                          }
+                          secondary={member.email}
+                        />
+                        <ListItemSecondaryAction>
+                          <Tooltip title={t('rbac.groups.removeMember')}>
+                            <IconButton
+                              edge="end"
+                              size="small"
+                              color="error"
+                              onClick={() => handleRemoveMember(member.userId)}
+                            >
+                              <PersonRemoveIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              )}
+            </TabPanel>
+
+            {/* Roles Tab */}
+            <TabPanel value={detailTab} index={1}>
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Autocomplete
+                  size="small"
+                  sx={{ flex: 1 }}
+                  options={availableRoles}
+                  getOptionLabel={(opt) => opt.roleName}
+                  value={availableRoles.find((r) => r.id === selectedRoleId) || null}
+                  onChange={(_, val) => setSelectedRoleId(val?.id || null)}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder={t('rbac.groups.selectRole')} />
+                  )}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<ShieldIcon />}
+                  disabled={!selectedRoleId}
+                  onClick={handleAddRole}
+                >
+                  {t('rbac.groups.addRole')}
+                </Button>
+              </Box>
+              {effectiveRoles.length === 0 ? (
+                <Alert severity="info">{t('rbac.groups.noRoles')}</Alert>
+              ) : (
+                <List dense>
+                  {effectiveRoles.map((role) => {
+                    const isPendingAdd = pendingRoleAdds.includes(role.roleId);
+                    return (
+                      <ListItem
+                        key={role.roleId}
+                        divider
+                        sx={{
+                          bgcolor: isPendingAdd ? 'action.selected' : 'transparent',
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {role.roleName || role.roleId}
+                              {isPendingAdd && (
+                                <Chip
+                                  label={t('common.new')}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                  sx={{ height: 20 }}
+                                />
+                              )}
+                            </Box>
+                          }
+                          secondary={role.description}
+                        />
+                        <ListItemSecondaryAction>
+                          <Tooltip title={t('rbac.groups.removeRole')}>
+                            <IconButton
+                              edge="end"
+                              size="small"
+                              color="error"
+                              onClick={() => handleRemoveRole(role.roleId)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              )}
+            </TabPanel>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button onClick={() => setDetailDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveDetail}
+            disabled={saving || !hasDetailChanges}
+          >
+            {saving ? <CircularProgress size={20} /> : t('common.save')}
+          </Button>
+        </Box>
+      </ResizableDrawer>
     </Box>
   );
 };

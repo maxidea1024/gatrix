@@ -104,6 +104,7 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '@/components/common/DynamicFilterBar';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { api } from '@/services/api';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
@@ -1035,106 +1036,104 @@ const MessageTemplatesPage: React.FC = () => {
         </Card>
       )}
 
-      <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : items.length === 0 ? (
-            <EmptyPagePlaceholder
-              message={t('messageTemplates.noTemplatesFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAdd : undefined}
-              addButtonLabel={t('messageTemplates.addTemplate')}
-            />
-          ) : (
-            <>
-              <TableContainer
-                sx={{
-                  opacity: !isInitialLoad && loading ? 0.5 : 1,
-                  transition: 'opacity 0.15s ease-in-out',
-                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
-                }}
-              >
-                <Table sx={{ tableLayout: 'auto' }}>
-                  <TableHead>
-                    <TableRow>
-                      {canManage && (
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={selectAll}
-                            indeterminate={
-                              selectedIds.length > 0 &&
-                              selectedIds.length < items.filter((item) => item.id).length
-                            }
-                            onChange={(e) => handleSelectAll(e.target.checked)}
-                          />
-                        </TableCell>
-                      )}
-                      {columns
-                        .filter((col) => col.visible)
-                        .map((column) => (
-                          <TableCell key={column.id} width={column.width}>
-                            {t(column.labelKey)}
-                          </TableCell>
-                        ))}
-                      {canManage && (
-                        <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>
-                          {t('common.actions')}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {items.map((row) => (
-                      <TableRow key={row.id} hover>
+      <PageContentLoader loading={isInitialLoad && loading}>
+        <Card sx={{ position: 'relative' }}>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            {items.length === 0 ? (
+              <EmptyPagePlaceholder
+                message={t('messageTemplates.noTemplatesFound')}
+                subtitle={canManage ? t('common.addFirstItem') : undefined}
+                onAddClick={canManage ? handleAdd : undefined}
+                addButtonLabel={t('messageTemplates.addTemplate')}
+              />
+            ) : (
+              <>
+                <TableContainer
+                  sx={{
+                    opacity: !isInitialLoad && loading ? 0.5 : 1,
+                    transition: 'opacity 0.15s ease-in-out',
+                    pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+                  }}
+                >
+                  <Table sx={{ tableLayout: 'auto' }}>
+                    <TableHead>
+                      <TableRow>
                         {canManage && (
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={selectedIds.includes(row.id!)}
-                              onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
-                              disabled={!row.id}
+                              checked={selectAll}
+                              indeterminate={
+                                selectedIds.length > 0 &&
+                                selectedIds.length < items.filter((item) => item.id).length
+                              }
+                              onChange={(e) => handleSelectAll(e.target.checked)}
                             />
                           </TableCell>
                         )}
                         {columns
                           .filter((col) => col.visible)
                           .map((column) => (
-                            <TableCell key={column.id}>
-                              {renderCellContent(row, column.id)}
+                            <TableCell key={column.id} width={column.width}>
+                              {t(column.labelKey)}
                             </TableCell>
                           ))}
                         {canManage && (
-                          <TableCell align="right">
-                            <IconButton size="small" onClick={() => handleEdit(row)}>
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => openDeleteDialog(row)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
+                          <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>
+                            {t('common.actions')}
                           </TableCell>
                         )}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <SimplePagination
-                count={total}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+                    </TableHead>
+                    <TableBody>
+                      {items.map((row) => (
+                        <TableRow key={row.id} hover>
+                          {canManage && (
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                checked={selectedIds.includes(row.id!)}
+                                onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
+                                disabled={!row.id}
+                              />
+                            </TableCell>
+                          )}
+                          {columns
+                            .filter((col) => col.visible)
+                            .map((column) => (
+                              <TableCell key={column.id}>
+                                {renderCellContent(row, column.id)}
+                              </TableCell>
+                            ))}
+                          {canManage && (
+                            <TableCell align="right">
+                              <IconButton size="small" onClick={() => handleEdit(row)}>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => openDeleteDialog(row)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <SimplePagination
+                  count={total}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       <ResizableDrawer
         open={dialogOpen}

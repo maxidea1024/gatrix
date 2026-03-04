@@ -57,6 +57,7 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 
 // ==================== Create/Edit Dialog ====================
 interface EndpointDialogProps {
@@ -614,7 +615,11 @@ const SignalEndpointsPage: React.FC = () => {
                                   <ListItem key={token.id} sx={{ px: 0 }}>
                                     <ListItemText
                                       primary={token.tokenName}
-                                      secondary={new Date(token.createdAt).toLocaleDateString()}
+                                      secondary={
+                                        <Tooltip title={formatDateTimeDetailed(token.createdAt)}>
+                                          <span>{formatRelativeTime(token.createdAt)}</span>
+                                        </Tooltip>
+                                      }
                                     />
                                     <ListItemSecondaryAction>
                                       <IconButton
