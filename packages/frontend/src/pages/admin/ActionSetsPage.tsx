@@ -31,6 +31,9 @@ import {
   InputLabel,
   Collapse,
   Divider,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -44,6 +47,7 @@ import {
   RemoveCircleOutline as RemoveIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -437,6 +441,20 @@ const ActionSetsPage: React.FC = () => {
     name: string;
   } | null>(null);
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<ActionSet | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: ActionSet) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(item);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
   const fetchActionSets = useCallback(async () => {
     setLoading(true);
     try {
@@ -651,30 +669,10 @@ const ActionSetsPage: React.FC = () => {
                           icon={<PlayIcon sx={{ fontSize: 14 }} />}
                         />
                       </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => setEditDialog({ open: true, actionSet })}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() =>
-                              setDeleteDialog({
-                                open: true,
-                                id: actionSet.id,
-                                name: actionSet.name,
-                              })
-                            }
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                      <TableCell align="center">
+                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, actionSet)}>
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
 
@@ -715,10 +713,10 @@ const ActionSetsPage: React.FC = () => {
                                           size="small"
                                           color={
                                             getStateColor(event.eventState) as
-                                              | 'success'
-                                              | 'error'
-                                              | 'info'
-                                              | 'default'
+                                            | 'success'
+                                            | 'error'
+                                            | 'info'
+                                            | 'default'
                                           }
                                         />
                                       </TableCell>
@@ -746,6 +744,32 @@ const ActionSetsPage: React.FC = () => {
           </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) setEditDialog({ open: true, actionSet: menuTarget });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) setDeleteDialog({ open: true, id: menuTarget.id, name: menuTarget.name });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Dialogs */}
       <ActionSetDialog

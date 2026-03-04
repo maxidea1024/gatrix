@@ -25,6 +25,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -35,6 +39,7 @@ import {
   CheckCircle as CompletedIcon,
   Error as ErrorIcon,
   Pause as WaitingIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -86,6 +91,20 @@ const CustomQueueMonitorPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
+
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<Job | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: Job) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(item);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
 
   const statusTabs = ['latest', 'waiting', 'active', 'completed', 'failed', 'delayed'];
 
@@ -280,7 +299,7 @@ const CustomQueueMonitorPage: React.FC = () => {
                 ))}
               </Tabs>
 
-              <TableContainer component={Paper}>
+              <TableContainer component={Paper} variant="outlined">
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -316,28 +335,10 @@ const CustomQueueMonitorPage: React.FC = () => {
                             <Typography variant="caption">{job.progress || 0}%</Typography>
                           </Box>
                         </TableCell>
-                        <TableCell>
-                          <Tooltip title="상세보기">
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                setSelectedJob(job);
-                                setJobDialogOpen(true);
-                              }}
-                            >
-                              <ViewIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="재시도">
-                            <IconButton size="small" onClick={() => retryJob(job.id)}>
-                              <RetryIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="삭제">
-                            <IconButton size="small" onClick={() => deleteJob(job.id)}>
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
+                        <TableCell align="center">
+                          <IconButton size="small" onClick={(e) => handleMenuOpen(e, job)}>
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -348,6 +349,46 @@ const CustomQueueMonitorPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              setSelectedJob(menuTarget);
+              setJobDialogOpen(true);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <ViewIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.detail')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) retryJob(menuTarget.id);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <RetryIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.retry')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) deleteJob(menuTarget.id);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* 작업 상세 다이얼로그 */}
       <Dialog open={jobDialogOpen} onClose={() => setJobDialogOpen(false)} maxWidth="md" fullWidth>

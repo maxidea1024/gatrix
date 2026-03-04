@@ -47,6 +47,9 @@ import {
   ClickAwayListener,
   Checkbox,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -69,6 +72,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Code as CodeIcon,
   Schedule as ScheduleIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -234,6 +238,15 @@ const SortableRow: React.FC<SortableRowProps> = ({
 
   const { t } = useTranslation();
 
+  // Menu state for MoreVert
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
   const renderTags = (tags?: Tag[] | null) => {
     const items = (tags || []).slice(0, 6);
     if (items.length === 0) return '-';
@@ -302,23 +315,44 @@ const SortableRow: React.FC<SortableRowProps> = ({
       </TableCell>
       {canManage && (
         <TableCell align="center">
-          {/* Duplicate world (copy values into new form, worldId cleared) */}
-          <Tooltip title={t('common.copy')}>
-            <IconButton size="small" onClick={() => onDuplicate(world)}>
-              <CopyIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={t('gameWorlds.editGameWorld')}>
-            <IconButton size="small" onClick={() => onEdit(world)}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('gameWorlds.deleteGameWorld')}>
-            <IconButton size="small" onClick={() => onDelete(world.id)} color="error">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
+          <IconButton size="small" onClick={handleMenuOpen}>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+            <MenuItem
+              onClick={() => {
+                onDuplicate(world);
+                handleMenuClose();
+              }}
+            >
+              <ListItemIcon>
+                <CopyIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('common.copy')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                onEdit(world);
+                handleMenuClose();
+              }}
+            >
+              <ListItemIcon>
+                <EditIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('common.edit')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                onDelete(world.id);
+                handleMenuClose();
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize="small" color="error" />
+              </ListItemIcon>
+              <ListItemText>{t('common.delete')}</ListItemText>
+            </MenuItem>
+          </Menu>
         </TableCell>
       )}
     </TableRow>
@@ -496,7 +530,7 @@ const GameWorldsPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   // Delete confirmation state
@@ -524,7 +558,7 @@ const GameWorldsPage: React.FC = () => {
     tagService
       .list()
       .then(setAllRegistryTags)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Load message templates
@@ -1518,35 +1552,35 @@ const GameWorldsPage: React.FC = () => {
         const maintenanceTooltip =
           maintenanceStatus === 'scheduled' || maintenanceStatus === 'active'
             ? (() => {
-                const parts: string[] = [];
-                // Start time: show "immediate start" if not set
+              const parts: string[] = [];
+              // Start time: show "immediate start" if not set
+              parts.push(
+                `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
+              );
+              // End time: show "manual stop" if not set
+              parts.push(
+                `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
+              );
+              // Force disconnect info
+              if (world.forceDisconnect) {
+                const delayText =
+                  (world.gracePeriodMinutes ?? 0) === 0
+                    ? t('maintenance.kickDelayImmediate')
+                    : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
                 parts.push(
-                  `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
+                  `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
                 );
-                // End time: show "manual stop" if not set
+              } else {
+                parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
+              }
+              if (world.maintenanceMessage) {
+                const msg = world.maintenanceMessage;
                 parts.push(
-                  `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
+                  `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
                 );
-                // Force disconnect info
-                if (world.forceDisconnect) {
-                  const delayText =
-                    (world.gracePeriodMinutes ?? 0) === 0
-                      ? t('maintenance.kickDelayImmediate')
-                      : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
-                  parts.push(
-                    `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
-                  );
-                } else {
-                  parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
-                }
-                if (world.maintenanceMessage) {
-                  const msg = world.maintenanceMessage;
-                  parts.push(
-                    `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
-                  );
-                }
-                return parts.join('\n');
-              })()
+              }
+              return parts.join('\n');
+            })()
             : '';
 
         const chip = (
@@ -2291,7 +2325,7 @@ const GameWorldsPage: React.FC = () => {
             }
             helperText={
               deleteConfirmDialog.inputValue !== '' &&
-              deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
+                deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
                 ? 'Name does not match'
                 : ''
             }

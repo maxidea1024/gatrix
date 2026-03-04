@@ -55,6 +55,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   ClickAwayListener,
 } from '@mui/material';
 import {
@@ -98,6 +99,7 @@ import {
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -442,6 +444,20 @@ const ClientVersionsPage: React.FC = () => {
   const [selectedClientVersionForTags, setSelectedClientVersionForTags] =
     useState<ClientVersion | null>(null);
   const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
+
+  // MoreVert menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<ClientVersion | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: ClientVersion) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(item);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -1812,76 +1828,13 @@ const ClientVersionsPage: React.FC = () => {
                           )}
                         </Box>
                       </TableCell>
-                      <TableCell align="center">
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            gap: 0.5,
-                            justifyContent: 'center',
-                          }}
-                        >
-                          {canManage && (
-                            <>
-                              <Tooltip title={t('clientVersions.copyVersion')} arrow>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleCopyVersion(clientVersion)}
-                                  color="primary"
-                                  sx={{
-                                    '&:hover': {
-                                      backgroundColor: 'primary.light',
-                                      color: 'white',
-                                    },
-                                  }}
-                                >
-                                  <CopyIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.edit')} arrow>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => {
-                                    console.log('Edit button clicked for client version:', {
-                                      id: clientVersion.id,
-                                      clientVersion: clientVersion,
-                                    });
-                                    setEditingClientVersion(clientVersion);
-                                    setIsCopyMode(false);
-                                    setFormDialogOpen(true);
-                                  }}
-                                  color="info"
-                                  sx={{
-                                    '&:hover': {
-                                      backgroundColor: 'info.light',
-                                      color: 'white',
-                                    },
-                                  }}
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')} arrow>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => {
-                                    setSelectedClientVersion(clientVersion);
-                                    setDeleteDialogOpen(true);
-                                  }}
-                                  color="error"
-                                  sx={{
-                                    '&:hover': {
-                                      backgroundColor: 'error.light',
-                                      color: 'white',
-                                    },
-                                  }}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </>
-                          )}
-                        </Box>
-                      </TableCell>
+                      {canManage && (
+                        <TableCell align="center">
+                          <IconButton size="small" onClick={(e) => handleMenuOpen(e, clientVersion)}>
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -1902,6 +1855,50 @@ const ClientVersionsPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleCopyVersion(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <CopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('clientVersions.copyVersion')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              setEditingClientVersion(menuTarget);
+              setIsCopyMode(false);
+              setFormDialogOpen(true);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) {
+              setSelectedClientVersion(menuTarget);
+              setDeleteDialogOpen(true);
+            }
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* 삭제 확인 Drawer */}
       <Drawer
