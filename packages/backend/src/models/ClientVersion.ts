@@ -8,6 +8,7 @@ export interface ClientVersionFilters {
   platform?: string | string[];
   clientStatus?: string | string[];
   guestModeAllowed?: boolean | boolean[];
+  search?: string;
   limit?: number;
   offset?: number;
   sortBy?: string;
@@ -181,6 +182,18 @@ export class ClientVersionModel {
                 .whereIn('ta.tagId', filters.tags);
             });
           }
+        }
+
+        // Search filter - search across multiple fields
+        if (filters?.search) {
+          const searchTerm = `%${filters.search}%`;
+          query.where(function (this: any) {
+            this.where('cv.clientVersion', 'like', searchTerm)
+              .orWhere('cv.platform', 'like', searchTerm)
+              .orWhere('cv.gameServerAddress', 'like', searchTerm)
+              .orWhere('cv.patchAddress', 'like', searchTerm)
+              .orWhere('cv.memo', 'like', searchTerm);
+          });
         }
 
         return query;

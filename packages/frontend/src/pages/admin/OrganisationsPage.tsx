@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -86,6 +86,11 @@ const OrganisationsPage: React.FC = () => {
   const [searchedUsers, setSearchedUsers] = useState<SearchUser[]>([]);
   const [searchingUsers, setSearchingUsers] = useState(false);
   const [selectedUser, setSelectedUser] = useState<SearchUser | null>(null);
+
+  // Pending member changes (local state for batch apply)
+  const [pendingMembers, setPendingMembers] = useState<OrgMember[]>([]);
+  const [initialMembers, setInitialMembers] = useState<OrgMember[]>([]);
+  const [applyingMembers, setApplyingMembers] = useState(false);
 
   // Load organisations
   const loadOrganisations = useCallback(async () => {
@@ -187,6 +192,9 @@ const OrganisationsPage: React.FC = () => {
       setMemberSearchTerm('');
       const detail = await orgProjectService.getOrganisation(org.id);
       setSelectedOrg(detail);
+      const members = detail.members || [];
+      setPendingMembers(JSON.parse(JSON.stringify(members)));
+      setInitialMembers(JSON.parse(JSON.stringify(members)));
     } catch {
       enqueueSnackbar(t('rbac.orgs.loadFailed'), { variant: 'error' });
     } finally {
@@ -194,55 +202,89 @@ const OrganisationsPage: React.FC = () => {
     }
   };
 
-  // Refresh members
-  const refreshMembers = async () => {
+  // Check if member list has pending changes
+  const isMembersDirty = useMemo(() => {
+    if (pendingMembers.length !== initialMembers.length) return true;
+    for (const pm of pendingMembers) {
+      const im = initialMembers.find((m) => m.userId === pm.userId);
+      if (!im) return true;
+      if (im.orgRole !== pm.orgRole) return true;
+    }
+    return false;
+  }, [pendingMembers, initialMembers]);
+
+  // Add member (local only)
+  const handleAddMember = () => {
+    if (!selectedUser) return;
+    // Prevent duplicate
+    if (pendingMembers.some((m) => m.userId === selectedUser.id)) return;
+    setPendingMembers((prev) => [
+      ...prev,
+      {
+        id: `pending-${selectedUser.id}`,
+        userId: selectedUser.id,
+        orgRole: 'user',
+        name: selectedUser.name,
+        email: selectedUser.email,
+      } as OrgMember,
+    ]);
+    setSelectedUser(null);
+    setMemberSearchTerm('');
+  };
+
+  // Remove member (local only)
+  const handleRemoveMember = (userId: string) => {
+    setPendingMembers((prev) => prev.filter((m) => m.userId !== userId));
+  };
+
+  // Update member role (local only)
+  const handleUpdateMemberRole = (userId: string, orgRole: 'admin' | 'user') => {
+    setPendingMembers((prev) => prev.map((m) => (m.userId === userId ? { ...m, orgRole } : m)));
+  };
+
+  // Apply all pending member changes
+  const handleApplyMembers = async () => {
     if (!selectedOrg) return;
     try {
+      setApplyingMembers(true);
+
+      // Compute diff: added, removed, role changed
+      const addedMembers = pendingMembers.filter(
+        (pm) => !initialMembers.some((im) => im.userId === pm.userId)
+      );
+      const removedMembers = initialMembers.filter(
+        (im) => !pendingMembers.some((pm) => pm.userId === im.userId)
+      );
+      const roleChangedMembers = pendingMembers.filter((pm) => {
+        const im = initialMembers.find((m) => m.userId === pm.userId);
+        return im && im.orgRole !== pm.orgRole;
+      });
+
+      // Execute API calls sequentially
+      for (const member of removedMembers) {
+        await rbacService.removeOrgMember(selectedOrg.id, member.userId);
+      }
+      for (const member of addedMembers) {
+        await rbacService.addOrgMember(selectedOrg.id, member.userId, member.orgRole);
+      }
+      for (const member of roleChangedMembers) {
+        await rbacService.updateOrgMemberRole(selectedOrg.id, member.userId, member.orgRole);
+      }
+
+      enqueueSnackbar(t('rbac.orgs.membersUpdated'), { variant: 'success' });
+
+      // Refresh from server
       const detail = await orgProjectService.getOrganisation(selectedOrg.id);
       setSelectedOrg(detail);
-    } catch {
-      // silent
-    }
-  };
-
-  // Add member
-  const handleAddMember = async () => {
-    if (!selectedOrg || !selectedUser) return;
-    try {
-      await rbacService.addOrgMember(selectedOrg.id, selectedUser.id);
-      enqueueSnackbar(t('rbac.orgs.memberAdded'), { variant: 'success' });
-      setSelectedUser(null);
-      setMemberSearchTerm('');
-      refreshMembers();
+      const members = detail.members || [];
+      setPendingMembers(JSON.parse(JSON.stringify(members)));
+      setInitialMembers(JSON.parse(JSON.stringify(members)));
+      loadOrganisations();
     } catch (error: any) {
-      const msg = error?.response?.data?.message || t('rbac.orgs.memberAddFailed');
+      const msg = error?.response?.data?.message || t('rbac.orgs.memberUpdateFailed');
       enqueueSnackbar(msg, { variant: 'error' });
-    }
-  };
-
-  // Remove member
-  const handleRemoveMember = async (userId: string) => {
-    if (!selectedOrg) return;
-    try {
-      await rbacService.removeOrgMember(selectedOrg.id, userId);
-      enqueueSnackbar(t('rbac.orgs.memberRemoved'), { variant: 'success' });
-      refreshMembers();
-    } catch (error: any) {
-      const msg = error?.response?.data?.message || t('rbac.orgs.memberRemoveFailed');
-      enqueueSnackbar(msg, { variant: 'error' });
-    }
-  };
-
-  // Update member role
-  const handleUpdateMemberRole = async (userId: string, orgRole: 'admin' | 'user') => {
-    if (!selectedOrg) return;
-    try {
-      await rbacService.updateOrgMemberRole(selectedOrg.id, userId, orgRole);
-      enqueueSnackbar(t('rbac.orgs.memberRoleUpdated'), { variant: 'success' });
-      refreshMembers();
-    } catch (error: any) {
-      const msg = error?.response?.data?.message || t('rbac.orgs.memberRoleUpdateFailed');
-      enqueueSnackbar(msg, { variant: 'error' });
+    } finally {
+      setApplyingMembers(false);
     }
   };
 
@@ -474,7 +516,7 @@ const OrganisationsPage: React.FC = () => {
                 <Tab
                   icon={<PeopleIcon />}
                   iconPosition="start"
-                  label={`${t('rbac.orgs.members')} (${selectedOrg.members?.length || 0})`}
+                  label={`${t('rbac.orgs.members')} (${pendingMembers.length})`}
                 />
               </Tabs>
               {detailTab === 0 && (
@@ -485,7 +527,7 @@ const OrganisationsPage: React.FC = () => {
                       size="small"
                       sx={{ flex: 1 }}
                       options={searchedUsers.filter(
-                        (u) => !selectedOrg.members?.some((m) => m.userId === u.id)
+                        (u) => !pendingMembers.some((m) => m.userId === u.id)
                       )}
                       getOptionLabel={(opt) => `${opt.name} (${opt.email})`}
                       value={selectedUser}
@@ -529,7 +571,7 @@ const OrganisationsPage: React.FC = () => {
                   </Box>
 
                   {/* Members list */}
-                  {!selectedOrg.members || selectedOrg.members.length === 0 ? (
+                  {pendingMembers.length === 0 ? (
                     <Alert severity="info">{t('rbac.orgs.noMembers')}</Alert>
                   ) : (
                     <Box
@@ -539,16 +581,16 @@ const OrganisationsPage: React.FC = () => {
                         borderRadius: 1,
                       }}
                     >
-                      {selectedOrg.members.map((member: OrgMember, index: number) => (
+                      {pendingMembers.map((member: OrgMember, index: number) => (
                         <Box
-                          key={member.id}
+                          key={member.userId}
                           sx={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             px: 2,
                             py: 1,
-                            borderBottom: index < (selectedOrg.members?.length || 0) - 1 ? 1 : 0,
+                            borderBottom: index < pendingMembers.length - 1 ? 1 : 0,
                             borderColor: 'divider',
                           }}
                         >
@@ -612,9 +654,17 @@ const OrganisationsPage: React.FC = () => {
             bgcolor: 'background.paper',
             display: 'flex',
             justifyContent: 'flex-end',
+            gap: 1,
           }}
         >
           <Button onClick={() => setDetailOpen(false)}>{t('common.close')}</Button>
+          <Button
+            variant="contained"
+            onClick={handleApplyMembers}
+            disabled={!isMembersDirty || applyingMembers}
+          >
+            {applyingMembers ? <CircularProgress size={20} /> : t('common.apply')}
+          </Button>
         </Box>
       </ResizableDrawer>
     </Box>

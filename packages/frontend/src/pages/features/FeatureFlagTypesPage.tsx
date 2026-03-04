@@ -38,6 +38,8 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import api from '../../services/api';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { getFlagTypeIconByName } from '../../utils/flagTypeIcons';
+import PageContentLoader from '../../components/common/PageContentLoader';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 
 interface FlagType {
   flagType: string;
@@ -154,78 +156,84 @@ const FeatureFlagTypesPage: React.FC = () => {
       </Box>
 
       {/* Types Table */}
-      <Card>
-        <CardContent>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('common.name')}</TableCell>
-                  <TableCell align="center">{t('featureFlags.lifetime')}</TableCell>
-                  {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {types.map((type) => (
-                  <TableRow key={type.flagType} hover>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: 1.5,
-                        }}
-                      >
-                        {getTypeIcon(type.iconName)}
-                        <Box>
-                          <Typography fontWeight={500}>
-                            {t(`featureFlags.flagTypes.${type.flagType}`, type.displayName)}
+      <PageContentLoader loading={loading}>
+        {types.length === 0 ? (
+          <EmptyPagePlaceholder message={t('featureFlags.noFlagTypes')} />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t('common.name')}</TableCell>
+                      <TableCell align="center">{t('featureFlags.lifetime')}</TableCell>
+                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {types.map((type) => (
+                      <TableRow key={type.flagType} hover>
+                        <TableCell>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: 1.5,
+                            }}
+                          >
+                            {getTypeIcon(type.iconName)}
+                            <Box>
+                              <Typography fontWeight={500}>
+                                {t(`featureFlags.flagTypes.${type.flagType}`, type.displayName)}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                {t(
+                                  `featureFlags.flagTypes.${type.flagType}.desc`,
+                                  type.description || ''
+                                )}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography
+                            variant="body2"
+                            color={type.lifetimeDays === null ? 'text.secondary' : 'text.primary'}
+                          >
+                            {formatLifetime(type.lifetimeDays)}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {t(
-                              `featureFlags.flagTypes.${type.flagType}.desc`,
-                              type.description || ''
-                            )}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography
-                        variant="body2"
-                        color={type.lifetimeDays === null ? 'text.secondary' : 'text.primary'}
-                      >
-                        {formatLifetime(type.lifetimeDays)}
-                      </Typography>
-                    </TableCell>
-                    {canManage && (
-                      <TableCell align="center">
-                        <Tooltip
-                          title={
-                            type.flagType === 'remoteConfig'
-                              ? t('featureFlags.systemTypeCannotEdit')
-                              : t('common.edit')
-                          }
-                        >
-                          <span>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(type)}
-                              disabled={type.flagType === 'remoteConfig'}
+                        </TableCell>
+                        {canManage && (
+                          <TableCell align="center">
+                            <Tooltip
+                              title={
+                                type.flagType === 'remoteConfig'
+                                  ? t('featureFlags.systemTypeCannotEdit')
+                                  : t('common.edit')
+                              }
                             >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </CardContent>
-      </Card>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleEdit(type)}
+                                  disabled={type.flagType === 'remoteConfig'}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Edit Drawer */}
       <ResizableDrawer

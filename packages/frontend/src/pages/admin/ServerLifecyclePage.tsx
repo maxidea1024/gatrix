@@ -1224,10 +1224,10 @@ const ServerLifecyclePage: React.FC = () => {
 
       {/* Table */}
       <PageContentLoader loading={isLoading}>
-        <Paper elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
-          {!data?.data || data.data.length === 0 ? (
-            <EmptyPagePlaceholder message={t('serverLifecycle.noEvents')} />
-          ) : (
+        {!data?.data || data.data.length === 0 ? (
+          <EmptyPagePlaceholder message={t('serverLifecycle.noEvents')} />
+        ) : (
+          <Paper elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
             <TableContainer>
               <Table aria-label="server lifecycle table" size="small">
                 <TableHead sx={{ bgcolor: 'action.hover' }}>
@@ -1269,19 +1269,19 @@ const ServerLifecyclePage: React.FC = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-          )}
-          {data && data.data && data.data.length > 0 && (
-            <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-              <SimplePagination
-                count={data.total}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-              />
-            </Box>
-          )}
-        </Paper>
+            {data && data.data && data.data.length > 0 && (
+              <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+                <SimplePagination
+                  count={data.total}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </Box>
+            )}
+          </Paper>
+        )}
       </PageContentLoader>
     </Box>
   );

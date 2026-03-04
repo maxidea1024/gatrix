@@ -888,7 +888,6 @@ export class FeatureFlagService {
           weight: 100,
           enabled: false,
           value: null,
-          valueType: 'string',
         },
       };
     }

@@ -37,7 +37,8 @@ import { tagService, Tag } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
+import { useI18n } from '@/contexts/I18nContext';
 import { ColorPicker } from '@/components/common/ColorPicker';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -53,6 +54,7 @@ const TagsPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { language } = useI18n();
   const canManage = hasPermission([PERMISSIONS.TAGS_MANAGE]);
 
   // Data/state
@@ -288,23 +290,22 @@ const TagsPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Table list - only show when there's data or loading */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : tags.length === 0 ? (
-            <EmptyPagePlaceholder
-              message={t('tags.noTagsFound')}
-              onAddClick={canManage ? () => nameInputRef.current?.focus() : undefined}
-              addButtonLabel={t('tags.addTag')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : filtered.length === 0 ? (
-            <EmptyPagePlaceholder message={t('tags.noMatchingTags')} />
-          ) : (
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+        </Box>
+      ) : tags.length === 0 ? (
+        <EmptyPagePlaceholder
+          message={t('tags.noTagsFound')}
+          onAddClick={canManage ? () => nameInputRef.current?.focus() : undefined}
+          addButtonLabel={t('tags.addTag')}
+          subtitle={canManage ? t('common.addFirstItem') : undefined}
+        />
+      ) : filtered.length === 0 ? (
+        <EmptyPagePlaceholder message={t('tags.noMatchingTags')} />
+      ) : (
+        <Card>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -405,10 +406,18 @@ const TagsPage: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
-                        {formatDateTimeDetailed(tag.createdAt || '')}
+                        <Tooltip title={formatDateTimeDetailed(tag.createdAt || '')}>
+                          <Typography variant="body2">
+                            {formatRelativeTime(tag.createdAt || '', undefined, language)}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
-                        {formatDateTimeDetailed(tag.updatedAt || '')}
+                        <Tooltip title={formatDateTimeDetailed(tag.updatedAt || '')}>
+                          <Typography variant="body2">
+                            {formatRelativeTime(tag.updatedAt || '', undefined, language)}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
                       <TableCell sx={{ width: 180 }}>
                         {tag.createdByName ? (
@@ -465,9 +474,9 @@ const TagsPage: React.FC = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Delete confirmation dialog */}
       <Dialog open={!!deleteTarget} onClose={closeDeleteDialog}>

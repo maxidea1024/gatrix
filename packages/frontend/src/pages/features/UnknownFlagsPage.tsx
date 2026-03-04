@@ -25,8 +25,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  TextField,
-  InputAdornment,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -36,7 +34,6 @@ import {
   MoreVert as MoreVertIcon,
   Undo as UndoIcon,
   ContentCopy as CopyIcon,
-  Search as SearchIcon,
   ViewColumn as ViewColumnIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -54,6 +51,8 @@ import HelpTip from '../../components/common/HelpTip';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useDebounce } from '../../hooks/useDebounce';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import SearchTextField from '@/components/common/SearchTextField';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -370,43 +369,15 @@ const UnknownFlagsPage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('featureFlags.searchUnknownFlags')}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(value) => setSearchTerm(value)}
                 sx={{
                   minWidth: 300,
                   flexGrow: 1,
                   maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
                 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
               <DynamicFilterBar
                 availableFilters={filterDefinitions}
@@ -441,17 +412,7 @@ const UnknownFlagsPage: React.FC = () => {
       {/* Content */}
       <PageContentLoader loading={loading}>
         {filteredFlags.length === 0 ? (
-          <Box
-            sx={{
-              border: '2px dashed',
-              borderColor: 'divider',
-              borderRadius: 2,
-              p: 6,
-              textAlign: 'center',
-            }}
-          >
-            <Typography color="text.secondary">{t('featureFlags.noUnknownFlags')}</Typography>
-          </Box>
+          <EmptyPagePlaceholder message={t('featureFlags.noUnknownFlags')} />
         ) : (
           <Card>
             <TableContainer>

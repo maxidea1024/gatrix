@@ -191,58 +191,45 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
         {/* Basic Info Tab */}
         {activeTab === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            {/* World ID */}
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.worldId')}
-                value={formData.worldId}
-                onChange={(e) => {
-                  const newWorldId = e.target.value;
-                  const newFormData = { ...formData, worldId: newWorldId };
+            {/* World ID + Name */}
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  label={t('gameWorlds.worldId')}
+                  value={formData.worldId}
+                  onChange={(e) => {
+                    const newWorldId = e.target.value;
+                    const newFormData = { ...formData, worldId: newWorldId };
 
-                  if (
-                    !editingWorld &&
-                    (formData.name === '' || formData.name === formData.worldId)
-                  ) {
-                    newFormData.name = newWorldId;
-                  }
+                    if (
+                      !editingWorld &&
+                      (formData.name === '' || formData.name === formData.worldId)
+                    ) {
+                      newFormData.name = newWorldId;
+                    }
 
-                  onFormDataChange(newFormData);
-                }}
-                error={!!formErrors.worldId}
-                helperText={formErrors.worldId}
-                required
-                inputRef={refToUse}
-                autoFocus
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('gameWorlds.form.worldIdHelp')}
-              </Typography>
-            </Box>
+                    onFormDataChange(newFormData);
+                  }}
+                  error={!!formErrors.worldId}
+                  helperText={formErrors.worldId || t('gameWorlds.form.worldIdHelp')}
+                  required
+                  inputRef={refToUse}
+                  autoFocus
+                />
+              </Box>
 
-            {/* Name */}
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.name')}
-                value={formData.name}
-                onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
-                error={!!formErrors.name}
-                helperText={formErrors.name}
-                required
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('gameWorlds.form.nameHelp')}
-              </Typography>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  label={t('gameWorlds.name')}
+                  value={formData.name}
+                  onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
+                  error={!!formErrors.name}
+                  helperText={formErrors.name || t('gameWorlds.form.nameHelp')}
+                  required
+                />
+              </Box>
             </Box>
 
             {/* Description */}

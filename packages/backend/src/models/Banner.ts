@@ -170,7 +170,7 @@ export class BannerModel {
         return query;
       };
 
-      const countQuery = applyFilters(baseQuery()).count('b.bannerId as total').first();
+      const countQuery = applyFilters(baseQuery()).count('b.id as total').first();
 
       const dataQuery = applyFilters(baseQuery())
         .select([
@@ -219,7 +219,7 @@ export class BannerModel {
           'updater.name as updatedByName',
           'updater.email as updatedByEmail',
         ])
-        .where('b.bannerId', bannerId)
+        .where('b.id', bannerId)
         .where('b.environmentId', environmentId)
         .first();
 
@@ -257,7 +257,7 @@ export class BannerModel {
     try {
       let query = db('g_banners').where('name', name).where('environmentId', environmentId);
       if (excludeBannerId) {
-        query = query.whereNot('bannerId', excludeBannerId);
+        query = query.whereNot('id', excludeBannerId);
       }
       const banner = await query.first();
       if (!banner) {
@@ -286,7 +286,7 @@ export class BannerModel {
     try {
       const environmentId = data.environmentId;
       await db('g_banners').insert({
-        bannerId: data.bannerId,
+        id: data.bannerId,
         environmentId: environmentId,
         name: data.name,
         description: data.description || null,
@@ -338,7 +338,7 @@ export class BannerModel {
 
       // Increment version on update
       await db('g_banners')
-        .where('bannerId', bannerId)
+        .where('id', bannerId)
         .where('environmentId', environmentId)
         .update({
           ...updateData,
@@ -358,7 +358,7 @@ export class BannerModel {
 
   static async delete(bannerId: string, environmentId: string): Promise<void> {
     try {
-      await db('g_banners').where('bannerId', bannerId).where('environmentId', environmentId).del();
+      await db('g_banners').where('id', bannerId).where('environmentId', environmentId).del();
     } catch (error) {
       logger.error('Error deleting banner:', error);
       throw error;
@@ -373,7 +373,7 @@ export class BannerModel {
   ): Promise<BannerAttributes> {
     try {
       await db('g_banners')
-        .where('bannerId', bannerId)
+        .where('id', bannerId)
         .where('environmentId', environmentId)
         .update({
           status,

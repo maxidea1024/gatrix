@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Drawer,
   Button,
   TextField,
   Box,
   Typography,
-  IconButton,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -13,11 +11,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  ExpandMore as ExpandMoreIcon,
-  Save as SaveIcon,
-} from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon, Save as SaveIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import {
@@ -27,6 +21,7 @@ import {
 } from '@/services/platformDefaultsService';
 import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import ResizableDrawer from '@/components/common/ResizableDrawer';
 
 interface PlatformDefaultsDialogProps {
   open: boolean;
@@ -44,7 +39,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
   const [saving, setSaving] = useState(false);
   const [defaults, setDefaults] = useState<PlatformDefaultsMap>({});
 
-  // 기본값 로드
+  // Load defaults
   const loadDefaults = async () => {
     try {
       setLoading(true);
@@ -72,9 +67,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
     }
   }, [open, platforms, platformsLoading]);
 
-  // 플랫폼 삭제/추가 기능은 사용하지 않음 (고정된 플랫폼 목록 사용)
-
-  // 플랫폼 기본값 변경
+  // Update platform default value
   const handlePlatformDefaultChange = (
     platform: string,
     field: keyof PlatformDefaults,
@@ -89,7 +82,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
     }));
   };
 
-  // 저장
+  // Save
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -109,53 +102,16 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
   const platformList = platforms;
 
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={onClose}
-      sx={{
-        zIndex: 1301,
-        '& .MuiDrawer-paper': {
-          width: { xs: '100%', sm: 600 },
-          maxWidth: '100vw',
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
+      title={t('platformDefaults.title')}
+      subtitle={t('platformDefaults.description')}
+      storageKey="platformDefaultsDrawerWidth"
+      defaultWidth={600}
+      minWidth={450}
+      zIndex={1301}
     >
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <Box>
-          <Typography variant="h6" component="h2">
-            {t('platformDefaults.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('platformDefaults.description')}
-          </Typography>
-        </Box>
-        <IconButton
-          onClick={onClose}
-          size="small"
-          sx={{
-            '&:hover': {
-              backgroundColor: 'action.hover',
-            },
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
-
       {/* Content */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
         {loading ? (
@@ -164,7 +120,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
           </Box>
         ) : (
           <Stack spacing={2}>
-            {/* 플랫폼별 설정 */}
+            {/* Platform settings */}
             {platformList.length === 0 ? (
               <Alert severity="info">{t('platformDefaults.noPlatforms')}</Alert>
             ) : (
@@ -246,8 +202,9 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({ open, o
           {t('common.save')}
         </Button>
       </Box>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 
 export default PlatformDefaultsDialog;
+

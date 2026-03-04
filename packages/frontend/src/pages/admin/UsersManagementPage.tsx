@@ -112,6 +112,7 @@ import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import SearchTextField from '@/components/common/SearchTextField';
 import { useDebounce } from '../../hooks/useDebounce';
 import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, {
@@ -1663,49 +1664,10 @@ const UsersManagementPage: React.FC = () => {
             }}
           >
             {/* Search */}
-            <TextField
+            <SearchTextField
               placeholder={t('users.searchPlaceholder')}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{
-                minWidth: 200,
-                flexGrow: 1,
-                maxWidth: 320,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    },
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    },
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              }}
-              size="small"
+              onChange={(value) => setSearchTerm(value)}
             />
 
             {/* Dynamic Filter Bar */}
@@ -1833,34 +1795,57 @@ const UsersManagementPage: React.FC = () => {
 
       {/* Users Table */}
       <PageContentLoader loading={isInitialLoad && loading}>
-        <Card sx={{ position: 'relative' }}>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            {users.length === 0 ? (
-              <EmptyPagePlaceholder
-                message={t('users.noUsersFound')}
-                subtitle={canManage ? t('common.addFirstItem') : undefined}
-                onAddClick={canManage ? handleAddUser : undefined}
-                addButtonLabel={t('users.addUser')}
-              />
-            ) : (
-              <>
-                <TableContainer
-                  style={{
-                    opacity: !isInitialLoad && loading ? 0.5 : 1,
-                    transition: 'opacity 0.15s ease-in-out',
-                    pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
-                  }}
-                >
-                  <Table sx={{ tableLayout: 'auto' }}>
-                    <TableHead>
-                      <TableRow>
+        {users.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('users.noUsersFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAddUser : undefined}
+            addButtonLabel={t('users.addUser')}
+          />
+        ) : (
+          <Card sx={{ position: 'relative' }}>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer
+                style={{
+                  opacity: !isInitialLoad && loading ? 0.5 : 1,
+                  transition: 'opacity 0.15s ease-in-out',
+                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+                }}
+              >
+                <Table sx={{ tableLayout: 'auto' }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          indeterminate={
+                            selectedUsers.size > 0 && selectedUsers.size < users.length
+                          }
+                          checked={users.length > 0 && selectedUsers.size === users.length}
+                          onChange={handleSelectAllUsers}
+                        />
+                      </TableCell>
+                      {columns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell
+                            key={column.id}
+                            align={column.id === 'emailVerified' ? 'center' : 'left'}
+                            width={column.width}
+                          >
+                            {t(column.labelKey)}
+                          </TableCell>
+                        ))}
+                      <TableCell>{t('users.createdBy')}</TableCell>
+                      <TableCell align="center">{t('common.actions')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id} hover>
                         <TableCell padding="checkbox">
                           <Checkbox
-                            indeterminate={
-                              selectedUsers.size > 0 && selectedUsers.size < users.length
-                            }
-                            checked={users.length > 0 && selectedUsers.size === users.length}
-                            onChange={handleSelectAllUsers}
+                            checked={selectedUsers.has(user.id)}
+                            onChange={() => handleSelectUser(user.id)}
                           />
                         </TableCell>
                         {columns
@@ -1871,80 +1856,55 @@ const UsersManagementPage: React.FC = () => {
                               align={column.id === 'emailVerified' ? 'center' : 'left'}
                               width={column.width}
                             >
-                              {t(column.labelKey)}
+                              {renderCellContent(user, column.id)}
                             </TableCell>
                           ))}
-                        <TableCell>{t('users.createdBy')}</TableCell>
-                        <TableCell align="center">{t('common.actions')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {users.map((user) => (
-                        <TableRow key={user.id} hover>
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={selectedUsers.has(user.id)}
-                              onChange={() => handleSelectUser(user.id)}
-                            />
-                          </TableCell>
-                          {columns
-                            .filter((col) => col.visible)
-                            .map((column) => (
-                              <TableCell
-                                key={column.id}
-                                align={column.id === 'emailVerified' ? 'center' : 'left'}
-                                width={column.width}
-                              >
-                                {renderCellContent(user, column.id)}
-                              </TableCell>
-                            ))}
-                          <TableCell>
-                            {user.createdByName ? (
-                              <Box>
-                                <Typography variant="body2" fontWeight="medium">
-                                  {user.createdByName}
+                        <TableCell>
+                          {user.createdByName ? (
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {user.createdByName}
+                              </Typography>
+                              {user.createdByEmail && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {user.createdByEmail}
                                 </Typography>
-                                {user.createdByEmail && (
-                                  <Typography variant="caption" color="text.secondary">
-                                    {user.createdByEmail}
-                                  </Typography>
-                                )}
-                              </Box>
-                            ) : (
-                              '-'
-                            )}
-                          </TableCell>
-                          <TableCell align="center">
-                            <IconButton
-                              onClick={(event) => handleMenuOpen(event, user)}
-                              size="small"
-                              title={t('common.actions')}
-                            >
-                              <MoreVertIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                              )}
+                            </Box>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          <IconButton
+                            onClick={(event) => handleMenuOpen(event, user)}
+                            size="small"
+                            title={t('common.actions')}
+                          >
+                            <MoreVertIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-                {total > 0 && (
-                  <SimplePagination
-                    count={total}
-                    page={pageState.page - 1}
-                    rowsPerPage={pageState.limit}
-                    onPageChange={(_, newPage) => updatePage(newPage + 1)}
-                    onRowsPerPageChange={(e) => {
-                      updateLimit(parseInt(e.target.value, 10));
-                    }}
-                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                  />
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
+              {total > 0 && (
+                <SimplePagination
+                  count={total}
+                  page={pageState.page - 1}
+                  rowsPerPage={pageState.limit}
+                  onPageChange={(_, newPage) => updatePage(newPage + 1)}
+                  onRowsPerPageChange={(e) => {
+                    updateLimit(parseInt(e.target.value, 10));
+                  }}
+                  rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Actions Menu */}

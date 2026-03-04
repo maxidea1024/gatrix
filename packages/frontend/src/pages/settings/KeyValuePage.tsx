@@ -263,21 +263,20 @@ const KeyValuePage: React.FC = () => {
         )}
       </Box>
 
-      {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading && items.length === 0 ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : items.length === 0 ? (
-            <EmptyPagePlaceholder
-              message={t('settings.kv.noItems')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('settings.kv.create')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
+      {loading && items.length === 0 ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+        </Box>
+      ) : items.length === 0 ? (
+        <EmptyPagePlaceholder
+          message={t('settings.kv.noItems')}
+          onAddClick={canManage ? handleCreate : undefined}
+          addButtonLabel={t('settings.kv.create')}
+          subtitle={canManage ? t('common.addFirstItem') : undefined}
+        />
+      ) : (
+        <Card>
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -403,9 +402,9 @@ const KeyValuePage: React.FC = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Form Drawer */}
       <KeyValueFormDrawer

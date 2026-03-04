@@ -47,6 +47,10 @@ const EmptyPagePlaceholder: React.FC<EmptyPagePlaceholderProps> = ({
         minHeight,
         py: 6,
         gap: 1.5,
+        border: '2px dashed',
+        borderColor: 'divider',
+        borderRadius: '4px',
+        bgcolor: 'action.hover',
       }}
     >
       {/* Icon */}

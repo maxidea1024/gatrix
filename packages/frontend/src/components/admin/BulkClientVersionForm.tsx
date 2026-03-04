@@ -379,10 +379,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         tags:
           selectedTags && selectedTags.length > 0
             ? selectedTags.map((tag) => ({
-                id: tag.id,
-                name: tag.name,
-                color: tag.color,
-              }))
+              id: tag.id,
+              name: tag.name,
+              color: tag.color,
+            }))
             : [],
       };
 
@@ -451,15 +451,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       >
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -642,15 +634,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               </Stack>
             </Paper>
 
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -740,11 +724,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             <Accordion
               defaultExpanded={false}
               disableGutters
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.default',
-              }}
+              variant="outlined"
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography

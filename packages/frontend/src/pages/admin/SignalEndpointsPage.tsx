@@ -53,7 +53,7 @@ import signalEndpointService, {
   SignalEndpointToken,
 } from '@/services/signalEndpointService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -461,7 +461,7 @@ const SignalEndpointsPage: React.FC = () => {
       {/* Content */}
       <PageContentLoader loading={loading}>
         {endpoints.length === 0 ? (
-          <EmptyPlaceholder
+          <EmptyPagePlaceholder
             message={t('signalEndpoints.noEndpoints')}
             onAddClick={() => setEditDialog({ open: true, endpoint: null })}
             addButtonLabel={t('signalEndpoints.createEndpoint')}

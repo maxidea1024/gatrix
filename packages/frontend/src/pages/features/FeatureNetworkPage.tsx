@@ -59,6 +59,7 @@ import { useTranslation } from 'react-i18next';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import api from '../../services/api';
 import { Environment } from '../../services/environmentService';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 // Register Chart.js components
 ChartJS.register(
@@ -926,362 +927,366 @@ const FeatureNetworkPage: React.FC = () => {
       </Paper>
 
       {/* Tabs */}
-      <Paper sx={{ mb: 3, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-        <Tabs
-          value={activeTab}
-          onChange={(_, newValue) => setActiveTab(newValue)}
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
-        >
-          <Tab label={t('network.tabApiRequests')} />
-          <Tab label={t('network.tabFlagEvaluations')} />
-        </Tabs>
+      <PageContentLoader loading={loading}>
+        <Paper sx={{ mb: 3, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            sx={{ borderBottom: 1, borderColor: 'divider' }}
+          >
+            <Tab label={t('network.tabApiRequests')} />
+            <Tab label={t('network.tabFlagEvaluations')} />
+          </Tabs>
 
-        {/* API Requests Tab */}
-        {activeTab === 0 && (
-          <Box sx={{ p: 3 }}>
-            {/* API Summary Cards */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                gap: 2,
-                mb: 3,
-              }}
-            >
-              {apiSummaryCards.map((card, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  }}
-                >
-                  <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mb: 0.5,
-                      }}
-                    >
-                      <Box sx={{ color: card.color, fontSize: 18 }}>{card.icon}</Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {card.label}
-                      </Typography>
-                    </Box>
-                    {(loading || isRefreshing) && !summary ? (
-                      <Skeleton variant="text" width={60} height={32} />
-                    ) : (
-                      <Typography variant="h5" fontWeight={600}>
-                        {card.value}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
-
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: 2,
-              }}
-            >
-              <Typography variant="h6">{t('network.requestsOverTime')}</Typography>
-              <ToggleButtonGroup
-                size="small"
-                value={chartGroupBy}
-                exclusive
-                onChange={(_, value) => value && setChartGroupBy(value)}
-              >
-                <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
-                <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
-                <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-            {(loading || isRefreshing) && chartDataByApp.length === 0 ? (
-              <Skeleton variant="rectangular" height={300} />
-            ) : chartDataByApp.length === 0 ? (
+          {/* API Requests Tab */}
+          {activeTab === 0 && (
+            <Box sx={{ p: 3 }}>
+              {/* API Summary Cards */}
               <Box
                 sx={{
-                  height: 300,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gap: 2,
+                  mb: 3,
                 }}
               >
-                <Typography color="text.secondary">{t('common.noData')}</Typography>
+                {apiSummaryCards.map((card, index) => (
+                  <Card
+                    key={index}
+                    sx={{
+                      borderRadius: 2,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          mb: 0.5,
+                        }}
+                      >
+                        <Box sx={{ color: card.color, fontSize: 18 }}>{card.icon}</Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {card.label}
+                        </Typography>
+                      </Box>
+                      {(loading || isRefreshing) && !summary ? (
+                        <Skeleton variant="text" width={60} height={32} />
+                      ) : (
+                        <Typography variant="h5" fontWeight={600}>
+                          {card.value}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
               </Box>
-            ) : (
-              <Box sx={{ height: 300 }}>
-                <Line data={lineChartData} options={lineChartOptions} />
-              </Box>
-            )}
 
-            {/* Traffic Detail Table */}
-            <Box sx={{ mt: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  cursor: 'pointer',
+                  mb: 2,
                 }}
-                onClick={() => setShowTable(!showTable)}
               >
-                <Typography variant="subtitle1" fontWeight={600}>
-                  {t('network.detailData')}
-                </Typography>
-                <IconButton size="small">
-                  {showTable ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </IconButton>
+                <Typography variant="h6">{t('network.requestsOverTime')}</Typography>
+                <ToggleButtonGroup
+                  size="small"
+                  value={chartGroupBy}
+                  exclusive
+                  onChange={(_, value) => value && setChartGroupBy(value)}
+                >
+                  <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+                  <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+                  <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
+                </ToggleButtonGroup>
               </Box>
-              <Collapse in={showTable}>
-                <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
-                  <Table size="small" stickyHeader>
-                    <TableHead
-                      sx={{
-                        '& .MuiTableCell-root': {
-                          bgcolor: 'background.paper',
-                          zIndex: 1,
-                        },
-                      }}
-                    >
-                      <TableRow>
-                        <TableCell>{t('network.time')}</TableCell>
-                        <TableCell>{t('common.environment')}</TableCell>
-                        <TableCell>{t('network.application')}</TableCell>
-                        <TableCell align="right">{t('network.features')}</TableCell>
-                        <TableCell align="right">{t('network.segments')}</TableCell>
-                        <TableCell align="right">{t('network.total')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {trafficData.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                            <Typography color="text.secondary">{t('common.noData')}</Typography>
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        trafficData
-                          .slice()
-                          .reverse()
-                          .map((row, index) => (
-                            <TableRow key={index} hover>
-                              <TableCell>{row.displayTime}</TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={row.environmentId}
-                                  size="small"
-                                  color="primary"
-                                  variant="outlined"
-                                  sx={{ borderRadius: '16px' }}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                {row.appName ? (
-                                  <Chip
-                                    label={row.appName}
-                                    size="small"
-                                    color="info"
-                                    sx={{ borderRadius: '16px' }}
-                                  />
-                                ) : (
-                                  '-'
-                                )}
-                              </TableCell>
-                              <TableCell align="right">
-                                {row.featuresCount.toLocaleString()}
-                              </TableCell>
-                              <TableCell align="right">
-                                {row.segmentsCount.toLocaleString()}
-                              </TableCell>
-                              <TableCell align="right">{row.totalCount.toLocaleString()}</TableCell>
-                            </TableRow>
-                          ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Collapse>
-            </Box>
-          </Box>
-        )}
-
-        {/* Flag Evaluations Tab */}
-        {activeTab === 1 && (
-          <Box sx={{ p: 3 }}>
-            {/* Evaluation Summary Cards */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                gap: 2,
-                mb: 3,
-              }}
-            >
-              {evalSummaryCards.map((card, index) => (
-                <Card
-                  key={index}
+              {(loading || isRefreshing) && chartDataByApp.length === 0 ? (
+                <Skeleton variant="rectangular" height={300} />
+              ) : chartDataByApp.length === 0 ? (
+                <Box
                   sx={{
-                    borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    height: 300,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mb: 0.5,
-                      }}
-                    >
-                      <Box sx={{ color: card.color, fontSize: 18 }}>{card.icon}</Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {card.label}
-                      </Typography>
-                    </Box>
-                    {(loading || isRefreshing) && !evaluations ? (
-                      <Skeleton variant="text" width={60} height={32} />
-                    ) : (
-                      <Typography variant="h5" fontWeight={600}>
-                        {card.value}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
+                  <Typography color="text.secondary">{t('common.noData')}</Typography>
+                </Box>
+              ) : (
+                <Box sx={{ height: 300 }}>
+                  <Line data={lineChartData} options={lineChartOptions} />
+                </Box>
+              )}
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: 2,
-              }}
-            >
-              <Typography variant="h6">{t('network.evaluationsOverTime')}</Typography>
-              <ToggleButtonGroup
-                size="small"
-                value={chartGroupBy}
-                exclusive
-                onChange={(_, value) => value && setChartGroupBy(value)}
-              >
-                <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
-                <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
-                <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
-              </ToggleButtonGroup>
+              {/* Traffic Detail Table */}
+              <Box sx={{ mt: 3 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setShowTable(!showTable)}
+                >
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {t('network.detailData')}
+                  </Typography>
+                  <IconButton size="small">
+                    {showTable ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
+                </Box>
+                <Collapse in={showTable}>
+                  <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead
+                        sx={{
+                          '& .MuiTableCell-root': {
+                            bgcolor: 'background.paper',
+                            zIndex: 1,
+                          },
+                        }}
+                      >
+                        <TableRow>
+                          <TableCell>{t('network.time')}</TableCell>
+                          <TableCell>{t('common.environment')}</TableCell>
+                          <TableCell>{t('network.application')}</TableCell>
+                          <TableCell align="right">{t('network.features')}</TableCell>
+                          <TableCell align="right">{t('network.segments')}</TableCell>
+                          <TableCell align="right">{t('network.total')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {trafficData.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                              <Typography color="text.secondary">{t('common.noData')}</Typography>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          trafficData
+                            .slice()
+                            .reverse()
+                            .map((row, index) => (
+                              <TableRow key={index} hover>
+                                <TableCell>{row.displayTime}</TableCell>
+                                <TableCell>
+                                  <Chip
+                                    label={row.environmentId}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                    sx={{ borderRadius: '16px' }}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  {row.appName ? (
+                                    <Chip
+                                      label={row.appName}
+                                      size="small"
+                                      color="info"
+                                      sx={{ borderRadius: '16px' }}
+                                    />
+                                  ) : (
+                                    '-'
+                                  )}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {row.featuresCount.toLocaleString()}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {row.segmentsCount.toLocaleString()}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {row.totalCount.toLocaleString()}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Collapse>
+              </Box>
             </Box>
-            {(loading || isRefreshing) && evaluationTimeSeriesByApp.length === 0 ? (
-              <Skeleton variant="rectangular" height={300} />
-            ) : evaluationTimeSeriesByApp.length === 0 ? (
+          )}
+
+          {/* Flag Evaluations Tab */}
+          {activeTab === 1 && (
+            <Box sx={{ p: 3 }}>
+              {/* Evaluation Summary Cards */}
               <Box
                 sx={{
-                  height: 300,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gap: 2,
+                  mb: 3,
                 }}
               >
-                <Typography color="text.secondary">{t('common.noData')}</Typography>
+                {evalSummaryCards.map((card, index) => (
+                  <Card
+                    key={index}
+                    sx={{
+                      borderRadius: 2,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          mb: 0.5,
+                        }}
+                      >
+                        <Box sx={{ color: card.color, fontSize: 18 }}>{card.icon}</Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {card.label}
+                        </Typography>
+                      </Box>
+                      {(loading || isRefreshing) && !evaluations ? (
+                        <Skeleton variant="text" width={60} height={32} />
+                      ) : (
+                        <Typography variant="h5" fontWeight={600}>
+                          {card.value}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
               </Box>
-            ) : (
-              <Box sx={{ height: 300 }}>
-                <Line data={evaluationChartData} options={lineChartOptions} />
-              </Box>
-            )}
 
-            {/* Evaluation Detail Table */}
-            <Box sx={{ mt: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  cursor: 'pointer',
+                  mb: 2,
                 }}
-                onClick={() => setShowEvalTable(!showEvalTable)}
               >
-                <Typography variant="subtitle1" fontWeight={600}>
-                  {t('network.detailData')}
-                </Typography>
-                <IconButton size="small">
-                  {showEvalTable ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </IconButton>
+                <Typography variant="h6">{t('network.evaluationsOverTime')}</Typography>
+                <ToggleButtonGroup
+                  size="small"
+                  value={chartGroupBy}
+                  exclusive
+                  onChange={(_, value) => value && setChartGroupBy(value)}
+                >
+                  <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+                  <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+                  <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
+                </ToggleButtonGroup>
               </Box>
-              <Collapse in={showEvalTable}>
-                <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
-                  <Table size="small" stickyHeader>
-                    <TableHead
-                      sx={{
-                        '& .MuiTableCell-root': {
-                          bgcolor: 'background.paper',
-                          zIndex: 1,
-                        },
-                      }}
-                    >
-                      <TableRow>
-                        <TableCell>{t('network.time')}</TableCell>
-                        <TableCell>{t('common.environment')}</TableCell>
-                        <TableCell>{t('network.application')}</TableCell>
-                        <TableCell align="right">{t('network.flagEvaluations')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {evaluationTimeSeriesByApp.length === 0 ? (
+              {(loading || isRefreshing) && evaluationTimeSeriesByApp.length === 0 ? (
+                <Skeleton variant="rectangular" height={300} />
+              ) : evaluationTimeSeriesByApp.length === 0 ? (
+                <Box
+                  sx={{
+                    height: 300,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Typography color="text.secondary">{t('common.noData')}</Typography>
+                </Box>
+              ) : (
+                <Box sx={{ height: 300 }}>
+                  <Line data={evaluationChartData} options={lineChartOptions} />
+                </Box>
+              )}
+
+              {/* Evaluation Detail Table */}
+              <Box sx={{ mt: 3 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setShowEvalTable(!showEvalTable)}
+                >
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {t('network.detailData')}
+                  </Typography>
+                  <IconButton size="small">
+                    {showEvalTable ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
+                </Box>
+                <Collapse in={showEvalTable}>
+                  <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead
+                        sx={{
+                          '& .MuiTableCell-root': {
+                            bgcolor: 'background.paper',
+                            zIndex: 1,
+                          },
+                        }}
+                      >
                         <TableRow>
-                          <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                            <Typography color="text.secondary">{t('common.noData')}</Typography>
-                          </TableCell>
+                          <TableCell>{t('network.time')}</TableCell>
+                          <TableCell>{t('common.environment')}</TableCell>
+                          <TableCell>{t('network.application')}</TableCell>
+                          <TableCell align="right">{t('network.flagEvaluations')}</TableCell>
                         </TableRow>
-                      ) : (
-                        evaluationTimeSeriesByApp
-                          .slice()
-                          .reverse()
-                          .map((row, index) => (
-                            <TableRow key={index} hover>
-                              <TableCell>{row.displayTime}</TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={row.environmentId}
-                                  size="small"
-                                  color="primary"
-                                  variant="outlined"
-                                  sx={{ borderRadius: '16px' }}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                {row.appName ? (
+                      </TableHead>
+                      <TableBody>
+                        {evaluationTimeSeriesByApp.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                              <Typography color="text.secondary">{t('common.noData')}</Typography>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          evaluationTimeSeriesByApp
+                            .slice()
+                            .reverse()
+                            .map((row, index) => (
+                              <TableRow key={index} hover>
+                                <TableCell>{row.displayTime}</TableCell>
+                                <TableCell>
                                   <Chip
-                                    label={row.appName}
+                                    label={row.environmentId}
                                     size="small"
-                                    color="info"
+                                    color="primary"
+                                    variant="outlined"
                                     sx={{ borderRadius: '16px' }}
                                   />
-                                ) : (
-                                  '-'
-                                )}
-                              </TableCell>
-                              <TableCell align="right">
-                                {row.evaluations.toLocaleString()}
-                              </TableCell>
-                            </TableRow>
-                          ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Collapse>
+                                </TableCell>
+                                <TableCell>
+                                  {row.appName ? (
+                                    <Chip
+                                      label={row.appName}
+                                      size="small"
+                                      color="info"
+                                      sx={{ borderRadius: '16px' }}
+                                    />
+                                  ) : (
+                                    '-'
+                                  )}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {row.evaluations.toLocaleString()}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Collapse>
+              </Box>
             </Box>
-          </Box>
-        )}
-      </Paper>
+          )}
+        </Paper>
+      </PageContentLoader>
     </Box>
   );
 };

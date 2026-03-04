@@ -1083,53 +1083,44 @@ const ApiTokensPage: React.FC = () => {
 
         {/* Tokens Table */}
         <PageContentLoader loading={loading}>
-          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer>
-              <Table stickyHeader sx={{ tableLayout: 'auto' }}>
-                <TableHead>
-                  <TableRow>
-                    {canManage && (
-                      <TableCell padding="checkbox" sx={{ width: 50 }}>
-                        <Checkbox
-                          checked={selectAll}
-                          indeterminate={
-                            selectedTokenIds.length > 0 &&
-                            selectedTokenIds.length < filteredTokens.length
-                          }
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          disabled={filteredTokens.length === 0}
-                        />
-                      </TableCell>
-                    )}
-                    {columns
-                      .filter((col) => col.visible)
-                      .map((column) => (
-                        <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
-                      ))}
-                    <TableCell align="center" sx={{ width: 150 }}>
-                      {t('common.actions')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {!filteredTokens || filteredTokens.length === 0 ? (
+          {!filteredTokens || filteredTokens.length === 0 ? (
+            <EmptyPagePlaceholder
+              message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
+              subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
+              onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}
+              addButtonLabel={t('apiTokens.createToken')}
+            />
+          ) : (
+            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+              <TableContainer>
+                <Table stickyHeader sx={{ tableLayout: 'auto' }}>
+                  <TableHead>
                     <TableRow>
-                      <TableCell
-                        colSpan={columns.filter((col) => col.visible).length + (canManage ? 2 : 1)}
-                        sx={{ p: 0 }}
-                      >
-                        <EmptyPagePlaceholder
-                          message={
-                            searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')
-                          }
-                          subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
-                          onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}
-                          addButtonLabel={t('apiTokens.createToken')}
-                        />
+                      {canManage && (
+                        <TableCell padding="checkbox" sx={{ width: 50 }}>
+                          <Checkbox
+                            checked={selectAll}
+                            indeterminate={
+                              selectedTokenIds.length > 0 &&
+                              selectedTokenIds.length < filteredTokens.length
+                            }
+                            onChange={(e) => handleSelectAll(e.target.checked)}
+                            disabled={filteredTokens.length === 0}
+                          />
+                        </TableCell>
+                      )}
+                      {columns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                        ))}
+                      <TableCell align="center" sx={{ width: 150 }}>
+                        {t('common.actions')}
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    filteredTokens.map((token) => (
+                  </TableHead>
+                  <TableBody>
+                    {filteredTokens.map((token) => (
                       <TableRow
                         key={token.id}
                         hover
@@ -1191,27 +1182,27 @@ const ApiTokensPage: React.FC = () => {
                           </Box>
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-            {/* Pagination */}
-            {!loading && tokens.length > 0 && (
-              <SimplePagination
-                count={total}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={(_, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(e) => {
-                  setRowsPerPage(parseInt(e.target.value, 10));
-                  setPage(0);
-                }}
-                rowsPerPageOptions={[5, 10, 25, 50]}
-              />
-            )}
-          </Paper>
+              {/* Pagination */}
+              {!loading && tokens.length > 0 && (
+                <SimplePagination
+                  count={total}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={(_, newPage) => setPage(newPage)}
+                  onRowsPerPageChange={(e) => {
+                    setRowsPerPage(parseInt(e.target.value, 10));
+                    setPage(0);
+                  }}
+                  rowsPerPageOptions={[5, 10, 25, 50]}
+                />
+              )}
+            </Paper>
+          )}
         </PageContentLoader>
       </Box>
 

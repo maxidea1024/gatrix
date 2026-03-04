@@ -26,7 +26,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Alert,
-  InputAdornment,
   Tabs,
   Tab,
   Select,
@@ -38,7 +37,6 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   ExpandMore as ExpandMoreIcon,
-  Search as SearchIcon,
   Shield as ShieldIcon,
   People as PeopleIcon,
   Group as GroupIcon,
@@ -55,6 +53,7 @@ import { orgProjectService, Project } from '@/services/orgProjectService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import SearchTextField from '@/components/common/SearchTextField';
 
 // ==================== Permission Editor ====================
 
@@ -870,33 +869,25 @@ const RolesPage: React.FC = () => {
 
       {/* Search */}
       <Box sx={{ mb: 2 }}>
-        <TextField
-          size="small"
+        <SearchTextField
           placeholder={t('rbac.roles.searchPlaceholder')}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
+          onChange={(value) => setSearchTerm(value)}
           sx={{ width: 300 }}
         />
       </Box>
 
       {/* Table */}
       <PageContentLoader loading={loading}>
-        <Card>
-          <CardContent sx={{ p: 0 }}>
-            {filteredRoles.length === 0 ? (
-              <EmptyPagePlaceholder
-                icon={<ShieldIcon sx={{ fontSize: 48 }} />}
-                message={t('rbac.roles.emptyTitle')}
-                subtitle={t('rbac.roles.emptyDescription')}
-              />
-            ) : (
+        {filteredRoles.length === 0 ? (
+          <EmptyPagePlaceholder
+            icon={<ShieldIcon sx={{ fontSize: 48 }} />}
+            message={t('rbac.roles.emptyTitle')}
+            subtitle={t('rbac.roles.emptyDescription')}
+          />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0 }}>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
@@ -994,9 +985,9 @@ const RolesPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Create / Edit Drawer */}

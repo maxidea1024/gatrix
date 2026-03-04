@@ -29,14 +29,12 @@ import {
   Autocomplete,
   Switch,
   FormControlLabel,
-  InputAdornment,
   Alert,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon,
   Group as GroupIcon,
   People as PeopleIcon,
   Shield as ShieldIcon,
@@ -58,6 +56,7 @@ import {
 import api from '@/services/api';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import SearchTextField from '@/components/common/SearchTextField';
 
 // ==================== Tab Panel ====================
 
@@ -415,33 +414,25 @@ const GroupsPage: React.FC = () => {
 
       {/* Search */}
       <Box sx={{ mb: 2 }}>
-        <TextField
-          size="small"
+        <SearchTextField
           placeholder={t('rbac.groups.searchPlaceholder')}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
+          onChange={(value) => setSearchTerm(value)}
           sx={{ width: 300 }}
         />
       </Box>
 
       {/* Table */}
       <PageContentLoader loading={loading}>
-        <Card>
-          <CardContent sx={{ p: 0 }}>
-            {filteredGroups.length === 0 ? (
-              <EmptyPagePlaceholder
-                icon={<GroupIcon sx={{ fontSize: 48 }} />}
-                message={t('rbac.groups.emptyTitle')}
-                subtitle={t('rbac.groups.emptyDescription')}
-              />
-            ) : (
+        {filteredGroups.length === 0 ? (
+          <EmptyPagePlaceholder
+            icon={<GroupIcon sx={{ fontSize: 48 }} />}
+            message={t('rbac.groups.emptyTitle')}
+            subtitle={t('rbac.groups.emptyDescription')}
+          />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0 }}>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
@@ -538,9 +529,9 @@ const GroupsPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Create / Edit Drawer */}

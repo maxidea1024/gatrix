@@ -95,4 +95,3 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
 };
 
 export default EmptyTableRow;
-

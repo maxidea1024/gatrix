@@ -122,7 +122,7 @@ export class EnvironmentCopyService {
       jobs,
     ] = await Promise.all([
       knex('g_game_worlds').where('environmentId', sourceEnvironment).select('worldId'),
-      knex('g_banners').where('environmentId', sourceEnvironment).select('bannerId'),
+      knex('g_banners').where('environmentId', sourceEnvironment).select('id'),
       knex('g_client_versions')
         .where('environmentId', sourceEnvironment)
         .select('id', 'platform', 'version'),
@@ -163,7 +163,7 @@ export class EnvironmentCopyService {
       existingJobs,
     ] = await Promise.all([
       knex('g_game_worlds').where('environmentId', targetEnvironment).select('worldId'),
-      knex('g_banners').where('environmentId', targetEnvironment).select('bannerId'),
+      knex('g_banners').where('environmentId', targetEnvironment).select('id'),
       knex('g_client_versions')
         .where('environmentId', targetEnvironment)
         .select('platform', 'version'),

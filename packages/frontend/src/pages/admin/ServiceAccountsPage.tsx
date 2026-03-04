@@ -53,7 +53,7 @@ import serviceAccountService, {
 } from '@/services/serviceAccountService';
 import { rbacService, Role, UserRole } from '@/services/rbacService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -633,7 +633,7 @@ const ServiceAccountsPage: React.FC = () => {
       {/* Content */}
       <PageContentLoader loading={loading}>
         {accounts.length === 0 ? (
-          <EmptyPlaceholder
+          <EmptyPagePlaceholder
             message={t('serviceAccounts.noAccounts')}
             onAddClick={() => setEditDialog({ open: true, account: null })}
             addButtonLabel={t('serviceAccounts.createAccount')}

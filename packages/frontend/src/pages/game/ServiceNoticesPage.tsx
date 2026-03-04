@@ -732,405 +732,398 @@ const ServiceNoticesPage: React.FC = () => {
 
       {/* Table */}
       <PageContentLoader loading={isInitialLoad && loading}>
-        <Card>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            {notices.length === 0 ? (
-              <EmptyPagePlaceholder
-                message={t('serviceNotices.noNoticesFound')}
-                onAddClick={canManage ? handleCreate : undefined}
-                addButtonLabel={t('serviceNotices.createNotice')}
-                subtitle={canManage ? t('common.addFirstItem') : undefined}
-              />
-            ) : (
-              <>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
+        {notices.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('serviceNotices.noNoticesFound')}
+            onAddClick={canManage ? handleCreate : undefined}
+            addButtonLabel={t('serviceNotices.createNotice')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={notices.length > 0 && selectedIds.length === notices.length}
+                            indeterminate={
+                              selectedIds.length > 0 && selectedIds.length < notices.length
+                            }
+                            onChange={handleSelectAll}
+                          />
+                        </TableCell>
+                      )}
+                      {visibleColumns.map((column) => {
+                        const isSortable = [
+                          'title',
+                          'isPinned',
+                          'status',
+                          'category',
+                          'period',
+                          'createdAt',
+                          'updatedAt',
+                        ].includes(column.id);
+                        const sortProperty =
+                          column.id === 'status'
+                            ? 'isActive'
+                            : column.id === 'period'
+                              ? 'startDate'
+                              : column.id;
+
+                        return (
+                          <TableCell
+                            key={column.id}
+                            align={column.id === 'isPinned' ? 'center' : 'left'}
+                            sortDirection={orderBy === sortProperty ? order : false}
+                          >
+                            {isSortable ? (
+                              <TableSortLabel
+                                active={orderBy === sortProperty}
+                                direction={orderBy === sortProperty ? order : 'asc'}
+                                onClick={() => handleRequestSort(sortProperty)}
+                              >
+                                {column.id === 'isPinned' ? (
+                                  <Tooltip title={t('serviceNotices.isPinned')}>
+                                    <PushPinIcon
+                                      fontSize="small"
+                                      sx={{
+                                        transform: 'rotate(45deg)',
+                                        verticalAlign: 'middle',
+                                      }}
+                                    />
+                                  </Tooltip>
+                                ) : (
+                                  t(column.labelKey)
+                                )}
+                              </TableSortLabel>
+                            ) : column.id === 'isPinned' ? (
+                              <Tooltip title={t('serviceNotices.isPinned')}>
+                                <PushPinIcon
+                                  fontSize="small"
+                                  sx={{
+                                    transform: 'rotate(45deg)',
+                                    verticalAlign: 'middle',
+                                  }}
+                                />
+                              </Tooltip>
+                            ) : (
+                              t(column.labelKey)
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                      {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {notices.map((notice) => (
+                      <TableRow key={notice.id} hover>
                         {canManage && (
                           <TableCell padding="checkbox">
                             <Checkbox
-                              checked={notices.length > 0 && selectedIds.length === notices.length}
-                              indeterminate={
-                                selectedIds.length > 0 && selectedIds.length < notices.length
-                              }
-                              onChange={handleSelectAll}
+                              checked={selectedIds.includes(notice.id)}
+                              onChange={() => handleSelectOne(notice.id)}
                             />
                           </TableCell>
                         )}
                         {visibleColumns.map((column) => {
-                          const isSortable = [
-                            'title',
-                            'isPinned',
-                            'status',
-                            'category',
-                            'period',
-                            'createdAt',
-                            'updatedAt',
-                          ].includes(column.id);
-                          const sortProperty =
-                            column.id === 'status'
-                              ? 'isActive'
-                              : column.id === 'period'
-                                ? 'startDate'
-                                : column.id;
+                          if (column.id === 'isPinned') {
+                            return (
+                              <TableCell key={column.id} align="center">
+                                <PushPinIcon
+                                  fontSize="small"
+                                  color={notice.isPinned ? 'primary' : 'disabled'}
+                                  sx={{
+                                    transform: 'rotate(45deg)',
+                                    opacity: notice.isPinned ? 1 : 0.3,
+                                  }}
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'status') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={
+                                    notice.isActive ? t('common.active') : t('common.inactive')
+                                  }
+                                  color={notice.isActive ? 'success' : 'default'}
+                                  size="small"
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'currentlyVisible') {
+                            const now = new Date();
+                            const startDate = notice.startDate ? new Date(notice.startDate) : null;
+                            const endDate = notice.endDate ? new Date(notice.endDate) : null;
+                            const isCurrentlyVisible =
+                              notice.isActive &&
+                              (!startDate || now >= startDate) &&
+                              (!endDate || now <= endDate);
 
-                          return (
-                            <TableCell
-                              key={column.id}
-                              align={column.id === 'isPinned' ? 'center' : 'left'}
-                              sortDirection={orderBy === sortProperty ? order : false}
-                            >
-                              {isSortable ? (
-                                <TableSortLabel
-                                  active={orderBy === sortProperty}
-                                  direction={orderBy === sortProperty ? order : 'asc'}
-                                  onClick={() => handleRequestSort(sortProperty)}
+                            const startText = startDate
+                              ? formatDateTime(startDate)
+                              : t('serviceNotices.startImmediately');
+                            const endText = endDate
+                              ? formatDateTime(endDate)
+                              : t('serviceNotices.permanentDisplay');
+
+                            const tooltipMessage = isCurrentlyVisible
+                              ? t('serviceNotices.currentlyVisibleTooltip', {
+                                  time: formatDateTime(now),
+                                  start: startText,
+                                  end: endText,
+                                })
+                              : t('serviceNotices.notVisibleTooltip', {
+                                  time: formatDateTime(now),
+                                  start: startText,
+                                  end: endText,
+                                  isActive: notice.isActive,
+                                });
+
+                            return (
+                              <TableCell key={column.id}>
+                                <Tooltip title={tooltipMessage} arrow>
+                                  <Chip
+                                    label={
+                                      isCurrentlyVisible
+                                        ? t('serviceNotices.visible')
+                                        : t('serviceNotices.notVisible')
+                                    }
+                                    color={isCurrentlyVisible ? 'primary' : 'default'}
+                                    size="small"
+                                    variant={isCurrentlyVisible ? 'filled' : 'outlined'}
+                                  />
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'category') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Chip
+                                  label={t(`serviceNotices.categories.${notice.category}`)}
+                                  size="small"
+                                  variant="outlined"
+                                />
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'title') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                  }}
                                 >
-                                  {column.id === 'isPinned' ? (
-                                    <Tooltip title={t('serviceNotices.isPinned')}>
-                                      <PushPinIcon
-                                        fontSize="small"
+                                  <Box>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        fontWeight: 500,
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                          textDecoration: 'underline',
+                                        },
+                                      }}
+                                      onClick={() => handleEdit(notice)}
+                                    >
+                                      {notice.tabTitle || notice.title}
+                                    </Typography>
+                                    {notice.tabTitle && (
+                                      <Typography variant="caption" color="text.secondary">
+                                        {notice.title}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'targetAudience') {
+                            const hasChannels = notice.channels && notice.channels.length > 0;
+                            const platformsText =
+                              notice.platforms.length === 0
+                                ? t('common.all')
+                                : notice.platforms.join(', ');
+                            const channelsText = hasChannels ? notice.channels.join(', ') : null;
+
+                            return (
+                              <TableCell key={column.id}>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                      {platformsText}
+                                    </Typography>
+                                    {channelsText && (
+                                      <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ display: 'block', mt: 0.5 }}
+                                      >
+                                        {channelsText}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                  {(hasChannels || notice.platforms.length > 2) && (
+                                    <Tooltip
+                                      title={
+                                        <Box>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{ display: 'block', mb: 0.5 }}
+                                          >
+                                            <strong>{t('serviceNotices.platforms')}:</strong>{' '}
+                                            {platformsText}
+                                          </Typography>
+                                          {channelsText && (
+                                            <Typography variant="caption" sx={{ display: 'block' }}>
+                                              <strong>{t('serviceNotices.channels')}:</strong>{' '}
+                                              {channelsText}
+                                            </Typography>
+                                          )}
+                                        </Box>
+                                      }
+                                    >
+                                      <InfoIcon
                                         sx={{
-                                          transform: 'rotate(45deg)',
-                                          verticalAlign: 'middle',
+                                          fontSize: '1rem',
+                                          cursor: 'pointer',
+                                          color: 'action.active',
                                         }}
                                       />
                                     </Tooltip>
-                                  ) : (
-                                    t(column.labelKey)
                                   )}
-                                </TableSortLabel>
-                              ) : column.id === 'isPinned' ? (
-                                <Tooltip title={t('serviceNotices.isPinned')}>
-                                  <PushPinIcon
-                                    fontSize="small"
-                                    sx={{
-                                      transform: 'rotate(45deg)',
-                                      verticalAlign: 'middle',
-                                    }}
-                                  />
+                                </Box>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'period') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Tooltip
+                                  title={
+                                    notice.startDate
+                                      ? formatDateTimeDetailed(notice.startDate)
+                                      : t('serviceNotices.startImmediately')
+                                  }
+                                >
+                                  <Typography variant="caption" display="block">
+                                    {notice.startDate
+                                      ? formatRelativeTime(notice.startDate, undefined, language)
+                                      : t('serviceNotices.startImmediately')}
+                                  </Typography>
                                 </Tooltip>
-                              ) : (
-                                t(column.labelKey)
-                              )}
-                            </TableCell>
-                          );
+                                <Tooltip
+                                  title={
+                                    notice.endDate
+                                      ? formatDateTimeDetailed(notice.endDate)
+                                      : t('serviceNotices.permanent')
+                                  }
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    display="block"
+                                    color="text.secondary"
+                                  >
+                                    ~{' '}
+                                    {notice.endDate
+                                      ? formatRelativeTime(notice.endDate, undefined, language)
+                                      : t('serviceNotices.permanent')}
+                                  </Typography>
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'createdAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
+                                  <Typography variant="caption">
+                                    {formatRelativeTime(notice.createdAt, undefined, language)}
+                                  </Typography>
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          if (column.id === 'updatedAt') {
+                            return (
+                              <TableCell key={column.id}>
+                                <Tooltip title={formatDateTimeDetailed(notice.updatedAt)}>
+                                  <Typography variant="caption">
+                                    {formatRelativeTime(notice.updatedAt, undefined, language)}
+                                  </Typography>
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
+                          return null;
                         })}
-                        {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                        {canManage && (
+                          <TableCell align="center">
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                gap: 0.5,
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <Tooltip title={t('common.edit')}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleEdit(notice)}
+                                  color="primary"
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('common.delete')}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleDelete(notice)}
+                                  color="error"
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          </TableCell>
+                        )}
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {notices.map((notice) => (
-                        <TableRow key={notice.id} hover>
-                          {canManage && (
-                            <TableCell padding="checkbox">
-                              <Checkbox
-                                checked={selectedIds.includes(notice.id)}
-                                onChange={() => handleSelectOne(notice.id)}
-                              />
-                            </TableCell>
-                          )}
-                          {visibleColumns.map((column) => {
-                            if (column.id === 'isPinned') {
-                              return (
-                                <TableCell key={column.id} align="center">
-                                  <PushPinIcon
-                                    fontSize="small"
-                                    color={notice.isPinned ? 'primary' : 'disabled'}
-                                    sx={{
-                                      transform: 'rotate(45deg)',
-                                      opacity: notice.isPinned ? 1 : 0.3,
-                                    }}
-                                  />
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'status') {
-                              return (
-                                <TableCell key={column.id}>
-                                  <Chip
-                                    label={
-                                      notice.isActive ? t('common.active') : t('common.inactive')
-                                    }
-                                    color={notice.isActive ? 'success' : 'default'}
-                                    size="small"
-                                  />
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'currentlyVisible') {
-                              const now = new Date();
-                              const startDate = notice.startDate
-                                ? new Date(notice.startDate)
-                                : null;
-                              const endDate = notice.endDate ? new Date(notice.endDate) : null;
-                              const isCurrentlyVisible =
-                                notice.isActive &&
-                                (!startDate || now >= startDate) &&
-                                (!endDate || now <= endDate);
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-                              const startText = startDate
-                                ? formatDateTime(startDate)
-                                : t('serviceNotices.startImmediately');
-                              const endText = endDate
-                                ? formatDateTime(endDate)
-                                : t('serviceNotices.permanentDisplay');
-
-                              const tooltipMessage = isCurrentlyVisible
-                                ? t('serviceNotices.currentlyVisibleTooltip', {
-                                    time: formatDateTime(now),
-                                    start: startText,
-                                    end: endText,
-                                  })
-                                : t('serviceNotices.notVisibleTooltip', {
-                                    time: formatDateTime(now),
-                                    start: startText,
-                                    end: endText,
-                                    isActive: notice.isActive,
-                                  });
-
-                              return (
-                                <TableCell key={column.id}>
-                                  <Tooltip title={tooltipMessage} arrow>
-                                    <Chip
-                                      label={
-                                        isCurrentlyVisible
-                                          ? t('serviceNotices.visible')
-                                          : t('serviceNotices.notVisible')
-                                      }
-                                      color={isCurrentlyVisible ? 'primary' : 'default'}
-                                      size="small"
-                                      variant={isCurrentlyVisible ? 'filled' : 'outlined'}
-                                    />
-                                  </Tooltip>
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'category') {
-                              return (
-                                <TableCell key={column.id}>
-                                  <Chip
-                                    label={t(`serviceNotices.categories.${notice.category}`)}
-                                    size="small"
-                                    variant="outlined"
-                                  />
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'title') {
-                              return (
-                                <TableCell key={column.id}>
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 1,
-                                    }}
-                                  >
-                                    <Box>
-                                      <Typography
-                                        variant="body2"
-                                        sx={{
-                                          fontWeight: 500,
-                                          cursor: 'pointer',
-                                          '&:hover': {
-                                            textDecoration: 'underline',
-                                          },
-                                        }}
-                                        onClick={() => handleEdit(notice)}
-                                      >
-                                        {notice.tabTitle || notice.title}
-                                      </Typography>
-                                      {notice.tabTitle && (
-                                        <Typography variant="caption" color="text.secondary">
-                                          {notice.title}
-                                        </Typography>
-                                      )}
-                                    </Box>
-                                  </Box>
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'targetAudience') {
-                              const hasChannels = notice.channels && notice.channels.length > 0;
-                              const platformsText =
-                                notice.platforms.length === 0
-                                  ? t('common.all')
-                                  : notice.platforms.join(', ');
-                              const channelsText = hasChannels ? notice.channels.join(', ') : null;
-
-                              return (
-                                <TableCell key={column.id}>
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 1,
-                                    }}
-                                  >
-                                    <Box sx={{ flex: 1 }}>
-                                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                        {platformsText}
-                                      </Typography>
-                                      {channelsText && (
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                          sx={{ display: 'block', mt: 0.5 }}
-                                        >
-                                          {channelsText}
-                                        </Typography>
-                                      )}
-                                    </Box>
-                                    {(hasChannels || notice.platforms.length > 2) && (
-                                      <Tooltip
-                                        title={
-                                          <Box>
-                                            <Typography
-                                              variant="caption"
-                                              sx={{ display: 'block', mb: 0.5 }}
-                                            >
-                                              <strong>{t('serviceNotices.platforms')}:</strong>{' '}
-                                              {platformsText}
-                                            </Typography>
-                                            {channelsText && (
-                                              <Typography
-                                                variant="caption"
-                                                sx={{ display: 'block' }}
-                                              >
-                                                <strong>{t('serviceNotices.channels')}:</strong>{' '}
-                                                {channelsText}
-                                              </Typography>
-                                            )}
-                                          </Box>
-                                        }
-                                      >
-                                        <InfoIcon
-                                          sx={{
-                                            fontSize: '1rem',
-                                            cursor: 'pointer',
-                                            color: 'action.active',
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    )}
-                                  </Box>
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'period') {
-                              return (
-                                <TableCell key={column.id}>
-                                  <Tooltip
-                                    title={
-                                      notice.startDate
-                                        ? formatDateTimeDetailed(notice.startDate)
-                                        : t('serviceNotices.startImmediately')
-                                    }
-                                  >
-                                    <Typography variant="caption" display="block">
-                                      {notice.startDate
-                                        ? formatRelativeTime(notice.startDate, undefined, language)
-                                        : t('serviceNotices.startImmediately')}
-                                    </Typography>
-                                  </Tooltip>
-                                  <Tooltip
-                                    title={
-                                      notice.endDate
-                                        ? formatDateTimeDetailed(notice.endDate)
-                                        : t('serviceNotices.permanent')
-                                    }
-                                  >
-                                    <Typography
-                                      variant="caption"
-                                      display="block"
-                                      color="text.secondary"
-                                    >
-                                      ~{' '}
-                                      {notice.endDate
-                                        ? formatRelativeTime(notice.endDate, undefined, language)
-                                        : t('serviceNotices.permanent')}
-                                    </Typography>
-                                  </Tooltip>
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'createdAt') {
-                              return (
-                                <TableCell key={column.id}>
-                                  <Tooltip title={formatDateTimeDetailed(notice.createdAt)}>
-                                    <Typography variant="caption">
-                                      {formatRelativeTime(notice.createdAt, undefined, language)}
-                                    </Typography>
-                                  </Tooltip>
-                                </TableCell>
-                              );
-                            }
-                            if (column.id === 'updatedAt') {
-                              return (
-                                <TableCell key={column.id}>
-                                  <Tooltip title={formatDateTimeDetailed(notice.updatedAt)}>
-                                    <Typography variant="caption">
-                                      {formatRelativeTime(notice.updatedAt, undefined, language)}
-                                    </Typography>
-                                  </Tooltip>
-                                </TableCell>
-                              );
-                            }
-                            return null;
-                          })}
-                          {canManage && (
-                            <TableCell align="center">
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  gap: 0.5,
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Tooltip title={t('common.edit')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleEdit(notice)}
-                                    color="primary"
-                                  >
-                                    <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('common.delete')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDelete(notice)}
-                                    color="error"
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                {/* Pagination */}
-                <SimplePagination
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  count={total}
-                  onPageChange={(event, newPage) => setPage(newPage)}
-                  onRowsPerPageChange={(event) => {
-                    setRowsPerPage(Number(event.target.value));
-                    setPage(0);
-                  }}
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
+              {/* Pagination */}
+              <SimplePagination
+                page={page}
+                rowsPerPage={rowsPerPage}
+                count={total}
+                onPageChange={(event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Form Drawer */}

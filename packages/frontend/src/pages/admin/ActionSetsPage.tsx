@@ -48,7 +48,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
 import actionSetService, { ActionSet, ActionSetEvent } from '@/services/actionSetService';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import featureFlagService from '@/services/featureFlagService';
@@ -589,7 +589,7 @@ const ActionSetsPage: React.FC = () => {
       {/* Content */}
       <PageContentLoader loading={loading}>
         {actionSets.length === 0 ? (
-          <EmptyPlaceholder
+          <EmptyPagePlaceholder
             message={t('actionSets.noActionSets')}
             onAddClick={() => setEditDialog({ open: true, actionSet: null })}
             addButtonLabel={t('actionSets.createActionSet')}

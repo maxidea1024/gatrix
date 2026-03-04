@@ -66,7 +66,7 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { provider, description, isEnabled, parameters, events, environments } = req.body;
+    const { provider, description, isEnabled, parameters, events, environmentIds } = req.body;
     const user = req.user as { id: string; name: string };
 
     if (!provider) {
@@ -98,7 +98,7 @@ router.post('/', async (req: Request, res: Response) => {
         isEnabled: isEnabled !== false,
         parameters: parameters || {},
         events,
-        environments: environments || [],
+        environmentIds: environmentIds || [],
         createdBy: user.id,
       },
       user
@@ -119,7 +119,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { description, isEnabled, parameters, events, environments } = req.body;
+    const { description, isEnabled, parameters, events, environmentIds } = req.body;
     const user = req.user as { id: string; name: string };
 
     const integration = await IntegrationService.update(
@@ -129,7 +129,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         isEnabled,
         parameters,
         events,
-        environments,
+        environmentIds,
         updatedBy: user.id,
       },
       user

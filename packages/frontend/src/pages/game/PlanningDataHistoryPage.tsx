@@ -48,6 +48,7 @@ import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateForm
 import { useDebounce } from '../../hooks/useDebounce';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 
 const PlanningDataHistoryPage: React.FC = () => {
   const { t } = useTranslation();
@@ -325,13 +326,7 @@ const PlanningDataHistoryPage: React.FC = () => {
       {/* Content */}
       <PageContentLoader loading={loading}>
         {history.length === 0 ? (
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" align="center">
-                {t('planningData.history.noRecords')}
-              </Typography>
-            </CardContent>
-          </Card>
+          <EmptyPagePlaceholder message={t('planningData.history.noRecords')} />
         ) : (
           <Card>
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>

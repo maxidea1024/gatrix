@@ -114,11 +114,13 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
+import SearchTextField from '../../components/common/SearchTextField';
 import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { RelativeTime } from '../../components/common/RelativeTime';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 
 // View mode type
 type ViewMode = 'list' | 'grid' | 'checkerboard' | 'card' | 'cluster';
@@ -901,20 +903,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({
       }}
     >
       {services.length === 0 ? (
-        <Box
-          sx={{
-            py: 4,
-            textAlign: 'center',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            {t('serverList.noData')}
-          </Typography>
-        </Box>
+        <EmptyPagePlaceholder message={t('serverList.noData')} />
       ) : (
         <>
           {/* Reset view button - floating top right */}
@@ -3787,27 +3776,14 @@ const ServerListPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {/* Row 1: Search & Filtering */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <TextField
+              <SearchTextField
                 placeholder={t('serverList.searchPlaceholder')}
-                size="small"
+                value={searchTerm}
+                onChange={(value) => setSearchTerm(value)}
                 sx={{
                   flex: 1,
                   minWidth: 280,
                   maxWidth: 400,
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: 'background.paper',
-                    borderRadius: 0,
-                    '&:hover fieldset': { borderColor: 'primary.main' },
-                  },
-                }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
                 }}
               />
 
@@ -4772,7 +4748,9 @@ const ServerListPage: React.FC = () => {
               groupingLevels.length > 0 ? buildListGroups(displayServices, groupingLevels) : [];
             const visibleColumnsHeader = columns.filter((col) => col.visible);
 
-            return (
+            return displayServices.length === 0 ? (
+              <EmptyPagePlaceholder message={t('serverList.noData')} />
+            ) : (
               <Card
                 sx={{
                   flex: 1,
@@ -4805,19 +4783,9 @@ const ServerListPage: React.FC = () => {
                       </TableHead>
                     )}
                     <TableBody>
-                      {displayServices.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={visibleColumnsHeader.length} align="center">
-                            <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
-                              {t('serverList.noData')}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      ) : groupingLevels.length > 0 ? (
-                        listGroups.flatMap((group) => renderGroupRows(group))
-                      ) : (
-                        displayServices.map((service) => renderServiceRow(service, 0))
-                      )}
+                      {groupingLevels.length > 0
+                        ? listGroups.flatMap((group) => renderGroupRows(group))
+                        : displayServices.map((service) => renderServiceRow(service, 0))}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -5720,13 +5688,9 @@ const ServerListPage: React.FC = () => {
                   }}
                 >
                   {gridDisplayServices.length === 0 ? (
-                    <Card sx={{ gridColumn: '1 / -1' }}>
-                      <CardContent sx={{ py: 4, textAlign: 'center' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {t('serverList.noData')}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                    <Box sx={{ gridColumn: '1 / -1' }}>
+                      <EmptyPagePlaceholder message={t('serverList.noData')} />
+                    </Box>
                   ) : (
                     gridDisplayServices.map((service) => renderServiceCard(service))
                   )}

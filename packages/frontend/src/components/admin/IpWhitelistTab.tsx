@@ -13,7 +13,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  InputAdornment,
   IconButton,
   Menu,
   MenuItem,
@@ -31,7 +30,6 @@ import {
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
-  Search as SearchIcon,
   MoreVert as MoreVertIcon,
   Add as AddIcon,
   Edit as EditIcon,
@@ -57,6 +55,7 @@ import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateForm
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import FormDialogHeader from '../common/FormDialogHeader';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
+import SearchTextField from '../common/SearchTextField';
 import dayjs from 'dayjs';
 
 interface IpWhitelistTabProps {
@@ -141,8 +140,8 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
   }, [loadIpWhitelists]);
 
   // Handlers
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
     setPage(0);
   };
 
@@ -370,193 +369,168 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
       )}
 
       {/* Search & Filters */}
-      <Card variant="outlined" sx={{ mb: 3 }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'wrap',
-              }}
-            >
-              <TextField
-                placeholder={t('ipWhitelist.searchPlaceholder')}
-                value={search}
-                onChange={handleSearchChange}
-                size="small"
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-                sx={{ minWidth: 300 }}
-              />
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          mb: 3,
+        }}
+      >
+        <SearchTextField
+          placeholder={t('ipWhitelist.searchPlaceholder')}
+          value={search}
+          onChange={handleSearchChange}
+          sx={{ minWidth: 300 }}
+        />
+      </Box>
 
-      {/* Table */}
-      <Card variant="outlined">
-        <CardContent sx={{ p: 0 }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
-            </Box>
-          ) : ipWhitelists.length === 0 ? (
-            <EmptyPagePlaceholder
-              message={t('ipWhitelist.noEntries')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAdd : undefined}
-              addButtonLabel={t('ipWhitelist.addEntry')}
-            />
-          ) : (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('ipWhitelist.ipAddress')}</TableCell>
-                      <TableCell>{t('ipWhitelist.purpose')}</TableCell>
-                      <TableCell>{t('ipWhitelist.period')}</TableCell>
-                      <TableCell>{t('ipWhitelist.status')}</TableCell>
-                      <TableCell>{t('ipWhitelist.createdBy')}</TableCell>
-                      <TableCell>{t('ipWhitelist.createdAt')}</TableCell>
-                      <TableCell align="center">{t('common.actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {ipWhitelists.map((ipWhitelist) => (
-                      <TableRow key={ipWhitelist.id} hover>
-                        <TableCell>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                            }}
-                          >
-                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                              {ipWhitelist.ipAddress}
-                            </Typography>
-                            <Tooltip title={t('common.copy') + ' ' + t('ipWhitelist.ipAddress')}>
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  handleCopyToClipboard(
-                                    ipWhitelist.ipAddress,
-                                    t('ipWhitelist.ipAddress')
-                                  )
-                                }
-                                sx={{ p: 0.5 }}
-                              >
-                                <ContentCopyIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">{ipWhitelist.purpose}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          {ipWhitelist.startDate || ipWhitelist.endDate ? (
-                            <Box>
-                              {ipWhitelist.startDate && (
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ display: 'block' }}
-                                >
-                                  {t('ipWhitelist.from')}:{' '}
-                                  <Tooltip title={formatDateTimeDetailed(ipWhitelist.startDate)}>
-                                    <span>{formatRelativeTime(ipWhitelist.startDate)}</span>
-                                  </Tooltip>
-                                </Typography>
-                              )}
-                              {ipWhitelist.endDate && (
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ display: 'block' }}
-                                >
-                                  {t('ipWhitelist.to')}:{' '}
-                                  <Tooltip title={formatDateTimeDetailed(ipWhitelist.endDate)}>
-                                    <span>{formatRelativeTime(ipWhitelist.endDate)}</span>
-                                  </Tooltip>
-                                </Typography>
-                              )}
-                            </Box>
-                          ) : (
-                            <Chip
-                              label={t('ipWhitelist.unlimited')}
-                              size="small"
-                              color="primary"
-                              variant="outlined"
-                            />
-                          )}
-                        </TableCell>
-                        <TableCell>{getStatusChip(ipWhitelist.isEnabled)}</TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {ipWhitelist.createdByName || t('dashboard.unknown')}
+      {/* Content */}
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
+        </Box>
+      ) : ipWhitelists.length === 0 ? (
+        <EmptyPagePlaceholder
+          message={t('ipWhitelist.noEntries')}
+          subtitle={canManage ? t('common.addFirstItem') : undefined}
+          onAddClick={canManage ? handleAdd : undefined}
+          addButtonLabel={t('ipWhitelist.addEntry')}
+        />
+      ) : (
+        <Card variant="outlined">
+          <CardContent sx={{ p: 0 }}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('ipWhitelist.ipAddress')}</TableCell>
+                    <TableCell>{t('ipWhitelist.purpose')}</TableCell>
+                    <TableCell>{t('ipWhitelist.period')}</TableCell>
+                    <TableCell>{t('ipWhitelist.status')}</TableCell>
+                    <TableCell>{t('ipWhitelist.createdBy')}</TableCell>
+                    <TableCell>{t('ipWhitelist.createdAt')}</TableCell>
+                    <TableCell align="center">{t('common.actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {ipWhitelists.map((ipWhitelist) => (
+                    <TableRow key={ipWhitelist.id} hover>
+                      <TableCell>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {ipWhitelist.ipAddress}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={formatDateTimeDetailed(ipWhitelist.createdAt)}>
-                            <Typography variant="body2">
-                              {formatRelativeTime(ipWhitelist.createdAt)}
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Tooltip
-                            title={ipWhitelist.isEnabled ? t('common.disable') : t('common.enable')}
-                          >
+                          <Tooltip title={t('common.copy') + ' ' + t('ipWhitelist.ipAddress')}>
                             <IconButton
                               size="small"
-                              onClick={() => handleToggleStatus(ipWhitelist)}
-                              color={ipWhitelist.isEnabled ? 'success' : 'default'}
+                              onClick={() =>
+                                handleCopyToClipboard(
+                                  ipWhitelist.ipAddress,
+                                  t('ipWhitelist.ipAddress')
+                                )
+                              }
+                              sx={{ p: 0.5 }}
                             >
-                              <ToggleIcon />
+                              <ContentCopyIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <IconButton size="small" onClick={(e) => handleMenuClick(e, ipWhitelist)}>
-                            <MoreVertIcon />
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">{ipWhitelist.purpose}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        {ipWhitelist.startDate || ipWhitelist.endDate ? (
+                          <Box>
+                            {ipWhitelist.startDate && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: 'block' }}
+                              >
+                                {t('ipWhitelist.from')}:{' '}
+                                <Tooltip title={formatDateTimeDetailed(ipWhitelist.startDate)}>
+                                  <span>{formatRelativeTime(ipWhitelist.startDate)}</span>
+                                </Tooltip>
+                              </Typography>
+                            )}
+                            {ipWhitelist.endDate && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: 'block' }}
+                              >
+                                {t('ipWhitelist.to')}:{' '}
+                                <Tooltip title={formatDateTimeDetailed(ipWhitelist.endDate)}>
+                                  <span>{formatRelativeTime(ipWhitelist.endDate)}</span>
+                                </Tooltip>
+                              </Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          <Chip
+                            label={t('ipWhitelist.unlimited')}
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>{getStatusChip(ipWhitelist.isEnabled)}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {ipWhitelist.createdByName || t('dashboard.unknown')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title={formatDateTimeDetailed(ipWhitelist.createdAt)}>
+                          <Typography variant="body2">
+                            {formatRelativeTime(ipWhitelist.createdAt)}
+                          </Typography>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip
+                          title={ipWhitelist.isEnabled ? t('common.disable') : t('common.enable')}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => handleToggleStatus(ipWhitelist)}
+                            color={ipWhitelist.isEnabled ? 'success' : 'default'}
+                          >
+                            <ToggleIcon />
                           </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              {total > 0 && (
-                <SimplePagination
-                  count={total}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                />
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+                        </Tooltip>
+                        <IconButton size="small" onClick={(e) => handleMenuClick(e, ipWhitelist)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {total > 0 && (
+              <SimplePagination
+                count={total}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Action Menu */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>

@@ -287,7 +287,7 @@ export class Environment extends Model implements EnvironmentData {
     };
     banners: {
       count: number;
-      items: Array<{ bannerId: string; name: string }>;
+      items: Array<{ id: string; name: string }>;
     };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
     serverLifecycleEvents: { count: number; items: Array<{ id: string; eventType: string }> };
@@ -416,7 +416,7 @@ export class Environment extends Model implements EnvironmentData {
           qb.where('isActive', true);
         }
       ),
-      safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
+      safeQuery<{ id: string; name: string }>('g_banners', ['id', 'name']),
       safeQuery<{ id: string; tokenName: string }>('g_api_access_tokens', ['id', 'tokenName']),
       safeQuery<{ id: string; eventType: string }>('g_server_lifecycle_events', [
         'id',

@@ -1732,16 +1732,16 @@ const GameWorldsPage: React.FC = () => {
 
       {/* Game Worlds Table */}
       <PageContentLoader loading={loading}>
-        <Card>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            {worlds.length === 0 ? (
-              <EmptyPagePlaceholder
-                message={t('gameWorlds.noWorldsFound')}
-                subtitle={canManage ? t('common.addFirstItem') : undefined}
-                onAddClick={canManage ? handleAddWorld : undefined}
-                addButtonLabel={t('gameWorlds.addGameWorld')}
-              />
-            ) : (
+        {worlds.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('gameWorlds.noWorldsFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAddWorld : undefined}
+            addButtonLabel={t('gameWorlds.addGameWorld')}
+          />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -1794,11 +1794,11 @@ const GameWorldsPage: React.FC = () => {
                   </Table>
                 </TableContainer>
               </DndContext>
-            )}
 
-            {/* Pagination removed (no server/client paging) */}
-          </CardContent>
-        </Card>
+              {/* Pagination removed (no server/client paging) */}
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Add/Edit Drawer */}

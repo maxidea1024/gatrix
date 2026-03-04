@@ -92,7 +92,8 @@ import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import featureFlagService, { FeatureFlag, FlagType } from '../../services/featureFlagService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import SearchTextField from '../../components/common/SearchTextField';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -1617,46 +1618,14 @@ const FeatureFlagsPage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('featureFlags.searchPlaceholder')}
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                onChange={(val) => {
+                  setSearchTerm(val);
                   setPage(0);
                 }}
-                sx={{
-                  minWidth: 300,
-                  flexGrow: 1,
-                  maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
+                sx={{ minWidth: 300, maxWidth: 500 }}
               />
 
               {/* Dynamic Filter Bar */}
@@ -1713,445 +1682,377 @@ const FeatureFlagsPage: React.FC = () => {
 
       {/* Table / Compact View */}
       <PageContentLoader loading={loading && isInitialLoad}>
-        <Card>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            {flags.length === 0 ? (
-              <EmptyPlaceholder
-                message={t('featureFlags.noFlagsFound')}
-                onAddClick={canManage ? () => handleOpenCreateDialog('featureFlag') : undefined}
-                addButtonLabel={t('featureFlags.createFlag')}
-              />
-            ) : compactView ? (
-              <>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  {flags.map((flag, index) => {
-                    // Value preview helper
-                    const formatValuePreview = (val: any): string => {
-                      if (val === null || val === undefined) return '-';
-                      if (typeof val === 'boolean') return val ? 'true' : 'false';
-                      if (typeof val === 'object') {
-                        const str = JSON.stringify(val);
+        {flags.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('featureFlags.noFlagsFound')}
+            onAddClick={canManage ? () => handleOpenCreateDialog('featureFlag') : undefined}
+            addButtonLabel={t('featureFlags.createFlag')}
+          />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              {compactView ? (
+                <>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {flags.map((flag, index) => {
+                      // Value preview helper
+                      const formatValuePreview = (val: any): string => {
+                        if (val === null || val === undefined) return '-';
+                        if (typeof val === 'boolean') return val ? 'true' : 'false';
+                        if (typeof val === 'object') {
+                          const str = JSON.stringify(val);
+                          return str.length > 40 ? str.slice(0, 40) + '…' : str;
+                        }
+                        const str = String(val);
                         return str.length > 40 ? str.slice(0, 40) + '…' : str;
-                      }
-                      const str = String(val);
-                      return str.length > 40 ? str.slice(0, 40) + '…' : str;
-                    };
-                    // Get the most recent lastSeenAt across all environments
-                    const lastSeen =
-                      flag.environments?.reduce((latest, env) => {
-                        if (!env.lastSeenAt) return latest;
-                        if (!latest) return env.lastSeenAt;
-                        return new Date(env.lastSeenAt) > new Date(latest)
-                          ? env.lastSeenAt
-                          : latest;
-                      }, flag.lastSeenAt || '') || flag.lastSeenAt;
+                      };
+                      // Get the most recent lastSeenAt across all environments
+                      const lastSeen =
+                        flag.environments?.reduce((latest, env) => {
+                          if (!env.lastSeenAt) return latest;
+                          if (!latest) return env.lastSeenAt;
+                          return new Date(env.lastSeenAt) > new Date(latest)
+                            ? env.lastSeenAt
+                            : latest;
+                        }, flag.lastSeenAt || '') || flag.lastSeenAt;
 
-                    return (
-                      <Box
-                        key={flag.id}
-                        sx={{
-                          px: 2.5,
-                          py: 1.5,
-                          borderBottom: '1px solid',
-                          borderColor: 'divider',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.15s',
-                          bgcolor: index % 2 === 1 ? 'action.hover' : 'transparent',
-                          '&:hover': { bgcolor: 'action.selected' },
-                          ...(flag.isArchived ? { opacity: 0.6 } : {}),
-                        }}
-                        onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
-                      >
-                        {/* Row 1: Flag name + status + action */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
-                            {getTypeIcon(flag.flagType)}
-                          </Tooltip>
-                          {isStale(flag) && (
-                            <Tooltip title={t('featureFlags.staleWarning')}>
-                              <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                      return (
+                        <Box
+                          key={flag.id}
+                          sx={{
+                            px: 2.5,
+                            py: 1.5,
+                            borderBottom: '1px solid',
+                            borderColor: 'divider',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.15s',
+                            bgcolor: index % 2 === 1 ? 'action.hover' : 'transparent',
+                            '&:hover': { bgcolor: 'action.selected' },
+                            ...(flag.isArchived ? { opacity: 0.6 } : {}),
+                          }}
+                          onClick={() => navigate(`/feature-flags/${flag.flagName}`)}
+                        >
+                          {/* Row 1: Flag name + status + action */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
+                              {getTypeIcon(flag.flagType)}
                             </Tooltip>
-                          )}
-                          <Typography
-                            fontWeight={600}
-                            variant="body1"
-                            noWrap
-                            sx={{ flex: 1, minWidth: 0 }}
-                          >
-                            {flag.flagName}
-                          </Typography>
-                          {flag.codeReferenceCount !== undefined && flag.codeReferenceCount > 0 && (
-                            <Chip
-                              icon={<GitHubIcon sx={{ fontSize: 14 }} />}
-                              label={flag.codeReferenceCount}
-                              size="small"
-                              variant="outlined"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/feature-flags/${flag.flagName}?tab=code-references`);
-                              }}
-                              sx={{
-                                height: 20,
-                                fontSize: '0.7rem',
-                                cursor: 'pointer',
-                                mr: 0.5,
-                                pl: 0.5,
-                                borderRadius: 1,
-                                '& .MuiChip-icon': { ml: 0 },
-                              }}
-                            />
-                          )}
-                          {flag.isFavorite && (
-                            <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
-                          )}
-                          {(() => {
-                            const { status: flagStatus, color } = getFlagStatus(flag);
-                            return (
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 0.5,
-                                  flexShrink: 0,
+                            {isStale(flag) && (
+                              <Tooltip title={t('featureFlags.staleWarning')}>
+                                <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                              </Tooltip>
+                            )}
+                            <Typography
+                              fontWeight={600}
+                              variant="body1"
+                              noWrap
+                              sx={{ flex: 1, minWidth: 0 }}
+                            >
+                              {flag.flagName}
+                            </Typography>
+                            {flag.codeReferenceCount !== undefined &&
+                              flag.codeReferenceCount > 0 && (
+                                <Chip
+                                  icon={<GitHubIcon sx={{ fontSize: 14 }} />}
+                                  label={flag.codeReferenceCount}
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/feature-flags/${flag.flagName}?tab=code-references`);
+                                  }}
+                                  sx={{
+                                    height: 20,
+                                    fontSize: '0.7rem',
+                                    cursor: 'pointer',
+                                    mr: 0.5,
+                                    pl: 0.5,
+                                    borderRadius: 1,
+                                    '& .MuiChip-icon': { ml: 0 },
+                                  }}
+                                />
+                              )}
+                            {flag.isFavorite && (
+                              <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                            )}
+                            {(() => {
+                              const { status: flagStatus, color } = getFlagStatus(flag);
+                              return (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <FlagStatusIcon status={flagStatus} size={16} />
+                                  <Chip
+                                    label={t(
+                                      `featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`
+                                    )}
+                                    size="small"
+                                    color={color}
+                                    variant={flagStatus === 'active' ? 'outlined' : 'filled'}
+                                    sx={{ height: 20, fontSize: '0.7rem' }}
+                                  />
+                                </Box>
+                              );
+                            })()}
+                            {canManage && (
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleActionMenuOpen(e, flag);
                                 }}
                               >
-                                <FlagStatusIcon status={flagStatus} size={16} />
-                                <Chip
-                                  label={t(
-                                    `featureFlags.status${flagStatus.charAt(0).toUpperCase() + flagStatus.slice(1)}`
-                                  )}
-                                  size="small"
-                                  color={color}
-                                  variant={flagStatus === 'active' ? 'outlined' : 'filled'}
-                                  sx={{ height: 20, fontSize: '0.7rem' }}
-                                />
-                              </Box>
-                            );
-                          })()}
-                          {canManage && (
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleActionMenuOpen(e, flag);
+                                <MoreVertIcon fontSize="small" />
+                              </IconButton>
+                            )}
+                          </Box>
+
+                          {/* Row 2: Display name + description (when available) */}
+                          {((flag.displayName && flag.displayName !== flag.flagName) ||
+                            flag.description) && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                mt: 0.25,
+                                pl: 3.5,
                               }}
                             >
-                              <MoreVertIcon fontSize="small" />
-                            </IconButton>
+                              {flag.displayName && flag.displayName !== flag.flagName && (
+                                <Typography variant="body2" color="text.secondary" noWrap>
+                                  {flag.displayName}
+                                </Typography>
+                              )}
+                              {flag.description && (
+                                <Typography
+                                  variant="body2"
+                                  color="text.disabled"
+                                  noWrap
+                                  sx={{ flex: 1, minWidth: 0 }}
+                                >
+                                  — {flag.description}
+                                </Typography>
+                              )}
+                            </Box>
                           )}
-                        </Box>
 
-                        {/* Row 2: Display name + description (when available) */}
-                        {((flag.displayName && flag.displayName !== flag.flagName) ||
-                          flag.description) && (
+                          {/* Row 3: Env switches + value info + tags + times */}
                           <Box
                             sx={{
                               display: 'flex',
                               alignItems: 'center',
                               gap: 1.5,
-                              mt: 0.25,
+                              mt: 0.75,
                               pl: 3.5,
                             }}
                           >
-                            {flag.displayName && flag.displayName !== flag.flagName && (
-                              <Typography variant="body2" color="text.secondary" noWrap>
-                                {flag.displayName}
-                              </Typography>
-                            )}
-                            {flag.description && (
-                              <Typography
-                                variant="body2"
-                                color="text.disabled"
-                                noWrap
-                                sx={{ flex: 1, minWidth: 0 }}
-                              >
-                                — {flag.description}
-                              </Typography>
-                            )}
-                          </Box>
-                        )}
-
-                        {/* Row 3: Env switches + value info + tags + times */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            mt: 0.75,
-                            pl: 3.5,
-                          }}
-                        >
-                          {/* Environment switches */}
-                          <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 0.25, flexShrink: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {environments.map((env) => {
-                              const isEnabled = getEnvEnabled(flag, env.environmentId);
-                              return (
-                                <FeatureSwitch
-                                  key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
-                                  size="small"
-                                  checked={isEnabled}
-                                  onChange={() => handleToggle(flag, env.environmentId, isEnabled)}
-                                  disabled={flag.isArchived || !canManage}
-                                  onClick={(e) => e.stopPropagation()}
-                                  color={env.color}
-                                  label={env.displayName}
-                                />
-                              );
-                            })}
-                          </Box>
-
-                          {/* Divider */}
-                          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-                          {/* Value type + value previews */}
-                          <Box
-                            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}
-                          >
-                            <FieldTypeIcon type={flag.valueType || 'string'} size={14} />
-                            <Tooltip
-                              title={`${t('featureFlags.enabledValue')}: ${formatValuePreview(flag.enabledValue)}`}
-                              disableFocusListener
-                            >
-                              <Chip
-                                label={formatValuePreview(flag.enabledValue)}
-                                size="small"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.7rem',
-                                  maxWidth: 120,
-                                  bgcolor: 'success.main',
-                                  color: 'success.contrastText',
-                                  opacity: 0.85,
-                                }}
-                              />
-                            </Tooltip>
-                            <Typography variant="caption" color="text.disabled">
-                              /
-                            </Typography>
-                            <Tooltip
-                              title={`${t('featureFlags.disabledValue')}: ${formatValuePreview(flag.disabledValue)}`}
-                              disableFocusListener
-                            >
-                              <Chip
-                                label={formatValuePreview(flag.disabledValue)}
-                                size="small"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.7rem',
-                                  maxWidth: 120,
-                                  bgcolor: 'action.disabledBackground',
-                                  color: 'text.secondary',
-                                }}
-                              />
-                            </Tooltip>
-                          </Box>
-
-                          {/* Tags */}
-                          {flag.tags && flag.tags.length > 0 && (
-                            <>
-                              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-                              <Box
-                                sx={{ display: 'flex', gap: 0.5, flexShrink: 0, flexWrap: 'wrap' }}
-                              >
-                                {flag.tags.slice(0, 5).map((tagName) => {
-                                  const tagObj = allTags.find((tItem) => tItem.name === tagName);
-                                  const color = tagObj?.color || '#888';
-                                  return (
-                                    <Chip
-                                      key={tagName}
-                                      label={tagName}
-                                      size="small"
-                                      sx={{
-                                        height: 20,
-                                        fontSize: '0.7rem',
-                                        bgcolor: color,
-                                        color: getContrastColor(color),
-                                      }}
-                                    />
-                                  );
-                                })}
-                                {flag.tags.length > 5 && (
-                                  <Chip
-                                    label={`+${flag.tags.length - 5}`}
-                                    size="small"
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                )}
-                              </Box>
-                            </>
-                          )}
-
-                          {/* Impression data indicator */}
-                          {flag.impressionDataEnabled && (
-                            <Tooltip
-                              title={t('featureFlags.impressionDataOn')}
-                              disableFocusListener
-                            >
-                              <Chip
-                                label="📊"
-                                size="small"
-                                variant="outlined"
-                                sx={{ height: 20, fontSize: '0.7rem', borderColor: 'info.main' }}
-                              />
-                            </Tooltip>
-                          )}
-
-                          {/* Spacer */}
-                          <Box sx={{ flex: 1 }} />
-
-                          {/* Last seen */}
-                          {lastSeen && (
-                            <Tooltip
-                              title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`}
-                              disableFocusListener
-                            >
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                noWrap
-                                sx={{ fontSize: '0.7rem' }}
-                              >
-                                ⚡ {formatRelativeTime(lastSeen)}
-                              </Typography>
-                            </Tooltip>
-                          )}
-
-                          {/* Created time */}
-                          <Tooltip
-                            title={formatDateTimeDetailed(flag.createdAt)}
-                            disableFocusListener
-                          >
-                            <Typography variant="caption" color="text.secondary" noWrap>
-                              {formatRelativeTime(flag.createdAt)}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pr: 1 }}>
-                  <SimplePagination
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    count={total}
-                    onPageChange={(event, newPage) => setPage(newPage)}
-                    onRowsPerPageChange={(event) => {
-                      setRowsPerPage(Number(event.target.value));
-                      setPage(0);
-                    }}
-                  />
-                </Box>
-              </>
-            ) : (
-              <>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell padding="checkbox" sx={{ width: 48 }}>
-                          <Checkbox
-                            indeterminate={
-                              selectedFlags.size > 0 && selectedFlags.size < flags.length
-                            }
-                            checked={flags.length > 0 && selectedFlags.size === flags.length}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedFlags(new Set(flags.map((f) => f.flagName)));
-                              } else {
-                                setSelectedFlags(new Set());
-                              }
-                            }}
-                            size="small"
-                          />
-                        </TableCell>
-
-                        {/* Dynamic columns based on visibleColumns order */}
-                        {visibleColumns.map((col) => {
-                          switch (col.id) {
-                            case 'flagName':
-                              return (
-                                <TableCell key={col.id}>
-                                  <TableSortLabel
-                                    active={orderBy === 'flagName'}
-                                    direction={orderBy === 'flagName' ? order : 'asc'}
-                                    onClick={() => handleSort('flagName')}
-                                  >
-                                    {t('featureFlags.flagName')}
-                                  </TableSortLabel>
-                                </TableCell>
-                              );
-                            case 'status':
-                              return <TableCell key={col.id}>{t('featureFlags.status')}</TableCell>;
-                            case 'environments':
-                              return environments.length > 0 ? (
-                                <TableCell
-                                  key={col.id}
-                                  align="center"
-                                  colSpan={environments.length}
-                                  sx={{ px: 0.5 }}
-                                >
-                                  {t('featureFlags.enabledByEnv')}
-                                </TableCell>
-                              ) : null;
-                            case 'createdBy':
-                              return <TableCell key={col.id}>{t('common.createdBy')}</TableCell>;
-                            case 'createdAt':
-                              return (
-                                <TableCell key={col.id}>
-                                  <TableSortLabel
-                                    active={orderBy === 'createdAt'}
-                                    direction={orderBy === 'createdAt' ? order : 'asc'}
-                                    onClick={() => handleSort('createdAt')}
-                                  >
-                                    {t('featureFlags.createdAt')}
-                                  </TableSortLabel>
-                                </TableCell>
-                              );
-                            case 'lastSeenAt':
-                              return (
-                                <TableCell key={col.id}>{t('featureFlags.lastSeenAt')}</TableCell>
-                              );
-                            case 'tags':
-                              return <TableCell key={col.id}>{t('featureFlags.tags')}</TableCell>;
-                            case 'valueType':
-                              return (
-                                <TableCell key={col.id}>{t('featureFlags.valueType')}</TableCell>
-                              );
-
-                            default:
-                              return null;
-                          }
-                        })}
-                        {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {flags.map((flag) => (
-                        <TableRow
-                          key={flag.id}
-                          hover
-                          selected={selectedFlags.has(flag.flagName)}
-                          sx={{
-                            ...(flag.isArchived ? { opacity: 0.6 } : {}),
-                          }}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={selectedFlags.has(flag.flagName)}
-                              onChange={(e) => {
-                                const newSelected = new Set(selectedFlags);
-                                if (e.target.checked) {
-                                  newSelected.add(flag.flagName);
-                                } else {
-                                  newSelected.delete(flag.flagName);
-                                }
-                                setSelectedFlags(newSelected);
+                            {/* Environment switches */}
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.25,
+                                flexShrink: 0,
                               }}
                               onClick={(e) => e.stopPropagation()}
+                            >
+                              {environments.map((env) => {
+                                const isEnabled = getEnvEnabled(flag, env.environmentId);
+                                return (
+                                  <FeatureSwitch
+                                    key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
+                                    size="small"
+                                    checked={isEnabled}
+                                    onChange={() =>
+                                      handleToggle(flag, env.environmentId, isEnabled)
+                                    }
+                                    disabled={flag.isArchived || !canManage}
+                                    onClick={(e) => e.stopPropagation()}
+                                    color={env.color}
+                                    label={env.displayName}
+                                  />
+                                );
+                              })}
+                            </Box>
+
+                            {/* Divider */}
+                            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+                            {/* Value type + value previews */}
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                flexShrink: 0,
+                              }}
+                            >
+                              <FieldTypeIcon type={flag.valueType || 'string'} size={14} />
+                              <Tooltip
+                                title={`${t('featureFlags.enabledValue')}: ${formatValuePreview(flag.enabledValue)}`}
+                                disableFocusListener
+                              >
+                                <Chip
+                                  label={formatValuePreview(flag.enabledValue)}
+                                  size="small"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: '0.7rem',
+                                    maxWidth: 120,
+                                    bgcolor: 'success.main',
+                                    color: 'success.contrastText',
+                                    opacity: 0.85,
+                                  }}
+                                />
+                              </Tooltip>
+                              <Typography variant="caption" color="text.disabled">
+                                /
+                              </Typography>
+                              <Tooltip
+                                title={`${t('featureFlags.disabledValue')}: ${formatValuePreview(flag.disabledValue)}`}
+                                disableFocusListener
+                              >
+                                <Chip
+                                  label={formatValuePreview(flag.disabledValue)}
+                                  size="small"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: '0.7rem',
+                                    maxWidth: 120,
+                                    bgcolor: 'action.disabledBackground',
+                                    color: 'text.secondary',
+                                  }}
+                                />
+                              </Tooltip>
+                            </Box>
+
+                            {/* Tags */}
+                            {flag.tags && flag.tags.length > 0 && (
+                              <>
+                                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    gap: 0.5,
+                                    flexShrink: 0,
+                                    flexWrap: 'wrap',
+                                  }}
+                                >
+                                  {flag.tags.slice(0, 5).map((tagName) => {
+                                    const tagObj = allTags.find((tItem) => tItem.name === tagName);
+                                    const color = tagObj?.color || '#888';
+                                    return (
+                                      <Chip
+                                        key={tagName}
+                                        label={tagName}
+                                        size="small"
+                                        sx={{
+                                          height: 20,
+                                          fontSize: '0.7rem',
+                                          bgcolor: color,
+                                          color: getContrastColor(color),
+                                        }}
+                                      />
+                                    );
+                                  })}
+                                  {flag.tags.length > 5 && (
+                                    <Chip
+                                      label={`+${flag.tags.length - 5}`}
+                                      size="small"
+                                      sx={{ height: 20, fontSize: '0.7rem' }}
+                                    />
+                                  )}
+                                </Box>
+                              </>
+                            )}
+
+                            {/* Impression data indicator */}
+                            {flag.impressionDataEnabled && (
+                              <Tooltip
+                                title={t('featureFlags.impressionDataOn')}
+                                disableFocusListener
+                              >
+                                <Chip
+                                  label="📊"
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ height: 20, fontSize: '0.7rem', borderColor: 'info.main' }}
+                                />
+                              </Tooltip>
+                            )}
+
+                            {/* Spacer */}
+                            <Box sx={{ flex: 1 }} />
+
+                            {/* Last seen */}
+                            {lastSeen && (
+                              <Tooltip
+                                title={`${t('featureFlags.lastSeenAt')}: ${formatDateTimeDetailed(lastSeen)}`}
+                                disableFocusListener
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  noWrap
+                                  sx={{ fontSize: '0.7rem' }}
+                                >
+                                  ⚡ {formatRelativeTime(lastSeen)}
+                                </Typography>
+                              </Tooltip>
+                            )}
+
+                            {/* Created time */}
+                            <Tooltip
+                              title={formatDateTimeDetailed(flag.createdAt)}
+                              disableFocusListener
+                            >
+                              <Typography variant="caption" color="text.secondary" noWrap>
+                                {formatRelativeTime(flag.createdAt)}
+                              </Typography>
+                            </Tooltip>
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', pr: 1 }}>
+                    <SimplePagination
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      count={total}
+                      onPageChange={(event, newPage) => setPage(newPage)}
+                      onRowsPerPageChange={(event) => {
+                        setRowsPerPage(Number(event.target.value));
+                        setPage(0);
+                      }}
+                    />
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell padding="checkbox" sx={{ width: 48 }}>
+                            <Checkbox
+                              indeterminate={
+                                selectedFlags.size > 0 && selectedFlags.size < flags.length
+                              }
+                              checked={flags.length > 0 && selectedFlags.size === flags.length}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedFlags(new Set(flags.map((f) => f.flagName)));
+                                } else {
+                                  setSelectedFlags(new Set());
+                                }
+                              }}
                               size="small"
                             />
                           </TableCell>
@@ -2162,326 +2063,427 @@ const FeatureFlagsPage: React.FC = () => {
                               case 'flagName':
                                 return (
                                   <TableCell key={col.id}>
-                                    <Box>
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 0.5,
-                                        }}
-                                      >
-                                        <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
-                                          {getTypeIcon(flag.flagType)}
-                                        </Tooltip>
-                                        {isStale(flag) && (
-                                          <Tooltip title={t('featureFlags.staleWarning')}>
-                                            <WarningIcon
-                                              sx={{
-                                                fontSize: 16,
-                                                color: 'warning.main',
-                                              }}
-                                            />
-                                          </Tooltip>
-                                        )}
-                                        <Typography
-                                          fontWeight={500}
-                                          sx={{
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                              textDecoration: 'underline',
-                                            },
-                                          }}
-                                          onClick={() =>
-                                            navigate(`/feature-flags/${flag.flagName}`)
-                                          }
-                                        >
-                                          {flag.flagName}
-                                        </Typography>
-                                        {flag.codeReferenceCount !== undefined &&
-                                          flag.codeReferenceCount > 0 && (
-                                            <Chip
-                                              icon={<GitHubIcon sx={{ fontSize: 14 }} />}
-                                              label={flag.codeReferenceCount}
-                                              size="small"
-                                              variant="outlined"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(
-                                                  `/feature-flags/${flag.flagName}?tab=code-references`
-                                                );
-                                              }}
-                                              sx={{
-                                                height: 20,
-                                                fontSize: '0.7rem',
-                                                cursor: 'pointer',
-                                                ml: 0.5,
-                                                pl: 0.5,
-                                                borderRadius: 1,
-                                                '& .MuiChip-icon': { ml: 0 },
-                                              }}
-                                            />
-                                          )}
-                                        <Tooltip title={t('common.copy')} disableFocusListener>
-                                          <IconButton
-                                            size="small"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              copyToClipboardWithNotification(
-                                                flag.flagName,
-                                                () =>
-                                                  enqueueSnackbar(t('common.copySuccess'), {
-                                                    variant: 'success',
-                                                  }),
-                                                () =>
-                                                  enqueueSnackbar(t('common.copyFailed'), {
-                                                    variant: 'error',
-                                                  })
-                                              );
-                                            }}
-                                            sx={{
-                                              opacity: 0.5,
-                                              '&:hover': { opacity: 1 },
-                                            }}
-                                          >
-                                            <CopyIcon sx={{ fontSize: 14 }} />
-                                          </IconButton>
-                                        </Tooltip>
-                                        <IconButton
-                                          size="small"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleFavoriteToggle(flag);
-                                          }}
-                                          sx={{
-                                            color: flag.isFavorite
-                                              ? 'warning.main'
-                                              : 'action.disabled',
-                                            opacity: flag.isFavorite ? 1 : 0.5,
-                                            '&:hover': { opacity: 1 },
-                                          }}
-                                        >
-                                          {flag.isFavorite ? (
-                                            <StarIcon sx={{ fontSize: 16 }} />
-                                          ) : (
-                                            <StarBorderIcon sx={{ fontSize: 16 }} />
-                                          )}
-                                        </IconButton>
-                                      </Box>
-                                      {flag.displayName && flag.displayName !== flag.flagName && (
-                                        <Typography
-                                          variant="body2"
-                                          color="text.secondary"
-                                          sx={{ fontSize: '0.8rem' }}
-                                        >
-                                          {flag.displayName}
-                                        </Typography>
-                                      )}
-                                    </Box>
+                                    <TableSortLabel
+                                      active={orderBy === 'flagName'}
+                                      direction={orderBy === 'flagName' ? order : 'asc'}
+                                      onClick={() => handleSort('flagName')}
+                                    >
+                                      {t('featureFlags.flagName')}
+                                    </TableSortLabel>
                                   </TableCell>
                                 );
                               case 'status':
-                                // Status column followed by environment columns
                                 return (
-                                  <React.Fragment key={col.id}>
-                                    <TableCell>
-                                      {(() => {
-                                        const { status, color } = getFlagStatus(flag);
-                                        return (
-                                          <Box
-                                            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                                          >
-                                            <FlagStatusIcon status={status} size={16} />
-                                            <Chip
-                                              label={t(
-                                                `featureFlags.status${status.charAt(0).toUpperCase() + status.slice(1)}`
-                                              )}
-                                              size="small"
-                                              color={color}
-                                              variant={status === 'active' ? 'outlined' : 'filled'}
-                                              sx={{
-                                                height: 20,
-                                                fontSize: '0.75rem',
-                                              }}
-                                            />
-                                          </Box>
-                                        );
-                                      })()}
-                                    </TableCell>
-                                  </React.Fragment>
+                                  <TableCell key={col.id}>{t('featureFlags.status')}</TableCell>
                                 );
                               case 'environments':
-                                return (
-                                  <React.Fragment key={col.id}>
-                                    {environments.map((env, envIndex) => {
-                                      const isEnabled = getEnvEnabled(flag, env.environmentId);
-                                      return (
-                                        <TableCell
-                                          key={env.environmentId}
-                                          align="center"
-                                          sx={{
-                                            px: 0.25,
-                                            py: 0.5,
-                                            borderLeft: (theme) =>
-                                              `1px dashed ${theme.palette.divider}`,
-                                            ...(envIndex === environments.length - 1 && {
-                                              borderRight: (theme: any) =>
-                                                `1px dashed ${theme.palette.divider}`,
-                                            }),
-                                          }}
-                                        >
-                                          <Box
-                                            sx={{
-                                              display: 'flex',
-                                              justifyContent: 'center',
-                                            }}
-                                          >
-                                            <FeatureSwitch
-                                              key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
-                                              size="small"
-                                              checked={isEnabled}
-                                              onChange={() => {
-                                                handleToggle(flag, env.environmentId, isEnabled);
-                                              }}
-                                              disabled={flag.isArchived || !canManage}
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                              }}
-                                              color={env.color}
-                                              label={env.displayName}
-                                            />
-                                          </Box>
-                                        </TableCell>
-                                      );
-                                    })}
-                                  </React.Fragment>
-                                );
-                              case 'createdBy':
-                                return (
-                                  <TableCell key={col.id}>
-                                    <Box>
-                                      <Typography variant="body2" fontWeight={500}>
-                                        {flag.createdByName || '-'}
-                                      </Typography>
-                                      {flag.createdByEmail && (
-                                        <Typography
-                                          variant="body2"
-                                          color="text.secondary"
-                                          sx={{ fontSize: '0.8rem' }}
-                                        >
-                                          {flag.createdByEmail}
-                                        </Typography>
-                                      )}
-                                    </Box>
+                                return environments.length > 0 ? (
+                                  <TableCell
+                                    key={col.id}
+                                    align="center"
+                                    colSpan={environments.length}
+                                    sx={{ px: 0.5 }}
+                                  >
+                                    {t('featureFlags.enabledByEnv')}
                                   </TableCell>
-                                );
+                                ) : null;
+                              case 'createdBy':
+                                return <TableCell key={col.id}>{t('common.createdBy')}</TableCell>;
                               case 'createdAt':
                                 return (
                                   <TableCell key={col.id}>
-                                    <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
-                                      <span>{formatRelativeTime(flag.createdAt)}</span>
-                                    </Tooltip>
+                                    <TableSortLabel
+                                      active={orderBy === 'createdAt'}
+                                      direction={orderBy === 'createdAt' ? order : 'asc'}
+                                      onClick={() => handleSort('createdAt')}
+                                    >
+                                      {t('featureFlags.createdAt')}
+                                    </TableSortLabel>
                                   </TableCell>
                                 );
                               case 'lastSeenAt':
                                 return (
-                                  <TableCell key={col.id}>
-                                    {flag.lastSeenAt ? (
-                                      <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)}>
-                                        <span>{formatRelativeTime(flag.lastSeenAt)}</span>
-                                      </Tooltip>
-                                    ) : (
-                                      <Typography variant="body2" color="text.secondary">
-                                        -
-                                      </Typography>
-                                    )}
-                                  </TableCell>
+                                  <TableCell key={col.id}>{t('featureFlags.lastSeenAt')}</TableCell>
                                 );
+                              case 'tags':
+                                return <TableCell key={col.id}>{t('featureFlags.tags')}</TableCell>;
                               case 'valueType':
                                 return (
-                                  <TableCell key={col.id}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                      <FieldTypeIcon type={flag.valueType || 'string'} size={18} />
-                                      <Typography variant="body2">
-                                        {t(`featureFlags.valueTypes.${flag.valueType || 'string'}`)}
-                                      </Typography>
-                                    </Box>
-                                  </TableCell>
+                                  <TableCell key={col.id}>{t('featureFlags.valueType')}</TableCell>
                                 );
 
-                              case 'tags':
-                                return (
-                                  <TableCell key={col.id}>
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        flexWrap: 'wrap',
-                                        gap: 0.5,
-                                      }}
-                                    >
-                                      {flag.tags?.slice(0, 3).map((tagName) => {
-                                        const tagData = allTags.find((t) => t.name === tagName);
-                                        const color = tagData?.color || '#888888';
-                                        return (
-                                          <Tooltip
-                                            key={tagName}
-                                            title={tagData?.description || ''}
-                                            arrow
-                                          >
-                                            <Chip
-                                              label={tagName}
-                                              size="small"
-                                              sx={{
-                                                height: 20,
-                                                bgcolor: color,
-                                                color: getContrastColor(color),
-                                              }}
-                                            />
-                                          </Tooltip>
-                                        );
-                                      })}
-                                      {flag.tags && flag.tags.length > 3 && (
-                                        <Chip
-                                          label={`+${flag.tags.length - 3}`}
-                                          size="small"
-                                          sx={{ height: 20 }}
-                                        />
-                                      )}
-                                    </Box>
-                                  </TableCell>
-                                );
                               default:
                                 return null;
                             }
                           })}
-                          {canManage && (
-                            <TableCell align="center">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => handleActionMenuOpen(e, flag)}
-                              >
-                                <MoreVertIcon fontSize="small" />
-                              </IconButton>
-                            </TableCell>
-                          )}
+                          {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <SimplePagination
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  count={total}
-                  onPageChange={(event, newPage) => setPage(newPage)}
-                  onRowsPerPageChange={(event) => {
-                    setRowsPerPage(Number(event.target.value));
-                    setPage(0);
-                  }}
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
+                      </TableHead>
+                      <TableBody>
+                        {flags.map((flag) => (
+                          <TableRow
+                            key={flag.id}
+                            hover
+                            selected={selectedFlags.has(flag.flagName)}
+                            sx={{
+                              ...(flag.isArchived ? { opacity: 0.6 } : {}),
+                            }}
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                checked={selectedFlags.has(flag.flagName)}
+                                onChange={(e) => {
+                                  const newSelected = new Set(selectedFlags);
+                                  if (e.target.checked) {
+                                    newSelected.add(flag.flagName);
+                                  } else {
+                                    newSelected.delete(flag.flagName);
+                                  }
+                                  setSelectedFlags(newSelected);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                size="small"
+                              />
+                            </TableCell>
+
+                            {/* Dynamic columns based on visibleColumns order */}
+                            {visibleColumns.map((col) => {
+                              switch (col.id) {
+                                case 'flagName':
+                                  return (
+                                    <TableCell key={col.id}>
+                                      <Box>
+                                        <Box
+                                          sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                          }}
+                                        >
+                                          <Tooltip title={t(`featureFlags.types.${flag.flagType}`)}>
+                                            {getTypeIcon(flag.flagType)}
+                                          </Tooltip>
+                                          {isStale(flag) && (
+                                            <Tooltip title={t('featureFlags.staleWarning')}>
+                                              <WarningIcon
+                                                sx={{
+                                                  fontSize: 16,
+                                                  color: 'warning.main',
+                                                }}
+                                              />
+                                            </Tooltip>
+                                          )}
+                                          <Typography
+                                            fontWeight={500}
+                                            sx={{
+                                              cursor: 'pointer',
+                                              '&:hover': {
+                                                textDecoration: 'underline',
+                                              },
+                                            }}
+                                            onClick={() =>
+                                              navigate(`/feature-flags/${flag.flagName}`)
+                                            }
+                                          >
+                                            {flag.flagName}
+                                          </Typography>
+                                          {flag.codeReferenceCount !== undefined &&
+                                            flag.codeReferenceCount > 0 && (
+                                              <Chip
+                                                icon={<GitHubIcon sx={{ fontSize: 14 }} />}
+                                                label={flag.codeReferenceCount}
+                                                size="small"
+                                                variant="outlined"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(
+                                                    `/feature-flags/${flag.flagName}?tab=code-references`
+                                                  );
+                                                }}
+                                                sx={{
+                                                  height: 20,
+                                                  fontSize: '0.7rem',
+                                                  cursor: 'pointer',
+                                                  ml: 0.5,
+                                                  pl: 0.5,
+                                                  borderRadius: 1,
+                                                  '& .MuiChip-icon': { ml: 0 },
+                                                }}
+                                              />
+                                            )}
+                                          <Tooltip title={t('common.copy')} disableFocusListener>
+                                            <IconButton
+                                              size="small"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                copyToClipboardWithNotification(
+                                                  flag.flagName,
+                                                  () =>
+                                                    enqueueSnackbar(t('common.copySuccess'), {
+                                                      variant: 'success',
+                                                    }),
+                                                  () =>
+                                                    enqueueSnackbar(t('common.copyFailed'), {
+                                                      variant: 'error',
+                                                    })
+                                                );
+                                              }}
+                                              sx={{
+                                                opacity: 0.5,
+                                                '&:hover': { opacity: 1 },
+                                              }}
+                                            >
+                                              <CopyIcon sx={{ fontSize: 14 }} />
+                                            </IconButton>
+                                          </Tooltip>
+                                          <IconButton
+                                            size="small"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleFavoriteToggle(flag);
+                                            }}
+                                            sx={{
+                                              color: flag.isFavorite
+                                                ? 'warning.main'
+                                                : 'action.disabled',
+                                              opacity: flag.isFavorite ? 1 : 0.5,
+                                              '&:hover': { opacity: 1 },
+                                            }}
+                                          >
+                                            {flag.isFavorite ? (
+                                              <StarIcon sx={{ fontSize: 16 }} />
+                                            ) : (
+                                              <StarBorderIcon sx={{ fontSize: 16 }} />
+                                            )}
+                                          </IconButton>
+                                        </Box>
+                                        {flag.displayName && flag.displayName !== flag.flagName && (
+                                          <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{ fontSize: '0.8rem' }}
+                                          >
+                                            {flag.displayName}
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    </TableCell>
+                                  );
+                                case 'status':
+                                  // Status column followed by environment columns
+                                  return (
+                                    <React.Fragment key={col.id}>
+                                      <TableCell>
+                                        {(() => {
+                                          const { status, color } = getFlagStatus(flag);
+                                          return (
+                                            <Box
+                                              sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                              }}
+                                            >
+                                              <FlagStatusIcon status={status} size={16} />
+                                              <Chip
+                                                label={t(
+                                                  `featureFlags.status${status.charAt(0).toUpperCase() + status.slice(1)}`
+                                                )}
+                                                size="small"
+                                                color={color}
+                                                variant={
+                                                  status === 'active' ? 'outlined' : 'filled'
+                                                }
+                                                sx={{
+                                                  height: 20,
+                                                  fontSize: '0.75rem',
+                                                }}
+                                              />
+                                            </Box>
+                                          );
+                                        })()}
+                                      </TableCell>
+                                    </React.Fragment>
+                                  );
+                                case 'environments':
+                                  return (
+                                    <React.Fragment key={col.id}>
+                                      {environments.map((env, envIndex) => {
+                                        const isEnabled = getEnvEnabled(flag, env.environmentId);
+                                        return (
+                                          <TableCell
+                                            key={env.environmentId}
+                                            align="center"
+                                            sx={{
+                                              px: 0.25,
+                                              py: 0.5,
+                                              borderLeft: (theme) =>
+                                                `1px dashed ${theme.palette.divider}`,
+                                              ...(envIndex === environments.length - 1 && {
+                                                borderRight: (theme: any) =>
+                                                  `1px dashed ${theme.palette.divider}`,
+                                              }),
+                                            }}
+                                          >
+                                            <Box
+                                              sx={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                              }}
+                                            >
+                                              <FeatureSwitch
+                                                key={`${flag.flagName}-${env.environmentId}-${isEnabled}`}
+                                                size="small"
+                                                checked={isEnabled}
+                                                onChange={() => {
+                                                  handleToggle(flag, env.environmentId, isEnabled);
+                                                }}
+                                                disabled={flag.isArchived || !canManage}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                }}
+                                                color={env.color}
+                                                label={env.displayName}
+                                              />
+                                            </Box>
+                                          </TableCell>
+                                        );
+                                      })}
+                                    </React.Fragment>
+                                  );
+                                case 'createdBy':
+                                  return (
+                                    <TableCell key={col.id}>
+                                      <Box>
+                                        <Typography variant="body2" fontWeight={500}>
+                                          {flag.createdByName || '-'}
+                                        </Typography>
+                                        {flag.createdByEmail && (
+                                          <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{ fontSize: '0.8rem' }}
+                                          >
+                                            {flag.createdByEmail}
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    </TableCell>
+                                  );
+                                case 'createdAt':
+                                  return (
+                                    <TableCell key={col.id}>
+                                      <Tooltip title={formatDateTimeDetailed(flag.createdAt)}>
+                                        <span>{formatRelativeTime(flag.createdAt)}</span>
+                                      </Tooltip>
+                                    </TableCell>
+                                  );
+                                case 'lastSeenAt':
+                                  return (
+                                    <TableCell key={col.id}>
+                                      {flag.lastSeenAt ? (
+                                        <Tooltip title={formatDateTimeDetailed(flag.lastSeenAt)}>
+                                          <span>{formatRelativeTime(flag.lastSeenAt)}</span>
+                                        </Tooltip>
+                                      ) : (
+                                        <Typography variant="body2" color="text.secondary">
+                                          -
+                                        </Typography>
+                                      )}
+                                    </TableCell>
+                                  );
+                                case 'valueType':
+                                  return (
+                                    <TableCell key={col.id}>
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <FieldTypeIcon
+                                          type={flag.valueType || 'string'}
+                                          size={18}
+                                        />
+                                        <Typography variant="body2">
+                                          {t(
+                                            `featureFlags.valueTypes.${flag.valueType || 'string'}`
+                                          )}
+                                        </Typography>
+                                      </Box>
+                                    </TableCell>
+                                  );
+
+                                case 'tags':
+                                  return (
+                                    <TableCell key={col.id}>
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          flexWrap: 'wrap',
+                                          gap: 0.5,
+                                        }}
+                                      >
+                                        {flag.tags?.slice(0, 3).map((tagName) => {
+                                          const tagData = allTags.find((t) => t.name === tagName);
+                                          const color = tagData?.color || '#888888';
+                                          return (
+                                            <Tooltip
+                                              key={tagName}
+                                              title={tagData?.description || ''}
+                                              arrow
+                                            >
+                                              <Chip
+                                                label={tagName}
+                                                size="small"
+                                                sx={{
+                                                  height: 20,
+                                                  bgcolor: color,
+                                                  color: getContrastColor(color),
+                                                }}
+                                              />
+                                            </Tooltip>
+                                          );
+                                        })}
+                                        {flag.tags && flag.tags.length > 3 && (
+                                          <Chip
+                                            label={`+${flag.tags.length - 3}`}
+                                            size="small"
+                                            sx={{ height: 20 }}
+                                          />
+                                        )}
+                                      </Box>
+                                    </TableCell>
+                                  );
+                                default:
+                                  return null;
+                              }
+                            })}
+                            {canManage && (
+                              <TableCell align="center">
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => handleActionMenuOpen(e, flag)}
+                                >
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <SimplePagination
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    count={total}
+                    onPageChange={(event, newPage) => setPage(newPage)}
+                    onRowsPerPageChange={(event) => {
+                      setRowsPerPage(Number(event.target.value));
+                      setPage(0);
+                    }}
+                  />
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Bulk Action Bar */}

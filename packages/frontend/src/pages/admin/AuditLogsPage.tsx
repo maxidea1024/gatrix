@@ -737,628 +737,624 @@ const AuditLogsPage: React.FC = () => {
       {/* Audit Logs Table */}
 
       <PageContentLoader loading={isInitialLoad && loading}>
-        <Card sx={{ position: 'relative' }}>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            {auditLogs.length === 0 ? (
-              <EmptyPagePlaceholder message={t('auditLogs.noLogsFound')} />
-            ) : (
-              <>
-                <TableContainer
-                  sx={{
-                    opacity: !isInitialLoad && loading ? 0.5 : 1,
-                    transition: 'opacity 0.15s ease-in-out',
-                    pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
-                  }}
-                >
-                  <Table sx={{ tableLayout: 'auto' }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ width: 50 }}></TableCell>
-                        {columns
-                          .filter((col) => col.visible)
-                          .map((column) => (
-                            <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
-                          ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {auditLogs.map((log, index) => (
-                        <React.Fragment key={log.id}>
-                          <TableRow
-                            hover
-                            sx={{
-                              cursor: 'pointer',
-                              bgcolor: (theme) =>
-                                index % 2 === 0
-                                  ? 'transparent'
-                                  : theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.02)'
-                                    : 'rgba(0, 0, 0, 0.02)',
-                              '& > *': {
-                                borderBottom: expandedRowId === log.id ? 'none' : undefined,
-                              },
-                            }}
-                            onClick={() =>
-                              setExpandedRowId(expandedRowId === log.id ? null : log.id)
-                            }
-                          >
-                            <TableCell>
-                              <IconButton size="small">
-                                {expandedRowId === log.id ? (
-                                  <KeyboardArrowDownIcon />
-                                ) : (
-                                  <KeyboardArrowRightIcon />
-                                )}
-                              </IconButton>
-                            </TableCell>
-                            {columns
-                              .filter((col) => col.visible)
-                              .map((column) => (
-                                <TableCell key={column.id}>
-                                  {renderCellContent(log, column.id)}
-                                </TableCell>
-                              ))}
-                          </TableRow>
+        {auditLogs.length === 0 ? (
+          <EmptyPagePlaceholder message={t('auditLogs.noLogsFound')} />
+        ) : (
+          <Card sx={{ position: 'relative' }}>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer
+                sx={{
+                  opacity: !isInitialLoad && loading ? 0.5 : 1,
+                  transition: 'opacity 0.15s ease-in-out',
+                  pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+                }}
+              >
+                <Table sx={{ tableLayout: 'auto' }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ width: 50 }}></TableCell>
+                      {columns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
+                        ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {auditLogs.map((log, index) => (
+                      <React.Fragment key={log.id}>
+                        <TableRow
+                          hover
+                          sx={{
+                            cursor: 'pointer',
+                            bgcolor: (theme) =>
+                              index % 2 === 0
+                                ? 'transparent'
+                                : theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.02)'
+                                  : 'rgba(0, 0, 0, 0.02)',
+                            '& > *': {
+                              borderBottom: expandedRowId === log.id ? 'none' : undefined,
+                            },
+                          }}
+                          onClick={() => setExpandedRowId(expandedRowId === log.id ? null : log.id)}
+                        >
+                          <TableCell>
+                            <IconButton size="small">
+                              {expandedRowId === log.id ? (
+                                <KeyboardArrowDownIcon />
+                              ) : (
+                                <KeyboardArrowRightIcon />
+                              )}
+                            </IconButton>
+                          </TableCell>
+                          {columns
+                            .filter((col) => col.visible)
+                            .map((column) => (
+                              <TableCell key={column.id}>
+                                {renderCellContent(log, column.id)}
+                              </TableCell>
+                            ))}
+                        </TableRow>
 
-                          {/* Expanded Detail Row */}
-                          <TableRow>
-                            <TableCell
-                              style={{ paddingBottom: 0, paddingTop: 0 }}
-                              colSpan={columns.filter((col) => col.visible).length + 1}
-                            >
-                              <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
+                        {/* Expanded Detail Row */}
+                        <TableRow>
+                          <TableCell
+                            style={{ paddingBottom: 0, paddingTop: 0 }}
+                            colSpan={columns.filter((col) => col.visible).length + 1}
+                          >
+                            <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
+                              <Box
+                                sx={{
+                                  py: 3,
+                                  px: 4,
+                                  bgcolor:
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.02)'
+                                      : 'rgba(0,0,0,0.02)',
+                                  borderTop: 1,
+                                  borderBottom: 1,
+                                  borderColor: 'divider',
+                                }}
+                              >
+                                {/* Header with Action Badge */}
                                 <Box
                                   sx={{
-                                    py: 3,
-                                    px: 4,
-                                    bgcolor:
-                                      theme.palette.mode === 'dark'
-                                        ? 'rgba(255,255,255,0.02)'
-                                        : 'rgba(0,0,0,0.02)',
-                                    borderTop: 1,
-                                    borderBottom: 1,
-                                    borderColor: 'divider',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    mb: 3,
+                                    pl: 3,
                                   }}
                                 >
-                                  {/* Header with Action Badge */}
-                                  <Box
+                                  <Chip
+                                    label={t(`auditLogs.actions.${log.action}`)}
+                                    color={AuditLogService.getActionColor(log.action)}
                                     sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 2,
-                                      mb: 3,
-                                      pl: 3,
+                                      fontWeight: 600,
+                                      fontSize: '0.875rem',
                                     }}
-                                  >
+                                  />
+                                  {((log as any).resourceType ||
+                                    (log as any).resource_type ||
+                                    (log as any).entityType) && (
                                     <Chip
-                                      label={t(`auditLogs.actions.${log.action}`)}
-                                      color={AuditLogService.getActionColor(log.action)}
+                                      label={String(
+                                        t(
+                                          `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
+                                          (log as any).resourceType ||
+                                            (log as any).resource_type ||
+                                            (log as any).entityType
+                                        )
+                                      )}
+                                      variant="outlined"
+                                      size="small"
+                                    />
+                                  )}
+                                </Box>
+
+                                {/* Detail Fields in OpenSearch Discovery Style */}
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 2.5,
+                                    pl: 3,
+                                  }}
+                                >
+                                  {/* Timestamp */}
+                                  <Box>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
                                       sx={{
                                         fontWeight: 600,
-                                        fontSize: '0.875rem',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: 0.5,
                                       }}
-                                    />
-                                    {((log as any).resourceType ||
-                                      (log as any).resource_type ||
-                                      (log as any).entityType) && (
-                                      <Chip
-                                        label={String(
-                                          t(
-                                            `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
-                                            (log as any).resourceType ||
-                                              (log as any).resource_type ||
-                                              (log as any).entityType
-                                          )
-                                        )}
-                                        variant="outlined"
-                                        size="small"
-                                      />
-                                    )}
+                                    >
+                                      {t('auditLogs.date')}
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                    >
+                                      <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
+                                        <span>
+                                          {formatRelativeTime(log.createdAt, undefined, language)}
+                                        </span>
+                                      </Tooltip>
+                                    </Typography>
                                   </Box>
 
-                                  {/* Detail Fields in OpenSearch Discovery Style */}
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: 2.5,
-                                      pl: 3,
-                                    }}
-                                  >
-                                    {/* Timestamp */}
-                                    <Box>
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{
-                                          fontWeight: 600,
-                                          textTransform: 'uppercase',
-                                          letterSpacing: 0.5,
-                                        }}
-                                      >
-                                        {t('auditLogs.date')}
-                                      </Typography>
-                                      <Typography
-                                        variant="body1"
-                                        sx={{ mt: 0.5, fontFamily: 'monospace' }}
-                                      >
-                                        <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
-                                          <span>
-                                            {formatRelativeTime(log.createdAt, undefined, language)}
-                                          </span>
-                                        </Tooltip>
-                                      </Typography>
-                                    </Box>
+                                  <Divider />
 
-                                    <Divider />
-
-                                    {/* User Information */}
-                                    <Box>
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{
-                                          fontWeight: 600,
-                                          textTransform: 'uppercase',
-                                          letterSpacing: 0.5,
-                                        }}
-                                      >
-                                        {t('auditLogs.user')}
-                                      </Typography>
-                                      <Box sx={{ mt: 0.5 }}>
-                                        {log.userName ? (
-                                          <>
-                                            <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                              {log.userName}
-                                            </Typography>
-                                            <Typography
-                                              variant="body2"
-                                              color="text.secondary"
-                                              sx={{
-                                                fontFamily: 'monospace',
-                                                fontSize: '0.8rem',
-                                              }}
-                                            >
-                                              {log.userEmail}
-                                            </Typography>
-                                          </>
-                                        ) : (
-                                          <Typography variant="body1" color="text.secondary">
-                                            {t('auditLogs.system')}
-                                          </Typography>
-                                        )}
-                                      </Box>
-                                    </Box>
-
-                                    <Divider />
-
-                                    {/* Resource Information */}
-                                    {((log as any).resourceId ||
-                                      (log as any).resource_id ||
-                                      (log as any).entityId) && (
-                                      <>
-                                        <Box>
-                                          <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            sx={{
-                                              fontWeight: 600,
-                                              textTransform: 'uppercase',
-                                              letterSpacing: 0.5,
-                                            }}
-                                          >
-                                            {t('auditLogs.resource')}
-                                          </Typography>
-                                          <Box sx={{ mt: 0.5 }}>
-                                            {(() => {
-                                              const oldVals =
-                                                (log as any).oldValues || (log as any).old_values;
-                                              const newVals =
-                                                (log as any).newValues || (log as any).new_values;
-                                              const resourceName =
-                                                oldVals?.name ||
-                                                newVals?.name ||
-                                                oldVals?.worldId ||
-                                                newVals?.worldId;
-                                              const resourceType =
-                                                (log as any).resourceType ||
-                                                (log as any).resource_type ||
-                                                (log as any).entityType;
-                                              const resourceId =
-                                                (log as any).resourceId ||
-                                                (log as any).resource_id ||
-                                                (log as any).entityId;
-
-                                              return (
-                                                <>
-                                                  {resourceName && (
-                                                    <Typography
-                                                      variant="body1"
-                                                      sx={{
-                                                        fontWeight: 600,
-                                                        mb: 0.5,
-                                                      }}
-                                                    >
-                                                      {resourceName}
-                                                    </Typography>
-                                                  )}
-                                                  <Typography
-                                                    variant="body2"
-                                                    sx={{
-                                                      fontFamily: 'monospace',
-                                                      color: 'text.secondary',
-                                                    }}
-                                                  >
-                                                    {resourceType} #{resourceId}
-                                                  </Typography>
-                                                </>
-                                              );
-                                            })()}
-                                          </Box>
-                                        </Box>
-                                        <Divider />
-                                      </>
-                                    )}
-
-                                    {/* IP Address */}
-                                    <Box>
-                                      <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{
-                                          fontWeight: 600,
-                                          textTransform: 'uppercase',
-                                          letterSpacing: 0.5,
-                                        }}
-                                      >
-                                        {t('auditLogs.ipAddress')}
-                                      </Typography>
-                                      <Typography
-                                        variant="body1"
-                                        sx={{ mt: 0.5, fontFamily: 'monospace' }}
-                                      >
-                                        {log.ipAddress || '-'}
-                                      </Typography>
-                                    </Box>
-
-                                    {/* User Agent */}
-                                    {log.userAgent && (
-                                      <>
-                                        <Divider />
-                                        <Box>
-                                          <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            sx={{
-                                              fontWeight: 600,
-                                              textTransform: 'uppercase',
-                                              letterSpacing: 0.5,
-                                            }}
-                                          >
-                                            {t('auditLogs.userAgent')}
+                                  {/* User Information */}
+                                  <Box>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: 0.5,
+                                      }}
+                                    >
+                                      {t('auditLogs.user')}
+                                    </Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                      {log.userName ? (
+                                        <>
+                                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                            {log.userName}
                                           </Typography>
                                           <Typography
                                             variant="body2"
+                                            color="text.secondary"
                                             sx={{
-                                              mt: 0.5,
-                                              wordBreak: 'break-all',
                                               fontFamily: 'monospace',
-                                              fontSize: '0.75rem',
-                                              color: 'text.secondary',
+                                              fontSize: '0.8rem',
                                             }}
                                           >
-                                            {log.userAgent}
+                                            {log.userEmail}
                                           </Typography>
-                                        </Box>
-                                      </>
-                                    )}
+                                        </>
+                                      ) : (
+                                        <Typography variant="body1" color="text.secondary">
+                                          {t('auditLogs.system')}
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  </Box>
 
-                                    {/* Changes - Diff Viewer */}
-                                    {(() => {
-                                      const oldVals =
-                                        (log as any).oldValues || (log as any).old_values;
-                                      const newVals =
-                                        (log as any).newValues || (log as any).new_values;
-                                      return (
-                                        oldVals &&
-                                        newVals && (
-                                          <>
-                                            <Divider />
-                                            <Box>
-                                              <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                                sx={{
-                                                  mb: 1.5,
-                                                  display: 'block',
-                                                  fontWeight: 600,
-                                                  textTransform: 'uppercase',
-                                                  letterSpacing: 0.5,
-                                                }}
-                                              >
-                                                {t('auditLogs.changes')}
-                                              </Typography>
-                                              <Paper
-                                                elevation={0}
-                                                sx={{
-                                                  bgcolor: 'background.default',
-                                                  overflow: 'hidden',
-                                                  border: 1,
-                                                  borderColor: 'divider',
-                                                  borderRadius: 1,
-                                                }}
-                                              >
-                                                <Table size="small">
-                                                  <TableHead>
-                                                    <TableRow
+                                  <Divider />
+
+                                  {/* Resource Information */}
+                                  {((log as any).resourceId ||
+                                    (log as any).resource_id ||
+                                    (log as any).entityId) && (
+                                    <>
+                                      <Box>
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                          sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: 0.5,
+                                          }}
+                                        >
+                                          {t('auditLogs.resource')}
+                                        </Typography>
+                                        <Box sx={{ mt: 0.5 }}>
+                                          {(() => {
+                                            const oldVals =
+                                              (log as any).oldValues || (log as any).old_values;
+                                            const newVals =
+                                              (log as any).newValues || (log as any).new_values;
+                                            const resourceName =
+                                              oldVals?.name ||
+                                              newVals?.name ||
+                                              oldVals?.worldId ||
+                                              newVals?.worldId;
+                                            const resourceType =
+                                              (log as any).resourceType ||
+                                              (log as any).resource_type ||
+                                              (log as any).entityType;
+                                            const resourceId =
+                                              (log as any).resourceId ||
+                                              (log as any).resource_id ||
+                                              (log as any).entityId;
+
+                                            return (
+                                              <>
+                                                {resourceName && (
+                                                  <Typography
+                                                    variant="body1"
+                                                    sx={{
+                                                      fontWeight: 600,
+                                                      mb: 0.5,
+                                                    }}
+                                                  >
+                                                    {resourceName}
+                                                  </Typography>
+                                                )}
+                                                <Typography
+                                                  variant="body2"
+                                                  sx={{
+                                                    fontFamily: 'monospace',
+                                                    color: 'text.secondary',
+                                                  }}
+                                                >
+                                                  {resourceType} #{resourceId}
+                                                </Typography>
+                                              </>
+                                            );
+                                          })()}
+                                        </Box>
+                                      </Box>
+                                      <Divider />
+                                    </>
+                                  )}
+
+                                  {/* IP Address */}
+                                  <Box>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{
+                                        fontWeight: 600,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: 0.5,
+                                      }}
+                                    >
+                                      {t('auditLogs.ipAddress')}
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{ mt: 0.5, fontFamily: 'monospace' }}
+                                    >
+                                      {log.ipAddress || '-'}
+                                    </Typography>
+                                  </Box>
+
+                                  {/* User Agent */}
+                                  {log.userAgent && (
+                                    <>
+                                      <Divider />
+                                      <Box>
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                          sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: 0.5,
+                                          }}
+                                        >
+                                          {t('auditLogs.userAgent')}
+                                        </Typography>
+                                        <Typography
+                                          variant="body2"
+                                          sx={{
+                                            mt: 0.5,
+                                            wordBreak: 'break-all',
+                                            fontFamily: 'monospace',
+                                            fontSize: '0.75rem',
+                                            color: 'text.secondary',
+                                          }}
+                                        >
+                                          {log.userAgent}
+                                        </Typography>
+                                      </Box>
+                                    </>
+                                  )}
+
+                                  {/* Changes - Diff Viewer */}
+                                  {(() => {
+                                    const oldVals =
+                                      (log as any).oldValues || (log as any).old_values;
+                                    const newVals =
+                                      (log as any).newValues || (log as any).new_values;
+                                    return (
+                                      oldVals &&
+                                      newVals && (
+                                        <>
+                                          <Divider />
+                                          <Box>
+                                            <Typography
+                                              variant="caption"
+                                              color="text.secondary"
+                                              sx={{
+                                                mb: 1.5,
+                                                display: 'block',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: 0.5,
+                                              }}
+                                            >
+                                              {t('auditLogs.changes')}
+                                            </Typography>
+                                            <Paper
+                                              elevation={0}
+                                              sx={{
+                                                bgcolor: 'background.default',
+                                                overflow: 'hidden',
+                                                border: 1,
+                                                borderColor: 'divider',
+                                                borderRadius: 1,
+                                              }}
+                                            >
+                                              <Table size="small">
+                                                <TableHead>
+                                                  <TableRow
+                                                    sx={{
+                                                      bgcolor: 'action.hover',
+                                                    }}
+                                                  >
+                                                    <TableCell
                                                       sx={{
-                                                        bgcolor: 'action.hover',
+                                                        fontWeight: 600,
+                                                        width: '25%',
                                                       }}
                                                     >
-                                                      <TableCell
-                                                        sx={{
-                                                          fontWeight: 600,
-                                                          width: '25%',
-                                                        }}
-                                                      >
-                                                        {t('changeRequest.field')}
-                                                      </TableCell>
-                                                      <TableCell
-                                                        sx={{
-                                                          fontWeight: 600,
-                                                          width: '37.5%',
-                                                        }}
-                                                      >
-                                                        {t('changeRequest.oldValue')}
-                                                      </TableCell>
-                                                      <TableCell
-                                                        sx={{
-                                                          fontWeight: 600,
-                                                          width: '37.5%',
-                                                        }}
-                                                      >
-                                                        {t('changeRequest.newValue')}
-                                                      </TableCell>
-                                                    </TableRow>
-                                                  </TableHead>
-                                                  <TableBody>
-                                                    {(() => {
-                                                      const allKeys = new Set([
-                                                        ...Object.keys(oldVals || {}),
-                                                        ...Object.keys(newVals || {}),
-                                                      ]);
-                                                      const changedFields: {
-                                                        key: string;
-                                                        oldVal: any;
-                                                        newVal: any;
-                                                      }[] = [];
-                                                      allKeys.forEach((key) => {
-                                                        const oldVal = oldVals?.[key];
-                                                        const newVal = newVals?.[key];
-                                                        if (
-                                                          JSON.stringify(oldVal) !==
-                                                          JSON.stringify(newVal)
-                                                        ) {
-                                                          changedFields.push({
-                                                            key,
-                                                            oldVal,
-                                                            newVal,
-                                                          });
-                                                        }
-                                                      });
-                                                      if (changedFields.length === 0) {
-                                                        return (
-                                                          <TableRow>
-                                                            <TableCell
-                                                              colSpan={3}
-                                                              align="center"
-                                                              sx={{
-                                                                color: 'text.secondary',
-                                                                py: 2,
-                                                              }}
-                                                            >
-                                                              {t('changeRequest.noChanges')}
-                                                            </TableCell>
-                                                          </TableRow>
-                                                        );
+                                                      {t('changeRequest.field')}
+                                                    </TableCell>
+                                                    <TableCell
+                                                      sx={{
+                                                        fontWeight: 600,
+                                                        width: '37.5%',
+                                                      }}
+                                                    >
+                                                      {t('changeRequest.oldValue')}
+                                                    </TableCell>
+                                                    <TableCell
+                                                      sx={{
+                                                        fontWeight: 600,
+                                                        width: '37.5%',
+                                                      }}
+                                                    >
+                                                      {t('changeRequest.newValue')}
+                                                    </TableCell>
+                                                  </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                  {(() => {
+                                                    const allKeys = new Set([
+                                                      ...Object.keys(oldVals || {}),
+                                                      ...Object.keys(newVals || {}),
+                                                    ]);
+                                                    const changedFields: {
+                                                      key: string;
+                                                      oldVal: any;
+                                                      newVal: any;
+                                                    }[] = [];
+                                                    allKeys.forEach((key) => {
+                                                      const oldVal = oldVals?.[key];
+                                                      const newVal = newVals?.[key];
+                                                      if (
+                                                        JSON.stringify(oldVal) !==
+                                                        JSON.stringify(newVal)
+                                                      ) {
+                                                        changedFields.push({
+                                                          key,
+                                                          oldVal,
+                                                          newVal,
+                                                        });
                                                       }
-                                                      return changedFields.map(
-                                                        ({ key, oldVal, newVal }) => (
-                                                          <TableRow
-                                                            key={key}
+                                                    });
+                                                    if (changedFields.length === 0) {
+                                                      return (
+                                                        <TableRow>
+                                                          <TableCell
+                                                            colSpan={3}
+                                                            align="center"
                                                             sx={{
-                                                              '&:nth-of-type(odd)': {
-                                                                bgcolor: 'action.hover',
-                                                              },
+                                                              color: 'text.secondary',
+                                                              py: 2,
                                                             }}
                                                           >
-                                                            <TableCell
-                                                              sx={{
-                                                                fontWeight: 500,
-                                                                fontFamily: 'monospace',
-                                                                fontSize: '0.75rem',
-                                                              }}
-                                                            >
-                                                              {key}
-                                                            </TableCell>
-                                                            <TableCell
-                                                              sx={{
-                                                                fontFamily: 'monospace',
-                                                                fontSize: '0.75rem',
-                                                                bgcolor: alpha(
-                                                                  theme.palette.error.main,
-                                                                  0.08
-                                                                ),
-                                                                color: 'text.secondary',
-                                                                wordBreak: 'break-all',
-                                                              }}
-                                                            >
-                                                              {oldVal !== undefined
-                                                                ? typeof oldVal === 'object'
-                                                                  ? JSON.stringify(oldVal)
-                                                                  : String(oldVal)
-                                                                : '-'}
-                                                            </TableCell>
-                                                            <TableCell
-                                                              sx={{
-                                                                fontFamily: 'monospace',
-                                                                fontSize: '0.75rem',
-                                                                bgcolor: alpha(
-                                                                  theme.palette.success.main,
-                                                                  0.08
-                                                                ),
-                                                                wordBreak: 'break-all',
-                                                              }}
-                                                            >
-                                                              {newVal !== undefined
-                                                                ? typeof newVal === 'object'
-                                                                  ? JSON.stringify(newVal)
-                                                                  : String(newVal)
-                                                                : '-'}
-                                                            </TableCell>
-                                                          </TableRow>
-                                                        )
+                                                            {t('changeRequest.noChanges')}
+                                                          </TableCell>
+                                                        </TableRow>
                                                       );
-                                                    })()}
-                                                  </TableBody>
-                                                </Table>
-                                              </Paper>
-                                            </Box>
-                                          </>
-                                        )
-                                      );
-                                    })()}
+                                                    }
+                                                    return changedFields.map(
+                                                      ({ key, oldVal, newVal }) => (
+                                                        <TableRow
+                                                          key={key}
+                                                          sx={{
+                                                            '&:nth-of-type(odd)': {
+                                                              bgcolor: 'action.hover',
+                                                            },
+                                                          }}
+                                                        >
+                                                          <TableCell
+                                                            sx={{
+                                                              fontWeight: 500,
+                                                              fontFamily: 'monospace',
+                                                              fontSize: '0.75rem',
+                                                            }}
+                                                          >
+                                                            {key}
+                                                          </TableCell>
+                                                          <TableCell
+                                                            sx={{
+                                                              fontFamily: 'monospace',
+                                                              fontSize: '0.75rem',
+                                                              bgcolor: alpha(
+                                                                theme.palette.error.main,
+                                                                0.08
+                                                              ),
+                                                              color: 'text.secondary',
+                                                              wordBreak: 'break-all',
+                                                            }}
+                                                          >
+                                                            {oldVal !== undefined
+                                                              ? typeof oldVal === 'object'
+                                                                ? JSON.stringify(oldVal)
+                                                                : String(oldVal)
+                                                              : '-'}
+                                                          </TableCell>
+                                                          <TableCell
+                                                            sx={{
+                                                              fontFamily: 'monospace',
+                                                              fontSize: '0.75rem',
+                                                              bgcolor: alpha(
+                                                                theme.palette.success.main,
+                                                                0.08
+                                                              ),
+                                                              wordBreak: 'break-all',
+                                                            }}
+                                                          >
+                                                            {newVal !== undefined
+                                                              ? typeof newVal === 'object'
+                                                                ? JSON.stringify(newVal)
+                                                                : String(newVal)
+                                                              : '-'}
+                                                          </TableCell>
+                                                        </TableRow>
+                                                      )
+                                                    );
+                                                  })()}
+                                                </TableBody>
+                                              </Table>
+                                            </Paper>
+                                          </Box>
+                                        </>
+                                      )
+                                    );
+                                  })()}
 
-                                    {/* Show only new values if old values don't exist */}
-                                    {(() => {
-                                      const oldVals =
-                                        (log as any).oldValues || (log as any).old_values;
-                                      const newVals =
-                                        (log as any).newValues || (log as any).new_values;
-                                      return (
-                                        !oldVals &&
-                                        newVals && (
-                                          <>
-                                            <Divider />
-                                            <Box>
-                                              <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                                sx={{
-                                                  mb: 1.5,
-                                                  display: 'block',
-                                                  fontWeight: 600,
-                                                  textTransform: 'uppercase',
-                                                  letterSpacing: 0.5,
+                                  {/* Show only new values if old values don't exist */}
+                                  {(() => {
+                                    const oldVals =
+                                      (log as any).oldValues || (log as any).old_values;
+                                    const newVals =
+                                      (log as any).newValues || (log as any).new_values;
+                                    return (
+                                      !oldVals &&
+                                      newVals && (
+                                        <>
+                                          <Divider />
+                                          <Box>
+                                            <Typography
+                                              variant="caption"
+                                              color="text.secondary"
+                                              sx={{
+                                                mb: 1.5,
+                                                display: 'block',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: 0.5,
+                                              }}
+                                            >
+                                              {t('auditLogs.newValues')}
+                                            </Typography>
+                                            <Paper
+                                              elevation={0}
+                                              sx={{
+                                                p: 2,
+                                                bgcolor: 'background.default',
+                                                border: 1,
+                                                borderColor: 'divider',
+                                                borderRadius: 1,
+                                                overflow: 'auto',
+                                                maxHeight: 400,
+                                              }}
+                                            >
+                                              <pre
+                                                style={{
+                                                  margin: 0,
+                                                  fontSize: '0.75rem',
+                                                  fontFamily: 'monospace',
+                                                  color: theme.palette.text.primary,
                                                 }}
                                               >
-                                                {t('auditLogs.newValues')}
-                                              </Typography>
-                                              <Paper
-                                                elevation={0}
-                                                sx={{
-                                                  p: 2,
-                                                  bgcolor: 'background.default',
-                                                  border: 1,
-                                                  borderColor: 'divider',
-                                                  borderRadius: 1,
-                                                  overflow: 'auto',
-                                                  maxHeight: 400,
-                                                }}
-                                              >
-                                                <pre
-                                                  style={{
-                                                    margin: 0,
-                                                    fontSize: '0.75rem',
-                                                    fontFamily: 'monospace',
-                                                    color: theme.palette.text.primary,
-                                                  }}
-                                                >
-                                                  {JSON.stringify(newVals, null, 2)}
-                                                </pre>
-                                              </Paper>
-                                            </Box>
-                                          </>
-                                        )
-                                      );
-                                    })()}
+                                                {JSON.stringify(newVals, null, 2)}
+                                              </pre>
+                                            </Paper>
+                                          </Box>
+                                        </>
+                                      )
+                                    );
+                                  })()}
 
-                                    {/* Show only old values if new values don't exist */}
-                                    {(() => {
-                                      const oldVals =
-                                        (log as any).oldValues || (log as any).old_values;
-                                      const newVals =
-                                        (log as any).newValues || (log as any).new_values;
-                                      return (
-                                        oldVals &&
-                                        !newVals && (
-                                          <>
-                                            <Divider />
-                                            <Box>
-                                              <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                                sx={{
-                                                  mb: 1.5,
-                                                  display: 'block',
-                                                  fontWeight: 600,
-                                                  textTransform: 'uppercase',
-                                                  letterSpacing: 0.5,
+                                  {/* Show only old values if new values don't exist */}
+                                  {(() => {
+                                    const oldVals =
+                                      (log as any).oldValues || (log as any).old_values;
+                                    const newVals =
+                                      (log as any).newValues || (log as any).new_values;
+                                    return (
+                                      oldVals &&
+                                      !newVals && (
+                                        <>
+                                          <Divider />
+                                          <Box>
+                                            <Typography
+                                              variant="caption"
+                                              color="text.secondary"
+                                              sx={{
+                                                mb: 1.5,
+                                                display: 'block',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: 0.5,
+                                              }}
+                                            >
+                                              {t('auditLogs.oldValues')}
+                                            </Typography>
+                                            <Paper
+                                              elevation={0}
+                                              sx={{
+                                                p: 2,
+                                                bgcolor: 'background.default',
+                                                border: 1,
+                                                borderColor: 'divider',
+                                                borderRadius: 1,
+                                                overflow: 'auto',
+                                                maxHeight: 400,
+                                              }}
+                                            >
+                                              <pre
+                                                style={{
+                                                  margin: 0,
+                                                  fontSize: '0.75rem',
+                                                  fontFamily: 'monospace',
+                                                  color: theme.palette.text.primary,
                                                 }}
                                               >
-                                                {t('auditLogs.oldValues')}
-                                              </Typography>
-                                              <Paper
-                                                elevation={0}
-                                                sx={{
-                                                  p: 2,
-                                                  bgcolor: 'background.default',
-                                                  border: 1,
-                                                  borderColor: 'divider',
-                                                  borderRadius: 1,
-                                                  overflow: 'auto',
-                                                  maxHeight: 400,
-                                                }}
-                                              >
-                                                <pre
-                                                  style={{
-                                                    margin: 0,
-                                                    fontSize: '0.75rem',
-                                                    fontFamily: 'monospace',
-                                                    color: theme.palette.text.primary,
-                                                  }}
-                                                >
-                                                  {JSON.stringify(oldVals, null, 2)}
-                                                </pre>
-                                              </Paper>
-                                            </Box>
-                                          </>
-                                        )
-                                      );
-                                    })()}
-                                  </Box>
+                                                {JSON.stringify(oldVals, null, 2)}
+                                              </pre>
+                                            </Paper>
+                                          </Box>
+                                        </>
+                                      )
+                                    );
+                                  })()}
                                 </Box>
-                              </Collapse>
-                            </TableCell>
-                          </TableRow>
-                        </React.Fragment>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-                <SimplePagination
-                  count={total}
-                  page={pageState.page - 1} // MUI는 0부터 시작
-                  rowsPerPage={pageState.limit}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
+              <SimplePagination
+                count={total}
+                page={pageState.page - 1} // MUI는 0부터 시작
+                rowsPerPage={pageState.limit}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              />
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Column Settings Popover */}

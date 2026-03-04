@@ -715,7 +715,7 @@ export class PlanningDataService {
       const uploadHash = combinedHash.digest('hex');
 
       // Get previous upload to determine changed files
-      const previousUpload = await db('planningDataUploads')
+      const previousUpload = await db('g_planning_data_uploads')
         .where({ environmentId })
         .orderBy('uploadedAt', 'desc')
         .first();
@@ -809,7 +809,7 @@ export class PlanningDataService {
       const totalSize = Object.values(fileStats).reduce((sum, stat) => sum + stat.size, 0);
 
       // Save upload record to database
-      const [uploadRecordId] = await db('planningDataUploads').insert({
+      const [uploadRecordId] = await db('g_planning_data_uploads').insert({
         environmentId,
         uploadHash,
         filesUploaded: JSON.stringify(uploadedFiles),
@@ -826,7 +826,9 @@ export class PlanningDataService {
       });
 
       // Fetch the created record
-      const uploadRecord = await db('planningDataUploads').where({ id: uploadRecordId }).first();
+      const uploadRecord = await db('g_planning_data_uploads')
+        .where({ id: uploadRecordId })
+        .first();
 
       // Cache all uploaded files in Redis (environment-scoped) - directly from parsed data
       await this.cacheUploadedFiles(environmentId, uploadedFiles, fileParsedData);
@@ -874,7 +876,7 @@ export class PlanningDataService {
    */
   static async getUploadHistory(environmentId: string, limit: number = 20): Promise<any[]> {
     try {
-      const uploads = await db('planningDataUploads')
+      const uploads = await db('g_planning_data_uploads')
         .where({ environmentId })
         .orderBy('uploadedAt', 'desc')
         .limit(limit);
@@ -913,7 +915,7 @@ export class PlanningDataService {
    */
   static async getLatestUpload(environmentId: string): Promise<any | null> {
     try {
-      const upload = await db('planningDataUploads')
+      const upload = await db('g_planning_data_uploads')
         .where({ environmentId })
         .orderBy('uploadedAt', 'desc')
         .first();
@@ -955,7 +957,7 @@ export class PlanningDataService {
    */
   static async resetUploadHistory(environmentId: string): Promise<number> {
     try {
-      const deletedCount = await db('planningDataUploads').where({ environmentId }).delete();
+      const deletedCount = await db('g_planning_data_uploads').where({ environmentId }).delete();
 
       logger.info('Upload history reset', { deletedCount, environmentId });
       return deletedCount;
@@ -976,7 +978,7 @@ export class PlanningDataService {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
-      const deletedCount = await db('planningDataUploads')
+      const deletedCount = await db('g_planning_data_uploads')
         .where({ environmentId })
         .where('uploadedAt', '<', cutoffDate)
         .delete();
@@ -1008,7 +1010,7 @@ export class PlanningDataService {
     byEnvironment: Record<string, number>;
   }> {
     try {
-      const environments = await db('planningDataUploads')
+      const environments = await db('g_planning_data_uploads')
         .distinct('environmentId')
         .pluck('environmentId');
 

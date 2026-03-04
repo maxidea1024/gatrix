@@ -705,106 +705,108 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               </Typography>
 
               <Stack spacing={2}>
-                {/* 버전 필드 */}
-                <Controller
-                  name="clientVersion"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      inputRef={versionFieldRef}
-                      fullWidth
-                      label={
-                        <Box component="span">
-                          {t('clientVersions.version')}{' '}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* 버전 필드 */}
+                  <Controller
+                    name="clientVersion"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        inputRef={versionFieldRef}
+                        fullWidth
+                        label={
+                          <Box component="span">
+                            {t('clientVersions.version')}{' '}
+                            <Typography component="span" color="error">
+                              *
+                            </Typography>
+                          </Box>
+                        }
+                        placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
+                        error={!!errors.clientVersion}
+                        helperText={
+                          errors.clientVersion?.message || t('clientVersions.form.versionHelp')
+                        }
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false,
+                        }}
+                      />
+                    )}
+                  />
+
+                  {/* 플랫폼 필드 */}
+                  <Controller
+                    name="platform"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl fullWidth error={!!errors.platform}>
+                        <InputLabel id="cvf-platform-label">
+                          {t('clientVersions.platform')}{' '}
                           <Typography component="span" color="error">
                             *
                           </Typography>
-                        </Box>
-                      }
-                      placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
-                      error={!!errors.clientVersion}
-                      helperText={
-                        errors.clientVersion?.message || t('clientVersions.form.versionHelp')
-                      }
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false,
-                      }}
-                    />
-                  )}
-                />
+                        </InputLabel>
+                        <Select
+                          labelId="cvf-platform-label"
+                          {...field}
+                          label={`${t('clientVersions.platform')} *`}
+                          MenuProps={{
+                            anchorOrigin: {
+                              vertical: 'bottom',
+                              horizontal: 'left',
+                            },
+                            transformOrigin: {
+                              vertical: 'top',
+                              horizontal: 'left',
+                            },
+                          }}
+                          onChange={async (e) => {
+                            field.onChange(e);
 
-                {/* 플랫폼 필드 */}
-                <Controller
-                  name="platform"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.platform}>
-                      <InputLabel id="cvf-platform-label">
-                        {t('clientVersions.platform')}{' '}
-                        <Typography component="span" color="error">
-                          *
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        labelId="cvf-platform-label"
-                        {...field}
-                        label={`${t('clientVersions.platform')} *`}
-                        MenuProps={{
-                          anchorOrigin: {
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          },
-                          transformOrigin: {
-                            vertical: 'top',
-                            horizontal: 'left',
-                          },
-                        }}
-                        onChange={async (e) => {
-                          field.onChange(e);
+                            // 새로 추가하는 경우에만 기본값 적용
+                            if (!isEdit && e.target.value) {
+                              try {
+                                const defaults = await PlatformDefaultsService.getPlatformDefaults(
+                                  projectApiPath,
+                                  e.target.value as string
+                                );
 
-                          // 새로 추가하는 경우에만 기본값 적용
-                          if (!isEdit && e.target.value) {
-                            try {
-                              const defaults = await PlatformDefaultsService.getPlatformDefaults(
-                                projectApiPath,
-                                e.target.value as string
-                              );
-
-                              // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
-                              if (defaults.gameServerAddress) {
-                                setValue('gameServerAddress', defaults.gameServerAddress);
+                                // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
+                                if (defaults.gameServerAddress) {
+                                  setValue('gameServerAddress', defaults.gameServerAddress);
+                                }
+                                if (defaults.patchAddress) {
+                                  setValue('patchAddress', defaults.patchAddress);
+                                }
+                              } catch (error) {
+                                console.error('Failed to apply platform defaults:', error);
                               }
-                              if (defaults.patchAddress) {
-                                setValue('patchAddress', defaults.patchAddress);
-                              }
-                            } catch (error) {
-                              console.error('Failed to apply platform defaults:', error);
                             }
-                          }
-                        }}
-                      >
-                        {platforms.map((p) => (
-                          <MenuItem key={p.value} value={p.value}>
-                            {p.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {(errors.platform?.message || t('clientVersions.form.platformHelp')) && (
-                        <Typography
-                          variant="caption"
-                          color={errors.platform ? 'error' : 'text.secondary'}
-                          sx={{ mt: 0.5, display: 'block' }}
+                          }}
                         >
-                          {errors.platform?.message || t('clientVersions.form.platformHelp')}
-                        </Typography>
-                      )}
-                    </FormControl>
-                  )}
-                />
+                          {platforms.map((p) => (
+                            <MenuItem key={p.value} value={p.value}>
+                              {p.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {(errors.platform?.message || t('clientVersions.form.platformHelp')) && (
+                          <Typography
+                            variant="caption"
+                            color={errors.platform ? 'error' : 'text.secondary'}
+                            sx={{ mt: 0.5, display: 'block' }}
+                          >
+                            {errors.platform?.message || t('clientVersions.form.platformHelp')}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Box>
 
                 {/* 상태 필드 */}
                 <Controller
@@ -914,114 +916,118 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               </Typography>
 
               <Stack spacing={2}>
-                {/* 게임 서버 주소 */}
-                <Controller
-                  name="gameServerAddress"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label={
-                        <Box component="span">
-                          {t('clientVersions.gameServerAddress')}{' '}
-                          <Typography component="span" color="error">
-                            *
-                          </Typography>
-                        </Box>
-                      }
-                      error={!!errors.gameServerAddress}
-                      helperText={
-                        errors.gameServerAddress?.message ||
-                        t('clientVersions.form.gameServerAddressHelp')
-                      }
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false,
-                      }}
-                    />
-                  )}
-                />
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* 게임 서버 주소 */}
+                  <Controller
+                    name="gameServerAddress"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label={
+                          <Box component="span">
+                            {t('clientVersions.gameServerAddress')}{' '}
+                            <Typography component="span" color="error">
+                              *
+                            </Typography>
+                          </Box>
+                        }
+                        error={!!errors.gameServerAddress}
+                        helperText={
+                          errors.gameServerAddress?.message ||
+                          t('clientVersions.form.gameServerAddressHelp')
+                        }
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false,
+                        }}
+                      />
+                    )}
+                  />
 
-                {/* 게임 서버 주소 (화이트리스트용) */}
-                <Controller
-                  name="gameServerAddressForWhiteList"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label={t('clientVersions.gameServerAddressForWhiteList')}
-                      error={!!errors.gameServerAddressForWhiteList}
-                      helperText={
-                        errors.gameServerAddressForWhiteList?.message ||
-                        t('clientVersions.form.gameServerAddressForWhiteListHelp')
-                      }
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false,
-                      }}
-                    />
-                  )}
-                />
+                  {/* 게임 서버 주소 (화이트리스트용) */}
+                  <Controller
+                    name="gameServerAddressForWhiteList"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label={t('clientVersions.gameServerAddressForWhiteList')}
+                        error={!!errors.gameServerAddressForWhiteList}
+                        helperText={
+                          errors.gameServerAddressForWhiteList?.message ||
+                          t('clientVersions.form.gameServerAddressForWhiteListHelp')
+                        }
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false,
+                        }}
+                      />
+                    )}
+                  />
+                </Box>
 
-                {/* 패치 주소 */}
-                <Controller
-                  name="patchAddress"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label={
-                        <Box component="span">
-                          {t('clientVersions.patchAddress')}{' '}
-                          <Typography component="span" color="error">
-                            *
-                          </Typography>
-                        </Box>
-                      }
-                      error={!!errors.patchAddress}
-                      helperText={
-                        errors.patchAddress?.message || t('clientVersions.form.patchAddressHelp')
-                      }
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false,
-                      }}
-                    />
-                  )}
-                />
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* 패치 주소 */}
+                  <Controller
+                    name="patchAddress"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label={
+                          <Box component="span">
+                            {t('clientVersions.patchAddress')}{' '}
+                            <Typography component="span" color="error">
+                              *
+                            </Typography>
+                          </Box>
+                        }
+                        error={!!errors.patchAddress}
+                        helperText={
+                          errors.patchAddress?.message || t('clientVersions.form.patchAddressHelp')
+                        }
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false,
+                        }}
+                      />
+                    )}
+                  />
 
-                {/* 패치 주소 (화이트리스트용) */}
-                <Controller
-                  name="patchAddressForWhiteList"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label={t('clientVersions.patchAddressForWhiteList')}
-                      error={!!errors.patchAddressForWhiteList}
-                      helperText={
-                        errors.patchAddressForWhiteList?.message ||
-                        t('clientVersions.form.patchAddressForWhiteListHelp')
-                      }
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false,
-                      }}
-                    />
-                  )}
-                />
+                  {/* 패치 주소 (화이트리스트용) */}
+                  <Controller
+                    name="patchAddressForWhiteList"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label={t('clientVersions.patchAddressForWhiteList')}
+                        error={!!errors.patchAddressForWhiteList}
+                        helperText={
+                          errors.patchAddressForWhiteList?.message ||
+                          t('clientVersions.form.patchAddressForWhiteListHelp')
+                        }
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false,
+                        }}
+                      />
+                    )}
+                  />
+                </Box>
               </Stack>
             </Paper>
 

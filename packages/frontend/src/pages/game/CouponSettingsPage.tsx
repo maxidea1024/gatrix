@@ -1343,71 +1343,69 @@ const CouponSettingsPage: React.FC = () => {
 
       {/* List */}
       <PageContentLoader loading={loading}>
-        <Card>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow sx={{ height: 48 }}>
-                    {canManage && (
-                      <TableCell padding="checkbox" sx={{ width: 48 }}>
-                        <Checkbox
-                          indeterminate={
-                            sortedItems.some((it) => selectedIds.includes(it.id)) &&
-                            !sortedItems.every((it) => selectedIds.includes(it.id))
+        {items.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('coupons.couponSettings.noCoupons')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={
+              canManage
+                ? () => {
+                    resetForm();
+                    setOpenForm(true);
+                  }
+                : undefined
+            }
+            addButtonLabel={t('coupons.couponSettings.addCoupon')}
+          />
+        ) : (
+          <Card>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ height: 48 }}>
+                      {canManage && (
+                        <TableCell padding="checkbox" sx={{ width: 48 }}>
+                          <Checkbox
+                            indeterminate={
+                              sortedItems.some((it) => selectedIds.includes(it.id)) &&
+                              !sortedItems.every((it) => selectedIds.includes(it.id))
+                            }
+                            checked={
+                              sortedItems.length > 0 &&
+                              sortedItems.every((it) => selectedIds.includes(it.id))
+                            }
+                            onChange={(e) => handleSelectAll(e.target.checked)}
+                          />
+                        </TableCell>
+                      )}
+                      {visibleColumns.map((col) => (
+                        <TableCell
+                          key={col.id}
+                          sortDirection={orderBy === col.id ? order : (false as any)}
+                          sx={{ py: 1, px: 2 }}
+                          align={
+                            ['type', 'status', 'usageRate'].includes(col.id) ? 'center' : 'left'
                           }
-                          checked={
-                            sortedItems.length > 0 &&
-                            sortedItems.every((it) => selectedIds.includes(it.id))
-                          }
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                        />
-                      </TableCell>
-                    )}
-                    {visibleColumns.map((col) => (
-                      <TableCell
-                        key={col.id}
-                        sortDirection={orderBy === col.id ? order : (false as any)}
-                        sx={{ py: 1, px: 2 }}
-                        align={['type', 'status', 'usageRate'].includes(col.id) ? 'center' : 'left'}
-                      >
-                        <TableSortLabel
-                          active={orderBy === col.id}
-                          direction={orderBy === col.id ? order : 'asc'}
-                          onClick={() => handleSort(col.id)}
                         >
-                          {t(col.labelKey)}
-                        </TableSortLabel>
-                      </TableCell>
-                    ))}
-                    {canManage && (
-                      <TableCell align="center" sx={{ py: 1, px: 2 }}>
-                        {t('common.actions')}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {items.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={colCount} sx={{ p: 0 }}>
-                        <EmptyPagePlaceholder
-                          message={t('coupons.couponSettings.noCoupons')}
-                          subtitle={canManage ? t('common.addFirstItem') : undefined}
-                          onAddClick={
-                            canManage
-                              ? () => {
-                                  resetForm();
-                                  setOpenForm(true);
-                                }
-                              : undefined
-                          }
-                          addButtonLabel={t('coupons.couponSettings.addCoupon')}
-                        />
-                      </TableCell>
+                          <TableSortLabel
+                            active={orderBy === col.id}
+                            direction={orderBy === col.id ? order : 'asc'}
+                            onClick={() => handleSort(col.id)}
+                          >
+                            {t(col.labelKey)}
+                          </TableSortLabel>
+                        </TableCell>
+                      ))}
+                      {canManage && (
+                        <TableCell align="center" sx={{ py: 1, px: 2 }}>
+                          {t('common.actions')}
+                        </TableCell>
+                      )}
                     </TableRow>
-                  ) : (
-                    sortedItems.map((it) => (
+                  </TableHead>
+                  <TableBody>
+                    {sortedItems.map((it) => (
                       <TableRow key={it.id} hover sx={{ height: 48 }}>
                         {canManage && (
                           <TableCell padding="checkbox" sx={{ py: 1, px: 2 }}>
@@ -1828,26 +1826,26 @@ const CouponSettingsPage: React.FC = () => {
                           </TableCell>
                         )}
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-            {!loading && items.length > 0 && (
-              <SimplePagination
-                count={total}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={(_, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(e: any) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setPage(0);
-                }}
-              />
-            )}
-          </CardContent>
-        </Card>
+              {!loading && items.length > 0 && (
+                <SimplePagination
+                  count={total}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={(_, newPage) => setPage(newPage)}
+                  onRowsPerPageChange={(e: any) => {
+                    setRowsPerPage(Number(e.target.value));
+                    setPage(0);
+                  }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
       </PageContentLoader>
 
       {/* Column Settings Dialog */}
