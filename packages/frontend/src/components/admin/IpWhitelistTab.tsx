@@ -26,7 +26,7 @@ import {
   Tooltip,
   Switch,
   FormControlLabel,
-  Drawer,
+
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
@@ -54,6 +54,7 @@ import SimplePagination from '../common/SimplePagination';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import FormDialogHeader from '../common/FormDialogHeader';
+import ResizableDrawer from '../common/ResizableDrawer';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import SearchTextField from '../common/SearchTextField';
 import dayjs from 'dayjs';
@@ -92,7 +93,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
     open: false,
     title: '',
     message: '',
-    action: () => {},
+    action: () => { },
   });
 
   // Form data
@@ -356,25 +357,12 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
 
   return (
     <>
-      {/* Action Buttons */}
-      {canManage && (
-        <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
-          <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setBulkDialog(true)}>
-            {t('ipWhitelist.bulkImport')}
-          </Button>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('ipWhitelist.addEntry')}
-          </Button>
-        </Box>
-      )}
-
-      {/* Search & Filters */}
+      {/* Search & Actions Row */}
       <Box
         sx={{
           display: 'flex',
           gap: 2,
           alignItems: 'center',
-          flexWrap: 'wrap',
           mb: 3,
         }}
       >
@@ -384,6 +372,16 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
           onChange={handleSearchChange}
           sx={{ minWidth: 300 }}
         />
+        {canManage && (
+          <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+            <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setBulkDialog(true)}>
+              {t('ipWhitelist.bulkImport')}
+            </Button>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+              {t('ipWhitelist.addEntry')}
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* Content */}
@@ -549,135 +547,69 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
       </Menu>
 
       {/* Add/Edit Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={addDialog || editDialog}
         onClose={() => {
           setAddDialog(false);
           setEditDialog(false);
         }}
-        sx={{
-          zIndex: 1300,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 600 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-        ModalProps={{
-          keepMounted: false,
-        }}
+        title={editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
+        subtitle={editDialog ? t('ipWhitelist.dialog.editDescription') : t('ipWhitelist.dialog.addDescription')}
+        storageKey="ipWhitelistDrawerWidth"
+        defaultWidth={500}
+        minWidth={400}
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Box>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {editDialog
-                ? t('ipWhitelist.dialog.editDescription')
-                : t('ipWhitelist.dialog.addDescription')}
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={() => {
-              setAddDialog(false);
-              setEditDialog(false);
-            }}
-            size="small"
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, p: 3, overflow: 'auto' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Box>
-              <TextField
-                fullWidth
-                label={t('ipWhitelist.form.ipAddress')}
-                value={formData.ipAddress}
-                onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-                error={!!formErrors.ipAddress}
-                helperText={formErrors.ipAddress}
-                placeholder={t('ipWhitelist.form.ipAddressPlaceholder')}
-                required
-                inputRef={ipAddressFieldRef}
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('ipWhitelist.form.ipAddressHelp')}
-              </Typography>
-            </Box>
-            <Box>
-              <DateTimePicker
-                label={t('ipWhitelist.form.startDate')}
-                value={formData.startDate ? dayjs(formData.startDate) : null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    startDate: date?.isValid() ? date.toISOString() : undefined,
-                  })
-                }
-                timeSteps={{ minutes: 1 }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    slotProps: { input: { readOnly: true } },
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('ipWhitelist.form.startDateHelp')}
-              </Typography>
-            </Box>
-            <Box>
-              <DateTimePicker
-                label={t('ipWhitelist.form.endDate')}
-                value={formData.endDate ? dayjs(formData.endDate) : null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    endDate: date?.isValid() ? date.toISOString() : undefined,
-                  })
-                }
-                minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
-                timeSteps={{ minutes: 1 }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    slotProps: { input: { readOnly: true } },
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('ipWhitelist.form.endDateHelp')}
-              </Typography>
-            </Box>
+            <TextField
+              fullWidth
+              label={t('ipWhitelist.form.ipAddress')}
+              value={formData.ipAddress}
+              onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
+              error={!!formErrors.ipAddress}
+              helperText={formErrors.ipAddress || t('ipWhitelist.form.ipAddressHelp')}
+              placeholder={t('ipWhitelist.form.ipAddressPlaceholder')}
+              required
+              inputRef={ipAddressFieldRef}
+            />
+            <DateTimePicker
+              label={t('ipWhitelist.form.startDate')}
+              value={formData.startDate ? dayjs(formData.startDate) : null}
+              onChange={(date) =>
+                setFormData({
+                  ...formData,
+                  startDate: date?.isValid() ? date.toISOString() : undefined,
+                })
+              }
+              timeSteps={{ minutes: 1 }}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  slotProps: { input: { readOnly: true } },
+                  helperText: t('ipWhitelist.form.startDateHelp'),
+                },
+              }}
+            />
+            <DateTimePicker
+              label={t('ipWhitelist.form.endDate')}
+              value={formData.endDate ? dayjs(formData.endDate) : null}
+              onChange={(date) =>
+                setFormData({
+                  ...formData,
+                  endDate: date?.isValid() ? date.toISOString() : undefined,
+                })
+              }
+              minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
+              timeSteps={{ minutes: 1 }}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  slotProps: { input: { readOnly: true } },
+                  helperText: t('ipWhitelist.form.endDateHelp'),
+                },
+              }}
+            />
             <Box>
               <FormControlLabel
                 control={
@@ -691,44 +623,35 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
+                sx={{ display: 'block' }}
               >
                 {t('ipWhitelist.form.enabledHelp')}
               </Typography>
             </Box>
-            <Box>
-              <TextField
-                fullWidth
-                label={t('ipWhitelist.form.purpose')}
-                value={formData.purpose}
-                onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                error={!!formErrors.purpose}
-                helperText={formErrors.purpose}
-                placeholder={t('ipWhitelist.form.purposePlaceholder')}
-                multiline
-                rows={3}
-                required
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('ipWhitelist.form.purposeHelp')}
-              </Typography>
-            </Box>
+            <TextField
+              fullWidth
+              label={t('ipWhitelist.form.purpose')}
+              value={formData.purpose}
+              onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+              error={!!formErrors.purpose}
+              helperText={formErrors.purpose || t('ipWhitelist.form.purposeHelp')}
+              placeholder={t('ipWhitelist.form.purposePlaceholder')}
+              multiline
+              rows={3}
+              required
+            />
           </Box>
         </Box>
 
         {/* Footer */}
         <Box
           sx={{
-            p: 3,
+            p: 2,
             borderTop: '1px solid',
             borderColor: 'divider',
             bgcolor: 'background.paper',
             display: 'flex',
-            gap: 2,
+            gap: 1,
             justifyContent: 'flex-end',
           }}
         >
@@ -737,15 +660,14 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
               setAddDialog(false);
               setEditDialog(false);
             }}
-            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
-            {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
+          <Button onClick={handleSave} variant="contained">
+            {t('common.save')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Bulk Import Dialog */}
       <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="md" fullWidth>

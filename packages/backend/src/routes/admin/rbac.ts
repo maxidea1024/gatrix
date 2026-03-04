@@ -283,7 +283,15 @@ router.get(
   requireOrgPermission(ORG_PERMISSIONS.ROLES_WRITE) as any,
   async (req: any, res) => {
     try {
-      const roles = await RoleModel.findByOrgId(req.user.orgId);
+      const roles = await db('g_roles')
+        .select(
+          'g_roles.*',
+          db.raw('(SELECT COUNT(*) FROM g_role_org_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_project_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_environment_permissions WHERE roleId = g_roles.id) as permissionCount'),
+          db.raw('(SELECT COUNT(*) FROM g_user_roles WHERE roleId = g_roles.id) as userCount'),
+          db.raw('(SELECT COUNT(*) FROM g_group_roles WHERE roleId = g_roles.id) as groupCount')
+        )
+        .where('g_roles.orgId', req.user.orgId)
+        .orderBy('g_roles.roleName', 'asc');
       res.json({ success: true, data: roles });
     } catch (error) {
       logger.error('Error listing roles:', error);

@@ -155,7 +155,7 @@ export async function fetchGameWorldById(id: string | string): Promise<any> {
  */
 export async function fetchUserById(id: string | string): Promise<any> {
   const user = await db('g_users')
-    .select('id', 'name', 'email', 'role', 'status', 'emailVerified')
+    .select('id', 'name', 'email', 'status', 'emailVerified')
     .where('id', id)
     .first();
 

@@ -148,6 +148,7 @@ import PlaygroundDialog from '../../components/features/PlaygroundDialog';
 import ValidationRulesEditor from '../../components/features/ValidationRulesEditor';
 import { ValidationRules } from '../../services/featureFlagService';
 import { getFlagTypeIcon } from '../../utils/flagTypeIcons';
+import PageContentLoader from '../../components/common/PageContentLoader';
 
 // Playground panel constants (outside component for stable references)
 const PLAYGROUND_VISIBLE_KEY = 'gatrix.embeddedPlaygroundVisible';
@@ -424,11 +425,11 @@ const FeatureFlagDetailPage: React.FC = () => {
       setFlag((prev) =>
         prev
           ? {
-              ...prev,
-              valueType: originalFlag.valueType,
-              enabledValue: originalFlag.enabledValue,
-              disabledValue: originalFlag.disabledValue,
-            }
+            ...prev,
+            valueType: originalFlag.valueType,
+            enabledValue: originalFlag.enabledValue,
+            disabledValue: originalFlag.disabledValue,
+          }
           : prev
       );
     }
@@ -451,26 +452,27 @@ const FeatureFlagDetailPage: React.FC = () => {
   const [flag, setFlag] = useState<FeatureFlag | null>(
     isCreating
       ? {
-          id: '',
-          environmentId: '',
-          flagName: generateDefaultFlagName(),
-          displayName: '',
-          description: '',
-          flagType: 'release',
-          isEnabled: false,
-          isArchived: false,
-          impressionDataEnabled: false,
-          tags: [],
-          strategies: [],
-          variants: [],
-          valueType: 'string',
-          enabledValue: '',
-          disabledValue: '',
-          createdAt: new Date().toISOString(),
-        }
+        id: '',
+        environmentId: '',
+        flagName: generateDefaultFlagName(),
+        displayName: '',
+        description: '',
+        flagType: 'release',
+        isEnabled: false,
+        isArchived: false,
+        impressionDataEnabled: false,
+        tags: [],
+        strategies: [],
+        variants: [],
+        valueType: 'string',
+        enabledValue: '',
+        disabledValue: '',
+        createdAt: new Date().toISOString(),
+      }
       : null
   );
   const [loading, setLoading] = useState(!isCreating);
+  const [envLoading, setEnvLoading] = useState(!isCreating);
   const [saving, setSaving] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
@@ -801,7 +803,8 @@ const FeatureFlagDetailPage: React.FC = () => {
   // Load environment-specific strategies after environments and flag are loaded
   useEffect(() => {
     if (!isCreating && flag?.flagName && environments.length > 0) {
-      loadEnvStrategies(environments, flag.flagName);
+      setEnvLoading(true);
+      loadEnvStrategies(environments, flag.flagName).finally(() => setEnvLoading(false));
     }
   }, [isCreating, flag?.flagName, environments, loadEnvStrategies]);
 
@@ -2198,385 +2201,266 @@ const FeatureFlagDetailPage: React.FC = () => {
 
           {/* Right Main Area - Environment Cards */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack spacing={2} sx={{ minWidth: 0 }}>
-              {environments.map((env, envIndex) => {
-                // Get environment-specific isEnabled from flag.environments
-                const envSettings = flag.environments?.find(
-                  (e) => e.environmentId === env.environmentId
-                );
-                const isEnabled = envSettings?.isEnabled ?? false;
-                // Use environment-specific strategies
-                const strategies = envStrategies[env.environmentId] || [];
-                const strategiesCount = strategies.length;
-                const isExpanded = expandedEnvs.has(env.environmentId);
+            <PageContentLoader loading={envLoading}>
+              <Stack spacing={2} sx={{ minWidth: 0 }}>
+                {environments.map((env, envIndex) => {
+                  // Get environment-specific isEnabled from flag.environments
+                  const envSettings = flag.environments?.find(
+                    (e) => e.environmentId === env.environmentId
+                  );
+                  const isEnabled = envSettings?.isEnabled ?? false;
+                  // Use environment-specific strategies
+                  const strategies = envStrategies[env.environmentId] || [];
+                  const strategiesCount = strategies.length;
+                  const isExpanded = expandedEnvs.has(env.environmentId);
 
-                return (
-                  <React.Fragment key={env.environmentId}>
-                    {envIndex > 0 && <Divider sx={{ borderStyle: 'dashed', my: 1 }} />}
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        border: 1,
-                        borderColor: 'divider',
-                        overflow: 'hidden',
-                        borderRadius: 1,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                      }}
-                    >
-                      {/* Color indicator bar */}
+                  return (
+                    <React.Fragment key={env.environmentId}>
+                      {envIndex > 0 && <Divider sx={{ borderStyle: 'dashed', my: 1 }} />}
                       <Box
                         sx={{
-                          width: 4,
-                          bgcolor: env.color || '#888',
-                          flexShrink: 0,
+                          display: 'flex',
+                          border: 1,
+                          borderColor: 'divider',
+                          overflow: 'hidden',
+                          borderRadius: 1,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         }}
-                      />
-                      {/* Content */}
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Accordion
-                          expanded={isExpanded}
-                          onChange={(_, expanded) => {
-                            setExpandedEnvs((prev) => {
-                              const next = new Set(prev);
-                              if (expanded) {
-                                next.add(env.environmentId);
-                              } else {
-                                next.delete(env.environmentId);
-                              }
-                              return next;
-                            });
-                          }}
-                          disableGutters
+                      >
+                        {/* Color indicator bar */}
+                        <Box
                           sx={{
-                            '&:before': { display: 'none' },
-                            bgcolor: 'background.paper',
+                            width: 4,
+                            bgcolor: env.color || '#888',
+                            flexShrink: 0,
                           }}
-                        >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
+                        />
+                        {/* Content */}
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Accordion
+                            expanded={isExpanded}
+                            onChange={(_, expanded) => {
+                              setExpandedEnvs((prev) => {
+                                const next = new Set(prev);
+                                if (expanded) {
+                                  next.add(env.environmentId);
+                                } else {
+                                  next.delete(env.environmentId);
+                                }
+                                return next;
+                              });
+                            }}
+                            disableGutters
                             sx={{
-                              px: 2,
-                              '& .MuiAccordionSummary-content': {
-                                alignItems: 'center',
-                                gap: 2,
-                              },
+                              '&:before': { display: 'none' },
+                              bgcolor: 'background.paper',
                             }}
                           >
-                            {/* Toggle switch */}
-                            <Tooltip
-                              title={isEnabled ? t('common.disable') : t('common.enable')}
-                              disableFocusListener
-                              enterDelay={500}
-                              leaveDelay={0}
-                            >
-                              <Box onClick={(e) => e.stopPropagation()}>
-                                <FeatureSwitch
-                                  size="small"
-                                  checked={isEnabled}
-                                  onChange={() => {
-                                    handleEnvToggle(env.environmentId, isEnabled);
-                                  }}
-                                  disabled={!canManage || flag.isArchived}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    (e.currentTarget as any).blur();
-                                  }}
-                                  color={env.color}
-                                />
-                              </Box>
-                            </Tooltip>
-
-                            {/* Environment info */}
-                            <Box sx={{ flex: 1 }}>
-                              <Typography variant="caption" color="text.secondary">
-                                {t('common.environment')}
-                              </Typography>
-                              <Box
-                                sx={{
-                                  display: 'flex',
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              sx={{
+                                px: 2,
+                                '& .MuiAccordionSummary-content': {
                                   alignItems: 'center',
-                                  gap: 1,
-                                }}
+                                  gap: 2,
+                                },
+                              }}
+                            >
+                              {/* Toggle switch */}
+                              <Tooltip
+                                title={isEnabled ? t('common.disable') : t('common.enable')}
+                                disableFocusListener
+                                enterDelay={500}
+                                leaveDelay={0}
                               >
-                                <Typography variant="subtitle1" fontWeight={600}>
-                                  {env.displayName}
-                                </Typography>
-                                {releaseFlowEnvs.has(env.environmentId) ? (
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 0.5,
-                                      px: 1,
-                                      py: 0.25,
-                                      bgcolor: 'action.hover',
-                                      borderRadius: '4px',
-                                      color: 'text.secondary',
-                                      mt: 0.5,
-                                      width: 'fit-content',
-                                      fontSize: '0.75rem',
+                                <Box onClick={(e) => e.stopPropagation()}>
+                                  <FeatureSwitch
+                                    size="small"
+                                    checked={isEnabled}
+                                    onChange={() => {
+                                      handleEnvToggle(env.environmentId, isEnabled);
                                     }}
-                                  >
-                                    <ReleaseFlowActiveIcon sx={{ fontSize: 13 }} />
-                                    {activeMilestoneByEnv[env.environmentId]
-                                      ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environmentId]}`
-                                      : t('releaseFlow.tabTitle')}
+                                    disabled={!canManage || flag.isArchived}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      (e.currentTarget as any).blur();
+                                    }}
+                                    color={env.color}
+                                  />
+                                </Box>
+                              </Tooltip>
+
+                              {/* Environment info */}
+                              <Box sx={{ flex: 1 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  {t('common.environment')}
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <Typography variant="subtitle1" fontWeight={600}>
+                                    {env.displayName}
                                   </Typography>
-                                ) : (
-                                  strategiesCount > 0 && (
+                                  {releaseFlowEnvs.has(env.environmentId) ? (
                                     <Typography
                                       variant="caption"
                                       sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.5,
                                         px: 1,
                                         py: 0.25,
                                         bgcolor: 'action.hover',
                                         borderRadius: '4px',
                                         color: 'text.secondary',
+                                        mt: 0.5,
+                                        width: 'fit-content',
+                                        fontSize: '0.75rem',
                                       }}
                                     >
-                                      {t('featureFlags.strategiesCount', {
-                                        count: strategiesCount,
-                                      })}
+                                      <ReleaseFlowActiveIcon sx={{ fontSize: 13 }} />
+                                      {activeMilestoneByEnv[env.environmentId]
+                                        ? `${t('releaseFlow.tabTitle')}: ${activeMilestoneByEnv[env.environmentId]}`
+                                        : t('releaseFlow.tabTitle')}
                                     </Typography>
-                                  )
-                                )}
+                                  ) : (
+                                    strategiesCount > 0 && (
+                                      <Typography
+                                        variant="caption"
+                                        sx={{
+                                          px: 1,
+                                          py: 0.25,
+                                          bgcolor: 'action.hover',
+                                          borderRadius: '4px',
+                                          color: 'text.secondary',
+                                        }}
+                                      >
+                                        {t('featureFlags.strategiesCount', {
+                                          count: strategiesCount,
+                                        })}
+                                      </Typography>
+                                    )
+                                  )}
+                                </Box>
                               </Box>
-                            </Box>
 
-                            {/* Metrics mini pie chart */}
-                            {(() => {
-                              const metrics = envMetrics[env.environmentId];
-                              // Only show chart if we have actual metrics data
-                              if (metrics && metrics.total > 0) {
-                                const yesPercent = Math.round(
-                                  (metrics.totalYes / metrics.total) * 100
-                                );
-                                const noPercent = 100 - yesPercent;
+                              {/* Metrics mini pie chart */}
+                              {(() => {
+                                const metrics = envMetrics[env.environmentId];
+                                // Only show chart if we have actual metrics data
+                                if (metrics && metrics.total > 0) {
+                                  const yesPercent = Math.round(
+                                    (metrics.totalYes / metrics.total) * 100
+                                  );
+                                  const noPercent = 100 - yesPercent;
 
-                                // SVG-based mini pie chart - filled style
-                                const radius = 24;
-                                const cx = 26;
-                                const cy = 26;
+                                  // SVG-based mini pie chart - filled style
+                                  const radius = 24;
+                                  const cx = 26;
+                                  const cy = 26;
 
-                                // Calculate arc path for pie chart
-                                const getArcPath = (
-                                  startAngle: number,
-                                  endAngle: number,
-                                  r: number
-                                ) => {
-                                  const startRad = ((startAngle - 90) * Math.PI) / 180;
-                                  const endRad = ((endAngle - 90) * Math.PI) / 180;
-                                  const x1 = cx + r * Math.cos(startRad);
-                                  const y1 = cy + r * Math.sin(startRad);
-                                  const x2 = cx + r * Math.cos(endRad);
-                                  const y2 = cy + r * Math.sin(endRad);
-                                  const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-                                  return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                                };
+                                  // Calculate arc path for pie chart
+                                  const getArcPath = (
+                                    startAngle: number,
+                                    endAngle: number,
+                                    r: number
+                                  ) => {
+                                    const startRad = ((startAngle - 90) * Math.PI) / 180;
+                                    const endRad = ((endAngle - 90) * Math.PI) / 180;
+                                    const x1 = cx + r * Math.cos(startRad);
+                                    const y1 = cy + r * Math.sin(startRad);
+                                    const x2 = cx + r * Math.cos(endRad);
+                                    const y2 = cy + r * Math.sin(endRad);
+                                    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+                                    return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                                  };
 
-                                const yesAngle = (yesPercent / 100) * 360;
+                                  const yesAngle = (yesPercent / 100) * 360;
 
+                                  return (
+                                    <Tooltip
+                                      title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
+                                      arrow
+                                    >
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                          mr: 1,
+                                        }}
+                                      >
+                                        <svg width="52" height="52" viewBox="0 0 52 52">
+                                          {/* No (red) - full circle background */}
+                                          <circle cx={cx} cy={cy} r={radius} fill="#ef5350" />
+                                          {/* Yes (green) - pie slice */}
+                                          {yesPercent > 0 && yesPercent < 100 && (
+                                            <path
+                                              d={getArcPath(0, yesAngle, radius)}
+                                              fill="#4caf50"
+                                            />
+                                          )}
+                                          {yesPercent >= 100 && (
+                                            <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />
+                                          )}
+                                          {/* Center text */}
+                                          <text
+                                            x={cx}
+                                            y={cy}
+                                            textAnchor="middle"
+                                            dominantBaseline="central"
+                                            fontSize="14"
+                                            fontWeight="bold"
+                                            fontFamily="system-ui, -apple-system, sans-serif"
+                                            fill="white"
+                                            style={{
+                                              textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                                            }}
+                                          >
+                                            {yesPercent}%
+                                          </text>
+                                        </svg>
+                                      </Box>
+                                    </Tooltip>
+                                  );
+                                }
                                 return (
-                                  <Tooltip
-                                    title={`${t('featureFlags.metrics.exposedTrue')}: ${metrics.totalYes} (${yesPercent}%) / ${t('featureFlags.metrics.exposedFalse')}: ${metrics.totalNo} (${noPercent}%)`}
-                                    arrow
-                                  >
+                                  <Tooltip title={t('featureFlags.noMetricsYetHint')} arrow>
                                     <Box
                                       sx={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 1,
                                         mr: 1,
                                       }}
                                     >
                                       <svg width="52" height="52" viewBox="0 0 52 52">
-                                        {/* No (red) - full circle background */}
-                                        <circle cx={cx} cy={cy} r={radius} fill="#ef5350" />
-                                        {/* Yes (green) - pie slice */}
-                                        {yesPercent > 0 && yesPercent < 100 && (
-                                          <path
-                                            d={getArcPath(0, yesAngle, radius)}
-                                            fill="#4caf50"
-                                          />
-                                        )}
-                                        {yesPercent >= 100 && (
-                                          <circle cx={cx} cy={cy} r={radius} fill="#4caf50" />
-                                        )}
-                                        {/* Center text */}
-                                        <text
-                                          x={cx}
-                                          y={cy}
-                                          textAnchor="middle"
-                                          dominantBaseline="central"
-                                          fontSize="14"
-                                          fontWeight="bold"
-                                          fontFamily="system-ui, -apple-system, sans-serif"
-                                          fill="white"
-                                          style={{
-                                            textShadow: '0 1px 2px rgba(0,0,0,0.8)',
-                                          }}
-                                        >
-                                          {yesPercent}%
-                                        </text>
+                                        {/* Donut ring for no metrics */}
+                                        <circle
+                                          cx={26}
+                                          cy={26}
+                                          r={20}
+                                          fill="none"
+                                          stroke={
+                                            theme.palette.mode === 'dark'
+                                              ? 'rgba(255,255,255,0.08)'
+                                              : 'rgba(0,0,0,0.06)'
+                                          }
+                                          strokeWidth={6}
+                                        />
                                       </svg>
                                     </Box>
                                   </Tooltip>
                                 );
-                              }
-                              return (
-                                <Tooltip title={t('featureFlags.noMetricsYetHint')} arrow>
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      mr: 1,
-                                    }}
-                                  >
-                                    <svg width="52" height="52" viewBox="0 0 52 52">
-                                      {/* Donut ring for no metrics */}
-                                      <circle
-                                        cx={26}
-                                        cy={26}
-                                        r={20}
-                                        fill="none"
-                                        stroke={
-                                          theme.palette.mode === 'dark'
-                                            ? 'rgba(255,255,255,0.08)'
-                                            : 'rgba(0,0,0,0.06)'
-                                        }
-                                        strokeWidth={6}
-                                      />
-                                    </svg>
-                                  </Box>
-                                </Tooltip>
-                              );
-                            })()}
-                          </AccordionSummary>
+                              })()}
+                            </AccordionSummary>
 
-                          <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
-                            {releaseFlowEnvs.has(env.environmentId) ? (
-                              <>
-                                <ReleaseFlowTab
-                                  flagId={flag.id}
-                                  flagName={flag.flagName}
-                                  environments={[
-                                    {
-                                      environmentId: env.environmentId,
-                                      displayName: env.displayName,
-                                    },
-                                  ]}
-                                  canManage={canManage}
-                                  envEnabled={isEnabled}
-                                  allSegments={segments}
-                                  contextFields={contextFields}
-                                  onPlanChange={() => mutateReleaseFlowPlans()}
-                                  onPlanDeleted={() => {
-                                    mutateReleaseFlowPlans();
-                                    const nextManual = new Set(envManualReleaseFlow);
-                                    nextManual.delete(env.environmentId);
-                                    setEnvManualReleaseFlow(nextManual);
-                                  }}
-                                />
-
-                                <Divider sx={{ my: 2 }} />
-
-                                <EnvironmentVariantsEditor
-                                  environmentId={env.environmentId}
-                                  variants={
-                                    (envVariants[env.environmentId] || []) as EditorVariant[]
-                                  }
-                                  valueType={flag.valueType || 'boolean'}
-                                  flagType={flag.flagType || 'release'}
-                                  enabledValue={flag.enabledValue}
-                                  disabledValue={flag.disabledValue}
-                                  envEnabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.enabledValue
-                                  }
-                                  envDisabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.disabledValue
-                                  }
-                                  overrideEnabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.overrideEnabledValue ?? false
-                                  }
-                                  overrideDisabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.overrideDisabledValue ?? false
-                                  }
-                                  canManage={canManage}
-                                  isArchived={flag.isArchived}
-                                  useFixedWeightVariants={flag.useFixedWeightVariants}
-                                  onUseFixedWeightVariantsChange={
-                                    handleUseFixedWeightVariantsChange
-                                  }
-                                  onSave={(variants) =>
-                                    handleSaveEnvVariants(env.environmentId, variants)
-                                  }
-                                  onSaveValues={(
-                                    enabledValue,
-                                    disabledValue,
-                                    overrideEnabled,
-                                    overrideDisabled
-                                  ) =>
-                                    handleSaveEnvFallbackValue(
-                                      env.environmentId,
-                                      enabledValue,
-                                      disabledValue,
-                                      overrideEnabled,
-                                      overrideDisabled
-                                    )
-                                  }
-                                  onGoToPayloadTab={() => setTabValue(1)}
-                                  defaultExpanded={env.environmentId === selectedEnvironment}
-                                />
-                              </>
-                            ) : strategies.length === 0 ? (
-                              <>
-                                <EmptyPlaceholder
-                                  message={t('featureFlags.noStrategiesTitle')}
-                                  description={t('featureFlags.noStrategiesDescription')}
-                                >
-                                  {canManage && (
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        gap: 2,
-                                        mt: 1.5,
-                                      }}
-                                    >
-                                      <Button
-                                        variant="contained"
-                                        size="small"
-                                        startIcon={<AddIcon />}
-                                        onClick={() => handleAddStrategy(env.environmentId)}
-                                      >
-                                        {t('featureFlags.addFirstStrategy')}
-                                      </Button>
-                                      <Button
-                                        variant="contained"
-                                        size="small"
-                                        startIcon={<ReleaseFlowActiveIcon sx={{ fontSize: 18 }} />}
-                                        onClick={() => {
-                                          setEnvManualReleaseFlow((prev) =>
-                                            new Set(prev).add(env.environmentId)
-                                          );
-                                        }}
-                                      >
-                                        {t('releaseFlow.tabTitle')}
-                                      </Button>
-                                    </Box>
-                                  )}
-                                </EmptyPlaceholder>
-
-                                {envManualReleaseFlow.has(env.environmentId) && (
+                            <AccordionDetails sx={{ px: 2, pt: 0, pb: 2 }}>
+                              {releaseFlowEnvs.has(env.environmentId) ? (
+                                <>
                                   <ReleaseFlowTab
                                     flagId={flag.id}
                                     flagName={flag.flagName}
@@ -2587,304 +2471,425 @@ const FeatureFlagDetailPage: React.FC = () => {
                                       },
                                     ]}
                                     canManage={canManage}
-                                    initialShowTemplates={true}
                                     envEnabled={isEnabled}
                                     allSegments={segments}
                                     contextFields={contextFields}
                                     onPlanChange={() => mutateReleaseFlowPlans()}
                                     onPlanDeleted={() => {
+                                      mutateReleaseFlowPlans();
                                       const nextManual = new Set(envManualReleaseFlow);
                                       nextManual.delete(env.environmentId);
                                       setEnvManualReleaseFlow(nextManual);
                                     }}
                                   />
-                                )}
 
-                                <Divider sx={{ my: 2 }} />
+                                  <Divider sx={{ my: 2 }} />
 
-                                <EnvironmentVariantsEditor
-                                  environmentId={env.environmentId}
-                                  variants={
-                                    (envVariants[env.environmentId] || []) as EditorVariant[]
-                                  }
-                                  valueType={flag.valueType || 'boolean'}
-                                  flagType={flag.flagType || 'release'}
-                                  enabledValue={flag.enabledValue}
-                                  disabledValue={flag.disabledValue}
-                                  envEnabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.enabledValue
-                                  }
-                                  envDisabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.disabledValue
-                                  }
-                                  overrideEnabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.overrideEnabledValue ?? false
-                                  }
-                                  overrideDisabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.overrideDisabledValue ?? false
-                                  }
-                                  canManage={canManage}
-                                  isArchived={flag.isArchived}
-                                  useFixedWeightVariants={flag.useFixedWeightVariants}
-                                  onUseFixedWeightVariantsChange={
-                                    handleUseFixedWeightVariantsChange
-                                  }
-                                  onSave={(variants) =>
-                                    handleSaveEnvVariants(env.environmentId, variants)
-                                  }
-                                  onSaveValues={(
-                                    enabledValue,
-                                    disabledValue,
-                                    overrideEnabled,
-                                    overrideDisabled
-                                  ) =>
-                                    handleSaveEnvFallbackValue(
-                                      env.environmentId,
+                                  <EnvironmentVariantsEditor
+                                    environmentId={env.environmentId}
+                                    variants={
+                                      (envVariants[env.environmentId] || []) as EditorVariant[]
+                                    }
+                                    valueType={flag.valueType || 'boolean'}
+                                    flagType={flag.flagType || 'release'}
+                                    enabledValue={flag.enabledValue}
+                                    disabledValue={flag.disabledValue}
+                                    envEnabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.enabledValue
+                                    }
+                                    envDisabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.disabledValue
+                                    }
+                                    overrideEnabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.overrideEnabledValue ?? false
+                                    }
+                                    overrideDisabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.overrideDisabledValue ?? false
+                                    }
+                                    canManage={canManage}
+                                    isArchived={flag.isArchived}
+                                    useFixedWeightVariants={flag.useFixedWeightVariants}
+                                    onUseFixedWeightVariantsChange={
+                                      handleUseFixedWeightVariantsChange
+                                    }
+                                    onSave={(variants) =>
+                                      handleSaveEnvVariants(env.environmentId, variants)
+                                    }
+                                    onSaveValues={(
                                       enabledValue,
                                       disabledValue,
                                       overrideEnabled,
                                       overrideDisabled
-                                    )
-                                  }
-                                  onGoToPayloadTab={() => setTabValue(1)}
-                                  defaultExpanded={env.environmentId === selectedEnvironment}
-                                />
-                              </>
-                            ) : (
-                              <>
-                                <DndContext
-                                  sensors={sensors}
-                                  collisionDetection={closestCenter}
-                                  onDragEnd={(event: DragEndEvent) => {
-                                    const { active, over } = event;
-                                    if (over && active.id !== over.id) {
-                                      const oldIndex = strategies.findIndex(
-                                        (s) => s.id === active.id
-                                      );
-                                      const newIndex = strategies.findIndex(
-                                        (s) => s.id === over.id
-                                      );
-                                      handleReorderStrategies(
+                                    ) =>
+                                      handleSaveEnvFallbackValue(
                                         env.environmentId,
-                                        oldIndex,
-                                        newIndex
-                                      );
+                                        enabledValue,
+                                        disabledValue,
+                                        overrideEnabled,
+                                        overrideDisabled
+                                      )
                                     }
-                                  }}
-                                >
-                                  <SortableContext
-                                    items={strategies.map((s) => s.id)}
-                                    strategy={verticalListSortingStrategy}
+                                    onGoToPayloadTab={() => setTabValue(1)}
+                                    defaultExpanded={env.environmentId === selectedEnvironment}
+                                  />
+                                </>
+                              ) : strategies.length === 0 ? (
+                                <>
+                                  <EmptyPlaceholder
+                                    message={t('featureFlags.noStrategiesTitle')}
+                                    description={t('featureFlags.noStrategiesDescription')}
                                   >
-                                    <Stack spacing={2}>
-                                      {strategies.map((strategy, index) => (
-                                        <React.Fragment key={strategy.id || index}>
-                                          {/* OR divider */}
-                                          {index > 0 && (
-                                            <Box
-                                              sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 1,
-                                              }}
-                                            >
-                                              <Divider sx={{ flexGrow: 1 }} />
-                                              <Chip
-                                                label="OR"
-                                                size="small"
-                                                variant="outlined"
-                                                color="secondary"
-                                                sx={{
-                                                  fontWeight: 600,
-                                                  fontSize: '0.7rem',
-                                                }}
-                                              />
-                                              <Divider sx={{ flexGrow: 1 }} />
-                                            </Box>
-                                          )}
+                                    {canManage && (
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          gap: 2,
+                                          mt: 1.5,
+                                        }}
+                                      >
+                                        <Button
+                                          variant="contained"
+                                          size="small"
+                                          startIcon={<AddIcon />}
+                                          onClick={() => handleAddStrategy(env.environmentId)}
+                                        >
+                                          {t('featureFlags.addFirstStrategy')}
+                                        </Button>
+                                        <Button
+                                          variant="contained"
+                                          size="small"
+                                          startIcon={<ReleaseFlowActiveIcon sx={{ fontSize: 18 }} />}
+                                          onClick={() => {
+                                            setEnvManualReleaseFlow((prev) =>
+                                              new Set(prev).add(env.environmentId)
+                                            );
+                                          }}
+                                        >
+                                          {t('releaseFlow.tabTitle')}
+                                        </Button>
+                                      </Box>
+                                    )}
+                                  </EmptyPlaceholder>
 
-                                          {/* Strategy card wrapped with sortable */}
-                                          <SortableStrategyItem
-                                            id={strategy.id}
-                                            isDraggable={strategies.length > 1}
-                                          >
-                                            {({ dragHandleProps }) => (
-                                              <StrategyCardReadonly
-                                                strategy={{
-                                                  strategyName: strategy.name,
-                                                  title: strategy.title,
-                                                  parameters: strategy.parameters,
-                                                  constraints: strategy.constraints,
-                                                  segments: strategy.segments,
-                                                  disabled: strategy.disabled,
-                                                }}
-                                                allSegments={segments}
-                                                contextFields={contextFields}
-                                                headerPrefix={
-                                                  dragHandleProps ? (
-                                                    <Box
-                                                      {...dragHandleProps}
-                                                      sx={{
-                                                        color: 'text.disabled',
-                                                        cursor: 'grab',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        '&:active': {
-                                                          cursor: 'grabbing',
-                                                        },
-                                                      }}
-                                                    >
-                                                      <DragIcon fontSize="small" />
-                                                    </Box>
-                                                  ) : undefined
-                                                }
-                                                headerActions={
-                                                  canManage ? (
-                                                    <Box
-                                                      sx={{
-                                                        display: 'flex',
-                                                        gap: 0,
-                                                      }}
-                                                    >
-                                                      <Tooltip title={t('common.edit')}>
-                                                        <IconButton
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleEditStrategy(
-                                                              strategy,
-                                                              env.environmentId
-                                                            )
-                                                          }
-                                                        >
-                                                          <EditIcon fontSize="small" />
-                                                        </IconButton>
-                                                      </Tooltip>
-                                                      <Tooltip title={t('common.delete')}>
-                                                        <IconButton
-                                                          size="small"
-                                                          onClick={() =>
-                                                            handleOpenDeleteStrategyConfirm(
-                                                              strategy.id,
-                                                              index,
-                                                              env.environmentId
-                                                            )
-                                                          }
-                                                        >
-                                                          <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                      </Tooltip>
-                                                    </Box>
-                                                  ) : undefined
-                                                }
-                                                collapsible
-                                                defaultCollapsed
-                                              />
-                                            )}
-                                          </SortableStrategyItem>
-                                        </React.Fragment>
-                                      ))}
-                                    </Stack>
-                                  </SortableContext>
-                                </DndContext>
+                                  {envManualReleaseFlow.has(env.environmentId) && (
+                                    <ReleaseFlowTab
+                                      flagId={flag.id}
+                                      flagName={flag.flagName}
+                                      environments={[
+                                        {
+                                          environmentId: env.environmentId,
+                                          displayName: env.displayName,
+                                        },
+                                      ]}
+                                      canManage={canManage}
+                                      initialShowTemplates={true}
+                                      envEnabled={isEnabled}
+                                      allSegments={segments}
+                                      contextFields={contextFields}
+                                      onPlanChange={() => mutateReleaseFlowPlans()}
+                                      onPlanDeleted={() => {
+                                        const nextManual = new Set(envManualReleaseFlow);
+                                        nextManual.delete(env.environmentId);
+                                        setEnvManualReleaseFlow(nextManual);
+                                      }}
+                                    />
+                                  )}
 
-                                {/* Add strategy button */}
-                                {canManage && (
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      justifyContent: 'flex-end',
-                                      gap: 1,
-                                      mt: 2,
+                                  <Divider sx={{ my: 2 }} />
+
+                                  <EnvironmentVariantsEditor
+                                    environmentId={env.environmentId}
+                                    variants={
+                                      (envVariants[env.environmentId] || []) as EditorVariant[]
+                                    }
+                                    valueType={flag.valueType || 'boolean'}
+                                    flagType={flag.flagType || 'release'}
+                                    enabledValue={flag.enabledValue}
+                                    disabledValue={flag.disabledValue}
+                                    envEnabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.enabledValue
+                                    }
+                                    envDisabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.disabledValue
+                                    }
+                                    overrideEnabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.overrideEnabledValue ?? false
+                                    }
+                                    overrideDisabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.overrideDisabledValue ?? false
+                                    }
+                                    canManage={canManage}
+                                    isArchived={flag.isArchived}
+                                    useFixedWeightVariants={flag.useFixedWeightVariants}
+                                    onUseFixedWeightVariantsChange={
+                                      handleUseFixedWeightVariantsChange
+                                    }
+                                    onSave={(variants) =>
+                                      handleSaveEnvVariants(env.environmentId, variants)
+                                    }
+                                    onSaveValues={(
+                                      enabledValue,
+                                      disabledValue,
+                                      overrideEnabled,
+                                      overrideDisabled
+                                    ) =>
+                                      handleSaveEnvFallbackValue(
+                                        env.environmentId,
+                                        enabledValue,
+                                        disabledValue,
+                                        overrideEnabled,
+                                        overrideDisabled
+                                      )
+                                    }
+                                    onGoToPayloadTab={() => setTabValue(1)}
+                                    defaultExpanded={env.environmentId === selectedEnvironment}
+                                  />
+                                </>
+                              ) : (
+                                <>
+                                  <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={(event: DragEndEvent) => {
+                                      const { active, over } = event;
+                                      if (over && active.id !== over.id) {
+                                        const oldIndex = strategies.findIndex(
+                                          (s) => s.id === active.id
+                                        );
+                                        const newIndex = strategies.findIndex(
+                                          (s) => s.id === over.id
+                                        );
+                                        handleReorderStrategies(
+                                          env.environmentId,
+                                          oldIndex,
+                                          newIndex
+                                        );
+                                      }
                                     }}
                                   >
-                                    <Button
-                                      variant="contained"
-                                      startIcon={<AddIcon />}
-                                      onClick={() => handleAddStrategy(env.environmentId)}
-                                      size="small"
+                                    <SortableContext
+                                      items={strategies.map((s) => s.id)}
+                                      strategy={verticalListSortingStrategy}
                                     >
-                                      {t('featureFlags.addStrategy')}
-                                    </Button>
-                                  </Box>
-                                )}
+                                      <Stack spacing={2}>
+                                        {strategies.map((strategy, index) => (
+                                          <React.Fragment key={strategy.id || index}>
+                                            {/* OR divider */}
+                                            {index > 0 && (
+                                              <Box
+                                                sx={{
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  gap: 1,
+                                                }}
+                                              >
+                                                <Divider sx={{ flexGrow: 1 }} />
+                                                <Chip
+                                                  label="OR"
+                                                  size="small"
+                                                  variant="outlined"
+                                                  color="secondary"
+                                                  sx={{
+                                                    fontWeight: 600,
+                                                    fontSize: '0.7rem',
+                                                  }}
+                                                />
+                                                <Divider sx={{ flexGrow: 1 }} />
+                                              </Box>
+                                            )}
 
-                                {/* Divider between strategies and variants */}
-                                <Divider sx={{ my: 2 }} />
+                                            {/* Strategy card wrapped with sortable */}
+                                            <SortableStrategyItem
+                                              id={strategy.id}
+                                              isDraggable={strategies.length > 1}
+                                            >
+                                              {({ dragHandleProps }) => (
+                                                <StrategyCardReadonly
+                                                  strategy={{
+                                                    strategyName: strategy.name,
+                                                    title: strategy.title,
+                                                    parameters: strategy.parameters,
+                                                    constraints: strategy.constraints,
+                                                    segments: strategy.segments,
+                                                    disabled: strategy.disabled,
+                                                  }}
+                                                  allSegments={segments}
+                                                  contextFields={contextFields}
+                                                  headerPrefix={
+                                                    dragHandleProps ? (
+                                                      <Box
+                                                        {...dragHandleProps}
+                                                        sx={{
+                                                          color: 'text.disabled',
+                                                          cursor: 'grab',
+                                                          display: 'flex',
+                                                          alignItems: 'center',
+                                                          '&:active': {
+                                                            cursor: 'grabbing',
+                                                          },
+                                                        }}
+                                                      >
+                                                        <DragIcon fontSize="small" />
+                                                      </Box>
+                                                    ) : undefined
+                                                  }
+                                                  headerActions={
+                                                    canManage ? (
+                                                      <Box
+                                                        sx={{
+                                                          display: 'flex',
+                                                          gap: 0,
+                                                        }}
+                                                      >
+                                                        <Tooltip title={t('common.edit')}>
+                                                          <IconButton
+                                                            size="small"
+                                                            onClick={() =>
+                                                              handleEditStrategy(
+                                                                strategy,
+                                                                env.environmentId
+                                                              )
+                                                            }
+                                                          >
+                                                            <EditIcon fontSize="small" />
+                                                          </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title={t('common.delete')}>
+                                                          <IconButton
+                                                            size="small"
+                                                            onClick={() =>
+                                                              handleOpenDeleteStrategyConfirm(
+                                                                strategy.id,
+                                                                index,
+                                                                env.environmentId
+                                                              )
+                                                            }
+                                                          >
+                                                            <DeleteIcon fontSize="small" />
+                                                          </IconButton>
+                                                        </Tooltip>
+                                                      </Box>
+                                                    ) : undefined
+                                                  }
+                                                  collapsible
+                                                  defaultCollapsed
+                                                />
+                                              )}
+                                            </SortableStrategyItem>
+                                          </React.Fragment>
+                                        ))}
+                                      </Stack>
+                                    </SortableContext>
+                                  </DndContext>
 
-                                {/* Environment-specific Variants Editor */}
-                                <EnvironmentVariantsEditor
-                                  environmentId={env.environmentId}
-                                  variants={
-                                    (envVariants[env.environmentId] || []) as EditorVariant[]
-                                  }
-                                  valueType={flag.valueType || 'boolean'}
-                                  flagType={flag.flagType || 'release'}
-                                  enabledValue={flag.enabledValue}
-                                  disabledValue={flag.disabledValue}
-                                  envEnabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.enabledValue
-                                  }
-                                  envDisabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.disabledValue
-                                  }
-                                  overrideEnabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.overrideEnabledValue ?? false
-                                  }
-                                  overrideDisabledValue={
-                                    flag.environments?.find(
-                                      (e) => e.environmentId === env.environmentId
-                                    )?.overrideDisabledValue ?? false
-                                  }
-                                  canManage={canManage}
-                                  isArchived={flag.isArchived}
-                                  useFixedWeightVariants={flag.useFixedWeightVariants}
-                                  onUseFixedWeightVariantsChange={
-                                    handleUseFixedWeightVariantsChange
-                                  }
-                                  onSave={(variants) =>
-                                    handleSaveEnvVariants(env.environmentId, variants)
-                                  }
-                                  onSaveValues={(
-                                    enabledValue,
-                                    disabledValue,
-                                    overrideEnabled,
-                                    overrideDisabled
-                                  ) =>
-                                    handleSaveEnvFallbackValue(
-                                      env.environmentId,
+                                  {/* Add strategy button */}
+                                  {canManage && (
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        justifyContent: 'flex-end',
+                                        gap: 1,
+                                        mt: 2,
+                                      }}
+                                    >
+                                      <Button
+                                        variant="contained"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => handleAddStrategy(env.environmentId)}
+                                        size="small"
+                                      >
+                                        {t('featureFlags.addStrategy')}
+                                      </Button>
+                                    </Box>
+                                  )}
+
+                                  {/* Divider between strategies and variants */}
+                                  <Divider sx={{ my: 2 }} />
+
+                                  {/* Environment-specific Variants Editor */}
+                                  <EnvironmentVariantsEditor
+                                    environmentId={env.environmentId}
+                                    variants={
+                                      (envVariants[env.environmentId] || []) as EditorVariant[]
+                                    }
+                                    valueType={flag.valueType || 'boolean'}
+                                    flagType={flag.flagType || 'release'}
+                                    enabledValue={flag.enabledValue}
+                                    disabledValue={flag.disabledValue}
+                                    envEnabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.enabledValue
+                                    }
+                                    envDisabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.disabledValue
+                                    }
+                                    overrideEnabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.overrideEnabledValue ?? false
+                                    }
+                                    overrideDisabledValue={
+                                      flag.environments?.find(
+                                        (e) => e.environmentId === env.environmentId
+                                      )?.overrideDisabledValue ?? false
+                                    }
+                                    canManage={canManage}
+                                    isArchived={flag.isArchived}
+                                    useFixedWeightVariants={flag.useFixedWeightVariants}
+                                    onUseFixedWeightVariantsChange={
+                                      handleUseFixedWeightVariantsChange
+                                    }
+                                    onSave={(variants) =>
+                                      handleSaveEnvVariants(env.environmentId, variants)
+                                    }
+                                    onSaveValues={(
                                       enabledValue,
                                       disabledValue,
                                       overrideEnabled,
                                       overrideDisabled
-                                    )
-                                  }
-                                  onGoToPayloadTab={() => setTabValue(1)}
-                                  defaultExpanded={env.environmentId === selectedEnvironment}
-                                />
-                              </>
-                            )}
-                          </AccordionDetails>
-                        </Accordion>
+                                    ) =>
+                                      handleSaveEnvFallbackValue(
+                                        env.environmentId,
+                                        enabledValue,
+                                        disabledValue,
+                                        overrideEnabled,
+                                        overrideDisabled
+                                      )
+                                    }
+                                    onGoToPayloadTab={() => setTabValue(1)}
+                                    defaultExpanded={env.environmentId === selectedEnvironment}
+                                  />
+                                </>
+                              )}
+                            </AccordionDetails>
+                          </Accordion>
+                        </Box>
                       </Box>
-                    </Box>
-                  </React.Fragment>
-                );
-              })}
-            </Stack>
+                    </React.Fragment>
+                  );
+                })}
+              </Stack>
+            </PageContentLoader>
           </Box>
 
           {/* Right Playground Panel - inline embedded playground */}
@@ -3105,11 +3110,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                       setFlag((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              enabledValue: originalFlag.enabledValue,
-                              disabledValue: originalFlag.disabledValue,
-                              validationRules: originalFlag.validationRules,
-                            }
+                            ...prev,
+                            enabledValue: originalFlag.enabledValue,
+                            disabledValue: originalFlag.disabledValue,
+                            validationRules: originalFlag.validationRules,
+                          }
                           : prev
                       );
                     }
@@ -3119,9 +3124,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(originalFlag?.disabledValue) &&
                       JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {t('common.cancel')}
@@ -3141,11 +3146,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                       setOriginalFlag((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              enabledValue: flag.enabledValue,
-                              disabledValue: flag.disabledValue,
-                              validationRules: flag.validationRules,
-                            }
+                            ...prev,
+                            enabledValue: flag.enabledValue,
+                            disabledValue: flag.disabledValue,
+                            validationRules: flag.validationRules,
+                          }
                           : prev
                       );
                       enqueueSnackbar(t('common.saveSuccess'), {
@@ -3167,9 +3172,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                     (JSON.stringify(flag.enabledValue) ===
                       JSON.stringify(originalFlag?.enabledValue) &&
                       JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
+                      JSON.stringify(originalFlag?.disabledValue) &&
                       JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
+                      JSON.stringify(originalFlag?.validationRules))
                   }
                 >
                   {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -3440,7 +3445,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                     editingFlagData?.description === (flag?.description || '') &&
                     editingFlagData?.impressionDataEnabled === flag?.impressionDataEnabled &&
                     JSON.stringify(editingFlagData?.tags || []) ===
-                      JSON.stringify(flag?.tags || []))
+                    JSON.stringify(flag?.tags || []))
                 }
               >
                 {saving ? <CircularProgress size={20} /> : t('common.save')}
@@ -3479,16 +3484,16 @@ const FeatureFlagDetailPage: React.FC = () => {
                       {(editingStrategy.segments?.length || 0) +
                         (editingStrategy.constraints?.length || 0) >
                         0 && (
-                        <Chip
-                          label={
-                            (editingStrategy.segments?.length || 0) +
-                            (editingStrategy.constraints?.length || 0)
-                          }
-                          size="small"
-                          color="primary"
-                          sx={{ height: 20, fontSize: '0.75rem' }}
-                        />
-                      )}
+                          <Chip
+                            label={
+                              (editingStrategy.segments?.length || 0) +
+                              (editingStrategy.constraints?.length || 0)
+                            }
+                            size="small"
+                            color="primary"
+                            sx={{ height: 20, fontSize: '0.75rem' }}
+                          />
+                        )}
                     </Box>
                   }
                 />
@@ -3572,148 +3577,148 @@ const FeatureFlagDetailPage: React.FC = () => {
                   {/* Rollout % for flexible rollout */}
                   {(editingStrategy.name === 'flexibleRollout' ||
                     editingStrategy.name?.includes('Rollout')) && (
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Typography
-                        variant="subtitle2"
-                        gutterBottom
-                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                      >
-                        {t('featureFlags.rollout')}
-                        <Tooltip title={t('featureFlags.rolloutTooltip')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ px: 2, pt: 3 }}>
-                        <Slider
-                          value={editingStrategy.parameters?.rollout ?? 100}
-                          onChange={(_, value) =>
-                            setEditingStrategy({
-                              ...editingStrategy,
-                              parameters: {
-                                ...editingStrategy.parameters,
-                                rollout: value as number,
-                              },
-                            })
-                          }
-                          valueLabelDisplay="on"
-                          min={0}
-                          max={100}
-                          marks={[
-                            { value: 0, label: '0%' },
-                            { value: 25, label: '25%' },
-                            { value: 50, label: '50%' },
-                            { value: 75, label: '75%' },
-                            { value: 100, label: '100%' },
-                          ]}
-                        />
-                      </Box>
+                      <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Typography
+                          variant="subtitle2"
+                          gutterBottom
+                          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                        >
+                          {t('featureFlags.rollout')}
+                          <Tooltip title={t('featureFlags.rolloutTooltip')}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ px: 2, pt: 3 }}>
+                          <Slider
+                            value={editingStrategy.parameters?.rollout ?? 100}
+                            onChange={(_, value) =>
+                              setEditingStrategy({
+                                ...editingStrategy,
+                                parameters: {
+                                  ...editingStrategy.parameters,
+                                  rollout: value as number,
+                                },
+                              })
+                            }
+                            valueLabelDisplay="on"
+                            min={0}
+                            max={100}
+                            marks={[
+                              { value: 0, label: '0%' },
+                              { value: 25, label: '25%' },
+                              { value: 50, label: '50%' },
+                              { value: 75, label: '75%' },
+                              { value: 100, label: '100%' },
+                            ]}
+                          />
+                        </Box>
 
-                      {/* Stickiness & GroupId */}
-                      <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid size={{ xs: 6 }}>
-                          <FormControl fullWidth size="small">
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
-                            >
-                              {t('featureFlags.stickiness')}
-                              <Tooltip title={t('featureFlags.stickinessHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <Select
-                              value={editingStrategy.parameters?.stickiness || 'default'}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    stickiness: e.target.value,
-                                  },
-                                })
-                              }
-                            >
-                              <MenuItem value="default">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessDefault')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessDefaultDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="userId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessUserId')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessUserIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="sessionId">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessSessionId')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessSessionIdDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                              <MenuItem value="random">
-                                <Box>
-                                  <Typography variant="body2">
-                                    {t('featureFlags.stickinessRandom')}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t('featureFlags.stickinessRandomDesc')}
-                                  </Typography>
-                                </Box>
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
+                        {/* Stickiness & GroupId */}
+                        <Grid container spacing={2} sx={{ mt: 2 }}>
+                          <Grid size={{ xs: 6 }}>
+                            <FormControl fullWidth size="small">
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              >
+                                {t('featureFlags.stickiness')}
+                                <Tooltip title={t('featureFlags.stickinessHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <Select
+                                value={editingStrategy.parameters?.stickiness || 'default'}
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      stickiness: e.target.value,
+                                    },
+                                  })
+                                }
+                              >
+                                <MenuItem value="default">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessDefault')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessDefaultDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="userId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessUserId')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessUserIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="sessionId">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessSessionId')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessSessionIdDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                                <MenuItem value="random">
+                                  <Box>
+                                    <Typography variant="body2">
+                                      {t('featureFlags.stickinessRandom')}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('featureFlags.stickinessRandomDesc')}
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid size={{ xs: 6 }}>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
+                              >
+                                {t('featureFlags.groupId')}
+                                <Tooltip title={t('featureFlags.groupIdHelp')}>
+                                  <HelpOutlineIcon
+                                    fontSize="small"
+                                    color="action"
+                                    sx={{ cursor: 'pointer' }}
+                                  />
+                                </Tooltip>
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
+                                onChange={(e) =>
+                                  setEditingStrategy({
+                                    ...editingStrategy,
+                                    parameters: {
+                                      ...editingStrategy.parameters,
+                                      groupId: e.target.value,
+                                    },
+                                  })
+                                }
+                              />
+                            </Box>
+                          </Grid>
                         </Grid>
-                        <Grid size={{ xs: 6 }}>
-                          <Box>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}
-                            >
-                              {t('featureFlags.groupId')}
-                              <Tooltip title={t('featureFlags.groupIdHelp')}>
-                                <HelpOutlineIcon
-                                  fontSize="small"
-                                  color="action"
-                                  sx={{ cursor: 'pointer' }}
-                                />
-                              </Tooltip>
-                            </Typography>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              value={editingStrategy.parameters?.groupId || flag?.flagName || ''}
-                              onChange={(e) =>
-                                setEditingStrategy({
-                                  ...editingStrategy,
-                                  parameters: {
-                                    ...editingStrategy.parameters,
-                                    groupId: e.target.value,
-                                  },
-                                })
-                              }
-                            />
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Paper>
-                  )}
+                      </Paper>
+                    )}
 
                   {/* User IDs input for userWithId strategy */}
                   {editingStrategy.name === 'userWithId' && (

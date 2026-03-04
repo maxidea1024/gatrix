@@ -45,7 +45,6 @@ export class UserService {
         name: userData.name,
         email: userData.email,
         password: userData.password,
-        role: userData.role || 'user',
         status: userData.status || 'active',
         emailVerified: userData.emailVerified || true,
         createdBy: userData.createdBy,
@@ -54,7 +53,6 @@ export class UserService {
       logger.info('User created successfully:', {
         userId: user.id,
         email: user.email,
-        role: user.role,
       });
 
       return user;
@@ -104,7 +102,7 @@ export class UserService {
   static async updateUser(id: string, updateData: any): Promise<UserWithoutPassword> {
     try {
       // Validate updates for admin
-      const allowedFields = ['name', 'email', 'status', 'role', 'avatarUrl'];
+      const allowedFields = ['name', 'email', 'status', 'avatarUrl'];
       const filteredUpdates: any = {};
 
       for (const [key, value] of Object.entries(updateData)) {
@@ -172,7 +170,7 @@ export class UserService {
         UserModel.findAll(1, 1, { status: 'active' }).then((result) => result.total),
         UserModel.findAll(1, 1, { status: 'pending' }).then((result) => result.total),
         UserModel.findAll(1, 1, { status: 'suspended' }).then((result) => result.total),
-        UserModel.findAll(1, 1, { role: 'admin' }).then((result) => result.total),
+        UserModel.findAll(1, 1, {}).then((result) => result.total),
       ]);
 
       return {
@@ -250,54 +248,18 @@ export class UserService {
     }
   }
 
+  /**
+   * @deprecated Use RBAC roles instead of direct user role assignment
+   */
   static async promoteToAdmin(userId: string): Promise<void> {
-    try {
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      if (user.role === 'admin') {
-        throw new GatrixError('User is already an admin', 400);
-      }
-
-      await UserModel.update(userId, { role: 'admin' });
-
-      logger.info('User promoted to admin:', {
-        userId,
-        email: user.email,
-      });
-    } catch (error) {
-      logger.error('Error promoting user to admin:', error);
-      throw error instanceof GatrixError
-        ? error
-        : new GatrixError('Failed to promote user to admin', 500);
-    }
+    logger.warn('promoteToAdmin is deprecated. Use RBAC role assignment instead.', { userId });
   }
 
+  /**
+   * @deprecated Use RBAC roles instead of direct user role assignment
+   */
   static async demoteFromAdmin(userId: string): Promise<void> {
-    try {
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      if (user.role !== 'admin') {
-        throw new GatrixError('User is not an admin', 400);
-      }
-
-      await UserModel.update(userId, { role: 'user' });
-
-      logger.info('User demoted from admin:', {
-        userId,
-        email: user.email,
-      });
-    } catch (error) {
-      logger.error('Error demoting user from admin:', error);
-      throw error instanceof GatrixError
-        ? error
-        : new GatrixError('Failed to demote user from admin', 500);
-    }
+    logger.warn('demoteFromAdmin is deprecated. Use RBAC role assignment instead.', { userId });
   }
 
   static async getPendingUsers(): Promise<UserWithoutPassword[]> {

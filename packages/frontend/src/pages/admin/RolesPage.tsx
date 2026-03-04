@@ -31,6 +31,7 @@ import {
   Select,
   MenuItem,
   Switch,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -104,14 +105,15 @@ const PermissionEditor: React.FC<PermissionEditorProps> = ({
     }
   };
 
+  const selectedCount = permissions.org.filter((p) => availablePermissions.includes(p)).length;
   const allSelected = availablePermissions.every((p) => permissions.org.includes(p));
-  const someSelected = permissions.org.length > 0 && !allSelected;
+  const someSelected = selectedCount > 0 && !allSelected;
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography variant="subtitle2" color="text.secondary">
-          {t('rbac.orgPermissions')} ({permissions.org.length}/{availablePermissions.length})
+          {t('rbac.orgPermissions')} ({selectedCount}/{availablePermissions.length})
         </Typography>
         <FormControlLabel
           control={
@@ -744,10 +746,10 @@ const RolesPage: React.FC = () => {
   // Filtered roles
   const filteredRoles = debouncedSearchTerm
     ? roles.filter(
-        (r) =>
-          r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-          (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      )
+      (r) =>
+        r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    )
     : roles;
 
   // Dialog handlers
@@ -771,6 +773,15 @@ const RolesPage: React.FC = () => {
       setInitialPermissions(details.permissions);
       setSelectedRole(details);
       setDialogOpen(true);
+
+      // Preload environments for all projects so assigned env names are visible
+      if (details.permissions.env.length > 0 && projects.length > 0) {
+        for (const project of projects) {
+          if (!environments[project.id]) {
+            loadEnvironmentsForProject(project.id);
+          }
+        }
+      }
     } catch (error) {
       console.error('Failed to load role details:', error);
       enqueueSnackbar(t('rbac.roles.loadFailed'), { variant: 'error' });
@@ -1002,6 +1013,12 @@ const RolesPage: React.FC = () => {
         <Box
           sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
         >
+          <Typography variant="body2" color="text.secondary" sx={{ mt: -1 }}>
+            {dialogMode === 'create'
+              ? t('rbac.roles.createDescription')
+              : t('rbac.roles.editDescription')}
+          </Typography>
+
           <TextField
             label={t('rbac.roles.name')}
             value={formData.roleName}
@@ -1010,6 +1027,7 @@ const RolesPage: React.FC = () => {
             fullWidth
             autoFocus
             size="small"
+            helperText={t('rbac.roles.nameHelp')}
           />
           <TextField
             label={t('rbac.roles.descriptionColumn')}
@@ -1023,6 +1041,7 @@ const RolesPage: React.FC = () => {
 
           {availablePermissions.length > 0 && (
             <Box>
+              <Divider sx={{ mb: 1 }} />
               <Tabs
                 value={permTabIndex}
                 onChange={(_, v) => setPermTabIndex(v)}
