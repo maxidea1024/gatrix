@@ -350,6 +350,15 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      MuiTableBody: {
+        styleOverrides: {
+          root: {
+            '& .MuiTableRow-root:nth-of-type(odd)': {
+              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+            },
+          },
+        },
+      },
       MuiPopover: {
         defaultProps: {
           disableScrollLock: true,
