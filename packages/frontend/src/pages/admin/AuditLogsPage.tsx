@@ -89,8 +89,7 @@ import DynamicFilterBar, {
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { InputAdornment } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+import SearchTextField from '@/components/common/SearchTextField';
 
 // Column definition interface
 interface ColumnConfig {
@@ -657,52 +656,12 @@ const AuditLogsPage: React.FC = () => {
             />
 
             {/* Search */}
-            <TextField
+            <SearchTextField
               placeholder={t('auditLogs.searchUserPlaceholder')}
-              size="small"
-              sx={{
-                minWidth: 200,
-                flexGrow: 1,
-                maxWidth: 320,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    },
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    },
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                },
-              }}
               value={userFilter}
-              onChange={(e) => {
-                const value = e.target.value;
+              onChange={(value) => {
                 setUserFilter(value);
                 handleFilterChange('user', value);
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
               }}
             />
 
@@ -838,19 +797,19 @@ const AuditLogsPage: React.FC = () => {
                                   {((log as any).resourceType ||
                                     (log as any).resource_type ||
                                     (log as any).entityType) && (
-                                    <Chip
-                                      label={String(
-                                        t(
-                                          `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
-                                          (log as any).resourceType ||
+                                      <Chip
+                                        label={String(
+                                          t(
+                                            `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
+                                            (log as any).resourceType ||
                                             (log as any).resource_type ||
                                             (log as any).entityType
-                                        )
-                                      )}
-                                      variant="outlined"
-                                      size="small"
-                                    />
-                                  )}
+                                          )
+                                        )}
+                                        variant="outlined"
+                                        size="small"
+                                      />
+                                    )}
                                 </Box>
 
                                 {/* Detail Fields in OpenSearch Discovery Style */}
@@ -933,69 +892,69 @@ const AuditLogsPage: React.FC = () => {
                                   {((log as any).resourceId ||
                                     (log as any).resource_id ||
                                     (log as any).entityId) && (
-                                    <>
-                                      <Box>
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                          sx={{
-                                            fontWeight: 600,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: 0.5,
-                                          }}
-                                        >
-                                          {t('auditLogs.resource')}
-                                        </Typography>
-                                        <Box sx={{ mt: 0.5 }}>
-                                          {(() => {
-                                            const oldVals =
-                                              (log as any).oldValues || (log as any).old_values;
-                                            const newVals =
-                                              (log as any).newValues || (log as any).new_values;
-                                            const resourceName =
-                                              oldVals?.name ||
-                                              newVals?.name ||
-                                              oldVals?.worldId ||
-                                              newVals?.worldId;
-                                            const resourceType =
-                                              (log as any).resourceType ||
-                                              (log as any).resource_type ||
-                                              (log as any).entityType;
-                                            const resourceId =
-                                              (log as any).resourceId ||
-                                              (log as any).resource_id ||
-                                              (log as any).entityId;
+                                      <>
+                                        <Box>
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{
+                                              fontWeight: 600,
+                                              textTransform: 'uppercase',
+                                              letterSpacing: 0.5,
+                                            }}
+                                          >
+                                            {t('auditLogs.resource')}
+                                          </Typography>
+                                          <Box sx={{ mt: 0.5 }}>
+                                            {(() => {
+                                              const oldVals =
+                                                (log as any).oldValues || (log as any).old_values;
+                                              const newVals =
+                                                (log as any).newValues || (log as any).new_values;
+                                              const resourceName =
+                                                oldVals?.name ||
+                                                newVals?.name ||
+                                                oldVals?.worldId ||
+                                                newVals?.worldId;
+                                              const resourceType =
+                                                (log as any).resourceType ||
+                                                (log as any).resource_type ||
+                                                (log as any).entityType;
+                                              const resourceId =
+                                                (log as any).resourceId ||
+                                                (log as any).resource_id ||
+                                                (log as any).entityId;
 
-                                            return (
-                                              <>
-                                                {resourceName && (
+                                              return (
+                                                <>
+                                                  {resourceName && (
+                                                    <Typography
+                                                      variant="body1"
+                                                      sx={{
+                                                        fontWeight: 600,
+                                                        mb: 0.5,
+                                                      }}
+                                                    >
+                                                      {resourceName}
+                                                    </Typography>
+                                                  )}
                                                   <Typography
-                                                    variant="body1"
+                                                    variant="body2"
                                                     sx={{
-                                                      fontWeight: 600,
-                                                      mb: 0.5,
+                                                      fontFamily: 'monospace',
+                                                      color: 'text.secondary',
                                                     }}
                                                   >
-                                                    {resourceName}
+                                                    {resourceType} #{resourceId}
                                                   </Typography>
-                                                )}
-                                                <Typography
-                                                  variant="body2"
-                                                  sx={{
-                                                    fontFamily: 'monospace',
-                                                    color: 'text.secondary',
-                                                  }}
-                                                >
-                                                  {resourceType} #{resourceId}
-                                                </Typography>
-                                              </>
-                                            );
-                                          })()}
+                                                </>
+                                              );
+                                            })()}
+                                          </Box>
                                         </Box>
-                                      </Box>
-                                      <Divider />
-                                    </>
-                                  )}
+                                        <Divider />
+                                      </>
+                                    )}
 
                                   {/* IP Address */}
                                   <Box>
