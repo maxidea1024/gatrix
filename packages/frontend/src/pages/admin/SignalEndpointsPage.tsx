@@ -32,6 +32,9 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -45,6 +48,7 @@ import {
   VpnKey as TokenIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -334,6 +338,20 @@ const SignalEndpointsPage: React.FC = () => {
     name: string;
   } | null>(null);
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<SignalEndpoint | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: SignalEndpoint) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(item);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
   const fetchEndpoints = useCallback(async () => {
     setLoading(true);
     try {
@@ -535,39 +553,10 @@ const SignalEndpointsPage: React.FC = () => {
                           icon={<TokenIcon sx={{ fontSize: 14 }} />}
                         />
                       </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('signalEndpoints.createToken')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => setTokenDialog({ open: true, endpointId: endpoint.id })}
-                          >
-                            <TokenIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => setEditDialog({ open: true, endpoint })}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() =>
-                              setDeleteDialog({
-                                open: true,
-                                type: 'endpoint',
-                                endpointId: endpoint.id,
-                                name: endpoint.name,
-                              })
-                            }
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                      <TableCell align="center">
+                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, endpoint)}>
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
 
@@ -605,7 +594,7 @@ const SignalEndpointsPage: React.FC = () => {
                             </Box>
                             <Divider sx={{ mb: 1 }} />
                             {!endpointTokens[endpoint.id] ||
-                            endpointTokens[endpoint.id].length === 0 ? (
+                              endpointTokens[endpoint.id].length === 0 ? (
                               <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
                                 {t('signalEndpoints.noTokens')}
                               </Typography>
@@ -682,6 +671,49 @@ const SignalEndpointsPage: React.FC = () => {
           </TableContainer>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) setTokenDialog({ open: true, endpointId: menuTarget.id });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <TokenIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('signalEndpoints.createToken')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) setEditDialog({ open: true, endpoint: menuTarget });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget)
+              setDeleteDialog({
+                open: true,
+                type: 'endpoint',
+                endpointId: menuTarget.id,
+                name: menuTarget.name,
+              });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Dialogs */}
       <EndpointDialog
