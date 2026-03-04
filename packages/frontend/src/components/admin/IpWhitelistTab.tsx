@@ -53,7 +53,7 @@ import {
   BulkCreateIpEntry,
 } from '../../services/ipWhitelistService';
 import SimplePagination from '../common/SimplePagination';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import FormDialogHeader from '../common/FormDialogHeader';
 import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
@@ -482,7 +482,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
                                   sx={{ display: 'block' }}
                                 >
                                   {t('ipWhitelist.from')}:{' '}
-                                  {formatDateTimeDetailed(ipWhitelist.startDate)}
+                                  <Tooltip title={formatDateTimeDetailed(ipWhitelist.startDate)}>
+                                    <span>{formatRelativeTime(ipWhitelist.startDate)}</span>
+                                  </Tooltip>
                                 </Typography>
                               )}
                               {ipWhitelist.endDate && (
@@ -492,7 +494,9 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
                                   sx={{ display: 'block' }}
                                 >
                                   {t('ipWhitelist.to')}:{' '}
-                                  {formatDateTimeDetailed(ipWhitelist.endDate)}
+                                  <Tooltip title={formatDateTimeDetailed(ipWhitelist.endDate)}>
+                                    <span>{formatRelativeTime(ipWhitelist.endDate)}</span>
+                                  </Tooltip>
                                 </Typography>
                               )}
                             </Box>
@@ -512,9 +516,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2">
-                            {formatDateTimeDetailed(ipWhitelist.createdAt)}
-                          </Typography>
+                          <Tooltip title={formatDateTimeDetailed(ipWhitelist.createdAt)}>
+                            <Typography variant="body2">
+                              {formatRelativeTime(ipWhitelist.createdAt)}
+                            </Typography>
+                          </Tooltip>
                         </TableCell>
                         <TableCell align="center">
                           <Tooltip

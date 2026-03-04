@@ -207,7 +207,7 @@ export function useConditionalApi<T = any>(
 
 // Hook for tags
 export function useTags(projectApiPath: string | null = null, config?: SWRConfiguration) {
-  const url = projectApiPath ? `${projectApiPath}/tags` : '/admin/tags';
+  const url = projectApiPath ? `${projectApiPath}/tags` : null;
   const { data, ...rest } = useApi<{ tags: any[] }>(url, config);
   return {
     data: data?.tags,
@@ -217,6 +217,7 @@ export function useTags(projectApiPath: string | null = null, config?: SWRConfig
 
 // Hook for client versions
 export function useClientVersions(
+  projectApiPath: string | null,
   page: number = 1,
   limit: number = 10,
   sortBy?: string,
@@ -246,7 +247,8 @@ export function useClientVersions(
     });
   }
 
-  const url = `/admin/client-versions?${params.toString()}`;
+  const baseUrl = projectApiPath ? `${projectApiPath}/client-versions` : null;
+  const url = baseUrl ? `${baseUrl}?${params.toString()}` : null;
   return useApi<{
     clientVersions: any[];
     total: number;
@@ -256,13 +258,15 @@ export function useClientVersions(
 }
 
 // Hook for available client versions
-export function useAvailableVersions(config?: SWRConfiguration) {
-  return useApi<string[]>('/admin/client-versions/meta/versions', config);
+export function useAvailableVersions(projectApiPath: string | null, config?: SWRConfiguration) {
+  const url = projectApiPath ? `${projectApiPath}/client-versions/meta/versions` : null;
+  return useApi<string[]>(url, config);
 }
 
 // Hook for available platforms
-export function useAvailablePlatforms(config?: SWRConfiguration) {
-  return useApi<string[]>('/admin/client-versions/meta/platforms', config);
+export function useAvailablePlatforms(projectApiPath: string | null, config?: SWRConfiguration) {
+  const url = projectApiPath ? `${projectApiPath}/client-versions/meta/platforms` : null;
+  return useApi<string[]>(url, config);
 }
 
 // Hook for message templates
@@ -307,8 +311,9 @@ export function useAllUsers(config?: SWRConfiguration) {
 }
 
 // Mutation helper
-export function mutateClientVersions() {
-  return mutate((key) => typeof key === 'string' && key.startsWith('/admin/client-versions'));
+export function mutateClientVersions(projectApiPath: string | null = null) {
+  const prefix = projectApiPath ? `${projectApiPath}/client-versions` : '/client-versions';
+  return mutate((key) => typeof key === 'string' && key.includes(prefix));
 }
 
 export function mutateMessageTemplates() {
@@ -316,6 +321,6 @@ export function mutateMessageTemplates() {
 }
 
 export function mutateTags(projectApiPath: string | null = null) {
-  const url = projectApiPath ? `${projectApiPath}/tags` : '/admin/tags';
-  return mutate(url);
+  const url = projectApiPath ? `${projectApiPath}/tags` : null;
+  return url ? mutate(url) : Promise.resolve();
 }

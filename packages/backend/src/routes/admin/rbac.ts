@@ -73,6 +73,121 @@ router.put('/organisations/:id', requireOrgAdmin as any, async (req: any, res) =
   }
 });
 
+// POST /api/admin/rbac/organisations
+router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
+  try {
+    const { orgName, displayName, description } = req.body;
+    if (!orgName || !displayName) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'orgName and displayName are required' });
+    }
+
+    const existing = await Organisation.findByName(orgName);
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'Organisation name already exists' });
+    }
+
+    const org = await Organisation.create({
+      orgName,
+      displayName,
+      description,
+      createdBy: req.user.id,
+    });
+
+    // Add the creator as org admin member
+    await Organisation.addMember(org.id, req.user.id, 'admin');
+
+    res.status(201).json({ success: true, data: org });
+  } catch (error) {
+    logger.error('Error creating organisation:', error);
+    res.status(500).json({ success: false, message: 'Failed to create organisation' });
+  }
+});
+
+// ==================== Organisation Members ====================
+
+// GET /api/admin/rbac/organisations/:id/members
+router.get('/organisations/:id/members', async (req: any, res) => {
+  try {
+    const members = await Organisation.getMembers(req.params.id);
+    res.json({ success: true, data: members });
+  } catch (error) {
+    logger.error('Error getting organisation members:', error);
+    res.status(500).json({ success: false, message: 'Failed to get organisation members' });
+  }
+});
+
+// POST /api/admin/rbac/organisations/:id/members
+router.post('/organisations/:id/members', requireOrgAdmin as any, async (req: any, res) => {
+  try {
+    const { userId, orgRole } = req.body;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'userId is required' });
+    }
+
+    // Check if user is already a member
+    const existing = await Organisation.getMember(req.params.id, userId);
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'User is already a member' });
+    }
+
+    await Organisation.addMember(req.params.id, userId, orgRole || 'user', req.user.id);
+    res.status(201).json({ success: true, message: 'Member added successfully' });
+  } catch (error) {
+    logger.error('Error adding organisation member:', error);
+    res.status(500).json({ success: false, message: 'Failed to add member' });
+  }
+});
+
+// DELETE /api/admin/rbac/organisations/:id/members/:userId
+router.delete(
+  '/organisations/:id/members/:userId',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      // Prevent self-modification
+      if (String(req.user.id) === String(req.params.userId)) {
+        return res
+          .status(403)
+          .json({ success: false, message: 'Cannot remove yourself from organisation' });
+      }
+      const result = await Organisation.removeMember(req.params.id, req.params.userId);
+      if (!result) {
+        return res.status(404).json({ success: false, message: 'Member not found' });
+      }
+      res.json({ success: true, message: 'Member removed successfully' });
+    } catch (error) {
+      logger.error('Error removing organisation member:', error);
+      res.status(500).json({ success: false, message: 'Failed to remove member' });
+    }
+  }
+);
+
+// PUT /api/admin/rbac/organisations/:id/members/:userId
+router.put('/organisations/:id/members/:userId', requireOrgAdmin as any, async (req: any, res) => {
+  try {
+    // Prevent self-modification
+    if (String(req.user.id) === String(req.params.userId)) {
+      return res
+        .status(403)
+        .json({ success: false, message: 'Cannot change your own organisation role' });
+    }
+    const { orgRole } = req.body;
+    if (!orgRole || !['admin', 'user'].includes(orgRole)) {
+      return res.status(400).json({
+        success: false,
+        message: 'orgRole must be "admin" or "user"',
+      });
+    }
+    await Organisation.updateMemberRole(req.params.id, req.params.userId, orgRole);
+    res.json({ success: true, message: 'Member role updated successfully' });
+  } catch (error) {
+    logger.error('Error updating organisation member role:', error);
+    res.status(500).json({ success: false, message: 'Failed to update member role' });
+  }
+});
+
 // ==================== Projects ====================
 
 // GET /api/admin/rbac/projects
@@ -493,6 +608,10 @@ router.post(
   requireOrgPermission(ORG_PERMISSIONS.USERS_WRITE) as any,
   async (req: any, res) => {
     try {
+      // Prevent self-modification
+      if (String(req.user.id) === String(req.params.id)) {
+        return res.status(403).json({ success: false, message: 'Cannot modify your own roles' });
+      }
       const { roleId } = req.body;
       if (!roleId) {
         return res.status(400).json({ success: false, message: 'roleId is required' });
@@ -522,6 +641,10 @@ router.delete(
   requireOrgPermission(ORG_PERMISSIONS.USERS_WRITE) as any,
   async (req: any, res) => {
     try {
+      // Prevent self-modification
+      if (String(req.user.id) === String(req.params.id)) {
+        return res.status(403).json({ success: false, message: 'Cannot modify your own roles' });
+      }
       const result = await db('g_user_roles')
         .where('userId', req.params.id)
         .where('roleId', req.params.roleId)

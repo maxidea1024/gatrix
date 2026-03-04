@@ -15,8 +15,10 @@ const createTokenValidation = [
     .withMessage('Token name must be between 3 and 200 characters'),
 
   body('tokenType')
-    .isIn(['client', 'server', 'edge', 'all'])
-    .withMessage('Token type must be client, server, edge, or all'),
+    .isIn(['client', 'server', 'edge'])
+    .withMessage('Token type must be client, server, or edge'),
+
+  body('environmentId').notEmpty().withMessage('Environment ID is required'),
 
   body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
 ];
@@ -27,6 +29,8 @@ const updateTokenValidation = [
     .withMessage('Token name is required')
     .isLength({ min: 3, max: 200 })
     .withMessage('Token name must be between 3 and 200 characters'),
+
+  body('environmentId').notEmpty().withMessage('Environment ID is required'),
 
   body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
 ];

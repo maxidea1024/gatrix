@@ -67,7 +67,7 @@ function handleSpecialTokens(token: string): {
     const match = token.match(UNSECURED_TOKEN_REGEX);
     if (match) {
       const [, orgId, projectId, envId, tokenType] = match;
-      const type = tokenType === 'edge' ? 'all' : (tokenType as 'client' | 'server');
+      const type = tokenType as 'client' | 'server' | 'edge';
       return {
         apiToken: {
           id: `unsecured-${tokenType}-${orgId}-${projectId}`,
@@ -88,7 +88,7 @@ function handleSpecialTokens(token: string): {
     return {
       apiToken: {
         id: 'edge-bypass',
-        tokenType: 'all',
+        tokenType: 'server',
         tokenName: 'Edge Bypass Token (Internal)',
         createdBy: '',
       },
@@ -195,7 +195,7 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
       });
     }
 
-    if (apiToken.tokenType === 'all' || apiToken.tokenType === (tokenType as any)) {
+    if (apiToken.tokenType === (tokenType as any)) {
       return next();
     }
 

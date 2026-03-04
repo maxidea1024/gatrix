@@ -1,4 +1,4 @@
-export type TokenType = 'client' | 'server' | 'edge' | 'all';
+export type TokenType = 'client' | 'server' | 'edge';
 
 export interface ApiAccessToken {
   id: string; // ULID (26 characters)
@@ -8,8 +8,7 @@ export interface ApiAccessToken {
   tokenHash: string;
   tokenValue?: string; // Original token value for copying (only in list response)
   tokenType: TokenType;
-  allowAllEnvironments: boolean;
-  environments?: string[]; // Environment names
+  environmentId?: string;
   expiresAt?: string;
   lastUsedAt?: string;
   usageCount?: number;
@@ -34,8 +33,7 @@ export interface CreateTokenRequest {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
-  allowAllEnvironments?: boolean;
-  environments?: string[];
+  environmentId?: string;
   expiresAt?: string;
   projectId?: string;
 }
@@ -43,8 +41,7 @@ export interface CreateTokenRequest {
 export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
-  allowAllEnvironments?: boolean;
-  environments?: string[];
+  environmentId?: string;
   expiresAt?: string;
 }
 

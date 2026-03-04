@@ -517,7 +517,13 @@ class FeatureFlagService {
     userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const result = await this.updateFlag(environmentId, flagName, { isEnabled }, userId, requestContext);
+    const result = await this.updateFlag(
+      environmentId,
+      flagName,
+      { isEnabled },
+      userId,
+      requestContext
+    );
 
     // Auto-control release flow plan based on toggle direction
     if (result) {

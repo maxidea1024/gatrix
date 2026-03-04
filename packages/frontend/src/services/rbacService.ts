@@ -214,6 +214,33 @@ export const rbacService = {
     await api.delete(`${BASE}/users/${userId}/roles/${roleId}`);
   },
 
+  // ─── Organisation Members ─────────────────────────
+
+  async getOrgMembers(orgId: string): Promise<any[]> {
+    const res = await api.get(`${BASE}/organisations/${orgId}/members`);
+    return res.data;
+  },
+
+  async addOrgMember(
+    orgId: string,
+    userId: string,
+    orgRole: 'admin' | 'user' = 'user'
+  ): Promise<void> {
+    await api.post(`${BASE}/organisations/${orgId}/members`, { userId, orgRole });
+  },
+
+  async removeOrgMember(orgId: string, userId: string): Promise<void> {
+    await api.delete(`${BASE}/organisations/${orgId}/members/${userId}`);
+  },
+
+  async updateOrgMemberRole(
+    orgId: string,
+    userId: string,
+    orgRole: 'admin' | 'user'
+  ): Promise<void> {
+    await api.put(`${BASE}/organisations/${orgId}/members/${userId}`, { orgRole });
+  },
+
   // ─── Admin API Tokens ─────────────────────────
 
   async getAdminTokens(): Promise<AdminApiToken[]> {
@@ -233,6 +260,19 @@ export const rbacService = {
 
   async deleteAdminToken(id: string): Promise<void> {
     await api.delete(`${BASE}/admin-tokens/${id}`);
+  },
+
+  // ─── User Search ─────────────────────────
+
+  async searchUsers(query: string): Promise<{ id: string; name: string; email: string }[]> {
+    const res = await api.get('/admin/users', {
+      params: { search: query, limit: 20 },
+    });
+    return (res.data?.users || []).map((u: any) => ({
+      id: String(u.id),
+      name: u.name,
+      email: u.email,
+    }));
   },
 
   // ─── Permission Reference ─────────────────────────

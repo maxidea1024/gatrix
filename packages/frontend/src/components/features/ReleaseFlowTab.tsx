@@ -552,7 +552,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             flexShrink: 0,
-            pl: '14px',
+            pl: '16px',
           }}
         >
           {hasTransition ? (
@@ -565,31 +565,31 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                 overflow: 'hidden',
                 ...(isCurrentActive && !isPaused
                   ? {
-                    // Center line behind chevrons
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      bottom: 0,
-                      left: '50%',
-                      width: 2,
-                      transform: 'translateX(-50%)',
-                      bgcolor: 'primary.main',
-                      opacity: 0.3,
-                    },
-                    // Flowing chevron arrows via seamless background-position loop
-                    background: (theme: any) =>
-                      `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
-                    backgroundSize: '10px 12px',
-                    animation: 'chevronFlow 1.8s linear infinite',
-                    '@keyframes chevronFlow': {
-                      '0%': { backgroundPositionY: '0px' },
-                      '100%': { backgroundPositionY: '12px' },
-                    },
-                  }
+                      // Center line behind chevrons
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        left: '50%',
+                        width: 2,
+                        transform: 'translateX(-50%)',
+                        bgcolor: 'primary.main',
+                        opacity: 0.3,
+                      },
+                      // Flowing chevron arrows via seamless background-position loop
+                      background: (theme: any) =>
+                        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
+                      backgroundSize: '10px 12px',
+                      animation: 'chevronFlow 1.8s linear infinite',
+                      '@keyframes chevronFlow': {
+                        '0%': { backgroundPositionY: '0px' },
+                        '100%': { backgroundPositionY: '12px' },
+                      },
+                    }
                   : {
-                    bgcolor: lineColor,
-                  }),
+                      bgcolor: lineColor,
+                    }),
               }}
             />
           ) : (
@@ -813,10 +813,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
-                  {
-                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                  };
+                    {
+                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                    };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -1018,9 +1018,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : 'rgba(0,0,0,0.015)'
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1272,9 +1272,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                            borderColor: 'primary.main',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          }
+                              borderColor: 'primary.main',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            }
                           : {},
                     }}
                   >

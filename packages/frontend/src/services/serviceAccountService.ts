@@ -7,10 +7,6 @@ export interface ServiceAccount {
   email: string;
   authType: string;
   status: string;
-  role: string;
-  permissions: string[] | null;
-  allowAllEnvironments: boolean;
-  environments: string[];
   createdAt: string;
   updatedAt: string;
   tokens?: ServiceAccountToken[];
@@ -18,11 +14,13 @@ export interface ServiceAccount {
 
 export interface ServiceAccountToken {
   id: number;
-  userId: number;
+  serviceAccountId: string;
   tokenName: string;
   description: string | null;
+  isActive: boolean;
   expiresAt: string | null;
   lastUsedAt: string | null;
+  createdBy: string | null;
   createdAt: string;
 }
 
@@ -41,10 +39,6 @@ class ServiceAccountService {
     projectApiPath: string,
     data: {
       name: string;
-      role?: string;
-      permissions?: string[];
-      allowAllEnvironments?: boolean;
-      environments?: string[];
     }
   ): Promise<ServiceAccount> {
     const response = await api.post(`${projectApiPath}/service-accounts`, data);
@@ -56,10 +50,6 @@ class ServiceAccountService {
     id: number,
     data: {
       name?: string;
-      role?: string;
-      permissions?: string[];
-      allowAllEnvironments?: boolean;
-      environments?: string[];
     }
   ): Promise<ServiceAccount> {
     const response = await api.put(`${projectApiPath}/service-accounts/${id}`, data);

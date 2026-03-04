@@ -15,9 +15,9 @@ export interface Tag {
   updatedByEmail?: string | null;
 }
 
-/** Build tags base path from project-scoped path or fallback */
-function basePath(projectApiPath: string | null): string {
-  return projectApiPath ? `${projectApiPath}/tags` : '/admin/tags';
+/** Build tags base path from project-scoped path (tags are project-scoped) */
+function basePath(projectApiPath: string | null): string | null {
+  return projectApiPath ? `${projectApiPath}/tags` : null;
 }
 
 export const tagService = {

@@ -51,7 +51,7 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, role, permissions, allowAllEnvironments, environments } = req.body;
+    const { name } = req.body;
     const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
@@ -60,10 +60,6 @@ router.post('/', async (req: Request, res: Response) => {
 
     const account = await ServiceAccountModel.create({
       name: name.trim(),
-      role,
-      permissions,
-      allowAllEnvironments,
-      environments,
       createdBy: user.id,
     });
 
@@ -82,15 +78,11 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const { name, role, permissions, allowAllEnvironments, environments } = req.body;
+    const { name } = req.body;
     const user = req.user as { id: string; name: string };
 
     const account = await ServiceAccountModel.update(id, {
       name,
-      role,
-      permissions,
-      allowAllEnvironments,
-      environments,
       updatedBy: user.id,
     });
 

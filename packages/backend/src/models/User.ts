@@ -57,10 +57,8 @@ export class UserModel {
           'g_users.createdBy',
           'creator.name as createdByName',
           'creator.email as createdByEmail',
-          db.raw("COALESCE(om.orgRole, 'user') as role"),
         ])
         .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
-        .leftJoin('g_organisation_members as om', 'g_users.id', 'om.userId')
         .where('g_users.id', id)
         .first();
 
@@ -273,9 +271,7 @@ export class UserModel {
 
       // Get users with camelCase field names
       const usersQuery = applyFilters(
-        db('g_users')
-          .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
-          .leftJoin('g_organisation_members as om', 'g_users.id', 'om.userId')
+        db('g_users').leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
       )
         .select([
           'g_users.id',
@@ -291,7 +287,6 @@ export class UserModel {
           'g_users.createdAt',
           'g_users.updatedAt',
           'g_users.createdBy',
-          db.raw("COALESCE(om.orgRole, 'user') as role"),
           'creator.name as createdByName',
           'creator.email as createdByEmail',
         ])

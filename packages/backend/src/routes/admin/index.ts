@@ -95,11 +95,6 @@ router.use(
   requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
   ipWhitelistRoutes
 );
-router.use(
-  '/api-tokens',
-  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
-  apiTokenRoutes
-);
 
 // ========================================
 // Project-scoped routes
@@ -212,6 +207,13 @@ projectRouter.use(
     PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
   ]) as any,
   serviceAccountRoutes
+);
+
+// API Tokens
+projectRouter.use(
+  '/api-tokens',
+  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  apiTokenRoutes
 );
 
 // Signal Endpoints

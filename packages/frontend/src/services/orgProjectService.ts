@@ -63,6 +63,15 @@ export const orgProjectService = {
     return res.data;
   },
 
+  async createOrganisation(data: {
+    orgName: string;
+    displayName: string;
+    description?: string;
+  }): Promise<Organisation> {
+    const res = await api.post(`${BASE}/organisations`, data);
+    return res.data;
+  },
+
   // ─── Projects ─────────────────────────
 
   async getProjects(): Promise<Project[]> {

@@ -52,6 +52,7 @@ export default class VarsModel {
   ): Promise<void> {
     await db('g_vars')
       .insert({
+        id: ulid(),
         varKey: key,
         varValue: value,
         createdBy: userId,

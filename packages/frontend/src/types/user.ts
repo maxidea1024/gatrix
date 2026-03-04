@@ -21,7 +21,7 @@ export interface User {
   email: string;
   avatarUrl?: string;
   preferredLanguage?: string;
-  role: UserRole;
+  role?: UserRole;
   status: UserStatus;
   emailVerified: boolean;
   emailVerifiedAt?: string;

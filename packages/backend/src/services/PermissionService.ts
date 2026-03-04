@@ -16,6 +16,9 @@ import db from '../config/knex';
 import redis from '../config/redis';
 import logger from '../config/logger';
 
+// Super admin email - has full system privileges across all resources
+const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
+
 // Cache TTL constants (in seconds)
 const CACHE_TTL = {
   ORG_ADMIN: 300, // 5 min
@@ -26,6 +29,7 @@ const CACHE_TTL = {
 // Cache key builders
 const cacheKey = {
   orgAdmin: (userId: string, orgId: string) => `rbac:org_admin:${userId}:${orgId}`,
+  superAdmin: (userId: string) => `rbac:super_admin:${userId}`,
   userRoles: (userId: string) => `rbac:user_roles:${userId}`,
   orgPerms: (roleId: string) => `rbac:org_perms:${roleId}`,
   projectPerms: (roleId: string, projectId: string) => `rbac:proj_perms:${roleId}:${projectId}`,
@@ -39,7 +43,10 @@ class PermissionService {
    * Check if user has an organisation-level permission
    */
   async hasOrgPermission(userId: string, orgId: string, perm: string): Promise<boolean> {
-    // 1. Org Admin ??all permissions
+    // 0. Super Admin bypass
+    if (await this.isSuperAdmin(userId)) return true;
+
+    // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
     // 2. Collect all roleIds
@@ -75,7 +82,10 @@ class PermissionService {
     projectId: string,
     perm: string
   ): Promise<boolean> {
-    // 1. Org Admin ??all permissions
+    // 0. Super Admin bypass
+    if (await this.isSuperAdmin(userId)) return true;
+
+    // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
     const roleIds = await this.getAllRoleIds(userId);
@@ -121,7 +131,10 @@ class PermissionService {
     environmentId: string,
     perm: string
   ): Promise<boolean> {
-    // 1. Org Admin ??all permissions
+    // 0. Super Admin bypass
+    if (await this.isSuperAdmin(userId)) return true;
+
+    // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
     const roleIds = await this.getAllRoleIds(userId);
@@ -166,9 +179,12 @@ class PermissionService {
   }
 
   /**
-   * Check if user is an Org Admin
+   * Check if user is an Org Admin (or Super Admin)
    */
   async isOrgAdmin(userId: string, orgId: string): Promise<boolean> {
+    // Super Admin is always org admin
+    if (await this.isSuperAdmin(userId)) return true;
+
     const key = cacheKey.orgAdmin(userId, orgId);
 
     try {
@@ -324,6 +340,33 @@ class PermissionService {
   }
 
   // ==================== Internal Helpers ====================
+
+  /**
+   * Check if user is a super admin (admin@gatrix.com)
+   * Super admin has full system privileges across all resources.
+   */
+  async isSuperAdmin(userId: string): Promise<boolean> {
+    const key = cacheKey.superAdmin(userId);
+
+    try {
+      const cached = await redis.get(key);
+      if (cached !== null) return cached === '1';
+    } catch {
+      // Cache miss or error
+    }
+
+    const user = await db('g_users').where('id', userId).select('email').first();
+
+    const isSuper = user?.email === SUPER_ADMIN_EMAIL;
+
+    try {
+      await redis.set(key, isSuper ? '1' : '0', CACHE_TTL.ORG_ADMIN);
+    } catch {
+      // Non-critical
+    }
+
+    return isSuper;
+  }
 
   /**
    * Get all roleIds for a user (direct roles + group roles), with caching

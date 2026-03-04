@@ -2,9 +2,23 @@ import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
 import crypto from 'crypto';
-import bcrypt from 'bcryptjs';
 
 const logger = createLogger('ServiceAccountModel');
+
+/**
+ * g_service_account_tokens schema (after migration 013):
+ *   id CHAR(26) PK
+ *   serviceAccountId CHAR(26) NOT NULL -> FK g_users(id)
+ *   name VARCHAR(255)
+ *   description TEXT
+ *   tokenValue VARCHAR(255) UNIQUE
+ *   isActive BOOLEAN
+ *   expiresAt TIMESTAMP
+ *   lastUsedAt TIMESTAMP
+ *   createdBy CHAR(26)
+ *   createdAt TIMESTAMP
+ *   updatedAt TIMESTAMP
+ */
 
 // Types
 export interface ServiceAccount {
@@ -18,38 +32,27 @@ export interface ServiceAccount {
   createdAt: Date;
   updatedAt: Date;
   tokens: ServiceAccountToken[];
-  permissions: string[];
-  role: string;
-  allowAllEnvironments: boolean;
-  environments: string[];
 }
 
 export interface ServiceAccountToken {
   id: string;
-  userId: string;
+  serviceAccountId: string;
   name: string;
   description: string | null;
+  isActive: boolean;
   expiresAt: Date | null;
   lastUsedAt: Date | null;
-  createdBy: string;
+  createdBy: string | null;
   createdAt: Date;
 }
 
 export interface CreateServiceAccountData {
   name: string;
-  role?: string;
-  permissions?: string[];
-  allowAllEnvironments?: boolean;
-  environments?: string[];
   createdBy: string;
 }
 
 export interface UpdateServiceAccountData {
   name?: string;
-  role?: string;
-  permissions?: string[];
-  allowAllEnvironments?: boolean;
-  environments?: string[];
   updatedBy: string;
 }
 
@@ -72,25 +75,11 @@ export class ServiceAccountModel {
         id,
         name: data.name,
         email,
-        role: data.role || 'user',
         status: 'active',
         authType: 'service-account',
         emailVerified: true,
-        allowAllEnvironments: data.allowAllEnvironments ?? false,
         createdBy: data.createdBy,
       });
-
-      const { UserModel } = await import('./User');
-
-      // Set environment access if provided
-      if (!data.allowAllEnvironments && data.environments && data.environments.length > 0) {
-        await UserModel.setEnvironmentAccess(id, false, data.environments, data.createdBy);
-      }
-
-      // Set permissions if provided
-      if (data.permissions && data.permissions.length > 0) {
-        await UserModel.setPermissions(id, data.permissions);
-      }
 
       const account = await this.findById(id);
       if (!account) {
@@ -116,8 +105,6 @@ export class ServiceAccountModel {
           `${this.TABLE}.email`,
           `${this.TABLE}.status`,
           `${this.TABLE}.authType`,
-          `${this.TABLE}.role`,
-          `${this.TABLE}.allowAllEnvironments`,
           `${this.TABLE}.createdBy`,
           `${this.TABLE}.createdAt`,
           `${this.TABLE}.updatedAt`,
@@ -149,8 +136,6 @@ export class ServiceAccountModel {
           `${this.TABLE}.email`,
           `${this.TABLE}.status`,
           `${this.TABLE}.authType`,
-          `${this.TABLE}.role`,
-          `${this.TABLE}.allowAllEnvironments`,
           `${this.TABLE}.createdBy`,
           `${this.TABLE}.createdAt`,
           `${this.TABLE}.updatedAt`,
@@ -174,9 +159,6 @@ export class ServiceAccountModel {
     try {
       const updateData: any = {};
       if (data.name !== undefined) updateData.name = data.name;
-      if (data.role !== undefined) updateData.role = data.role;
-      if (data.allowAllEnvironments !== undefined)
-        updateData.allowAllEnvironments = data.allowAllEnvironments;
       updateData.updatedBy = data.updatedBy;
       updateData.updatedAt = db.fn.now();
 
@@ -185,21 +167,6 @@ export class ServiceAccountModel {
           .where('id', id)
           .where('authType', 'service-account')
           .update(updateData);
-      }
-
-      const { UserModel } = await import('./User');
-
-      // Update environment access if provided
-      if (data.allowAllEnvironments !== undefined || data.environments !== undefined) {
-        const allowAll =
-          data.allowAllEnvironments ?? (await this.findById(id))?.allowAllEnvironments ?? false;
-        const envs = data.environments ?? (await UserModel.getEnvironmentAccess(id)).environments;
-        await UserModel.setEnvironmentAccess(id, allowAll, envs, data.updatedBy);
-      }
-
-      // Update permissions if provided
-      if (data.permissions !== undefined) {
-        await UserModel.setPermissions(id, data.permissions);
       }
 
       return this.findById(id);
@@ -226,29 +193,27 @@ export class ServiceAccountModel {
   }
 
   /**
-   * Create a new token for a service account
-   * Returns the plain token (only shown once)
+   * Create a new token for a service account.
+   * Tokens are stored as plain values in the tokenValue column.
    */
   static async createToken(
-    userId: string,
+    serviceAccountId: string,
     name: string,
     createdBy: string,
     description?: string,
     expiresAt?: Date
   ): Promise<{ token: ServiceAccountToken; plainToken: string }> {
     try {
-      // Generate a random token
       const plainToken = `gsa_${crypto.randomBytes(32).toString('hex')}`;
-      const tokenHash = await bcrypt.hash(plainToken, 10);
-
       const id = generateULID();
 
       await db(this.TOKENS_TABLE).insert({
         id,
-        userId,
+        serviceAccountId,
         name,
-        tokenHash,
+        tokenValue: plainToken,
         description: description || null,
+        isActive: true,
         expiresAt: expiresAt || null,
         createdBy,
       });
@@ -256,9 +221,10 @@ export class ServiceAccountModel {
       const token = await db(this.TOKENS_TABLE)
         .select(
           'id',
-          'userId',
+          'serviceAccountId',
           'name',
           'description',
+          'isActive',
           'expiresAt',
           'lastUsedAt',
           'createdBy',
@@ -277,20 +243,22 @@ export class ServiceAccountModel {
   /**
    * Find tokens for a service account
    */
-  static async findTokens(userId: string): Promise<ServiceAccountToken[]> {
+  static async findTokens(serviceAccountId: string): Promise<ServiceAccountToken[]> {
     try {
       return db(this.TOKENS_TABLE)
         .select(
           'id',
-          'userId',
+          'serviceAccountId',
           'name',
           'description',
+          'isActive',
           'expiresAt',
           'lastUsedAt',
           'createdBy',
           'createdAt'
         )
-        .where('userId', userId)
+        .where('serviceAccountId', serviceAccountId)
+        .where('isActive', true)
         .orderBy('createdAt', 'desc');
     } catch (error) {
       logger.error('Error finding service account tokens:', error);
@@ -299,11 +267,14 @@ export class ServiceAccountModel {
   }
 
   /**
-   * Delete a token
+   * Delete a token (soft-delete by setting isActive = false)
    */
-  static async deleteToken(tokenId: string, userId: string): Promise<boolean> {
+  static async deleteToken(tokenId: string, serviceAccountId: string): Promise<boolean> {
     try {
-      const result = await db(this.TOKENS_TABLE).where('id', tokenId).where('userId', userId).del();
+      const result = await db(this.TOKENS_TABLE)
+        .where('id', tokenId)
+        .where('serviceAccountId', serviceAccountId)
+        .update({ isActive: false });
       return result > 0;
     } catch (error) {
       logger.error('Error deleting service account token:', error);
@@ -312,28 +283,28 @@ export class ServiceAccountModel {
   }
 
   /**
-   * Verify a token and return the associated service account
+   * Verify a token and return the associated service account.
+   * Token lookup is a direct value comparison (not hashed).
+   * The service account's permissions come from RBAC roles.
    */
   static async verifyToken(plainToken: string): Promise<ServiceAccount | null> {
     try {
-      const tokens = await db(this.TOKENS_TABLE).select('*');
+      const token = await db(this.TOKENS_TABLE)
+        .where('tokenValue', plainToken)
+        .where('isActive', true)
+        .first();
 
-      for (const token of tokens) {
-        const isMatch = await bcrypt.compare(plainToken, token.tokenHash);
-        if (isMatch) {
-          // Check expiration
-          if (token.expiresAt && new Date(token.expiresAt) < new Date()) {
-            return null;
-          }
+      if (!token) return null;
 
-          // Update lastUsedAt
-          await db(this.TOKENS_TABLE).where('id', token.id).update({ lastUsedAt: db.fn.now() });
-
-          return this.findById(token.userId);
-        }
+      // Check expiration
+      if (token.expiresAt && new Date(token.expiresAt) < new Date()) {
+        return null;
       }
 
-      return null;
+      // Update lastUsedAt
+      await db(this.TOKENS_TABLE).where('id', token.id).update({ lastUsedAt: db.fn.now() });
+
+      return this.findById(token.serviceAccountId);
     } catch (error) {
       logger.error('Error verifying service account token:', error);
       throw error;
@@ -341,23 +312,15 @@ export class ServiceAccountModel {
   }
 
   /**
-   * Enrich a service account row with tokens and permissions
+   * Enrich a service account row with tokens
    */
   private static async enrichAccount(row: any): Promise<ServiceAccount> {
-    const { UserModel } = await import('./User');
-    const [tokens, permissions, envAccess] = await Promise.all([
-      this.findTokens(row.id),
-      db('g_user_permissions').select('permission').where('userId', row.id),
-      UserModel.getEnvironmentAccess(row.id),
-    ]);
+    const tokens = await this.findTokens(row.id);
 
     return {
       ...row,
       authType: 'service-account' as const,
       tokens,
-      permissions: permissions.map((p: any) => p.permission),
-      allowAllEnvironments: !!row.allowAllEnvironments,
-      environments: envAccess.environments,
     };
   }
 }
