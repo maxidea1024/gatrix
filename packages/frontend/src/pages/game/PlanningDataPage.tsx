@@ -1494,7 +1494,7 @@ const PlanningDataPage: React.FC = () => {
                                         }
 
                                         return (
-                                          <TableRow hover
+                                          <TableRow
                                             key={item.id}
                                             hover
                                             sx={{
@@ -2632,7 +2632,7 @@ const PlanningDataPage: React.FC = () => {
                                           const mateName = item.mateName;
 
                                           return (
-                                            <TableRow hover
+                                            <TableRow
                                               key={item.id}
                                               hover
                                               sx={{
@@ -3049,7 +3049,7 @@ const PlanningDataPage: React.FC = () => {
                                           const spawnHours = formatSpawnHours(item.spawnHours);
 
                                           return (
-                                            <TableRow hover
+                                            <TableRow
                                               key={item.id}
                                               hover
                                               sx={{

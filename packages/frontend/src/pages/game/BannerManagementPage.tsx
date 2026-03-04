@@ -556,7 +556,7 @@ const BannerManagementPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {banners.map((banner) => (
-                      <TableRow hover
+                      <TableRow
                         key={banner.bannerId}
                         hover
                         selected={selectedIds.includes(banner.bannerId)}

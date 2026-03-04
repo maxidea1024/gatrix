@@ -1091,7 +1091,7 @@ const CrashEventsPage: React.FC = () => {
                   <TableBody>
                     {events.map((event, index) => (
                       <React.Fragment key={event.id}>
-                        <TableRow hover
+                        <TableRow
                           hover
                           sx={{
                             bgcolor: (theme) =>

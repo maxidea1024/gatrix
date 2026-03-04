@@ -590,7 +590,7 @@ const WhitelistPage: React.FC = () => {
                         </TableHead>
                         <TableBody>
                           {whitelists.map((whitelist) => (
-                            <TableRow hover
+                            <TableRow
                               key={whitelist.id}
                               hover
                               selected={selectedIds.includes(whitelist.id)}

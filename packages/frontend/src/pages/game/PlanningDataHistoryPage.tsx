@@ -379,7 +379,7 @@ const PlanningDataHistoryPage: React.FC = () => {
                   <TableBody>
                     {paginatedHistory.map((record, index) => (
                       <React.Fragment key={record.id}>
-                        <TableRow hover
+                        <TableRow
                           hover
                           sx={{
                             cursor:

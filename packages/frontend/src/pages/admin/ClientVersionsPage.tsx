@@ -845,14 +845,14 @@ const ClientVersionsPage: React.FC = () => {
           maintenanceEndDate: maintenanceEndDate || undefined,
           ...(inputMode === 'direct'
             ? {
-                maintenanceMessage: maintenanceMessage || undefined,
-                supportsMultiLanguage: supportsMultiLanguage,
-                maintenanceLocales: maintenanceLocales.filter((l) => l.message.trim() !== ''),
-              }
+              maintenanceMessage: maintenanceMessage || undefined,
+              supportsMultiLanguage: supportsMultiLanguage,
+              maintenanceLocales: maintenanceLocales.filter((l) => l.message.trim() !== ''),
+            }
             : {
-                messageTemplateId:
-                  selectedTemplateId === '' ? undefined : Number(selectedTemplateId),
-              }),
+              messageTemplateId:
+                selectedTemplateId === '' ? undefined : Number(selectedTemplateId),
+            }),
         }),
       };
 
@@ -1723,10 +1723,10 @@ const ClientVersionsPage: React.FC = () => {
             onAddClick={
               canManage
                 ? () => {
-                    setEditingClientVersion(null);
-                    setIsCopyMode(false);
-                    setFormDialogOpen(true);
-                  }
+                  setEditingClientVersion(null);
+                  setIsCopyMode(false);
+                  setFormDialogOpen(true);
+                }
                 : undefined
             }
             addButtonLabel={t('clientVersions.addIndividual')}
@@ -1772,10 +1772,10 @@ const ClientVersionsPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {clientVersions.map((clientVersion) => (
-                    <TableRow hover
+                    <TableRow
                       key={clientVersion.id}
-                      selected={selectedIds.includes(clientVersion.id)}
                       hover
+                      selected={selectedIds.includes(clientVersion.id)}
                     >
                       {canManage && (
                         <TableCell padding="checkbox">

@@ -1499,7 +1499,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {templates.map((template) => (
-                      <TableRow hover
+                      <TableRow
                         key={template.id}
                         hover
                         selected={selectedIds.includes(template.id)}

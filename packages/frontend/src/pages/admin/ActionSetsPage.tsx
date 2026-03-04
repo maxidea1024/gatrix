@@ -610,7 +610,7 @@ const ActionSetsPage: React.FC = () => {
               <TableBody>
                 {actionSets.map((actionSet) => (
                   <React.Fragment key={actionSet.id}>
-                    <TableRow hover
+                    <TableRow
                       hover
                       sx={{
                         '& > td': {

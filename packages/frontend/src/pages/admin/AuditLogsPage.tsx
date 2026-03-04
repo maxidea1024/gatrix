@@ -722,7 +722,7 @@ const AuditLogsPage: React.FC = () => {
                   <TableBody>
                     {auditLogs.map((log, index) => (
                       <React.Fragment key={log.id}>
-                        <TableRow hover
+                        <TableRow
                           hover
                           sx={{
                             cursor: 'pointer',
