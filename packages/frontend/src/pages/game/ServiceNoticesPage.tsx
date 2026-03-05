@@ -891,16 +891,16 @@ const ServiceNoticesPage: React.FC = () => {
 
                             const tooltipMessage = isCurrentlyVisible
                               ? t('serviceNotices.currentlyVisibleTooltip', {
-                                time: formatDateTime(now),
-                                start: startText,
-                                end: endText,
-                              })
+                                  time: formatDateTime(now),
+                                  start: startText,
+                                  end: endText,
+                                })
                               : t('serviceNotices.notVisibleTooltip', {
-                                time: formatDateTime(now),
-                                start: startText,
-                                end: endText,
-                                isActive: notice.isActive,
-                              });
+                                  time: formatDateTime(now),
+                                  start: startText,
+                                  end: endText,
+                                  isActive: notice.isActive,
+                                });
 
                             return (
                               <TableCell key={column.id}>
@@ -1091,7 +1091,10 @@ const ServiceNoticesPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center">
-                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, notice)}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleActionMenuOpen(e, notice)}
+                            >
                               <MoreVertIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
@@ -1119,7 +1122,11 @@ const ServiceNoticesPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
+      <Menu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
         <MenuItem
           onClick={() => {
             if (actionMenuTarget) handleEdit(actionMenuTarget);

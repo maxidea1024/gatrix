@@ -184,10 +184,10 @@ const GroupsPage: React.FC = () => {
   // Filtered groups
   const filteredGroups = debouncedSearchTerm
     ? groups.filter(
-      (g) =>
-        g.groupName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        (g.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    )
+        (g) =>
+          g.groupName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          (g.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      )
     : groups;
 
   // ─── Dialog handlers ─────────────────────────
@@ -393,14 +393,14 @@ const GroupsPage: React.FC = () => {
   // Available members: not already in group AND not pending add; also include pending removes as available again
   const effectiveMembers = selectedGroup
     ? [
-      ...selectedGroup.members.filter((m) => !pendingMemberRemoves.includes(m.userId)),
-      ...(pendingMemberAdds
-        .map((userId) => {
-          const u = allUsers.find((u) => u.id === userId);
-          return u ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember) : null;
-        })
-        .filter(Boolean) as GroupMember[]),
-    ]
+        ...selectedGroup.members.filter((m) => !pendingMemberRemoves.includes(m.userId)),
+        ...(pendingMemberAdds
+          .map((userId) => {
+            const u = allUsers.find((u) => u.id === userId);
+            return u ? ({ userId: u.id, name: u.name, email: u.email } as GroupMember) : null;
+          })
+          .filter(Boolean) as GroupMember[]),
+      ]
     : [];
 
   const availableUsers = allUsers.filter((u) => !effectiveMembers.some((m) => m.userId === u.id));
@@ -408,16 +408,16 @@ const GroupsPage: React.FC = () => {
   // Available roles: not already assigned AND not pending add; also include pending removes
   const effectiveRoles = selectedGroup
     ? [
-      ...selectedGroup.roles.filter((r) => !pendingRoleRemoves.includes(r.roleId)),
-      ...(pendingRoleAdds
-        .map((roleId) => {
-          const r = allRoles.find((r) => r.id === roleId);
-          return r
-            ? ({ roleId: r.id, roleName: r.roleName, description: r.description } as GroupRole)
-            : null;
-        })
-        .filter(Boolean) as GroupRole[]),
-    ]
+        ...selectedGroup.roles.filter((r) => !pendingRoleRemoves.includes(r.roleId)),
+        ...(pendingRoleAdds
+          .map((roleId) => {
+            const r = allRoles.find((r) => r.id === roleId);
+            return r
+              ? ({ roleId: r.id, roleName: r.roleName, description: r.description } as GroupRole)
+              : null;
+          })
+          .filter(Boolean) as GroupRole[]),
+      ]
     : [];
 
   const availableRoles = allRoles.filter((r) => !effectiveRoles.some((er) => er.roleId === r.id));
@@ -534,9 +534,19 @@ const GroupsPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="center">
                       {group.addNewUsersByDefault ? (
-                        <Chip label={t('common.yes')} size="small" color="success" sx={{ borderRadius: '8px' }} />
+                        <Chip
+                          label={t('common.yes')}
+                          size="small"
+                          color="success"
+                          sx={{ borderRadius: '8px' }}
+                        />
                       ) : (
-                        <Chip label={t('common.no')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
+                        <Chip
+                          label={t('common.no')}
+                          size="small"
+                          variant="outlined"
+                          sx={{ borderRadius: '8px' }}
+                        />
                       )}
                     </TableCell>
                     <TableCell>

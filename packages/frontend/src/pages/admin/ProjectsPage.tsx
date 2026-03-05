@@ -2,13 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Card,
+  CardContent,
+  CardActionArea,
   IconButton,
   Tooltip,
   Chip,
@@ -23,6 +19,11 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Breadcrumbs,
+  Link,
+  Collapse,
+  List,
+  ListItemButton,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -30,27 +31,43 @@ import {
   Delete as DeleteIcon,
   Folder as ProjectIcon,
   MoreVert as MoreVertIcon,
-  ContentCopy as CopyIcon,
+  CalendarToday as CalendarTodayIcon,
+  NavigateNext as NavigateNextIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+  Public as EnvironmentIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import { orgProjectService, Project, Organisation } from '@/services/orgProjectService';
+import { orgProjectService, Project, AccessTree } from '@/services/orgProjectService';
+import { environmentService, Environment } from '@/services/environmentService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { refreshProjects } = useOrgProject();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { refreshProjects, currentOrg, currentProjectId, organisations, switchContext } = useOrgProject();
+
+  // Resolve the parent org from URL param or current context
+  const urlOrgId = searchParams.get('orgId');
+  const effectiveOrg = urlOrgId
+    ? organisations.find((o) => o.id === urlOrgId) || currentOrg
+    : currentOrg;
 
   const [projects, setProjects] = useState<Project[]>([]);
-  const [organisations, setOrganisations] = useState<Organisation[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [accessTree, setAccessTree] = useState<AccessTree>({});
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [projectEnvMap, setProjectEnvMap] = useState<Record<string, Environment[]>>({});
+  const [loadingEnvProjects, setLoadingEnvProjects] = useState<Set<string>>(new Set());
 
   // Create/Edit dialog
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -85,30 +102,74 @@ const ProjectsPage: React.FC = () => {
     setMenuTarget(null);
   };
 
-  const handleCopyText = (text: string) => {
-    copyToClipboardWithNotification(
-      text,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-    );
-  };
-
-  // Load projects
+  // Load projects and filter by effective org
   const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
-      const [projectData, orgData] = await Promise.all([
-        orgProjectService.getProjects(),
-        orgProjectService.getOrganisations(),
-      ]);
-      setProjects(projectData);
-      setOrganisations(orgData);
+      const projectData = await orgProjectService.getProjects();
+      // Filter by the effective org (URL param or current context)
+      const orgId = effectiveOrg?.id;
+      setProjects(orgId ? projectData.filter((p) => p.orgId === orgId) : projectData);
+
+      // Load access tree (non-blocking)
+      try {
+        const access = await orgProjectService.getMyAccess();
+        setAccessTree(access);
+      } catch {
+        console.warn('Failed to load access tree');
+      }
     } catch {
       enqueueSnackbar(t('rbac.projects.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
-  }, [enqueueSnackbar, t]);
+  }, [enqueueSnackbar, t, effectiveOrg?.id]);
+
+  // Toggle project expansion and load environments
+  const handleToggleProjectExpand = useCallback(
+    async (e: React.MouseEvent, proj: Project) => {
+      e.stopPropagation();
+      const projId = proj.id;
+
+      setExpandedProjects((prev) => {
+        const next = new Set(prev);
+        if (next.has(projId)) {
+          next.delete(projId);
+        } else {
+          next.add(projId);
+        }
+        return next;
+      });
+
+      // Load environments if not already loaded
+      if (!projectEnvMap[projId]) {
+        setLoadingEnvProjects((prev) => new Set(prev).add(projId));
+        try {
+          const orgId = proj.orgId;
+          const apiPath = `/admin/orgs/${orgId}/projects/${projId}`;
+          const envs = await environmentService.getEnvironments(apiPath);
+
+          // Filter by RBAC access
+          const orgAccess = accessTree[orgId];
+          const accessibleEnvIds = orgAccess?.environments?.[projId];
+          const filteredEnvs = accessibleEnvIds
+            ? envs.filter((e) => accessibleEnvIds.includes(e.environmentId))
+            : envs;
+
+          setProjectEnvMap((prev) => ({ ...prev, [projId]: filteredEnvs }));
+        } catch {
+          console.warn('Failed to load environments for project', projId);
+        } finally {
+          setLoadingEnvProjects((prev) => {
+            const next = new Set(prev);
+            next.delete(projId);
+            return next;
+          });
+        }
+      }
+    },
+    [projectEnvMap, accessTree]
+  );
 
   useEffect(() => {
     loadProjects();
@@ -149,7 +210,10 @@ const ProjectsPage: React.FC = () => {
     try {
       setSaving(true);
       if (dialogMode === 'create') {
-        await orgProjectService.createProject(formData);
+        await orgProjectService.createProject({
+          ...formData,
+          orgId: effectiveOrg?.id,
+        });
         enqueueSnackbar(t('rbac.projects.createSuccess'), { variant: 'success' });
       } else if (editId) {
         await orgProjectService.updateProject(editId, {
@@ -190,6 +254,22 @@ const ProjectsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Breadcrumb */}
+      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
+        <Link
+          component={RouterLink}
+          to="/admin/workspace"
+          underline="hover"
+          color="inherit"
+          sx={{ display: 'flex', alignItems: 'center' }}
+        >
+          {t('workspace.title')}
+        </Link>
+        <Typography color="text.primary" fontWeight={500}>
+          {effectiveOrg?.displayName || effectiveOrg?.orgName || t('common.organisation')}
+        </Typography>
+      </Breadcrumbs>
+
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
@@ -212,99 +292,243 @@ const ProjectsPage: React.FC = () => {
             description={t('rbac.projects.emptyDescription')}
           />
         ) : (
-          <TableContainer component={Paper} variant="outlined">
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('rbac.projects.name')}</TableCell>
-                  <TableCell>{t('rbac.projects.displayName')}</TableCell>
-                  <TableCell>{t('common.organisation')}</TableCell>
-                  <TableCell>{t('rbac.projects.descriptionColumn')}</TableCell>
-                  <TableCell align="center">{t('rbac.projects.default')}</TableCell>
-                  <TableCell align="center">{t('rbac.orgs.status')}</TableCell>
-                  <TableCell>{t('common.createdAt')}</TableCell>
-                  <TableCell align="center">{t('common.actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {projects.map((proj) => (
-                  <TableRow key={proj.id} hover>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <ProjectIcon fontSize="small" sx={{ opacity: 0.6 }} />
-                        <Typography variant="body2" fontWeight={600}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+              },
+              gap: 3,
+            }}
+          >
+            {projects.map((proj) => (
+              <Card
+                key={proj.id}
+                sx={{
+                  borderRadius: 3,
+                  border: '1px solid',
+                  borderColor: proj.id === currentProjectId ? 'primary.main' : 'divider',
+                  boxShadow:
+                    proj.id === currentProjectId
+                      ? (theme) =>
+                        `0 0 0 2px ${theme.palette.primary.main}40, 0 4px 12px ${theme.palette.primary.main}20`
+                      : '0 2px 8px rgba(0, 0, 0, 0.06)',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    boxShadow:
+                      proj.id === currentProjectId
+                        ? (theme) =>
+                          `0 0 0 2px ${theme.palette.primary.main}60, 0 6px 20px ${theme.palette.primary.main}30`
+                        : '0 4px 16px rgba(0, 0, 0, 0.1)',
+                    transform: 'translateY(-2px)',
+                  },
+                  position: 'relative',
+                }}
+              >
+                {/* MoreVert button */}
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMenuOpen(e, proj);
+                  }}
+                  sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+                >
+                  <MoreVertIcon fontSize="small" />
+                </IconButton>
+
+                <CardActionArea
+                  onClick={() => {
+                    switchContext(proj.orgId, proj.id);
+                    navigate(`/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`);
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    {/* Header */}
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2, pr: 4 }}>
+                      <Box
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          bgcolor: 'info.main',
+                          color: 'info.contrastText',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <ProjectIcon fontSize="small" />
+                      </Box>
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight={600}
+                          noWrap
+                          title={proj.displayName || proj.projectName}
+                        >
+                          {proj.displayName || proj.projectName}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          noWrap
+                          sx={{ display: 'block' }}
+                          title={proj.projectName}
+                        >
                           {proj.projectName}
                         </Typography>
-                        <Tooltip title={t('common.copy')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleCopyText(proj.projectName)}
-                            sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
-                          >
-                            <CopyIcon sx={{ fontSize: 14 }} />
-                          </IconButton>
+                      </Box>
+                    </Box>
+
+                    {/* Chips */}
+                    <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                      <Chip
+                        label={proj.isActive ? t('common.active') : t('common.inactive')}
+                        size="small"
+                        color={proj.isActive ? 'success' : 'default'}
+                        variant="outlined"
+                      />
+                      {proj.isDefault && (
+                        <Chip
+                          label={t('rbac.projects.default')}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      )}
+                    </Box>
+
+                    {/* Description */}
+                    {proj.description && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 2,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {proj.description}
+                      </Typography>
+                    )}
+
+                    {/* Footer info */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        pt: 2,
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Tooltip title={formatDateTimeDetailed(proj.createdAt)} arrow>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatRelativeTime(proj.createdAt)}
+                          </Typography>
                         </Tooltip>
                       </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Typography variant="body2">
-                          {proj.displayName || '—'}
-                        </Typography>
-                        {proj.displayName && (
-                          <Tooltip title={t('common.copy')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleCopyText(proj.displayName)}
-                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
-                            >
-                              <CopyIcon sx={{ fontSize: 14 }} />
-                            </IconButton>
-                          </Tooltip>
-                        )}
+                    </Box>
+                  </CardContent>
+                </CardActionArea>
+
+                {/* Expandable environment list */}
+                <Box
+                  sx={{
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <ListItemButton
+                    onClick={(e) => handleToggleProjectExpand(e, proj)}
+                    dense
+                    sx={{ py: 0.5 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 28 }}>
+                      {expandedProjects.has(proj.id) ? (
+                        <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                      ) : (
+                        <ChevronRightIcon sx={{ fontSize: 18 }} />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t('common.environment')} (${projectEnvMap[proj.id]?.length ?? '...'})`}
+                      primaryTypographyProps={{
+                        variant: 'caption',
+                        color: 'text.secondary',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </ListItemButton>
+                  <Collapse in={expandedProjects.has(proj.id)}>
+                    {loadingEnvProjects.has(proj.id) ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+                        <CircularProgress size={16} />
                       </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {organisations.find((o) => o.id === proj.orgId)?.displayName || '-'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ opacity: 0.7, maxWidth: 300 }} noWrap>
-                        {proj.description || '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      {proj.isDefault ? (
-                        <Chip label={t('common.yes')} size="small" color="primary" sx={{ borderRadius: '8px' }} />
-                      ) : (
-                        <Chip label={t('common.no')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      {proj.isActive ? (
-                        <Chip label={t('common.active')} size="small" color="success" sx={{ borderRadius: '8px' }} />
-                      ) : (
-                        <Chip label={t('common.inactive')} size="small" variant="outlined" sx={{ borderRadius: '8px' }} />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title={formatDateTimeDetailed(proj.createdAt)}>
-                        <Typography variant="body2">
-                          {formatRelativeTime(proj.createdAt)}
-                        </Typography>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, proj)}>
-                        <MoreVertIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    ) : (
+                      <List dense disablePadding>
+                        {(projectEnvMap[proj.id] || []).map((env) => (
+                          <ListItemButton
+                            key={env.environmentId}
+                            sx={{ pl: 4, py: 0.25 }}
+                            onClick={() => {
+                              switchContext(proj.orgId, proj.id);
+                              navigate(
+                                `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
+                              );
+                            }}
+                          >
+                            {' '}
+                            <ListItemIcon sx={{ minWidth: 24 }}>
+                              <EnvironmentIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={env.displayName || env.environmentName}
+                              primaryTypographyProps={{
+                                variant: 'body2',
+                                noWrap: true,
+                              }}
+                            />
+                          </ListItemButton>
+                        ))}
+                        {(projectEnvMap[proj.id] || []).length === 0 && (
+                          <ListItemButton
+                            sx={{ pl: 4, py: 0.25 }}
+                            onClick={() => {
+                              switchContext(proj.orgId, proj.id);
+                              navigate(
+                                `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
+                              );
+                            }}
+                          >
+                            <ListItemText
+                              primary={t('environments.noEnvironments')}
+                              primaryTypographyProps={{
+                                variant: 'caption',
+                                color: 'warning.main',
+                                fontStyle: 'italic',
+                              }}
+                            />
+                          </ListItemButton>
+                        )}
+                      </List>
+                    )}
+                  </Collapse>
+                </Box>
+              </Card>
+            ))}
+          </Box>
         )}
       </PageContentLoader>
 

@@ -5971,7 +5971,8 @@ const ServerListPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {bulkHealthCheckResults.map((item, index) => (
-                  <TableRow hover
+                  <TableRow
+                    hover
                     key={item.serviceKey}
                     id={`bulk-health-row-${index}`}
                     sx={{

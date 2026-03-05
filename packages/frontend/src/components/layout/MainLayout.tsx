@@ -101,7 +101,12 @@ import {
   MaintenanceStatusType,
 } from '@/utils/maintenanceStatusUtils';
 import moment from 'moment';
-import { getMenuCategories, MenuItem as NavMenuItem, MenuCategory } from '@/config/navigation';
+import {
+  getMenuCategories,
+  getPathMatchMap,
+  MenuItem as NavMenuItem,
+  MenuCategory,
+} from '@/config/navigation';
 import mailService from '@/services/mailService';
 import { Permission, PERMISSIONS } from '@/types/permissions';
 
@@ -818,15 +823,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const isActivePath = (path: string) => {
-    // 정확한 경로 매칭
+    // Exact path match
     if (location.pathname === path) {
       return true;
     }
-    // /settings, /feature-flags 경로들은 정확한 매칭만 사용 (prefix 매칭 안 함)
+    // Check alias paths from navigation config (e.g., workspace matches projects/environments)
+    const pathMatchMap = getPathMatchMap();
+    const aliases = pathMatchMap[path];
+    if (aliases?.some((p) => location.pathname.startsWith(p))) {
+      return true;
+    }
+    // /settings, /feature-flags use exact match only (no prefix matching)
     if (path.startsWith('/settings') || path.startsWith('/feature-flags')) {
       return false;
     }
-    // 하위 경로인 경우에만 true (단, 정확히 '/'로 구분되는 경우만)
+    // Sub-path match (only when separated by '/')
     if (path !== '/' && location.pathname.startsWith(path + '/')) {
       return true;
     }

@@ -26,7 +26,7 @@ export interface EnvironmentContextType {
   currentEnvironmentId: string | null; // Keep for backward compatibility (actually environment name)
   isLoading: boolean;
   error: string | null;
-  switchEnvironment: (environmentId: string) => void;
+  switchEnvironment: (orgId: string, projectId: string, environmentId: string) => void;
   refresh: () => Promise<void>;
 }
 
@@ -54,7 +54,7 @@ const storeEnvironment = (environmentId: string, name: string): void => {
 
 export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
-  const { getProjectApiPath, currentProjectId } = useOrgProject();
+  const { getProjectApiPath, currentProjectId, switchContext } = useOrgProject();
   const [allEnvironments, setAllEnvironments] = useState<Environment[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [currentEnvironmentId, setCurrentEnvironmentId] = useState<string | null>(
@@ -171,23 +171,32 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     }
   }, [isAuthenticated, currentProjectId, loadEnvironments]);
 
-  // Switch to a different environment
   const switchEnvironment = useCallback(
-    (environmentId: string) => {
-      const env = environments.find((e) => e.environmentId === environmentId);
+    (orgId: string, projectId: string, environmentId: string) => {
+      // Atomically switch org and project context
+      switchContext(orgId, projectId);
+
+      // Set environment ID and persist
+      const env =
+        environments.find((e) => e.environmentId === environmentId) ||
+        allEnvironments.find((e) => e.environmentId === environmentId);
       if (env) {
         setCurrentEnvironmentId(environmentId);
         storeEnvironment(environmentId, env.displayName);
-
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(
-          new CustomEvent('environment-changed', {
-            detail: { environmentId, env },
-          })
-        );
+      } else {
+        // Environment not in current list — store ID directly; list will reload after project switch
+        setCurrentEnvironmentId(environmentId);
+        localStorage.setItem(STORAGE_KEY, environmentId);
       }
+
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(
+        new CustomEvent('environment-changed', {
+          detail: { environmentId, orgId, projectId },
+        })
+      );
     },
-    [environments]
+    [environments, allEnvironments, switchContext]
   );
 
   const value: EnvironmentContextType = {

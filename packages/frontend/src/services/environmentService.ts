@@ -20,7 +20,6 @@ export interface Environment {
 }
 
 export interface CreateEnvironmentData {
-  environmentId: string; // Environment name (primary key)
   displayName: string;
   description?: string;
   environmentType: 'development' | 'staging' | 'production';

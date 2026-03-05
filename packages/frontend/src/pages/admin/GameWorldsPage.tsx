@@ -530,7 +530,7 @@ const GameWorldsPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    onConfirm: () => { },
+    onConfirm: () => {},
   });
 
   // Delete confirmation state
@@ -558,7 +558,7 @@ const GameWorldsPage: React.FC = () => {
     tagService
       .list()
       .then(setAllRegistryTags)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   // Load message templates
@@ -1552,35 +1552,35 @@ const GameWorldsPage: React.FC = () => {
         const maintenanceTooltip =
           maintenanceStatus === 'scheduled' || maintenanceStatus === 'active'
             ? (() => {
-              const parts: string[] = [];
-              // Start time: show "immediate start" if not set
-              parts.push(
-                `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
-              );
-              // End time: show "manual stop" if not set
-              parts.push(
-                `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
-              );
-              // Force disconnect info
-              if (world.forceDisconnect) {
-                const delayText =
-                  (world.gracePeriodMinutes ?? 0) === 0
-                    ? t('maintenance.kickDelayImmediate')
-                    : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
+                const parts: string[] = [];
+                // Start time: show "immediate start" if not set
                 parts.push(
-                  `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
+                  `${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`
                 );
-              } else {
-                parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
-              }
-              if (world.maintenanceMessage) {
-                const msg = world.maintenanceMessage;
+                // End time: show "manual stop" if not set
                 parts.push(
-                  `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
+                  `${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`
                 );
-              }
-              return parts.join('\n');
-            })()
+                // Force disconnect info
+                if (world.forceDisconnect) {
+                  const delayText =
+                    (world.gracePeriodMinutes ?? 0) === 0
+                      ? t('maintenance.kickDelayImmediate')
+                      : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
+                  parts.push(
+                    `${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`
+                  );
+                } else {
+                  parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
+                }
+                if (world.maintenanceMessage) {
+                  const msg = world.maintenanceMessage;
+                  parts.push(
+                    `${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`
+                  );
+                }
+                return parts.join('\n');
+              })()
             : '';
 
         const chip = (
@@ -2325,7 +2325,7 @@ const GameWorldsPage: React.FC = () => {
             }
             helperText={
               deleteConfirmDialog.inputValue !== '' &&
-                deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
+              deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name
                 ? 'Name does not match'
                 : ''
             }

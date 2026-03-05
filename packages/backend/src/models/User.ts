@@ -2,18 +2,8 @@ import bcrypt from 'bcryptjs';
 import { generateULID } from '../utils/ulid';
 import db from '../config/knex';
 import logger from '../config/logger';
-import {
-  User as UserType,
-  CreateUserData,
-  UpdateUserData,
-  UserWithoutPassword,
-} from '../types/user';
+import { CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
 import { Model } from 'objection';
-import {
-  convertDateFieldsForMySQL,
-  convertDateFieldsFromMySQL,
-  COMMON_DATE_FIELDS,
-} from '../utils/dateUtils';
 
 // Export User class for Objection.js models
 export class User extends Model {
@@ -511,57 +501,6 @@ export class UserModel {
       logger.error('Error getting users for sync:', error);
       throw error;
     }
-  }
-
-  // Environment access methods
-  // NOTE: Legacy g_user_environments table and allowAllEnvironments column removed in RBAC redesign.
-  // Environment access is now managed via g_role_environment_permissions.
-  // These stubs return permissive defaults until fully migrated.
-
-  /**
-   * Get user's environment access settings
-   * @deprecated Use role-based environment permissions instead
-   */
-  static async getEnvironmentAccess(userId: string): Promise<{
-    allowAllEnvironments: boolean;
-    environments: string[];
-  }> {
-    // Return all-access by default until role-based env permissions are wired
-    return {
-      allowAllEnvironments: true,
-      environments: [],
-    };
-  }
-
-  /**
-   * Set user's environment access
-   * @deprecated Use role-based environment permissions instead
-   */
-  static async setEnvironmentAccess(
-    userId: string,
-    allowAllEnvironments: boolean,
-    environments: string[],
-    updatedBy: string
-  ): Promise<void> {
-    logger.warn('setEnvironmentAccess: Legacy method called, no-op until RBAC migration complete');
-  }
-
-  /**
-   * Check if user has access to a specific environment
-   * @deprecated Use role-based environment permissions instead
-   */
-  static async hasEnvironmentAccess(userId: string, environmentId: string): Promise<boolean> {
-    // Allow all access by default until role-based env permissions are wired
-    return true;
-  }
-
-  /**
-   * Get accessible environment names for a user
-   * @deprecated Use role-based environment permissions instead
-   */
-  static async getAccessibleEnvironments(userId: string): Promise<string[] | 'all'> {
-    // Return 'all' by default until role-based env permissions are wired
-    return 'all';
   }
 
   // Permission methods for RBAC

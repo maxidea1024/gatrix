@@ -26,7 +26,6 @@ import {
   MenuItem,
   Tabs,
   Tab,
-
   Checkbox,
   Tooltip,
   Dialog,
@@ -139,7 +138,7 @@ const WhitelistPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    action: () => { },
+    action: () => {},
   });
 
   // Form data
@@ -784,7 +783,11 @@ const WhitelistPage: React.FC = () => {
                 setEditDialog(false);
               }}
               title={editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
-              subtitle={editDialog ? t('whitelist.dialog.editDescription') : t('whitelist.dialog.addDescription')}
+              subtitle={
+                editDialog
+                  ? t('whitelist.dialog.editDescription')
+                  : t('whitelist.dialog.addDescription')
+              }
               storageKey="whitelistDrawerWidth"
               defaultWidth={500}
               minWidth={400}
@@ -818,7 +821,8 @@ const WhitelistPage: React.FC = () => {
                     onChange={(date) => {
                       setFormData({
                         ...formData,
-                        startDate: date && dayjs.isDayjs(date) && date.isValid() ? date.toISOString() : '',
+                        startDate:
+                          date && dayjs.isDayjs(date) && date.isValid() ? date.toISOString() : '',
                       });
                     }}
                     timeSteps={{ minutes: 1 }}
@@ -838,7 +842,8 @@ const WhitelistPage: React.FC = () => {
                     onChange={(date) =>
                       setFormData({
                         ...formData,
-                        endDate: date && dayjs.isDayjs(date) && date.isValid() ? date.toISOString() : '',
+                        endDate:
+                          date && dayjs.isDayjs(date) && date.isValid() ? date.toISOString() : '',
                       })
                     }
                     minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
@@ -938,9 +943,7 @@ const WhitelistPage: React.FC = () => {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button onClick={() => setBulkDialog(false)}>
-                  {t('common.cancel')}
-                </Button>
+                <Button onClick={() => setBulkDialog(false)}>{t('common.cancel')}</Button>
                 <Button onClick={handleBulkCreate} variant="contained" startIcon={<UploadIcon />}>
                   {t('whitelist.dialog.import')}
                 </Button>
@@ -957,9 +960,7 @@ const WhitelistPage: React.FC = () => {
                 <Typography>{confirmDialog.message}</Typography>
               </DialogContent>
               <DialogActions>
-                <Button
-                  onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
-                >
+                <Button onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}>
                   {t('common.cancel')}
                 </Button>
                 <Button

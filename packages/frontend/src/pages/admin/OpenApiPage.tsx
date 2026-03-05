@@ -248,14 +248,17 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         '& .swagger-ui .opblock': { borderColor },
         '& .swagger-ui .opblock .opblock-summary': { backgroundColor: bgSubtle },
         // Force all text inside opblock-summary to be white in dark mode
-        ...(isDark ? {
-          '& .swagger-ui .opblock .opblock-summary-description': {
-            color: 'rgba(255,255,255,0.6) !important',
-          },
-          '& .swagger-ui .opblock .opblock-summary-path, & .swagger-ui .opblock .opblock-summary-path a, & .swagger-ui .opblock .opblock-summary-path span': {
-            color: '#fff !important',
-          },
-        } : {}),
+        ...(isDark
+          ? {
+              '& .swagger-ui .opblock .opblock-summary-description': {
+                color: 'rgba(255,255,255,0.6) !important',
+              },
+              '& .swagger-ui .opblock .opblock-summary-path, & .swagger-ui .opblock .opblock-summary-path a, & .swagger-ui .opblock .opblock-summary-path span':
+                {
+                  color: '#fff !important',
+                },
+            }
+          : {}),
         '& .swagger-ui .opblock-description-text': { color: textSecondary },
         '& .swagger-ui .opblock-description-text p': { color: textSecondary },
         '& .swagger-ui .opblock-external-docs-url': { color: accentColor },
@@ -286,9 +289,10 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
           borderColor,
         },
         // "No parameters" text
-        '& .swagger-ui .opblock-description-wrapper, & .swagger-ui .opblock-description-wrapper p': {
-          color: textSecondary,
-        },
+        '& .swagger-ui .opblock-description-wrapper, & .swagger-ui .opblock-description-wrapper p':
+          {
+            color: textSecondary,
+          },
         // Table
         '& .swagger-ui table': { color: textPrimary },
         '& .swagger-ui table thead tr': { backgroundColor: bgSubtle },
@@ -358,11 +362,12 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
           color: textPrimary,
           borderColor,
         },
-        '& .swagger-ui input[type=text], & .swagger-ui input[type=password], & .swagger-ui input[type=search], & .swagger-ui input[type=email], & .swagger-ui input[type=file]': {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : bgPaper,
-          color: textPrimary,
-          borderColor,
-        },
+        '& .swagger-ui input[type=text], & .swagger-ui input[type=password], & .swagger-ui input[type=search], & .swagger-ui input[type=email], & .swagger-ui input[type=file]':
+          {
+            backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : bgPaper,
+            color: textPrimary,
+            borderColor,
+          },
         '& .swagger-ui textarea': {
           backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : bgPaper,
           color: textPrimary,
@@ -389,9 +394,10 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
         '& .swagger-ui .arrow': { fill: textPrimary },
         '& .swagger-ui svg:not(:root)': { fill: isDark ? '#e0e0e0' : undefined },
         // Markdown rendered content
-        '& .swagger-ui .markdown p, & .swagger-ui .markdown li, & .swagger-ui .markdown td, & .swagger-ui .markdown th': {
-          color: textSecondary,
-        },
+        '& .swagger-ui .markdown p, & .swagger-ui .markdown li, & .swagger-ui .markdown td, & .swagger-ui .markdown th':
+          {
+            color: textSecondary,
+          },
         '& .swagger-ui .markdown a': { color: accentColor },
         '& .swagger-ui .markdown code': {
           backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : undefined,
@@ -4132,107 +4138,107 @@ function createAdminApiSpec() {
         },
       },
       '/admin/orgs/{orgId}/projects/{projectId}/environments/{sourceEnvironmentId}/copy/{targetEnvironmentId}/preview':
-      {
-        get: {
-          summary: 'Preview environment copy',
-          tags: ['Environments'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          get: {
+            summary: 'Preview environment copy',
+            tags: ['Environments'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'sourceEnvironmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'targetEnvironmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'sourceEnvironmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'targetEnvironmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/environments/{sourceEnvironmentId}/copy/{targetEnvironmentId}':
-      {
-        post: {
-          summary: 'Copy environment',
-          tags: ['Environments'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          post: {
+            summary: 'Copy environment',
+            tags: ['Environments'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'sourceEnvironmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'targetEnvironmentId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'sourceEnvironmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'targetEnvironmentId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/flags': {
         get: {
           summary: 'List feature flags',
@@ -4756,104 +4762,104 @@ function createAdminApiSpec() {
         },
       },
       '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/strategies/{strategyId}':
-      {
-        put: {
-          summary: 'Update strategy',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          put: {
+            summary: 'Update strategy',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
+              },
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'strategyId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
               },
             },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+          },
+          delete: {
+            summary: 'Delete strategy',
+            tags: ['Feature Flags'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'strategyId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'flagName',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'strategyId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-        delete: {
-          summary: 'Delete strategy',
-          tags: ['Feature Flags'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'flagName',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'strategyId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
-            },
-          },
-        },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/features/flags/{flagName}/variants': {
         put: {
           summary: 'Update flag variants',
@@ -10953,56 +10959,56 @@ function createAdminApiSpec() {
         },
       },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{planId}/milestones/{milestoneId}/start':
-      {
-        post: {
-          summary: 'Start milestone',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          post: {
+            summary: 'Start milestone',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'planId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'milestoneId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'planId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'milestoneId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/plans/{id}': {
         delete: {
           summary: 'Delete plan',
@@ -11214,174 +11220,174 @@ function createAdminApiSpec() {
         },
       },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/milestones/{milestoneId}/transition':
-      {
-        put: {
-          summary: 'Set milestone transition',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          put: {
+            summary: 'Set milestone transition',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
+              },
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'milestoneId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
               },
             },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+          },
+          delete: {
+            summary: 'Remove milestone transition',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'milestoneId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'milestoneId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '204': {
+                description: 'Deleted',
+              },
             },
           },
         },
-        delete: {
-          summary: 'Remove milestone transition',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-            {
-              name: 'milestoneId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
-              },
-            },
-          ],
-          responses: {
-            '204': {
-              description: 'Deleted',
-            },
-          },
-        },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/milestones/{milestoneId}/safeguards':
-      {
-        get: {
-          summary: 'Get milestone safeguards',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          get: {
+            summary: 'Get milestone safeguards',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'milestoneId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'milestoneId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/milestones/{milestoneId}/safeguards/evaluate':
-      {
-        post: {
-          summary: 'Evaluate milestone safeguards',
-          tags: ['Release Flows'],
-          security: [
-            {
-              bearerAuth: [],
-            },
-          ],
-          parameters: [
-            {
-              name: 'orgId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+        {
+          post: {
+            summary: 'Evaluate milestone safeguards',
+            tags: ['Release Flows'],
+            security: [
+              {
+                bearerAuth: [],
               },
-            },
-            {
-              name: 'projectId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+            ],
+            parameters: [
+              {
+                name: 'orgId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-            {
-              name: 'milestoneId',
-              in: 'path',
-              required: true,
-              schema: {
-                type: 'string',
+              {
+                name: 'projectId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
               },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
+              {
+                name: 'milestoneId',
+                in: 'path',
+                required: true,
+                schema: {
+                  type: 'string',
+                },
+              },
+            ],
+            responses: {
+              '200': {
+                description: 'Success',
+              },
             },
           },
         },
-      },
       '/admin/orgs/{orgId}/projects/{projectId}/release-flows/safeguards': {
         post: {
           summary: 'Create safeguard',

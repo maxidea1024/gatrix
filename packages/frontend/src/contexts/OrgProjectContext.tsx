@@ -30,6 +30,8 @@ export interface OrgProjectContextType {
   // Actions
   switchOrg: (orgId: string) => void;
   switchProject: (projectId: string) => void;
+  /** Atomically switch both org and project without resetting project to null */
+  switchContext: (orgId: string, projectId: string) => void;
   refreshOrgs: () => Promise<void>;
   refreshProjects: () => Promise<void>;
 
@@ -145,32 +147,29 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     }
   }, [currentProjectId, currentProject]);
 
-  // Switch org
-  const switchOrg = useCallback(
-    (orgId: string) => {
-      const org = organisations.find((o) => o.id === orgId);
-      if (org) {
-        setCurrentOrgId(orgId);
-        storeOrgId(orgId);
-        // Reset project — will auto-select in loadProjects
-        setCurrentProjectId(null);
-        localStorage.removeItem(STORAGE_KEY_PROJECT);
-      }
-    },
-    [organisations]
-  );
+  // Switch org only (resets project — loadProjects will auto-select)
+  const switchOrg = useCallback((orgId: string) => {
+    setCurrentOrgId(orgId);
+    storeOrgId(orgId);
+    setCurrentProjectId(null);
+    localStorage.removeItem(STORAGE_KEY_PROJECT);
+  }, []);
 
-  // Switch project
-  const switchProject = useCallback(
-    (projectId: string) => {
-      const proj = projects.find((p) => p.id === projectId);
-      if (proj) {
-        setCurrentProjectId(projectId);
-        storeProjectId(projectId);
-      }
-    },
-    [projects]
-  );
+  // Switch project within current org
+  const switchProject = useCallback((projectId: string) => {
+    setCurrentProjectId(projectId);
+    storeProjectId(projectId);
+  }, []);
+
+  // Atomically switch both org and project at once.
+  // Unlike calling switchOrg + switchProject sequentially,
+  // this does NOT reset projectId to null in between.
+  const switchContext = useCallback((orgId: string, projectId: string) => {
+    setCurrentOrgId(orgId);
+    storeOrgId(orgId);
+    setCurrentProjectId(projectId);
+    storeProjectId(projectId);
+  }, []);
 
   // Build project-scoped API base path
   const getProjectApiPath = useCallback((): string | null => {
@@ -188,6 +187,7 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     isLoading,
     switchOrg,
     switchProject,
+    switchContext,
     refreshOrgs: loadOrgs,
     refreshProjects: loadProjects,
     getProjectApiPath,

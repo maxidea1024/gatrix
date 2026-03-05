@@ -1190,7 +1190,10 @@ const ApiTokensPage: React.FC = () => {
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}
-        onClose={() => { setMenuAnchorEl(null); setMenuTargetToken(null); }}
+        onClose={() => {
+          setMenuAnchorEl(null);
+          setMenuTargetToken(null);
+        }}
       >
         <MenuItem
           onClick={async () => {
@@ -1981,7 +1984,7 @@ const ApiTokensPage: React.FC = () => {
                   }
                   helperText={
                     regenerateConfirmText.length > 0 &&
-                      regenerateConfirmText !== selectedToken.tokenName
+                    regenerateConfirmText !== selectedToken.tokenName
                       ? t('apiTokens.regenerateConfirmMismatch')
                       : ''
                   }

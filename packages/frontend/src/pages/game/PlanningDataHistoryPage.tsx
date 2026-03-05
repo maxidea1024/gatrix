@@ -561,7 +561,8 @@ const PlanningDataHistoryPage: React.FC = () => {
                             </Typography>
                           </TableCell>
                         </TableRow>
-                        <TableRow hover
+                        <TableRow
+                          hover
                           sx={{
                             bgcolor:
                               index % 2 === 1

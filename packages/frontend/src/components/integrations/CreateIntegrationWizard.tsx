@@ -391,25 +391,25 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         slotProps={
           isSensitive
             ? {
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowSensitive((prev) => ({
-                          ...prev,
-                          [param.name]: !prev[param.name],
-                        }))
-                      }
-                      edge="end"
-                      size="small"
-                    >
-                      {isVisible ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowSensitive((prev) => ({
+                            ...prev,
+                            [param.name]: !prev[param.name],
+                          }))
+                        }
+                        edge="end"
+                        size="small"
+                      >
+                        {isVisible ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }
             : undefined
         }
       />

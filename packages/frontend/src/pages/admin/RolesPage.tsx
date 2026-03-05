@@ -773,10 +773,10 @@ const RolesPage: React.FC = () => {
   // Filtered roles
   const filteredRoles = debouncedSearchTerm
     ? roles.filter(
-      (r) =>
-        r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    )
+        (r) =>
+          r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      )
     : roles;
 
   // Dialog handlers

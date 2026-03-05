@@ -289,6 +289,85 @@ class PermissionService {
     return project?.orgId || null;
   }
 
+  // ==================== Accessibility Queries ====================
+
+  /**
+   * Get all project IDs accessible by a user within an org.
+   * Org Admin / Super Admin → all active projects in the org.
+   * Otherwise → projects where user has any project-level or environment-level permission.
+   */
+  async getAccessibleProjectIds(userId: string, orgId: string): Promise<string[]> {
+    // Org Admin or Super Admin → all projects
+    if (await this.isOrgAdmin(userId, orgId)) {
+      const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
+      return allProjects.map((p: any) => p.id);
+    }
+
+    const roleIds = await this.getAllRoleIds(userId);
+    if (roleIds.length === 0) return [];
+
+    // Projects with direct project-level permissions
+    const projectPerms = await db('g_role_project_permissions')
+      .whereIn('roleId', roleIds)
+      .join('g_projects', 'g_role_project_permissions.projectId', 'g_projects.id')
+      .where('g_projects.orgId', orgId)
+      .where('g_projects.isActive', true)
+      .select('g_projects.id');
+
+    // Projects inferred from environment-level permissions
+    const envPerms = await db('g_role_environment_permissions')
+      .whereIn('g_role_environment_permissions.roleId', roleIds)
+      .join('g_environments', 'g_role_environment_permissions.environmentId', 'g_environments.id')
+      .join('g_projects', 'g_environments.projectId', 'g_projects.id')
+      .where('g_projects.orgId', orgId)
+      .where('g_projects.isActive', true)
+      .select('g_projects.id');
+
+    const ids = new Set([...projectPerms.map((p: any) => p.id), ...envPerms.map((p: any) => p.id)]);
+
+    return Array.from(ids);
+  }
+
+  /**
+   * Get all environment IDs accessible by a user within a project.
+   * Org Admin / Project Admin → all active environments.
+   * Otherwise → environments where user has any environment-level permission.
+   */
+  async getAccessibleEnvironmentIds(
+    userId: string,
+    orgId: string,
+    projectId: string
+  ): Promise<string[]> {
+    // Org Admin → all environments
+    if (await this.isOrgAdmin(userId, orgId)) {
+      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      return allEnvs.map((e: any) => e.id);
+    }
+
+    const roleIds = await this.getAllRoleIds(userId);
+    if (roleIds.length === 0) return [];
+
+    // Project Admin → all environments
+    const isProjectAdmin = await db('g_role_project_permissions')
+      .whereIn('roleId', roleIds)
+      .where('projectId', projectId)
+      .where('isAdmin', true)
+      .first();
+    if (isProjectAdmin) {
+      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      return allEnvs.map((e: any) => e.id);
+    }
+
+    // Environments with direct environment-level permissions
+    const envPerms = await db('g_role_environment_permissions')
+      .whereIn('g_role_environment_permissions.roleId', roleIds)
+      .join('g_environments', 'g_role_environment_permissions.environmentId', 'g_environments.id')
+      .where('g_environments.projectId', projectId)
+      .select('g_environments.id');
+
+    return Array.from(new Set(envPerms.map((e: any) => e.id)));
+  }
+
   // ==================== Cache Invalidation ====================
 
   /**

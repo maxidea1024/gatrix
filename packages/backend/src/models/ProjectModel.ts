@@ -68,6 +68,10 @@ export class ProjectModel {
       .orderBy('createdAt', 'desc');
   }
 
+  static async findAll(): Promise<ProjectRecord[]> {
+    return db(this.TABLE).where('isActive', true).orderBy('createdAt', 'desc');
+  }
+
   static async findByName(orgId: string, projectName: string): Promise<ProjectRecord | null> {
     const row = await db(this.TABLE)
       .where('orgId', orgId)

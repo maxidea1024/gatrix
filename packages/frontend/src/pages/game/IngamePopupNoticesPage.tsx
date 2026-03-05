@@ -133,7 +133,10 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [actionMenuTarget, setActionMenuTarget] = useState<IngamePopupNotice | null>(null);
 
-  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, notice: IngamePopupNotice) => {
+  const handleActionMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    notice: IngamePopupNotice
+  ) => {
     setActionMenuAnchorEl(event.currentTarget);
     setActionMenuTarget(notice);
   };
@@ -792,7 +795,10 @@ const IngamePopupNoticesPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center">
-                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, notice)}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleActionMenuOpen(e, notice)}
+                            >
                               <MoreVertIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
@@ -820,13 +826,31 @@ const IngamePopupNoticesPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
-        <MenuItem onClick={() => { if (actionMenuTarget) handleEdit(actionMenuTarget); handleActionMenuClose(); }}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+      <Menu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (actionMenuTarget) handleDelete(actionMenuTarget); handleActionMenuClose(); }}>
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleDelete(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>
       </Menu>

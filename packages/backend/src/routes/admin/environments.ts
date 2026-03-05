@@ -4,7 +4,7 @@ import { requireAdmin } from '../../middleware/requireAdmin';
 import EnvironmentController from '../../controllers/EnvironmentController';
 import { PERMISSIONS } from '../../types/permissions';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // Apply authentication to all routes
 router.use(auth as any);

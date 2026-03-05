@@ -258,9 +258,9 @@ const FeatureFlagTypesPage: React.FC = () => {
                       setEditingType((prev) =>
                         prev
                           ? {
-                            ...prev,
-                            lifetimeDays: e.target.checked ? null : 40,
-                          }
+                              ...prev,
+                              lifetimeDays: e.target.checked ? null : 40,
+                            }
                           : prev
                       )
                     }

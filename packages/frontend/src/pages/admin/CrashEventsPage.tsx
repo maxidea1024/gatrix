@@ -2228,47 +2228,47 @@ const CrashEventsPage: React.FC = () => {
               <Typography color="text.secondary">{t('crashes.stackTraceNotAvailable')}</Typography>
             )
           ) : // Log View
-            loadingLog ? (
-              <Box
+          loadingLog ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                p: 4,
+              }}
+            >
+              <HourglassIcon
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  p: 4,
+                  fontSize: 48,
+                  color: 'primary.main',
+                  animation: 'hourglassRotate 2s ease-in-out infinite',
+                  '@keyframes hourglassRotate': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '50%': { transform: 'rotate(180deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
                 }}
-              >
-                <HourglassIcon
-                  sx={{
-                    fontSize: 48,
-                    color: 'primary.main',
-                    animation: 'hourglassRotate 2s ease-in-out infinite',
-                    '@keyframes hourglassRotate': {
-                      '0%': { transform: 'rotate(0deg)' },
-                      '50%': { transform: 'rotate(180deg)' },
-                      '100%': { transform: 'rotate(360deg)' },
-                    },
-                  }}
-                />
-              </Box>
-            ) : logContent ? (
-              <Box
-                sx={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                }}
-              >
-                <LogViewer
-                  logContent={logContent}
-                  logFilePath={selectedEvent?.logFilePath || ''}
-                  eventId={selectedEvent?.id}
-                  initialScrollLine={initialLogScrollLine}
-                />
-              </Box>
-            ) : (
-              <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
-            )}
+              />
+            </Box>
+          ) : logContent ? (
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+              }}
+            >
+              <LogViewer
+                logContent={logContent}
+                logFilePath={selectedEvent?.logFilePath || ''}
+                eventId={selectedEvent?.id}
+                initialScrollLine={initialLogScrollLine}
+              />
+            </Box>
+          ) : (
+            <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
+          )}
         </Box>
       </Drawer>
 

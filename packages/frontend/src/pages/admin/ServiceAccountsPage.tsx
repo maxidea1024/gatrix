@@ -742,7 +742,10 @@ const ServiceAccountsPage: React.FC = () => {
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}
-        onClose={() => { setMenuAnchorEl(null); setMenuTargetAccount(null); }}
+        onClose={() => {
+          setMenuAnchorEl(null);
+          setMenuTargetAccount(null);
+        }}
       >
         <MenuItem
           onClick={() => {

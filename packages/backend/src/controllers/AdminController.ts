@@ -11,11 +11,6 @@ import db from '../config/knex';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
 
-const setEnvironmentAccessSchema = Joi.object({
-  allowAllEnvironments: Joi.boolean().required(),
-  environments: Joi.array().items(Joi.string().min(1).max(127)).default([]),
-});
-
 // Super admin email - this account cannot be modified by anyone except themselves (name only)
 const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
 
@@ -202,11 +197,6 @@ export class AdminController {
       // 태그 설정
       if (tagIds && tagIds.length > 0) {
         await UserTagService.setUserTags(user.id, tagIds, req.user.userId);
-      }
-
-      // 환경 접근 권한 설정
-      if (environments && environments.length > 0 && !allowAllEnvironments) {
-        await UserModel.setEnvironmentAccess(user.id, false, environments, createdBy);
       }
 
       // Reload user to get all updated info
@@ -1087,71 +1077,6 @@ export class AdminController {
       res.json({
         success: true,
         message: `Deleted ${userIds.length} users`,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  // User environment access
-
-  /**
-   * Get user's environment access settings
-   */
-  static async getUserEnvironmentAccess(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = req.params.id;
-      if (!userId) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      const access = await UserModel.getEnvironmentAccess(userId);
-
-      res.json({
-        success: true,
-        data: access,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Set user's environment access
-   */
-  static async setUserEnvironmentAccess(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = req.params.id;
-      if (!userId) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      // Protect super admin from being modified by others
-      if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
-        throw new GatrixError('Cannot modify super admin account', 403);
-      }
-
-      const { error, value } = setEnvironmentAccessSchema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
-
-      const { allowAllEnvironments, environments } = value;
-      const updatedBy = req.user!.userId;
-
-      await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environments, updatedBy);
-
-      res.json({
-        success: true,
-        message: 'Environment access updated successfully',
       });
     } catch (error) {
       next(error);

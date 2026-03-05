@@ -7,22 +7,57 @@ import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopy
 import { initializeSystemKV } from '../utils/systemKV';
 import { pubSubService } from '../services/PubSubService';
 import { ErrorCodes } from '../utils/apiResponse';
+import { permissionService } from '../services/PermissionService';
 
 export class EnvironmentController {
   /**
-   * Get all environments
+   * Get all environments for a specific project
    */
   static getEnvironments = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { projectId } = req.params;
     const includeHidden = req.query.includeHidden === 'true';
-    const environments = await Environment.getAll(includeHidden);
+    const userId = req.user?.userId;
 
-    // Get stats for each environment and add id field for frontend compatibility
+    if (!projectId) {
+      throw new GatrixError('Project ID is required', 400, true, ErrorCodes.VALIDATION_ERROR);
+    }
+
+    // Get environments scoped to this project
+    const query = Environment.query()
+      .where('projectId', projectId)
+      .orderBy('displayOrder', 'asc')
+      .orderBy('displayName');
+
+    if (!includeHidden) {
+      query.where('isHidden', false);
+    }
+
+    let environments = await query;
+
+    // Apply RBAC filtering: only return environments user has access to
+    if (userId) {
+      const { orgId } = req.params;
+      try {
+        const accessibleEnvIds = await permissionService.getAccessibleEnvironmentIds(
+          userId,
+          orgId,
+          projectId
+        );
+        // If accessibleEnvIds is empty array, user may be super admin (handled by permissionService)
+        if (accessibleEnvIds.length > 0) {
+          environments = environments.filter((env) => accessibleEnvIds.includes(env.id));
+        }
+      } catch (err) {
+        logger.warn('Failed to check user environment access', { userId, err });
+      }
+    }
+
+    // Get stats for each environment
     const environmentsWithStats = await Promise.all(
       environments.map(async (env) => {
         const stats = await env.getStats();
         return {
           ...env,
-          // environmentName removed - use env.id
           stats,
         };
       })
@@ -35,7 +70,7 @@ export class EnvironmentController {
   });
 
   /**
-   * Get environment by name
+   * Get environment by id
    */
   static getEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const { environmentId } = req.params;
@@ -67,21 +102,24 @@ export class EnvironmentController {
    */
   static createEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const {
-      environmentId,
       displayName,
       description,
       environmentType,
       color,
       displayOrder,
-      projectId,
       requiresApproval,
       requiredApprovers,
       baseEnvironment,
     } = req.body;
     const userId = (req.user as any)?.userId;
+    const projectId = req.params.projectId;
 
     if (!userId) {
       throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
+    }
+
+    if (!projectId) {
+      throw new GatrixError('Project ID is required', 400, true, ErrorCodes.BAD_REQUEST);
     }
 
     // Validate base environment if provided
@@ -94,7 +132,6 @@ export class EnvironmentController {
 
     try {
       const newEnv = await Environment.createEnvironment({
-        // name field removed
         displayName,
         description,
         environmentType: environmentType || 'development',
@@ -102,7 +139,7 @@ export class EnvironmentController {
         isHidden: false,
         displayOrder: displayOrder || 99,
         color: color || '#607D8B',
-        projectId: projectId || undefined,
+        projectId,
         isDefault: false,
         requiresApproval: requiresApproval || false,
         requiredApprovers: requiredApprovers || 1,
@@ -113,7 +150,8 @@ export class EnvironmentController {
       if (!baseEnvironment) {
         // Initialize system-defined KV items ($channels, $platforms, $clientVersionPassiveData)
         await initializeSystemKV(newEnv.id);
-        logger.info(`System KV items initialized for new environmentId: ${environmentId}`);
+
+        logger.info(`System KV items initialized for new environmentId: ${newEnv.id}`);
       }
 
       // Copy data from base environment if provided
@@ -153,12 +191,12 @@ export class EnvironmentController {
           userId
         );
 
-        logger.info(`Data copied from base environmentId to ${environmentId}`, {
+        logger.info(`Data copied from base environmentId to ${newEnv.id}`, {
           copyResult,
         });
       }
 
-      logger.info(`Environment created: ${environmentId} by user ${userId}`);
+      logger.info(`Environment created: ${newEnv.id} by user ${userId}`);
 
       // Publish SDK event for dynamic environment detection
       try {
@@ -185,6 +223,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error creating environment:', error);
+
       res.status(400).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to create environment',
@@ -251,6 +290,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error updating environment:', error);
+
       res.status(400).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to update environment',
@@ -281,6 +321,7 @@ export class EnvironmentController {
         error: err instanceof Error ? err.message : String(err),
         stack: err instanceof Error ? err.stack : undefined,
       });
+
       return res.status(500).json({
         success: false,
         message: 'Failed to load related data',
@@ -561,6 +602,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error copying environment data:', error);
+
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to copy environment data',
@@ -614,6 +656,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error getting copy preview:', error);
+
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to get copy preview',

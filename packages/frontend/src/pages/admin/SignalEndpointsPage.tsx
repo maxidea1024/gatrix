@@ -500,7 +500,8 @@ const SignalEndpointsPage: React.FC = () => {
               <TableBody
                 sx={{
                   '& .MuiTableRow-root:nth-of-type(4n+1)': {
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
                   },
                   '& .MuiTableRow-root:nth-of-type(4n+3)': {
                     backgroundColor: 'transparent',
@@ -603,7 +604,7 @@ const SignalEndpointsPage: React.FC = () => {
                             </Box>
                             <Divider sx={{ mb: 1 }} />
                             {!endpointTokens[endpoint.id] ||
-                              endpointTokens[endpoint.id].length === 0 ? (
+                            endpointTokens[endpoint.id].length === 0 ? (
                               <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
                                 {t('signalEndpoints.noTokens')}
                               </Typography>

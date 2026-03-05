@@ -41,8 +41,6 @@ router.post('/users/:id/demote', auditUserDemote as any, AdminController.demoteF
 router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
 
 // User environment access
-router.get('/users/:id/environments', AdminController.getUserEnvironmentAccess as any);
-router.put('/users/:id/environments', AdminController.setUserEnvironmentAccess as any);
 
 // User permissions (RBAC)
 router.get('/permissions', AdminController.getAllPermissions as any);

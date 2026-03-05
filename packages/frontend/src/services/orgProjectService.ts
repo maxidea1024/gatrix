@@ -88,6 +88,7 @@ export const orgProjectService = {
     projectName: string;
     displayName: string;
     description?: string;
+    orgId?: string;
   }): Promise<Project> {
     const res = await api.post(`${BASE}/projects`, data);
     return res.data;
@@ -107,6 +108,22 @@ export const orgProjectService = {
   async deleteProject(id: string): Promise<void> {
     await api.delete(`${BASE}/projects/${id}`);
   },
+
+  // ─── My Access ─────────────────────────
+
+  async getMyAccess(): Promise<AccessTree> {
+    const res = await api.get(`${BASE}/my-access`);
+    return res.data;
+  },
 };
+
+// orgId → { projectIds, environments: { projectId → environmentIds } }
+export type AccessTree = Record<
+  string,
+  {
+    projectIds: string[];
+    environments: Record<string, string[]>;
+  }
+>;
 
 export default orgProjectService;

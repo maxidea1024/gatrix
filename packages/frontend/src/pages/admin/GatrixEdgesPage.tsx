@@ -894,7 +894,8 @@ const GatrixEdgesPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {Object.entries(summary).map(([category, envCounts]) => (
-                  <TableRow hover
+                  <TableRow
+                    hover
                     key={category}
                     sx={{
                       '& td': { py: 0.75, fontSize: '0.75rem' },
@@ -1495,7 +1496,8 @@ const GatrixEdgesPage: React.FC = () => {
                   .sort(([, a], [, b]) => b.count - a.count)
                   .slice(0, 20) // Show top 20 endpoints
                   .map(([endpoint, data]) => (
-                    <TableRow hover
+                    <TableRow
+                      hover
                       key={endpoint}
                       sx={{
                         '& td': { py: 0.5, fontSize: '0.7rem' },
@@ -2423,7 +2425,8 @@ const GatrixEdgesPage: React.FC = () => {
                           </TableHead>
                           <TableBody>
                             {entries.map(([endpoint, data]) => (
-                              <TableRow hover
+                              <TableRow
+                                hover
                                 key={endpoint}
                                 sx={{
                                   '&:nth-of-type(odd)': {

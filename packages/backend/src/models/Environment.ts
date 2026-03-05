@@ -13,7 +13,7 @@ export interface EnvironmentData {
   isHidden: boolean;
   displayOrder: number;
   color: string;
-  projectId?: string; // ULID
+  projectId: string; // ULID
   isDefault: boolean;
   requiresApproval: boolean;
   requiredApprovers: number;
@@ -39,7 +39,7 @@ export class Environment extends Model implements EnvironmentData {
   isHidden!: boolean;
   displayOrder!: number;
   color!: string;
-  projectId?: string; // ULID
+  projectId!: string; // ULID
   isDefault!: boolean;
   requiresApproval!: boolean;
   requiredApprovers!: number;
@@ -72,7 +72,7 @@ export class Environment extends Model implements EnvironmentData {
         isHidden: { type: 'boolean' },
         displayOrder: { type: 'integer', minimum: 0 },
         color: { type: 'string', maxLength: 7, pattern: '^#[0-9A-Fa-f]{6}$' },
-        projectId: { type: ['string', 'null'], minLength: 26, maxLength: 26 }, // ULID
+        projectId: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
         isDefault: { type: 'boolean' },
         requiresApproval: { type: 'boolean' },
         requiredApprovers: { type: 'integer', minimum: 1, maximum: 10 },
@@ -200,11 +200,10 @@ export class Environment extends Model implements EnvironmentData {
     data: Omit<EnvironmentData, 'createdAt' | 'updatedAt'>
   ): Promise<Environment> {
     // Check if environment with same displayName already exists in same project
-    const existingQuery = this.query().where('displayName', data.displayName);
-    if (data.projectId) {
-      existingQuery.where('projectId', data.projectId);
-    }
-    const existing = await existingQuery.first();
+    const existing = await this.query()
+      .where('displayName', data.displayName)
+      .where('projectId', data.projectId)
+      .first();
     if (existing) {
       throw new Error(`Environment '${data.displayName}' already exists`);
     }

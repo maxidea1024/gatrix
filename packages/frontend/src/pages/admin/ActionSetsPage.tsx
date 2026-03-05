@@ -275,7 +275,10 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
                 {signalEndpoints.map((ep) => (
                   <MenuItem key={ep.id} value={ep.id}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                      <SensorsIcon fontSize="small" sx={{ mt: 0.3, color: ep.isEnabled ? 'success.main' : 'text.disabled' }} />
+                      <SensorsIcon
+                        fontSize="small"
+                        sx={{ mt: 0.3, color: ep.isEnabled ? 'success.main' : 'text.disabled' }}
+                      />
                       <Box>
                         <Typography variant="body2">
                           {ep.name}
@@ -642,7 +645,8 @@ const ActionSetsPage: React.FC = () => {
               <TableBody
                 sx={{
                   '& .MuiTableRow-root:nth-of-type(4n+1)': {
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
                   },
                   '& .MuiTableRow-root:nth-of-type(4n+3)': {
                     backgroundColor: 'transparent',
@@ -736,10 +740,10 @@ const ActionSetsPage: React.FC = () => {
                                           size="small"
                                           color={
                                             getStateColor(event.eventState) as
-                                            | 'success'
-                                            | 'error'
-                                            | 'info'
-                                            | 'default'
+                                              | 'success'
+                                              | 'error'
+                                              | 'info'
+                                              | 'default'
                                           }
                                         />
                                       </TableCell>
@@ -783,7 +787,8 @@ const ActionSetsPage: React.FC = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (menuTarget) setDeleteDialog({ open: true, id: menuTarget.id, name: menuTarget.name });
+            if (menuTarget)
+              setDeleteDialog({ open: true, id: menuTarget.id, name: menuTarget.name });
             handleMenuClose();
           }}
         >

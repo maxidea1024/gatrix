@@ -687,7 +687,10 @@ const SurveysPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, survey)}>
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => handleActionMenuOpen(e, survey)}
+                                >
                                   <MoreVertIcon fontSize="small" />
                                 </IconButton>
                               </TableCell>
@@ -718,13 +721,31 @@ const SurveysPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <Menu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
-        <MenuItem onClick={() => { if (actionMenuTarget) handleEdit(actionMenuTarget); handleActionMenuClose(); }}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+      <Menu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (actionMenuTarget) handleDelete(actionMenuTarget); handleActionMenuClose(); }}>
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleDelete(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>
       </Menu>

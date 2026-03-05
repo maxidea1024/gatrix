@@ -188,13 +188,62 @@ router.put('/organisations/:id/members/:userId', requireOrgAdmin as any, async (
   }
 });
 
+// ==================== My Access (RBAC-filtered tree) ====================
+
+// GET /api/admin/rbac/my-access
+// Returns the user's accessible orgs → projects → environments based on RBAC
+router.get('/my-access', async (req: any, res) => {
+  try {
+    const userId = req.user.id;
+    const isSuperAdmin = await permissionService.isSuperAdmin(userId);
+
+    // Super admin sees all orgs, regular users only their memberships
+    let orgIds: string[];
+    if (isSuperAdmin) {
+      const allOrgs = await db('g_organisations').where('isActive', true).select('id');
+      orgIds = allOrgs.map((o: any) => o.id);
+    } else {
+      const orgMemberships = await permissionService.getUserOrganisations(userId);
+      orgIds = orgMemberships.map((m) => m.orgId);
+    }
+
+    const result: Record<
+      string,
+      {
+        projectIds: string[];
+        environments: Record<string, string[]>;
+      }
+    > = {};
+
+    for (const orgId of orgIds) {
+      const projectIds = await permissionService.getAccessibleProjectIds(userId, orgId);
+
+      const environments: Record<string, string[]> = {};
+      for (const projectId of projectIds) {
+        const envIds = await permissionService.getAccessibleEnvironmentIds(
+          userId,
+          orgId,
+          projectId
+        );
+        environments[projectId] = envIds;
+      }
+
+      result[orgId] = { projectIds, environments };
+    }
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Error getting user access tree:', error);
+    res.status(500).json({ success: false, message: 'Failed to get access tree' });
+  }
+});
+
 // ==================== Projects ====================
 
 // GET /api/admin/rbac/projects
 router.get('/projects', async (req: any, res) => {
   try {
-    const orgId = req.user.orgId;
-    const projects = await ProjectModel.findByOrgId(orgId);
+    const projects = await ProjectModel.findAll();
     res.json({ success: true, data: projects });
   } catch (error) {
     logger.error('Error listing projects:', error);
@@ -208,20 +257,23 @@ router.post(
   requireOrgPermission(ORG_PERMISSIONS.PROJECTS_WRITE) as any,
   async (req: any, res) => {
     try {
-      const { projectName, displayName, description } = req.body;
+      const { projectName, displayName, description, orgId } = req.body;
       if (!projectName || !displayName) {
         return res
           .status(400)
           .json({ success: false, message: 'projectName and displayName are required' });
       }
 
-      const existing = await ProjectModel.findByName(req.user.orgId, projectName);
+      // Use the provided orgId if specified, otherwise default to user's current org
+      const targetOrgId = orgId || req.user.orgId;
+
+      const existing = await ProjectModel.findByName(targetOrgId, projectName);
       if (existing) {
         return res.status(409).json({ success: false, message: 'Project name already exists' });
       }
 
       const project = await ProjectModel.create({
-        orgId: req.user.orgId,
+        orgId: targetOrgId,
         projectName,
         displayName,
         description,
@@ -286,7 +338,9 @@ router.get(
       const roles = await db('g_roles')
         .select(
           'g_roles.*',
-          db.raw('(SELECT COUNT(*) FROM g_role_org_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_project_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_environment_permissions WHERE roleId = g_roles.id) as permissionCount'),
+          db.raw(
+            '(SELECT COUNT(*) FROM g_role_org_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_project_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_environment_permissions WHERE roleId = g_roles.id) as permissionCount'
+          ),
           db.raw('(SELECT COUNT(*) FROM g_user_roles WHERE roleId = g_roles.id) as userCount'),
           db.raw('(SELECT COUNT(*) FROM g_group_roles WHERE roleId = g_roles.id) as groupCount')
         )

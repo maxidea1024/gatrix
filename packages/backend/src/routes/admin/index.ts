@@ -60,8 +60,46 @@ router.use('/services', serviceDiscoveryRoutes);
 
 // Self-service routes for authenticated users (not requiring admin role)
 // These must be mounted BEFORE requireAdmin middleware
-import { UserController } from '../../controllers/UserController';
-router.get('/users/me/environments', authenticate as any, UserController.getMyEnvironmentAccess);
+import { permissionService } from '../../services/PermissionService';
+import logger from '../../config/logger';
+router.get('/users/me/environments', authenticate as any, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.userId || req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    // Super admin gets all access
+    const isSuperAdmin = await permissionService.isSuperAdmin(userId);
+    if (isSuperAdmin) {
+      return res.json({
+        success: true,
+        data: { allowAllEnvironments: true, environments: [] },
+      });
+    }
+
+    // Check org admin status for any org
+    const orgs = await permissionService.getUserOrganisations(userId);
+    for (const org of orgs) {
+      if (await permissionService.isOrgAdmin(userId, org.orgId)) {
+        return res.json({
+          success: true,
+          data: { allowAllEnvironments: true, environments: [] },
+        });
+      }
+    }
+
+    // Otherwise return allowAllEnvironments: true for now
+    // (granular env-level filtering is done per-project in getEnvironments)
+    return res.json({
+      success: true,
+      data: { allowAllEnvironments: true, environments: [] },
+    });
+  } catch (error) {
+    logger.error('Error getting user environment access:', error);
+    res.status(500).json({ success: false, message: 'Failed to get environment access' });
+  }
+});
 
 // RBAC management routes (uses its own RBAC middleware, not legacy requireAdmin)
 router.use('/rbac', rbacRoutes);

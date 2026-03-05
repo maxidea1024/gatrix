@@ -352,7 +352,7 @@ const UsersManagementPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    action: () => { },
+    action: () => {},
   });
   const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
@@ -2360,7 +2360,7 @@ const UsersManagementPage: React.FC = () => {
             }
             helperText={
               deleteConfirmDialog.inputValue !== '' &&
-                deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email
+              deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email
                 ? t('users.emailDoesNotMatch')
                 : ''
             }
@@ -3131,8 +3131,8 @@ const UsersManagementPage: React.FC = () => {
                                   const permKey = change.details?.addedKeys?.[i];
                                   const tooltipText = permKey
                                     ? t(`permissions.${permKey.replace('.', '_')}_desc`, {
-                                      defaultValue: '',
-                                    })
+                                        defaultValue: '',
+                                      })
                                     : '';
                                   return (
                                     <Tooltip
@@ -3182,8 +3182,8 @@ const UsersManagementPage: React.FC = () => {
                                   const permKey = change.details?.removedKeys?.[i];
                                   const tooltipText = permKey
                                     ? t(`permissions.${permKey.replace('.', '_')}_desc`, {
-                                      defaultValue: '',
-                                    })
+                                        defaultValue: '',
+                                      })
                                     : '';
                                   return (
                                     <Tooltip

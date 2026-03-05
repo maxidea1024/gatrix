@@ -58,11 +58,6 @@ const createUserSchema = Joi.object({
   tagIds: Joi.array().items(Joi.string()).optional().default([]),
 });
 
-const setEnvironmentAccessSchema = Joi.object({
-  allowAllEnvironments: Joi.boolean().required(),
-  environments: Joi.array().items(Joi.string().min(1).max(127)).default([]),
-});
-
 export class UserController {
   static getAllUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     // Validate query parameters
@@ -546,67 +541,6 @@ export class UserController {
       message: 'Language preference updated successfully',
       data: {
         preferredLanguage,
-      },
-    });
-  });
-
-  // Environment access endpoints
-
-  /**
-   * Get user's environment access settings
-   */
-  static getEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.params.id;
-    if (!userId) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    const access = await UserModel.getEnvironmentAccess(userId);
-
-    res.json({
-      success: true,
-      data: access,
-    });
-  });
-
-  /**
-   * Set user's environment access
-   */
-  static setEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.params.id;
-    if (!userId) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    const { error, value } = setEnvironmentAccessSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
-
-    const { allowAllEnvironments, environments } = value;
-    const updatedBy = req.user!.userId;
-
-    await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environments, updatedBy);
-
-    res.json({
-      success: true,
-      message: 'Environment access updated successfully',
-    });
-  });
-
-  /**
-   * Get current user's accessible environments
-   */
-  static getMyEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user!.userId;
-
-    const accessibleEnvs = await UserModel.getAccessibleEnvironments(userId);
-
-    res.json({
-      success: true,
-      data: {
-        allowAllEnvironments: accessibleEnvs === 'all',
-        environments: accessibleEnvs === 'all' ? [] : accessibleEnvs,
       },
     });
   });

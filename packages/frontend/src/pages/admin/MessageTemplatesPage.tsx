@@ -267,7 +267,10 @@ const MessageTemplatesPage: React.FC = () => {
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [actionMenuTarget, setActionMenuTarget] = useState<MessageTemplate | null>(null);
 
-  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, template: MessageTemplate) => {
+  const handleActionMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    template: MessageTemplate
+  ) => {
     setActionMenuAnchorEl(event.currentTarget);
     setActionMenuTarget(template);
   };
@@ -1144,13 +1147,31 @@ const MessageTemplatesPage: React.FC = () => {
       </PageContentLoader>
 
       {/* Action Menu */}
-      <MuiMenu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
-        <MenuItem onClick={() => { if (actionMenuTarget) handleEdit(actionMenuTarget); handleActionMenuClose(); }}>
-          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+      <MuiMenu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (actionMenuTarget) openDeleteDialog(actionMenuTarget); handleActionMenuClose(); }}>
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) openDeleteDialog(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>
       </MuiMenu>

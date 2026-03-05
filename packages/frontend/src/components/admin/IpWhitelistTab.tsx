@@ -26,7 +26,6 @@ import {
   Tooltip,
   Switch,
   FormControlLabel,
-
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
@@ -93,7 +92,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
     open: false,
     title: '',
     message: '',
-    action: () => { },
+    action: () => {},
   });
 
   // Form data
@@ -374,7 +373,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
         />
         {canManage && (
           <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
-            <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setBulkDialog(true)}>
+            <Button
+              variant="outlined"
+              startIcon={<UploadIcon />}
+              onClick={() => setBulkDialog(true)}
+            >
               {t('ipWhitelist.bulkImport')}
             </Button>
             <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
@@ -554,7 +557,11 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
           setEditDialog(false);
         }}
         title={editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
-        subtitle={editDialog ? t('ipWhitelist.dialog.editDescription') : t('ipWhitelist.dialog.addDescription')}
+        subtitle={
+          editDialog
+            ? t('ipWhitelist.dialog.editDescription')
+            : t('ipWhitelist.dialog.addDescription')
+        }
         storageKey="ipWhitelistDrawerWidth"
         defaultWidth={500}
         minWidth={400}
@@ -620,11 +627,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
                 }
                 label={t('ipWhitelist.form.enabled')}
               />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: 'block' }}
-              >
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                 {t('ipWhitelist.form.enabledHelp')}
               </Typography>
             </Box>
