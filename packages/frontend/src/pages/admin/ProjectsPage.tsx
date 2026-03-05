@@ -53,7 +53,8 @@ const ProjectsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { refreshProjects, currentOrg, currentProjectId, organisations, switchContext } = useOrgProject();
+  const { refreshProjects, currentOrg, currentProjectId, organisations, switchContext } =
+    useOrgProject();
 
   // Resolve the parent org from URL param or current context
   const urlOrgId = searchParams.get('orgId');
@@ -313,14 +314,14 @@ const ProjectsPage: React.FC = () => {
                   boxShadow:
                     proj.id === currentProjectId
                       ? (theme) =>
-                        `0 0 0 2px ${theme.palette.primary.main}40, 0 4px 12px ${theme.palette.primary.main}20`
+                          `0 0 0 2px ${theme.palette.primary.main}40, 0 4px 12px ${theme.palette.primary.main}20`
                       : '0 2px 8px rgba(0, 0, 0, 0.06)',
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
                     boxShadow:
                       proj.id === currentProjectId
                         ? (theme) =>
-                          `0 0 0 2px ${theme.palette.primary.main}60, 0 6px 20px ${theme.palette.primary.main}30`
+                            `0 0 0 2px ${theme.palette.primary.main}60, 0 6px 20px ${theme.palette.primary.main}30`
                         : '0 4px 16px rgba(0, 0, 0, 0.1)',
                     transform: 'translateY(-2px)',
                   },

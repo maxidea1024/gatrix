@@ -315,10 +315,10 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                                 pl: 1.5,
                                 backgroundColor: isCurrentProject
                                   ? (theme) =>
-                                    alpha(
-                                      theme.palette.primary.main,
-                                      theme.palette.mode === 'dark' ? 0.1 : 0.04
-                                    )
+                                      alpha(
+                                        theme.palette.primary.main,
+                                        theme.palette.mode === 'dark' ? 0.1 : 0.04
+                                      )
                                   : 'transparent',
                               }}
                             >
@@ -418,10 +418,10 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size =
                               pl: 4,
                               backgroundColor: isCurrentProject
                                 ? (theme) =>
-                                  alpha(
-                                    theme.palette.primary.main,
-                                    theme.palette.mode === 'dark' ? 0.1 : 0.04
-                                  )
+                                    alpha(
+                                      theme.palette.primary.main,
+                                      theme.palette.mode === 'dark' ? 0.1 : 0.04
+                                    )
                                 : 'transparent',
                             }}
                           >
