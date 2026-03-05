@@ -48,6 +48,7 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   MoreVert as MoreVertIcon,
+  Sensors as SensorsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -273,8 +274,20 @@ const ActionSetDialog: React.FC<ActionSetDialogProps> = ({ open, actionSet, onCl
               >
                 {signalEndpoints.map((ep) => (
                   <MenuItem key={ep.id} value={ep.id}>
-                    {ep.name}
-                    {!ep.isEnabled && ` (${t('signalEndpoints.disabled')})`}
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <SensorsIcon fontSize="small" sx={{ mt: 0.3, color: ep.isEnabled ? 'success.main' : 'text.disabled' }} />
+                      <Box>
+                        <Typography variant="body2">
+                          {ep.name}
+                          {!ep.isEnabled && ` (${t('signalEndpoints.disabled')})`}
+                        </Typography>
+                        {ep.description && (
+                          <Typography variant="caption" color="text.secondary">
+                            {ep.description}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
                   </MenuItem>
                 ))}
               </Select>
@@ -619,6 +632,7 @@ const ActionSetsPage: React.FC = () => {
                 <TableRow>
                   <TableCell width={40} />
                   <TableCell>{t('actionSets.name')}</TableCell>
+                  <TableCell>{t('common.description')}</TableCell>
                   <TableCell>{t('actionSets.source')}</TableCell>
                   <TableCell align="center">{t('actionSets.status')}</TableCell>
                   <TableCell align="center">{t('actionSets.actionCount')}</TableCell>
@@ -652,11 +666,11 @@ const ActionSetsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Typography fontWeight="medium">{actionSet.name}</Typography>
-                        {actionSet.description && (
-                          <Typography variant="caption" color="text.secondary">
-                            {actionSet.description}
-                          </Typography>
-                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {actionSet.description || '-'}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
@@ -688,7 +702,7 @@ const ActionSetsPage: React.FC = () => {
                     {/* Expanded Events */}
                     <TableRow hover>
                       <TableCell
-                        colSpan={6}
+                        colSpan={7}
                         sx={{
                           py: 0,
                           borderBottom: expandedId === actionSet.id ? undefined : 'none',
