@@ -160,7 +160,7 @@ const FeatureFlagTypesPage: React.FC = () => {
         {types.length === 0 ? (
           <EmptyPagePlaceholder message={t('featureFlags.noFlagTypes')} />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
@@ -258,9 +258,9 @@ const FeatureFlagTypesPage: React.FC = () => {
                       setEditingType((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              lifetimeDays: e.target.checked ? null : 40,
-                            }
+                            ...prev,
+                            lifetimeDays: e.target.checked ? null : 40,
+                          }
                           : prev
                       )
                     }

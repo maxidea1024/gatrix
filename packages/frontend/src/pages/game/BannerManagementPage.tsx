@@ -504,7 +504,7 @@ const BannerManagementPage: React.FC = () => {
             subtitle={canManage ? t('common.addFirstItem') : undefined}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
@@ -635,30 +635,12 @@ const BannerManagementPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
-                                  }}
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => handleActionMenuOpen(e, banner)}
                                 >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton size="small" onClick={() => handleEdit(banner)}>
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton size="small" onClick={() => handleDelete(banner)}>
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <IconButton
-                                    size="small"
-                                    onClick={(e) => handleActionMenuOpen(e, banner)}
-                                  >
-                                    <MoreVertIcon fontSize="small" />
-                                  </IconButton>
-                                </Box>
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
                               </TableCell>
                             );
                           }
@@ -690,6 +672,17 @@ const BannerManagementPage: React.FC = () => {
         open={Boolean(actionMenuAnchor)}
         onClose={handleActionMenuClose}
       >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuBanner) handleEdit(actionMenuBanner);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
         <MenuItem onClick={handleDuplicate}>
           <ListItemIcon>
             <ContentCopyIcon fontSize="small" />
@@ -712,6 +705,17 @@ const BannerManagementPage: React.FC = () => {
             <ListItemText>{t('banners.archive')}</ListItemText>
           </MenuItem>
         )}
+        <MenuItem
+          onClick={() => {
+            if (actionMenuBanner) handleDelete(actionMenuBanner);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
       </Menu>
 
       {/* Column Settings Dialog */}
