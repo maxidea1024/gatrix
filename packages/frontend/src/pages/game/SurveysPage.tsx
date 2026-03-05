@@ -22,6 +22,10 @@ import {
   Checkbox,
   Skeleton,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Poll as PollIcon,
@@ -33,6 +37,7 @@ import {
   ViewColumn as ViewColumnIcon,
   Close as CloseIcon,
   Refresh as RefreshIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -83,6 +88,20 @@ const SurveysPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<Survey | null>(null);
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, survey: Survey) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(survey);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { handleApiError, ErrorDialog } = useHandleApiError();
@@ -505,7 +524,7 @@ const SurveysPage: React.FC = () => {
             subtitle={canManage ? t('common.addFirstItem') : undefined}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
@@ -668,24 +687,9 @@ const SurveysPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
-                                  }}
-                                >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton size="small" onClick={() => handleEdit(survey)}>
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton size="small" onClick={() => handleDelete(survey)}>
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
+                                <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, survey)}>
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
                               </TableCell>
                             );
                           }
@@ -712,6 +716,18 @@ const SurveysPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
+        <MenuItem onClick={() => { if (actionMenuTarget) handleEdit(actionMenuTarget); handleActionMenuClose(); }}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (actionMenuTarget) handleDelete(actionMenuTarget); handleActionMenuClose(); }}>
+          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
