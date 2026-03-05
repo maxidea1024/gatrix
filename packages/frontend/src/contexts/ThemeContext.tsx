@@ -354,10 +354,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             '& .MuiTableRow-root:nth-of-type(odd)': {
-              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.025)',
+              backgroundColor: mode === 'dark' ? '#1e2125' : '#f8f9fa',
             },
-            '& .MuiTableRow-root:hover': {
-              backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+            '& .MuiTableRow-root.MuiTableRow-hover:hover': {
+              backgroundColor: (mode === 'dark' ? '#282c31' : '#eef1f5') + ' !important',
             },
           },
         },
