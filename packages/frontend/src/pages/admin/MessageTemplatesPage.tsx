@@ -42,7 +42,9 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   ClickAwayListener,
+  Menu as MuiMenu,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -79,6 +81,7 @@ import {
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -259,6 +262,20 @@ const MessageTemplatesPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<MessageTemplate | null>(null);
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, template: MessageTemplate) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(template);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   // 태그 관련 상태
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -1045,7 +1062,7 @@ const MessageTemplatesPage: React.FC = () => {
             addButtonLabel={t('messageTemplates.addTemplate')}
           />
         ) : (
-          <Card sx={{ position: 'relative' }}>
+          <Card variant="outlined" sx={{ position: 'relative' }}>
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer
                 sx={{
@@ -1104,15 +1121,8 @@ const MessageTemplatesPage: React.FC = () => {
                           ))}
                         {canManage && (
                           <TableCell align="right">
-                            <IconButton size="small" onClick={() => handleEdit(row)}>
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => openDeleteDialog(row)}
-                            >
-                              <DeleteIcon fontSize="small" />
+                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, row)}>
+                              <MoreVertIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
                         )}
@@ -1132,6 +1142,18 @@ const MessageTemplatesPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <MuiMenu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
+        <MenuItem onClick={() => { if (actionMenuTarget) handleEdit(actionMenuTarget); handleActionMenuClose(); }}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (actionMenuTarget) openDeleteDialog(actionMenuTarget); handleActionMenuClose(); }}>
+          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </MuiMenu>
 
       <ResizableDrawer
         open={dialogOpen}
