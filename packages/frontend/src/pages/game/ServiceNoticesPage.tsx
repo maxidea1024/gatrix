@@ -42,6 +42,7 @@ import {
   Info as InfoIcon,
   SportsEsports as SportsEsportsIcon,
   PushPin as PushPinIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -170,6 +171,20 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Webview menu state
   const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<ServiceNotice | null>(null);
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, notice: ServiceNotice) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(notice);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
@@ -740,7 +755,7 @@ const ServiceNoticesPage: React.FC = () => {
             subtitle={canManage ? t('common.addFirstItem') : undefined}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
@@ -876,16 +891,16 @@ const ServiceNoticesPage: React.FC = () => {
 
                             const tooltipMessage = isCurrentlyVisible
                               ? t('serviceNotices.currentlyVisibleTooltip', {
-                                  time: formatDateTime(now),
-                                  start: startText,
-                                  end: endText,
-                                })
+                                time: formatDateTime(now),
+                                start: startText,
+                                end: endText,
+                              })
                               : t('serviceNotices.notVisibleTooltip', {
-                                  time: formatDateTime(now),
-                                  start: startText,
-                                  end: endText,
-                                  isActive: notice.isActive,
-                                });
+                                time: formatDateTime(now),
+                                start: startText,
+                                end: endText,
+                                isActive: notice.isActive,
+                              });
 
                             return (
                               <TableCell key={column.id}>
@@ -1076,32 +1091,9 @@ const ServiceNoticesPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(notice)}
-                                  color="primary"
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(notice)}
-                                  color="error"
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
+                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, notice)}>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -1125,6 +1117,32 @@ const ServiceNoticesPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleDelete(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Form Drawer */}
       <ServiceNoticeFormDialog

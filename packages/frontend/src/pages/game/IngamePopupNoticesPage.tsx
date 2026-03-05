@@ -25,6 +25,10 @@ import {
   DialogActions,
   DialogContentText,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -36,6 +40,7 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   Code as CodeIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -123,6 +128,20 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [deletingNotice, setDeletingNotice] = useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<IngamePopupNotice | null>(null);
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, notice: IngamePopupNotice) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(notice);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -566,7 +585,7 @@ const IngamePopupNoticesPage: React.FC = () => {
             subtitle={canManage ? t('common.addFirstItem') : undefined}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
@@ -773,32 +792,9 @@ const IngamePopupNoticesPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(notice)}
-                                  color="primary"
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(notice)}
-                                  color="error"
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
+                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, notice)}>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -822,6 +818,18 @@ const IngamePopupNoticesPage: React.FC = () => {
           </Card>
         )}
       </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={actionMenuAnchorEl} open={Boolean(actionMenuAnchorEl)} onClose={handleActionMenuClose}>
+        <MenuItem onClick={() => { if (actionMenuTarget) handleEdit(actionMenuTarget); handleActionMenuClose(); }}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (actionMenuTarget) handleDelete(actionMenuTarget); handleActionMenuClose(); }}>
+          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Form Drawer */}
       <IngamePopupNoticeFormDialog
