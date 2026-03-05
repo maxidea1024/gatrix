@@ -692,7 +692,7 @@ const ChangeRequestsPage: React.FC = () => {
         </Button>
       </Box>
 
-      <Card>
+      <Card variant="outlined">
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {/* Status Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>

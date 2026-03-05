@@ -60,7 +60,7 @@ class PermissionService {
       .first();
     if (hasExact) return true;
 
-    // 4. write ??read fallback
+    // 4. write → read fallback
     if (perm.endsWith('.read')) {
       const writePerm = perm.replace('.read', '.write');
       const hasWrite = await db('g_role_org_permissions')
@@ -91,7 +91,7 @@ class PermissionService {
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return false;
 
-    // 2. Project Admin ??all project + env permissions
+    // 2. Project Admin → all project + env permissions
     const isProjectAdmin = await db('g_role_project_permissions')
       .whereIn('roleId', roleIds)
       .where('projectId', projectId)
@@ -107,7 +107,7 @@ class PermissionService {
       .first();
     if (hasExact) return true;
 
-    // 4. write ??read fallback
+    // 4. write → read fallback
     if (perm.endsWith('.read')) {
       const writePerm = perm.replace('.read', '.write');
       const hasWrite = await db('g_role_project_permissions')
@@ -140,7 +140,7 @@ class PermissionService {
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return false;
 
-    // 2. Project Admin ??all env permissions
+    // 2. Project Admin → all env permissions
     const isProjectAdmin = await db('g_role_project_permissions')
       .whereIn('roleId', roleIds)
       .where('projectId', projectId)
@@ -148,7 +148,7 @@ class PermissionService {
       .first();
     if (isProjectAdmin) return true;
 
-    // 3. Env Admin ??all env permissions for this environment
+    // 3. Env Admin → all env permissions for this environment
     const isEnvAdmin = await db('g_role_environment_permissions')
       .whereIn('roleId', roleIds)
       .where('environmentId', environmentId)

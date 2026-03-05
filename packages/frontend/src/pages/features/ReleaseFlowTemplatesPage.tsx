@@ -1447,7 +1447,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
             addButtonLabel={t('releaseFlow.addTemplate')}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>

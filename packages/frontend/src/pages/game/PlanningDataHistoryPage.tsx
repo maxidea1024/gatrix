@@ -328,7 +328,7 @@ const PlanningDataHistoryPage: React.FC = () => {
         {history.length === 0 ? (
           <EmptyPagePlaceholder message={t('planningData.history.noRecords')} />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>

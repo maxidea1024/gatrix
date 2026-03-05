@@ -304,7 +304,7 @@ const TagsPage: React.FC = () => {
       ) : filtered.length === 0 ? (
         <EmptyPagePlaceholder message={t('tags.noMatchingTags')} />
       ) : (
-        <Card>
+        <Card variant="outlined">
           <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>

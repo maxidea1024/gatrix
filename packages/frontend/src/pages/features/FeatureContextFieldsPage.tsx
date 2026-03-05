@@ -779,7 +779,7 @@ const FeatureContextFieldsPage: React.FC = () => {
             addButtonLabel={t('featureFlags.addContextField')}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>

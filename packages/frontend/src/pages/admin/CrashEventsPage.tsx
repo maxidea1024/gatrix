@@ -1049,7 +1049,7 @@ const CrashEventsPage: React.FC = () => {
         {events.length === 0 ? (
           !loading && <EmptyPagePlaceholder message={t('crashes.noEvents')} />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table sx={{ tableLayout: 'auto' }}>

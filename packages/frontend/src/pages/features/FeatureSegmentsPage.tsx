@@ -630,7 +630,7 @@ const FeatureSegmentsPage: React.FC = () => {
             addButtonLabel={t('featureFlags.addSegment')}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>

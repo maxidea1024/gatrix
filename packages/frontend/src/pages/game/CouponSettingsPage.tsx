@@ -1358,7 +1358,7 @@ const CouponSettingsPage: React.FC = () => {
             addButtonLabel={t('coupons.couponSettings.addCoupon')}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table size="small">

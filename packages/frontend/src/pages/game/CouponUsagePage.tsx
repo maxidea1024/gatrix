@@ -617,7 +617,7 @@ const CouponUsagePage: React.FC = () => {
         {records.length === 0 ? (
           <EmptyPagePlaceholder message={t('coupons.couponUsage.noRecords')} />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table size="small">

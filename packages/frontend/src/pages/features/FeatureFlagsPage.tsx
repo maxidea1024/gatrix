@@ -1689,7 +1689,7 @@ const FeatureFlagsPage: React.FC = () => {
             addButtonLabel={t('featureFlags.createFlag')}
           />
         ) : (
-          <Card>
+          <Card variant="outlined">
             <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               {compactView ? (
                 <>

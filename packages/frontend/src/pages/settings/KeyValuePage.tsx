@@ -275,7 +275,7 @@ const KeyValuePage: React.FC = () => {
           subtitle={canManage ? t('common.addFirstItem') : undefined}
         />
       ) : (
-        <Card>
+        <Card variant="outlined">
           <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
