@@ -164,7 +164,7 @@ class PermissionService {
       .first();
     if (hasExact) return true;
 
-    // 5. write ??read fallback
+    // 5. write → read fallback
     if (perm.endsWith('.read')) {
       const writePerm = perm.replace('.read', '.write');
       const hasWrite = await db('g_role_environment_permissions')
@@ -282,7 +282,7 @@ class PermissionService {
   }
 
   /**
-   * Resolve projectId ??orgId
+   * Resolve projectId → orgId
    */
   async resolveProjectOrg(projectId: string): Promise<string | null> {
     const project = await db('g_projects').where('id', projectId).select('orgId').first();

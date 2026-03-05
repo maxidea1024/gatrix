@@ -1748,7 +1748,7 @@ const ClientVersionsPage: React.FC = () => {
             addButtonLabel={t('clientVersions.addIndividual')}
           />
         ) : (
-          <Card sx={{ position: 'relative' }}>
+          <Card variant="outlined" sx={{ position: 'relative' }}>
             <TableContainer
               sx={{
                 opacity: !isInitialLoad && loading ? 0.5 : 1,
