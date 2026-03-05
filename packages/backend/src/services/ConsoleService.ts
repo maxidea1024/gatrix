@@ -128,7 +128,6 @@ class ConsoleService {
           `ID: ${u.id ?? ''}`,
           `Name: ${u.name ?? ''}`,
           `Email: ${u.email ?? ''}`,
-          `Role: ${u.role ?? ''}`,
         ];
         return { output: lines.join('\n') };
       });
@@ -1237,10 +1236,10 @@ class ConsoleService {
         '\u001b[32mAPI Tokens:\u001b[0m',
         '',
         'ID'.padEnd(6) +
-          'Name'.padEnd(25) +
-          'Type'.padEnd(10) +
-          'Created By'.padEnd(20) +
-          'Expires',
+        'Name'.padEnd(25) +
+        'Type'.padEnd(10) +
+        'Created By'.padEnd(20) +
+        'Expires',
         '─'.repeat(80),
         ...tokens.map((t: any) => {
           const id = String(t.id).padEnd(6);
@@ -1288,13 +1287,17 @@ class ConsoleService {
         return { output: '\u001b[33mUser not found\u001b[0m' };
       }
 
+      // Get role from org membership (RBAC)
+      const membership = await db('g_organisation_members').where('userId', user.id).first();
+      const orgRole = membership?.orgRole || 'user';
+
       const lines = [
         '\u001b[32mUser Information:\u001b[0m',
         '',
         `ID: ${user.id}`,
         `Name: ${user.name || 'N/A'}`,
         `Email: ${user.email}`,
-        `Role: ${user.role || 'user'}`,
+        `Role: ${orgRole}`,
         `Status: ${user.status || 'unknown'}`,
         `Email Verified: ${user.emailVerified ? 'Yes' : 'No'}`,
         `Created: ${user.createdAt ? new Date(user.createdAt).toISOString() : 'N/A'}`,

@@ -55,7 +55,7 @@ class ServerAuthController {
           email: user.email,
           name: user.name,
           avatarUrl: user.avatarUrl,
-          role: user.role,
+
           status: user.status,
           lastLoginAt: user.lastLoginAt,
           createdAt: user.createdAt,
@@ -107,7 +107,7 @@ class ServerAuthController {
           email: user.email,
           name: user.name,
           avatarUrl: user.avatarUrl,
-          role: user.role,
+
           status: user.status,
           lastLoginAt: user.lastLoginAt,
           createdAt: user.createdAt,

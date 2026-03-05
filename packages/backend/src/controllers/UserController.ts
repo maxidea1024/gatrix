@@ -14,7 +14,6 @@ const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.pn
 const getUsersQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).optional(),
   limit: Joi.number().integer().min(1).max(100).optional(),
-  role: Joi.string().valid('admin', 'user').optional(),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional(),
   search: Joi.string().max(100).optional(),
 });
@@ -23,7 +22,6 @@ const updateUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   email: Joi.string().email().optional(),
   avatarUrl: Joi.string().uri().optional().allow(''),
-  role: Joi.string().valid('admin', 'user').optional(),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional(),
   email_verified: Joi.boolean().optional(),
   tagIds: Joi.array().items(Joi.string()).optional(),
@@ -49,7 +47,6 @@ const createUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  role: Joi.string().valid('admin', 'user').optional().default('user'),
   status: Joi.string()
     .valid('pending', 'active', 'suspended', 'deleted')
     .optional()
@@ -66,9 +63,9 @@ export class UserController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const { page, limit, role, status, search } = value;
+    const { page, limit, status, search } = value;
 
-    const filters = { role, status, search };
+    const filters = { status, search };
     const pagination = { page, limit };
 
     const result = await UserService.getAllUsers(filters, pagination);
@@ -156,12 +153,7 @@ export class UserController {
       updatedBy,
     });
 
-    // Prevent users from modifying their own role or status (except admins)
-    if (req.user?.userId === userId && req.user?.role !== 'admin') {
-      if (userData.role || userData.status) {
-        throw new GatrixError('You cannot modify your own role or status', 403);
-      }
-    }
+
 
     let user = await UserService.updateUser(userId, userData);
 
@@ -274,42 +266,7 @@ export class UserController {
     });
   });
 
-  static promoteToAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.params.id;
 
-    if (!userId) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    const user = await UserService.promoteToAdmin(userId);
-
-    res.json({
-      success: true,
-      data: { user },
-      message: 'User promoted to admin successfully',
-    });
-  });
-
-  static demoteFromAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.params.id;
-
-    if (!userId) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    // Prevent users from demoting themselves
-    if (req.user?.userId === userId) {
-      throw new GatrixError('You cannot demote your own account', 403);
-    }
-
-    const user = await UserService.demoteFromAdmin(userId);
-
-    res.json({
-      success: true,
-      data: { user },
-      message: 'User demoted from admin successfully',
-    });
-  });
 
   static getPendingUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const users = await UserService.getPendingUsers();

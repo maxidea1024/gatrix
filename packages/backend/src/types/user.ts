@@ -15,7 +15,7 @@ export interface User {
   name: string;
   avatarUrl?: string;
   preferredLanguage: SupportedLanguage;
-  role: 'admin' | 'user'; // mapped from org membership, kept for gradual migration
+
   status: 'pending' | 'active' | 'suspended' | 'deleted';
   authType: AuthType;
   emailVerified: boolean;
@@ -38,7 +38,7 @@ export interface CreateUserData {
   name: string;
   avatarUrl?: string;
   preferredLanguage?: SupportedLanguage;
-  role?: 'admin' | 'user';
+
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   authType?: AuthType;
   emailVerified?: boolean;
@@ -50,7 +50,7 @@ export interface UpdateUserData {
   name?: string;
   avatarUrl?: string;
   preferredLanguage?: SupportedLanguage;
-  role?: 'admin' | 'user';
+
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   authType?: AuthType;
   emailVerified?: boolean;
@@ -59,7 +59,7 @@ export interface UpdateUserData {
   forceToEditorMode?: boolean;
 }
 
-export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
+export interface UserWithoutPassword extends Omit<User, 'passwordHash'> { }
 
 export interface OAuthAccount {
   id: string;

@@ -9,8 +9,6 @@ import {
   auditUserReject,
   auditUserSuspend,
   auditUserUnsuspend,
-  auditUserPromote,
-  auditUserDemote,
 } from '../../middleware/auditLog';
 
 const router = Router();
@@ -36,8 +34,7 @@ router.put('/users/:id', auditUserUpdate as any, AdminController.updateUser as a
 router.delete('/users/:id', auditUserDelete as any, AdminController.deleteUser as any);
 router.post('/users/:id/activate', auditUserUnsuspend as any, AdminController.activateUser as any);
 router.post('/users/:id/suspend', auditUserSuspend as any, AdminController.suspendUser as any);
-router.post('/users/:id/promote', auditUserPromote as any, AdminController.promoteToAdmin as any);
-router.post('/users/:id/demote', auditUserDemote as any, AdminController.demoteFromAdmin as any);
+
 router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
 
 // User environment access
@@ -45,11 +42,11 @@ router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
 // User permissions (RBAC)
 router.get('/permissions', AdminController.getAllPermissions as any);
 router.get('/users/:id/permissions', AdminController.getUserPermissions as any);
-router.put('/users/:id/permissions', AdminController.setUserPermissions as any);
+
 
 // Bulk user operations
 router.post('/users/bulk/status', AdminController.bulkUpdateUserStatus as any);
-router.post('/users/bulk/role', AdminController.bulkUpdateUserRole as any);
+
 router.post('/users/bulk/email-verified', AdminController.bulkUpdateUserEmailVerified as any);
 router.post('/users/bulk/tags', AdminController.bulkUpdateUserTags as any);
 router.post('/users/bulk/delete', AdminController.bulkDeleteUsers as any);

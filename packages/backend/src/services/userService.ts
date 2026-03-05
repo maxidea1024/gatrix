@@ -5,7 +5,6 @@ import logger from '../config/logger';
 import EmailService from './EmailService';
 
 export interface UserFilters {
-  role?: string;
   status?: string;
   search?: string;
   tags?: string[];
@@ -29,7 +28,6 @@ export class UserService {
     name: string;
     email: string;
     password: string;
-    role?: 'admin' | 'user';
     status?: 'active' | 'pending' | 'suspended';
     emailVerified?: boolean;
     createdBy?: string;
@@ -248,19 +246,7 @@ export class UserService {
     }
   }
 
-  /**
-   * @deprecated Use RBAC roles instead of direct user role assignment
-   */
-  static async promoteToAdmin(userId: string): Promise<void> {
-    logger.warn('promoteToAdmin is deprecated. Use RBAC role assignment instead.', { userId });
-  }
 
-  /**
-   * @deprecated Use RBAC roles instead of direct user role assignment
-   */
-  static async demoteFromAdmin(userId: string): Promise<void> {
-    logger.warn('demoteFromAdmin is deprecated. Use RBAC role assignment instead.', { userId });
-  }
 
   static async getPendingUsers(): Promise<UserWithoutPassword[]> {
     try {

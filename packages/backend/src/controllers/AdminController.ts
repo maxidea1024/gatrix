@@ -95,14 +95,6 @@ export class AdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      // Handle role as single value or array
-      const role = req.query.role;
-      let roleValue: string | string[] | undefined;
-      if (role) {
-        roleValue = Array.isArray(role) ? role.map((r) => String(r)) : String(role);
-      }
-      const roleOperator = req.query.role_operator as 'any_of' | 'include_all' | undefined;
-
       // Handle status as single value or array
       const status = req.query.status;
       let statusValue: string | string[] | undefined;
@@ -116,10 +108,6 @@ export class AdminController {
       const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
       const filters: Record<string, any> = {};
-      if (roleValue) {
-        filters.role = roleValue;
-        if (roleOperator) filters.role_operator = roleOperator;
-      }
       if (statusValue) {
         filters.status = statusValue;
         if (statusOperator) filters.status_operator = statusOperator;
@@ -168,7 +156,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { name, email, password, role, tagIds, allowAllEnvironments, environments } = req.body;
+      const { name, email, password, tagIds, allowAllEnvironments, environments } = req.body;
 
       if (!req.user?.userId) {
         throw new GatrixError('User not authenticated', 401);
@@ -185,7 +173,6 @@ export class AdminController {
         name,
         email,
         password,
-        role: role || 'user',
         status: 'active' as const, // Admin-created users are active by default
         emailVerified: true, // Admin-created users are verified by default
         createdBy, // Set the creator
@@ -354,67 +341,7 @@ export class AdminController {
     }
   }
 
-  static async promoteToAdmin(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = req.params.id;
-      await UserService.promoteToAdmin(userId);
 
-      // Send real-time notification to the affected user
-      await pubSubService.publishNotification({
-        type: 'user_role_changed',
-        data: {
-          userId,
-          changeType: 'role',
-        },
-        targetUsers: [userId],
-      });
-
-      res.json({
-        success: true,
-        message: 'User promoted to admin successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async demoteFromAdmin(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = req.params.id;
-
-      // Prevent admin from demoting themselves
-      if (req.user?.userId === userId) {
-        throw new GatrixError('Cannot demote your own account', 400);
-      }
-
-      await UserService.demoteFromAdmin(userId);
-
-      // Send real-time notification to the affected user
-      await pubSubService.publishNotification({
-        type: 'user_role_changed',
-        data: {
-          userId,
-          changeType: 'role',
-        },
-        targetUsers: [userId],
-      });
-
-      res.json({
-        success: true,
-        message: 'User demoted from admin successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 
   static async verifyUserEmail(
     req: AuthenticatedRequest,
@@ -857,58 +784,7 @@ export class AdminController {
     }
   }
 
-  static async bulkUpdateUserRole(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const { userIds, role } = req.body;
 
-      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new GatrixError('User IDs are required', 400);
-      }
-
-      if (!role || !['user', 'admin'].includes(role)) {
-        throw new GatrixError('Valid role is required', 400);
-      }
-
-      if (!req.user?.userId) {
-        throw new GatrixError('User not authenticated', 401);
-      }
-
-      const currentUserId = req.user.userId;
-
-      await db.transaction(async (trx) => {
-        await trx('g_users').whereIn('id', userIds).update({
-          role,
-          updatedAt: new Date(),
-        });
-
-        // Log audit entries
-        for (const userId of userIds) {
-          await AuditLogModel.create({
-            userId: currentUserId,
-            action: 'user_role_updated',
-            description: `User #${userId} role changed to '${role}' (bulk operation)`,
-            resourceType: 'user',
-            resourceId: userId.toString(),
-            newValues: { role, bulkOperation: true },
-            ipAddress: req.ip,
-          });
-        }
-      });
-
-      clearAllCache();
-
-      res.json({
-        success: true,
-        message: `Updated role for ${userIds.length} users`,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 
   static async bulkUpdateUserEmailVerified(
     req: AuthenticatedRequest,
@@ -1144,88 +1020,4 @@ export class AdminController {
     }
   }
 
-  /**
-   * Set permissions for a specific user
-   */
-  static async setUserPermissions(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = req.params.id;
-
-      if (!userId) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      // Protect super admin from being modified by others
-      if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
-        throw new GatrixError('Cannot modify super admin account', 403);
-      }
-
-      // Validate request body
-      const schema = Joi.object({
-        permissions: Joi.array().items(Joi.string()).required(),
-      });
-
-      const { error, value } = schema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
-
-      // Check if user exists
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      // Validate that all permissions are valid
-      const { ALL_PERMISSIONS } = await import('../types/permissions');
-      const invalidPermissions = value.permissions.filter(
-        (p: string) => !ALL_PERMISSIONS.includes(p as any)
-      );
-      if (invalidPermissions.length > 0) {
-        throw new GatrixError(`Invalid permissions: ${invalidPermissions.join(', ')}`, 400);
-      }
-
-      await UserModel.setPermissions(userId, value.permissions);
-
-      // Log audit
-      const actorId = (req.user as any)?.id ?? (req.user as any)?.userId;
-      await AuditLogModel.create({
-        action: 'user_permissions_updated',
-        description: `User #${userId} (${user.email}) permissions updated (${value.permissions.length} permissions)`,
-        resourceType: 'user',
-        resourceId: userId.toString(),
-        userId: actorId,
-        newValues: {
-          permissions: value.permissions,
-        },
-        ipAddress: req.ip || 'unknown',
-        userAgent: req.headers['user-agent'] || 'unknown',
-      });
-
-      // Send real-time notification to the affected user
-      await pubSubService.publishNotification({
-        type: 'user_role_changed',
-        data: {
-          userId,
-          changeType: 'permissions',
-        },
-        targetUsers: [userId],
-      });
-
-      res.json({
-        success: true,
-        message: 'Permissions updated successfully',
-        data: {
-          userId,
-          permissions: value.permissions,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 }

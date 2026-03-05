@@ -179,8 +179,6 @@ export class UserModel {
     page: number = 1,
     limit: number = 10,
     filters: {
-      role?: string | string[];
-      role_operator?: 'any_of' | 'include_all';
       status?: string | string[];
       status_operator?: 'any_of' | 'include_all';
       search?: string;
@@ -204,7 +202,6 @@ export class UserModel {
 
       // Apply filters function
       const applyFilters = (query: any) => {
-        // Role filter is handled via g_organisation_members.orgRole, not g_users.role
 
         // Handle status filter (single or multiple)
         if (filters.status) {
@@ -575,33 +572,4 @@ export class UserModel {
     }
   }
 
-  /**
-   * Set permissions for a user
-   * @deprecated Permissions are now managed via roles in the RBAC system
-   */
-  static async setPermissions(userId: string, _permissions: string[]): Promise<void> {
-    logger.warn('UserModel.setPermissions is deprecated. Use role-based permissions instead.', {
-      userId,
-    });
-  }
-
-  /**
-   * Add a permission to a user
-   * @deprecated Permissions are now managed via roles in the RBAC system
-   */
-  static async addPermission(userId: string, _permission: string): Promise<void> {
-    logger.warn('UserModel.addPermission is deprecated. Use role-based permissions instead.', {
-      userId,
-    });
-  }
-
-  /**
-   * Remove a permission from a user
-   * @deprecated Permissions are now managed via roles in the RBAC system
-   */
-  static async removePermission(userId: string, _permission: string): Promise<void> {
-    logger.warn('UserModel.removePermission is deprecated. Use role-based permissions instead.', {
-      userId,
-    });
-  }
 }

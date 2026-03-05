@@ -120,7 +120,7 @@ export const auditUserUpdate = enhancedAuditLog({
     // Track only changed fields
     if (body.name !== undefined && body.name !== oldValues?.name) changes.name = body.name;
     if (body.email !== undefined && body.email !== oldValues?.email) changes.email = body.email;
-    if (body.role !== undefined && body.role !== oldValues?.role) changes.role = body.role;
+
     if (body.status !== undefined && body.status !== oldValues?.status)
       changes.status = body.status;
     if (body.tags !== undefined) changes.tags = body.tags;
@@ -151,7 +151,6 @@ export const auditUserDelete = enhancedAuditLog({
       id: oldValues?.id,
       email: oldValues?.email,
       name: oldValues?.name,
-      role: oldValues?.role,
       status: oldValues?.status,
     },
   }),
@@ -159,7 +158,6 @@ export const auditUserDelete = enhancedAuditLog({
     operation: 'delete_user',
     userName: oldValues?.name,
     userEmail: oldValues?.email,
-    userRole: oldValues?.role,
   }),
   getDescription: (_req, oldValues) => `User '${oldValues?.name}' (${oldValues?.email}) deleted`,
 });
@@ -254,52 +252,6 @@ export const auditUserUnsuspend = enhancedAuditLog({
   }),
   getDescription: (_req, oldValues) =>
     `User '${oldValues?.name}' (${oldValues?.email}) unsuspended (${oldValues?.status} ??active)`,
-});
-
-export const auditUserPromote = enhancedAuditLog({
-  action: 'user_promote',
-  resourceType: 'user',
-  getResourceId: (req) => req.params?.id,
-  fetchOldValues: async (req) => {
-    const id = req.params?.id;
-    if (!id) return null;
-    return await fetchUserById(id);
-  },
-  getNewValues: (_req, _res, oldValues) => ({
-    role: 'admin',
-    previousRole: oldValues?.role,
-  }),
-  getContext: (_req, oldValues) => ({
-    operation: 'promote_user',
-    userName: oldValues?.name,
-    userEmail: oldValues?.email,
-    roleChange: `${oldValues?.role} ??admin`,
-  }),
-  getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) promoted to admin (${oldValues?.role} ??admin)`,
-});
-
-export const auditUserDemote = enhancedAuditLog({
-  action: 'user_demote',
-  resourceType: 'user',
-  getResourceId: (req) => req.params?.id,
-  fetchOldValues: async (req) => {
-    const id = req.params?.id;
-    if (!id) return null;
-    return await fetchUserById(id);
-  },
-  getNewValues: (_req, _res, oldValues) => ({
-    role: 'user',
-    previousRole: oldValues?.role,
-  }),
-  getContext: (_req, oldValues) => ({
-    operation: 'demote_user',
-    userName: oldValues?.name,
-    userEmail: oldValues?.email,
-    roleChange: `${oldValues?.role} ??user`,
-  }),
-  getDescription: (_req, oldValues) =>
-    `User '${oldValues?.name}' (${oldValues?.email}) demoted to user (${oldValues?.role} ??user)`,
 });
 
 // Game world actions

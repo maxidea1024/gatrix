@@ -87,7 +87,7 @@ export class AuthService {
         email: user.email,
       });
 
-      // Include role from org membership in the response user object
+      // Attach RBAC orgRole to the response so the frontend can determine user permissions
       (userWithoutPassword as any).role = orgRole;
 
       return {
