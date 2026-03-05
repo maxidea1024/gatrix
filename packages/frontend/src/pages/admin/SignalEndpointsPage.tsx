@@ -494,10 +494,19 @@ const SignalEndpointsPage: React.FC = () => {
                   <TableCell>{t('signalEndpoints.description')}</TableCell>
                   <TableCell align="center">{t('signalEndpoints.status')}</TableCell>
                   <TableCell align="center">{t('signalEndpoints.tokens')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody
+                sx={{
+                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
+                  },
+                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
                 {endpoints.map((endpoint) => (
                   <React.Fragment key={endpoint.id}>
                     <TableRow

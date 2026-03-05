@@ -622,10 +622,19 @@ const ActionSetsPage: React.FC = () => {
                   <TableCell>{t('actionSets.source')}</TableCell>
                   <TableCell align="center">{t('actionSets.status')}</TableCell>
                   <TableCell align="center">{t('actionSets.actionCount')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody
+                sx={{
+                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
+                  },
+                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
                 {actionSets.map((actionSet) => (
                   <React.Fragment key={actionSet.id}>
                     <TableRow
