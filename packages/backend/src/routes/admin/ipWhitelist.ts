@@ -1,5 +1,5 @@
 ﻿import express from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { auditLog } from '../../middleware/auditLog';
 import { IpWhitelistController } from '../../controllers/IpWhitelistController';
 
@@ -7,8 +7,6 @@ const router = express.Router();
 
 // All routes require authentication and admin privileges
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // IP Whitelist management routes
 router.get('/', IpWhitelistController.getIpWhitelists);
 router.get('/check', IpWhitelistController.checkIpWhitelist);

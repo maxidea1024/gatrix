@@ -111,8 +111,6 @@ export const optionalAuth = async (
 };
 
 // Gradual migration: re-export from rbacMiddleware
-export { requireOrgAdmin as requireAdmin } from './rbacMiddleware';
-
 export const requireRole = (roles: string | string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {

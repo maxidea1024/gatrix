@@ -1,13 +1,11 @@
 import express from 'express';
 import { ChangeRequestController } from '../../controllers/ChangeRequestController';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 
 const router = express.Router();
 
 // All routes require authentication and admin role
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 /**
  * @route GET /api/v1/admin/change-requests
  * @desc Get list of change requests for current environment

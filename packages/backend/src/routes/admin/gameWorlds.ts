@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { GameWorldController } from '../../controllers/GameWorldController';
 import {
   auditGameWorldCreate,
@@ -303,7 +303,6 @@ router.get('/id/:id', GameWorldController.getGameWorldById);
 router.get('/world/:worldId', GameWorldController.getGameWorldByWorldId);
 
 // Admin-only routes
-router.use(requireAdmin as any);
 router.post('/', auditGameWorldCreate as any, GameWorldController.createGameWorld);
 router.put('/:id', auditGameWorldUpdate as any, GameWorldController.updateGameWorld);
 router.delete('/:id', auditGameWorldDelete as any, GameWorldController.deleteGameWorld);

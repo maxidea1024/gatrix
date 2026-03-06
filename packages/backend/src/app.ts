@@ -21,7 +21,7 @@ import { ALLOWED_HEADERS } from './constants/headers';
 import routes from './routes';
 
 // import advancedSettingsRoutes from './routes/advancedSettings';
-import { authenticate, requireAdmin } from './middleware/auth';
+import { authenticate } from './middleware/auth';
 import { BullBoardConfig } from './config/bullboard';
 
 const app = express();
@@ -208,8 +208,7 @@ const bullBoardAdapter = BullBoardConfig.initialize();
 app.use('/bull-board', bullBoardAdapter.getRouter());
 app.use(
   '/api/v1/bull-board',
-  authenticate as any,
-  requireAdmin as any,
+  authenticate as any as any,
   bullBoardAdapter.getRouter()
 );
 

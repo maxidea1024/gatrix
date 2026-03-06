@@ -1,13 +1,11 @@
 import { Router } from 'express';
 import { AdminController } from '../../controllers/AdminController';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 
 const router = Router();
 
 // All audit log routes require admin authentication
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 /**
  * @swagger
  * /api/audit-logs:

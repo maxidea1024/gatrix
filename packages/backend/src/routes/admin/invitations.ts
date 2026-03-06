@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import {
   AdminInvitationController,
   createInvitationValidation,
@@ -9,8 +9,6 @@ import { enhancedAuditLog, fetchInvitationById } from '../../utils/enhancedAudit
 const router = Router();
 
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // POST /api/v1/admin/invitations - 사용자 초대 생성
 router.post(
   '/',

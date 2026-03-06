@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { AdminController } from '../../controllers/AdminController';
 import apiTokenRoutes from './apiTokens';
 import {
@@ -15,8 +15,6 @@ const router = Router();
 
 // All admin routes require authentication and admin privileges
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // Dashboard and statistics
 router.get('/dashboard', AdminController.getDashboard as any);
 router.get('/stats', AdminController.getStats as any);

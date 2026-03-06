@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, requireAdmin, requirePermission } from '../../middleware/auth';
+import { authenticate, requirePermission } from '../../middleware/auth';
 import { environmentContextMiddleware } from '../../middleware/environmentMiddleware';
 import { orgProjectScope } from '../../middleware/orgProjectScope';
 import { PERMISSIONS } from '../../types/permissions';
@@ -59,7 +59,7 @@ router.use('/notifications', notificationRoutes);
 router.use('/services', serviceDiscoveryRoutes);
 
 // Self-service routes for authenticated users (not requiring admin role)
-// These must be mounted BEFORE requireAdmin middleware
+
 import { permissionService } from '../../services/PermissionService';
 import { createLogger } from '../../config/logger';
 
@@ -97,12 +97,10 @@ router.get('/users/me/environments', authenticate as any, async (req: any, res: 
 import { UserController } from '../../controllers/UserController';
 router.get('/users/me/permissions', authenticate as any, UserController.getMyPermissions);
 
-// RBAC management routes (uses its own RBAC middleware, not legacy requireAdmin)
 router.use('/rbac', rbacRoutes);
 
 // Apply authentication middleware to all other admin routes
 router.use(authenticate as any);
-// Note: requireAdmin removed - each route uses its own requirePermission via RBAC
 
 // Apply environment context middleware to set current environment from X-Environment-Id header
 router.use(environmentContextMiddleware as any);

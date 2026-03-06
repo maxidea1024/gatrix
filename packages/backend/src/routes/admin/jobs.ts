@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { auditLog } from '../../middleware/auditLog';
 import {
   getJobs,
@@ -23,8 +23,6 @@ const router = express.Router();
 
 // 모든 라우트에 인증 및 관리자 권한 필요
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // Job Types 라우트
 router.get('/job-types', getJobTypes as any);
 router.get('/job-types/:id', getJobType as any);
