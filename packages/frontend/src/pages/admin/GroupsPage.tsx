@@ -32,6 +32,7 @@ import {
   Alert,
   Menu,
   MenuItem,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -57,11 +58,13 @@ import {
   GroupRole,
   Role,
 } from '@/services/rbacService';
+import type { EffectivePermissions } from '@/services/rbacService';
 import api from '@/services/api';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsViewer';
 
 // ==================== Tab Panel ====================
 
@@ -128,6 +131,10 @@ const GroupsPage: React.FC = () => {
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+
+  // Effective permissions for group
+  const [groupEffectivePerms, setGroupEffectivePerms] = useState<EffectivePermissions | null>(null);
+  const [groupEffectivePermsLoading, setGroupEffectivePermsLoading] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -233,6 +240,12 @@ const GroupsPage: React.FC = () => {
       setSelectedRoleId(null);
       loadUsers();
       loadRoles();
+      // Load group effective permissions
+      setGroupEffectivePermsLoading(true);
+      rbacService.getGroupEffectivePermissions(group.id)
+        .then((data) => setGroupEffectivePerms(data))
+        .catch(() => setGroupEffectivePerms(null))
+        .finally(() => setGroupEffectivePermsLoading(false));
     } catch (error) {
       console.error('Failed to load group detail:', error);
       enqueueSnackbar(t('rbac.groups.loadFailed'), { variant: 'error' });
@@ -734,52 +747,54 @@ const GroupsPage: React.FC = () => {
               {effectiveMembers.length === 0 ? (
                 <Alert severity="info">{t('rbac.groups.noMembers')}</Alert>
               ) : (
-                <List dense>
-                  {effectiveMembers.map((member) => {
-                    const isPendingAdd = pendingMemberAdds.includes(member.userId);
-                    const isPendingRemove = pendingMemberRemoves.includes(member.userId);
-                    return (
-                      <ListItem
-                        key={member.userId}
-                        divider
-                        sx={{
-                          opacity: isPendingRemove ? 0.4 : 1,
-                          bgcolor: isPendingAdd ? 'action.selected' : 'transparent',
-                        }}
-                      >
-                        <ListItemText
-                          primary={
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              {member.name || member.userId}
-                              {isPendingAdd && (
-                                <Chip
-                                  label={t('common.new')}
-                                  size="small"
-                                  color="success"
-                                  variant="outlined"
-                                  sx={{ height: 20 }}
-                                />
-                              )}
-                            </Box>
-                          }
-                          secondary={member.email}
-                        />
-                        <ListItemSecondaryAction>
-                          <Tooltip title={t('rbac.groups.removeMember')}>
-                            <IconButton
-                              edge="end"
-                              size="small"
-                              color="error"
-                              onClick={() => handleRemoveMember(member.userId)}
-                            >
-                              <PersonRemoveIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    );
-                  })}
-                </List>
+                <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                  <List dense disablePadding>
+                    {effectiveMembers.map((member) => {
+                      const isPendingAdd = pendingMemberAdds.includes(member.userId);
+                      const isPendingRemove = pendingMemberRemoves.includes(member.userId);
+                      return (
+                        <ListItem
+                          key={member.userId}
+                          divider
+                          sx={{
+                            opacity: isPendingRemove ? 0.4 : 1,
+                            bgcolor: isPendingAdd ? 'action.selected' : 'transparent',
+                          }}
+                        >
+                          <ListItemText
+                            primary={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {member.name || member.userId}
+                                {isPendingAdd && (
+                                  <Chip
+                                    label={t('common.new')}
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                    sx={{ height: 20 }}
+                                  />
+                                )}
+                              </Box>
+                            }
+                            secondary={member.email}
+                          />
+                          <ListItemSecondaryAction>
+                            <Tooltip title={t('rbac.groups.removeMember')}>
+                              <IconButton
+                                edge="end"
+                                size="small"
+                                color="error"
+                                onClick={() => handleRemoveMember(member.userId)}
+                              >
+                                <PersonRemoveIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Box>
               )}
             </TabPanel>
 
@@ -854,6 +869,23 @@ const GroupsPage: React.FC = () => {
                     );
                   })}
                 </List>
+              )}
+
+              {/* Effective Permissions */}
+              {effectiveRoles.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Divider sx={{ mb: 1 }} />
+                  <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                    {t('rbac.roles.effectivePermissions')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.8rem' }}>
+                    {t('rbac.groups.effectivePermissionsDesc', 'Permissions that members of this group will receive from assigned roles.')}
+                  </Typography>
+                  <EffectivePermissionsViewer
+                    data={groupEffectivePerms}
+                    loading={groupEffectivePermsLoading}
+                  />
+                </Box>
               )}
             </TabPanel>
           </Box>

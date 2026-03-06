@@ -214,7 +214,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
-  const { user, logout, isAdmin, hasPermission } = useAuth();
+  const { user, logout, hasPermission, permissions, permissionsLoading } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -233,8 +233,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // My pending review count (open status - edits are locked)
   const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
 
-  // Check if admin user has environment access
-  const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
+  // User has RBAC permissions assigned (regardless of system role)
+  const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
+
+  // Check if user has environment access (has permissions + environments loaded)
+  const hasEnvironmentAccess = hasAnyPermissions && !environmentsLoading && environments.length > 0;
+
+  // Show sidebar when user has any permissions
+  const showSidebar = hasAnyPermissions;
 
   // Filter menu items based on permissions
   const canAccessMenuItem = useCallback(
@@ -283,7 +289,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Get filtered menu categories
   const getFilteredMenuCategories = useCallback((): MenuCategory[] => {
     const categories = getMenuCategories(
-      isAdmin(),
+      hasAnyPermissions,
       {
         'sidebar.changeRequests': pendingCRCount,
       },
@@ -297,7 +303,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         children: filterMenuItems(category.children),
       }))
       .filter((category) => category.children.length > 0);
-  }, [isAdmin, filterMenuItems, pendingCRCount, currentEnvironment]);
+  }, [hasAnyPermissions, filterMenuItems, pendingCRCount, currentEnvironment]);
 
   // Flag to track if initial URL sync has been done
   const initialSyncDoneRef = useRef(false);
@@ -1527,7 +1533,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* 사이드바 - 전체 높이 차지 */}
+      {/* 사이드바 - 전체 높이 차지 (admin only) */}
+      {showSidebar && (
       <Box
         component="nav"
         sx={{
@@ -1567,6 +1574,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: sidebarCollapsed ? 64 : sidebarWidth,
+              transition: 'width 0.3s ease',
               backgroundColor: theme.palette.background.paper,
               color: theme.palette.text.primary,
               position: 'fixed',
@@ -1585,6 +1593,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {drawerContent}
         </Drawer>
       </Box>
+      )}
 
       {/* 오른쪽 영역: AppBar + 메인 컨텐츠 */}
       <Box
@@ -1613,26 +1622,28 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {isMobile ? (
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  sx={{ mr: 1 }}
-                >
-                  <MenuIcon />
-                </IconButton>
-              ) : (
-                <IconButton
-                  color="inherit"
-                  aria-label="toggle sidebar"
-                  edge="start"
-                  onClick={handleSidebarToggle}
-                  sx={{ mr: 1 }}
-                >
-                  <MenuOpenIcon />
-                </IconButton>
+              {showSidebar && (
+                isMobile ? (
+                  <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    edge="start"
+                    onClick={handleDrawerToggle}
+                    sx={{ mr: 1 }}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    color="inherit"
+                    aria-label="toggle sidebar"
+                    edge="start"
+                    onClick={handleSidebarToggle}
+                    sx={{ mr: 1 }}
+                  >
+                    <MenuOpenIcon />
+                  </IconButton>
+                )
               )}
             </Box>
 
@@ -1935,8 +1946,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {/* Chat button - only visible for admin users with chat permission */}
-              {isAdmin() && hasPermission(P.CHAT_ACCESS) && (
+              {/* Chat button - visible for users with chat permission */}
+              {hasPermission(P.CHAT_ACCESS) && (
                 <Tooltip title={t('sidebar.chat')}>
                   <IconButton color="inherit" onClick={() => navigate('/chat')}>
                     <ChatIcon />

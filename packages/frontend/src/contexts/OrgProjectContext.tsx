@@ -6,6 +6,9 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
+import { Box, Typography, Button, Paper } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { Business as BusinessIcon, Logout as LogoutIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import { useAuth } from './AuthContext';
 import { orgProjectService, Organisation, Project } from '../services/orgProjectService';
 import { devLogger } from '../utils/logger';
@@ -26,6 +29,7 @@ export interface OrgProjectContextType {
 
   // Loading
   isLoading: boolean;
+  noOrgAccess: boolean;
 
   // Actions
   switchOrg: (orgId: string) => void;
@@ -64,6 +68,8 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
   const [currentOrgId, setCurrentOrgId] = useState<string | null>(getStoredOrgId());
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(getStoredProjectId());
   const [isLoading, setIsLoading] = useState(true);
+  const [noOrgAccess, setNoOrgAccess] = useState(false);
+  const { t } = useTranslation();
 
   const currentOrg = organisations.find((o) => o.id === currentOrgId) || null;
   const currentProject = projects.find((p) => p.id === currentProjectId) || null;
@@ -73,6 +79,7 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     try {
       const orgs = await orgProjectService.getOrganisations();
       setOrganisations(orgs);
+      setNoOrgAccess(false);
 
       // Auto-select: stored → first active org
       const stored = getStoredOrgId();
@@ -83,9 +90,16 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
         const active = orgs.find((o) => o.isActive) || orgs[0];
         setCurrentOrgId(active.id);
         storeOrgId(active.id);
+      } else {
+        // Authenticated but no orgs returned
+        setNoOrgAccess(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       devLogger.error('Failed to load organisations:', error);
+      const status = error?.status || error?.response?.status;
+      if (status === 403) {
+        setNoOrgAccess(true);
+      }
     }
   }, []);
 
@@ -185,6 +199,7 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     currentProject,
     currentProjectId,
     isLoading,
+    noOrgAccess,
     switchOrg,
     switchProject,
     switchContext,
@@ -192,6 +207,63 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     refreshProjects: loadProjects,
     getProjectApiPath,
   };
+
+  // Show full-screen notice when user has no org access
+  if (noOrgAccess && !isLoading) {
+    return (
+      <OrgProjectContext.Provider value={value}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+            bgcolor: 'background.default',
+            p: 3,
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              p: 5,
+              maxWidth: 480,
+              textAlign: 'center',
+              borderRadius: 3,
+            }}
+          >
+            <BusinessIcon sx={{ fontSize: 64, color: 'warning.main', mb: 2 }} />
+            <Typography variant="h5" fontWeight={600} gutterBottom>
+              {t('rbac.noOrgAccess.title')}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
+              {t('rbac.noOrgAccess.description')}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+              <Button
+                variant="outlined"
+                startIcon={<RefreshIcon />}
+                onClick={() => {
+                  setNoOrgAccess(false);
+                  setIsLoading(true);
+                  loadOrgs().finally(() => setIsLoading(false));
+                }}
+              >
+                {t('common.refresh')}
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<LogoutIcon />}
+                onClick={() => { window.location.href = '/logout'; }}
+              >
+                {t('common.logout')}
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+      </OrgProjectContext.Provider>
+    );
+  }
 
   return <OrgProjectContext.Provider value={value}>{children}</OrgProjectContext.Provider>;
 };

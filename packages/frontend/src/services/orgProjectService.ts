@@ -38,6 +38,7 @@ export interface Project {
   updatedAt: string;
   orgName?: string;
   orgDisplayName?: string;
+  memberCount?: number;
 }
 
 // ==================== Service ====================

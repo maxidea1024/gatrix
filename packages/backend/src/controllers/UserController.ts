@@ -499,4 +499,23 @@ export class UserController {
       },
     });
   });
+  /**
+   * Get current user's RBAC permissions (self-service, no admin required)
+   */
+  static getMyPermissions = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new GatrixError('User not authenticated', 401);
+    }
+
+    const userId = req.user.userId;
+    const permissions = await UserModel.getPermissions(userId);
+
+    res.json({
+      success: true,
+      data: {
+        userId,
+        permissions,
+      },
+    });
+  });
 }

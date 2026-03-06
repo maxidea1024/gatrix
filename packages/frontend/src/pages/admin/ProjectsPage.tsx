@@ -523,6 +523,12 @@ const ProjectsPage: React.FC = () => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="caption" color="text.secondary">
+                          {proj.memberCount ?? 0}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                         <Tooltip title={formatDateTimeDetailed(proj.createdAt)} arrow>
                           <Typography variant="caption" color="text.secondary">

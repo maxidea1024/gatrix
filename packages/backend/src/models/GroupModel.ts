@@ -146,6 +146,17 @@ export class GroupModel {
   // ─── Roles ─────────────────────────
 
   static async addRole(groupId: string, roleId: string, orgId: string, assignedBy?: string): Promise<void> {
+    // Check for duplicate binding
+    const existing = await db(this.BINDINGS_TABLE)
+      .where('groupId', groupId)
+      .where('roleId', roleId)
+      .first();
+    if (existing) {
+      const error: any = new Error('Role already assigned');
+      error.code = 'ER_DUP_ENTRY';
+      throw error;
+    }
+
     const id = generateULID();
     await db(this.BINDINGS_TABLE).insert({
       id,
@@ -181,9 +192,19 @@ export class GroupModel {
 
   static async getRoles(groupId: string): Promise<any[]> {
     return db(this.BINDINGS_TABLE)
-      .select([`${this.BINDINGS_TABLE}.id`, `${this.BINDINGS_TABLE}.roleId`, `${this.BINDINGS_TABLE}.assignedBy`, `${this.BINDINGS_TABLE}.assignedAt`, `${this.BINDINGS_TABLE}.scopeType`, `${this.BINDINGS_TABLE}.scopeId`, 'r.roleName', 'r.description as roleDescription'])
+      .select([
+        db.raw('MIN(`g_role_bindings`.`id`) as id'),
+        `${this.BINDINGS_TABLE}.roleId`,
+        db.raw('MIN(`g_role_bindings`.`assignedBy`) as assignedBy'),
+        db.raw('MIN(`g_role_bindings`.`assignedAt`) as assignedAt'),
+        db.raw("MIN(`g_role_bindings`.`scopeType`) as scopeType"),
+        db.raw("MIN(`g_role_bindings`.`scopeId`) as scopeId"),
+        'r.roleName',
+        'r.description as roleDescription',
+      ])
       .join('g_roles as r', `${this.BINDINGS_TABLE}.roleId`, 'r.id')
       .where(`${this.BINDINGS_TABLE}.groupId`, groupId)
+      .groupBy(`${this.BINDINGS_TABLE}.roleId`, 'r.roleName', 'r.description')
       .orderBy('r.roleName', 'asc');
   }
 

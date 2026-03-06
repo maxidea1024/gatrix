@@ -53,7 +53,8 @@ const storeEnvironment = (environmentId: string, name: string): void => {
 };
 
 export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasPermission, permissions, permissionsLoading } = useAuth();
+  const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
   const { getProjectApiPath, currentProjectId, switchContext } = useOrgProject();
   const [allEnvironments, setAllEnvironments] = useState<Environment[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
@@ -159,7 +160,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
 
   // Reload environments when project changes
   useEffect(() => {
-    if (isAuthenticated && currentProjectId) {
+    if (isAuthenticated && hasAnyPermissions && currentProjectId) {
       console.log('[EnvironmentContext] Project changed, reloading environments...');
       loadEnvironments();
     } else if (!isAuthenticated) {

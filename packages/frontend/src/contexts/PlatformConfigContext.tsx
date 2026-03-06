@@ -11,7 +11,8 @@ interface PlatformConfigProviderProps {
 }
 
 export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, permissions, permissionsLoading } = useAuth();
+  const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
   const { getProjectApiPath, currentProjectId } = useOrgProject();
   const [platforms, setPlatforms] = useState<PlatformOption[]>([]);
   const [channels, setChannels] = useState<ChannelOption[]>([]);
@@ -45,7 +46,7 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ 
 
   // Fetch when authenticated and project is selected
   useEffect(() => {
-    if (isAuthenticated && currentProjectId) {
+    if (isAuthenticated && hasAnyPermissions && currentProjectId) {
       loadPlatformConfig();
     } else {
       // Reset and stop loading when unauthenticated or no project

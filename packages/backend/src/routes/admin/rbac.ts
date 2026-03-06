@@ -33,9 +33,19 @@ router.use(authenticate as any);
 // ==================== Organisations ====================
 
 // GET /api/admin/rbac/organisations
-router.get('/organisations', requireOrgAdmin as any, async (req: any, res) => {
+// Returns organisations the current user is a member of (no org context needed)
+router.get('/organisations', async (req: any, res) => {
   try {
-    const orgs = await Organisation.findAll();
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const orgs = await db('g_organisations as o')
+      .join('g_organisation_members as om', 'o.id', 'om.orgId')
+      .where('om.userId', userId)
+      .select('o.*');
+
     res.json({ success: true, data: orgs });
   } catch (error) {
     logger.error('Error listing organisations:', error);
@@ -257,7 +267,12 @@ router.get('/projects', async (req: any, res) => {
       .join('g_organisations as o', 'p.orgId', 'o.id')
       .join('g_organisation_members as om', 'o.id', 'om.orgId')
       .where('om.userId', userId)
-      .select('p.*', 'o.orgName', 'o.displayName as orgDisplayName');
+      .select(
+        'p.*',
+        'o.orgName',
+        'o.displayName as orgDisplayName',
+        db.raw('(SELECT COUNT(*) FROM g_project_members WHERE projectId = p.id) as memberCount')
+      );
 
     res.json({ success: true, data: projects });
   } catch (error) {
@@ -466,6 +481,67 @@ router.get(
     } catch (error) {
       logger.error('Error listing roles:', error);
       res.status(500).json({ success: false, message: 'Failed to list roles' });
+    }
+  }
+);
+
+// GET /api/admin/rbac/roles/:id/effective-permissions
+// Returns the role's own + inherited (from parent roles) permissions
+router.get(
+  '/roles/:id/effective-permissions',
+  requireOrgPermission(ORG_PERMISSIONS.ROLES_WRITE) as any,
+  async (req: any, res) => {
+    try {
+      const roleId = req.params.id;
+
+      // Get own permissions
+      const ownPerms = await db('g_role_permissions')
+        .where('roleId', roleId)
+        .select('permission');
+      const ownPermSet = new Set(ownPerms.map((p: any) => p.permission));
+
+      // Get inherited permissions via parent roles (recursively)
+      const inheritedPerms: Array<{ permission: string; fromRoleId: string; fromRoleName: string }> = [];
+
+      // Recursive parent resolution
+      const resolveParents = async (rIds: string[], depth: number = 0): Promise<void> => {
+        if (depth >= 5 || rIds.length === 0) return;
+        const parents = await db('g_role_inheritance as ri')
+          .join('g_roles as r', 'ri.parentRoleId', 'r.id')
+          .whereIn('ri.roleId', rIds)
+          .select('ri.parentRoleId', 'r.roleName');
+
+        const nextIds: string[] = [];
+        for (const parent of parents) {
+          const parentPerms = await db('g_role_permissions')
+            .where('roleId', parent.parentRoleId)
+            .select('permission');
+          for (const pp of parentPerms) {
+            if (!ownPermSet.has(pp.permission) && !inheritedPerms.some((ip) => ip.permission === pp.permission)) {
+              inheritedPerms.push({
+                permission: pp.permission,
+                fromRoleId: parent.parentRoleId,
+                fromRoleName: parent.roleName,
+              });
+            }
+          }
+          nextIds.push(parent.parentRoleId);
+        }
+        await resolveParents(nextIds, depth + 1);
+      };
+
+      await resolveParents([roleId]);
+
+      res.json({
+        success: true,
+        data: {
+          own: Array.from(ownPermSet),
+          inherited: inheritedPerms,
+        },
+      });
+    } catch (error) {
+      logger.error('Error getting effective permissions:', error);
+      res.status(500).json({ success: false, message: 'Failed to get effective permissions' });
     }
   }
 );
@@ -755,6 +831,78 @@ router.delete(
     } catch (error) {
       logger.error('Error removing group role:', error);
       res.status(500).json({ success: false, message: 'Failed to remove role' });
+    }
+  }
+);
+
+// GET /api/admin/rbac/groups/:id/effective-permissions
+router.get(
+  '/groups/:id/effective-permissions',
+  requireOrgPermission(ORG_PERMISSIONS.GROUPS_READ) as any,
+  async (req: any, res) => {
+    try {
+      const groupId = req.params.id;
+      const roles = await GroupModel.getRoles(groupId);
+
+      const ownPermSet = new Set<string>();
+      const permSources: Record<string, string> = {}; // permission -> source role name
+
+      for (const role of roles) {
+        // Get direct permissions of each role
+        const rolePerms = await db('g_role_permissions')
+          .where('roleId', role.roleId)
+          .select('permission');
+        for (const rp of rolePerms) {
+          if (!ownPermSet.has(rp.permission)) {
+            ownPermSet.add(rp.permission);
+            permSources[rp.permission] = role.roleName;
+          }
+        }
+
+        // Get inherited permissions via parent roles (recursively)
+        const resolveParents = async (rIds: string[], depth: number = 0): Promise<void> => {
+          if (depth >= 5 || rIds.length === 0) return;
+          const parents = await db('g_role_inheritance as ri')
+            .join('g_roles as r', 'ri.parentRoleId', 'r.id')
+            .whereIn('ri.roleId', rIds)
+            .select('ri.parentRoleId', 'r.roleName');
+
+          const nextIds: string[] = [];
+          for (const parent of parents) {
+            const parentPerms = await db('g_role_permissions')
+              .where('roleId', parent.parentRoleId)
+              .select('permission');
+            for (const pp of parentPerms) {
+              if (!ownPermSet.has(pp.permission)) {
+                ownPermSet.add(pp.permission);
+                permSources[pp.permission] = `${role.roleName} ← ${parent.roleName}`;
+              }
+            }
+            nextIds.push(parent.parentRoleId);
+          }
+          await resolveParents(nextIds, depth + 1);
+        };
+
+        await resolveParents([role.roleId]);
+      }
+
+      // Build response: all permissions with source info
+      const allPerms = Array.from(ownPermSet).map((perm) => ({
+        permission: perm,
+        fromRoleName: permSources[perm] || '',
+      }));
+
+      res.json({
+        success: true,
+        data: {
+          own: allPerms.map((p) => p.permission),
+          inherited: [] as Array<{ permission: string; fromRoleId: string; fromRoleName: string }>,
+          sources: allPerms,
+        },
+      });
+    } catch (error) {
+      logger.error('Error getting group effective permissions:', error);
+      res.status(500).json({ success: false, message: 'Failed to get effective permissions' });
     }
   }
 );

@@ -96,6 +96,12 @@ const ProfilePage: React.FC = () => {
     const fetchEnvironmentAccess = async () => {
       if (!user) return;
 
+      // Non-admin users don't have access to environment APIs
+      if (user.role !== 'admin') {
+        setEnvLoading(false);
+        return;
+      }
+
       try {
         setEnvLoading(true);
         const projectApiPath = getProjectApiPath();

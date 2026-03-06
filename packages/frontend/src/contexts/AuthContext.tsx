@@ -25,7 +25,7 @@ interface AuthContextType {
   updateProfile?: (data: any) => Promise<User>;
   changePassword?: (currentPassword: string, newPassword: string) => Promise<void>;
   clearError: () => void;
-  isAdmin: () => boolean;
+
   canAccess: (requiredRoles?: string[]) => boolean;
   getToken: () => string | null;
   hasPermission: (permission: Permission | Permission[]) => boolean;
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await api.get<{
         userId: number;
         permissions: Permission[];
-      }>(`/admin/users/${userId}/permissions`);
+      }>('/admin/users/me/permissions');
       setPermissions(response.data?.permissions || []);
     } catch (error) {
       devLogger.error('Failed to fetch permissions:', error);
@@ -161,9 +161,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   };
 
-  const isAdmin = (): boolean => {
-    return user?.role === 'admin';
-  };
+
 
   const canAccess = (requiredRoles?: string[]): boolean => {
     if (!isAuthenticated || !user) {
@@ -193,10 +191,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return false;
       }
 
-      // Admin users with role 'admin' need to have permissions assigned
-      if (user.role !== 'admin') {
-        return false;
-      }
+      // All users can have permissions assigned via RBAC roles
 
       // While permissions are loading, return false to prevent showing menus prematurely
       if (permissionsLoading) {
@@ -236,15 +231,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [isAuthenticated, user, permissions, permissionsLoading]
   );
 
-  // Fetch permissions when user changes
+  // Fetch permissions when user changes -- all authenticated users can have RBAC permissions
   useEffect(() => {
-    if (user?.id && user.role === 'admin') {
+    if (user?.id) {
       fetchPermissions(user.id);
     } else {
       setPermissions([]);
-      setPermissionsLoading(false); // Non-admin users don't need permission loading
+      setPermissionsLoading(false);
     }
-  }, [user?.id, user?.role, fetchPermissions]);
+  }, [user?.id, fetchPermissions]);
 
   useEffect(() => {
     // Initialize auth state from localStorage only
@@ -349,7 +344,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     refreshAuth,
     clearError,
-    isAdmin,
+
     canAccess,
     getToken,
     hasPermission,

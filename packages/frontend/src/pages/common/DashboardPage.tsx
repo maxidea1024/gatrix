@@ -55,7 +55,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import { useUserStats } from '@/hooks/useSWR';
+import { useConditionalApi } from '@/hooks/useSWR';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { P } from '@/types/permissions';
@@ -284,11 +284,16 @@ interface EnvironmentWithCounts extends Environment {
 
 const DashboardPage: React.FC = () => {
   const theme = useTheme();
-  const { user, isAdmin, hasPermission, permissionsLoading } = useAuth();
-  const { data: statsData, isLoading: statsLoading, mutate: refreshStats } = useUserStats();
+  const { user, hasPermission, permissions, permissionsLoading } = useAuth();
+  const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
+  const { data: statsData, isLoading: statsLoading, mutate: refreshStats } = useConditionalApi<{
+    totalUsers: number;
+    activeUsers: number;
+    pendingUsers: number;
+    adminUsers: number;
+  }>('/admin/stats/users', hasAnyPermissions && hasPermission(P.USERS_READ));
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const isAdminUser = isAdmin();
   const { switchEnvironment, currentEnvironmentId } = useEnvironment();
   const { getProjectApiPath, currentOrgId, currentProjectId } = useOrgProject();
 
@@ -536,7 +541,7 @@ const DashboardPage: React.FC = () => {
 
   // Load alerts summary
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(P.MONITORING_READ)) {
+    if (!hasAnyPermissions || !hasPermission(P.MONITORING_READ)) {
       return;
     }
 
@@ -572,11 +577,11 @@ const DashboardPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [isAdminUser, hasPermission]);
+  }, [hasAnyPermissions, hasPermission]);
 
   // Load recent activities
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(P.AUDIT_LOGS_READ)) {
+    if (!hasAnyPermissions || !hasPermission(P.AUDIT_LOGS_READ)) {
       return;
     }
 
@@ -612,11 +617,11 @@ const DashboardPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [isAdminUser, hasPermission]);
+  }, [hasAnyPermissions, hasPermission]);
 
   // Load recent crash events
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(P.CRASH_EVENTS_READ)) {
+    if (!hasAnyPermissions || !hasPermission(P.CRASH_EVENTS_READ)) {
       return;
     }
 
@@ -644,11 +649,11 @@ const DashboardPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [isAdminUser, hasPermission]);
+  }, [hasAnyPermissions, hasPermission]);
 
   // Load recent lifecycle events
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(P.SERVERS_READ)) {
+    if (!hasAnyPermissions || !hasPermission(P.SERVERS_READ)) {
       return;
     }
 
@@ -672,11 +677,11 @@ const DashboardPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [isAdminUser, hasPermission]);
+  }, [hasAnyPermissions, hasPermission]);
 
   // Load maintenance status
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(P.MAINTENANCE_READ)) {
+    if (!hasAnyPermissions || !hasPermission(P.MAINTENANCE_READ)) {
       return;
     }
 
@@ -722,11 +727,11 @@ const DashboardPage: React.FC = () => {
         handleMaintenanceChange as EventListener
       );
     };
-  }, [isAdminUser, hasPermission]);
+  }, [hasAnyPermissions, hasPermission]);
 
   // Load environment data counts
   useEffect(() => {
-    if (!isAdminUser) {
+    if (!hasAnyPermissions) {
       return;
     }
 
@@ -820,7 +825,7 @@ const DashboardPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [isAdminUser]);
+  }, [hasAnyPermissions]);
 
   // Get time-based greeting
   const getGreeting = () => {
@@ -880,7 +885,7 @@ const DashboardPage: React.FC = () => {
                 {getGreeting()}, {user?.name}!
               </Typography>
               <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                {isAdminUser ? t('dashboard.adminWelcome') : t('dashboard.userWelcome')}
+                {hasAnyPermissions ? t('dashboard.adminWelcome') : t('dashboard.userWelcome')}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
@@ -916,7 +921,7 @@ const DashboardPage: React.FC = () => {
       </Paper>
 
       {/* Maintenance Status - Shown at top when active or scheduled */}
-      {isAdminUser && maintenanceStatus?.isUnderMaintenance && maintenanceStatus?.detail && (
+      {hasAnyPermissions && maintenanceStatus?.isUnderMaintenance && maintenanceStatus?.detail && (
         <Box sx={{ mb: 4 }}>
           {(() => {
             const detail = maintenanceStatus.detail;
@@ -1044,7 +1049,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Stats Section - Only for Admins with USERS_VIEW permission */}
-      {isAdminUser && hasPermission(P.USERS_READ) && (
+      {hasAnyPermissions && hasPermission(P.USERS_READ) && (
         <Box sx={{ mb: 4 }}>
           <Box
             sx={{
@@ -1124,7 +1129,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Monitoring Section - Only for Admins with MONITORING_VIEW permission */}
-      {isAdminUser && hasPermission(P.MONITORING_READ) && (
+      {hasAnyPermissions && hasPermission(P.MONITORING_READ) && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
             {t('dashboard.monitoringOverview')}
@@ -1526,6 +1531,238 @@ const DashboardPage: React.FC = () => {
         </Box>
       )}
 
+      {/* Non-admin Welcome Hub */}
+      {!hasAnyPermissions && (
+        <Box sx={{ mb: 4 }}>
+          {/* Status Card */}
+          <Card
+            sx={{
+              mb: 3,
+              borderLeft: 4,
+              borderColor: 'info.main',
+            }}
+          >
+            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
+                <Avatar
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    bgcolor: alpha(theme.palette.info.main, 0.12),
+                    color: 'info.main',
+                  }}
+                >
+                  <SecurityIcon sx={{ fontSize: 28 }} />
+                </Avatar>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    {t('dashboard.welcomeHub.statusTitle')}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8, mb: 2 }}>
+                    {t('dashboard.welcomeHub.statusDescription')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Chip
+                      size="small"
+                      icon={<CheckCircleIcon />}
+                      label={t('dashboard.welcomeHub.accountActive')}
+                      color="success"
+                      variant="outlined"
+                    />
+                    <Chip
+                      size="small"
+                      icon={<PeopleIcon />}
+                      label={t('dashboard.welcomeHub.orgMember')}
+                      color="primary"
+                      variant="outlined"
+                    />
+                    <Chip
+                      size="small"
+                      icon={<ScheduleIcon />}
+                      label={t('dashboard.welcomeHub.awaitingPermissions')}
+                      color="warning"
+                      variant="outlined"
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {/* Available Actions */}
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+            {t('dashboard.welcomeHub.availableActions')}
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <Card
+                sx={{
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.shadows[4],
+                    '& .action-icon': { transform: 'scale(1.1)' },
+                  },
+                }}
+              >
+                <CardActionArea onClick={() => navigate('/profile')} sx={{ p: 2.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar
+                      className="action-icon"
+                      sx={{
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                        transition: 'transform 0.2s ease-in-out',
+                      }}
+                    >
+                      <PeopleIcon />
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle2" fontWeight={600} noWrap>
+                        {t('dashboard.welcomeHub.viewProfile')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" noWrap>
+                        {t('dashboard.welcomeHub.viewProfileDesc')}
+                      </Typography>
+                    </Box>
+                    <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                  </Box>
+                </CardActionArea>
+              </Card>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <Card
+                sx={{
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.shadows[4],
+                    '& .action-icon': { transform: 'scale(1.1)' },
+                  },
+                }}
+              >
+                <CardActionArea onClick={() => navigate('/profile')} sx={{ p: 2.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar
+                      className="action-icon"
+                      sx={{
+                        bgcolor: alpha(theme.palette.warning.main, 0.1),
+                        color: 'warning.main',
+                        transition: 'transform 0.2s ease-in-out',
+                      }}
+                    >
+                      <VpnKeyIcon />
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle2" fontWeight={600} noWrap>
+                        {t('dashboard.welcomeHub.changePassword')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" noWrap>
+                        {t('dashboard.welcomeHub.changePasswordDesc')}
+                      </Typography>
+                    </Box>
+                    <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                  </Box>
+                </CardActionArea>
+              </Card>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <Card
+                sx={{
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.shadows[4],
+                    '& .action-icon': { transform: 'scale(1.1)' },
+                  },
+                }}
+              >
+                <CardActionArea onClick={() => navigate('/settings')} sx={{ p: 2.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar
+                      className="action-icon"
+                      sx={{
+                        bgcolor: alpha(theme.palette.secondary.main, 0.1),
+                        color: 'secondary.main',
+                        transition: 'transform 0.2s ease-in-out',
+                      }}
+                    >
+                      <SettingsIcon />
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle2" fontWeight={600} noWrap>
+                        {t('dashboard.welcomeHub.settings')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" noWrap>
+                        {t('dashboard.welcomeHub.settingsDesc')}
+                      </Typography>
+                    </Box>
+                    <ArrowForwardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                  </Box>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Account Info Card */}
+          <Card sx={{ mt: 3 }}>
+            <CardContent>
+              <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+                {t('dashboard.welcomeHub.accountInfo')}
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('users.name')}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {user?.name || '-'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('users.email')}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {user?.email || '-'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('users.role')}
+                  </Typography>
+                  <Chip
+                    size="small"
+                    label={t(`roles.${user?.role}`)}
+                    color="default"
+                    variant="outlined"
+                  />
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('users.status')}
+                  </Typography>
+                  <Chip
+                    size="small"
+                    label={t(`users.statuses.${user?.status}`)}
+                    color={user?.status === 'active' ? 'success' : 'warning'}
+                    variant="outlined"
+                  />
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+
+      {/* Admin Quick Actions & Recent Activity */}
+      {hasAnyPermissions && (
       <Grid container spacing={3}>
         {/* Quick Actions */}
         <Grid size={{ xs: 12, lg: 8 }}>
@@ -1655,9 +1892,10 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+      )}
 
       {/* Recent Crash Events & Server Lifecycle Events */}
-      {isAdminUser && (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
+      {hasAnyPermissions && (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Recent Crash Events */}
           {hasPermission(P.CRASH_EVENTS_READ) && (

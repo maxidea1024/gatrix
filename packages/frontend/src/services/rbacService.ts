@@ -101,6 +101,11 @@ export interface PermissionReference {
   categories: Record<string, { label: string; permissions: string[] }>;
 }
 
+export interface EffectivePermissions {
+  own: string[];
+  inherited: Array<{ permission: string; fromRoleId: string; fromRoleName: string }>;
+}
+
 // ==================== Service ====================
 
 const BASE = '/admin/rbac';
@@ -115,6 +120,11 @@ export const rbacService = {
 
   async getRole(id: string): Promise<RoleWithDetails> {
     const res = await api.get(`${BASE}/roles/${id}`);
+    return res.data;
+  },
+
+  async getEffectivePermissions(roleId: string): Promise<EffectivePermissions> {
+    const res = await api.get(`${BASE}/roles/${roleId}/effective-permissions`);
     return res.data;
   },
 
@@ -201,6 +211,11 @@ export const rbacService = {
 
   async removeGroupRole(groupId: string, roleId: string): Promise<void> {
     await api.delete(`${BASE}/groups/${groupId}/roles/${roleId}`);
+  },
+
+  async getGroupEffectivePermissions(groupId: string): Promise<EffectivePermissions> {
+    const res = await api.get(`${BASE}/groups/${groupId}/effective-permissions`);
+    return res.data;
   },
 
   // ─── User Roles ─────────────────────────

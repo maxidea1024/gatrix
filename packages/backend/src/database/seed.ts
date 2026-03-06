@@ -396,6 +396,88 @@ async function createSampleReleaseFlows(createdBy: string) {
   }
 }
 
+// ==================== Default RBAC Roles ====================
+
+async function createDefaultRoles(orgId: string) {
+  const existing = await database.query(
+    'SELECT id FROM g_roles WHERE orgId = ? LIMIT 1',
+    [orgId]
+  );
+  if (existing.length > 0) {
+    logger.info('Default roles already exist, skipping creation');
+    return;
+  }
+
+  // All org-level resources
+  const orgResources = [
+    'users', 'groups', 'roles', 'invitations', 'projects',
+    'admin_tokens', 'ip_whitelist', 'account_whitelist', 'integrations',
+    'audit_logs', 'monitoring', 'realtime_events', 'open_api', 'console', 'chat',
+    'scheduler', 'event_lens', 'system_settings', 'translation',
+  ];
+  // All project-level resources
+  const projectResources = [
+    'features', 'segments', 'context_fields', 'release_flows', 'unknown_flags', 'crash_events',
+    'tags', 'impact_metrics', 'service_accounts', 'signal_endpoints', 'actions', 'data',
+  ];
+  // All env-level resources
+  const envResources = [
+    'environments', 'env_features', 'env_keys', 'change_requests',
+    'client_versions', 'game_worlds', 'maintenance', 'maintenance_templates',
+    'service_notices', 'banners', 'servers', 'message_templates', 'vars', 'planning_data',
+    'coupons', 'coupon_settings', 'surveys', 'store_products',
+    'reward_templates', 'ingame_popups', 'operation_events',
+  ];
+  const allResources = [...orgResources, ...projectResources, ...envResources];
+  const crudActions = ['create', 'read', 'update', 'delete'];
+
+  const roles = [
+    {
+      name: 'Viewer',
+      description: 'Read-only access to all resources',
+      actions: ['read'],
+    },
+    {
+      name: 'Editor',
+      description: 'Read and update access to all resources',
+      actions: ['read', 'update'],
+    },
+    {
+      name: 'Manager',
+      description: 'Full CRUD access to all resources',
+      actions: crudActions,
+    },
+  ];
+
+  for (const role of roles) {
+    const roleId = ulid();
+    await database.query(
+      `INSERT INTO g_roles (id, orgId, roleName, description, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [roleId, orgId, role.name, role.description]
+    );
+
+    // Generate permissions: resource:action
+    const perms: string[] = [];
+    for (const resource of allResources) {
+      for (const action of role.actions) {
+        perms.push(`${resource}:${action}`);
+      }
+    }
+
+    // Bulk insert permissions
+    if (perms.length > 0) {
+      const values = perms.map((p) => `('${ulid()}', '${roleId}', '${p}')`).join(',');
+      await database.query(
+        `INSERT INTO g_role_permissions (id, roleId, permission) VALUES ${values}`
+      );
+    }
+
+    logger.info(`  Role created: ${role.name} (${perms.length} permissions)`);
+  }
+  logger.info('Default roles created');
+}
+
 // ==================== Internal Gatrix Setup ====================
 
 /**
@@ -499,6 +581,9 @@ async function seedDatabase() {
 
     // 8. Create sample release flow templates
     await createSampleReleaseFlows(adminUserId);
+
+    // 9. Create default RBAC roles (Viewer, Editor, Manager)
+    await createDefaultRoles(orgId);
 
     logger.info('Database seeding completed successfully');
   } catch (error) {
