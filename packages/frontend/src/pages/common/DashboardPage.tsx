@@ -890,7 +890,7 @@ const DashboardPage: React.FC = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Chip
-                label={t(`roles.${user?.role}`)}
+                label={hasAnyPermissions ? t('roles.admin') : t('roles.user')}
                 sx={{
                   bgcolor: 'rgba(255, 255, 255, 0.2)',
                   color: 'white',
@@ -1732,17 +1732,6 @@ const DashboardPage: React.FC = () => {
                   <Typography variant="body2" fontWeight={500}>
                     {user?.email || '-'}
                   </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('users.role')}
-                  </Typography>
-                  <Chip
-                    size="small"
-                    label={t(`roles.${user?.role}`)}
-                    color="default"
-                    variant="outlined"
-                  />
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant="body2" color="text.secondary">

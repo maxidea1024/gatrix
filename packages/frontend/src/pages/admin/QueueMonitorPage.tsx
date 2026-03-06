@@ -241,7 +241,7 @@ const QueueMonitorPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
-  if (!user || user.role !== 'admin') {
+  if (!user) {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">{t('errors.accessDenied')}</Alert>

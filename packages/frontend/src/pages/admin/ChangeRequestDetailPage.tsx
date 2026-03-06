@@ -107,7 +107,8 @@ const ChangeRequestDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuth();
+  const { user, permissions } = useAuth();
+  const hasAnyPermissions = permissions.length > 0;
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
@@ -871,9 +872,7 @@ const ChangeRequestDetailPage: React.FC = () => {
 
               {/* Status Banners */}
               {cr.status === 'rejected' &&
-                (cr.requesterId === user?.id ||
-                  user?.role === 'admin' ||
-                  Number(user?.role) === 0) && (
+                (cr.requesterId === user?.id || hasAnyPermissions) && (
                   <Paper
                     sx={{
                       p: 2,

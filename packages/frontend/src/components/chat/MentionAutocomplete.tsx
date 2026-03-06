@@ -154,15 +154,7 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
                       @{user.username}
                     </Typography>
-                    {user.role === 'admin' && (
-                      <Chip
-                        label={t('chat.admin')}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ height: 16, fontSize: '0.6rem' }}
-                      />
-                    )}
+
                     {user.status === 'online' && (
                       <Box
                         sx={{

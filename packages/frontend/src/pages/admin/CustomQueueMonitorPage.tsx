@@ -109,7 +109,7 @@ const CustomQueueMonitorPage: React.FC = () => {
   const statusTabs = ['latest', 'waiting', 'active', 'completed', 'failed', 'delayed'];
 
   useEffect(() => {
-    if (user?.role === 'admin') {
+    if (user) {
       fetchQueues();
       const interval = setInterval(fetchQueues, 5000); // 5초마다 갱신
       return () => clearInterval(interval);
@@ -207,7 +207,7 @@ const CustomQueueMonitorPage: React.FC = () => {
 
   const currentQueue = queues.find((q) => q.name === selectedQueue);
 
-  if (!user || user.role !== 'admin') {
+  if (!user) {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error">{t('errors.accessDenied')}</Alert>

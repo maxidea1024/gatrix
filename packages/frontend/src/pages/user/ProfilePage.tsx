@@ -96,8 +96,8 @@ const ProfilePage: React.FC = () => {
     const fetchEnvironmentAccess = async () => {
       if (!user) return;
 
-      // Non-admin users don't have access to environment APIs
-      if (user.role !== 'admin') {
+      // Users without RBAC permissions don't have access to environment APIs
+      if (permissions.length === 0) {
         setEnvLoading(false);
         return;
       }
@@ -122,7 +122,7 @@ const ProfilePage: React.FC = () => {
     };
 
     fetchEnvironmentAccess();
-  }, [user]);
+  }, [user, permissions]);
 
   if (!user) {
     return (
@@ -411,12 +411,7 @@ const ProfilePage: React.FC = () => {
                 justifyContent={{ xs: 'center', sm: 'flex-start' }}
                 flexWrap="wrap"
               >
-                <Chip
-                  icon={<SecurityIcon />}
-                  label={t(`roles.${user.role}`)}
-                  color={getRoleColor(user.role || '')}
-                  size="small"
-                />
+
                 <Chip
                   icon={<CheckCircleIcon />}
                   label={t(`users.statuses.${user.status}`)}
@@ -545,7 +540,7 @@ const ProfilePage: React.FC = () => {
         {/* Right Column - Permissions & Environments */}
         <Grid size={{ xs: 12, md: 6 }}>
           {/* Permissions */}
-          {user.role === 'admin' && (
+          {permissions.length > 0 && (
             <Card sx={{ mb: 3 }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

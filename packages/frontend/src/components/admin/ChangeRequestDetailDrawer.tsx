@@ -124,7 +124,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuth();
+  const { user, permissions } = useAuth();
+  const hasAnyPermissions = permissions.length > 0;
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
@@ -1145,7 +1146,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 
                   {/* Status Banners */}
                   {cr.status === 'rejected' &&
-                    (cr.requesterId === user?.id || user?.role === 'admin') && (
+                    (cr.requesterId === user?.id || hasAnyPermissions) && (
                       <Paper
                         sx={{
                           p: 2,
@@ -1212,7 +1213,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     )}
 
                   {cr.status === 'conflict' &&
-                    (cr.requesterId === user?.id || user?.role === 'admin') && (
+                    (cr.requesterId === user?.id || hasAnyPermissions) && (
                       <Paper
                         sx={{
                           p: 2,

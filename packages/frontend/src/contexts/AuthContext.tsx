@@ -176,7 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true;
     }
 
-    return requiredRoles.includes(user.role);
+    return permissions.length > 0;
   };
 
   const getToken = (): string | null => {

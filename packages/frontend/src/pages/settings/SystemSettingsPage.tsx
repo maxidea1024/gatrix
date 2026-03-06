@@ -68,7 +68,7 @@ const SystemSettingsPage: React.FC = () => {
 
   // Load service discovery config
   useEffect(() => {
-    if (user?.role === 'admin') {
+    if (hasPermission([P.SYSTEM_SETTINGS_UPDATE])) {
       (async () => {
         try {
           const config = await serviceDiscoveryConfigService.getConfig();
@@ -78,7 +78,7 @@ const SystemSettingsPage: React.FC = () => {
         }
       })();
     }
-  }, [user]);
+  }, []);
 
   // Save service discovery config
   const handleSaveServiceDiscoveryConfig = async () => {
