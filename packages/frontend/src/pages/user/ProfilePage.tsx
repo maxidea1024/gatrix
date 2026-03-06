@@ -106,17 +106,24 @@ const ProfilePage: React.FC = () => {
       try {
         setEnvLoading(true);
         const projectApiPath = getProjectApiPath();
-        const requests: Promise<any>[] = [
-          api.get<UserEnvironmentAccess>('/admin/users/me/environments'),
-        ];
-        if (projectApiPath) {
-          requests.push(api.get<Environment[]>(`${projectApiPath}/environments`));
+
+        // Fetch user's environment access info
+        try {
+          const accessResult = await api.get<UserEnvironmentAccess>('/admin/users/me/environments');
+          setEnvironmentAccess(accessResult.data || null);
+        } catch {
+          // Silently ignore - user may not have permission
         }
-        const results = await Promise.all(requests);
-        setEnvironmentAccess(results[0].data || null);
-        setEnvironments(results[1]?.data || []);
-      } catch (error) {
-        console.error('Failed to fetch environment access:', error);
+
+        // Fetch environment list (requires project-level permission)
+        if (projectApiPath) {
+          try {
+            const envResult = await api.get<Environment[]>(`${projectApiPath}/environments`);
+            setEnvironments(envResult.data || []);
+          } catch {
+            // Silently ignore - user may not have permission
+          }
+        }
       } finally {
         setEnvLoading(false);
       }
