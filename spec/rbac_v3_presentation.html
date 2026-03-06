@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RBAC v3 — Role Binding 패턴</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a1a;
+    --surface: #12122a;
+    --card: #1a1a3e;
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --green: #00b894;
+    --red: #e17055;
+    --orange: #fdcb6e;
+    --blue: #74b9ff;
+    --text: #e8e8f0;
+    --muted: #8888aa;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .slide-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 100px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* Title slide */
+  .slide.title-slide {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 30%, rgba(108,92,231,0.15), transparent 70%);
+  }
+
+  .slide.title-slide h1 {
+    font-size: 72px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent2), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    letter-spacing: -2px;
+  }
+
+  .slide.title-slide .subtitle {
+    font-size: 28px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .slide.title-slide .version {
+    margin-top: 40px;
+    font-size: 16px;
+    color: var(--muted);
+    padding: 8px 24px;
+    border: 1px solid rgba(108,92,231,0.3);
+    border-radius: 20px;
+  }
+
+  /* Section slides */
+  h2 {
+    font-size: 44px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    letter-spacing: -1px;
+  }
+
+  h2 .num {
+    color: var(--accent);
+    font-size: 24px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--accent2);
+  }
+
+  /* Cards & boxes */
+  .card-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    flex: 1;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .card.accent {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(108,92,231,0.1), var(--card));
+  }
+
+  .card.green {
+    border-color: var(--green);
+    background: linear-gradient(135deg, rgba(0,184,148,0.08), var(--card));
+  }
+
+  .card.red {
+    border-color: var(--red);
+    background: linear-gradient(135deg, rgba(225,112,85,0.08), var(--card));
+  }
+
+  .card.blue {
+    border-color: var(--blue);
+    background: linear-gradient(135deg, rgba(116,185,255,0.08), var(--card));
+  }
+
+  .card.orange {
+    border-color: var(--orange);
+    background: linear-gradient(135deg, rgba(253,203,110,0.08), var(--card));
+  }
+
+  .card .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .card .label {
+    font-size: 14px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .card .value {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .card p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  th {
+    background: rgba(108,92,231,0.15);
+    padding: 14px 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent2);
+  }
+
+  td {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  tr:nth-child(even) td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .badge.new { background: rgba(0,184,148,0.2); color: var(--green); }
+  .badge.del { background: rgba(225,112,85,0.2); color: var(--red); }
+  .badge.keep { background: rgba(136,136,170,0.2); color: var(--muted); }
+
+  /* Code block */
+  .code {
+    background: #0d0d20;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 24px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 15px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--accent2);
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+
+  .flow .step {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .flow .step.gate {
+    border-color: var(--red);
+    background: rgba(225,112,85,0.1);
+  }
+
+  .flow .step.check {
+    border-color: var(--green);
+    background: rgba(0,184,148,0.1);
+  }
+
+  .flow .step.resolve {
+    border-color: var(--accent);
+    background: rgba(108,92,231,0.1);
+  }
+
+  .flow .arrow {
+    font-size: 20px;
+    color: var(--muted);
+  }
+
+  /* Comparison */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .compare .vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--muted);
+    padding-top: 40px;
+  }
+
+  /* List */
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul li {
+    padding: 8px 0;
+    font-size: 18px;
+    line-height: 1.6;
+    padding-left: 28px;
+    position: relative;
+  }
+
+  ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  ul li.check::before { content: '✅'; }
+  ul li.cross::before { content: '❌'; }
+  ul li.warn::before { content: '⚠️'; }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    right: 40px;
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .progress {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--blue));
+    transition: width 0.4s ease;
+  }
+
+  .slide-num {
+    position: fixed;
+    bottom: 38px;
+    left: 40px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide.active .card-row,
+  .slide.active table,
+  .slide.active .code,
+  .slide.active ul,
+  .slide.active .compare,
+  .slide.active .flow { animation: fadeInUp 0.5s ease 0.2s both; }
+
+  .highlight { color: var(--accent2); font-weight: 600; }
+  .green-text { color: var(--green); }
+  .red-text { color: var(--red); }
+  .small { font-size: 14px; color: var(--muted); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<div class="slide-container" id="slides">
+
+  <!-- Slide 1: Title -->
+  <div class="slide title-slide active">
+    <h1>RBAC v3</h1>
+    <div class="subtitle">Role Binding 패턴</div>
+    <div class="version">Gatrix · 2026-03-06</div>
+  </div>
+
+  <!-- Slide 2: Current Problems -->
+  <div class="slide">
+    <h2><span class="num">Problem</span>현재 시스템의 문제</h2>
+    <div class="card-row">
+      <div class="card red">
+        <div class="icon">🔀</div>
+        <div class="value">3가지 독립 경로</div>
+        <p>조직 멤버십, 프로젝트 멤버십, 역할 권한이 각각 독립적으로 동작</p>
+      </div>
+      <div class="card red">
+        <div class="icon">🤷</div>
+        <div class="value">정합성 미보장</div>
+        <p>역할에 프로젝트A 권한이 있는데 멤버십에는 없거나, 그 반대 상황 발생</p>
+      </div>
+      <div class="card red">
+        <div class="icon">📊</div>
+        <div class="value">5개 권한 테이블</div>
+        <p>org/project/env 퍼미션 + user_roles + group_roles 분산 관리</p>
+      </div>
+    </div>
+    <div class="card red" style="max-width: 100%">
+      <div class="icon">💡</div>
+      <div class="value">핵심 모순</div>
+      <p>역할 안에 "무엇을 할 수 있는가(권한)" + "어디에서(프로젝트/환경 범위)"가 혼재 → 오버라이드 불가, 추적 어려움</p>
+    </div>
+  </div>
+
+  <!-- Slide 3: Solution Overview -->
+  <div class="slide">
+    <h2><span class="num">Solution</span>3가지 분리 원칙</h2>
+    <div class="card-row">
+      <div class="card green">
+        <div class="icon">🚪</div>
+        <div class="label">멤버십</div>
+        <div class="value">접근 게이트</div>
+        <p>"어디에 접근할 수 있는가"<br/>멤버가 아니면 어떤 권한이 있어도 차단</p>
+      </div>
+      <div class="card accent">
+        <div class="icon">🎭</div>
+        <div class="label">역할</div>
+        <div class="value">순수 권한 집합</div>
+        <p>"무엇을 할 수 있는가"<br/>features:read, segments:update 등 행위만 정의</p>
+      </div>
+      <div class="card orange">
+        <div class="icon">📌</div>
+        <div class="label">바인딩</div>
+        <div class="value">스코프별 역할 할당</div>
+        <p>"어디에서 어떤 역할인가"<br/>org/project/env별 오버라이드 지원</p>
+      </div>
+    </div>
+    <p class="small">※ Google Cloud IAM과 동일한 패턴 (Role + Role Binding)</p>
+  </div>
+
+  <!-- Slide 4: Architecture -->
+  <div class="slide">
+    <h2><span class="num">Architecture</span>새로운 데이터 모델</h2>
+    <div class="compare">
+      <div>
+        <h3 class="red-text">현재 (v1/v2)</h3>
+        <div class="code" style="font-size:13px">g_roles
+├── g_role_org_permissions
+│   └── permission
+├── g_role_project_permissions
+│   └── projectId + permission
+└── g_role_environment_permissions
+    └── environmentId + permission
+
+g_user_roles (userId → roleId)
+g_group_roles (groupId → roleId)</div>
+        <p class="small">5개 테이블, 범위가 역할 안에 혼재</p>
+      </div>
+      <div class="vs">→</div>
+      <div>
+        <h3 class="green-text">제안 (v3)</h3>
+        <div class="code" style="font-size:13px">g_roles
+└── g_role_permissions
+    └── permission (범위 없음!)
+
+g_role_bindings
+├── userId / groupId
+├── roleId
+├── scopeType (system|org|project|env)
+└── scopeId</div>
+        <p class="small">2개 테이블, 역할과 범위 완전 분리</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Role = Pure Permissions -->
+  <div class="slide">
+    <h2><span class="num">Roles</span>역할 = 순수 권한 집합</h2>
+    <div class="card-row">
+      <div class="card accent">
+        <h3>Developer</h3>
+        <div class="code" style="font-size:14px;padding:16px">features:*
+segments:read
+client_versions:update
+change_requests:create</div>
+      </div>
+      <div class="card blue">
+        <h3>Viewer</h3>
+        <div class="code" style="font-size:14px;padding:16px">*:read</div>
+      </div>
+      <div class="card green">
+        <h3>System Admin</h3>
+        <div class="code" style="font-size:14px;padding:16px">*:*</div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--surface)">
+      <ul>
+        <li class="check">역할에 <span class="highlight">projectId / environmentId 없음</span></li>
+        <li class="check">"이 역할이 어디에서 적용되는지"는 <span class="highlight">바인딩</span>이 결정</li>
+        <li class="check">와일드카드: <span class="highlight">*:*</span>, <span class="highlight">features:*</span>, <span class="highlight">*:read</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Slide 6: Role Binding -->
+  <div class="slide">
+    <h2><span class="num">Binding</span>역할 바인딩 = 스코프별 할당</h2>
+    <table>
+      <tr>
+        <th>scopeType</th>
+        <th>scopeId</th>
+        <th>의미</th>
+        <th>우선순위</th>
+      </tr>
+      <tr>
+        <td><span class="badge keep">system</span></td>
+        <td>'SYSTEM'</td>
+        <td>전체 시스템 (System Admin)</td>
+        <td>낮음 (최상위 fallback)</td>
+      </tr>
+      <tr>
+        <td><span class="badge keep">org</span></td>
+        <td>orgId</td>
+        <td>조직 내 모든 프로젝트에 기본 적용</td>
+        <td>↑</td>
+      </tr>
+      <tr>
+        <td><span class="badge new">project</span></td>
+        <td>projectId</td>
+        <td>특정 프로젝트에서 오버라이드</td>
+        <td>↑</td>
+      </tr>
+      <tr>
+        <td><span class="badge new">environment</span></td>
+        <td>environmentId</td>
+        <td>특정 환경에서 오버라이드</td>
+        <td>높음 (최우선)</td>
+      </tr>
+    </table>
+    <div class="card orange">
+      <div class="value">핵심 규칙: 가장 구체적인 바인딩이 이김 (Override)</div>
+      <p>env 바인딩 > project 바인딩 > org 바인딩 > system 바인딩</p>
+    </div>
+  </div>
+
+  <!-- Slide 7: Override Examples -->
+  <div class="slide">
+    <h2><span class="num">Examples</span>오버라이드 동작 예시</h2>
+    <table style="font-size:15px">
+      <tr>
+        <th>System</th>
+        <th>Org</th>
+        <th>Project</th>
+        <th>Environment</th>
+        <th style="color:var(--green)">최종 역할</th>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>Developer</td>
+        <td>—</td>
+        <td>—</td>
+        <td><strong>Developer</strong> (모든 곳)</td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>Developer</td>
+        <td>Viewer<br/><span class="small">(프로젝트B)</span></td>
+        <td>—</td>
+        <td><strong>B: Viewer</strong>, 나머지: Developer</td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>Developer</td>
+        <td>—</td>
+        <td>ReadOnly<br/><span class="small">(production)</span></td>
+        <td><strong>prod: ReadOnly</strong>, 나머지: Developer</td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td>Developer</td>
+        <td>Viewer<br/><span class="small">(A)</span></td>
+        <td>Editor<br/><span class="small">(A/prod)</span></td>
+        <td><strong>A/prod: Editor</strong>, A/나머지: Viewer, 기타: Developer</td>
+      </tr>
+      <tr>
+        <td>SysAdmin</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td><strong>전체 *:*</strong></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Slide 8: Permission Check Flow -->
+  <div class="slide">
+    <h2><span class="num">Engine</span>권한 체크 흐름</h2>
+    <div class="flow">
+      <div class="step check">① System Admin?</div>
+      <div class="arrow">→</div>
+      <div class="step gate">② 조직 멤버?</div>
+      <div class="arrow">→</div>
+      <div class="step check">③ Org Admin?</div>
+      <div class="arrow">→</div>
+      <div class="step gate">④ 프로젝트 멤버?</div>
+      <div class="arrow">→</div>
+      <div class="step resolve">⑤ 바인딩 resolve</div>
+      <div class="arrow">→</div>
+      <div class="step check">⑥ 권한 매칭</div>
+    </div>
+    <div class="card-row" style="margin-top:24px">
+      <div class="card green">
+        <div class="label">Step ①③</div>
+        <div class="value">즉시 허용</div>
+        <p>System Admin 또는 Org Admin이면 나머지 체크 스킵</p>
+      </div>
+      <div class="card red">
+        <div class="label">Step ②④</div>
+        <div class="value">멤버십 게이트</div>
+        <p>멤버가 아니면 역할/바인딩과 무관하게 즉시 거부</p>
+      </div>
+      <div class="card accent">
+        <div class="label">Step ⑤⑥</div>
+        <div class="value">바인딩 → 역할 → 권한</div>
+        <p>가장 구체적 바인딩의 역할에서 와일드카드 포함 매칭</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: DB Changes -->
+  <div class="slide">
+    <h2><span class="num">Migration</span>DB 스키마 변경</h2>
+    <div class="card-row">
+      <div class="card green">
+        <div class="icon">✨</div>
+        <div class="label">신규</div>
+        <div class="value">2개</div>
+        <p>g_role_permissions<br/>g_role_bindings</p>
+      </div>
+      <div class="card red">
+        <div class="icon">🗑️</div>
+        <div class="label">삭제</div>
+        <div class="value">5개</div>
+        <p>g_role_org_permissions<br/>g_role_project_permissions<br/>g_role_environment_permissions<br/>g_user_roles<br/>g_group_roles</p>
+      </div>
+      <div class="card blue">
+        <div class="icon">📌</div>
+        <div class="label">유지</div>
+        <div class="value">기존 대부분</div>
+        <p>g_roles, g_groups, g_group_members<br/>g_organisation_members<br/>g_project_members<br/>g_role_inheritance</p>
+      </div>
+    </div>
+    <div class="card" style="background:var(--surface)">
+      <div class="value">순변화: <span class="green-text">-3개 테이블</span></div>
+      <p>복잡도 감소 + 오버라이드 기능 추가</p>
+    </div>
+  </div>
+
+  <!-- Slide 10: UI Changes -->
+  <div class="slide">
+    <h2><span class="num">UI</span>UI 변경점</h2>
+    <div class="compare">
+      <div>
+        <h3>역할 편집 (변경 후)</h3>
+        <div class="code" style="font-size:13px">역할 "Developer"
+└── 권한만 설정:
+    features: ✓C ✓R ✓U ✓D
+    segments:    ✓R
+    client_versions: ✓R ✓U
+
+(프로젝트/환경 선택 없음 ← 단순화)</div>
+      </div>
+      <div class="vs">+</div>
+      <div>
+        <h3 class="green-text">바인딩 관리 (신규)</h3>
+        <div class="code" style="font-size:13px">사용자: user@example.com
+
+🏢 조직 기본:     Developer
+📁 Project GameA: (기본값)
+📁 Project GameB: Viewer ✏️ 오버라이드
+🌍 GameA/prod:    ReadOnly ✏️ 오버라이드
+
+[+ 바인딩 추가]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: Summary -->
+  <div class="slide title-slide">
+    <h1 style="font-size:56px">정리</h1>
+    <div style="text-align:left;max-width:700px;margin-top:40px">
+      <ul>
+        <li class="check" style="font-size:22px;padding:12px 0 12px 36px"><span class="highlight">멤버십 = 접근 게이트</span> — 정합성 문제 해결</li>
+        <li class="check" style="font-size:22px;padding:12px 0 12px 36px"><span class="highlight">역할 = 순수 권한</span> — 범위 혼재 제거</li>
+        <li class="check" style="font-size:22px;padding:12px 0 12px 36px"><span class="highlight">바인딩 = 스코프별 할당</span> — 오버라이드 지원</li>
+        <li class="check" style="font-size:22px;padding:12px 0 12px 36px"><span class="highlight">테이블 순감 3개</span> — 복잡도 감소</li>
+        <li class="check" style="font-size:22px;padding:12px 0 12px 36px"><span class="highlight">4단계 스코프</span> — system > org > project > env</li>
+      </ul>
+    </div>
+    <div class="version" style="margin-top:48px">
+      📄 상세 스펙: spec/rbac_v3_role_binding.md
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prev()" id="btnPrev">←</button>
+  <button onclick="next()" id="btnNext">→</button>
+</div>
+<div class="progress" id="progress"></div>
+<div class="slide-num" id="slideNum"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function show(idx) {
+    slides.forEach(s => s.classList.remove('active'));
+    slides[idx].classList.add('active');
+    current = idx;
+    document.getElementById('progress').style.width = ((idx + 1) / slides.length * 100) + '%';
+    document.getElementById('slideNum').textContent = (idx + 1) + ' / ' + slides.length;
+  }
+
+  function next() { if (current < slides.length - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (diff > 50) next();
+    else if (diff < -50) prev();
+  });
+
+  show(0);
+</script>
+
+</body>
+</html>
