@@ -51,7 +51,7 @@ export interface UpdateGroupData {
 export class GroupModel {
   private static readonly TABLE = 'g_groups';
   private static readonly MEMBERS_TABLE = 'g_group_members';
-  private static readonly ROLES_TABLE = 'g_group_roles';
+  private static readonly BINDINGS_TABLE = 'g_role_bindings';
 
   // ─── Group CRUD ─────────────────────────
 
@@ -145,12 +145,15 @@ export class GroupModel {
 
   // ─── Roles ─────────────────────────
 
-  static async addRole(groupId: string, roleId: string, assignedBy?: string): Promise<void> {
+  static async addRole(groupId: string, roleId: string, orgId: string, assignedBy?: string): Promise<void> {
     const id = generateULID();
-    await db(this.ROLES_TABLE).insert({
+    await db(this.BINDINGS_TABLE).insert({
       id,
+      userId: null,
       groupId,
       roleId,
+      scopeType: 'org',
+      scopeId: orgId,
       assignedBy: assignedBy || null,
     });
 
@@ -162,7 +165,7 @@ export class GroupModel {
   }
 
   static async removeRole(groupId: string, roleId: string): Promise<boolean> {
-    const result = await db(this.ROLES_TABLE)
+    const result = await db(this.BINDINGS_TABLE)
       .where('groupId', groupId)
       .where('roleId', roleId)
       .del();
@@ -177,10 +180,10 @@ export class GroupModel {
   }
 
   static async getRoles(groupId: string): Promise<any[]> {
-    return db(this.ROLES_TABLE)
-      .select([`${this.ROLES_TABLE}.*`, 'r.roleName', 'r.description as roleDescription'])
-      .join('g_roles as r', `${this.ROLES_TABLE}.roleId`, 'r.id')
-      .where(`${this.ROLES_TABLE}.groupId`, groupId)
+    return db(this.BINDINGS_TABLE)
+      .select([`${this.BINDINGS_TABLE}.id`, `${this.BINDINGS_TABLE}.roleId`, `${this.BINDINGS_TABLE}.assignedBy`, `${this.BINDINGS_TABLE}.assignedAt`, `${this.BINDINGS_TABLE}.scopeType`, `${this.BINDINGS_TABLE}.scopeId`, 'r.roleName', 'r.description as roleDescription'])
+      .join('g_roles as r', `${this.BINDINGS_TABLE}.roleId`, 'r.id')
+      .where(`${this.BINDINGS_TABLE}.groupId`, groupId)
       .orderBy('r.roleName', 'asc');
   }
 
@@ -201,9 +204,9 @@ export class GroupModel {
         .count('id as count')
         .whereIn('groupId', groupIds)
         .groupBy('groupId'),
-      db(this.ROLES_TABLE)
+      db(this.BINDINGS_TABLE)
         .select('groupId')
-        .count('id as count')
+        .countDistinct('roleId as count')
         .whereIn('groupId', groupIds)
         .groupBy('groupId'),
     ]);

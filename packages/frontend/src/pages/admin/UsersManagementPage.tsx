@@ -2879,6 +2879,8 @@ const UsersManagementPage: React.FC = () => {
                           id: `pending-${roleToAdd.id}`,
                           userId: editUserDialog.user ? String(editUserDialog.user.id) : '',
                           roleId: roleToAdd.id,
+                          scopeType: 'org',
+                          scopeId: '',
                           assignedBy: null,
                           roleName: roleToAdd.roleName,
                           roleDescription: roleToAdd.description,

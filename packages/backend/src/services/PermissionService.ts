@@ -1,15 +1,15 @@
 /**
- * PermissionService - RBAC Permission Calculation Engine
+ * PermissionService - RBAC v3 Permission Engine (Role Binding Pattern)
  *
- * Implements 4-level permission check (System > Org > Project > Environment)
- * with wildcard matching, role inheritance, and instance wildcards.
+ * Implements 4-level scope hierarchy (System > Org > Project > Environment)
+ * with role bindings, wildcard matching, role inheritance, and override resolution.
  *
- * Permission check order:
- * 1. Org Admin check → immediate grant (replaces super admin email check)
- * 2. Collect roleIds (direct + group + inherited)
- * 3. Instance wildcard check (projectId='*' or environmentId='*')
- * 4. Specific instance permission check
- * 5. Permission wildcard matching (resource:*, *:read, *:*)
+ * Permission check flow:
+ * 1. System Admin check (system scope binding with *:*)
+ * 2. Org Admin check → immediate grant
+ * 3. Membership gate (org member? project member?)
+ * 4. Resolve effective role IDs at the given scope (override chain)
+ * 5. Wildcard matching against g_role_permissions
  */
 
 import db from '../config/knex';
@@ -17,7 +17,7 @@ import redis from '../config/redis';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('PermissionService');
-import { matchSingle, MAX_INHERITANCE_DEPTH, INSTANCE_WILDCARD } from '@gatrix/shared/permissions';
+import { matchSingle, MAX_INHERITANCE_DEPTH } from '@gatrix/shared/permissions';
 
 // Cache TTL constants (in seconds)
 const CACHE_TTL = {
@@ -30,9 +30,7 @@ const CACHE_TTL = {
 const cacheKey = {
   orgAdmin: (userId: string, orgId: string) => `rbac:org_admin:${userId}:${orgId}`,
   userRoles: (userId: string) => `rbac:user_roles:${userId}`,
-  orgPerms: (roleId: string) => `rbac:org_perms:${roleId}`,
-  projectPerms: (roleId: string, projectId: string) => `rbac:proj_perms:${roleId}:${projectId}`,
-  envPerms: (roleId: string, env: string) => `rbac:env_perms:${roleId}:${env}`,
+  rolePerms: (roleId: string) => `rbac:role_perms:${roleId}`,
 };
 
 class PermissionService {
@@ -45,17 +43,12 @@ class PermissionService {
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
-    // 2. Collect all roleIds (direct + group + inherited)
-    const roleIds = await this.getAllRoleIds(userId);
+    // 2. Get effective role IDs at org scope
+    const roleIds = await this.getEffectiveRoleIds(userId, 'org', orgId);
     if (roleIds.length === 0) return false;
 
-    // 3. Get all org permissions for these roles
-    const perms = await db('g_role_org_permissions')
-      .whereIn('roleId', roleIds)
-      .select('permission');
-
-    // 4. Check with wildcard matching
-    return perms.some((row: any) => matchSingle(row.permission, perm));
+    // 3. Check permissions
+    return this.checkPermissionInRoles(roleIds, perm);
   }
 
   /**
@@ -70,24 +63,12 @@ class PermissionService {
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
-    const roleIds = await this.getAllRoleIds(userId);
+    // 2. Get effective role IDs at project scope (with override chain)
+    const roleIds = await this.getEffectiveRoleIds(userId, 'project', projectId);
     if (roleIds.length === 0) return false;
 
-    // 2. Check instance wildcard (projectId='*') permissions
-    const wildcardPerms = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where('projectId', INSTANCE_WILDCARD)
-      .select('permission');
-
-    if (wildcardPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
-
-    // 3. Check specific project permissions
-    const specificPerms = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where('projectId', projectId)
-      .select('permission');
-
-    return specificPerms.some((row: any) => matchSingle(row.permission, perm));
+    // 3. Check permissions
+    return this.checkPermissionInRoles(roleIds, perm);
   }
 
   /**
@@ -103,45 +84,16 @@ class PermissionService {
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
-    const roleIds = await this.getAllRoleIds(userId);
+    // 2. Get effective role IDs at environment scope (with override chain)
+    const roleIds = await this.getEffectiveRoleIds(userId, 'environment', environmentId);
     if (roleIds.length === 0) return false;
 
-    // 2. Project Admin check (projectId='*' with *:*)
-    const projWildcardPerms = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where('projectId', INSTANCE_WILDCARD)
-      .select('permission');
-
-    if (projWildcardPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
-
-    // 3. Specific project *:* check (project admin for this project → all env permissions)
-    const projSpecificPerms = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where('projectId', projectId)
-      .select('permission');
-
-    if (projSpecificPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
-
-    // 4. Check instance wildcard (environmentId='*') permissions
-    const envWildcardPerms = await db('g_role_environment_permissions')
-      .whereIn('roleId', roleIds)
-      .where('environmentId', INSTANCE_WILDCARD)
-      .select('permission');
-
-    if (envWildcardPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
-
-    // 5. Check specific environment permissions
-    const envSpecificPerms = await db('g_role_environment_permissions')
-      .whereIn('roleId', roleIds)
-      .where('environmentId', environmentId)
-      .select('permission');
-
-    return envSpecificPerms.some((row: any) => matchSingle(row.permission, perm));
+    // 3. Check permissions
+    return this.checkPermissionInRoles(roleIds, perm);
   }
 
   /**
    * Check if user is an Org Admin
-   * Replaces the old isSuperAdmin() email-based check.
    */
   async isOrgAdmin(userId: string, orgId: string): Promise<boolean> {
     const key = cacheKey.orgAdmin(userId, orgId);
@@ -248,9 +200,8 @@ class PermissionService {
 
   /**
    * Get all project IDs accessible by a user within an org.
-   * Org Admin → all active projects in the org.
-   * Instance wildcard (projectId='*') → all active projects.
-   * Otherwise → projects where user has any project-level or environment-level permission.
+   * Org Admin → all active projects.
+   * Otherwise → projects where user has membership or any binding.
    */
   async getAccessibleProjectIds(userId: string, orgId: string): Promise<string[]> {
     // Org Admin → all projects
@@ -259,38 +210,7 @@ class PermissionService {
       return allProjects.map((p: any) => p.id);
     }
 
-    const roleIds = await this.getAllRoleIds(userId);
-    if (roleIds.length === 0) return [];
-
-    // Check for instance wildcard (projectId='*')
-    const hasWildcard = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where('projectId', INSTANCE_WILDCARD)
-      .first();
-
-    if (hasWildcard) {
-      const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
-      return allProjects.map((p: any) => p.id);
-    }
-
-    // Projects with direct project-level permissions
-    const projectPerms = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .join('g_projects', 'g_role_project_permissions.projectId', 'g_projects.id')
-      .where('g_projects.orgId', orgId)
-      .where('g_projects.isActive', true)
-      .select('g_projects.id');
-
-    // Projects inferred from environment-level permissions
-    const envPerms = await db('g_role_environment_permissions')
-      .whereIn('g_role_environment_permissions.roleId', roleIds)
-      .join('g_environments', 'g_role_environment_permissions.environmentId', 'g_environments.id')
-      .join('g_projects', 'g_environments.projectId', 'g_projects.id')
-      .where('g_projects.orgId', orgId)
-      .where('g_projects.isActive', true)
-      .select('g_projects.id');
-
-    const ids = new Set([...projectPerms.map((p: any) => p.id), ...envPerms.map((p: any) => p.id)]);
+    const ids = new Set<string>();
 
     // Projects accessible via direct project membership
     const memberProjects = await db('g_project_members')
@@ -303,14 +223,48 @@ class PermissionService {
       ids.add(p.id);
     }
 
+    // Projects accessible via org-level role bindings (org member with role → all projects)
+    const orgBindings = await db('g_role_bindings')
+      .where({ userId, scopeType: 'org', scopeId: orgId })
+      .select('roleId');
+
+    if (orgBindings.length > 0) {
+      // User has org-level binding → access to all projects in the org
+      const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
+      return allProjects.map((p: any) => p.id);
+    }
+
+    // Projects accessible via project-level bindings
+    const projectBindings = await db('g_role_bindings')
+      .where({ userId, scopeType: 'project' })
+      .join('g_projects', 'g_role_bindings.scopeId', 'g_projects.id')
+      .where('g_projects.orgId', orgId)
+      .where('g_projects.isActive', true)
+      .select('g_projects.id');
+    for (const p of projectBindings) {
+      ids.add(p.id);
+    }
+
+    // Projects inferred from environment bindings
+    const envBindings = await db('g_role_bindings')
+      .where({ userId, scopeType: 'environment' })
+      .join('g_environments', 'g_role_bindings.scopeId', 'g_environments.id')
+      .join('g_projects', 'g_environments.projectId', 'g_projects.id')
+      .where('g_projects.orgId', orgId)
+      .where('g_projects.isActive', true)
+      .select('g_projects.id');
+    for (const p of envBindings) {
+      ids.add(p.id);
+    }
+
     return Array.from(ids);
   }
 
   /**
    * Get all environment IDs accessible by a user within a project.
    * Org Admin / Project Admin → all environments.
-   * Instance wildcard (environmentId='*') → all environments.
-   * Otherwise → environments where user has any environment-level permission.
+   * Project member → all environments.
+   * Otherwise → environments where user has a binding.
    */
   async getAccessibleEnvironmentIds(
     userId: string,
@@ -323,9 +277,7 @@ class PermissionService {
       return allEnvs.map((e: any) => e.id);
     }
 
-    const roleIds = await this.getAllRoleIds(userId);
-
-    // Project member check — project members get access to all environments
+    // Project member → all environments
     const isProjectMember = await db('g_project_members')
       .where({ projectId, userId })
       .first();
@@ -334,99 +286,90 @@ class PermissionService {
       return allEnvs.map((e: any) => e.id);
     }
 
-    if (roleIds.length === 0) return [];
-
-    // Project Admin check (projectId='*' or specific project with *:*)
-    const projPerms = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where(function (this: any) {
-        this.where('projectId', projectId).orWhere('projectId', INSTANCE_WILDCARD);
-      })
-      .select('permission');
-
-    const isProjectAdmin = projPerms.some((row: any) => matchSingle(row.permission, '*:*'));
-    if (isProjectAdmin) {
+    // Org-level or project-level binding → all environments
+    const roleIds = await this.getEffectiveRoleIds(userId, 'project', projectId);
+    if (roleIds.length > 0) {
       const allEnvs = await db('g_environments').where({ projectId }).select('id');
       return allEnvs.map((e: any) => e.id);
     }
 
-    // Instance wildcard (environmentId='*')
-    const hasEnvWildcard = await db('g_role_environment_permissions')
-      .whereIn('roleId', roleIds)
-      .where('environmentId', INSTANCE_WILDCARD)
-      .first();
-
-    if (hasEnvWildcard) {
-      const allEnvs = await db('g_environments').where({ projectId }).select('id');
-      return allEnvs.map((e: any) => e.id);
-    }
-
-    // Environments with direct environment-level permissions
-    const envPerms = await db('g_role_environment_permissions')
-      .whereIn('g_role_environment_permissions.roleId', roleIds)
-      .join('g_environments', 'g_role_environment_permissions.environmentId', 'g_environments.id')
+    // Environment-specific bindings only
+    const envBindings = await db('g_role_bindings')
+      .where({ userId, scopeType: 'environment' })
+      .join('g_environments', 'g_role_bindings.scopeId', 'g_environments.id')
       .where('g_environments.projectId', projectId)
       .select('g_environments.id');
 
-    return Array.from(new Set(envPerms.map((e: any) => e.id)));
+    return Array.from(new Set(envBindings.map((e: any) => e.id)));
   }
 
   // ==================== Permission Preview ====================
 
   /**
-   * Get all effective permissions for a user (for preview UI).
-   * Collects permissions from all sources: direct roles, group roles, inherited roles.
+   * Get all effective permissions for a user across all scopes
    */
   async getUserEffectivePermissions(
     userId: string,
     orgId: string
   ): Promise<{
-    orgPermissions: Array<{ permission: string; source: string }>;
-    projectPermissions: Array<{ projectId: string; permission: string; source: string }>;
-    envPermissions: Array<{ environmentId: string; permission: string; source: string }>;
+    bindings: Array<{
+      scopeType: string;
+      scopeId: string;
+      roleId: string;
+      roleName: string;
+      permissions: string[];
+      source: string;
+    }>;
   }> {
-    const roleIds = await this.getAllRoleIds(userId);
+    const bindings: Array<{
+      scopeType: string;
+      scopeId: string;
+      roleId: string;
+      roleName: string;
+      permissions: string[];
+      source: string;
+    }> = [];
 
-    // Get role info for source tracking
-    const roleInfo = await this.getRoleSourceInfo(userId);
+    // Direct user bindings
+    const directBindings = await db('g_role_bindings as rb')
+      .join('g_roles as r', 'rb.roleId', 'r.id')
+      .where('rb.userId', userId)
+      .select('rb.scopeType', 'rb.scopeId', 'rb.roleId', 'r.roleName');
 
-    const orgPerms: Array<{ permission: string; source: string }> = [];
-    const projectPerms: Array<{ projectId: string; permission: string; source: string }> = [];
-    const envPerms: Array<{ environmentId: string; permission: string; source: string }> = [];
-
-    for (const roleId of roleIds) {
-      const source = roleInfo.get(roleId) || 'unknown';
-
-      // Org perms
-      const orgRows = await db('g_role_org_permissions')
-        .where('roleId', roleId)
-        .select('permission');
-      for (const row of orgRows) {
-        orgPerms.push({ permission: row.permission, source });
-      }
-
-      // Project perms
-      const projRows = await db('g_role_project_permissions')
-        .where('roleId', roleId)
-        .select('projectId', 'permission');
-      for (const row of projRows) {
-        projectPerms.push({ projectId: row.projectId, permission: row.permission, source });
-      }
-
-      // Env perms
-      const envRows = await db('g_role_environment_permissions')
-        .where('roleId', roleId)
-        .select('environmentId', 'permission');
-      for (const row of envRows) {
-        envPerms.push({ environmentId: row.environmentId, permission: row.permission, source });
-      }
+    for (const b of directBindings) {
+      const perms = await this.getRolePermissions(b.roleId);
+      bindings.push({
+        scopeType: b.scopeType,
+        scopeId: b.scopeId,
+        roleId: b.roleId,
+        roleName: b.roleName,
+        permissions: perms,
+        source: 'direct',
+      });
     }
 
-    return {
-      orgPermissions: orgPerms,
-      projectPermissions: projectPerms,
-      envPermissions: envPerms,
-    };
+    // Group bindings
+    const groupBindings = await db('g_role_bindings as rb')
+      .join('g_group_members as gm', 'rb.groupId', 'gm.groupId')
+      .join('g_roles as r', 'rb.roleId', 'r.id')
+      .join('g_groups as g', 'rb.groupId', 'g.id')
+      .where('gm.userId', userId)
+      .whereNotNull('rb.groupId')
+      .select('rb.scopeType', 'rb.scopeId', 'rb.roleId', 'r.roleName', 'g.groupName');
+
+    for (const b of groupBindings) {
+      const perms = await this.getRolePermissions(b.roleId);
+      bindings.push({
+        scopeType: b.scopeType,
+        scopeId: b.scopeId,
+        roleId: b.roleId,
+        roleName: b.roleName,
+        permissions: perms,
+        source: `group:${b.groupName}`,
+      });
+    }
+
+    return { bindings };
   }
 
   // ==================== Cache Invalidation ====================
@@ -468,9 +411,11 @@ class PermissionService {
   async invalidateRoleCache(roleId: string): Promise<void> {
     try {
       const client = redis.getClient();
-      const keys = await client.keys(`rbac:*_perms:${roleId}:*`);
-      if (keys.length > 0) {
-        await client.del(keys);
+      const keys = await client.keys(`rbac:*_perms:${roleId}*`);
+      const permKey = cacheKey.rolePerms(roleId);
+      const allKeys = [...keys, permKey];
+      if (allKeys.length > 0) {
+        await client.del(allKeys);
       }
     } catch (error) {
       logger.warn('Failed to invalidate role RBAC cache:', error);
@@ -480,42 +425,128 @@ class PermissionService {
   // ==================== Internal Helpers ====================
 
   /**
-   * Get all roleIds for a user (direct roles + group roles + inherited), with caching
+   * Get effective role IDs for a user at a given scope with override resolution.
+   * Override chain: environment > project > org > system
+   * Includes both direct user bindings and group bindings + inherited roles.
    */
-  async getAllRoleIds(userId: string): Promise<string[]> {
-    const key = cacheKey.userRoles(userId);
+  private async getEffectiveRoleIds(
+    userId: string,
+    scopeType: 'system' | 'org' | 'project' | 'environment',
+    scopeId: string
+  ): Promise<string[]> {
+    if (scopeType === 'environment') {
+      // Check environment-specific bindings first
+      const envRoles = await this.getBindingRoleIds(userId, 'environment', scopeId);
+      if (envRoles.length > 0) return this.resolveInheritedRoles(envRoles);
+
+      // Fallback to project
+      const projectId = await this.getProjectFromEnv(scopeId);
+      if (projectId) {
+        const projRoles = await this.getBindingRoleIds(userId, 'project', projectId);
+        if (projRoles.length > 0) return this.resolveInheritedRoles(projRoles);
+      }
+
+      // Fallback to org
+      const orgId = await this.resolveOrgFromScope(scopeType, scopeId);
+      if (orgId) {
+        const orgRoles = await this.getBindingRoleIds(userId, 'org', orgId);
+        if (orgRoles.length > 0) return this.resolveInheritedRoles(orgRoles);
+      }
+
+      // Fallback to system
+      return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+    }
+
+    if (scopeType === 'project') {
+      const projRoles = await this.getBindingRoleIds(userId, 'project', scopeId);
+      if (projRoles.length > 0) return this.resolveInheritedRoles(projRoles);
+
+      // Fallback to org
+      const orgId = await this.resolveOrgFromScope('project', scopeId);
+      if (orgId) {
+        const orgRoles = await this.getBindingRoleIds(userId, 'org', orgId);
+        if (orgRoles.length > 0) return this.resolveInheritedRoles(orgRoles);
+      }
+
+      return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+    }
+
+    if (scopeType === 'org') {
+      const orgRoles = await this.getBindingRoleIds(userId, 'org', scopeId);
+      if (orgRoles.length > 0) return this.resolveInheritedRoles(orgRoles);
+
+      return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+    }
+
+    // system scope
+    return this.resolveInheritedRoles(await this.getBindingRoleIds(userId, 'system', 'SYSTEM'));
+  }
+
+  /**
+   * Get role IDs from both direct user bindings and group bindings at a specific scope
+   */
+  private async getBindingRoleIds(
+    userId: string,
+    scopeType: string,
+    scopeId: string
+  ): Promise<string[]> {
+    // Direct user bindings
+    const directBindings = await db('g_role_bindings')
+      .where({ userId, scopeType, scopeId })
+      .select('roleId');
+
+    // Group bindings (user's groups)
+    const groupBindings = await db('g_role_bindings as rb')
+      .join('g_group_members as gm', 'rb.groupId', 'gm.groupId')
+      .where('gm.userId', userId)
+      .where('rb.scopeType', scopeType)
+      .where('rb.scopeId', scopeId)
+      .whereNotNull('rb.groupId')
+      .select('rb.roleId');
+
+    const ids = new Set([
+      ...directBindings.map((r: any) => r.roleId),
+      ...groupBindings.map((r: any) => r.roleId),
+    ]);
+    return Array.from(ids);
+  }
+
+  /**
+   * Check if any of the given roles have the required permission
+   */
+  private async checkPermissionInRoles(roleIds: string[], perm: string): Promise<boolean> {
+    for (const roleId of roleIds) {
+      const perms = await this.getRolePermissions(roleId);
+      if (perms.some((p) => matchSingle(p, perm))) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get all permissions for a role (with caching)
+   */
+  private async getRolePermissions(roleId: string): Promise<string[]> {
+    const key = cacheKey.rolePerms(roleId);
 
     try {
       const cached = await redis.get(key);
       if (cached !== null) return JSON.parse(cached);
     } catch {
-      // Cache miss or error
+      // Cache miss
     }
 
-    // Direct roles
-    const directRoles = await db('g_user_roles').where('userId', userId).select('roleId');
-
-    // Group roles
-    const groupRoles = await db('g_group_members as gm')
-      .join('g_group_roles as gr', 'gm.groupId', 'gr.groupId')
-      .where('gm.userId', userId)
-      .select('gr.roleId');
-
-    const baseRoleIds = new Set([
-      ...directRoles.map((r: any) => r.roleId),
-      ...groupRoles.map((r: any) => r.roleId),
-    ]);
-
-    // Resolve inherited roles
-    const allRoleIds = await this.resolveInheritedRoles(Array.from(baseRoleIds));
+    const rows = await db('g_role_permissions')
+      .where('roleId', roleId)
+      .select('permission');
+    const perms = rows.map((r: any) => r.permission);
 
     try {
-      await redis.set(key, JSON.stringify(allRoleIds), CACHE_TTL.USER_ROLES);
+      await redis.set(key, JSON.stringify(perms), CACHE_TTL.ROLE_PERMS);
     } catch {
       // Non-critical
     }
 
-    return allRoleIds;
+    return perms;
   }
 
   /**
@@ -546,7 +577,6 @@ class PermissionService {
 
   /**
    * Detect if adding parentRoleId as parent of roleId would create a cycle.
-   * Uses BFS to trace the ancestry of parentRoleId; if roleId appears, it's a cycle.
    */
   async wouldCreateCycle(roleId: string, parentRoleId: string): Promise<boolean> {
     if (roleId === parentRoleId) return true;
@@ -559,7 +589,6 @@ class PermissionService {
       if (visited.has(current)) return true;
       visited.add(current);
 
-      // Check depth limit
       if (visited.size > MAX_INHERITANCE_DEPTH + 2) return true;
 
       const parents = await db('g_role_inheritance')
@@ -577,37 +606,71 @@ class PermissionService {
   }
 
   /**
-   * Get source info (role name + how assigned) for each roleId
-   * Returns Map<roleId, sourceLabel>
+   * Get all role IDs for a user (all scopes, for global permission check in User.ts)
    */
-  private async getRoleSourceInfo(userId: string): Promise<Map<string, string>> {
-    const sourceMap = new Map<string, string>();
+  async getAllRoleIds(userId: string): Promise<string[]> {
+    const key = cacheKey.userRoles(userId);
 
-    // Direct roles
-    const directRoles = await db('g_user_roles as ur')
-      .join('g_roles as r', 'ur.roleId', 'r.id')
-      .where('ur.userId', userId)
-      .select('r.id', 'r.roleName');
-
-    for (const role of directRoles) {
-      sourceMap.set(role.id, `${role.roleName} (direct)`);
+    try {
+      const cached = await redis.get(key);
+      if (cached !== null) return JSON.parse(cached);
+    } catch {
+      // Cache miss or error
     }
 
-    // Group roles
-    const groupRoles = await db('g_group_members as gm')
-      .join('g_group_roles as gr', 'gm.groupId', 'gr.groupId')
-      .join('g_roles as r', 'gr.roleId', 'r.id')
-      .join('g_groups as g', 'gm.groupId', 'g.id')
+    // Direct bindings
+    const directRoles = await db('g_role_bindings')
+      .where('userId', userId)
+      .select('roleId');
+
+    // Group bindings
+    const groupRoles = await db('g_role_bindings as rb')
+      .join('g_group_members as gm', 'rb.groupId', 'gm.groupId')
       .where('gm.userId', userId)
-      .select('r.id', 'r.roleName', 'g.groupName');
+      .whereNotNull('rb.groupId')
+      .select('rb.roleId');
 
-    for (const role of groupRoles) {
-      if (!sourceMap.has(role.id)) {
-        sourceMap.set(role.id, `${role.roleName} (${role.groupName})`);
-      }
+    const baseRoleIds = new Set([
+      ...directRoles.map((r: any) => r.roleId),
+      ...groupRoles.map((r: any) => r.roleId),
+    ]);
+
+    // Resolve inherited roles
+    const allRoleIds = await this.resolveInheritedRoles(Array.from(baseRoleIds));
+
+    try {
+      await redis.set(key, JSON.stringify(allRoleIds), CACHE_TTL.USER_ROLES);
+    } catch {
+      // Non-critical
     }
 
-    return sourceMap;
+    return allRoleIds;
+  }
+
+  // ─── Scope resolution helpers ─────────────────────────
+
+  private async getProjectFromEnv(environmentId: string): Promise<string | null> {
+    const env = await db('g_environments').where('id', environmentId).select('projectId').first();
+    return env?.projectId || null;
+  }
+
+  private async resolveOrgFromScope(scopeType: string, scopeId: string): Promise<string | null> {
+    if (scopeType === 'org') return scopeId;
+    if (scopeType === 'system') return null;
+
+    if (scopeType === 'project') {
+      const proj = await db('g_projects').where('id', scopeId).select('orgId').first();
+      return proj?.orgId || null;
+    }
+
+    if (scopeType === 'environment') {
+      const env = await db('g_environments').where('id', scopeId).select('projectId').first();
+      if (!env?.projectId) return null;
+      const proj = await db('g_projects').where('id', env.projectId).select('orgId').first();
+      return proj?.orgId || null;
+    }
+
+    return null;
   }
 }
 

@@ -20,7 +20,7 @@ export interface RolePermissions {
 }
 
 export interface RoleWithDetails extends Role {
-  permissions: RolePermissions;
+  permissions: string[];
   userCount: number;
   groupCount: number;
 }
@@ -58,6 +58,8 @@ export interface GroupRole {
   roleId: string;
   assignedAt: string;
   assignedBy: string | null;
+  scopeType?: string;
+  scopeId?: string;
   // joined from g_roles
   roleName?: string;
   description?: string;
@@ -87,6 +89,8 @@ export interface UserRole {
   id: string;
   userId: string;
   roleId: string;
+  scopeType: string;
+  scopeId: string;
   assignedBy: string | null;
   roleName: string;
   roleDescription: string | null;
@@ -117,7 +121,7 @@ export const rbacService = {
   async createRole(data: {
     roleName: string;
     description?: string;
-    permissions?: RolePermissions;
+    permissions?: string[];
   }): Promise<RoleWithDetails> {
     const res = await api.post(`${BASE}/roles`, data);
     return res.data;
@@ -128,7 +132,7 @@ export const rbacService = {
     data: {
       roleName?: string;
       description?: string;
-      permissions?: RolePermissions;
+      permissions?: string[];
     }
   ): Promise<RoleWithDetails> {
     const res = await api.put(`${BASE}/roles/${id}`, data);

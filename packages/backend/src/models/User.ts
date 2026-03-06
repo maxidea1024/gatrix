@@ -504,7 +504,7 @@ export class UserModel {
   // Permission methods for RBAC
 
   /**
-   * Get all permissions for a user
+   * Get all permissions for a user (from role bindings + role permissions)
    */
   static async getPermissions(userId: string): Promise<string[]> {
     try {
@@ -514,16 +514,22 @@ export class UserModel {
         return ['*'];
       }
 
-      // Get all role IDs for the user (direct + group-based)
-      const directRoleIds = await db('g_user_roles').where('userId', userId).select('roleId');
-      const groupRoleIds = await db('g_group_members')
-        .where('g_group_members.userId', userId)
-        .join('g_group_roles', 'g_group_members.groupId', 'g_group_roles.groupId')
-        .select('g_group_roles.roleId');
+      // Get all role IDs from direct bindings
+      const directBindings = await db('g_role_bindings')
+        .where('userId', userId)
+        .select('roleId');
+
+      // Get all role IDs from group bindings
+      const groupBindings = await db('g_role_bindings as rb')
+        .join('g_group_members as gm', 'rb.groupId', 'gm.groupId')
+        .where('gm.userId', userId)
+        .whereNotNull('rb.groupId')
+        .select('rb.roleId');
+
       const roleIds = [
         ...new Set([
-          ...directRoleIds.map((r: any) => r.roleId),
-          ...groupRoleIds.map((r: any) => r.roleId),
+          ...directBindings.map((r: any) => r.roleId),
+          ...groupBindings.map((r: any) => r.roleId),
         ]),
       ];
 
@@ -531,8 +537,8 @@ export class UserModel {
         return [];
       }
 
-      // Get org-level permissions from all roles
-      const perms = await db('g_role_org_permissions')
+      // Get permissions from g_role_permissions
+      const perms = await db('g_role_permissions')
         .whereIn('roleId', roleIds)
         .select('permission')
         .distinct();

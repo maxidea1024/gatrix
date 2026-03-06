@@ -455,10 +455,10 @@ router.get(
         .select(
           'g_roles.*',
           db.raw(
-            '(SELECT COUNT(*) FROM g_role_org_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_project_permissions WHERE roleId = g_roles.id) + (SELECT COUNT(*) FROM g_role_environment_permissions WHERE roleId = g_roles.id) as permissionCount'
+            '(SELECT COUNT(*) FROM g_role_permissions WHERE roleId = g_roles.id) as permissionCount'
           ),
-          db.raw('(SELECT COUNT(*) FROM g_user_roles WHERE roleId = g_roles.id) as userCount'),
-          db.raw('(SELECT COUNT(*) FROM g_group_roles WHERE roleId = g_roles.id) as groupCount')
+          db.raw('(SELECT COUNT(DISTINCT userId) FROM g_role_bindings WHERE roleId = g_roles.id AND userId IS NOT NULL) as userCount'),
+          db.raw('(SELECT COUNT(DISTINCT groupId) FROM g_role_bindings WHERE roleId = g_roles.id AND groupId IS NOT NULL) as groupCount')
         )
         .where('g_roles.orgId', req.user.orgId)
         .orderBy('g_roles.roleName', 'asc');
@@ -729,7 +729,7 @@ router.post(
       if (!roleId) {
         return res.status(400).json({ success: false, message: 'roleId is required' });
       }
-      await GroupModel.addRole(req.params.id, roleId, req.user.id);
+      await GroupModel.addRole(req.params.id, roleId, req.user.orgId, req.user.id);
       res.status(201).json({ success: true, message: 'Role assigned to group' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -767,12 +767,12 @@ router.get(
   requireOrgPermission(ORG_PERMISSIONS.USERS_READ) as any,
   async (req: any, res) => {
     try {
-      const userRoles = await db('g_user_roles')
-        .select(['g_user_roles.*', 'r.roleName', 'r.description as roleDescription'])
-        .join('g_roles as r', 'g_user_roles.roleId', 'r.id')
-        .where('g_user_roles.userId', req.params.id)
+      const userBindings = await db('g_role_bindings')
+        .select(['g_role_bindings.*', 'r.roleName', 'r.description as roleDescription'])
+        .join('g_roles as r', 'g_role_bindings.roleId', 'r.id')
+        .where('g_role_bindings.userId', req.params.id)
         .orderBy('r.roleName', 'asc');
-      res.json({ success: true, data: userRoles });
+      res.json({ success: true, data: userBindings });
     } catch (error) {
       logger.error('Error getting user roles:', error);
       res.status(500).json({ success: false, message: 'Failed to get user roles' });
@@ -795,10 +795,13 @@ router.post(
         return res.status(400).json({ success: false, message: 'roleId is required' });
       }
       const id = generateULID();
-      await db('g_user_roles').insert({
+      await db('g_role_bindings').insert({
         id,
         userId: req.params.id,
+        groupId: null,
         roleId,
+        scopeType: 'org',
+        scopeId: req.user.orgId,
         assignedBy: req.user.id,
       });
       await permissionService.invalidateUserCache(req.params.id);
@@ -823,7 +826,7 @@ router.delete(
       if (String(req.user.id) === String(req.params.id)) {
         return res.status(403).json({ success: false, message: 'Cannot modify your own roles' });
       }
-      const result = await db('g_user_roles')
+      const result = await db('g_role_bindings')
         .where('userId', req.params.id)
         .where('roleId', req.params.roleId)
         .del();
@@ -851,28 +854,24 @@ router.get(
       const roleIds = await permissionService.getAllRoleIds(userId);
 
       // Get all permissions from all roles
-      const [orgPerms, projectPerms, envPerms] = await Promise.all([
-        db('g_role_org_permissions').whereIn('roleId', roleIds).select('permission').distinct(),
-        db('g_role_project_permissions')
-          .whereIn('roleId', roleIds)
-          .select('projectId', 'permission', 'isAdmin')
-          .distinct(),
-        db('g_role_environment_permissions')
-          .whereIn('roleId', roleIds)
-          .select('environmentId', 'permission', 'isAdmin')
-          .distinct(),
-      ]);
+      const permissions = await db('g_role_permissions')
+        .whereIn('roleId', roleIds)
+        .select('permission')
+        .distinct();
+
+      // Get all bindings for this user
+      const bindings = await db('g_role_bindings')
+        .select(['g_role_bindings.*', 'r.roleName'])
+        .join('g_roles as r', 'g_role_bindings.roleId', 'r.id')
+        .where('g_role_bindings.userId', userId);
 
       res.json({
         success: true,
         data: {
           isOrgAdmin: isAdmin,
           roleIds,
-          permissions: {
-            org: orgPerms.map((r: any) => r.permission),
-            project: projectPerms,
-            env: envPerms,
-          },
+          permissions: permissions.map((r: any) => r.permission),
+          bindings,
         },
       });
     } catch (error) {

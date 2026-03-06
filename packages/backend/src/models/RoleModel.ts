@@ -18,12 +18,6 @@ export interface RoleRecord {
   updatedAt: Date;
 }
 
-export interface RolePermissions {
-  org: string[];
-  project: Array<{ projectId: string; permission: string; isAdmin: boolean }>;
-  env: Array<{ environmentId: string; permission: string; isAdmin: boolean }>;
-}
-
 export interface CreateRoleData {
   orgId: string;
   roleName: string;
@@ -41,9 +35,7 @@ export interface UpdateRoleData {
 
 export class RoleModel {
   private static readonly TABLE = 'g_roles';
-  private static readonly ORG_PERMS_TABLE = 'g_role_org_permissions';
-  private static readonly PROJECT_PERMS_TABLE = 'g_role_project_permissions';
-  private static readonly ENV_PERMS_TABLE = 'g_role_environment_permissions';
+  private static readonly PERMISSIONS_TABLE = 'g_role_permissions';
 
   // ─── Role CRUD ─────────────────────────
 
@@ -86,86 +78,43 @@ export class RoleModel {
   }
 
   static async delete(id: string): Promise<boolean> {
-    // Cascade delete handles permissions via FK
+    // Cascade delete handles permissions and bindings via FK
     const result = await db(this.TABLE).where('id', id).del();
     if (result > 0) {
-      // Invalidate caches
       await permissionService.invalidateRoleCache(id);
     }
     return result > 0;
   }
 
-  // ─── Permissions ─────────────────────────
+  // ─── Permissions (g_role_permissions) ─────────────────────────
 
-  static async getPermissions(roleId: string): Promise<RolePermissions> {
-    const [orgPerms, projectPerms, envPerms] = await Promise.all([
-      db(this.ORG_PERMS_TABLE).where('roleId', roleId).select('permission'),
-      db(this.PROJECT_PERMS_TABLE)
-        .where('roleId', roleId)
-        .select('projectId', 'permission', 'isAdmin'),
-      db(this.ENV_PERMS_TABLE)
-        .where('roleId', roleId)
-        .select('environmentId', 'permission', 'isAdmin'),
-    ]);
-
-    return {
-      org: orgPerms.map((r: any) => r.permission),
-      project: projectPerms.map((r: any) => ({
-        projectId: r.projectId,
-        permission: r.permission,
-        isAdmin: !!r.isAdmin,
-      })),
-      env: envPerms.map((r: any) => ({
-        environmentId: r.environmentId,
-        permission: r.permission,
-        isAdmin: !!r.isAdmin,
-      })),
-    };
+  /**
+   * Get permissions for a role (pure permission strings, no scope)
+   */
+  static async getPermissions(roleId: string): Promise<string[]> {
+    const rows = await db(this.PERMISSIONS_TABLE)
+      .where('roleId', roleId)
+      .select('permission');
+    return rows.map((r: any) => r.permission);
   }
 
   /**
-   * Set permissions for a role (replaces all existing permissions)
+   * Set permissions for a role (replaces all existing)
    */
-  static async setPermissions(roleId: string, permissions: RolePermissions): Promise<void> {
+  static async setPermissions(roleId: string, permissions: string[]): Promise<void> {
     await db.transaction(async (trx) => {
       // Clear existing
-      await trx(this.ORG_PERMS_TABLE).where('roleId', roleId).del();
-      await trx(this.PROJECT_PERMS_TABLE).where('roleId', roleId).del();
-      await trx(this.ENV_PERMS_TABLE).where('roleId', roleId).del();
+      await trx(this.PERMISSIONS_TABLE).where('roleId', roleId).del();
 
-      // Insert org permissions
-      if (permissions.org.length > 0) {
-        await trx(this.ORG_PERMS_TABLE).insert(
-          permissions.org.map((perm) => ({
+      // Insert new
+      if (permissions.length > 0) {
+        // Deduplicate
+        const uniquePerms = [...new Set(permissions)];
+        await trx(this.PERMISSIONS_TABLE).insert(
+          uniquePerms.map((perm) => ({
             id: generateULID(),
             roleId,
             permission: perm,
-          }))
-        );
-      }
-
-      // Insert project permissions
-      if (permissions.project.length > 0) {
-        await trx(this.PROJECT_PERMS_TABLE).insert(
-          permissions.project.map((p) => ({
-            id: generateULID(),
-            roleId,
-            projectId: p.projectId,
-            permission: p.permission,
-            isAdmin: p.isAdmin,
-          }))
-        );
-      }
-
-      // Insert env permissions
-      if (permissions.env.length > 0) {
-        await trx(this.ENV_PERMS_TABLE).insert(
-          permissions.env.map((e) => ({
-            id: generateULID(),
-            roleId,
-            environmentId: e.environmentId,
-            permission: e.permission,
-            isAdmin: e.isAdmin,
           }))
         );
       }
@@ -176,20 +125,28 @@ export class RoleModel {
   }
 
   /**
-   * Get role with full details (including permissions and assigned users/groups count)
+   * Get role with full details (permissions + binding counts)
    */
   static async getWithDetails(
     roleId: string
   ): Promise<
-    (RoleRecord & { permissions: RolePermissions; userCount: number; groupCount: number }) | null
+    (RoleRecord & { permissions: string[]; userCount: number; groupCount: number }) | null
   > {
     const role = await this.findById(roleId);
     if (!role) return null;
 
     const [permissions, userCountResult, groupCountResult] = await Promise.all([
       this.getPermissions(roleId),
-      db('g_user_roles').where('roleId', roleId).count('id as count').first(),
-      db('g_group_roles').where('roleId', roleId).count('id as count').first(),
+      db('g_role_bindings')
+        .where('roleId', roleId)
+        .whereNotNull('userId')
+        .countDistinct('userId as count')
+        .first(),
+      db('g_role_bindings')
+        .where('roleId', roleId)
+        .whereNotNull('groupId')
+        .countDistinct('groupId as count')
+        .first(),
     ]);
 
     return {
