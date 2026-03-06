@@ -1,4 +1,6 @@
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CmsCashShopService');
 import { PlanningDataService } from './PlanningDataService';
 
 // Supported language codes

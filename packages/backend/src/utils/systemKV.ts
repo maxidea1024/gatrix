@@ -5,7 +5,9 @@
  */
 
 import VarsModel, { VarValueType } from '../models/Vars';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('systemKV');
 import { getAllEnvironments } from './environmentContext';
 import knex from '../config/knex';
 

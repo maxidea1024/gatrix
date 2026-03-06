@@ -13,7 +13,7 @@ export class EventWorker {
 
   constructor() {
     this.worker = new Worker('event-lens-events', this.processJob.bind(this), {
-      connection: redis,
+      connection: redis as any,
       concurrency: config.worker.concurrency,
     });
 

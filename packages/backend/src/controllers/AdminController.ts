@@ -6,7 +6,9 @@ import { AuditLogModel } from '../models/AuditLog';
 import { UserModel } from '../models/User';
 import { GatrixError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AdminController');
 import db from '../config/knex';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
@@ -111,7 +113,7 @@ export class AdminController {
         if (tagsOperator) filters.tags_operator = tagsOperator;
       }
 
-      logger.debug('[AdminController] User filters:', { filters });
+      logger.debug('User filters:', { filters });
 
       const result = await UserService.getAllUsers(filters, { page, limit });
 
@@ -445,7 +447,7 @@ export class AdminController {
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
 
-      logger.info('[AdminController] Audit log query filters:', filters);
+      logger.info('Audit log query filters:', filters);
 
       logger.debug('Calling AuditLogModel.findAll with:', {
         page,

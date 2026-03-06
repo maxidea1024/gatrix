@@ -61,7 +61,9 @@ router.use('/services', serviceDiscoveryRoutes);
 // Self-service routes for authenticated users (not requiring admin role)
 // These must be mounted BEFORE requireAdmin middleware
 import { permissionService } from '../../services/PermissionService';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('index');
 router.get('/users/me/environments', authenticate as any, async (req: any, res: any) => {
   try {
     const userId = req.user?.userId || req.user?.id;

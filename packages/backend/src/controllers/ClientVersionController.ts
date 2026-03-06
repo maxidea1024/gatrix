@@ -9,7 +9,9 @@ import ClientVersionService, {
 import { ClientStatus } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientVersionController');
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 /**

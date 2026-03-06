@@ -1,6 +1,8 @@
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('analytics');
 
 const router = express.Router();
 

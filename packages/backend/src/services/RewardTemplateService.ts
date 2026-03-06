@@ -2,7 +2,9 @@ import { ulid } from 'ulid';
 import database from '../config/database';
 import { RowDataPacket } from 'mysql2';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('RewardTemplateService');
 import { TagService } from './TagService';
 
 export interface ParticipationReward {

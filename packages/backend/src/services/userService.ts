@@ -1,7 +1,9 @@
 import { UserModel } from '../models/User';
 import { UserWithoutPassword } from '../types/user';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('userService');
 import EmailService from './EmailService';
 
 export interface UserFilters {

@@ -5,7 +5,9 @@
  */
 
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UnknownFlagService');
 import redisClient from '../config/redis';
 
 // Redis key prefix for unknown flags buffer

@@ -1,4 +1,6 @@
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('JobFactory');
 
 // Job 실행 결과 인터페이스
 export interface JobExecutionResult {

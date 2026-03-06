@@ -5,7 +5,9 @@
  * Each handler is isolated and imported dynamically to avoid circular dependencies.
  */
 import { Job } from 'bullmq';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('schedulerJobs');
 import { CouponSettingsService } from './CouponSettingsService';
 
 export interface QueueJobData {

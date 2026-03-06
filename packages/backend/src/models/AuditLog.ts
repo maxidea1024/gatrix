@@ -1,6 +1,8 @@
 import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuditLog');
 import { AuditLog, CreateAuditLogData } from '../types/user';
 
 export class AuditLogModel {
@@ -293,13 +295,13 @@ export class AuditLogModel {
         .offset(safeOffset);
 
       // Log the actual SQL query for debugging
-      logger.info('[AuditLog] Query filters:', filters);
-      logger.info('[AuditLog] SQL Query:', logsQuery.toSQL().toNative());
+      logger.info('Query filters:', filters);
+      logger.info('SQL Query:', logsQuery.toSQL().toNative());
 
       // Execute queries in parallel
       const [countResult, logs] = await Promise.all([countQuery, logsQuery]);
 
-      logger.info('[AuditLog] Query results:', {
+      logger.info('Query results:', {
         count: countResult?.total || 0,
         logsReturned: logs?.length || 0,
       });

@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('jwt');
 import { UserWithoutPassword } from '../types/user';
 
 export interface JwtPayload {

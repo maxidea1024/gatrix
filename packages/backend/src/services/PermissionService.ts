@@ -14,7 +14,9 @@
 
 import db from '../config/knex';
 import redis from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PermissionService');
 import { matchSingle, MAX_INHERITANCE_DEPTH, INSTANCE_WILDCARD } from '@gatrix/shared/permissions';
 
 // Cache TTL constants (in seconds)

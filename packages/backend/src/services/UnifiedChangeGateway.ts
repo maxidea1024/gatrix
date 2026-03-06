@@ -1,7 +1,9 @@
 import { Environment } from '../models/Environment';
 import { ChangeRequest } from '../models/ChangeRequest';
 import { ChangeRequestService } from './ChangeRequestService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UnifiedChangeGateway');
 import knex from '../config/knex';
 import { ErrorCodes } from '@gatrix/shared';
 import { GatrixError } from '../middleware/errorHandler';
@@ -82,7 +84,7 @@ export class UnifiedChangeGateway {
         mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error('[UnifiedChangeGateway.requestCreation] Error:', error);
+      logger.error('requestCreation error:', error);
       throw error;
     }
   }
@@ -169,7 +171,7 @@ export class UnifiedChangeGateway {
         mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error('[UnifiedChangeGateway.requestDeletion] Error:', error);
+      logger.error('requestDeletion error:', error);
       throw error;
     }
   }
@@ -271,7 +273,7 @@ export class UnifiedChangeGateway {
         mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error('[UnifiedChangeGateway] Error:', error);
+      logger.error('processChange error:', error);
       throw error;
     }
   }

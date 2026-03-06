@@ -2,7 +2,9 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import db from '../config/knex';
 import emailService from './EmailService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PasswordResetService');
 
 export interface PasswordResetToken {
   id: string;

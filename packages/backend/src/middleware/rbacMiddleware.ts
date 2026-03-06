@@ -11,7 +11,9 @@ import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types/auth';
 import { permissionService } from '../services/PermissionService';
 import { GatrixError } from './errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('rbacMiddleware');
 
 /**
  * Require an organisation-level permission.

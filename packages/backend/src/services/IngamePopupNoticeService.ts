@@ -56,7 +56,7 @@ export interface CreateIngamePopupNoticeData {
   endDate?: string | null;
 }
 
-export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> {}
+export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> { }
 
 export interface IngamePopupNoticeFilters {
   isActive?: boolean;
@@ -235,7 +235,7 @@ class IngamePopupNoticeService {
         generatedId,
         environmentId,
         data.isActive,
-        data.content,
+        data.content ?? null,
         data.targetWorlds ? JSON.stringify(data.targetWorlds) : null,
         data.targetWorldsInverted ?? false,
         data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null,
@@ -565,9 +565,9 @@ class IngamePopupNoticeService {
     // Parse targetUserIds from comma-separated string to array
     const targetUserIds = row.targetUserIds
       ? row.targetUserIds
-          .split(',')
-          .map((id: string) => id.trim())
-          .filter((id: string) => id)
+        .split(',')
+        .map((id: string) => id.trim())
+        .filter((id: string) => id)
       : [];
 
     const targetPlatforms = parseArray(row.targetPlatforms);

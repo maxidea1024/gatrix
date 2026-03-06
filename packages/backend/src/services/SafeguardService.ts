@@ -11,7 +11,9 @@
  */
 
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('Safeguard');
 import { impactMetricsService } from './ImpactMetricsService';
 import { ulid } from 'ulid';
 
@@ -99,7 +101,7 @@ class SafeguardService {
 
     await db(TABLE_NAME).insert(safeguard);
 
-    logger.info('[Safeguard] Created safeguard', {
+    logger.info('Created safeguard', {
       id,
       flowId: input.flowId,
       milestoneId: input.milestoneId,
@@ -149,7 +151,7 @@ class SafeguardService {
 
     await db(TABLE_NAME).where({ id }).update(updateData);
 
-    logger.info('[Safeguard] Updated safeguard', { id, ...input });
+    logger.info('Updated safeguard', { id, ...input });
 
     return this.getById(id);
   }
@@ -160,7 +162,7 @@ class SafeguardService {
   async delete(id: string): Promise<boolean> {
     const deleted = await db(TABLE_NAME).where({ id }).del();
     if (deleted > 0) {
-      logger.info('[Safeguard] Deleted safeguard', { id });
+      logger.info('Deleted safeguard', { id });
     }
     return deleted > 0;
   }
@@ -170,7 +172,7 @@ class SafeguardService {
    */
   async deleteByFlowId(flowId: string): Promise<number> {
     const deleted = await db(TABLE_NAME).where({ flowId }).del();
-    logger.info('[Safeguard] Deleted safeguards for flow', { flowId, count: deleted });
+    logger.info('Deleted safeguards for flow', { flowId, count: deleted });
     return deleted;
   }
 
@@ -223,7 +225,7 @@ class SafeguardService {
             triggeredAt: db.raw('UTC_TIMESTAMP()'),
           });
 
-        logger.warn('[Safeguard] Safeguard triggered!', {
+        logger.warn('Safeguard triggered!', {
           safeguardId: safeguard.id,
           metricName: safeguard.metricName,
           currentValue: result.currentValue,
@@ -281,7 +283,7 @@ class SafeguardService {
         triggered,
       };
     } catch (error: any) {
-      logger.error('[Safeguard] Evaluation error', {
+      logger.error('Evaluation error', {
         safeguardId: safeguard.id,
         error: error.message,
       });
@@ -338,7 +340,7 @@ class SafeguardService {
     });
 
     if (updated > 0) {
-      logger.info('[Safeguard] Reset triggered safeguard', { id });
+      logger.info('Reset triggered safeguard', { id });
     }
     return updated > 0;
   }

@@ -5,7 +5,9 @@
  */
 
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('FeatureMetricsService');
 import { queueService } from './QueueService';
 import { Job } from 'bullmq';
 import { FeatureFlagModel } from '../models/FeatureFlag';

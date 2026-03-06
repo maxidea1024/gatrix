@@ -4,7 +4,9 @@ import { GameWorldService } from '../services/GameWorldService';
 import { TagService } from '../services/TagService';
 import { GatrixError } from '../middleware/errorHandler';
 import { asyncHandler } from '../utils/asyncHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('GameWorldController');
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';

@@ -5,7 +5,9 @@
  */
 
 import config from '../../config';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('ServiceDiscoveryFactory');
 import { IServiceDiscoveryProvider } from '../../types/serviceDiscovery';
 import { RedisServiceDiscoveryProvider } from './RedisServiceDiscoveryProvider';
 import { EtcdServiceDiscoveryProvider } from './EtcdServiceDiscoveryProvider';

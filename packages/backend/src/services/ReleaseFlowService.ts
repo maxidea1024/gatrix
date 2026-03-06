@@ -10,7 +10,9 @@ import { FeatureStrategyModel } from '../models/FeatureFlag';
 import { AuditLogModel } from '../models/AuditLog';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ReleaseFlowService');
 import db from '../config/knex';
 import { ulid } from 'ulid';
 import { pubSubService } from './PubSubService';

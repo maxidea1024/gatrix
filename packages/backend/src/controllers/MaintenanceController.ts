@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
 import { pubSubService } from '../services/PubSubService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MaintenanceController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';

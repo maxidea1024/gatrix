@@ -1,6 +1,8 @@
 import { UserModel } from '../models/User';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UserTagService');
 
 export class UserTagService {
   // 사용자 태그 조회

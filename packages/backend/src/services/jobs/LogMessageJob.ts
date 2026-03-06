@@ -1,5 +1,7 @@
 import { BaseJob, JobExecutionResult } from './JobFactory';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('LogMessageJob');
 
 interface LogMessageJobData {
   message: string;

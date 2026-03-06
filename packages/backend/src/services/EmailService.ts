@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import sgMail from '@sendgrid/mail';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EmailService');
 import { config } from '../config';
 import EmailTemplateService from './EmailTemplateService';
 import { UserModel } from '../models/User';

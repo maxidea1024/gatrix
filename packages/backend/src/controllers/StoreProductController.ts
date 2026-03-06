@@ -4,7 +4,9 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import StoreProductService from '../services/StoreProductService';
 import { TagService } from '../services/TagService';
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('StoreProductController');
 
 export class StoreProductController {
   /**

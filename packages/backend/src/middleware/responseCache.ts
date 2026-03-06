@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import redisClient from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('responseCache');
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import crypto from 'crypto';
 

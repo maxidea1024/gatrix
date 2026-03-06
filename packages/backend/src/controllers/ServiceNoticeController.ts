@@ -8,7 +8,9 @@ import {
   sendSuccessResponse,
   ErrorCodes,
 } from '../utils/apiResponse';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServiceNoticeController');
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 class ServiceNoticeController {

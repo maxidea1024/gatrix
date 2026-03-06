@@ -9,7 +9,9 @@ import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import RewardTemplateService from '../services/RewardTemplateService';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('SurveyController');
 
 interface ServerReward {
   type: number;

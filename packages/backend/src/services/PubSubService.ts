@@ -3,7 +3,9 @@ import { Queue, Worker, Job } from 'bullmq';
 import { createClient, RedisClientType } from 'redis';
 import { config } from '../config';
 import redisClient from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PubSubService');
 import { cacheService } from './CacheService';
 
 export interface CacheInvalidationMessage {

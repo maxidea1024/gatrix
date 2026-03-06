@@ -1,6 +1,8 @@
 import { config } from '../config';
 import ServerLifecycleEvent from '../models/ServerLifecycleEvent';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('lifecycleCleanupScheduler');
 import { queueService } from './QueueService';
 
 /**

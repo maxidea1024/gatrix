@@ -5,7 +5,9 @@
  * Uses Redis with TTL for automatic expiration.
  */
 import redisClient from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EntityLock');
 import { pubSubService } from './PubSubService';
 
 interface LockInfo {
@@ -79,10 +81,10 @@ class EntityLockService {
       };
       await redisClient.set(key, JSON.stringify(lockInfo), ttlSeconds);
 
-      logger.debug(`[EntityLock] Lock acquired: ${key} by user ${userId}`);
+      logger.debug(`Lock acquired: ${key} by user ${userId}`);
       return { success: true };
     } catch (error) {
-      logger.error('[EntityLock] Failed to acquire lock', error);
+      logger.error('Failed to acquire lock', error);
       // On error, allow editing (fail open)
       return { success: true };
     }
@@ -119,7 +121,7 @@ class EntityLockService {
       };
       await redisClient.set(key, JSON.stringify(lockInfo), ttlSeconds);
 
-      logger.info(`[EntityLock] Lock force acquired: ${key} by user ${userId}`);
+      logger.info(`Lock force acquired: ${key} by user ${userId}`);
 
       // Send SSE notification to notify the previous owner
       if (previousOwner && previousOwner.userId !== userId) {
@@ -143,13 +145,13 @@ class EntityLockService {
             },
           });
         } catch (sseError) {
-          logger.warn('[EntityLock] Failed to send SSE notification for force takeover', sseError);
+          logger.warn('Failed to send SSE notification for force takeover', sseError);
         }
       }
 
       return true;
     } catch (error) {
-      logger.error('[EntityLock] Failed to force acquire lock', error);
+      logger.error('Failed to force acquire lock', error);
       return false;
     }
   }
@@ -171,13 +173,13 @@ class EntityLockService {
       if (existingLockStr) {
         const existingLock: LockInfo = JSON.parse(existingLockStr);
         if (existingLock.userId !== userId) {
-          logger.warn(`[EntityLock] Cannot release lock owned by another user: ${key}`);
+          logger.warn(`Cannot release lock owned by another user: ${key}`);
           return false;
         }
       }
 
       await redisClient.del(key);
-      logger.debug(`[EntityLock] Lock released: ${key}`);
+      logger.debug(`Lock released: ${key}`);
 
       // Send SSE notification for lock release
       try {
@@ -191,12 +193,12 @@ class EntityLockService {
           },
         });
       } catch (sseError) {
-        logger.warn('[EntityLock] Failed to send SSE notification for lock release', sseError);
+        logger.warn('Failed to send SSE notification for lock release', sseError);
       }
 
       return true;
     } catch (error) {
-      logger.error('[EntityLock] Failed to release lock', error);
+      logger.error('Failed to release lock', error);
       return false;
     }
   }
@@ -218,7 +220,7 @@ class EntityLockService {
       }
       return null;
     } catch (error) {
-      logger.error('[EntityLock] Failed to check lock', error);
+      logger.error('Failed to check lock', error);
       return null;
     }
   }
@@ -252,7 +254,7 @@ class EntityLockService {
 
       return true;
     } catch (error) {
-      logger.error('[EntityLock] Failed to extend lock', error);
+      logger.error('Failed to extend lock', error);
       return false;
     }
   }
@@ -295,7 +297,7 @@ class EntityLockService {
 
       return { hasPending: false };
     } catch (error) {
-      logger.error('[EntityLock] Failed to check pending CR', error);
+      logger.error('Failed to check pending CR', error);
       return { hasPending: false };
     }
   }

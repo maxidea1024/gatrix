@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserService } from '../services/userService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerAuthController');
 
 export interface ServerAuthRequest extends Request {
   apiToken?: any;

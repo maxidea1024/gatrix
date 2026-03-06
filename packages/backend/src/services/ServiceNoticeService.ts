@@ -4,7 +4,9 @@ import database from '../config/database';
 import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/dateUtils';
 import { pubSubService } from './PubSubService';
 
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServiceNoticeService');
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface ServiceNotice {

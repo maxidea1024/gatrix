@@ -1,5 +1,7 @@
 import axios from 'axios';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('TranslationService');
 import redisClient from '../config/redis';
 import crypto from 'crypto';
 import { TRANSLATION, DEFAULT_CONFIG } from '../constants/cacheKeys';

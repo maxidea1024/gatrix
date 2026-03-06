@@ -6,7 +6,9 @@
  * NOTE: Game servers register directly to etcd/Redis, not via this service
  */
 
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('serviceDiscoveryService');
 import { ServiceDiscoveryFactory } from './serviceDiscovery/ServiceDiscoveryFactory';
 import {
   IServiceDiscoveryProvider,

@@ -4,7 +4,9 @@
  * 모든 날짜는 UTC로 저장되며, MySQL DATETIME 형식으로 변환됩니다.
  */
 
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('dateUtils');
 
 /**
  * ISO 8601 날짜 문자열을 MySQL DATETIME 형식(UTC)으로 변환

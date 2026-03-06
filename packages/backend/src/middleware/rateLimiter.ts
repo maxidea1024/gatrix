@@ -1,5 +1,7 @@
 import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('rateLimiter');
 
 // Rate limiter configuration from environment variables
 const isDevelopment = process.env.NODE_ENV === 'development';

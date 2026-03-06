@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import { EventEmitter } from 'events';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('sseNotificationService');
 import { pubSubService } from './PubSubService';
 
 export interface SSEClient {

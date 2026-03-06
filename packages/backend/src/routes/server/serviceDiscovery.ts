@@ -9,12 +9,14 @@ import { serverSDKAuth } from '../../middleware/apiTokenAuth';
 import serviceDiscoveryService from '../../services/serviceDiscoveryService';
 import { IpWhitelistModel } from '../../models/IpWhitelist';
 import { WhitelistModel } from '../../models/AccountWhitelist';
-import logger from '../../config/logger';
 import { ulid } from 'ulid';
 import { pubSubService } from '../../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../../constants/cacheKeys';
 import { respondWithEtagCache } from '../../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../../middleware/environmentResolver';
+
+import { createLogger } from '../../config/logger';
+const logger = createLogger('serviceDiscovery');
 
 const router = express.Router();
 

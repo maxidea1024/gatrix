@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import Handlebars, { TemplateDelegate } from 'handlebars';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EmailTemplateService');
 import { SupportedLanguage } from '../types/user';
 
 export interface EmailTemplateData {

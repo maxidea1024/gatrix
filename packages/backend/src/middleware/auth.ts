@@ -2,7 +2,9 @@ import { Response, NextFunction } from 'express';
 import { JwtUtils } from '../utils/jwt';
 import { UserModel } from '../models/User';
 import { GatrixError } from './errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('auth');
 import { permissionService } from '../services/PermissionService';
 import { AppUser, AuthenticatedRequest } from '../types/auth';
 

@@ -27,7 +27,9 @@ import {
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
 import { AuditLogModel } from '../models/AuditLog';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('FeatureFlagService');
 import { pubSubService } from './PubSubService';
 import { ENV_SCOPED } from '../constants/cacheKeys';
 import db from '../config/knex';

@@ -1,6 +1,8 @@
 import redisClient from '../config/redis';
 import { ApiAccessToken } from '../models/ApiAccessToken';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ApiTokenUsageService');
 import { queueService } from './QueueService';
 import { getInstanceId } from '../utils/AppInstance';
 

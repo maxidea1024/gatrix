@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import { BaseJob, JobExecutionResult } from './JobFactory';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('MailSendJob');
 
 export class MailSendJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {

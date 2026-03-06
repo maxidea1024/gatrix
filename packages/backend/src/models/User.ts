@@ -1,7 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { generateULID } from '../utils/ulid';
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UserModel');
 import { CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
 import { Model } from 'objection';
 
@@ -205,10 +207,10 @@ export class UserModel {
         // Handle status filter (single or multiple)
         if (filters.status) {
           if (Array.isArray(filters.status)) {
-            logger.info(`[UserModel] Applying status filter (array): ${filters.status.join(', ')}`);
+            logger.info(`Applying status filter (array): ${filters.status.join(', ')}`);
             query.whereIn('g_users.status', filters.status);
           } else {
-            logger.info(`[UserModel] Applying status filter (single): ${filters.status}`);
+            logger.info(`Applying status filter (single): ${filters.status}`);
             query.where('g_users.status', filters.status);
           }
         }

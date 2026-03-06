@@ -1,4 +1,6 @@
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('releaseFlowScheduler');
 import { QueueService, queueService } from './QueueService';
 import { ReleaseFlowMilestoneModel } from '../models/ReleaseFlow';
 import { releaseFlowService } from './ReleaseFlowService';

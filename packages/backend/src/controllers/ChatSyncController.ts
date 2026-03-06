@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { ChatServerService } from '../services/ChatServerService';
 import { UserModel } from '../models/User';
 import { AuthenticatedRequest } from '../middleware/auth';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ChatSyncController');
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 

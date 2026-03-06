@@ -1,6 +1,8 @@
 import { ulid } from 'ulid';
 import os from 'os';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AppInstance');
 
 export interface AppInstanceInfo {
   instanceId: string;

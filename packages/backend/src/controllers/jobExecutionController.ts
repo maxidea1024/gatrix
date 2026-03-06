@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { JobExecutionModel } from '../models/JobExecution';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('jobExecutionController');
 
 // Job 실행 이력 목록 조회
 export const getJobExecutions = async (req: Request, res: Response) => {

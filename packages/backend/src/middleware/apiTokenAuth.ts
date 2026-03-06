@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiAccessToken } from '../models/ApiAccessToken';
 import { Environment } from '../models/Environment';
 import { CacheService } from '../services/CacheService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('apiTokenAuth');
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import { ErrorCodes } from '../utils/apiResponse';
 

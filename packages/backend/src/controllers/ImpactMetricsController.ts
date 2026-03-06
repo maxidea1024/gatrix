@@ -10,7 +10,9 @@
 import { Request, Response } from 'express';
 import { impactMetricsService } from '../services/ImpactMetricsService';
 import { ImpactMetricConfigModel } from '../models/ImpactMetricConfig';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ImpactMetricsController');
 
 class ImpactMetricsController {
   private isInitialized = false;
@@ -39,7 +41,7 @@ class ImpactMetricsController {
         return;
       }
 
-      logger.debug('[ImpactMetrics] Received metrics from SDK', {
+      logger.debug('Received metrics from SDK', {
         count: impactMetrics.length,
         sdkVersion,
       });
@@ -48,7 +50,7 @@ class ImpactMetricsController {
 
       res.status(202).json({ success: true });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to process metrics', {
+      logger.error('Failed to process metrics', {
         error: error.message,
       });
       res.status(500).json({
@@ -105,7 +107,7 @@ class ImpactMetricsController {
 
       res.json({ success: true, data: result });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to query time-series', {
+      logger.error('Failed to query time-series', {
         error: error.message,
       });
       res.status(500).json({
@@ -124,7 +126,7 @@ class ImpactMetricsController {
       const metrics = await impactMetricsService.getAvailableMetrics();
       res.json({ success: true, data: metrics });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to get available metrics', {
+      logger.error('Failed to get available metrics', {
         error: error.message,
       });
       res.status(500).json({
@@ -154,7 +156,7 @@ class ImpactMetricsController {
         res.json({ success: true, data: [] });
         return;
       }
-      logger.error('[ImpactMetrics] Failed to get configs', { error: error.message });
+      logger.error('Failed to get configs', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to get configs' } });
     }
   }
@@ -176,7 +178,7 @@ class ImpactMetricsController {
       const labels = await impactMetricsService.getMetricLabels(metric);
       res.json({ success: true, data: labels });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to get metric labels', { error: error.message });
+      logger.error('Failed to get metric labels', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to get metric labels' } });
     }
   }
@@ -226,7 +228,7 @@ class ImpactMetricsController {
 
       res.status(201).json({ success: true, data: config });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to create config', { error: error.message });
+      logger.error('Failed to create config', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to create config' } });
     }
   }
@@ -245,7 +247,7 @@ class ImpactMetricsController {
       }
       res.json({ success: true, data: config });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to update config', { error: error.message });
+      logger.error('Failed to update config', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to update config' } });
     }
   }
@@ -260,7 +262,7 @@ class ImpactMetricsController {
       await ImpactMetricConfigModel.delete(id);
       res.json({ success: true });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to delete config', { error: error.message });
+      logger.error('Failed to delete config', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to delete config' } });
     }
   }
@@ -288,7 +290,7 @@ class ImpactMetricsController {
       }
       res.json({ success: true });
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Failed to update layouts', { error: error.message });
+      logger.error('Failed to update layouts', { error: error.message });
       res.status(500).json({ success: false, error: { message: 'Failed to update layouts' } });
     }
   }

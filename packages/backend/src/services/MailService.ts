@@ -1,5 +1,7 @@
 import { MailModel, MailType, MailPriority, ContentType, MailData } from '../models/Mail';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MailService');
 
 export interface SendMailOptions {
   senderId?: string | null;

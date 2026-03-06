@@ -1,7 +1,9 @@
 import { Job } from 'bullmq';
 import { ulid } from 'ulid';
 import database from '../../config/database';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('CouponGenerationJob');
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCouponCode, CodePattern } from '../../utils/couponCodeGenerator';
 
@@ -151,7 +153,7 @@ export class CouponGenerationJob {
           const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
           await pool.execute(
             `INSERT INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
-            batchCodes.flat()
+            batchCodes.flat() as string[]
           );
 
           totalGenerated += batchCodes.length;
@@ -196,7 +198,7 @@ export class CouponGenerationJob {
       try {
         await pool.execute(
           'UPDATE g_coupon_settings SET generationStatus = ?, generationJobId = NULL WHERE id = ?',
-          ['FAILED', settingId]
+          ['FAILED', settingId ?? null]
         );
       } catch (updateError) {
         logger.error('Failed to update coupon status to FAILED', {

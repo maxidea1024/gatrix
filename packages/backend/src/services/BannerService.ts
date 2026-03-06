@@ -7,7 +7,9 @@ import {
   Sequence,
 } from '../models/Banner';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('BannerService');
 import { cacheService } from './CacheService';
 import { pubSubService } from './PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';

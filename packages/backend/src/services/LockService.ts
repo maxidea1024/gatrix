@@ -6,7 +6,9 @@
 import { ulid } from 'ulid';
 import { EntityLock, LockType } from '../models/EntityLock';
 import { User } from '../models/User';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('LockService');
 
 export interface LockCheckResult {
   isLocked: boolean;
@@ -162,7 +164,7 @@ export class LockService {
     });
 
     logger.info(
-      `[LockService] Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
+      `Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
     );
     return lock;
   }
@@ -188,7 +190,7 @@ export class LockService {
 
     const deleted = await query.delete();
     if (deleted > 0) {
-      logger.info(`[LockService] Lock released: ${entityType}:${entityId}`);
+      logger.info(`Lock released: ${entityType}:${entityId}`);
       return true;
     }
     return false;
@@ -205,7 +207,7 @@ export class LockService {
       .delete();
 
     if (deleted > 0) {
-      logger.info(`[LockService] Cleaned up ${deleted} expired locks`);
+      logger.info(`Cleaned up ${deleted} expired locks`);
     }
     return deleted;
   }
@@ -224,7 +226,7 @@ export class LockService {
     const deleted = await EntityLock.query().where('lockedBy', userId).delete();
 
     if (deleted > 0) {
-      logger.info(`[LockService] Released all locks for user ${userId}: ${deleted} locks`);
+      logger.info(`Released all locks for user ${userId}: ${deleted} locks`);
     }
     return deleted;
   }

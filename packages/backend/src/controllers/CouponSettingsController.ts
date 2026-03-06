@@ -4,7 +4,9 @@ import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
 import { CouponSettingsService } from '../services/CouponSettingsService';
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CouponSettingsController');
 
 // Validation schemas
 const createSchema = Joi.object({

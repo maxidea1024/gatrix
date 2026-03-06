@@ -3,7 +3,9 @@ import { AuthenticatedRequest } from '../types/auth';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { PlanningDataService } from '../services/PlanningDataService';
 import { pubSubService } from '../services/PubSubService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PlanningDataController');
 
 // Helper to get environment from request
 function getEnvironment(req: AuthenticatedRequest): string {
@@ -333,7 +335,7 @@ export class PlanningDataController {
   static previewDiff = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const environmentId = getEnvironment(req);
 
-    logger.info('[PlanningData] Preview diff requested', {
+    logger.info('Preview diff requested', {
       userId: req.user?.userId,
       filesCount: req.files ? Object.keys(req.files).length : 0,
       environmentId,

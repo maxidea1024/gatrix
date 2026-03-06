@@ -10,7 +10,9 @@ import ServiceDiscoveryController from '../../controllers/ServiceDiscoveryContro
 import { ServiceDiscoveryConfigController } from '../../controllers/ServiceDiscoveryConfigController';
 import { authenticate, requireAdmin } from '../../middleware/auth';
 import serviceDiscoveryService from '../../services/serviceDiscoveryService';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('serviceDiscovery');
 
 const router = express.Router();
 

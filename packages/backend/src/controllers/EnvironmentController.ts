@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { Environment } from '../models/Environment';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EnvironmentController');
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
 import { initializeSystemKV } from '../utils/systemKV';
 import { pubSubService } from '../services/PubSubService';

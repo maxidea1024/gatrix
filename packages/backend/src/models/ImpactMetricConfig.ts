@@ -6,7 +6,9 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ImpactMetricConfig');
 
 export interface ImpactMetricConfigAttributes {
   id: string;

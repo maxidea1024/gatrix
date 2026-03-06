@@ -1,5 +1,7 @@
 import db from '../../config/knex';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('FeatureFlagModel');
 import { ulid } from 'ulid';
 import { parseJsonField } from '../../utils/dbUtils';
 import {

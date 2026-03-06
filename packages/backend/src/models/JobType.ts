@@ -1,6 +1,8 @@
 import db from '../config/knex';
 import { generateULID } from '../utils/ulid';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('JobType');
 import { getCurrentEnvironment } from '../utils/environmentContext';
 
 export interface JobTypeAttributes {

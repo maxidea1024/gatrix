@@ -3,7 +3,9 @@
  */
 
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('dbTimezoneCheck');
 
 /**
  * MySQL 시간대 설정 확인

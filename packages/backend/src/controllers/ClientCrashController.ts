@@ -6,7 +6,9 @@ import { CrashUploadRequest, CrashState, CRASH_CONSTANTS } from '../types/crash'
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientCrashController');
 import { cacheService } from '../services/CacheService';
 import { isGreaterThan } from '../utils/semver';
 import { generateULID } from '../utils/ulid';

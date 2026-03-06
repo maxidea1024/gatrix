@@ -8,7 +8,9 @@ import {
 } from '../models/IpWhitelist';
 import { GatrixError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('IpWhitelistService');
 import { pubSubService } from './PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 

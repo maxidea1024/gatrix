@@ -2,7 +2,9 @@ import VarsModel, { VarItem } from '../models/Vars';
 import { cacheService } from './CacheService';
 import { pubSubService } from './PubSubService';
 import { withEnvironment, SERVER_SDK_ETAG } from '../constants/cacheKeys';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('VarsService');
 
 const CACHE_TTL = 300; // 5 minutes
 

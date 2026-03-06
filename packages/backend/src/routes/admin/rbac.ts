@@ -20,7 +20,9 @@ import { EnvironmentKey } from '../../models/EnvironmentKey';
 import { permissionService } from '../../services/PermissionService';
 import { generateULID } from '../../utils/ulid';
 import { GatrixError } from '../../middleware/errorHandler';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('rbac');
 import db from '../../config/knex';
 
 const router = express.Router();
@@ -251,7 +253,7 @@ router.get('/projects', async (req: any, res) => {
     }
 
     // Get projects from orgs the user is a member of
-    const projects = await knex('g_projects as p')
+    const projects = await db('g_projects as p')
       .join('g_organisations as o', 'p.orgId', 'o.id')
       .join('g_organisation_members as om', 'o.id', 'om.orgId')
       .where('om.userId', userId)

@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserModel } from '../models/User';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerUserController');
 import {
   sendBadRequest,
   sendNotFound,

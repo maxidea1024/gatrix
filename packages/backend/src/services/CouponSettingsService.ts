@@ -3,7 +3,9 @@ import { GatrixError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
 import { convertToMySQLDateTime } from '../utils/dateUtils';
 import { queueService } from './QueueService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CouponSettings');
 import { generateCouponCode, CodePattern } from '../utils/couponCodeGenerator';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
@@ -541,7 +543,7 @@ export class CouponSettingsService {
       .offset(offset);
 
     if (rows.length > 0) {
-      logger.info('[CouponUsage] Sample record:', {
+      logger.info('Sample usage record:', {
         id: rows[0].id,
         userId: rows[0].userId,
         platform: rows[0].platform,
@@ -676,7 +678,7 @@ export class CouponSettingsService {
     const unused = issued - used;
 
     logger.debug(
-      `[CouponStats] settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`
+      `settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`
     );
 
     return { issued, used, unused };
@@ -737,7 +739,7 @@ export class CouponSettingsService {
       }
 
       total = Number(setting.issuedCount || 0);
-      logger.debug(`[getIssuedCodes] Cache hit: total=${total}, time=${Date.now() - startTime}ms`);
+      logger.debug(`Cache hit: total=${total}, time=${Date.now() - startTime}ms`);
     } else {
       const countResult = await db('g_coupons')
         .where('settingId', settingId)
@@ -760,7 +762,7 @@ export class CouponSettingsService {
 
     const codes = await codesQuery;
     logger.debug(
-      `[getIssuedCodes] Data query: rows=${codes.length}, offset=${offset}, time=${Date.now() - startTime}ms`
+      `Data query: rows=${codes.length}, offset=${offset}, time=${Date.now() - startTime}ms`
     );
 
     return { codes, total, page, limit };

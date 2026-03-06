@@ -2,7 +2,9 @@
 import { UserModel } from '../models/User';
 import { JwtUtils } from '../utils/jwt';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuthService');
 import { CreateUserData, UserWithoutPassword } from '../types/user';
 import db from '../config/knex';
 

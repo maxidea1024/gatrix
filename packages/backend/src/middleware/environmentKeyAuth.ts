@@ -16,7 +16,9 @@ import { Request, Response, NextFunction } from 'express';
 import { EnvironmentKey, EnvironmentKeyRecord, KeyType } from '../models/EnvironmentKey';
 import { Environment } from '../models/Environment';
 import { CacheService } from '../services/CacheService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('environmentKeyAuth');
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import { ErrorCodes } from '../utils/apiResponse';
 

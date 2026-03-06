@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BaseJob, JobExecutionResult } from './JobFactory';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('HttpRequestJob');
 import { HEADERS, HEADER_VALUES } from '../../constants/headers';
 
 export class HttpRequestJob extends BaseJob {

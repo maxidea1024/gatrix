@@ -17,7 +17,9 @@ import { IncomingMessage } from 'http';
 import { createClient, RedisClientType } from 'redis';
 import WebSocket, { WebSocketServer } from 'ws';
 import { config } from '../config';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('FlagStreamingService');
 
 interface StreamingClient {
   id: string;

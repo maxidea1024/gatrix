@@ -6,13 +6,15 @@ import { Approval } from '../models/Approval';
 import { Environment } from '../models/Environment';
 import { User } from '../models/User';
 import { ActionGroup, ACTION_GROUP_TYPES, ActionGroupType } from '../models/ActionGroup';
-import logger from '../config/logger';
 import knex from '../config/knex';
 import { ChangeRequestNotifications } from './sseNotificationService';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '@gatrix/shared';
 import { diff } from 'deep-diff';
 import { OutboxService } from './OutboxService';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ChangeRequest');
 
 /**
  * Generate ops from beforeData and afterData
@@ -350,7 +352,7 @@ export class ChangeRequestService {
 
       return { changeRequestId: cr.id, status: cr.status };
     } catch (error) {
-      logger.error('[ChangeRequestService] Error upserting change request:', error);
+      logger.error('Error upserting change request:', error);
       throw error;
     }
   }
@@ -401,7 +403,7 @@ export class ChangeRequestService {
         }
       } catch (err) {
         logger.warn(
-          `[ChangeRequest] Failed to capture version for ${item.targetTable}:${item.targetId}`,
+          `Failed to capture version for ${item.targetTable}:${item.targetId}`,
           err
         );
       }
@@ -490,7 +492,7 @@ export class ChangeRequestService {
       }
 
       logger.info(
-        `[ChangeRequest] Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId})`
+        `Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId})`
       );
 
       if (currentApprovals >= requiredApprovers) {
@@ -499,7 +501,7 @@ export class ChangeRequestService {
           updatedAt: new Date().toISOString() as any,
         });
 
-        logger.info(`[ChangeRequest] Request ${cr.id} transitioned to APPROVED status.`);
+        logger.info(`Request ${cr.id} transitioned to APPROVED status.`);
 
         // Send SSE notification to requester when approved
         await ChangeRequestNotifications.notifyApproved(
@@ -539,7 +541,7 @@ export class ChangeRequestService {
 
     if (approvalCount >= effectiveMinApprovals) {
       logger.info(
-        `[ChangeRequest] Auto-approving ${cr.id} as threshold ${effectiveMinApprovals} is met via lazy check`
+        `Auto-approving ${cr.id} as threshold ${effectiveMinApprovals} is met via lazy check`
       );
 
       const updated = await ChangeRequest.query().patchAndFetchById(cr.id, {
@@ -560,7 +562,7 @@ export class ChangeRequestService {
           ''
         );
       } catch (err) {
-        logger.error('[ChangeRequest] Failed to send auto-approve notification', err);
+        logger.error('Failed to send auto-approve notification', err);
       }
 
       return updated;
@@ -778,7 +780,7 @@ export class ChangeRequestService {
           } else {
             // Warn but continue (dev/test environments)
             logger.warn(
-              `[ChangeRequest] Conflict detected but continuing (non-strict): ${conflictReason}`
+              `Conflict detected but continuing (non-strict): ${conflictReason}`
             );
           }
         }
@@ -807,7 +809,7 @@ export class ChangeRequestService {
             affectedRows = await trx(item.targetTable).where('id', item.targetId).delete();
           }
 
-          logger.info(`[ChangeRequest] Deleted ${item.targetTable}:${item.targetId}`);
+          logger.info(`Deleted ${item.targetTable}:${item.targetId}`);
 
           if (hasServiceHandler(item.targetTable)) {
             serviceCallsNeeded.push({
@@ -939,7 +941,7 @@ export class ChangeRequestService {
                     targetId: String(realId),
                   });
                 logger.info(
-                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
+                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
                 );
               }
             } else {
@@ -1018,7 +1020,7 @@ export class ChangeRequestService {
                     targetId: String(realId),
                   });
                 logger.info(
-                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
+                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
                 );
               }
             } else {
@@ -1044,7 +1046,7 @@ export class ChangeRequestService {
               }
             }
             logger.warn(
-              `[ChangeRequest] No service handler for ${item.targetTable}, events not published`
+              `No service handler for ${item.targetTable}, events not published`
             );
           }
         }
@@ -1114,7 +1116,7 @@ export class ChangeRequestService {
             );
           } catch (err) {
             logger.error(
-              `[ChangeRequest] Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,
+              `Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,
               err
             );
             // We do NOT rollback transaction here as data is already committed.
@@ -1262,7 +1264,7 @@ export class ChangeRequestService {
             }
           } catch (err) {
             logger.warn(
-              `[Revert] Could not fetch live data for ${item.targetTable}:${item.targetId}`,
+              `Could not fetch live data for ${item.targetTable}:${item.targetId}`,
               err
             );
           }
@@ -1300,7 +1302,7 @@ export class ChangeRequestService {
           requesterName: requester?.name || requester?.email,
         });
       } catch (err) {
-        logger.error('[ChangeRequest] Failed to send revert notification', err);
+        logger.error('Failed to send revert notification', err);
       }
 
       // Return the full CR with items AND action groups
@@ -1341,7 +1343,7 @@ export class ChangeRequestService {
       // Delete requests
       const deleted = await ChangeRequest.query(trx).whereIn('id', ids).delete();
 
-      logger.info('[ChangeRequest] Cleanup completed', {
+      logger.info('Cleanup completed', {
         deleted,
         retentionDays,
       });

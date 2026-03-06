@@ -1,6 +1,8 @@
 import redisClient from '../config/redis';
 import { config } from '../config';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('sessionManager');
 
 export class SessionManager {
   private static readonly SESSION_PREFIX = 'gatrix:session:';

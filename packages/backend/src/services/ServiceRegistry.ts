@@ -15,7 +15,9 @@ import { WhitelistService } from './WhitelistService';
 import { IpWhitelistService } from './IpWhitelistService';
 import { TagService } from './TagService';
 import { featureFlagService } from './FeatureFlagService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServiceRegistry');
 
 export interface ServiceHandler {
   /**
@@ -233,7 +235,7 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
           data: { varKey, value: data.value, environmentId },
           targetChannels: ['admin', 'general'],
         });
-        logger.info(`[ServiceRegistry] Published maintenance event for ${varKey}`);
+        logger.info(`Published maintenance event for ${varKey}`);
       }
 
       return { varKey, value: data.value };
@@ -298,7 +300,7 @@ export async function executeChangeViaService(
   const handler = getServiceHandler(tableName);
 
   if (!handler) {
-    logger.warn(`[ServiceRegistry] No handler for table ${tableName}, fallback to direct update`);
+    logger.warn(`No handler for table ${tableName}, fallback to direct update`);
     return { usedService: false };
   }
 
@@ -309,10 +311,10 @@ export async function executeChangeViaService(
     } else {
       result = await handler.apply(id, data, environmentId, userId);
     }
-    logger.info(`[ServiceRegistry] Applied change via service for ${tableName}:${id}`);
+    logger.info(`Applied change via service for ${tableName}:${id}`);
     return { usedService: true, result };
   } catch (error) {
-    logger.error(`[ServiceRegistry] Failed to apply via service for ${tableName}:${id}`, error);
+    logger.error(`Failed to apply via service for ${tableName}:${id}`, error);
     throw error;
   }
 }

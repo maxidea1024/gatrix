@@ -5,7 +5,9 @@ import { CrashEvent } from '../models/CrashEvent';
 import { ClientCrash } from '../models/ClientCrash';
 import fs from 'fs/promises';
 import path from 'path';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CrashEventController');
 
 /**
  * Controller for crash event management (admin)

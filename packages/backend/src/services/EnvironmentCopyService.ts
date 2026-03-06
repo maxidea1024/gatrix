@@ -1,6 +1,8 @@
 import knex from '../config/knex';
 import { generateULID } from '../utils/ulid';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EnvironmentCopyService');
 import { GameWorldModel } from '../models/GameWorld';
 import { PlanningDataService } from './PlanningDataService';
 

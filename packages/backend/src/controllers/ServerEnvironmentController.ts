@@ -6,7 +6,9 @@
 import { Response } from 'express';
 import { SDKRequest } from '../middleware/apiTokenAuth';
 import { Environment } from '../models/Environment';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerEnvironmentController');
 
 export class ServerEnvironmentController {
   /**

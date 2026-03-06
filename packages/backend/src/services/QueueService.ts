@@ -1,5 +1,7 @@
 import { Queue, Worker, Job, QueueEvents, RepeatableJob } from 'bullmq';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('QueueService');
 import { BullBoardConfig } from '../config/bullboard';
 
 export interface QueueJobData {

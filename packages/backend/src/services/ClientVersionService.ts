@@ -5,7 +5,9 @@ import {
   ClientStatus,
 } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientVersionService');
 import {
   applyMaintenanceStatusCalculationToArray,
   applyMaintenanceStatusCalculation,

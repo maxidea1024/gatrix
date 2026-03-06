@@ -3,7 +3,9 @@ import path from 'path';
 import crypto from 'crypto';
 import { diff as deepDiff, Diff } from 'deep-diff';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PlanningDataService');
 import { cacheService } from './CacheService';
 import db from '../config/knex';
 

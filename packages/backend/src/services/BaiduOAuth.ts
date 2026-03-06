@@ -1,5 +1,7 @@
 import axios from 'axios';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('BaiduOAuth');
 import config from '../config';
 
 export interface BaiduProfile {

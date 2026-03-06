@@ -7,7 +7,9 @@ import { GameWorldService } from '../services/GameWorldService';
 import { cacheService } from '../services/CacheService';
 import { pubSubService } from '../services/PubSubService';
 import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cacheKeys';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientController');
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
 import { VarsService } from '../services/VarsService';

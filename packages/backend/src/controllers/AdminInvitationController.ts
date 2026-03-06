@@ -5,7 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { body, validationResult } from 'express-validator';
 import { UserModel } from '../models/User';
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AdminInvitationController');
 import { pubSubService } from '../services/PubSubService';
 
 export class AdminInvitationController {

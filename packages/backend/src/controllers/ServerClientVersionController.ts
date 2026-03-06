@@ -3,7 +3,9 @@ import ClientVersionService from '../services/ClientVersionService';
 import { ClientVersionModel } from '../models/ClientVersion';
 import VarsModel from '../models/Vars';
 import { TagService } from '../services/TagService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerClientVersionController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';

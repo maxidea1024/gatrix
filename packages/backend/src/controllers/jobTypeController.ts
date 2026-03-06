@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { JobTypeModel } from '../models/JobType';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('jobTypeController');
 
 // Job 타입 목록 조회
 export const getJobTypes = async (req: Request, res: Response) => {
