@@ -47,3 +47,6 @@ export {
   getCategoriesByScope,
   getResourcesByScope,
 } from './categories';
+
+// Role Label inference
+export { inferRoleLabelKey, getRoleLabelColor } from './roleLabel';

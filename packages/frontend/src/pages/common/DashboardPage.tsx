@@ -54,6 +54,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { inferRoleLabelKey, getRoleLabelColor } from '@gatrix/shared/permissions';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useConditionalApi } from '@/hooks/useSWR';
 import api from '@/services/api';
@@ -890,7 +891,7 @@ const DashboardPage: React.FC = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Chip
-                label={hasAnyPermissions ? t('roles.admin') : t('roles.user')}
+                label={t(inferRoleLabelKey(permissions))}
                 sx={{
                   bgcolor: 'rgba(255, 255, 255, 0.2)',
                   color: 'white',

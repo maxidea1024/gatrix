@@ -45,6 +45,7 @@ import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
 import { PERMISSION_CATEGORIES, RESOURCE_ACTIONS, type Resource } from '@gatrix/shared/permissions';
+import { inferRoleLabelKey, getRoleLabelColor } from '@gatrix/shared/permissions';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 
 interface Environment {
@@ -411,7 +412,13 @@ const ProfilePage: React.FC = () => {
                 justifyContent={{ xs: 'center', sm: 'flex-start' }}
                 flexWrap="wrap"
               >
-
+                <Chip
+                  icon={<SecurityIcon />}
+                  label={t(inferRoleLabelKey(permissions))}
+                  color={getRoleLabelColor(inferRoleLabelKey(permissions))}
+                  size="small"
+                  variant="outlined"
+                />
                 <Chip
                   icon={<CheckCircleIcon />}
                   label={t(`users.statuses.${user.status}`)}
