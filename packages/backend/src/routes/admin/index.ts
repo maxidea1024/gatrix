@@ -93,6 +93,10 @@ router.get('/users/me/environments', authenticate as any, async (req: any, res: 
   }
 });
 
+// Self-service: Get current user's RBAC permissions (no requirePermission needed)
+import UserController from '../../controllers/UserController';
+router.get('/users/me/permissions', authenticate as any, UserController.getMyPermissions);
+
 // RBAC management routes (uses its own RBAC middleware, not legacy requireAdmin)
 router.use('/rbac', rbacRoutes);
 
