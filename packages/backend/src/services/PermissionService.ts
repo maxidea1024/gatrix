@@ -292,6 +292,17 @@ class PermissionService {
 
     const ids = new Set([...projectPerms.map((p: any) => p.id), ...envPerms.map((p: any) => p.id)]);
 
+    // Projects accessible via direct project membership
+    const memberProjects = await db('g_project_members')
+      .where('g_project_members.userId', userId)
+      .join('g_projects', 'g_project_members.projectId', 'g_projects.id')
+      .where('g_projects.orgId', orgId)
+      .where('g_projects.isActive', true)
+      .select('g_projects.id');
+    for (const p of memberProjects) {
+      ids.add(p.id);
+    }
+
     return Array.from(ids);
   }
 
@@ -313,6 +324,16 @@ class PermissionService {
     }
 
     const roleIds = await this.getAllRoleIds(userId);
+
+    // Project member check — project members get access to all environments
+    const isProjectMember = await db('g_project_members')
+      .where({ projectId, userId })
+      .first();
+    if (isProjectMember) {
+      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      return allEnvs.map((e: any) => e.id);
+    }
+
     if (roleIds.length === 0) return [];
 
     // Project Admin check (projectId='*' or specific project with *:*)

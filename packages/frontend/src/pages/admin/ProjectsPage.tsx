@@ -24,6 +24,8 @@ import {
   Collapse,
   List,
   ListItemButton,
+  Autocomplete,
+  Select,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -36,6 +38,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
   Public as EnvironmentIcon,
+  People as PeopleIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +50,8 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { rbacService } from '@/services/rbacService';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -102,6 +107,91 @@ const ProjectsPage: React.FC = () => {
     setMenuAnchorEl(null);
     setMenuTarget(null);
   };
+
+  // ─── Member Management ─────────────────────────
+  const [memberDrawerOpen, setMemberDrawerOpen] = useState(false);
+  const [memberProject, setMemberProject] = useState<Project | null>(null);
+  const [memberLoading, setMemberLoading] = useState(false);
+  const [members, setMembers] = useState<any[]>([]);
+  const [pendingChanges, setPendingChanges] = useState<{
+    add: { userId: string; name: string; email: string; projectRole: 'admin' | 'member' }[];
+    remove: string[];
+    roleChanges: Record<string, 'admin' | 'member'>;
+  }>({ add: [], remove: [], roleChanges: {} });
+  const [userSearchInput, setUserSearchInput] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [userSearchLoading, setUserSearchLoading] = useState(false);
+  const debouncedUserSearch = useDebounce(userSearchInput, 300);
+  const [memberApplying, setMemberApplying] = useState(false);
+
+  // Search users for autocomplete
+  useEffect(() => {
+    if (!debouncedUserSearch || debouncedUserSearch.length < 2) {
+      setUserSearchResults([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setUserSearchLoading(true);
+      try {
+        const results = await rbacService.searchUsers(debouncedUserSearch);
+        if (!cancelled) setUserSearchResults(results);
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) setUserSearchLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [debouncedUserSearch]);
+
+  const handleOpenMemberDrawer = async (proj: Project) => {
+    setMemberProject(proj);
+    setMemberDrawerOpen(true);
+    setMemberLoading(true);
+    setPendingChanges({ add: [], remove: [], roleChanges: {} });
+    try {
+      const data = await rbacService.getProjectMembers(proj.id);
+      setMembers(data);
+    } catch {
+      enqueueSnackbar(t('rbac.projects.memberUpdateFailed'), { variant: 'error' });
+    } finally {
+      setMemberLoading(false);
+    }
+  };
+
+  const handleApplyMembers = async () => {
+    if (!memberProject) return;
+    setMemberApplying(true);
+    try {
+      // Apply removals
+      for (const userId of pendingChanges.remove) {
+        await rbacService.removeProjectMember(memberProject.id, userId);
+      }
+      // Apply additions
+      for (const m of pendingChanges.add) {
+        await rbacService.addProjectMember(memberProject.id, m.userId, m.projectRole);
+      }
+      // Apply role changes
+      for (const [userId, role] of Object.entries(pendingChanges.roleChanges)) {
+        await rbacService.updateProjectMemberRole(memberProject.id, userId, role);
+      }
+      enqueueSnackbar(t('rbac.projects.membersUpdated'), { variant: 'success' });
+      // Reload members
+      const data = await rbacService.getProjectMembers(memberProject.id);
+      setMembers(data);
+      setPendingChanges({ add: [], remove: [], roleChanges: {} });
+    } catch {
+      enqueueSnackbar(t('rbac.projects.memberUpdateFailed'), { variant: 'error' });
+    } finally {
+      setMemberApplying(false);
+    }
+  };
+
+  const hasPendingMemberChanges =
+    pendingChanges.add.length > 0 ||
+    pendingChanges.remove.length > 0 ||
+    Object.keys(pendingChanges.roleChanges).length > 0;
 
   // Load projects and filter by effective org
   const loadProjects = useCallback(async (silent = false) => {
@@ -560,6 +650,17 @@ const ProjectsPage: React.FC = () => {
             <ListItemText>{t('common.delete')}</ListItemText>
           </MenuItem>
         )}
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) handleOpenMemberDrawer(menuTarget);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <PeopleIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('rbac.projects.memberManageTitle')}</ListItemText>
+        </MenuItem>
       </Menu>
 
       {/* Create/Edit Drawer */}
@@ -664,6 +765,245 @@ const ProjectsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Member Management Drawer */}
+      <ResizableDrawer
+        open={memberDrawerOpen}
+        onClose={() => setMemberDrawerOpen(false)}
+        title={t('rbac.projects.memberManageTitle')}
+        subtitle={t('rbac.projects.memberManageDescription')}
+        storageKey="projectMemberDrawerWidth"
+        defaultWidth={550}
+        minWidth={400}
+      >
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+          {memberLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : memberProject ? (
+            <>
+              {/* Add member section */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Autocomplete
+                  sx={{ flex: 1 }}
+                  size="small"
+                  options={userSearchResults}
+                  getOptionLabel={(option) => `${option.name} (${option.email})`}
+                  loading={userSearchLoading}
+                  onInputChange={(_, value) => setUserSearchInput(value)}
+                  onChange={(_, value) => {
+                    if (!value) return;
+                    // Check if already a member or already pending add
+                    const alreadyMember = members.some((m) => m.userId === value.id);
+                    const alreadyPending = pendingChanges.add.some((m) => m.userId === value.id);
+                    if (alreadyMember || alreadyPending) return;
+                    setPendingChanges((prev) => ({
+                      ...prev,
+                      add: [...prev.add, { userId: value.id, name: value.name, email: value.email, projectRole: 'member' }],
+                      remove: prev.remove.filter((id) => id !== value.id),
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder={t('common.search')} />
+                  )}
+                  value={null}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  filterOptions={(x) => x}
+                  noOptionsText={t('common.noResults')}
+                />
+              </Box>
+
+              {/* Member list */}
+              {(pendingChanges.add.length > 0 || members.length > 0) ? (
+                <Box
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                  }}
+                >
+                  {/* Pending additions */}
+                  {pendingChanges.add.map((m, index) => (
+                    <Box
+                      key={`add-${m.userId}`}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        px: 2,
+                        py: 1,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
+                        <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Select
+                          size="small"
+                          value={m.projectRole}
+                          onChange={(e) => {
+                            const newRole = e.target.value as 'admin' | 'member';
+                            setPendingChanges((prev) => ({
+                              ...prev,
+                              add: prev.add.map((a) =>
+                                a.userId === m.userId ? { ...a, projectRole: newRole } : a
+                              ),
+                            }));
+                          }}
+                          sx={{ minWidth: 100 }}
+                        >
+                          <MenuItem value="member">{t('rbac.projects.roleMember')}</MenuItem>
+                          <MenuItem value="admin">{t('rbac.projects.roleAdmin')}</MenuItem>
+                        </Select>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setPendingChanges((prev) => ({
+                              ...prev,
+                              add: prev.add.filter((a) => a.userId !== m.userId),
+                            }));
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  ))}
+
+                  {/* Existing members */}
+                  {members
+                    .filter((m) => !pendingChanges.remove.includes(m.userId))
+                    .map((m, index, arr) => (
+                      <Box
+                        key={m.userId}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          px: 2,
+                          py: 1,
+                          borderBottom:
+                            index < arr.length - 1 ||
+                            members.some((rm) => pendingChanges.remove.includes(rm.userId))
+                              ? 1
+                              : 0,
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Select
+                            size="small"
+                            value={pendingChanges.roleChanges[m.userId] || m.projectRole}
+                            onChange={(e) => {
+                              const newRole = e.target.value as 'admin' | 'member';
+                              setPendingChanges((prev) => {
+                                const changes = { ...prev.roleChanges };
+                                if (newRole === m.projectRole) {
+                                  delete changes[m.userId];
+                                } else {
+                                  changes[m.userId] = newRole;
+                                }
+                                return { ...prev, roleChanges: changes };
+                              });
+                            }}
+                            sx={{ minWidth: 100 }}
+                          >
+                            <MenuItem value="member">{t('rbac.projects.roleMember')}</MenuItem>
+                            <MenuItem value="admin">{t('rbac.projects.roleAdmin')}</MenuItem>
+                          </Select>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setPendingChanges((prev) => ({
+                                ...prev,
+                                remove: [...prev.remove, m.userId],
+                                roleChanges: Object.fromEntries(
+                                  Object.entries(prev.roleChanges).filter(([k]) => k !== m.userId)
+                                ),
+                              }));
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" color="error" />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    ))}
+
+                  {/* Pending removals */}
+                  {members
+                    .filter((m) => pendingChanges.remove.includes(m.userId))
+                    .map((m, index, arr) => (
+                      <Box
+                        key={`rm-${m.userId}`}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          px: 2,
+                          py: 1,
+                          borderBottom: index < arr.length - 1 ? 1 : 0,
+                          borderColor: 'divider',
+                          opacity: 0.5,
+                        }}
+                      >
+                        <Box sx={{ flex: 1, minWidth: 0, textDecoration: 'line-through' }}>
+                          <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
+                        </Box>
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            setPendingChanges((prev) => ({
+                              ...prev,
+                              remove: prev.remove.filter((id) => id !== m.userId),
+                            }));
+                          }}
+                        >
+                          {t('common.restore')}
+                        </Button>
+                      </Box>
+                    ))}
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                  {t('rbac.projects.noMembers')}
+                </Typography>
+              )}
+            </>
+          ) : null}
+        </Box>
+        {/* Apply Button */}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button onClick={() => setMemberDrawerOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleApplyMembers}
+            disabled={memberApplying || !hasPendingMemberChanges}
+          >
+            {memberApplying ? <CircularProgress size={20} /> : t('common.apply')}
+          </Button>
+        </Box>
+      </ResizableDrawer>
     </Box>
   );
 };

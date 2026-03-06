@@ -342,6 +342,107 @@ router.delete(
   }
 );
 
+// ==================== Project Members ====================
+
+// GET /api/admin/rbac/projects/:id/members
+router.get('/projects/:id/members', async (req: any, res) => {
+  try {
+    const members = await db('g_project_members as pm')
+      .join('g_users as u', 'pm.userId', 'u.id')
+      .where('pm.projectId', req.params.id)
+      .select('pm.id', 'pm.projectId', 'pm.userId', 'pm.projectRole', 'pm.joinedAt', 'u.name', 'u.email');
+    res.json({ success: true, data: members });
+  } catch (error) {
+    logger.error('Error getting project members:', error);
+    res.status(500).json({ success: false, message: 'Failed to get project members' });
+  }
+});
+
+// POST /api/admin/rbac/projects/:id/members
+router.post(
+  '/projects/:id/members',
+  requireOrgPermission(ORG_PERMISSIONS.PROJECTS_WRITE) as any,
+  async (req: any, res) => {
+    try {
+      const { userId, projectRole } = req.body;
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'userId is required' });
+      }
+
+      // Check if user is already a member
+      const existing = await db('g_project_members')
+        .where({ projectId: req.params.id, userId })
+        .first();
+      if (existing) {
+        return res.status(409).json({ success: false, message: 'User is already a member' });
+      }
+
+      const id = generateULID();
+      await db('g_project_members').insert({
+        id,
+        projectId: req.params.id,
+        userId,
+        projectRole: projectRole || 'member',
+        invitedBy: req.user.id,
+      });
+      await permissionService.invalidateUserCache(userId);
+      res.status(201).json({ success: true, message: 'Member added successfully' });
+    } catch (error) {
+      logger.error('Error adding project member:', error);
+      res.status(500).json({ success: false, message: 'Failed to add member' });
+    }
+  }
+);
+
+// PUT /api/admin/rbac/projects/:id/members/:userId
+router.put(
+  '/projects/:id/members/:userId',
+  requireOrgPermission(ORG_PERMISSIONS.PROJECTS_WRITE) as any,
+  async (req: any, res) => {
+    try {
+      const { projectRole } = req.body;
+      if (!projectRole || !['admin', 'member'].includes(projectRole)) {
+        return res.status(400).json({
+          success: false,
+          message: 'projectRole must be "admin" or "member"',
+        });
+      }
+      const result = await db('g_project_members')
+        .where({ projectId: req.params.id, userId: req.params.userId })
+        .update({ projectRole });
+      if (result === 0) {
+        return res.status(404).json({ success: false, message: 'Member not found' });
+      }
+      await permissionService.invalidateUserCache(req.params.userId);
+      res.json({ success: true, message: 'Member role updated successfully' });
+    } catch (error) {
+      logger.error('Error updating project member role:', error);
+      res.status(500).json({ success: false, message: 'Failed to update member role' });
+    }
+  }
+);
+
+// DELETE /api/admin/rbac/projects/:id/members/:userId
+router.delete(
+  '/projects/:id/members/:userId',
+  requireOrgPermission(ORG_PERMISSIONS.PROJECTS_WRITE) as any,
+  async (req: any, res) => {
+    try {
+      const result = await db('g_project_members')
+        .where({ projectId: req.params.id, userId: req.params.userId })
+        .del();
+      if (result === 0) {
+        return res.status(404).json({ success: false, message: 'Member not found' });
+      }
+      await permissionService.invalidateUserCache(req.params.userId);
+      res.json({ success: true, message: 'Member removed successfully' });
+    } catch (error) {
+      logger.error('Error removing project member:', error);
+      res.status(500).json({ success: false, message: 'Failed to remove member' });
+    }
+  }
+);
+
 // ==================== Roles ====================
 
 // GET /api/admin/rbac/roles

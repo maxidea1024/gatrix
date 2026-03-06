@@ -241,6 +241,33 @@ export const rbacService = {
     await api.put(`${BASE}/organisations/${orgId}/members/${userId}`, { orgRole });
   },
 
+  // ─── Project Members ─────────────────────────
+
+  async getProjectMembers(projectId: string): Promise<any[]> {
+    const res = await api.get(`${BASE}/projects/${projectId}/members`);
+    return res.data;
+  },
+
+  async addProjectMember(
+    projectId: string,
+    userId: string,
+    projectRole: 'admin' | 'member' = 'member'
+  ): Promise<void> {
+    await api.post(`${BASE}/projects/${projectId}/members`, { userId, projectRole });
+  },
+
+  async removeProjectMember(projectId: string, userId: string): Promise<void> {
+    await api.delete(`${BASE}/projects/${projectId}/members/${userId}`);
+  },
+
+  async updateProjectMemberRole(
+    projectId: string,
+    userId: string,
+    projectRole: 'admin' | 'member'
+  ): Promise<void> {
+    await api.put(`${BASE}/projects/${projectId}/members/${userId}`, { projectRole });
+  },
+
   // ─── Admin API Tokens ─────────────────────────
 
   async getAdminTokens(): Promise<AdminApiToken[]> {
