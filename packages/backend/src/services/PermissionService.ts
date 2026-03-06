@@ -93,7 +93,7 @@ class PermissionService {
   }
 
   /**
-   * Check if user is an Org Admin
+   * Check if user has wildcard (*:*) permission at org scope via RBAC role bindings
    */
   async isOrgAdmin(userId: string, orgId: string): Promise<boolean> {
     const key = cacheKey.orgAdmin(userId, orgId);
@@ -105,11 +105,12 @@ class PermissionService {
       // Cache miss or error → fall through to DB
     }
 
-    const member = await db('g_organisation_members')
-      .where({ userId, orgId, orgRole: 'admin' })
-      .first();
-
-    const isAdmin = !!member;
+    // Check if user has a role with *:* permission at org scope
+    const roleIds = await this.getEffectiveRoleIds(userId, 'org', orgId);
+    let isAdmin = false;
+    if (roleIds.length > 0) {
+      isAdmin = await this.checkPermissionInRoles(roleIds, '*:*');
+    }
 
     try {
       await redis.set(key, isAdmin ? '1' : '0', CACHE_TTL.ORG_ADMIN);
