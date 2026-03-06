@@ -184,7 +184,7 @@ const LoginPage: React.FC = () => {
     watch,
     setValue,
   } = useForm<LoginCredentials & { rememberMe: boolean }>({
-    resolver,
+    resolver: resolver as any,
     mode: 'onChange', // 실시간 validation 활성화
     defaultValues: {
       email: '',
@@ -600,8 +600,8 @@ const LoginPage: React.FC = () => {
                   // Mask characters when using type=text on WebKit browsers
                   ...(isWebkit && !showPassword
                     ? {
-                        WebkitTextSecurity: 'disc',
-                      }
+                      WebkitTextSecurity: 'disc',
+                    }
                     : {}),
                   '&:-webkit-autofill': {
                     WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',

@@ -181,31 +181,31 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
                   href={
                     references.length > 0 && references[0].codeUrl
                       ? (() => {
-                          // Attempt to construct commit URL from codeURL
-                          // e.g. https://github.com/user/repo/blob/hash/file... -> https://github.com/user/repo/commit/hash
-                          try {
-                            const url = new URL(references[0].codeUrl);
-                            if (
-                              url.hostname.includes('github.com') ||
-                              url.hostname.includes('gitlab.com')
-                            ) {
-                              const parts = url.pathname.split('/');
-                              // find 'blob' or 'tree' and replace with 'commit' logic?
-                              // GitHub: /user/repo/blob/hash/file
-                              // Commit: /user/repo/commit/hash
-                              const blobIndex = parts.indexOf('blob');
-                              if (blobIndex !== -1 && parts.length > blobIndex + 1) {
-                                const hash = parts[blobIndex + 1];
-                                // Reconstruct base
-                                const basePath = parts.slice(0, blobIndex).join('/');
-                                return `${url.origin}${basePath}/commit/${hash}`;
-                              }
+                        // Attempt to construct commit URL from codeURL
+                        // e.g. https://github.com/user/repo/blob/hash/file... -> https://github.com/user/repo/commit/hash
+                        try {
+                          const url = new URL(references[0].codeUrl);
+                          if (
+                            url.hostname.includes('github.com') ||
+                            url.hostname.includes('gitlab.com')
+                          ) {
+                            const parts = url.pathname.split('/');
+                            // find 'blob' or 'tree' and replace with 'commit' logic?
+                            // GitHub: /user/repo/blob/hash/file
+                            // Commit: /user/repo/commit/hash
+                            const blobIndex = parts.indexOf('blob');
+                            if (blobIndex !== -1 && parts.length > blobIndex + 1) {
+                              const hash = parts[blobIndex + 1];
+                              // Reconstruct base
+                              const basePath = parts.slice(0, blobIndex).join('/');
+                              return `${url.origin}${basePath}/commit/${hash}`;
                             }
-                            return undefined;
-                          } catch {
-                            return undefined;
                           }
-                        })()
+                          return undefined;
+                        } catch {
+                          return undefined;
+                        }
+                      })()
                       : undefined
                   }
                   target="_blank"
@@ -375,6 +375,7 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
                         }}
                       >
                         <Box sx={{ px: 2, py: 1 }}>
+                          {/* @ts-expect-error react-syntax-highlighter type incompatibility with React 18 */}
                           <SyntaxHighlighter
                             language={ref.language?.toLowerCase() || 'typescript'}
                             style={syntaxStyle}
@@ -411,8 +412,9 @@ const FeatureFlagCodeReferences: React.FC<FeatureFlagCodeReferencesProps> = ({
             </TableBody>
           </Table>
         </TableContainer>
-      )}
-    </Box>
+      )
+      }
+    </Box >
   );
 };
 

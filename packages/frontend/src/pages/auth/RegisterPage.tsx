@@ -103,7 +103,7 @@ const RegisterPage: React.FC = () => {
     watch,
     setValue,
   } = useForm<RegisterData & { confirmPassword: string }>({
-    resolver,
+    resolver: resolver as any,
     mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
     defaultValues: {
       name: '',
@@ -727,8 +727,8 @@ const RegisterPage: React.FC = () => {
                   // Mask characters when using type=text on WebKit browsers
                   ...(isWebkit && !showPassword
                     ? {
-                        WebkitTextSecurity: 'disc',
-                      }
+                      WebkitTextSecurity: 'disc',
+                    }
                     : {}),
                   '&:-webkit-autofill': {
                     WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -845,8 +845,8 @@ const RegisterPage: React.FC = () => {
                     // Mask characters when using type=text on WebKit browsers
                     ...(isWebkit && !showConfirmPassword
                       ? {
-                          WebkitTextSecurity: 'disc',
-                        }
+                        WebkitTextSecurity: 'disc',
+                      }
                       : {}),
                     '&:-webkit-autofill': {
                       WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',

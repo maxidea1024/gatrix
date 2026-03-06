@@ -9,18 +9,26 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js",
+      "require": "./dist/errors/index.js",
       "default": "./dist/errors/index.js"
     },
     "./permissions": {
       "types": "./dist/permissions/index.d.ts",
+      "import": "./dist/permissions/index.js",
+      "require": "./dist/permissions/index.js",
       "default": "./dist/permissions/index.js"
     },
     "./features": {
       "types": "./dist/features/index.d.ts",
+      "import": "./dist/features/index.js",
+      "require": "./dist/features/index.js",
       "default": "./dist/features/index.js"
     }
   },
@@ -36,9 +44,7 @@
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.ts\""
   },
-  "dependencies": {
-    "murmurhash": "^2.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0",

@@ -67,7 +67,7 @@ import SearchTextField from '@/components/common/SearchTextField';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 // Helper: convert 'resource:action' to i18n key 'rbac.perm.resource.action'
-const permLabel = (t: (key: string, fallback?: string) => string, perm: string): string => {
+const permLabel = (t: any, perm: string): string => {
   const key = `rbac.perm.${perm.replace(':', '.')}`;
   return t(key, perm);
 };
@@ -804,10 +804,10 @@ const RolesPage: React.FC = () => {
   // Filtered roles
   const filteredRoles = debouncedSearchTerm
     ? roles.filter(
-        (r) =>
-          r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-          (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      )
+      (r) =>
+        r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    )
     : roles;
 
   // Dialog handlers
