@@ -24,7 +24,7 @@ export class AdminInvitationController {
       });
     }
 
-    const { email, role = 'user', expirationHours = 168 } = req.body; // 기본값: 168시간(7일)
+    const { email, expirationHours = 168 } = req.body; // 기본값: 168시간(7일)
     const userId = req.user?.id;
 
     if (!userId) {
@@ -74,7 +74,6 @@ export class AdminInvitationController {
       id: invitationId,
       token,
       email: email || null, // 이메일이 없으면 null로 저장
-      role,
       createdBy: userId,
       createdAt: new Date(),
       expiresAt,
@@ -120,7 +119,7 @@ export class AdminInvitationController {
   static getCurrent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
       const activeInvitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
+        .select(['id', 'token', 'email', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
         .where('isActive', true)
         .where('expiresAt', '>', new Date())
         .orderBy('createdAt', 'desc')
@@ -140,7 +139,6 @@ export class AdminInvitationController {
           id: activeInvitation.id,
           token: activeInvitation.token,
           email: activeInvitation.email,
-          role: activeInvitation.role,
           createdAt: activeInvitation.createdAt,
           expiresAt: activeInvitation.expiresAt,
           createdBy: activeInvitation.createdBy,
@@ -161,7 +159,7 @@ export class AdminInvitationController {
   static getInvitations = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
       const allInvitations = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
+        .select(['id', 'token', 'email', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
         .orderBy('createdAt', 'desc');
 
       res.json({
@@ -170,7 +168,6 @@ export class AdminInvitationController {
           id: inv.id,
           token: inv.token,
           email: inv.email,
-          role: inv.role,
           createdAt: inv.createdAt,
           expiresAt: inv.expiresAt,
           createdBy: inv.createdBy,
@@ -245,7 +242,7 @@ export const createInvitationValidation = [
     .isEmail()
     .withMessage('Valid email is required when provided')
     .normalizeEmail(),
-  body('role').optional().isIn(['user', 'admin']).withMessage('Role must be either user or admin'),
+
   body('expirationHours')
     .optional()
     .isInt({ min: 1, max: 8760 }) // 최소 1시간, 최대 1년(365*24)
