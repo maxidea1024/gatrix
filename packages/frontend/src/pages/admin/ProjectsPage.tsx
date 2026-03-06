@@ -53,7 +53,7 @@ const ProjectsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { refreshProjects, currentOrg, currentProjectId, organisations, switchContext } =
+  const { refreshProjects, currentOrg, currentProjectId, organisations } =
     useOrgProject();
 
   // Resolve the parent org from URL param or current context
@@ -104,9 +104,9 @@ const ProjectsPage: React.FC = () => {
   };
 
   // Load projects and filter by effective org
-  const loadProjects = useCallback(async () => {
+  const loadProjects = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const projectData = await orgProjectService.getProjects();
       // Filter by the effective org (URL param or current context)
       const orgId = effectiveOrg?.id;
@@ -122,7 +122,7 @@ const ProjectsPage: React.FC = () => {
     } catch {
       enqueueSnackbar(t('rbac.projects.loadFailed'), { variant: 'error' });
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [enqueueSnackbar, t, effectiveOrg?.id]);
 
@@ -224,7 +224,7 @@ const ProjectsPage: React.FC = () => {
         enqueueSnackbar(t('rbac.projects.updateSuccess'), { variant: 'success' });
       }
       setDialogOpen(false);
-      loadProjects();
+      loadProjects(true);
       refreshProjects();
     } catch (error: any) {
       const message = error?.response?.data?.message || t('rbac.projects.saveFailed');
@@ -243,7 +243,7 @@ const ProjectsPage: React.FC = () => {
       enqueueSnackbar(t('rbac.projects.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setDeleteTarget(null);
-      loadProjects();
+      loadProjects(true);
       refreshProjects();
     } catch (error: any) {
       const message = error?.response?.data?.message || t('rbac.projects.deleteFailed');
@@ -341,8 +341,8 @@ const ProjectsPage: React.FC = () => {
                 </IconButton>
 
                 <CardActionArea
+                  disableRipple
                   onClick={() => {
-                    switchContext(proj.orgId, proj.id);
                     navigate(`/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`);
                   }}
                 >
@@ -484,7 +484,6 @@ const ProjectsPage: React.FC = () => {
                             key={env.environmentId}
                             sx={{ pl: 4, py: 0.25 }}
                             onClick={() => {
-                              switchContext(proj.orgId, proj.id);
                               navigate(
                                 `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
                               );
@@ -507,7 +506,6 @@ const ProjectsPage: React.FC = () => {
                           <ListItemButton
                             sx={{ pl: 4, py: 0.25 }}
                             onClick={() => {
-                              switchContext(proj.orgId, proj.id);
                               navigate(
                                 `/admin/environments?orgId=${proj.orgId}&projectId=${proj.id}`
                               );
@@ -574,6 +572,11 @@ const ProjectsPage: React.FC = () => {
         storageKey="projectsDrawerWidth"
         defaultWidth={450}
         minWidth={380}
+        subtitle={
+          dialogMode === 'create'
+            ? t('rbac.projects.createDescription')
+            : t('rbac.projects.editDescription')
+        }
       >
         <Box
           sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
@@ -586,6 +589,8 @@ const ProjectsPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
             disabled={dialogMode === 'edit'}
             autoFocus
+            required
+            helperText={t('rbac.projects.nameHelp')}
           />
           <TextField
             fullWidth
@@ -593,6 +598,8 @@ const ProjectsPage: React.FC = () => {
             label={t('rbac.projects.displayName')}
             value={formData.displayName}
             onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+            required
+            helperText={t('rbac.projects.displayNameHelp')}
           />
           <TextField
             fullWidth
@@ -602,6 +609,7 @@ const ProjectsPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             multiline
             rows={3}
+            helperText={t('rbac.projects.descriptionHelp')}
           />
         </Box>
         <Box
@@ -618,8 +626,23 @@ const ProjectsPage: React.FC = () => {
           <Button onClick={() => setDialogOpen(false)} disabled={saving}>
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving || !isEditDirty}>
-            {saving ? <CircularProgress size={20} /> : t('common.save')}
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={
+              saving ||
+              (dialogMode === 'create'
+                ? !formData.projectName.trim() || !formData.displayName.trim()
+                : !isEditDirty)
+            }
+          >
+            {saving ? (
+              <CircularProgress size={20} />
+            ) : dialogMode === 'create' ? (
+              t('common.add')
+            ) : (
+              t('common.save')
+            )}
           </Button>
         </Box>
       </ResizableDrawer>
