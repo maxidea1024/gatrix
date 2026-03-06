@@ -281,6 +281,29 @@ export const rbacService = {
     const res = await api.get(`${BASE}/permissions`);
     return res.data;
   },
+
+  // ─── Role Inheritance ─────────────────────────
+
+  async getRoleInheritance(roleId: string): Promise<RoleInheritance[]> {
+    const res = await api.get(`${BASE}/roles/${roleId}/inheritance`);
+    return res.data;
+  },
+
+  async addRoleInheritance(roleId: string, parentRoleId: string): Promise<{ id: string }> {
+    const res = await api.post(`${BASE}/roles/${roleId}/inheritance`, { parentRoleId });
+    return res.data;
+  },
+
+  async removeRoleInheritance(roleId: string, inheritanceId: string): Promise<void> {
+    await api.delete(`${BASE}/roles/${roleId}/inheritance/${inheritanceId}`);
+  },
 };
+
+export interface RoleInheritance {
+  id: string;
+  parentRoleId: string;
+  parentRoleName: string;
+  createdAt: string;
+}
 
 export default rbacService;

@@ -6,7 +6,8 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "packages/sdks/*"
+    "packages/sdks/*",
+    "packages/evaluator"
   ],
   "scripts": {
     "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:edge\"",
@@ -23,7 +24,7 @@
     "infra:down": "docker compose -f docker-compose-infra.yml down",
     "infra:logs": "docker compose -f docker-compose-infra.yml logs -f",
     "build": "yarn build:shared && yarn build:sdk && yarn build:docs && yarn build:apps",
-    "build:shared": "yarn workspace @gatrix/shared build",
+    "build:shared": "yarn workspace @gatrix/shared build && yarn workspace @gatrix/evaluator build",
     "build:sdk": "yarn workspace @gatrix/server-sdk build",
     "build:apps": "concurrently -n backend,frontend,edge,event-lens,chat-server -c blue,green,cyan,yellow,magenta \"yarn build:backend\" \"yarn build:frontend\" \"yarn build:edge\" \"yarn build:event-lens\" \"yarn build:chat-server\"",
     "build:backend": "yarn workspace @gatrix/backend build",

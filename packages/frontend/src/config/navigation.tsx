@@ -5,10 +5,10 @@
  * To add a new menu item, only modify MENU_CONFIG below.
  *
  * Icon names: See menuIcons.ts for available icons
- * Permission shorthand: 'users' auto-expands to ['users.view', 'users.manage']
+ * Permission shorthand: 'users' auto-expands to ['users:read', 'users:update']
  */
 import React from 'react';
-import { Permission, PERMISSIONS } from '@/types/permissions';
+import { Permission, P } from '@/types/permissions';
 import { getIcon } from './menuIcons';
 
 // ==================== Types ====================
@@ -20,7 +20,7 @@ export interface MenuItemConfig {
   icon: string;
   /** Route path (if navigable) */
   path?: string;
-  /** Permission shorthand (e.g., 'users' -> 'users.view', 'users.manage') */
+  /** Permission shorthand (e.g., 'users' -> 'users:read', 'users:update') */
   permission?: string;
   /** Explicit permissions (overrides permission shorthand) */
   requiredPermission?: Permission | Permission[];
@@ -86,21 +86,21 @@ export interface MenuCategory {
 
 /**
  * Expand permission shorthand to full permission array
- * e.g., 'users' -> [PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]
+ * e.g., 'users' -> [P.USERS_READ, P.USERS_UPDATE]
  */
 function expandPermission(shorthand: string): Permission[] {
   const key = shorthand.toUpperCase().replace(/-/g, '_');
-  const viewKey = `${key}_VIEW` as keyof typeof PERMISSIONS;
-  const manageKey = `${key}_MANAGE` as keyof typeof PERMISSIONS;
+  const readKey = `${key}_READ` as keyof typeof P;
+  const updateKey = `${key}_UPDATE` as keyof typeof P;
 
   const permissions: Permission[] = [];
-  if (PERMISSIONS[viewKey]) permissions.push(PERMISSIONS[viewKey]);
-  if (PERMISSIONS[manageKey]) permissions.push(PERMISSIONS[manageKey]);
+  if (P[readKey]) permissions.push(P[readKey]);
+  if (P[updateKey]) permissions.push(P[updateKey]);
 
-  // If no view/manage, try direct key (e.g., AUDIT_LOGS_VIEW)
+  // If no read/update, try access key (e.g., CONSOLE_ACCESS, CHAT_ACCESS)
   if (permissions.length === 0) {
-    const directKey = key as keyof typeof PERMISSIONS;
-    if (PERMISSIONS[directKey]) permissions.push(PERMISSIONS[directKey]);
+    const accessKey = `${key}_ACCESS` as keyof typeof P;
+    if (P[accessKey]) permissions.push(P[accessKey]);
   }
 
   return permissions;
@@ -499,19 +499,19 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         text: 'sidebar.auditLogs',
         icon: 'History',
         path: '/admin/audit-logs',
-        requiredPermission: PERMISSIONS.AUDIT_LOGS_VIEW,
+        requiredPermission: P.AUDIT_LOGS_READ,
       },
       {
         text: 'sidebar.realtimeEvents',
         icon: 'Timeline',
         path: '/admin/realtime-events',
-        requiredPermission: PERMISSIONS.REALTIME_EVENTS_VIEW,
+        requiredPermission: P.REALTIME_EVENTS_READ,
       },
       {
         text: 'sidebar.crashEvents',
         icon: 'BugReport',
         path: '/admin/crash-events',
-        requiredPermission: PERMISSIONS.CRASH_EVENTS_VIEW,
+        requiredPermission: P.CRASH_EVENTS_READ,
       },
       {
         text: 'sidebar.security',
@@ -547,38 +547,38 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
             text: 'sidebar.serverLifecycle',
             icon: 'History',
             path: '/admin/server-lifecycle',
-            requiredPermission: PERMISSIONS.SERVERS_VIEW,
+            requiredPermission: P.SERVERS_READ,
           },
           {
             text: 'sidebar.gatrixEdges',
             icon: 'Dns',
             path: '/admin/gatrix-edges',
-            requiredPermission: PERMISSIONS.SERVERS_VIEW,
+            requiredPermission: P.SERVERS_READ,
           },
         ],
       },
       {
         text: 'sidebar.monitoring',
         icon: 'Monitor',
-        requiredPermission: PERMISSIONS.MONITORING_VIEW,
+        requiredPermission: P.MONITORING_READ,
         children: [
           {
             text: 'sidebar.grafana',
             icon: 'Monitor',
             path: '/admin/grafana-dashboard',
-            requiredPermission: PERMISSIONS.MONITORING_VIEW,
+            requiredPermission: P.MONITORING_READ,
           },
           {
             text: 'sidebar.logs',
             icon: 'Monitor',
             path: '/monitoring/logs',
-            requiredPermission: PERMISSIONS.MONITORING_VIEW,
+            requiredPermission: P.MONITORING_READ,
           },
           {
             text: 'sidebar.alerts',
             icon: 'Notifications',
             path: '/monitoring/alerts',
-            requiredPermission: PERMISSIONS.MONITORING_VIEW,
+            requiredPermission: P.MONITORING_READ,
           },
         ],
       },
@@ -586,13 +586,13 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         text: 'sidebar.openApi',
         icon: 'Api',
         path: '/admin/open-api',
-        requiredPermission: PERMISSIONS.OPEN_API_VIEW,
+        requiredPermission: P.OPEN_API_READ,
       },
       {
         text: 'sidebar.console',
         icon: 'Terminal',
         path: '/admin/console',
-        requiredPermission: PERMISSIONS.CONSOLE_ACCESS,
+        requiredPermission: P.CONSOLE_ACCESS,
       },
       {
         text: 'settings.systemSettings',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
 import {
   Box,
@@ -59,7 +59,7 @@ const FeatureFlagTypesPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
+  const canManage = hasPermission([P.FEATURES_UPDATE]);
 
   // State
   const [types, setTypes] = useState<FlagType[]>([]);

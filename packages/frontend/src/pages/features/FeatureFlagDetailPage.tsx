@@ -90,7 +90,7 @@ import {
 } from '@mui/icons-material';
 import FieldTypeIcon from '../../components/common/FieldTypeIcon';
 import { useAuth } from '../../contexts/AuthContext';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
@@ -397,7 +397,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const { currentEnvironmentId: selectedEnvironment } = useEnvironment();
-  const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
+  const canManage = hasPermission([P.FEATURES_UPDATE]);
 
   const isCreating = flagName === 'new';
 

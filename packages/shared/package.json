@@ -15,9 +15,13 @@
       "types": "./dist/errors/index.d.ts",
       "default": "./dist/errors/index.js"
     },
-    "./evaluation": {
-      "types": "./dist/evaluation/index.d.ts",
-      "default": "./dist/evaluation/index.js"
+    "./permissions": {
+      "types": "./dist/permissions/index.d.ts",
+      "default": "./dist/permissions/index.js"
+    },
+    "./features": {
+      "types": "./dist/features/index.d.ts",
+      "default": "./dist/features/index.js"
     }
   },
   "files": [

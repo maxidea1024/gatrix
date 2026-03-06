@@ -1,23 +1,21 @@
 /**
  * PermissionService - RBAC Permission Calculation Engine
  *
- * Implements the 3-level permission check (Org ??Project ??Environment)
- * with Redis caching for performance.
+ * Implements 4-level permission check (System > Org > Project > Environment)
+ * with wildcard matching, role inheritance, and instance wildcards.
  *
  * Permission check order:
- * 1. Org Admin check ??immediate grant
- * 2. Collect roleIds (direct + group)
- * 3. Admin flag check (Project Admin, Env Admin)
- * 4. Exact permission match
- * 5. write ??read fallback
+ * 1. Org Admin check → immediate grant (replaces super admin email check)
+ * 2. Collect roleIds (direct + group + inherited)
+ * 3. Instance wildcard check (projectId='*' or environmentId='*')
+ * 4. Specific instance permission check
+ * 5. Permission wildcard matching (resource:*, *:read, *:*)
  */
 
 import db from '../config/knex';
 import redis from '../config/redis';
 import logger from '../config/logger';
-
-// Super admin email - has full system privileges across all resources
-const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
+import { matchSingle, MAX_INHERITANCE_DEPTH, INSTANCE_WILDCARD } from '@gatrix/shared/permissions';
 
 // Cache TTL constants (in seconds)
 const CACHE_TTL = {
@@ -29,7 +27,6 @@ const CACHE_TTL = {
 // Cache key builders
 const cacheKey = {
   orgAdmin: (userId: string, orgId: string) => `rbac:org_admin:${userId}:${orgId}`,
-  superAdmin: (userId: string) => `rbac:super_admin:${userId}`,
   userRoles: (userId: string) => `rbac:user_roles:${userId}`,
   orgPerms: (roleId: string) => `rbac:org_perms:${roleId}`,
   projectPerms: (roleId: string, projectId: string) => `rbac:proj_perms:${roleId}:${projectId}`,
@@ -43,34 +40,20 @@ class PermissionService {
    * Check if user has an organisation-level permission
    */
   async hasOrgPermission(userId: string, orgId: string, perm: string): Promise<boolean> {
-    // 0. Super Admin bypass
-    if (await this.isSuperAdmin(userId)) return true;
-
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
-    // 2. Collect all roleIds
+    // 2. Collect all roleIds (direct + group + inherited)
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return false;
 
-    // 3. Check exact permission
-    const hasExact = await db('g_role_org_permissions')
+    // 3. Get all org permissions for these roles
+    const perms = await db('g_role_org_permissions')
       .whereIn('roleId', roleIds)
-      .where('permission', perm)
-      .first();
-    if (hasExact) return true;
+      .select('permission');
 
-    // 4. write → read fallback
-    if (perm.endsWith('.read')) {
-      const writePerm = perm.replace('.read', '.write');
-      const hasWrite = await db('g_role_org_permissions')
-        .whereIn('roleId', roleIds)
-        .where('permission', writePerm)
-        .first();
-      if (hasWrite) return true;
-    }
-
-    return false;
+    // 4. Check with wildcard matching
+    return perms.some((row: any) => matchSingle(row.permission, perm));
   }
 
   /**
@@ -82,43 +65,27 @@ class PermissionService {
     projectId: string,
     perm: string
   ): Promise<boolean> {
-    // 0. Super Admin bypass
-    if (await this.isSuperAdmin(userId)) return true;
-
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return false;
 
-    // 2. Project Admin → all project + env permissions
-    const isProjectAdmin = await db('g_role_project_permissions')
+    // 2. Check instance wildcard (projectId='*') permissions
+    const wildcardPerms = await db('g_role_project_permissions')
+      .whereIn('roleId', roleIds)
+      .where('projectId', INSTANCE_WILDCARD)
+      .select('permission');
+
+    if (wildcardPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
+
+    // 3. Check specific project permissions
+    const specificPerms = await db('g_role_project_permissions')
       .whereIn('roleId', roleIds)
       .where('projectId', projectId)
-      .where('isAdmin', true)
-      .first();
-    if (isProjectAdmin) return true;
+      .select('permission');
 
-    // 3. Check exact permission
-    const hasExact = await db('g_role_project_permissions')
-      .whereIn('roleId', roleIds)
-      .where('projectId', projectId)
-      .where('permission', perm)
-      .first();
-    if (hasExact) return true;
-
-    // 4. write → read fallback
-    if (perm.endsWith('.read')) {
-      const writePerm = perm.replace('.read', '.write');
-      const hasWrite = await db('g_role_project_permissions')
-        .whereIn('roleId', roleIds)
-        .where('projectId', projectId)
-        .where('permission', writePerm)
-        .first();
-      if (hasWrite) return true;
-    }
-
-    return false;
+    return specificPerms.some((row: any) => matchSingle(row.permission, perm));
   }
 
   /**
@@ -131,67 +98,57 @@ class PermissionService {
     environmentId: string,
     perm: string
   ): Promise<boolean> {
-    // 0. Super Admin bypass
-    if (await this.isSuperAdmin(userId)) return true;
-
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return false;
 
-    // 2. Project Admin → all env permissions
-    const isProjectAdmin = await db('g_role_project_permissions')
+    // 2. Project Admin check (projectId='*' with *:*)
+    const projWildcardPerms = await db('g_role_project_permissions')
+      .whereIn('roleId', roleIds)
+      .where('projectId', INSTANCE_WILDCARD)
+      .select('permission');
+
+    if (projWildcardPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
+
+    // 3. Specific project *:* check (project admin for this project → all env permissions)
+    const projSpecificPerms = await db('g_role_project_permissions')
       .whereIn('roleId', roleIds)
       .where('projectId', projectId)
-      .where('isAdmin', true)
-      .first();
-    if (isProjectAdmin) return true;
+      .select('permission');
 
-    // 3. Env Admin → all env permissions for this environment
-    const isEnvAdmin = await db('g_role_environment_permissions')
+    if (projSpecificPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
+
+    // 4. Check instance wildcard (environmentId='*') permissions
+    const envWildcardPerms = await db('g_role_environment_permissions')
+      .whereIn('roleId', roleIds)
+      .where('environmentId', INSTANCE_WILDCARD)
+      .select('permission');
+
+    if (envWildcardPerms.some((row: any) => matchSingle(row.permission, perm))) return true;
+
+    // 5. Check specific environment permissions
+    const envSpecificPerms = await db('g_role_environment_permissions')
       .whereIn('roleId', roleIds)
       .where('environmentId', environmentId)
-      .where('isAdmin', true)
-      .first();
-    if (isEnvAdmin) return true;
+      .select('permission');
 
-    // 4. Check exact permission
-    const hasExact = await db('g_role_environment_permissions')
-      .whereIn('roleId', roleIds)
-      .where('environmentId', environmentId)
-      .where('permission', perm)
-      .first();
-    if (hasExact) return true;
-
-    // 5. write → read fallback
-    if (perm.endsWith('.read')) {
-      const writePerm = perm.replace('.read', '.write');
-      const hasWrite = await db('g_role_environment_permissions')
-        .whereIn('roleId', roleIds)
-        .where('environmentId', environmentId)
-        .where('permission', writePerm)
-        .first();
-      if (hasWrite) return true;
-    }
-
-    return false;
+    return envSpecificPerms.some((row: any) => matchSingle(row.permission, perm));
   }
 
   /**
-   * Check if user is an Org Admin (or Super Admin)
+   * Check if user is an Org Admin
+   * Replaces the old isSuperAdmin() email-based check.
    */
   async isOrgAdmin(userId: string, orgId: string): Promise<boolean> {
-    // Super Admin is always org admin
-    if (await this.isSuperAdmin(userId)) return true;
-
     const key = cacheKey.orgAdmin(userId, orgId);
 
     try {
       const cached = await redis.get(key);
       if (cached !== null) return cached === '1';
     } catch {
-      // Cache miss or error ??fall through to DB
+      // Cache miss or error → fall through to DB
     }
 
     const member = await db('g_organisation_members')
@@ -230,7 +187,6 @@ class PermissionService {
       query.where('orgId', orgId);
     }
 
-    // Return first membership (or specific org if provided)
     const membership = await query.first();
     if (!membership) return null;
 
@@ -259,15 +215,12 @@ class PermissionService {
   }
 
   /**
-   * Resolve environment ??projectId ??orgId chain
+   * Resolve environment → projectId → orgId chain
    */
   async resolveEnvironmentChain(
     environmentId: string
   ): Promise<{ projectId: string; orgId: string } | null> {
-    const env = await db('g_environments')
-      .where('environmentId', environmentId)
-      .select('projectId')
-      .first();
+    const env = await db('g_environments').where('id', environmentId).select('projectId').first();
 
     if (!env?.projectId) return null;
 
@@ -293,11 +246,12 @@ class PermissionService {
 
   /**
    * Get all project IDs accessible by a user within an org.
-   * Org Admin / Super Admin → all active projects in the org.
+   * Org Admin → all active projects in the org.
+   * Instance wildcard (projectId='*') → all active projects.
    * Otherwise → projects where user has any project-level or environment-level permission.
    */
   async getAccessibleProjectIds(userId: string, orgId: string): Promise<string[]> {
-    // Org Admin or Super Admin → all projects
+    // Org Admin → all projects
     if (await this.isOrgAdmin(userId, orgId)) {
       const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
       return allProjects.map((p: any) => p.id);
@@ -305,6 +259,17 @@ class PermissionService {
 
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return [];
+
+    // Check for instance wildcard (projectId='*')
+    const hasWildcard = await db('g_role_project_permissions')
+      .whereIn('roleId', roleIds)
+      .where('projectId', INSTANCE_WILDCARD)
+      .first();
+
+    if (hasWildcard) {
+      const allProjects = await db('g_projects').where({ orgId, isActive: true }).select('id');
+      return allProjects.map((p: any) => p.id);
+    }
 
     // Projects with direct project-level permissions
     const projectPerms = await db('g_role_project_permissions')
@@ -330,7 +295,8 @@ class PermissionService {
 
   /**
    * Get all environment IDs accessible by a user within a project.
-   * Org Admin / Project Admin → all active environments.
+   * Org Admin / Project Admin → all environments.
+   * Instance wildcard (environmentId='*') → all environments.
    * Otherwise → environments where user has any environment-level permission.
    */
   async getAccessibleEnvironmentIds(
@@ -347,13 +313,27 @@ class PermissionService {
     const roleIds = await this.getAllRoleIds(userId);
     if (roleIds.length === 0) return [];
 
-    // Project Admin → all environments
-    const isProjectAdmin = await db('g_role_project_permissions')
+    // Project Admin check (projectId='*' or specific project with *:*)
+    const projPerms = await db('g_role_project_permissions')
       .whereIn('roleId', roleIds)
-      .where('projectId', projectId)
-      .where('isAdmin', true)
-      .first();
+      .where(function (this: any) {
+        this.where('projectId', projectId).orWhere('projectId', INSTANCE_WILDCARD);
+      })
+      .select('permission');
+
+    const isProjectAdmin = projPerms.some((row: any) => matchSingle(row.permission, '*:*'));
     if (isProjectAdmin) {
+      const allEnvs = await db('g_environments').where({ projectId }).select('id');
+      return allEnvs.map((e: any) => e.id);
+    }
+
+    // Instance wildcard (environmentId='*')
+    const hasEnvWildcard = await db('g_role_environment_permissions')
+      .whereIn('roleId', roleIds)
+      .where('environmentId', INSTANCE_WILDCARD)
+      .first();
+
+    if (hasEnvWildcard) {
       const allEnvs = await db('g_environments').where({ projectId }).select('id');
       return allEnvs.map((e: any) => e.id);
     }
@@ -368,6 +348,64 @@ class PermissionService {
     return Array.from(new Set(envPerms.map((e: any) => e.id)));
   }
 
+  // ==================== Permission Preview ====================
+
+  /**
+   * Get all effective permissions for a user (for preview UI).
+   * Collects permissions from all sources: direct roles, group roles, inherited roles.
+   */
+  async getUserEffectivePermissions(
+    userId: string,
+    orgId: string
+  ): Promise<{
+    orgPermissions: Array<{ permission: string; source: string }>;
+    projectPermissions: Array<{ projectId: string; permission: string; source: string }>;
+    envPermissions: Array<{ environmentId: string; permission: string; source: string }>;
+  }> {
+    const roleIds = await this.getAllRoleIds(userId);
+
+    // Get role info for source tracking
+    const roleInfo = await this.getRoleSourceInfo(userId);
+
+    const orgPerms: Array<{ permission: string; source: string }> = [];
+    const projectPerms: Array<{ projectId: string; permission: string; source: string }> = [];
+    const envPerms: Array<{ environmentId: string; permission: string; source: string }> = [];
+
+    for (const roleId of roleIds) {
+      const source = roleInfo.get(roleId) || 'unknown';
+
+      // Org perms
+      const orgRows = await db('g_role_org_permissions')
+        .where('roleId', roleId)
+        .select('permission');
+      for (const row of orgRows) {
+        orgPerms.push({ permission: row.permission, source });
+      }
+
+      // Project perms
+      const projRows = await db('g_role_project_permissions')
+        .where('roleId', roleId)
+        .select('projectId', 'permission');
+      for (const row of projRows) {
+        projectPerms.push({ projectId: row.projectId, permission: row.permission, source });
+      }
+
+      // Env perms
+      const envRows = await db('g_role_environment_permissions')
+        .where('roleId', roleId)
+        .select('environmentId', 'permission');
+      for (const row of envRows) {
+        envPerms.push({ environmentId: row.environmentId, permission: row.permission, source });
+      }
+    }
+
+    return {
+      orgPermissions: orgPerms,
+      projectPermissions: projectPerms,
+      envPermissions: envPerms,
+    };
+  }
+
   // ==================== Cache Invalidation ====================
 
   /**
@@ -375,8 +413,6 @@ class PermissionService {
    */
   async invalidateUserCache(userId: string): Promise<void> {
     try {
-      // We need to scan for all keys matching this user
-      // For simplicity, invalidate known keys
       const client = redis.getClient();
       const keys = await client.keys(`rbac:*:${userId}:*`);
       const roleKey = cacheKey.userRoles(userId);
@@ -421,34 +457,7 @@ class PermissionService {
   // ==================== Internal Helpers ====================
 
   /**
-   * Check if user is a super admin (admin@gatrix.com)
-   * Super admin has full system privileges across all resources.
-   */
-  async isSuperAdmin(userId: string): Promise<boolean> {
-    const key = cacheKey.superAdmin(userId);
-
-    try {
-      const cached = await redis.get(key);
-      if (cached !== null) return cached === '1';
-    } catch {
-      // Cache miss or error
-    }
-
-    const user = await db('g_users').where('id', userId).select('email').first();
-
-    const isSuper = user?.email === SUPER_ADMIN_EMAIL;
-
-    try {
-      await redis.set(key, isSuper ? '1' : '0', CACHE_TTL.ORG_ADMIN);
-    } catch {
-      // Non-critical
-    }
-
-    return isSuper;
-  }
-
-  /**
-   * Get all roleIds for a user (direct roles + group roles), with caching
+   * Get all roleIds for a user (direct roles + group roles + inherited), with caching
    */
   async getAllRoleIds(userId: string): Promise<string[]> {
     const key = cacheKey.userRoles(userId);
@@ -469,17 +478,113 @@ class PermissionService {
       .where('gm.userId', userId)
       .select('gr.roleId');
 
-    const all = Array.from(
-      new Set([...directRoles.map((r: any) => r.roleId), ...groupRoles.map((r: any) => r.roleId)])
-    );
+    const baseRoleIds = new Set([
+      ...directRoles.map((r: any) => r.roleId),
+      ...groupRoles.map((r: any) => r.roleId),
+    ]);
+
+    // Resolve inherited roles
+    const allRoleIds = await this.resolveInheritedRoles(Array.from(baseRoleIds));
 
     try {
-      await redis.set(key, JSON.stringify(all), CACHE_TTL.USER_ROLES);
+      await redis.set(key, JSON.stringify(allRoleIds), CACHE_TTL.USER_ROLES);
     } catch {
       // Non-critical
     }
 
-    return all;
+    return allRoleIds;
+  }
+
+  /**
+   * Recursively resolve inherited roles (max depth to prevent cycles)
+   */
+  private async resolveInheritedRoles(roleIds: string[], depth: number = 0): Promise<string[]> {
+    if (depth >= MAX_INHERITANCE_DEPTH || roleIds.length === 0) {
+      return roleIds;
+    }
+
+    const parentRoles = await db('g_role_inheritance')
+      .whereIn('roleId', roleIds)
+      .select('parentRoleId');
+
+    const parentIds = parentRoles
+      .map((r: any) => r.parentRoleId)
+      .filter((id: string) => !roleIds.includes(id)); // Prevent cycles
+
+    if (parentIds.length === 0) {
+      return roleIds;
+    }
+
+    // Recursively resolve parent roles
+    const allParentIds = await this.resolveInheritedRoles([...roleIds, ...parentIds], depth + 1);
+
+    return Array.from(new Set([...roleIds, ...allParentIds]));
+  }
+
+  /**
+   * Detect if adding parentRoleId as parent of roleId would create a cycle.
+   * Uses BFS to trace the ancestry of parentRoleId; if roleId appears, it's a cycle.
+   */
+  async wouldCreateCycle(roleId: string, parentRoleId: string): Promise<boolean> {
+    if (roleId === parentRoleId) return true;
+
+    const visited = new Set<string>([roleId]);
+    const queue = [parentRoleId];
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (visited.has(current)) return true;
+      visited.add(current);
+
+      // Check depth limit
+      if (visited.size > MAX_INHERITANCE_DEPTH + 2) return true;
+
+      const parents = await db('g_role_inheritance')
+        .where('roleId', current)
+        .select('parentRoleId');
+
+      for (const p of parents) {
+        if (!visited.has(p.parentRoleId)) {
+          queue.push(p.parentRoleId);
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Get source info (role name + how assigned) for each roleId
+   * Returns Map<roleId, sourceLabel>
+   */
+  private async getRoleSourceInfo(userId: string): Promise<Map<string, string>> {
+    const sourceMap = new Map<string, string>();
+
+    // Direct roles
+    const directRoles = await db('g_user_roles as ur')
+      .join('g_roles as r', 'ur.roleId', 'r.id')
+      .where('ur.userId', userId)
+      .select('r.id', 'r.roleName');
+
+    for (const role of directRoles) {
+      sourceMap.set(role.id, `${role.roleName} (direct)`);
+    }
+
+    // Group roles
+    const groupRoles = await db('g_group_members as gm')
+      .join('g_group_roles as gr', 'gm.groupId', 'gr.groupId')
+      .join('g_roles as r', 'gr.roleId', 'r.id')
+      .join('g_groups as g', 'gm.groupId', 'g.id')
+      .where('gm.userId', userId)
+      .select('r.id', 'r.roleName', 'g.groupName');
+
+    for (const role of groupRoles) {
+      if (!sourceMap.has(role.id)) {
+        sourceMap.set(role.id, `${role.roleName} (${role.groupName})`);
+      }
+    }
+
+    return sourceMap;
   }
 }
 

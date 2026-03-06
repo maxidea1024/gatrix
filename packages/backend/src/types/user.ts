@@ -59,7 +59,7 @@ export interface UpdateUserData {
   forceToEditorMode?: boolean;
 }
 
-export interface UserWithoutPassword extends Omit<User, 'passwordHash'> { }
+export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 
 export interface OAuthAccount {
   id: string;

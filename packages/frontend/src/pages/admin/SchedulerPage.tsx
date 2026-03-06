@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -151,7 +151,7 @@ const SchedulerPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const calendarRef = useRef<FullCalendar>(null);
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
+  const canManage = hasPermission([P.SCHEDULER_UPDATE]);
 
   // State
   const [events, setEvents] = useState<ScheduleEvent[]>([]);

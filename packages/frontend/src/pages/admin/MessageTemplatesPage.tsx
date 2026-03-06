@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
@@ -177,7 +177,7 @@ const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE]);
+  const canManage = hasPermission([P.MAINTENANCE_TEMPLATES_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const [items, setItems] = useState<MessageTemplate[]>([]);

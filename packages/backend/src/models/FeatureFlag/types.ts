@@ -5,9 +5,14 @@ import { parseJsonField } from '../../utils/dbUtils';
 
 // Re-export shared types for backward compatibility
 // All consumers that import from this file still work unchanged
-export type { ValueType, ConstraintOperator, StrategyParameters, Constraint } from '@gatrix/shared';
+export type {
+  ValueType,
+  ConstraintOperator,
+  StrategyParameters,
+  Constraint,
+} from '@gatrix/evaluator';
 
-import type { Constraint, StrategyParameters, ValueType } from '@gatrix/shared';
+import type { Constraint, StrategyParameters, ValueType } from '@gatrix/evaluator';
 
 // ==================== Backend-only Types ====================
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -67,7 +67,7 @@ const SurveysPage: React.FC = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.SURVEYS_MANAGE]);
+  const canManage = hasPermission([P.SURVEYS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

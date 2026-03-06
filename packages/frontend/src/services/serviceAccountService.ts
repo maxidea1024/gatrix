@@ -15,7 +15,7 @@ export interface ServiceAccount {
 export interface ServiceAccountToken {
   id: number;
   serviceAccountId: string;
-  tokenName: string;
+  name: string;
   description: string | null;
   isActive: boolean;
   expiresAt: string | null;

@@ -124,11 +124,7 @@ class ConsoleService {
       .action(async (_args, ctx) => {
         const u = ctx?.user;
         if (!u) return { output: 'Not authenticated' };
-        const lines = [
-          `ID: ${u.id ?? ''}`,
-          `Name: ${u.name ?? ''}`,
-          `Email: ${u.email ?? ''}`,
-        ];
+        const lines = [`ID: ${u.id ?? ''}`, `Name: ${u.name ?? ''}`, `Email: ${u.email ?? ''}`];
         return { output: lines.join('\n') };
       });
 
@@ -1236,10 +1232,10 @@ class ConsoleService {
         '\u001b[32mAPI Tokens:\u001b[0m',
         '',
         'ID'.padEnd(6) +
-        'Name'.padEnd(25) +
-        'Type'.padEnd(10) +
-        'Created By'.padEnd(20) +
-        'Expires',
+          'Name'.padEnd(25) +
+          'Type'.padEnd(10) +
+          'Created By'.padEnd(20) +
+          'Expires',
         '─'.repeat(80),
         ...tokens.map((t: any) => {
           const id = String(t.id).padEnd(6);

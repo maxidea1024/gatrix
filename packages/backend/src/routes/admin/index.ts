@@ -69,24 +69,14 @@ router.get('/users/me/environments', authenticate as any, async (req: any, res: 
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    // Super admin gets all access
-    const isSuperAdmin = await permissionService.isSuperAdmin(userId);
-    if (isSuperAdmin) {
+    // Check org admin status for any org — org admin gets all access
+    const orgs = await permissionService.getUserOrganisations(userId);
+    const isAnyOrgAdmin = orgs.some((m) => m.orgRole === 'admin');
+    if (isAnyOrgAdmin) {
       return res.json({
         success: true,
         data: { allowAllEnvironments: true, environments: [] },
       });
-    }
-
-    // Check org admin status for any org
-    const orgs = await permissionService.getUserOrganisations(userId);
-    for (const org of orgs) {
-      if (await permissionService.isOrgAdmin(userId, org.orgId)) {
-        return res.json({
-          success: true,
-          data: { allowAllEnvironments: true, environments: [] },
-        });
-      }
     }
 
     // Otherwise return allowAllEnvironments: true for now

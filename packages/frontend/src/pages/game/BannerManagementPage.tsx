@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -57,7 +57,7 @@ const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.BANNERS_MANAGE]);
+  const canManage = hasPermission([P.BANNERS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

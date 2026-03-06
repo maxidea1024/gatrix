@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -110,7 +110,7 @@ const CouponSettingsPage: React.FC = () => {
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.COUPONS_MANAGE]);
+  const canManage = hasPermission([P.COUPONS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

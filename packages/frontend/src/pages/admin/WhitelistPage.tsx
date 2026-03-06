@@ -62,7 +62,7 @@ import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 
 const WhitelistPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -71,7 +71,7 @@ const WhitelistPage: React.FC = () => {
   const { hasPermission } = useAuth();
 
   // Check if user can manage (create/edit/delete) whitelist entries
-  const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
+  const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
 
   // Refs for form focus
   const accountIdFieldRef = useRef<HTMLInputElement>(null);

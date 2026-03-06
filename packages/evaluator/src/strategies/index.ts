@@ -4,7 +4,7 @@
  * Registers all built-in strategies and provides lookup by name.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 import { DefaultStrategy } from './DefaultStrategy';
 import { FlexibleRolloutStrategy } from './FlexibleRolloutStrategy';

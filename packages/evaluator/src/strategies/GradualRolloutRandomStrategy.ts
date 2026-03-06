@@ -5,7 +5,7 @@
  * No stickiness - purely random on every check.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 
 export class GradualRolloutRandomStrategy extends Strategy {

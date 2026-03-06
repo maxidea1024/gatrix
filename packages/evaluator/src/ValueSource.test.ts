@@ -7,7 +7,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
-import type { FeatureFlag, EvaluationContext, FeatureSegment } from './types';
+import type { FeatureFlag, EvaluationContext, FeatureSegment } from '@gatrix/shared';
 
 const emptySegmentsMap = new Map<string, FeatureSegment>();
 const defaultContext: EvaluationContext = {

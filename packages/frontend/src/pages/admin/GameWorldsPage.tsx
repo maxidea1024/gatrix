@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -366,7 +366,7 @@ const GameWorldsPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentEnvironmentId, currentEnvironment } = useEnvironment();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.GAME_WORLDS_MANAGE]);
+  const canManage = hasPermission([P.GAME_WORLDS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;

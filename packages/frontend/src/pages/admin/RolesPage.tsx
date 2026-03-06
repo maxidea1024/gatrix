@@ -53,13 +53,24 @@ import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
-import { rbacService, Role, RoleWithDetails, RolePermissions } from '@/services/rbacService';
+import rbacService, {
+  type RoleWithDetails,
+  type RolePermissions,
+  type Role,
+  type RoleInheritance,
+} from '@/services/rbacService';
 import { orgProjectService, Project } from '@/services/orgProjectService';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+
+// Helper: convert 'resource:action' to i18n key 'rbac.perm.resource.action'
+const permLabel = (t: (key: string, fallback?: string) => string, perm: string): string => {
+  const key = `rbac.perm.${perm.replace(':', '.')}`;
+  return t(key, perm);
+};
 
 // ==================== Permission Editor ====================
 
@@ -161,7 +172,7 @@ const PermissionEditor: React.FC<PermissionEditorProps> = ({
                   onClick={(e) => e.stopPropagation()}
                 />
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {t(`rbac.permCategory.${key}`)}
+                  {t(category.label, key)}
                 </Typography>
                 <Chip
                   label={`${catPerms.filter((p) => permissions.org.includes(p)).length}/${catPerms.length}`}
@@ -185,7 +196,7 @@ const PermissionEditor: React.FC<PermissionEditorProps> = ({
                     }
                     label={
                       <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                        {t(`rbac.perm.${perm}`, perm)}
+                        {permLabel(t, perm)}
                       </Typography>
                     }
                     sx={{ width: '50%', m: 0 }}
@@ -300,6 +311,7 @@ const ProjectPermissionEditor: React.FC<ProjectPermissionEditorProps> = ({
             .filter((p) => !assignedProjectIds.includes(p.id))
             .map((p) => (
               <MenuItem key={p.id} value={p.id}>
+                {p.orgDisplayName ? `${p.orgDisplayName} / ` : ''}
                 {p.displayName || p.projectName}
               </MenuItem>
             ))}
@@ -337,6 +349,7 @@ const ProjectPermissionEditor: React.FC<ProjectPermissionEditorProps> = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
                   <ProjectIcon fontSize="small" color="primary" />
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {project?.orgDisplayName ? `${project.orgDisplayName} / ` : ''}
                     {project?.displayName || project?.projectName || projectId}
                   </Typography>
                   {isAdmin && <Chip label="Admin" size="small" color="warning" />}
@@ -381,7 +394,7 @@ const ProjectPermissionEditor: React.FC<ProjectPermissionEditorProps> = ({
                         }
                         label={
                           <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                            {t(`rbac.perm.${perm}`, perm)}
+                            {permLabel(t, perm)}
                           </Typography>
                         }
                         sx={{ width: '50%', m: 0 }}
@@ -516,6 +529,7 @@ const EnvPermissionEditor: React.FC<EnvPermissionEditorProps> = ({
           </MenuItem>
           {projects.map((p) => (
             <MenuItem key={p.id} value={p.id}>
+              {p.orgDisplayName ? `${p.orgDisplayName} / ` : ''}
               {p.displayName || p.projectName}
             </MenuItem>
           ))}
@@ -564,7 +578,20 @@ const EnvPermissionEditor: React.FC<EnvPermissionEditorProps> = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
                   <EnvIcon fontSize="small" color="primary" />
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {envLookup[envId] || envId}
+                    {(() => {
+                      // Find which project this env belongs to
+                      const projectEntry = Object.entries(environments).find(([, envs]) =>
+                        envs.some((env) => env.environmentId === envId)
+                      );
+                      const projectId = projectEntry?.[0];
+                      const project = projectId ? projects.find((p) => p.id === projectId) : null;
+                      const orgPrefix = project?.orgDisplayName
+                        ? `${project.orgDisplayName} / `
+                        : '';
+                      const projectName = project?.displayName || project?.projectName || '';
+                      const envName = envLookup[envId] || envId;
+                      return projectName ? `${orgPrefix}${projectName} / ${envName}` : envName;
+                    })()}
                   </Typography>
                   {isAdmin && <Chip label="Admin" size="small" color="warning" />}
                   <Box sx={{ ml: 'auto', mr: 1 }}>
@@ -678,6 +705,10 @@ const RolesPage: React.FC = () => {
   const [environments, setEnvironments] = useState<
     Record<string, Array<{ environmentId: string; name: string }>>
   >({});
+
+  // Role inheritance state
+  const [parentRoles, setParentRoles] = useState<RoleInheritance[]>([]);
+  const [selectedParentRoleId, setSelectedParentRoleId] = useState<string>('');
 
   // Menu state
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -800,6 +831,14 @@ const RolesPage: React.FC = () => {
       setInitialPermissions(details.permissions);
       setSelectedRole(details);
       setDialogOpen(true);
+
+      // Load role inheritance
+      try {
+        const inheritance = await rbacService.getRoleInheritance(role.id);
+        setParentRoles(inheritance);
+      } catch {
+        setParentRoles([]);
+      }
 
       // Preload environments for all projects so assigned env names are visible
       if (details.permissions.env.length > 0 && projects.length > 0) {
@@ -1120,47 +1159,156 @@ const RolesPage: React.FC = () => {
               </Tabs>
 
               {/* Org Permissions Tab */}
-              {permTabIndex === 0 && (
-                <PermissionEditor
-                  permissions={formPermissions}
-                  onChange={setFormPermissions}
-                  availablePermissions={availablePermissions.filter((p) => p.startsWith('org.'))}
-                  permissionCategories={Object.fromEntries(
+              {permTabIndex === 0 &&
+                (() => {
+                  const orgCats = Object.fromEntries(
                     Object.entries(permissionCategories).filter(
                       ([, v]) => (v as any).scope === 'org'
                     )
-                  )}
-                />
-              )}
+                  );
+                  const orgPerms = Object.values(orgCats).flatMap((c) => c.permissions);
+                  return (
+                    <PermissionEditor
+                      permissions={formPermissions}
+                      onChange={setFormPermissions}
+                      availablePermissions={orgPerms}
+                      permissionCategories={orgCats}
+                    />
+                  );
+                })()}
 
               {/* Project Permissions Tab */}
-              {permTabIndex === 1 && (
-                <ProjectPermissionEditor
-                  projects={projects}
-                  formPermissions={formPermissions}
-                  onChange={setFormPermissions}
-                  permissionCategories={Object.fromEntries(
+              {permTabIndex === 1 &&
+                (() => {
+                  const projectCats = Object.fromEntries(
                     Object.entries(permissionCategories).filter(
                       ([, v]) => (v as any).scope === 'project'
                     )
-                  )}
-                />
-              )}
+                  );
+                  return (
+                    <ProjectPermissionEditor
+                      projects={projects}
+                      formPermissions={formPermissions}
+                      onChange={setFormPermissions}
+                      permissionCategories={projectCats}
+                    />
+                  );
+                })()}
 
               {/* Environment Permissions Tab */}
-              {permTabIndex === 2 && (
-                <EnvPermissionEditor
-                  projects={projects}
-                  environments={environments}
-                  loadEnvironmentsForProject={loadEnvironmentsForProject}
-                  formPermissions={formPermissions}
-                  onChange={setFormPermissions}
-                  permissionCategories={Object.fromEntries(
+              {permTabIndex === 2 &&
+                (() => {
+                  const envCats = Object.fromEntries(
                     Object.entries(permissionCategories).filter(
                       ([, v]) => (v as any).scope === 'env'
                     )
-                  )}
-                />
+                  );
+                  return (
+                    <EnvPermissionEditor
+                      projects={projects}
+                      environments={environments}
+                      loadEnvironmentsForProject={loadEnvironmentsForProject}
+                      formPermissions={formPermissions}
+                      onChange={setFormPermissions}
+                      permissionCategories={envCats}
+                    />
+                  );
+                })()}
+            </Box>
+          )}
+
+          {/* Role Inheritance Section (edit mode only) */}
+          {dialogMode === 'edit' && selectedRole && (
+            <Box>
+              <Divider sx={{ mb: 1 }} />
+              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                {t('rbac.roles.inheritance')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {t('rbac.roles.inheritanceHelp')}
+              </Typography>
+
+              {/* Add parent role */}
+              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                <Select
+                  value={selectedParentRoleId}
+                  onChange={(e) => setSelectedParentRoleId(e.target.value)}
+                  size="small"
+                  displayEmpty
+                  sx={{ flex: 1 }}
+                >
+                  <MenuItem value="" disabled>
+                    {t('rbac.roles.selectParentRole')}
+                  </MenuItem>
+                  {roles
+                    .filter(
+                      (r) =>
+                        r.id !== selectedRole.id &&
+                        !parentRoles.some((pr) => pr.parentRoleId === r.id)
+                    )
+                    .map((r) => (
+                      <MenuItem key={r.id} value={r.id}>
+                        {r.roleName}
+                      </MenuItem>
+                    ))}
+                </Select>
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={!selectedParentRoleId}
+                  onClick={async () => {
+                    if (!selectedParentRoleId || !selectedRole) return;
+                    try {
+                      await rbacService.addRoleInheritance(selectedRole.id, selectedParentRoleId);
+                      // Reload inheritance
+                      const data = await rbacService.getRoleInheritance(selectedRole.id);
+                      setParentRoles(data);
+                      setSelectedParentRoleId('');
+                      enqueueSnackbar(t('rbac.roles.inheritanceAdded'), { variant: 'success' });
+                    } catch (error: any) {
+                      const msg =
+                        error?.response?.data?.message || t('rbac.roles.inheritanceAddFailed');
+                      enqueueSnackbar(msg, { variant: 'error' });
+                    }
+                  }}
+                >
+                  {t('common.add')}
+                </Button>
+              </Box>
+
+              {/* Parent role list */}
+              {parentRoles.length === 0 ? (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: 'center', py: 2 }}
+                >
+                  {t('rbac.roles.noParentRoles')}
+                </Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {parentRoles.map((pr) => (
+                    <Chip
+                      key={pr.id}
+                      label={pr.parentRoleName}
+                      onDelete={async () => {
+                        try {
+                          await rbacService.removeRoleInheritance(selectedRole.id, pr.id);
+                          setParentRoles((prev) => prev.filter((p) => p.id !== pr.id));
+                          enqueueSnackbar(t('rbac.roles.inheritanceRemoved'), {
+                            variant: 'success',
+                          });
+                        } catch {
+                          enqueueSnackbar(t('rbac.roles.inheritanceRemoveFailed'), {
+                            variant: 'error',
+                          });
+                        }
+                      }}
+                      size="small"
+                      variant="outlined"
+                    />
+                  ))}
+                </Box>
               )}
             </Box>
           )}

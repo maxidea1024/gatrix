@@ -108,7 +108,7 @@ import {
   MenuCategory,
 } from '@/config/navigation';
 import mailService from '@/services/mailService';
-import { Permission, PERMISSIONS } from '@/types/permissions';
+import { Permission, P } from '@/types/permissions';
 
 // Sidebar width is now dynamic
 
@@ -1936,7 +1936,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {/* Chat button - only visible for admin users with chat permission */}
-              {isAdmin() && hasPermission(PERMISSIONS.CHAT_ACCESS) && (
+              {isAdmin() && hasPermission(P.CHAT_ACCESS) && (
                 <Tooltip title={t('sidebar.chat')}>
                   <IconButton color="inherit" onClick={() => navigate('/chat')}>
                     <ChatIcon />

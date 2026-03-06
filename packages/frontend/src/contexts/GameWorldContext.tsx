@@ -3,7 +3,7 @@ import { gameWorldService } from '../services/gameWorldService';
 import { useAuth } from './AuthContext';
 import { useEnvironment } from './EnvironmentContext';
 import { useOrgProject } from './OrgProjectContext';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 
 export interface GameWorldOption {
   label: string;
@@ -32,10 +32,7 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
   const [error, setError] = useState<string | null>(null);
 
   // Check if user has permission to view game worlds
-  const canViewGameWorlds = hasPermission([
-    PERMISSIONS.GAME_WORLDS_VIEW,
-    PERMISSIONS.GAME_WORLDS_MANAGE,
-  ]);
+  const canViewGameWorlds = hasPermission([P.GAME_WORLDS_READ, P.GAME_WORLDS_UPDATE]);
 
   const loadGameWorlds = async () => {
     // Don't load if no environment is selected

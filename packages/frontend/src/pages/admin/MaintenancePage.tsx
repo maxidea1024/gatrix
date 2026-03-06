@@ -25,7 +25,7 @@ import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useChangeRequestToast } from '@/utils/changeRequestToast';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -61,7 +61,7 @@ const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user, hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.MAINTENANCE_MANAGE]);
+  const canManage = hasPermission([P.MAINTENANCE_UPDATE]);
   const navigate = useNavigate();
   const { showCreated } = useChangeRequestToast();
   const { getProjectApiPath } = useOrgProject();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -79,7 +79,7 @@ const JobsPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
+  const canManage = hasPermission([P.SCHEDULER_UPDATE]);
 
   // Column settings state
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {

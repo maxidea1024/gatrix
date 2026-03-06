@@ -24,7 +24,7 @@ import {
   FlagMetric,
 } from '../types/featureFlags';
 import { FeatureFlagError, FeatureFlagErrorCode } from '../utils/errors';
-import { FeatureFlagEvaluator, VALUE_SOURCE } from '@gatrix/shared';
+import { FeatureFlagEvaluator, VALUE_SOURCE } from '@gatrix/evaluator';
 import { SDK_VERSION } from '../version';
 
 export class FeatureFlagService {

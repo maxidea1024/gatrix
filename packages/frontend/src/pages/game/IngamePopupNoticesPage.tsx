@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -74,7 +74,7 @@ const IngamePopupNoticesPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE]);
+  const canManage = hasPermission([P.INGAME_POPUPS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

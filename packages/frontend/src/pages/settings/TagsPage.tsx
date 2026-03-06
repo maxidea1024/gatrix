@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -55,7 +55,7 @@ const TagsPage: React.FC = () => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const { language } = useI18n();
-  const canManage = hasPermission([PERMISSIONS.TAGS_MANAGE]);
+  const canManage = hasPermission([P.TAGS_UPDATE]);
 
   // Data/state
   const [tags, setTags] = useState<Tag[]>([]);

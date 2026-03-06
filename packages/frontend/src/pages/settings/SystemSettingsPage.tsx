@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -34,7 +34,7 @@ const SystemSettingsPage: React.FC = () => {
   const { currentEnvironmentId } = useEnvironment();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
+  const canManage = hasPermission([P.SYSTEM_SETTINGS_UPDATE]);
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 

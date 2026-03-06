@@ -246,8 +246,6 @@ export class UserService {
     }
   }
 
-
-
   static async getPendingUsers(): Promise<UserWithoutPassword[]> {
     try {
       const result = await UserModel.findAll(1, 100, { status: 'pending' });

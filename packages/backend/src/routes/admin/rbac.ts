@@ -195,15 +195,16 @@ router.put('/organisations/:id/members/:userId', requireOrgAdmin as any, async (
 router.get('/my-access', async (req: any, res) => {
   try {
     const userId = req.user.id;
-    const isSuperAdmin = await permissionService.isSuperAdmin(userId);
 
-    // Super admin sees all orgs, regular users only their memberships
+    // Check org memberships — org admin sees all
+    const orgMemberships = await permissionService.getUserOrganisations(userId);
+    const isAnyOrgAdmin = orgMemberships.some((m) => m.orgRole === 'admin');
+
     let orgIds: string[];
-    if (isSuperAdmin) {
+    if (isAnyOrgAdmin) {
       const allOrgs = await db('g_organisations').where('isActive', true).select('id');
       orgIds = allOrgs.map((o: any) => o.id);
     } else {
-      const orgMemberships = await permissionService.getUserOrganisations(userId);
       orgIds = orgMemberships.map((m) => m.orgId);
     }
 
@@ -241,9 +242,21 @@ router.get('/my-access', async (req: any, res) => {
 // ==================== Projects ====================
 
 // GET /api/admin/rbac/projects
+// Returns projects from all orgs the current user is a member of, with org info
 router.get('/projects', async (req: any, res) => {
   try {
-    const projects = await ProjectModel.findAll();
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    // Get projects from orgs the user is a member of
+    const projects = await knex('g_projects as p')
+      .join('g_organisations as o', 'p.orgId', 'o.id')
+      .join('g_organisation_members as om', 'o.id', 'om.orgId')
+      .where('om.userId', userId)
+      .select('p.*', 'o.orgName', 'o.displayName as orgDisplayName');
+
     res.json({ success: true, data: projects });
   } catch (error) {
     logger.error('Error listing projects:', error);
@@ -938,12 +951,36 @@ router.delete('/environment-keys/:id', async (req: any, res) => {
 // GET /api/admin/rbac/permissions - list all available permissions (for role editor UI)
 router.get('/permissions', async (req: any, res) => {
   try {
-    const { ALL_PERMISSIONS, PERMISSION_CATEGORIES } = await import('../../types/permissions');
+    const { ALL_PERMISSIONS, PERMISSION_CATEGORIES, RESOURCE_ACTIONS, PERMISSION_SEPARATOR } =
+      await import('../../types/permissions');
+
+    // Transform array categories into Record format for FE consumption
+    // FE expects: Record<string, { label: string; scope: string; permissions: string[] }>
+    const categories: Record<string, { label: string; scope: string; permissions: string[] }> = {};
+    for (const cat of PERMISSION_CATEGORIES) {
+      // Extract key from labelKey (e.g. 'permissions.category.workspace' -> 'workspace')
+      const key = cat.labelKey.split('.').pop() || cat.labelKey;
+      const permissions: string[] = [];
+      for (const resource of cat.resources) {
+        const actions = RESOURCE_ACTIONS[resource];
+        if (actions) {
+          for (const action of actions) {
+            permissions.push(`${resource}${PERMISSION_SEPARATOR}${action}`);
+          }
+        }
+      }
+      categories[key] = {
+        label: cat.labelKey,
+        scope: cat.scope,
+        permissions,
+      };
+    }
+
     res.json({
       success: true,
       data: {
         all: ALL_PERMISSIONS,
-        categories: PERMISSION_CATEGORIES,
+        categories,
       },
     });
   } catch (error) {
@@ -951,5 +988,136 @@ router.get('/permissions', async (req: any, res) => {
     res.status(500).json({ success: false, message: 'Failed to list permissions' });
   }
 });
+
+// ==================== Role Inheritance ====================
+
+// GET /api/admin/rbac/roles/:roleId/inheritance - Get parent roles for a role
+router.get('/roles/:roleId/inheritance', requireOrgAdmin as any, async (req: any, res) => {
+  try {
+    const { roleId } = req.params;
+
+    const parents = await db('g_role_inheritance as ri')
+      .join('g_roles as r', 'ri.parentRoleId', 'r.id')
+      .where('ri.roleId', roleId)
+      .select('ri.id', 'ri.parentRoleId', 'r.roleName as parentRoleName', 'ri.createdAt');
+
+    res.json({ success: true, data: parents });
+  } catch (error) {
+    logger.error('Error getting role inheritance:', error);
+    res.status(500).json({ success: false, message: 'Failed to get role inheritance' });
+  }
+});
+
+// POST /api/admin/rbac/roles/:roleId/inheritance - Add parent role (with cycle detection)
+router.post('/roles/:roleId/inheritance', requireOrgAdmin as any, async (req: any, res) => {
+  try {
+    const { roleId } = req.params;
+    const { parentRoleId } = req.body;
+
+    if (!parentRoleId) {
+      return res.status(400).json({ success: false, message: 'parentRoleId is required' });
+    }
+
+    if (roleId === parentRoleId) {
+      return res.status(400).json({ success: false, message: 'A role cannot inherit from itself' });
+    }
+
+    // Check both roles exist
+    const [role, parentRole] = await Promise.all([
+      db('g_roles').where('id', roleId).first(),
+      db('g_roles').where('id', parentRoleId).first(),
+    ]);
+
+    if (!role) {
+      return res.status(404).json({ success: false, message: 'Role not found' });
+    }
+    if (!parentRole) {
+      return res.status(404).json({ success: false, message: 'Parent role not found' });
+    }
+
+    // Check for circular reference
+    const wouldCycle = await permissionService.wouldCreateCycle(roleId, parentRoleId);
+    if (wouldCycle) {
+      return res.status(400).json({
+        success: false,
+        message: 'Adding this parent role would create a circular inheritance chain',
+      });
+    }
+
+    // Check for duplicate
+    const existing = await db('g_role_inheritance').where({ roleId, parentRoleId }).first();
+    if (existing) {
+      return res
+        .status(409)
+        .json({ success: false, message: 'Inheritance relationship already exists' });
+    }
+
+    const id = generateULID();
+    await db('g_role_inheritance').insert({ id, roleId, parentRoleId });
+
+    // Invalidate cache for affected users
+    await permissionService.invalidateRoleCache(roleId);
+
+    res.json({ success: true, data: { id, roleId, parentRoleId } });
+  } catch (error) {
+    logger.error('Error adding role inheritance:', error);
+    res.status(500).json({ success: false, message: 'Failed to add role inheritance' });
+  }
+});
+
+// DELETE /api/admin/rbac/roles/:roleId/inheritance/:inheritanceId - Remove parent role
+router.delete(
+  '/roles/:roleId/inheritance/:inheritanceId',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const { roleId, inheritanceId } = req.params;
+
+      const deleted = await db('g_role_inheritance').where({ id: inheritanceId, roleId }).del();
+
+      if (!deleted) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Inheritance relationship not found' });
+      }
+
+      // Invalidate cache for affected users
+      await permissionService.invalidateRoleCache(roleId);
+
+      res.json({ success: true, message: 'Inheritance removed' });
+    } catch (error) {
+      logger.error('Error removing role inheritance:', error);
+      res.status(500).json({ success: false, message: 'Failed to remove role inheritance' });
+    }
+  }
+);
+
+// ==================== Permission Preview ====================
+
+// GET /api/admin/rbac/users/:userId/effective-permissions - Get effective permissions with sources
+router.get(
+  '/users/:userId/effective-permissions',
+  requireOrgAdmin as any,
+  async (req: any, res) => {
+    try {
+      const { userId } = req.params;
+      const orgId = req.user.orgId;
+
+      if (!orgId) {
+        return res.status(400).json({ success: false, message: 'Organisation context required' });
+      }
+
+      const effectivePermissions = await permissionService.getUserEffectivePermissions(
+        userId,
+        orgId
+      );
+
+      res.json({ success: true, data: effectivePermissions });
+    } catch (error) {
+      logger.error('Error getting effective permissions:', error);
+      res.status(500).json({ success: false, message: 'Failed to get effective permissions' });
+    }
+  }
+);
 
 export default router;

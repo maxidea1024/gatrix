@@ -5,7 +5,7 @@
  * Supports exact match and CIDR notation (e.g., 192.168.1.0/24).
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 
 /**

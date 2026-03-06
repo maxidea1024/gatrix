@@ -101,7 +101,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface CreateTokenData {
@@ -206,7 +206,7 @@ const ApiTokensPage: React.FC = () => {
   const { hasPermission } = useAuth();
 
   // Check if user can manage (create/edit/delete) tokens
-  const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
+  const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
   const { currentProjectId, currentOrgId, projects, getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

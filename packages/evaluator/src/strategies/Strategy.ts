@@ -5,7 +5,7 @@
  * Each strategy defines its own isEnabled() and isEnabledWithDetails() logic.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 
 export abstract class Strategy {
   public readonly name: string;

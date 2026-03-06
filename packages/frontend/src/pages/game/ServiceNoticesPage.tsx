@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -78,7 +78,7 @@ const ServiceNoticesPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironment } = useEnvironment();
-  const canManage = hasPermission([PERMISSIONS.SERVICE_NOTICES_MANAGE]);
+  const canManage = hasPermission([P.SERVICE_NOTICES_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

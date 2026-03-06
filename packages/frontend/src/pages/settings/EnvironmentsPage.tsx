@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Paper,
@@ -82,7 +82,7 @@ const EnvironmentsPage: React.FC = () => {
     useOrgProject();
   const [searchParams] = useSearchParams();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
+  const canManage = hasPermission([P.ENVIRONMENTS_UPDATE]);
 
   // Resolve the effective project from URL param or current context
   const urlProjectId = searchParams.get('projectId');

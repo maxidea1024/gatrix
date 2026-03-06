@@ -43,7 +43,6 @@ router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
 router.get('/permissions', AdminController.getAllPermissions as any);
 router.get('/users/:id/permissions', AdminController.getUserPermissions as any);
 
-
 // Bulk user operations
 router.post('/users/bulk/status', AdminController.bulkUpdateUserStatus as any);
 

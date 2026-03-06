@@ -49,6 +49,7 @@
     "@bull-board/ui": "^6.12.6",
     "@gatrix/server-sdk": "file:../sdks/server-sdk",
     "@gatrix/shared": "file:../shared",
+    "@gatrix/evaluator": "file:../evaluator",
     "@keyv/redis": "^5.1.3",
     "@sendgrid/mail": "^8.1.5",
     "@types/bcrypt": "^6.0.0",

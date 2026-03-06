@@ -9,7 +9,7 @@ import {
   ForceLink,
 } from 'd3-force';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -2255,7 +2255,7 @@ const ServerListPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.SERVERS_MANAGE]);
+  const canManage = hasPermission([P.SERVERS_UPDATE]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);

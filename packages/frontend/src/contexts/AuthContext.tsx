@@ -186,6 +186,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Check if user has a specific permission or any of the permissions
+  // Supports wildcard matching: '*:*', 'resource:*', '*:action'
   const hasPermission = useCallback(
     (permission: Permission | Permission[]): boolean => {
       if (!isAuthenticated || !user) {
@@ -202,13 +203,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return false;
       }
 
-      // Check for wildcard permission '*' that grants all permissions
-      if (permissions.includes('*' as Permission)) {
+      // Check for wildcard permission '*' or '*:*' that grants all permissions
+      if (permissions.includes('*' as Permission) || permissions.includes('*:*' as Permission)) {
         return true;
       }
 
       const requiredPermissions = Array.isArray(permission) ? permission : [permission];
-      return requiredPermissions.some((p) => permissions.includes(p));
+
+      // Use wildcard matching: check if any granted permission matches any required permission
+      return requiredPermissions.some((required) =>
+        permissions.some((granted) => {
+          // Exact match
+          if (granted === required) return true;
+
+          // Wildcard matching for resource:action pattern
+          const grantedParts = (granted as string).split(':');
+          const requiredParts = required.split(':');
+          if (grantedParts.length === 2 && requiredParts.length === 2) {
+            const [gResource, gAction] = grantedParts;
+            const [rResource, rAction] = requiredParts;
+            // resource:* matches resource:anything
+            if (gResource === rResource && gAction === '*') return true;
+            // *:action matches anything:action
+            if (gResource === '*' && gAction === rAction) return true;
+            // *:* matches everything
+            if (gResource === '*' && gAction === '*') return true;
+          }
+          return false;
+        })
+      );
     },
     [isAuthenticated, user, permissions, permissionsLoading]
   );

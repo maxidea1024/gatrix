@@ -153,8 +153,6 @@ export class UserController {
       updatedBy,
     });
 
-
-
     let user = await UserService.updateUser(userId, userData);
 
     // 태그 설정 (tagIds가 제공된 경우에만)
@@ -265,8 +263,6 @@ export class UserController {
       message: 'User unsuspended successfully',
     });
   });
-
-
 
   static getPendingUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const users = await UserService.getPendingUsers();

@@ -18,8 +18,8 @@ import {
   Variant,
   FeatureSegment,
   Constraint,
-} from './types';
-import { VALUE_SOURCE } from './valueSource';
+  VALUE_SOURCE,
+} from '@gatrix/shared';
 
 export class FeatureFlagEvaluator {
   /**

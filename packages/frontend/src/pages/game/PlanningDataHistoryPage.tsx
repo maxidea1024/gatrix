@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -54,8 +54,8 @@ const PlanningDataHistoryPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canView = hasPermission([PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE]);
-  const canManage = hasPermission([PERMISSIONS.PLANNING_DATA_MANAGE]);
+  const canView = hasPermission([P.PLANNING_DATA_READ, P.PLANNING_DATA_UPDATE]);
+  const canManage = hasPermission([P.PLANNING_DATA_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

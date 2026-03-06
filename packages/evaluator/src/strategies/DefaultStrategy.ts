@@ -3,7 +3,7 @@
  * Only constraints and segments determine the outcome.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 
 export class DefaultStrategy extends Strategy {

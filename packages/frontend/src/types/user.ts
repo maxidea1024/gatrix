@@ -1,6 +1,6 @@
 // 태그 인터페이스
 export interface Tag {
-  id: number;
+  id: string;
   name: string;
   color: string;
   description?: string;
@@ -16,7 +16,7 @@ export type UserStatus = 'pending' | 'active' | 'suspended' | 'deleted';
 
 // 기본 사용자 인터페이스
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   avatarUrl?: string;
@@ -28,7 +28,7 @@ export interface User {
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
-  createdBy?: number;
+  createdBy?: string;
   createdByName?: string;
   createdByEmail?: string;
   tags?: Tag[];
@@ -42,7 +42,7 @@ export interface CreateUserData {
   role?: UserRole;
   status?: UserStatus;
   emailVerified?: boolean;
-  tags?: number[]; // 태그 ID 배열
+  tags?: string[]; // Tag ID array
 }
 
 // 사용자 업데이트 데이터
@@ -53,7 +53,7 @@ export interface UpdateUserData {
   role?: UserRole;
   status?: UserStatus;
   emailVerified?: boolean;
-  tags?: number[]; // 태그 ID 배열
+  tags?: string[]; // Tag ID array
 }
 
 // 사용자 필터
@@ -61,7 +61,7 @@ export interface UserFilters {
   role?: UserRole;
   status?: UserStatus;
   search?: string;
-  tags?: number[]; // 태그 ID 배열로 필터링
+  tags?: string[]; // Filter by tag IDs
 }
 
 // 사용자 목록 응답

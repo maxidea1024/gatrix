@@ -36,6 +36,8 @@ export interface Project {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  orgName?: string;
+  orgDisplayName?: string;
 }
 
 // ==================== Service ====================

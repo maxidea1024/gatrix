@@ -10,7 +10,11 @@ import { asyncHandler } from '../../../middleware/errorHandler';
 import { featureFlagService } from '../../../services/FeatureFlagService';
 import { ValidationRules } from '../../../models/FeatureFlag';
 import { validateFlagValue } from '../../../utils/validateFlagValue';
-import { VALUE_SOURCE, evaluateStrategyWithDetails, normalizedStrategyValue } from '@gatrix/shared';
+import {
+  VALUE_SOURCE,
+  evaluateStrategyWithDetails,
+  normalizedStrategyValue,
+} from '@gatrix/evaluator';
 import { createLogger } from '../../../config/logger';
 import { getFallbackValue } from './_helpers';
 

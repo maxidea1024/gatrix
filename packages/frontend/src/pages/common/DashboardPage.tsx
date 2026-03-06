@@ -58,7 +58,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useUserStats } from '@/hooks/useSWR';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import { crashService } from '@/services/crashService';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
 import { CrashEvent } from '@/types/crash';
@@ -337,7 +337,7 @@ const DashboardPage: React.FC = () => {
     }> = [];
 
     // Admin Panel actions
-    if (hasPermission(PERMISSIONS.USERS_VIEW)) {
+    if (hasPermission(P.USERS_READ)) {
       actions.push({
         key: 'users',
         title: t('sidebar.userManagement'),
@@ -348,7 +348,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.CLIENT_VERSIONS_VIEW)) {
+    if (hasPermission(P.CLIENT_VERSIONS_READ)) {
       actions.push({
         key: 'clientVersions',
         title: t('sidebar.clientVersions'),
@@ -358,7 +358,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.GAME_WORLDS_VIEW)) {
+    if (hasPermission(P.GAME_WORLDS_READ)) {
       actions.push({
         key: 'gameWorlds',
         title: t('sidebar.gameWorlds'),
@@ -368,7 +368,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.SERVERS_VIEW)) {
+    if (hasPermission(P.SERVERS_READ)) {
       actions.push({
         key: 'servers',
         title: t('sidebar.serverList'),
@@ -378,7 +378,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.MAINTENANCE_VIEW)) {
+    if (hasPermission(P.MAINTENANCE_READ)) {
       actions.push({
         key: 'maintenance',
         title: t('sidebar.maintenance'),
@@ -388,7 +388,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.SCHEDULER_VIEW)) {
+    if (hasPermission(P.SCHEDULER_READ)) {
       actions.push({
         key: 'scheduler',
         title: t('sidebar.scheduler'),
@@ -399,7 +399,7 @@ const DashboardPage: React.FC = () => {
     }
 
     // Game Management actions
-    if (hasPermission(PERMISSIONS.SERVICE_NOTICES_VIEW)) {
+    if (hasPermission(P.SERVICE_NOTICES_READ)) {
       actions.push({
         key: 'serviceNotices',
         title: t('sidebar.serviceNotices'),
@@ -409,7 +409,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.INGAME_POPUP_NOTICES_VIEW)) {
+    if (hasPermission(P.INGAME_POPUPS_READ)) {
       actions.push({
         key: 'ingamePopupNotices',
         title: t('sidebar.ingamePopupNotices'),
@@ -419,7 +419,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.COUPONS_VIEW)) {
+    if (hasPermission(P.COUPONS_READ)) {
       actions.push({
         key: 'coupons',
         title: t('sidebar.coupons'),
@@ -429,7 +429,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.SURVEYS_VIEW)) {
+    if (hasPermission(P.SURVEYS_READ)) {
       actions.push({
         key: 'surveys',
         title: t('sidebar.surveys'),
@@ -439,7 +439,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.OPERATION_EVENTS_VIEW)) {
+    if (hasPermission(P.OPERATION_EVENTS_READ)) {
       actions.push({
         key: 'operationEvents',
         title: t('sidebar.operationEvents'),
@@ -449,7 +449,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.BANNERS_VIEW)) {
+    if (hasPermission(P.BANNERS_READ)) {
       actions.push({
         key: 'banners',
         title: t('sidebar.banners'),
@@ -459,7 +459,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.STORE_PRODUCTS_VIEW)) {
+    if (hasPermission(P.STORE_PRODUCTS_READ)) {
       actions.push({
         key: 'storeProducts',
         title: t('sidebar.storeProducts'),
@@ -469,7 +469,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.PLANNING_DATA_VIEW)) {
+    if (hasPermission(P.PLANNING_DATA_READ)) {
       actions.push({
         key: 'planningData',
         title: t('sidebar.planningData'),
@@ -480,7 +480,7 @@ const DashboardPage: React.FC = () => {
     }
 
     // Security actions
-    if (hasPermission(PERMISSIONS.SECURITY_VIEW)) {
+    if (hasPermission(P.IP_WHITELIST_READ)) {
       actions.push({
         key: 'security',
         title: t('sidebar.security'),
@@ -490,7 +490,7 @@ const DashboardPage: React.FC = () => {
       });
     }
 
-    if (hasPermission(PERMISSIONS.AUDIT_LOGS_VIEW)) {
+    if (hasPermission(P.AUDIT_LOGS_READ)) {
       actions.push({
         key: 'auditLogs',
         title: t('sidebar.auditLogs'),
@@ -501,7 +501,7 @@ const DashboardPage: React.FC = () => {
     }
 
     // Monitoring actions
-    if (hasPermission(PERMISSIONS.MONITORING_VIEW)) {
+    if (hasPermission(P.MONITORING_READ)) {
       actions.push({
         key: 'monitoring',
         title: t('sidebar.monitoring'),
@@ -514,7 +514,7 @@ const DashboardPage: React.FC = () => {
     }
 
     // Settings actions
-    if (hasPermission(PERMISSIONS.ENVIRONMENTS_VIEW)) {
+    if (hasPermission(P.ENVIRONMENTS_READ)) {
       actions.push({
         key: 'environments',
         title: t('sidebar.environments'),
@@ -536,7 +536,7 @@ const DashboardPage: React.FC = () => {
 
   // Load alerts summary
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(PERMISSIONS.MONITORING_VIEW)) {
+    if (!isAdminUser || !hasPermission(P.MONITORING_READ)) {
       return;
     }
 
@@ -576,7 +576,7 @@ const DashboardPage: React.FC = () => {
 
   // Load recent activities
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(PERMISSIONS.AUDIT_LOGS_VIEW)) {
+    if (!isAdminUser || !hasPermission(P.AUDIT_LOGS_READ)) {
       return;
     }
 
@@ -616,7 +616,7 @@ const DashboardPage: React.FC = () => {
 
   // Load recent crash events
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(PERMISSIONS.CRASH_EVENTS_VIEW)) {
+    if (!isAdminUser || !hasPermission(P.CRASH_EVENTS_READ)) {
       return;
     }
 
@@ -648,7 +648,7 @@ const DashboardPage: React.FC = () => {
 
   // Load recent lifecycle events
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(PERMISSIONS.SERVERS_VIEW)) {
+    if (!isAdminUser || !hasPermission(P.SERVERS_READ)) {
       return;
     }
 
@@ -676,7 +676,7 @@ const DashboardPage: React.FC = () => {
 
   // Load maintenance status
   useEffect(() => {
-    if (!isAdminUser || !hasPermission(PERMISSIONS.MAINTENANCE_VIEW)) {
+    if (!isAdminUser || !hasPermission(P.MAINTENANCE_READ)) {
       return;
     }
 
@@ -1044,7 +1044,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Stats Section - Only for Admins with USERS_VIEW permission */}
-      {isAdminUser && hasPermission(PERMISSIONS.USERS_VIEW) && (
+      {isAdminUser && hasPermission(P.USERS_READ) && (
         <Box sx={{ mb: 4 }}>
           <Box
             sx={{
@@ -1124,7 +1124,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Monitoring Section - Only for Admins with MONITORING_VIEW permission */}
-      {isAdminUser && hasPermission(PERMISSIONS.MONITORING_VIEW) && (
+      {isAdminUser && hasPermission(P.MONITORING_READ) && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
             {t('dashboard.monitoringOverview')}
@@ -1177,7 +1177,7 @@ const DashboardPage: React.FC = () => {
             <Typography variant="h6" fontWeight={600}>
               {t('dashboard.environmentOverview')}
             </Typography>
-            {hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE) && (
+            {hasPermission(P.ENVIRONMENTS_UPDATE) && (
               <Tooltip title={t('sidebar.environments')}>
                 <IconButton size="small" onClick={() => navigate('/admin/environments')}>
                   <OpenInNewIcon fontSize="small" />
@@ -1192,7 +1192,7 @@ const DashboardPage: React.FC = () => {
               const mdSize = 3;
               const smSize = 6;
               // Calculate empty cards needed to fill the row (4 columns on md)
-              const canManageEnvs = hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE);
+              const canManageEnvs = hasPermission(P.ENVIRONMENTS_UPDATE);
               const emptyCardsCount = (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
 
               // Sort environments to put current environment first
@@ -1572,7 +1572,7 @@ const DashboardPage: React.FC = () => {
                 <Typography variant="h6" fontWeight={600}>
                   {t('dashboard.recentActivity')}
                 </Typography>
-                {hasPermission(PERMISSIONS.AUDIT_LOGS_VIEW) && (
+                {hasPermission(P.AUDIT_LOGS_READ) && (
                   <Tooltip title={t('dashboard.viewAll')}>
                     <IconButton size="small" onClick={() => navigate('/admin/audit-logs')}>
                       <OpenInNewIcon fontSize="small" />
@@ -1657,54 +1657,208 @@ const DashboardPage: React.FC = () => {
       </Grid>
 
       {/* Recent Crash Events & Server Lifecycle Events */}
-      {isAdminUser &&
-        (hasPermission(PERMISSIONS.CRASH_EVENTS_VIEW) ||
-          hasPermission(PERMISSIONS.SERVERS_VIEW)) && (
-          <Grid container spacing={3} sx={{ mt: 1 }}>
-            {/* Recent Crash Events */}
-            {hasPermission(PERMISSIONS.CRASH_EVENTS_VIEW) && (
-              <Grid size={{ xs: 12, lg: 6 }}>
-                <Card sx={{ height: '100%' }}>
-                  <CardContent>
+      {isAdminUser && (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
+        <Grid container spacing={3} sx={{ mt: 1 }}>
+          {/* Recent Crash Events */}
+          {hasPermission(P.CRASH_EVENTS_READ) && (
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 2,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        {t('dashboard.recentCrashEvents')}
+                      </Typography>
+                      {recentCrashEvents.length > 0 && (
+                        <Chip label={recentCrashEvents.length} size="small" color="error" />
+                      )}
+                    </Box>
+                    <Tooltip title={t('dashboard.viewAll')}>
+                      <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
+                        <OpenInNewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+
+                  {crashEventsLoading ? (
                     <Box
                       sx={{
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        mb: 2,
+                        flexDirection: 'column',
+                        gap: 1,
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="h6" fontWeight={600}>
-                          {t('dashboard.recentCrashEvents')}
-                        </Typography>
-                        {recentCrashEvents.length > 0 && (
-                          <Chip label={recentCrashEvents.length} size="small" color="error" />
-                        )}
-                      </Box>
-                      <Tooltip title={t('dashboard.viewAll')}>
-                        <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
-                          <OpenInNewIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Skeleton key={i} height={48} />
+                      ))}
                     </Box>
-
-                    {crashEventsLoading ? (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 1,
-                        }}
-                      >
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <Skeleton key={i} height={48} />
+                  ) : recentCrashEvents.length > 0 ? (
+                    <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
+                      <List disablePadding dense>
+                        {recentCrashEvents.slice(0, 10).map((event, index) => (
+                          <React.Fragment key={event.id}>
+                            <ListItem
+                              disablePadding
+                              sx={{
+                                py: 1,
+                                cursor: 'pointer',
+                                '&:hover': { bgcolor: 'action.hover' },
+                              }}
+                              onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
+                            >
+                              <ListItemIcon sx={{ minWidth: 36 }}>
+                                <Avatar
+                                  sx={{
+                                    width: 28,
+                                    height: 28,
+                                    bgcolor: alpha(theme.palette.error.main, 0.1),
+                                    color: 'error.main',
+                                    fontSize: 12,
+                                  }}
+                                >
+                                  <BugReportIcon sx={{ fontSize: 16 }} />
+                                </Avatar>
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                                    {(event as any).firstLine || event.crashId}
+                                  </Typography>
+                                }
+                                secondary={
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 1,
+                                      mt: 0.5,
+                                      flexWrap: 'wrap',
+                                    }}
+                                  >
+                                    <Chip
+                                      label={event.platform}
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ height: 18, fontSize: 10 }}
+                                    />
+                                    <Chip
+                                      label={event.branch}
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ height: 18, fontSize: 10 }}
+                                    />
+                                    <Typography variant="caption" color="text.secondary">
+                                      {formatRelativeTime(
+                                        event.createdAt,
+                                        undefined,
+                                        i18n.language
+                                      )}
+                                    </Typography>
+                                  </Box>
+                                }
+                                secondaryTypographyProps={{
+                                  component: 'div',
+                                }}
+                              />
+                            </ListItem>
+                            {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
+                          </React.Fragment>
                         ))}
-                      </Box>
-                    ) : recentCrashEvents.length > 0 ? (
-                      <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
-                        <List disablePadding dense>
-                          {recentCrashEvents.slice(0, 10).map((event, index) => (
+                      </List>
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        py: 8,
+                        color: 'text.secondary',
+                      }}
+                    >
+                      <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+
+          {/* Recent Server Lifecycle Events */}
+          {hasPermission(P.SERVERS_READ) && (
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 2,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        {t('serverLifecycle.title')}
+                      </Typography>
+                      {recentLifecycleEvents.length > 0 && (
+                        <Chip label={recentLifecycleEvents.length} size="small" color="primary" />
+                      )}
+                    </Box>
+                    <Tooltip title={t('dashboard.viewAll')}>
+                      <IconButton size="small" onClick={() => navigate('/admin/server-lifecycle')}>
+                        <OpenInNewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+
+                  {lifecycleEventsLoading ? (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1,
+                      }}
+                    >
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Skeleton key={i} height={48} />
+                      ))}
+                    </Box>
+                  ) : recentLifecycleEvents.length > 0 ? (
+                    <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
+                      <List disablePadding dense>
+                        {recentLifecycleEvents.map((event, index) => {
+                          const getEventColor = (type: string) => {
+                            switch (type) {
+                              case 'REGISTER':
+                                return 'success';
+                              case 'READY':
+                                return 'success';
+                              case 'INITIALIZING':
+                                return 'info';
+                              case 'UNREGISTER':
+                                return 'default';
+                              case 'SHUTTING_DOWN':
+                                return 'warning';
+                              case 'TERMINATED':
+                                return 'default';
+                              case 'TIMEOUT':
+                                return 'warning';
+                              case 'NO_RESPONSE':
+                                return 'warning';
+                              case 'ERROR':
+                                return 'error';
+                              default:
+                                return 'primary';
+                            }
+                          };
+
+                          return (
                             <React.Fragment key={event.id}>
                               <ListItem
                                 disablePadding
@@ -1713,26 +1867,43 @@ const DashboardPage: React.FC = () => {
                                   cursor: 'pointer',
                                   '&:hover': { bgcolor: 'action.hover' },
                                 }}
-                                onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
+                                onClick={() =>
+                                  navigate(
+                                    `/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`
+                                  )
+                                }
                               >
-                                <ListItemIcon sx={{ minWidth: 36 }}>
-                                  <Avatar
-                                    sx={{
-                                      width: 28,
-                                      height: 28,
-                                      bgcolor: alpha(theme.palette.error.main, 0.1),
-                                      color: 'error.main',
-                                      fontSize: 12,
-                                    }}
-                                  >
-                                    <BugReportIcon sx={{ fontSize: 16 }} />
-                                  </Avatar>
-                                </ListItemIcon>
                                 <ListItemText
                                   primary={
-                                    <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                                      {(event as any).firstLine || event.crashId}
-                                    </Typography>
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        flexWrap: 'wrap',
+                                      }}
+                                    >
+                                      <Chip
+                                        label={t(`serverLifecycle.eventTypes.${event.eventType}`, {
+                                          defaultValue: event.eventType,
+                                        })}
+                                        size="small"
+                                        color={getEventColor(event.eventType) as any}
+                                        sx={{
+                                          height: 22,
+                                          fontSize: '0.7rem',
+                                          fontWeight: 600,
+                                        }}
+                                      />
+                                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                        {event.serviceType}
+                                      </Typography>
+                                      {event.serviceGroup && (
+                                        <Typography variant="caption" color="text.secondary">
+                                          ({event.serviceGroup})
+                                        </Typography>
+                                      )}
+                                    </Box>
                                   }
                                   secondary={
                                     <Box
@@ -1744,18 +1915,25 @@ const DashboardPage: React.FC = () => {
                                         flexWrap: 'wrap',
                                       }}
                                     >
-                                      <Chip
-                                        label={event.platform}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ height: 18, fontSize: 10 }}
-                                      />
-                                      <Chip
-                                        label={event.branch}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ height: 18, fontSize: 10 }}
-                                      />
+                                      {event.hostname && (
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                          sx={{ fontWeight: 500 }}
+                                        >
+                                          {event.hostname}
+                                        </Typography>
+                                      )}
+                                      <Typography
+                                        variant="caption"
+                                        color="text.disabled"
+                                        sx={{
+                                          fontFamily: 'monospace',
+                                          fontSize: '0.65rem',
+                                        }}
+                                      >
+                                        {event.instanceId}
+                                      </Typography>
                                       <Typography variant="caption" color="text.secondary">
                                         {formatRelativeTime(
                                           event.createdAt,
@@ -1763,6 +1941,19 @@ const DashboardPage: React.FC = () => {
                                           i18n.language
                                         )}
                                       </Typography>
+                                      {event.cloudRegion && (
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            bgcolor: 'action.selected',
+                                            px: 0.5,
+                                            borderRadius: 0,
+                                            fontSize: '0.65rem',
+                                          }}
+                                        >
+                                          {event.cloudRegion}
+                                        </Typography>
+                                      )}
                                     </Box>
                                   }
                                   secondaryTypographyProps={{
@@ -1770,226 +1961,29 @@ const DashboardPage: React.FC = () => {
                                   }}
                                 />
                               </ListItem>
-                              {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
+                              {index < recentLifecycleEvents.length - 1 && <Divider />}
                             </React.Fragment>
-                          ))}
-                        </List>
-                      </Box>
-                    ) : (
-                      <Box
-                        sx={{
-                          textAlign: 'center',
-                          py: 8,
-                          color: 'text.secondary',
-                        }}
-                      >
-                        <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
-                      </Box>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            )}
-
-            {/* Recent Server Lifecycle Events */}
-            {hasPermission(PERMISSIONS.SERVERS_VIEW) && (
-              <Grid size={{ xs: 12, lg: 6 }}>
-                <Card sx={{ height: '100%' }}>
-                  <CardContent>
+                          );
+                        })}
+                      </List>
+                    </Box>
+                  ) : (
                     <Box
                       sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        mb: 2,
+                        textAlign: 'center',
+                        py: 8,
+                        color: 'text.secondary',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="h6" fontWeight={600}>
-                          {t('serverLifecycle.title')}
-                        </Typography>
-                        {recentLifecycleEvents.length > 0 && (
-                          <Chip label={recentLifecycleEvents.length} size="small" color="primary" />
-                        )}
-                      </Box>
-                      <Tooltip title={t('dashboard.viewAll')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate('/admin/server-lifecycle')}
-                        >
-                          <OpenInNewIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      <Typography variant="body2">{t('serverLifecycle.noEvents')}</Typography>
                     </Box>
-
-                    {lifecycleEventsLoading ? (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 1,
-                        }}
-                      >
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <Skeleton key={i} height={48} />
-                        ))}
-                      </Box>
-                    ) : recentLifecycleEvents.length > 0 ? (
-                      <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
-                        <List disablePadding dense>
-                          {recentLifecycleEvents.map((event, index) => {
-                            const getEventColor = (type: string) => {
-                              switch (type) {
-                                case 'REGISTER':
-                                  return 'success';
-                                case 'READY':
-                                  return 'success';
-                                case 'INITIALIZING':
-                                  return 'info';
-                                case 'UNREGISTER':
-                                  return 'default';
-                                case 'SHUTTING_DOWN':
-                                  return 'warning';
-                                case 'TERMINATED':
-                                  return 'default';
-                                case 'TIMEOUT':
-                                  return 'warning';
-                                case 'NO_RESPONSE':
-                                  return 'warning';
-                                case 'ERROR':
-                                  return 'error';
-                                default:
-                                  return 'primary';
-                              }
-                            };
-
-                            return (
-                              <React.Fragment key={event.id}>
-                                <ListItem
-                                  disablePadding
-                                  sx={{
-                                    py: 1,
-                                    cursor: 'pointer',
-                                    '&:hover': { bgcolor: 'action.hover' },
-                                  }}
-                                  onClick={() =>
-                                    navigate(
-                                      `/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`
-                                    )
-                                  }
-                                >
-                                  <ListItemText
-                                    primary={
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 1,
-                                          flexWrap: 'wrap',
-                                        }}
-                                      >
-                                        <Chip
-                                          label={t(
-                                            `serverLifecycle.eventTypes.${event.eventType}`,
-                                            { defaultValue: event.eventType }
-                                          )}
-                                          size="small"
-                                          color={getEventColor(event.eventType) as any}
-                                          sx={{
-                                            height: 22,
-                                            fontSize: '0.7rem',
-                                            fontWeight: 600,
-                                          }}
-                                        />
-                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                          {event.serviceType}
-                                        </Typography>
-                                        {event.serviceGroup && (
-                                          <Typography variant="caption" color="text.secondary">
-                                            ({event.serviceGroup})
-                                          </Typography>
-                                        )}
-                                      </Box>
-                                    }
-                                    secondary={
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 1,
-                                          mt: 0.5,
-                                          flexWrap: 'wrap',
-                                        }}
-                                      >
-                                        {event.hostname && (
-                                          <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            sx={{ fontWeight: 500 }}
-                                          >
-                                            {event.hostname}
-                                          </Typography>
-                                        )}
-                                        <Typography
-                                          variant="caption"
-                                          color="text.disabled"
-                                          sx={{
-                                            fontFamily: 'monospace',
-                                            fontSize: '0.65rem',
-                                          }}
-                                        >
-                                          {event.instanceId}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                          {formatRelativeTime(
-                                            event.createdAt,
-                                            undefined,
-                                            i18n.language
-                                          )}
-                                        </Typography>
-                                        {event.cloudRegion && (
-                                          <Typography
-                                            variant="caption"
-                                            sx={{
-                                              bgcolor: 'action.selected',
-                                              px: 0.5,
-                                              borderRadius: 0,
-                                              fontSize: '0.65rem',
-                                            }}
-                                          >
-                                            {event.cloudRegion}
-                                          </Typography>
-                                        )}
-                                      </Box>
-                                    }
-                                    secondaryTypographyProps={{
-                                      component: 'div',
-                                    }}
-                                  />
-                                </ListItem>
-                                {index < recentLifecycleEvents.length - 1 && <Divider />}
-                              </React.Fragment>
-                            );
-                          })}
-                        </List>
-                      </Box>
-                    ) : (
-                      <Box
-                        sx={{
-                          textAlign: 'center',
-                          py: 8,
-                          color: 'text.secondary',
-                        }}
-                      >
-                        <Typography variant="body2">{t('serverLifecycle.noEvents')}</Typography>
-                      </Box>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            )}
-          </Grid>
-        )}
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+        </Grid>
+      )}
     </Box>
   );
 };

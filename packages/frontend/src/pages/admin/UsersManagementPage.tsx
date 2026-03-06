@@ -102,7 +102,7 @@ import { UserService } from '@/services/users';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
@@ -228,7 +228,7 @@ const UsersManagementPage: React.FC = () => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const { environments } = useEnvironments();
-  const canManage = hasPermission([PERMISSIONS.USERS_MANAGE]);
+  const canManage = hasPermission([P.USERS_UPDATE]);
 
   // Helper function to check if user is current user
   const isCurrentUser = (user: User | null): boolean => {

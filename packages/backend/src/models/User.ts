@@ -202,7 +202,6 @@ export class UserModel {
 
       // Apply filters function
       const applyFilters = (query: any) => {
-
         // Handle status filter (single or multiple)
         if (filters.status) {
           if (Array.isArray(filters.status)) {
@@ -571,5 +570,4 @@ export class UserModel {
       return false;
     }
   }
-
 }

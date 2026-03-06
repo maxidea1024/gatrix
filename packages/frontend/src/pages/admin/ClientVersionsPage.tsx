@@ -8,7 +8,7 @@ import {
   mutateClientVersions,
 } from '../../hooks/useSWR';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import * as XLSX from 'xlsx';
 import {
   Box,
@@ -346,7 +346,7 @@ const ClientVersionsPage: React.FC = () => {
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.CLIENT_VERSIONS_MANAGE]);
+  const canManage = hasPermission([P.CLIENT_VERSIONS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

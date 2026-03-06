@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useOrgProject } from '../../contexts/OrgProjectContext';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -91,7 +91,7 @@ const FeatureSegmentsPage: React.FC = () => {
   const { hasPermission } = useAuth();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
-  const canManage = hasPermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]);
+  const canManage = hasPermission([P.FEATURES_UPDATE]);
   const { currentProjectId } = useOrgProject();
 
   // State

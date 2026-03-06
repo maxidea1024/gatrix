@@ -13,7 +13,7 @@ import { RemoteAddressStrategy } from './RemoteAddressStrategy';
 import { ApplicationHostnameStrategy } from './ApplicationHostnameStrategy';
 import { evaluateStrategyWithDetails, getStrategy } from './index';
 import { normalizedStrategyValue } from './util';
-import type { EvaluationContext, StrategyParameters } from '../types';
+import type { EvaluationContext, StrategyParameters } from '@gatrix/shared';
 
 const defaultContext: EvaluationContext = {
   appName: 'test-app',

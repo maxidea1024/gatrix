@@ -186,46 +186,52 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
               {t('serviceAccounts.noRolesAvailable')}
             </Typography>
           ) : (
-            <List dense disablePadding>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
               {allRoles.map((role) => {
                 const isSelected = selectedRoleIds.includes(role.id);
                 return (
-                  <ListItem
+                  <Paper
                     key={role.id}
+                    variant="outlined"
                     sx={{
-                      px: 1,
-                      py: 0.5,
-                      borderRadius: 1,
-                      mb: 0.5,
+                      px: 1.5,
+                      py: 1,
                       cursor: 'pointer',
+                      borderColor: isSelected ? 'primary.main' : 'divider',
                       bgcolor: isSelected ? 'action.selected' : 'transparent',
                       '&:hover': { bgcolor: isSelected ? 'action.selected' : 'action.hover' },
+                      transition: 'all 0.15s',
                     }}
                     onClick={() => handleToggleRole(role.id)}
                   >
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <ShieldIcon
-                            sx={{
-                              fontSize: 16,
-                              color: isSelected ? 'primary.main' : 'text.disabled',
-                            }}
-                          />
-                          <Typography variant="body2" fontWeight={isSelected ? 600 : 400}>
-                            {role.roleName}
-                          </Typography>
-                          {isSelected && (
-                            <Chip label="✓" size="small" color="primary" sx={{ height: 20 }} />
-                          )}
-                        </Box>
-                      }
-                      secondary={role.description || null}
-                    />
-                  </ListItem>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <ShieldIcon
+                        sx={{
+                          fontSize: 16,
+                          color: isSelected ? 'primary.main' : 'text.disabled',
+                        }}
+                      />
+                      <Typography variant="body2" fontWeight={isSelected ? 600 : 400}>
+                        {role.roleName}
+                      </Typography>
+                      {isSelected && (
+                        <Chip
+                          label="✓"
+                          size="small"
+                          color="primary"
+                          sx={{ height: 20, ml: 'auto' }}
+                        />
+                      )}
+                    </Box>
+                    {role.description && (
+                      <Typography variant="caption" color="text.secondary" sx={{ ml: 3 }}>
+                        {role.description}
+                      </Typography>
+                    )}
+                  </Paper>
                 );
               })}
-            </List>
+            </Box>
           )}
         </Paper>
       </Box>
@@ -831,31 +837,57 @@ const ServiceAccountsPage: React.FC = () => {
                   {t('serviceAccounts.noTokens')}
                 </Typography>
               ) : (
-                <List dense disablePadding>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {detailTokens.map((token) => (
-                    <ListItem key={token.id} sx={{ px: 0 }}>
-                      <ListItemText
-                        primary={token.tokenName}
-                        secondary={
-                          <>
-                            {token.description && `${token.description} · `}
+                    <Paper key={token.id} variant="outlined" sx={{ p: 1.5 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <TokenIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                            <Typography variant="body2" fontWeight={600} noWrap>
+                              {token.name}
+                            </Typography>
+                          </Box>
+                          {token.description && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ display: 'block', mb: 0.5 }}
+                            >
+                              {token.description}
+                            </Typography>
+                          )}
+                          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                             <Tooltip title={formatDateTimeDetailed(token.createdAt)}>
-                              <span>{formatRelativeTime(token.createdAt)}</span>
+                              <Chip
+                                label={`${t('serviceAccounts.createdAt')}: ${formatRelativeTime(token.createdAt)}`}
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 22, fontSize: '0.7rem' }}
+                              />
                             </Tooltip>
                             {token.expiresAt && (
-                              <>
-                                {` · ${t('serviceAccounts.expiresAt')}: `}
-                                <Tooltip title={formatDateTimeDetailed(token.expiresAt)}>
-                                  <span>{formatRelativeTime(token.expiresAt)}</span>
-                                </Tooltip>
-                              </>
+                              <Tooltip title={formatDateTimeDetailed(token.expiresAt)}>
+                                <Chip
+                                  label={`${t('serviceAccounts.expiresAt')}: ${formatRelativeTime(token.expiresAt)}`}
+                                  size="small"
+                                  variant="outlined"
+                                  color={
+                                    new Date(token.expiresAt) < new Date() ? 'error' : 'default'
+                                  }
+                                  sx={{ height: 22, fontSize: '0.7rem' }}
+                                />
+                              </Tooltip>
                             )}
-                          </>
-                        }
-                      />
-                      <ListItemSecondaryAction>
+                          </Box>
+                        </Box>
                         <IconButton
-                          edge="end"
                           size="small"
                           color="error"
                           onClick={() => {
@@ -865,17 +897,17 @@ const ServiceAccountsPage: React.FC = () => {
                                 type: 'token',
                                 accountId: detailAccount.id,
                                 tokenId: token.id,
-                                name: token.tokenName,
+                                name: token.name,
                               });
                             }
                           }}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
+                      </Box>
+                    </Paper>
                   ))}
-                </List>
+                </Box>
               )}
             </TabPanel>
 
@@ -933,33 +965,48 @@ const ServiceAccountsPage: React.FC = () => {
                   {t('serviceAccounts.noRoles')}
                 </Typography>
               ) : (
-                <List dense disablePadding>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                   {detailRoles.map((ur) => (
-                    <ListItem key={ur.id} sx={{ px: 0 }}>
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <ShieldIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                            <Typography variant="body2" fontWeight="medium">
+                    <Paper key={ur.id} variant="outlined" sx={{ px: 1.5, py: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            flex: 1,
+                            minWidth: 0,
+                          }}
+                        >
+                          <ShieldIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="body2" fontWeight={600} noWrap>
                               {ur.roleName}
                             </Typography>
+                            {ur.roleDescription && (
+                              <Typography variant="caption" color="text.secondary" noWrap>
+                                {ur.roleDescription}
+                              </Typography>
+                            )}
                           </Box>
-                        }
-                        secondary={ur.roleDescription || null}
-                      />
-                      <ListItemSecondaryAction>
+                        </Box>
                         <IconButton
-                          edge="end"
                           size="small"
                           color="error"
                           onClick={() => handleRemoveRole(ur.roleId)}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
+                      </Box>
+                    </Paper>
                   ))}
-                </List>
+                </Box>
               )}
             </TabPanel>
           </Box>

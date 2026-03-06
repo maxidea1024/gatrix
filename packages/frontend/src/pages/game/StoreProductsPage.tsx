@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -84,7 +84,7 @@ const StoreProductsPage: React.FC = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.STORE_PRODUCTS_MANAGE]);
+  const canManage = hasPermission([P.STORE_PRODUCTS_UPDATE]);
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
 

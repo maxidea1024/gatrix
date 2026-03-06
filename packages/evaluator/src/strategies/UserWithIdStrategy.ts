@@ -5,7 +5,7 @@
  * No stickiness - direct userId match.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 
 export class UserWithIdStrategy extends Strategy {

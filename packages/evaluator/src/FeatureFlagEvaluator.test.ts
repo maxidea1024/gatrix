@@ -10,7 +10,7 @@ import type {
   FeatureSegment,
   Constraint,
   ConstraintOperator,
-} from './types';
+} from '@gatrix/shared';
 
 // Helper to create a minimal flag with a single constraint
 function createFlagWithConstraint(constraint: Constraint): FeatureFlag {

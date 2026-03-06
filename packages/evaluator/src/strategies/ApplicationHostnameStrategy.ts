@@ -5,7 +5,7 @@
  */
 
 import { hostname } from 'os';
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 
 export class ApplicationHostnameStrategy extends Strategy {

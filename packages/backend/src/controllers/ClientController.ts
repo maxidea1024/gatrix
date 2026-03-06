@@ -23,7 +23,7 @@ import {
   EvaluationContext,
   VALUE_SOURCE,
   EvaluationUtils,
-} from '@gatrix/shared';
+} from '@gatrix/evaluator';
 import db from '../config/knex';
 
 export class ClientController {

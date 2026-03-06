@@ -44,7 +44,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
-import { Permission, getPermissionLabelKey, PERMISSION_CATEGORIES } from '@/types/permissions';
+import { PERMISSION_CATEGORIES, RESOURCE_ACTIONS, type Resource } from '@gatrix/shared/permissions';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 
 interface Environment {
@@ -584,14 +584,16 @@ const ProfilePage: React.FC = () => {
                   </Box>
                 ) : permissions.length > 0 ? (
                   <Stack spacing={2}>
-                    {Object.entries(PERMISSION_CATEGORIES).map(([categoryKey, category]) => {
-                      const categoryPermissions = category.permissions.filter((p) =>
-                        permissions.includes(p)
+                    {PERMISSION_CATEGORIES.map((category, catIdx) => {
+                      // Build permission strings for this category
+                      const catPerms = category.resources.flatMap((resource: Resource) =>
+                        (RESOURCE_ACTIONS[resource] || []).map((action) => `${resource}:${action}`)
                       );
+                      const categoryPermissions = catPerms.filter((p) => permissions.includes(p));
                       if (categoryPermissions.length === 0) return null;
 
                       return (
-                        <Box key={categoryKey}>
+                        <Box key={catIdx}>
                           <Typography
                             variant="caption"
                             color="text.secondary"
@@ -603,7 +605,7 @@ const ProfilePage: React.FC = () => {
                               letterSpacing: 0.5,
                             }}
                           >
-                            {t(category.label)}
+                            {t(category.labelKey)}
                           </Typography>
                           <Box
                             sx={{
@@ -613,12 +615,14 @@ const ProfilePage: React.FC = () => {
                             }}
                           >
                             {categoryPermissions.map((permission) => {
-                              const isManage = permission.includes('.manage');
-                              const permissionLabel = t(
-                                getPermissionLabelKey(permission as Permission)
-                              );
-                              // Get localized description for tooltip (e.g., permissions.users_view_desc)
-                              const descKey = `permissions.${permission.replace('.', '_')}_desc`;
+                              const isWrite =
+                                permission.includes(':update') ||
+                                permission.includes(':create') ||
+                                permission.includes(':delete');
+                              const permKey = `permissions.${permission.replace(/[.:]/g, '_')}`;
+                              const permissionLabel = t(permKey);
+                              // Get localized description for tooltip
+                              const descKey = `${permKey}_desc`;
                               const permissionDesc = t(descKey, {
                                 defaultValue: '',
                               });
@@ -634,16 +638,16 @@ const ProfilePage: React.FC = () => {
                                       px: 1,
                                       py: 0.5,
                                       borderRadius: 0,
-                                      bgcolor: isManage
+                                      bgcolor: isWrite
                                         ? alpha(theme.palette.warning.main, 0.15)
                                         : alpha(theme.palette.primary.main, 0.1),
-                                      color: isManage ? 'warning.dark' : 'primary.main',
+                                      color: isWrite ? 'warning.dark' : 'primary.main',
                                       fontWeight: 500,
                                       fontSize: '0.75rem',
-                                      border: `1px solid ${isManage ? alpha(theme.palette.warning.main, 0.3) : alpha(theme.palette.primary.main, 0.2)}`,
+                                      border: `1px solid ${isWrite ? alpha(theme.palette.warning.main, 0.3) : alpha(theme.palette.primary.main, 0.2)}`,
                                       cursor: 'default',
                                       '&:hover': {
-                                        bgcolor: isManage
+                                        bgcolor: isWrite
                                           ? alpha(theme.palette.warning.main, 0.25)
                                           : alpha(theme.palette.primary.main, 0.15),
                                       },

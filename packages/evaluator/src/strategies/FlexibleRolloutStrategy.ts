@@ -5,7 +5,7 @@
  * This is the only strategy that accepts a user-configurable stickiness parameter.
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 import { normalizedStrategyValue } from './util';
 

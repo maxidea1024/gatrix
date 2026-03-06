@@ -10,15 +10,7 @@ import logger from '../config/logger';
 import db from '../config/knex';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
-
-// Super admin email - this account cannot be modified by anyone except themselves (name only)
-const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
-
-// Helper function to check if a user is the super admin
-const isSuperAdminUser = async (userId: string): Promise<boolean> => {
-  const user = await db('g_users').where('id', userId).select('email').first();
-  return user?.email === SUPER_ADMIN_EMAIL;
-};
+import { permissionService } from '../services/PermissionService';
 
 export class AdminController {
   // Dashboard and statistics
@@ -212,15 +204,16 @@ export class AdminController {
         throw new GatrixError('User not authenticated', 401);
       }
 
-      // Protect super admin from being modified by others
-      const isTargetSuperAdmin = await isSuperAdminUser(userId);
+      // Protect org admin from being modified by others
+      const orgId = req.user?.orgId;
+      const isTargetOrgAdmin = orgId ? await permissionService.isOrgAdmin(userId, orgId) : false;
       const isOwnAccount = req.user.userId === userId;
-      if (isTargetSuperAdmin && !isOwnAccount) {
-        throw new GatrixError('Cannot modify super admin account', 403);
+      if (isTargetOrgAdmin && !isOwnAccount) {
+        throw new GatrixError('Cannot modify org admin account', 403);
       }
 
-      // If it's super admin modifying their own account, only allow name changes
-      if (isTargetSuperAdmin && isOwnAccount) {
+      // If org admin modifying their own account, only allow name changes
+      if (isTargetOrgAdmin && isOwnAccount) {
         const allowedUpdates = { name: updates.name };
         const user = await UserService.updateUser(userId, allowedUpdates);
         res.json({
@@ -263,9 +256,10 @@ export class AdminController {
         throw new GatrixError('Cannot delete your own account', 400);
       }
 
-      // Protect super admin from being deleted
-      if (await isSuperAdminUser(userId)) {
-        throw new GatrixError('Cannot delete super admin account', 403);
+      // Protect org admin from being deleted
+      const orgId = req.user?.orgId;
+      if (orgId && (await permissionService.isOrgAdmin(userId, orgId))) {
+        throw new GatrixError('Cannot delete org admin account', 403);
       }
 
       await UserService.deleteUser(userId);
@@ -287,9 +281,14 @@ export class AdminController {
     try {
       const userId = req.params.id;
 
-      // Protect super admin from being modified by others
-      if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
-        throw new GatrixError('Cannot modify super admin account', 403);
+      // Protect org admin from being modified by others
+      const orgId = req.user?.orgId;
+      if (
+        orgId &&
+        (await permissionService.isOrgAdmin(userId, orgId)) &&
+        req.user?.userId !== userId
+      ) {
+        throw new GatrixError('Cannot modify org admin account', 403);
       }
 
       await UserService.activateUser(userId);
@@ -316,9 +315,10 @@ export class AdminController {
         throw new GatrixError('Cannot suspend your own account', 400);
       }
 
-      // Protect super admin from being suspended
-      if (await isSuperAdminUser(userId)) {
-        throw new GatrixError('Cannot suspend super admin account', 403);
+      // Protect org admin from being suspended
+      const orgId = req.user?.orgId;
+      if (orgId && (await permissionService.isOrgAdmin(userId, orgId))) {
+        throw new GatrixError('Cannot suspend org admin account', 403);
       }
 
       await UserService.suspendUser(userId);
@@ -340,8 +340,6 @@ export class AdminController {
       next(error);
     }
   }
-
-
 
   static async verifyUserEmail(
     req: AuthenticatedRequest,
@@ -784,8 +782,6 @@ export class AdminController {
     }
   }
 
-
-
   static async bulkUpdateUserEmailVerified(
     req: AuthenticatedRequest,
     res: Response,
@@ -1019,5 +1015,4 @@ export class AdminController {
       next(error);
     }
   }
-
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Button,
@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 const DataManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.DATA_MANAGEMENT_MANAGE]);
+  const canManage = hasPermission([P.DATA_UPDATE]);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);

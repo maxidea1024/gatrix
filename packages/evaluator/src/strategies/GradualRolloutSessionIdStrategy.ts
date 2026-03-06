@@ -5,7 +5,7 @@
  * Stickiness is fixed to sessionId (not configurable).
  */
 
-import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '../types';
+import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
 import { Strategy } from './Strategy';
 import { normalizedStrategyValue } from './util';
 
