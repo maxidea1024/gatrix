@@ -9,18 +9,16 @@ export interface JwtPayload {
   userId: string;
   email: string;
   orgId: string;
-  orgRole: string;
   iat?: number;
   exp?: number;
 }
 
 export class JwtUtils {
-  static generateToken(user: UserWithoutPassword, orgId: string, orgRole: string): string {
+  static generateToken(user: UserWithoutPassword, orgId: string): string {
     const payload: JwtPayload = {
       userId: user.id as any,
       email: user.email,
       orgId,
-      orgRole,
     };
 
     const options: jwt.SignOptions = {
@@ -31,12 +29,11 @@ export class JwtUtils {
     return jwt.sign(payload, config.jwt.secret as string, options);
   }
 
-  static generateRefreshToken(user: UserWithoutPassword, orgId: string, orgRole: string): string {
+  static generateRefreshToken(user: UserWithoutPassword, orgId: string): string {
     const payload: JwtPayload = {
       userId: user.id as any,
       email: user.email,
       orgId,
-      orgRole,
     };
 
     const options: jwt.SignOptions = {
@@ -62,7 +59,6 @@ export class JwtUtils {
       logger.debug('JWT token verified successfully:', {
         userId: decoded.userId,
         orgId: decoded.orgId,
-        orgRole: decoded.orgRole,
         exp: decoded.exp,
         iat: decoded.iat,
         expiresAt: new Date(decoded.exp * 1000).toISOString(),

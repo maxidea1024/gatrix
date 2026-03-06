@@ -10,6 +10,7 @@ export interface UserFilters {
   status?: string;
   search?: string;
   tags?: string[];
+  orgId?: string;
 }
 
 export interface PaginationOptions {
@@ -410,9 +411,9 @@ export class UserService {
   /**
    * Search users by name or email (for chat system)
    */
-  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+  static async searchUsers(query: string, limit: number = 20, orgId?: string): Promise<UserWithoutPassword[]> {
     try {
-      const users = await UserModel.searchUsers(query, limit);
+      const users = await UserModel.searchUsers(query, limit, orgId);
       return users;
     } catch (error) {
       logger.error('Error searching users:', error);

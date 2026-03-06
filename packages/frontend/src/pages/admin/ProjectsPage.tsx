@@ -134,7 +134,7 @@ const ProjectsPage: React.FC = () => {
     (async () => {
       setUserSearchLoading(true);
       try {
-        const results = await rbacService.searchUsers(debouncedUserSearch);
+        const results = await rbacService.searchUsers(debouncedUserSearch, effectiveOrg?.id);
         if (!cancelled) setUserSearchResults(results);
       } catch {
         // ignore
@@ -143,7 +143,7 @@ const ProjectsPage: React.FC = () => {
       }
     })();
     return () => { cancelled = true; };
-  }, [debouncedUserSearch]);
+  }, [debouncedUserSearch, effectiveOrg?.id]);
 
   const handleOpenMemberDrawer = async (proj: Project) => {
     setMemberProject(proj);
@@ -848,23 +848,6 @@ const ProjectsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Select
-                          size="small"
-                          value={m.projectRole}
-                          onChange={(e) => {
-                            const newRole = e.target.value as 'admin' | 'member';
-                            setPendingChanges((prev) => ({
-                              ...prev,
-                              add: prev.add.map((a) =>
-                                a.userId === m.userId ? { ...a, projectRole: newRole } : a
-                              ),
-                            }));
-                          }}
-                          sx={{ minWidth: 100 }}
-                        >
-                          <MenuItem value="member">{t('rbac.projects.roleMember')}</MenuItem>
-                          <MenuItem value="admin">{t('rbac.projects.roleAdmin')}</MenuItem>
-                        </Select>
                         <IconButton
                           size="small"
                           onClick={() => {
@@ -904,27 +887,7 @@ const ProjectsPage: React.FC = () => {
                           <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
                           <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Select
-                            size="small"
-                            value={pendingChanges.roleChanges[m.userId] || m.projectRole}
-                            onChange={(e) => {
-                              const newRole = e.target.value as 'admin' | 'member';
-                              setPendingChanges((prev) => {
-                                const changes = { ...prev.roleChanges };
-                                if (newRole === m.projectRole) {
-                                  delete changes[m.userId];
-                                } else {
-                                  changes[m.userId] = newRole;
-                                }
-                                return { ...prev, roleChanges: changes };
-                              });
-                            }}
-                            sx={{ minWidth: 100 }}
-                          >
-                            <MenuItem value="member">{t('rbac.projects.roleMember')}</MenuItem>
-                            <MenuItem value="admin">{t('rbac.projects.roleAdmin')}</MenuItem>
-                          </Select>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <IconButton
                             size="small"
                             onClick={() => {

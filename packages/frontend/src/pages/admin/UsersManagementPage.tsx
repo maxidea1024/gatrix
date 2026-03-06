@@ -384,6 +384,10 @@ const UsersManagementPage: React.FC = () => {
   // Permission state for new user
   const [newUserPermissions, setNewUserPermissions] = useState<Permission[]>([]);
 
+  // RBAC roles for new user
+  const [newUserRbacRoles, setNewUserRbacRoles] = useState<{ roleId: string; roleName: string; description?: string }[]>([]);
+  const [newUserSelectedRbacRoleId, setNewUserSelectedRbacRoleId] = useState<string | null>(null);
+
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
     open: false,
@@ -1277,7 +1281,7 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     // 폼 데이터 초기화
     setNewUserData({
       name: '',
@@ -1289,7 +1293,19 @@ const UsersManagementPage: React.FC = () => {
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
     setNewUserPermissions([]);
+    setNewUserRbacRoles([]);
+    setNewUserSelectedRbacRoleId(null);
     setAddUserDialog(true);
+
+    // Load RBAC roles if not loaded yet
+    if (allRbacRoles.length === 0) {
+      try {
+        const roles = await rbacService.getRoles();
+        setAllRbacRoles(roles);
+      } catch {
+        console.error('Failed to load RBAC roles');
+      }
+    }
 
     // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
     setTimeout(() => {
@@ -1316,6 +1332,8 @@ const UsersManagementPage: React.FC = () => {
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
     setNewUserPermissions([]);
+    setNewUserRbacRoles([]);
+    setNewUserSelectedRbacRoleId(null);
     setNewUserErrors({
       name: '',
       email: '',
@@ -1365,6 +1383,14 @@ const UsersManagementPage: React.FC = () => {
         await apiService.put(`/admin/users/${createdUser.id}/permissions`, {
           permissions: newUserPermissions,
         });
+      }
+
+      // Assign RBAC roles after user creation
+      if (createdUser && newUserRbacRoles.length > 0) {
+        const userId = String(createdUser.id);
+        await Promise.all(
+          newUserRbacRoles.map((r) => rbacService.assignUserRole(userId, r.roleId))
+        );
       }
 
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
@@ -2094,23 +2120,7 @@ const UsersManagementPage: React.FC = () => {
                 }}
               />
             </Box>
-            <FormControl fullWidth>
-              <InputLabel>{t('users.role')}</InputLabel>
-              <Select
-                value={newUserData.role}
-                label={t('users.role')}
-                onChange={(e) =>
-                  setNewUserData({
-                    ...newUserData,
-                    role: e.target.value as 'admin' | 'user',
-                  })
-                }
-              >
-                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-              </Select>
-              <FormHelperText>{t('users.roleHelp')}</FormHelperText>
-            </FormControl>
+
 
             {/* Tags Selection */}
             <Box>
@@ -2175,10 +2185,119 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* RBAC roles can be assigned after user creation */}
-            <Alert severity="info" sx={{ mt: 2 }}>
-              {t('rbac.userRoles.noRoles')}
-            </Alert>
+            {/* RBAC Role Assignment */}
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                {t('rbac.userRoles.title')}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                <Autocomplete
+                  size="small"
+                  sx={{ flex: 1 }}
+                  options={allRbacRoles.filter(
+                    (r) => !newUserRbacRoles.some((ur) => ur.roleId === r.id)
+                  )}
+                  getOptionLabel={(opt) => opt.roleName}
+                  value={allRbacRoles.find((r) => r.id === newUserSelectedRbacRoleId) || null}
+                  onChange={(_, val) => setNewUserSelectedRbacRoleId(val?.id || null)}
+                  slotProps={{
+                    popper: { style: { zIndex: 9999 } },
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder={t('rbac.userRoles.selectRole')} />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <Box component="li" key={key} {...otherProps}>
+                        <Box>
+                          <Typography variant="body2">{option.roleName}</Typography>
+                          {option.description && (
+                            <Typography variant="caption" color="text.secondary">
+                              {option.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                    );
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={!newUserSelectedRbacRoleId}
+                  onClick={() => {
+                    if (!newUserSelectedRbacRoleId) return;
+                    const roleToAdd = allRbacRoles.find((r) => r.id === newUserSelectedRbacRoleId);
+                    if (!roleToAdd) return;
+                    setNewUserRbacRoles((prev) => [
+                      ...prev,
+                      {
+                        roleId: roleToAdd.id,
+                        roleName: roleToAdd.roleName,
+                        description: roleToAdd.description,
+                      },
+                    ]);
+                    setNewUserSelectedRbacRoleId(null);
+                  }}
+                >
+                  {t('rbac.userRoles.addRole')}
+                </Button>
+              </Box>
+              {newUserRbacRoles.length === 0 ? (
+                <Alert severity="info" sx={{ mt: 1 }}>
+                  {t('rbac.userRoles.noRoles')}
+                </Alert>
+              ) : (
+                <Box
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    mt: 1,
+                  }}
+                >
+                  {newUserRbacRoles.map((role, index) => (
+                    <Box
+                      key={role.roleId}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        px: 2,
+                        py: 1,
+                        borderBottom: index < newUserRbacRoles.length - 1 ? 1 : 0,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {role.roleName}
+                        </Typography>
+                        {role.description && (
+                          <Typography variant="caption" color="text.secondary">
+                            {role.description}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Tooltip title={t('rbac.userRoles.removeRole')}>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => {
+                            setNewUserRbacRoles((prev) =>
+                              prev.filter((r) => r.roleId !== role.roleId)
+                            );
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
           </Box>
         </Box>
 

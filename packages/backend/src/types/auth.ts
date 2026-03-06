@@ -6,8 +6,6 @@ export interface AppUser {
   email: string;
   name: string;
   orgId: string;
-  orgRole: 'admin' | 'user';
-  role: 'admin' | 'user'; // maps to orgRole, for gradual migration
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -24,7 +22,6 @@ export interface JWTPayload {
   userId: string;
   email: string;
   orgId: string;
-  orgRole: string;
   iat?: number;
   exp?: number;
 }

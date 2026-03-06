@@ -26,7 +26,8 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@gatrix/shared/permissions": ["../shared/src/permissions/index.ts"]
     },
 
     /* Additional options */

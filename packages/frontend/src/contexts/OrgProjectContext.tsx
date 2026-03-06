@@ -209,7 +209,7 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
   };
 
   // Show full-screen notice when user has no org access
-  if (noOrgAccess && !isLoading) {
+  if (noOrgAccess) {
     return (
       <OrgProjectContext.Provider value={value}>
         <Box
@@ -241,9 +241,9 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
               <Button
                 variant="outlined"
-                startIcon={<RefreshIcon />}
+                startIcon={isLoading ? <RefreshIcon sx={{ animation: 'spin 1s linear infinite', '@keyframes spin': { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } } }} /> : <RefreshIcon />}
+                disabled={isLoading}
                 onClick={() => {
-                  setNoOrgAccess(false);
                   setIsLoading(true);
                   loadOrgs().finally(() => setIsLoading(false));
                 }}

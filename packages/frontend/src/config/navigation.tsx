@@ -116,7 +116,9 @@ function getItemPermissions(item: MenuItemConfig): Permission[] | undefined {
       : [item.requiredPermission];
   }
   if (item.permission) {
-    return expandPermission(item.permission);
+    const expanded = expandPermission(item.permission);
+    // If no permissions could be resolved (shorthand not in P), treat as no restriction
+    return expanded.length > 0 ? expanded : undefined;
   }
   return undefined;
 }

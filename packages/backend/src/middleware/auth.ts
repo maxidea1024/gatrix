@@ -3,6 +3,7 @@ import { JwtUtils } from '../utils/jwt';
 import { UserModel } from '../models/User';
 import { GatrixError } from './errorHandler';
 import { createLogger } from '../config/logger';
+import db from '../config/knex';
 
 const logger = createLogger('auth');
 import { permissionService } from '../services/PermissionService';
@@ -37,8 +38,22 @@ export const auth = async (
       throw new GatrixError('User account is not active', 401);
     }
 
-    const orgId = payload.orgId;
-    const orgRole = payload.orgRole as 'admin' | 'user';
+    let orgId = payload.orgId;
+
+    // Fallback: if JWT orgId is empty (token issued before org membership), look it up from DB
+    if (!orgId) {
+      try {
+        const membership = await db('g_organisation_members')
+          .where('userId', String(user.id))
+          .orderBy('joinedAt', 'asc')
+          .first();
+        if (membership) {
+          orgId = membership.orgId;
+        }
+      } catch {
+        // Non-critical: proceed with empty orgId
+      }
+    }
 
     const appUser: AppUser = {
       id: String(user.id),
@@ -46,8 +61,6 @@ export const auth = async (
       email: user.email,
       name: (user as any).name,
       orgId,
-      orgRole,
-      role: orgRole,
       isActive: user.status === 'active',
       createdAt: (user as any).createdAt,
       updatedAt: (user as any).updatedAt,
@@ -84,15 +97,12 @@ export const optionalAuth = async (
       if (payload) {
         const user = await UserModel.findById(payload.userId as any);
         if (user && user.status === 'active') {
-          const orgRole = payload.orgRole as 'admin' | 'user';
           const appUser: AppUser = {
             id: String(user.id),
             userId: String(user.id),
             email: user.email,
             name: (user as any).name,
             orgId: payload.orgId,
-            orgRole,
-            role: orgRole,
             isActive: true,
             createdAt: (user as any).createdAt,
             updatedAt: (user as any).updatedAt,
@@ -108,26 +118,6 @@ export const optionalAuth = async (
     logger.debug('Optional auth failed:', error);
     next();
   }
-};
-
-// Gradual migration: re-export from rbacMiddleware
-export const requireRole = (roles: string | string[]) => {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      next(new GatrixError('Authentication required', 401));
-      return;
-    }
-
-    const userRole = req.user.orgRole;
-    const allowedRoles = Array.isArray(roles) ? roles : [roles];
-
-    if (!allowedRoles.includes(userRole)) {
-      next(new GatrixError('Insufficient permissions', 403));
-      return;
-    }
-
-    next();
-  };
 };
 
 export const requirePermission = (permissions: string | string[]) => {
@@ -154,6 +144,9 @@ export const requirePermission = (permissions: string | string[]) => {
         return;
       }
     }
+
+    // DEBUG: Log permission check failure details
+    logger.warn(`[requirePermission] DENIED: userId=${req.user.id}, orgId=${req.user.orgId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
 
     next(new GatrixError('Insufficient permissions', 403));
   };

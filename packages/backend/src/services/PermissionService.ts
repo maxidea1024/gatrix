@@ -135,8 +135,8 @@ class PermissionService {
   async getOrgMembership(
     userId: string,
     orgId?: string
-  ): Promise<{ orgId: string; orgRole: 'admin' | 'user' } | null> {
-    const query = db('g_organisation_members').where('userId', userId).select('orgId', 'orgRole');
+  ): Promise<{ orgId: string } | null> {
+    const query = db('g_organisation_members').where('userId', userId).select('orgId');
 
     if (orgId) {
       query.where('orgId', orgId);
@@ -147,7 +147,6 @@ class PermissionService {
 
     return {
       orgId: membership.orgId,
-      orgRole: membership.orgRole as 'admin' | 'user',
     };
   }
 
@@ -156,16 +155,15 @@ class PermissionService {
    */
   async getUserOrganisations(
     userId: string
-  ): Promise<Array<{ orgId: string; orgRole: 'admin' | 'user' }>> {
+  ): Promise<Array<{ orgId: string }>> {
     const memberships = await db('g_organisation_members')
       .where('userId', userId)
       .join('g_organisations', 'g_organisation_members.orgId', 'g_organisations.id')
       .where('g_organisations.isActive', true)
-      .select('g_organisation_members.orgId', 'g_organisation_members.orgRole');
+      .select('g_organisation_members.orgId');
 
     return memberships.map((m: any) => ({
       orgId: m.orgId,
-      orgRole: m.orgRole as 'admin' | 'user',
     }));
   }
 

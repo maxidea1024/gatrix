@@ -186,6 +186,7 @@ export class UserModel {
       search?: string;
       tags?: string[];
       tags_operator?: 'any_of' | 'include_all';
+      orgId?: string;
     } = {}
   ): Promise<{
     users: UserWithoutPassword[];
@@ -199,8 +200,20 @@ export class UserModel {
       const limitNum = parseInt(limit.toString());
       const offset = (pageNum - 1) * limitNum;
 
-      // Build base query
-      const baseQuery = () => db('g_users');
+      // Build base query — scope to org if orgId filter is present
+      const baseQuery = () => {
+        const q = db('g_users');
+        if (filters.orgId) {
+          q.join('g_organisation_members as om', function () {
+            this.on('om.userId', '=', 'g_users.id').andOn(
+              'om.orgId',
+              '=',
+              db.raw('?', [filters.orgId])
+            );
+          });
+        }
+        return q;
+      };
 
       // Apply filters function
       const applyFilters = (query: any) => {
@@ -229,7 +242,7 @@ export class UserModel {
           const tagsOperator = filters.tags_operator || 'include_all'; // Default to include_all (AND)
 
           if (tagsOperator === 'include_all') {
-            // AND 조건: 모든 태그를 가진 사용자만 반환
+            // AND: only users with all specified tags
             filters.tags.forEach((tagId: string) => {
               query.whereExists(function (this: any) {
                 this.select('*')
@@ -240,7 +253,7 @@ export class UserModel {
               });
             });
           } else {
-            // OR 조건: 태그 중 하나라도 가진 사용자 반환
+            // OR: users with any of the specified tags
             query.whereExists(function (this: any) {
               this.select('*')
                 .from('g_tag_assignments')
@@ -453,17 +466,26 @@ export class UserModel {
   /**
    * Search users by name or email
    */
-  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+  static async searchUsers(query: string, limit: number = 20, orgId?: string): Promise<UserWithoutPassword[]> {
     try {
-      const users = await db('g_users')
-        .select('id', 'name', 'email', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
-        .where('status', 'active') // 활성 사용자만 검색
+      const q = db('g_users')
+        .select('g_users.id', 'g_users.name', 'g_users.email', 'g_users.status', 'g_users.avatarUrl', 'g_users.createdAt', 'g_users.updatedAt')
+        .where('g_users.status', 'active')
         .andWhere(function () {
-          this.where('name', 'like', `%${query}%`).orWhere('email', 'like', `%${query}%`);
+          this.where('g_users.name', 'like', `%${query}%`).orWhere('g_users.email', 'like', `%${query}%`);
         })
-        .orderBy('name', 'asc')
+        .orderBy('g_users.name', 'asc')
         .limit(limit);
 
+      // Scope to organisation members if orgId is provided
+      if (orgId) {
+        q.join('g_organisation_members as om', function () {
+          this.on('om.userId', '=', 'g_users.id')
+            .andOn('om.orgId', '=', db.raw('?', [orgId]));
+        });
+      }
+
+      const users = await q;
       return users;
     } catch (error) {
       logger.error('Error searching users:', error);

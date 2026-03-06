@@ -1285,9 +1285,12 @@ class ConsoleService {
         return { output: '\u001b[33mUser not found\u001b[0m' };
       }
 
-      // Get role from org membership (RBAC)
-      const membership = await db('g_organisation_members').where('userId', user.id).first();
-      const orgRole = membership?.orgRole || 'user';
+      // Get RBAC roles from role bindings
+      const roleBindings = await db('g_role_bindings as rb')
+        .join('g_roles as r', 'rb.roleId', 'r.id')
+        .where('rb.userId', user.id)
+        .select('r.name as roleName');
+      const roles = roleBindings.map((rb: any) => rb.roleName).join(', ') || 'No roles assigned';
 
       const lines = [
         '\u001b[32mUser Information:\u001b[0m',
@@ -1295,7 +1298,7 @@ class ConsoleService {
         `ID: ${user.id}`,
         `Name: ${user.name || 'N/A'}`,
         `Email: ${user.email}`,
-        `Role: ${orgRole}`,
+        `Roles: ${roles}`,
         `Status: ${user.status || 'unknown'}`,
         `Email Verified: ${user.emailVerified ? 'Yes' : 'No'}`,
         `Created: ${user.createdAt ? new Date(user.createdAt).toISOString() : 'N/A'}`,

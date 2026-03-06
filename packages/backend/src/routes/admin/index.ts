@@ -71,17 +71,18 @@ router.get('/users/me/environments', authenticate as any, async (req: any, res: 
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    // Check org admin status for any org — org admin gets all access
-    const orgs = await permissionService.getUserOrganisations(userId);
-    const isAnyOrgAdmin = orgs.some((m) => m.orgRole === 'admin');
-    if (isAnyOrgAdmin) {
+    const orgId = req.user?.orgId;
+
+    // Check if user is org admin via RBAC (has wildcard permissions)
+    const isSuperAdmin = orgId ? await permissionService.isOrgAdmin(userId, orgId) : false;
+    if (isSuperAdmin) {
       return res.json({
         success: true,
         data: { allowAllEnvironments: true, environments: [] },
       });
     }
 
-    // Otherwise return allowAllEnvironments: true for now
+    // Regular users: return allowAllEnvironments: true for now
     // (granular env-level filtering is done per-project in getEnvironments)
     return res.json({
       success: true,
@@ -150,7 +151,11 @@ projectRouter.use(
 );
 
 // Environments
-projectRouter.use('/environments', environmentRoutes);
+projectRouter.use(
+  '/environments',
+  requirePermission([PERMISSIONS.ENVIRONMENTS_VIEW, PERMISSIONS.ENVIRONMENTS_MANAGE]) as any,
+  environmentRoutes
+);
 
 // Unknown Flags
 projectRouter.use(
@@ -299,7 +304,11 @@ projectRouter.use(
 );
 
 // Vars (KV)
-projectRouter.use('/vars', varsRoutes);
+projectRouter.use(
+  '/vars',
+  requirePermission([PERMISSIONS.VARS_VIEW, PERMISSIONS.VARS_MANAGE]) as any,
+  varsRoutes
+);
 
 // Service Notices
 projectRouter.use(
@@ -371,7 +380,11 @@ projectRouter.use(
 );
 
 // Platform Defaults
-projectRouter.use('/platform-defaults', platformDefaultsRoutes);
+projectRouter.use(
+  '/platform-defaults',
+  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  platformDefaultsRoutes
+);
 
 // Mount project-scoped router
 router.use('/orgs/:orgId/projects/:projectId', projectRouter);

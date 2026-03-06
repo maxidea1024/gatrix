@@ -245,8 +245,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Filter menu items based on permissions
   const canAccessMenuItem = useCallback(
     (item: NavMenuItem): boolean => {
-      // Check admin-only restriction
-      if (item.adminOnly && !hasEnvironmentAccess) {
+      // Check admin-only restriction (requires RBAC permissions)
+      if (item.adminOnly && !hasAnyPermissions) {
         return false;
       }
       // Check permission-based access
@@ -258,7 +258,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
       return true;
     },
-    [hasEnvironmentAccess, hasPermission]
+    [hasAnyPermissions, hasPermission]
   );
 
   const filterMenuItems = useCallback(

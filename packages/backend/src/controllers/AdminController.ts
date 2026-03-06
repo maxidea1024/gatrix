@@ -113,6 +113,16 @@ export class AdminController {
         if (tagsOperator) filters.tags_operator = tagsOperator;
       }
 
+      // Org scoping: non-SuperAdmin users only see members of their org
+      const userId = req.user?.userId || req.user?.id;
+      const orgId = req.user?.orgId;
+      if (orgId && userId) {
+        const isSuperAdmin = await permissionService.isOrgAdmin(userId, orgId);
+        if (!isSuperAdmin) {
+          filters.orgId = orgId;
+        }
+      }
+
       logger.debug('User filters:', { filters });
 
       const result = await UserService.getAllUsers(filters, { page, limit });

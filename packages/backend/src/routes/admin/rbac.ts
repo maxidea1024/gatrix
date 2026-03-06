@@ -20,6 +20,7 @@ import { EnvironmentKey } from '../../models/EnvironmentKey';
 import { permissionService } from '../../services/PermissionService';
 import { generateULID } from '../../utils/ulid';
 import { GatrixError } from '../../middleware/errorHandler';
+import { initializeSystemKV } from '../../utils/systemKV';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('rbac');
@@ -133,7 +134,7 @@ router.get('/organisations/:id/members', async (req: any, res) => {
 // POST /api/admin/rbac/organisations/:id/members
 router.post('/organisations/:id/members', requireOrgAdmin as any, async (req: any, res) => {
   try {
-    const { userId, orgRole } = req.body;
+    const { userId } = req.body;
     if (!userId) {
       return res.status(400).json({ success: false, message: 'userId is required' });
     }
@@ -144,7 +145,7 @@ router.post('/organisations/:id/members', requireOrgAdmin as any, async (req: an
       return res.status(409).json({ success: false, message: 'User is already a member' });
     }
 
-    await Organisation.addMember(req.params.id, userId, orgRole || 'user', req.user.id);
+    await Organisation.addMember(req.params.id, userId, req.user.id);
     res.status(201).json({ success: true, message: 'Member added successfully' });
   } catch (error) {
     logger.error('Error adding organisation member:', error);
@@ -176,29 +177,7 @@ router.delete(
   }
 );
 
-// PUT /api/admin/rbac/organisations/:id/members/:userId
-router.put('/organisations/:id/members/:userId', requireOrgAdmin as any, async (req: any, res) => {
-  try {
-    // Prevent self-modification
-    if (String(req.user.id) === String(req.params.userId)) {
-      return res
-        .status(403)
-        .json({ success: false, message: 'Cannot change your own organisation role' });
-    }
-    const { orgRole } = req.body;
-    if (!orgRole || !['admin', 'user'].includes(orgRole)) {
-      return res.status(400).json({
-        success: false,
-        message: 'orgRole must be "admin" or "user"',
-      });
-    }
-    await Organisation.updateMemberRole(req.params.id, req.params.userId, orgRole);
-    res.json({ success: true, message: 'Member role updated successfully' });
-  } catch (error) {
-    logger.error('Error updating organisation member role:', error);
-    res.status(500).json({ success: false, message: 'Failed to update member role' });
-  }
-});
+
 
 // ==================== My Access (RBAC-filtered tree) ====================
 
@@ -208,12 +187,20 @@ router.get('/my-access', async (req: any, res) => {
   try {
     const userId = req.user.id;
 
-    // Check org memberships — org admin sees all
+    // Check org memberships
     const orgMemberships = await permissionService.getUserOrganisations(userId);
-    const isAnyOrgAdmin = orgMemberships.some((m) => m.orgRole === 'admin');
 
     let orgIds: string[];
-    if (isAnyOrgAdmin) {
+    // Check if user has Super Admin (wildcard) permissions in any org
+    let isSuperAdmin = false;
+    for (const m of orgMemberships) {
+      if (await permissionService.isOrgAdmin(userId, m.orgId)) {
+        isSuperAdmin = true;
+        break;
+      }
+    }
+
+    if (isSuperAdmin) {
       const allOrgs = await db('g_organisations').where('isActive', true).select('id');
       orgIds = allOrgs.map((o: any) => o.id);
     } else {
@@ -309,6 +296,33 @@ router.post(
         description,
         createdBy: req.user.id,
       });
+
+      // Create default environments (same as seed)
+      const defaultEnvironments = [
+        { displayName: 'Development', type: 'development', color: '#4CAF50', order: 0, isDefault: true, requiresApproval: false },
+        { displayName: 'Staging', type: 'staging', color: '#FF9800', order: 1, isDefault: false, requiresApproval: false },
+        { displayName: 'Production', type: 'production', color: '#F44336', order: 2, isDefault: false, requiresApproval: true },
+      ];
+
+      for (const env of defaultEnvironments) {
+        const envId = generateULID();
+        await db('g_environments').insert({
+          id: envId,
+          displayName: env.displayName,
+          environmentType: env.type,
+          isSystemDefined: true,
+          displayOrder: env.order,
+          color: env.color,
+          projectId: project.id,
+          isDefault: env.isDefault,
+          requiresApproval: env.requiresApproval,
+          createdBy: req.user.id,
+          createdAt: db.raw('UTC_TIMESTAMP()'),
+          updatedAt: db.raw('UTC_TIMESTAMP()'),
+        });
+        await initializeSystemKV(envId);
+      }
+      logger.info(`Default environments created for project ${project.id}`);
 
       res.status(201).json({ success: true, data: project });
     } catch (error) {

@@ -34,15 +34,18 @@ const getResourceLabel = (
   return resource.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
 };
 
-// Get action display label from full permission label
+// Get action display label — just extract the action part and localize it
 const getActionLabel = (
   t: any,
   perm: string
 ): string => {
-  const label = permLabel(t, perm);
-  const lastSpace = label.lastIndexOf(' ');
-  if (lastSpace === -1) return label;
-  return label.substring(lastSpace + 1);
+  const { action } = parsePerm(perm);
+  if (!action) return perm;
+  const key = `rbac.action.${action}`;
+  const label = t(key, '');
+  if (label) return label;
+  // Fallback: capitalize
+  return action.charAt(0).toUpperCase() + action.slice(1);
 };
 
 interface PermItem {
@@ -66,22 +69,32 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Build resource-grouped tree
+  // Detect wildcard permission
+  const hasWildcard = useMemo(() => {
+    if (!data) return false;
+    return data.own.includes('*:*') || data.inherited.some((ip) => ip.permission === '*:*');
+  }, [data]);
+
+  // Build resource-grouped tree (exclude wildcard from regular list)
   const resourceTree = useMemo(() => {
     if (!data) return [];
 
     const allPerms: PermItem[] = [
-      ...data.own.map((p) => ({
-        perm: p,
-        ...parsePerm(p),
-        source: 'own' as const,
-      })),
-      ...data.inherited.map((ip) => ({
-        perm: ip.permission,
-        ...parsePerm(ip.permission),
-        source: 'inherited' as const,
-        fromRoleName: ip.fromRoleName,
-      })),
+      ...data.own
+        .filter((p) => p !== '*:*')
+        .map((p) => ({
+          perm: p,
+          ...parsePerm(p),
+          source: 'own' as const,
+        })),
+      ...data.inherited
+        .filter((ip) => ip.permission !== '*:*')
+        .map((ip) => ({
+          perm: ip.permission,
+          ...parsePerm(ip.permission),
+          source: 'inherited' as const,
+          fromRoleName: ip.fromRoleName,
+        })),
     ];
 
     // Group by resource
@@ -126,62 +139,85 @@ const EffectivePermissionsViewer: React.FC<EffectivePermissionsViewerProps> = ({
         {t('rbac.roles.inheritedPermission')}: {data.inherited.length} &nbsp;|&nbsp;
         {t('common.total', 'Total')}: {totalCount}
       </Typography>
-      <Box
-        sx={{
-          maxHeight,
-          overflow: 'auto',
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: 1,
-        }}
-      >
-        {resourceTree.map(({ resource, label, items }) => (
-          <Box
-            key={resource}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              px: 1.5,
-              py: 0.5,
-              borderBottom: 1,
-              borderColor: 'divider',
-              '&:last-child': { borderBottom: 0 },
-              gap: 1,
-            }}
-          >
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, fontSize: '0.8rem', minWidth: 100, flexShrink: 0 }}
+
+      {hasWildcard && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1.5,
+            py: 1,
+            mb: 1,
+            bgcolor: 'primary.main',
+            color: 'primary.contrastText',
+            borderRadius: 1,
+          }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            ✦ {t('rbac.roles.wildcardPermission', 'All Permissions (Wildcard *:*)')}
+          </Typography>
+        </Box>
+      )}
+
+      {resourceTree.length > 0 && (
+        <Box
+          sx={{
+            maxHeight,
+            overflow: 'auto',
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+          }}
+        >
+          {resourceTree.map(({ resource, label, items }) => (
+            <Box
+              key={resource}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                px: 1.5,
+                py: 0.5,
+                borderBottom: 1,
+                borderColor: 'divider',
+                '&:last-child': { borderBottom: 0 },
+                gap: 1,
+              }}
             >
-              {label}
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {items.map((item) => (
-                <Tooltip
-                  key={item.perm}
-                  title={
-                    item.source === 'inherited'
-                      ? `${t('rbac.roles.inheritedPermission')}: ${item.fromRoleName}`
-                      : t('rbac.roles.ownPermission')
-                  }
-                >
-                  <Chip
-                    label={getActionLabel(t, item.perm)}
-                    size="small"
-                    variant={item.source === 'inherited' ? 'outlined' : 'filled'}
-                    color={item.source === 'inherited' ? 'default' : 'primary'}
-                    sx={{
-                      fontSize: '0.7rem',
-                      height: 20,
-                      fontStyle: item.source === 'inherited' ? 'italic' : 'normal',
-                    }}
-                  />
-                </Tooltip>
-              ))}
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, fontSize: '0.8rem', minWidth: 100, flexShrink: 0 }}
+              >
+                {label}
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {items.map((item) => (
+                  <Tooltip
+                    key={item.perm}
+                    title={
+                      item.source === 'inherited'
+                        ? `${t('rbac.roles.inheritedPermission')}: ${item.fromRoleName}`
+                        : t('rbac.roles.ownPermission')
+                    }
+                  >
+                    <Chip
+                      label={getActionLabel(t, item.perm)}
+                      size="small"
+                      variant={item.source === 'inherited' ? 'outlined' : 'filled'}
+                      color={item.source === 'inherited' ? 'default' : 'primary'}
+                      sx={{
+                        fontSize: '0.7rem',
+                        height: 20,
+                        fontStyle: item.source === 'inherited' ? 'italic' : 'normal',
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+              </Box>
             </Box>
-          </Box>
-        ))}
-      </Box>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };

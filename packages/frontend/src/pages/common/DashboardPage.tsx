@@ -826,7 +826,7 @@ const DashboardPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [hasAnyPermissions]);
+  }, [hasAnyPermissions, currentOrgId, currentProjectId]);
 
   // Get time-based greeting
   const getGreeting = () => {
@@ -1412,21 +1412,22 @@ const DashboardPage: React.FC = () => {
                                     },
                                   }}
                                 >
-                                  <Box
+                                  <Typography
                                     className="env-count-label"
+                                    noWrap
                                     sx={{
                                       flex: 1,
-                                      display: 'flex',
-                                      alignItems: 'center',
                                       px: 1,
                                       fontSize: '0.7rem',
+                                      lineHeight: '24px',
                                       color: 'text.secondary',
                                       bgcolor: 'background.paper',
                                       transition: 'background-color 0.15s',
+                                      minWidth: 0,
                                     }}
                                   >
                                     {t(`dashboard.${item.label}`)}
-                                  </Box>
+                                  </Typography>
                                   <Box
                                     className="env-count-value"
                                     sx={{
@@ -1886,7 +1887,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Recent Crash Events & Server Lifecycle Events */}
       {hasAnyPermissions && (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
-        <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid container spacing={3} sx={{ mt: 4 }}>
           {/* Recent Crash Events */}
           {hasPermission(P.CRASH_EVENTS_READ) && (
             <Grid size={{ xs: 12, lg: 6 }}>

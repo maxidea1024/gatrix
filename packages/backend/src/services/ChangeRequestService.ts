@@ -636,13 +636,16 @@ export class ChangeRequestService {
       }
 
       const user = await User.query(trx).findById(requesterId);
-      // Check admin status via org membership instead of deprecated user.role
-      const orgMembership = await knex('g_organisation_members')
-        .transacting(trx)
-        .where('userId', requesterId)
-        .where('orgRole', 'admin')
-        .first();
-      const isAdmin = !!orgMembership;
+      // Check admin status via RBAC permissions (wildcard = org admin)
+      const { permissionService } = await import('./PermissionService');
+      const userOrgs = await permissionService.getUserOrganisations(requesterId);
+      let isAdmin = false;
+      for (const org of userOrgs) {
+        if (await permissionService.isOrgAdmin(requesterId, org.orgId)) {
+          isAdmin = true;
+          break;
+        }
+      }
 
       // Validate ownership: Only the original requester or an admin can reopen
       if (cr.requesterId !== requesterId && !isAdmin) {

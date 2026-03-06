@@ -89,7 +89,6 @@ export class Organisation {
   static async addMember(
     orgId: string,
     userId: string,
-    orgRole: 'admin' | 'user' = 'user',
     invitedBy?: string
   ): Promise<void> {
     const id = generateULID();
@@ -97,7 +96,6 @@ export class Organisation {
       id,
       orgId,
       userId,
-      orgRole,
       invitedBy: invitedBy || null,
     });
   }
@@ -107,18 +105,10 @@ export class Organisation {
     return result > 0;
   }
 
-  static async updateMemberRole(
-    orgId: string,
-    userId: string,
-    orgRole: 'admin' | 'user'
-  ): Promise<void> {
-    await db(this.MEMBERS_TABLE).where('orgId', orgId).where('userId', userId).update({ orgRole });
-  }
-
   static async getMember(
     orgId: string,
     userId: string
-  ): Promise<{ orgId: string; userId: string; orgRole: 'admin' | 'user' } | null> {
+  ): Promise<{ orgId: string; userId: string } | null> {
     const row = await db(this.MEMBERS_TABLE).where('orgId', orgId).where('userId', userId).first();
     return row || null;
   }

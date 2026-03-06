@@ -286,7 +286,7 @@ export class UserController {
 
   // 사용자 검색 (채팅 시스템용)
   static searchUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { q: query, limit = 20 } = req.query;
+    const { q: query, limit = 20, orgId } = req.query;
 
     if (!query || typeof query !== 'string') {
       throw new GatrixError('Search query is required', 400);
@@ -296,9 +296,10 @@ export class UserController {
       throw new GatrixError('Search query must be at least 2 characters', 400);
     }
 
-    const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // 최대 50개로 제한
+    const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // Max 50
+    const searchOrgId = typeof orgId === 'string' ? orgId : undefined;
 
-    const users = await UserService.searchUsers(query, searchLimit);
+    const users = await UserService.searchUsers(query, searchLimit, searchOrgId);
 
     res.json({
       success: true,

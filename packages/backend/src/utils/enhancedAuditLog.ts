@@ -233,7 +233,6 @@ export function createAuditContext(req: AuthenticatedRequest, additionalInfo?: a
     userId: req.user?.id,
     userName: (req.user as any)?.name,
     userEmail: req.user?.email,
-    userRole: req.user?.orgRole,
     ipAddress: req.ip,
     userAgent: req.get('User-Agent'),
     method: req.method,

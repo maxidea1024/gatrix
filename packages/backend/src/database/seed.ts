@@ -121,8 +121,8 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
 async function createAdminUser(orgId: string): Promise<string> {
   try {
     const existingAdmin = await database.query(
-      'SELECT u.id FROM g_users u JOIN g_organisation_members om ON u.id = om.userId WHERE u.email = ? AND om.orgRole = ?',
-      [config.admin.email, 'admin']
+      'SELECT u.id FROM g_users u JOIN g_organisation_members om ON u.id = om.userId WHERE u.email = ?',
+      [config.admin.email]
     );
 
     if (existingAdmin.length > 0) {
@@ -140,10 +140,10 @@ async function createAdminUser(orgId: string): Promise<string> {
       [userId, config.admin.email, passwordHash, config.admin.name]
     );
 
-    // Add as org admin
+    // Add as org member
     await database.query(
-      `INSERT INTO g_organisation_members (id, orgId, userId, orgRole, joinedAt)
-       VALUES (?, ?, ?, 'admin', UTC_TIMESTAMP())`,
+      `INSERT INTO g_organisation_members (id, orgId, userId, joinedAt)
+       VALUES (?, ?, ?, UTC_TIMESTAMP())`,
       [ulid(), orgId, userId]
     );
 
@@ -398,7 +398,7 @@ async function createSampleReleaseFlows(createdBy: string) {
 
 // ==================== Default RBAC Roles ====================
 
-async function createDefaultRoles(orgId: string) {
+async function createDefaultRoles(orgId: string, adminUserId: string) {
   const existing = await database.query(
     'SELECT id FROM g_roles WHERE orgId = ? LIMIT 1',
     [orgId]
@@ -431,6 +431,28 @@ async function createDefaultRoles(orgId: string) {
   const allResources = [...orgResources, ...projectResources, ...envResources];
   const crudActions = ['create', 'read', 'update', 'delete'];
 
+  // 1. Create Super Admin role with wildcard permission
+  const superAdminRoleId = ulid();
+  await database.query(
+    `INSERT INTO g_roles (id, orgId, roleName, description, createdAt, updatedAt)
+     VALUES (?, ?, 'Super Admin', 'Full access to all resources (wildcard)', UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+    [superAdminRoleId, orgId]
+  );
+  await database.query(
+    `INSERT INTO g_role_permissions (id, roleId, permission) VALUES (?, ?, '*:*')`,
+    [ulid(), superAdminRoleId]
+  );
+  logger.info('  Role created: Super Admin (wildcard *:*)');
+
+  // Bind Super Admin role to admin user at org scope
+  await database.query(
+    `INSERT INTO g_role_bindings (id, userId, roleId, scopeType, scopeId, assignedAt)
+     VALUES (?, ?, ?, 'org', ?, UTC_TIMESTAMP())`,
+    [ulid(), adminUserId, superAdminRoleId, orgId]
+  );
+  logger.info(`  Admin user bound to Super Admin role (orgId: ${orgId})`);
+
+  // 2. Create standard roles (Viewer, Editor, Manager)
   const roles = [
     {
       name: 'Viewer',
@@ -510,8 +532,8 @@ async function createInternalGatrixSetup(adminUserId: string) {
   );
   if (existingMember.length === 0) {
     await database.query(
-      `INSERT INTO g_organisation_members (id, orgId, userId, orgRole, joinedAt)
-       VALUES (?, ?, ?, 'admin', UTC_TIMESTAMP())`,
+      `INSERT INTO g_organisation_members (id, orgId, userId, joinedAt)
+       VALUES (?, ?, ?, UTC_TIMESTAMP())`,
       [ulid(), gatrixOrgId, adminUserId]
     );
   }
@@ -582,8 +604,8 @@ async function seedDatabase() {
     // 8. Create sample release flow templates
     await createSampleReleaseFlows(adminUserId);
 
-    // 9. Create default RBAC roles (Viewer, Editor, Manager)
-    await createDefaultRoles(orgId);
+    // 9. Create default RBAC roles (Super Admin, Viewer, Editor, Manager) + bind admin
+    await createDefaultRoles(orgId, adminUserId);
 
     logger.info('Database seeding completed successfully');
   } catch (error) {

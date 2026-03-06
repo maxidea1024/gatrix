@@ -1,8 +1,9 @@
 import express from 'express';
 import { body } from 'express-validator';
 import ApiTokensController from '../../controllers/ApiTokensController';
-import { authenticate, requireRole } from '../../middleware/auth';
+import { authenticate, requirePermission } from '../../middleware/auth';
 import { auditLog } from '../../middleware/auditLog';
+import { PERMISSIONS } from '../../types/permissions';
 
 const router = express.Router();
 
@@ -35,9 +36,9 @@ const updateTokenValidation = [
   body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
 ];
 
-// Apply authentication and admin role requirement to all routes
+// Apply authentication and permission requirement to all routes
 router.use(authenticate as any);
-router.use(requireRole(['admin']) as any);
+router.use(requirePermission([PERMISSIONS.SERVICE_ACCOUNTS_VIEW, PERMISSIONS.SERVICE_ACCOUNTS_MANAGE]) as any);
 
 // Routes
 router.get('/', ApiTokensController.getTokens as any);

@@ -4,7 +4,6 @@ import {
   Typography,
   Card,
   CardContent,
-  CardActionArea,
   Chip,
   Alert,
   Tooltip,
@@ -48,6 +47,7 @@ import {
 import { rbacService } from '@/services/rbacService';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAuth } from '@/contexts/AuthContext';
+import { P } from '@/types/permissions';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
@@ -67,9 +67,10 @@ interface SearchUser {
 const WorkspacePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, hasPermission } = useAuth();
   const navigate = useNavigate();
   const { currentOrgId, refreshOrgs } = useOrgProject();
+  const canManageOrgs = hasPermission([P.ALL]);
   const [organisations, setOrganisations] = useState<OrgWithMemberCount[]>([]);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -379,16 +380,18 @@ const WorkspacePage: React.FC = () => {
             {t('workspace.subtitle')}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => {
-            setCreateData({ orgName: '', displayName: '', description: '' });
-            setCreateDrawerOpen(true);
-          }}
-        >
-          {t('rbac.orgs.create')}
-        </Button>
+        {canManageOrgs && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              setCreateData({ orgName: '', displayName: '', description: '' });
+              setCreateDrawerOpen(true);
+            }}
+          >
+            {t('rbac.orgs.create')}
+          </Button>
+        )}
       </Box>
 
       <PageContentLoader loading={loading}>
@@ -451,8 +454,10 @@ const WorkspacePage: React.FC = () => {
                     },
                   }}
                 >
-                  <CardActionArea disableRipple onClick={() => navigate(`/admin/projects?orgId=${org.id}`)}>
-                    <CardContent sx={{ p: 3 }}>
+                  <CardContent
+                    sx={{ p: 3, cursor: 'pointer' }}
+                    onClick={() => navigate(`/admin/projects?orgId=${org.id}`)}
+                  >
                       {/* Header */}
                       <Box
                         sx={{
@@ -513,13 +518,15 @@ const WorkspacePage: React.FC = () => {
                             color={org.isActive ? 'success' : 'default'}
                             variant="outlined"
                           />
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleMenuOpen(e, org)}
-                            sx={{ ml: 0.5 }}
-                          >
-                            <MoreVertIcon fontSize="small" />
-                          </IconButton>
+                          {canManageOrgs && (
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleMenuOpen(e, org)}
+                              sx={{ ml: 0.5 }}
+                            >
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
+                          )}
                         </Box>
                       </Box>
 
@@ -568,7 +575,6 @@ const WorkspacePage: React.FC = () => {
                         </Box>
                       </Box>
                     </CardContent>
-                  </CardActionArea>
 
                   {/* Expandable project list */}
                   {accessibleProjects.length > 0 && (
@@ -871,21 +877,6 @@ const WorkspacePage: React.FC = () => {
                             </Typography>
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Select
-                              size="small"
-                              value={member.orgRole}
-                              onChange={(e) =>
-                                handleUpdateMemberRole(
-                                  member.userId,
-                                  e.target.value as 'admin' | 'user'
-                                )
-                              }
-                              sx={{ minWidth: 100 }}
-                              disabled={String(member.userId) === String(currentUser?.id)}
-                            >
-                              <MenuItem value="admin">{t('rbac.orgs.roleAdmin')}</MenuItem>
-                              <MenuItem value="user">{t('rbac.orgs.roleUser')}</MenuItem>
-                            </Select>
                             <Tooltip
                               title={
                                 String(member.userId) === String(currentUser?.id)

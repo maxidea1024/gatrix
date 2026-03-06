@@ -310,10 +310,10 @@ export const rbacService = {
 
   // ─── User Search ─────────────────────────
 
-  async searchUsers(query: string): Promise<{ id: string; name: string; email: string }[]> {
-    const res = await api.get('/admin/users', {
-      params: { search: query, limit: 20 },
-    });
+  async searchUsers(query: string, orgId?: string): Promise<{ id: string; name: string; email: string }[]> {
+    const params: Record<string, any> = { search: query, limit: 20 };
+    if (orgId) params.orgId = orgId;
+    const res = await api.get('/admin/users', { params });
     return (res.data?.users || []).map((u: any) => ({
       id: String(u.id),
       name: u.name,

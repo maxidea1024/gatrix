@@ -61,9 +61,8 @@ export class AuthService {
       delete (userWithoutPassword as any).passwordHash;
 
       // Generate tokens
-      // Look up org membership to include correct orgId/orgRole in JWT
+      // Look up org membership to include correct orgId in JWT
       let orgId = '';
-      let orgRole = 'user';
       try {
         const membership = await db('g_organisation_members')
           .where('userId', user.id)
@@ -71,26 +70,21 @@ export class AuthService {
           .first();
         if (membership) {
           orgId = membership.orgId;
-          orgRole = membership.orgRole || 'user';
         }
       } catch (err) {
         logger.warn('Failed to lookup org membership during login:', err);
       }
 
-      const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId, orgRole);
+      const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId);
       const refreshToken = JwtUtils.generateRefreshToken(
         userWithoutPassword as any,
-        orgId,
-        orgRole
+        orgId
       );
 
       logger.info('User logged in successfully:', {
         userId: user.id,
         email: user.email,
       });
-
-      // Attach RBAC orgRole to the response so the frontend can determine user permissions
-      (userWithoutPassword as any).role = orgRole;
 
       return {
         user: userWithoutPassword as any,
@@ -176,8 +170,8 @@ export class AuthService {
       }
 
       // Generate new tokens
-      const newAccessToken = JwtUtils.generateToken(user, payload.orgId, payload.orgRole);
-      const newRefreshToken = JwtUtils.generateRefreshToken(user, payload.orgId, payload.orgRole);
+      const newAccessToken = JwtUtils.generateToken(user, payload.orgId);
+      const newRefreshToken = JwtUtils.generateRefreshToken(user, payload.orgId);
 
       return {
         accessToken: newAccessToken,

@@ -681,14 +681,28 @@ const EnvironmentsPage: React.FC = () => {
                         </Box>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {effectiveProject?.displayName || effectiveProject?.projectName || '-'}
-                        </Typography>
+                        <Link
+                          component={RouterLink}
+                          to={`/admin/projects?orgId=${effectiveOrg?.id || ''}`}
+                          underline="hover"
+                          color="inherit"
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            {effectiveProject?.displayName || effectiveProject?.projectName || '-'}
+                          </Typography>
+                        </Link>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {effectiveOrg?.displayName || effectiveOrg?.orgName || '-'}
-                        </Typography>
+                        <Link
+                          component={RouterLink}
+                          to="/admin/workspace"
+                          underline="hover"
+                          color="inherit"
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            {effectiveOrg?.displayName || effectiveOrg?.orgName || '-'}
+                          </Typography>
+                        </Link>
                       </TableCell>
                       <TableCell>
                         <Chip

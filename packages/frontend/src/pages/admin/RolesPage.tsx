@@ -531,139 +531,167 @@ const RolesPage: React.FC = () => {
             size="small"
           />
 
-          {availablePermissions.length > 0 && (
+          {formPermissions.includes('*:*') ? (
+            /* Wildcard role — no need for granular permission editing */
             <Box>
               <Divider sx={{ mb: 1 }} />
-              <PermissionTreeEditor
-                permissions={formPermissions}
-                onChange={setFormPermissions}
-                availablePermissions={availablePermissions}
-                permissionCategories={permissionCategories}
-              />
-            </Box>
-          )}
-
-          {/* Role Inheritance Section */}
-          <Box>
-            <Divider sx={{ mb: 1 }} />
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-              {t('rbac.roles.inheritance')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {t('rbac.roles.inheritanceHelp')}
-            </Typography>
-
-            {/* Add parent role */}
-            <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-              <Select
-                value={selectedParentRoleId}
-                onChange={(e) => setSelectedParentRoleId(e.target.value)}
-                size="small"
-                displayEmpty
-                sx={{ flex: 1 }}
-              >
-                <MenuItem value="" disabled>
-                  {t('rbac.roles.selectParentRole')}
-                </MenuItem>
-                {roles
-                  .filter(
-                    (r) =>
-                      (dialogMode === 'create' || r.id !== selectedRole?.id) &&
-                      !parentRoles.some((pr) => pr.parentRoleId === r.id) &&
-                      !pendingInheritanceAdds.includes(r.id)
-                  )
-                  .map((r) => (
-                    <MenuItem key={r.id} value={r.id}>
-                      {r.roleName}
-                    </MenuItem>
-                  ))}
-              </Select>
-              <Button
-                variant="contained"
-                size="small"
-                disabled={!selectedParentRoleId}
-                onClick={() => {
-                  if (!selectedParentRoleId) return;
-                  // Buffer locally — do not call server
-                  if (pendingInheritanceRemoves.includes(selectedParentRoleId)) {
-                    // Cancel pending remove
-                    setPendingInheritanceRemoves((prev) => prev.filter((id) => id !== selectedParentRoleId));
-                  } else {
-                    setPendingInheritanceAdds((prev) => [...prev, selectedParentRoleId]);
-                  }
-                  setSelectedParentRoleId('');
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 1.5,
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  borderRadius: 1,
                 }}
               >
-                {t('common.add')}
-              </Button>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  ✦ {t('rbac.roles.wildcardPermission')}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontSize: '0.8rem' }}>
+                {t('rbac.roles.wildcardPermissionDesc', 'This role has unrestricted access to all resources and actions.')}
+              </Typography>
             </Box>
-
-            {/* Parent role list */}
-            {(() => {
-              const effectiveParents = [
-                ...parentRoles
-                  .filter((pr) => !pendingInheritanceRemoves.includes(pr.parentRoleId))
-                  .map((pr) => ({ id: pr.parentRoleId, name: pr.parentRoleName, isPending: false })),
-                ...pendingInheritanceAdds.map((id) => {
-                  const r = roles.find((r) => r.id === id);
-                  return { id, name: r?.roleName || id, isPending: true };
-                }),
-              ];
-              if (effectiveParents.length === 0) {
-                return (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ textAlign: 'center', py: 2 }}
-                  >
-                    {t('rbac.roles.noParentRoles')}
-                  </Typography>
-                );
-              }
-              return (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {effectiveParents.map((pr) => (
-                    <Chip
-                      key={pr.id}
-                      label={pr.name}
-                      onDelete={() => {
-                        if (pr.isPending) {
-                          // Remove from pending adds
-                          setPendingInheritanceAdds((prev) => prev.filter((id) => id !== pr.id));
-                        } else {
-                          // Add to pending removes
-                          setPendingInheritanceRemoves((prev) => [...prev, pr.id]);
-                        }
-                      }}
-                      size="small"
-                      variant="outlined"
-                      color={pr.isPending ? 'success' : 'default'}
-                    />
-                  ))}
+          ) : (
+            <>
+              {availablePermissions.length > 0 && (
+                <Box>
+                  <Divider sx={{ mb: 1 }} />
+                  <PermissionTreeEditor
+                    permissions={formPermissions}
+                    onChange={setFormPermissions}
+                    availablePermissions={availablePermissions}
+                    permissionCategories={permissionCategories}
+                  />
                 </Box>
-              );
-            })()}
-          </Box>
+              )}
 
-          {/* Effective Permissions — reflects current form state */}
-          <Box>
-            <Divider sx={{ mb: 1 }} />
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
-              {t('rbac.roles.effectivePermissions')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.8rem' }}>
-              {t('rbac.roles.effectivePermissionsDesc')}
-            </Typography>
-            <EffectivePermissionsViewer
-              data={{
-                own: formPermissions,
-                inherited: (effectivePerms?.inherited || []).filter(
-                  (ip) => !pendingInheritanceRemoves.includes(ip.fromRoleId)
-                ),
-              }}
-              loading={effectivePermsLoading}
-            />
-          </Box>
+              {/* Role Inheritance Section */}
+              <Box>
+                <Divider sx={{ mb: 1 }} />
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                  {t('rbac.roles.inheritance')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {t('rbac.roles.inheritanceHelp')}
+                </Typography>
+
+                {/* Add parent role */}
+                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                  <Select
+                    value={selectedParentRoleId}
+                    onChange={(e) => setSelectedParentRoleId(e.target.value)}
+                    size="small"
+                    displayEmpty
+                    sx={{ flex: 1 }}
+                  >
+                    <MenuItem value="" disabled>
+                      {t('rbac.roles.selectParentRole')}
+                    </MenuItem>
+                    {roles
+                      .filter(
+                        (r) =>
+                          (dialogMode === 'create' || r.id !== selectedRole?.id) &&
+                          !parentRoles.some((pr) => pr.parentRoleId === r.id) &&
+                          !pendingInheritanceAdds.includes(r.id)
+                      )
+                      .map((r) => (
+                        <MenuItem key={r.id} value={r.id}>
+                          {r.roleName}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    disabled={!selectedParentRoleId}
+                    onClick={() => {
+                      if (!selectedParentRoleId) return;
+                      // Buffer locally — do not call server
+                      if (pendingInheritanceRemoves.includes(selectedParentRoleId)) {
+                        // Cancel pending remove
+                        setPendingInheritanceRemoves((prev) => prev.filter((id) => id !== selectedParentRoleId));
+                      } else {
+                        setPendingInheritanceAdds((prev) => [...prev, selectedParentRoleId]);
+                      }
+                      setSelectedParentRoleId('');
+                    }}
+                  >
+                    {t('common.add')}
+                  </Button>
+                </Box>
+
+                {/* Parent role list */}
+                {(() => {
+                  const effectiveParents = [
+                    ...parentRoles
+                      .filter((pr) => !pendingInheritanceRemoves.includes(pr.parentRoleId))
+                      .map((pr) => ({ id: pr.parentRoleId, name: pr.parentRoleName, isPending: false })),
+                    ...pendingInheritanceAdds.map((id) => {
+                      const r = roles.find((r) => r.id === id);
+                      return { id, name: r?.roleName || id, isPending: true };
+                    }),
+                  ];
+                  if (effectiveParents.length === 0) {
+                    return (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: 'center', py: 2 }}
+                      >
+                        {t('rbac.roles.noParentRoles')}
+                      </Typography>
+                    );
+                  }
+                  return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {effectiveParents.map((pr) => (
+                        <Chip
+                          key={pr.id}
+                          label={pr.name}
+                          onDelete={() => {
+                            if (pr.isPending) {
+                              // Remove from pending adds
+                              setPendingInheritanceAdds((prev) => prev.filter((id) => id !== pr.id));
+                            } else {
+                              // Add to pending removes
+                              setPendingInheritanceRemoves((prev) => [...prev, pr.id]);
+                            }
+                          }}
+                          size="small"
+                          variant="outlined"
+                          color={pr.isPending ? 'success' : 'default'}
+                        />
+                      ))}
+                    </Box>
+                  );
+                })()}
+              </Box>
+
+              {/* Effective Permissions — reflects current form state */}
+              <Box>
+                <Divider sx={{ mb: 1 }} />
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+                  {t('rbac.roles.effectivePermissions')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.8rem' }}>
+                  {t('rbac.roles.effectivePermissionsDesc')}
+                </Typography>
+                <EffectivePermissionsViewer
+                  data={{
+                    own: formPermissions,
+                    inherited: (effectivePerms?.inherited || []).filter(
+                      (ip) => !pendingInheritanceRemoves.includes(ip.fromRoleId)
+                    ),
+                  }}
+                  loading={effectivePermsLoading}
+                />
+              </Box>
+            </>
+          )}
         </Box>
 
         {/* Footer Actions */}
