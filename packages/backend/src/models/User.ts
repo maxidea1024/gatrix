@@ -508,12 +508,6 @@ export class UserModel {
    */
   static async getPermissions(userId: string): Promise<string[]> {
     try {
-      // Check if user is org admin (gets all permissions)
-      const membership = await db('g_organisation_members').where('userId', userId).first();
-      if (membership?.orgRole === 'admin') {
-        return ['*'];
-      }
-
       // Get all role IDs from direct bindings
       const directBindings = await db('g_role_bindings')
         .where('userId', userId)
