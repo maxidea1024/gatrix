@@ -1022,15 +1022,15 @@ const UsersManagementPage: React.FC = () => {
     // Load RBAC roles for this user
     setEditUserRbacRolesLoading(true);
     setSelectedRbacRoleId(null);
+    let loadedUserRoles: RbacUserRole[] = [];
     try {
       const [userRoles, roles] = await Promise.all([
         rbacService.getUserRoles(String(user.id)),
         rbacService.getRoles(),
       ]);
+      loadedUserRoles = userRoles;
       setEditUserRbacRoles(userRoles);
       setAllRbacRoles(roles);
-      // Update original data with loaded roles
-      setOriginalUserData((prev) => (prev ? { ...prev, rbacRoles: userRoles } : prev));
     } catch (error) {
       console.error('Failed to load RBAC roles:', error);
       setEditUserRbacRoles([]);
@@ -1039,7 +1039,7 @@ const UsersManagementPage: React.FC = () => {
       setEditUserRbacRolesLoading(false);
     }
 
-    // Save original data for comparison (rbacRoles saved after async load)
+    // Save original data for comparison (includes loaded rbacRoles)
     setOriginalUserData({
       name: user.name,
       email: user.email,
@@ -1047,7 +1047,7 @@ const UsersManagementPage: React.FC = () => {
       tags: user.tags || [],
       allowAllEnvs: userWithEnv.allowAllEnvironments || false,
       selectedEnvironments: userWithEnv.environments || [],
-      rbacRoles: [],
+      rbacRoles: loadedUserRoles,
     });
 
     setEditUserDialog({
@@ -1193,15 +1193,24 @@ const UsersManagementPage: React.FC = () => {
           const origRoleIds = new Set(originalUserData.rbacRoles.map((r) => r.roleId));
           const newRoleIds = new Set(editUserRbacRoles.map((r) => r.roleId));
 
-          // Roles to add
-          const rolesToAdd = editUserRbacRoles.filter((r) => !origRoleIds.has(r.roleId));
-          // Roles to remove
-          const rolesToRemove = originalUserData.rbacRoles.filter((r) => !newRoleIds.has(r.roleId));
+          // Deduplicate by roleId to prevent redundant API calls
+          const uniqueRolesToAdd = [...new Set(
+            editUserRbacRoles.filter((r) => !origRoleIds.has(r.roleId)).map((r) => r.roleId)
+          )];
+          const uniqueRolesToRemove = [...new Set(
+            originalUserData.rbacRoles.filter((r) => !newRoleIds.has(r.roleId)).map((r) => r.roleId)
+          )];
 
           const userId = String(editUserDialog.user.id);
+
+          // Use Promise.allSettled for removals to gracefully handle 404 (already removed)
           await Promise.all([
-            ...rolesToAdd.map((r) => rbacService.assignUserRole(userId, r.roleId)),
-            ...rolesToRemove.map((r) => rbacService.removeUserRole(userId, r.roleId)),
+            ...uniqueRolesToAdd.map((roleId) => rbacService.assignUserRole(userId, roleId)),
+            ...uniqueRolesToRemove.map((roleId) =>
+              rbacService.removeUserRole(userId, roleId).catch(() => {
+                // Ignore 404 - role binding may already be removed
+              })
+            ),
           ]);
         }
       }
