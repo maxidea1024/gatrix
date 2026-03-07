@@ -224,11 +224,20 @@ class ApiService {
           }
         }
 
-        // Handle 403 Forbidden - just set error message, don't redirect automatically
-        // Redirecting on every 403 causes issues during initial load when some APIs may fail
-        // Individual pages should handle 403 errors appropriately
+        // Handle 403 Forbidden - dispatch a global event for the UI layer to display a snackbar
+        // Deduplicate: only fire once within a cooldown window
         if (error.response?.status === 403) {
-          error.message = '접근 권한이 없습니다.';
+          error.message = error.response?.data?.error?.message || 'Insufficient permissions';
+          if (typeof window !== 'undefined') {
+            const now = Date.now();
+            const lastForbidden = (window as any).__lastForbiddenAt || 0;
+            if (now - lastForbidden > 3000) {
+              (window as any).__lastForbiddenAt = now;
+              window.dispatchEvent(new CustomEvent('gatrix:forbidden', {
+                detail: { url: error.config?.url, message: error.message },
+              }));
+            }
+          }
         }
 
         // Enhance error message for better user experience

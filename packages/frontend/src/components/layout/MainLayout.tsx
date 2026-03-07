@@ -408,6 +408,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [user?.id]);
 
+  // Handle 403 Forbidden - show global snackbar
+  useEffect(() => {
+    const handleForbidden = () => {
+      enqueueSnackbar(t('errors.insufficientPermissions'), {
+        variant: 'warning',
+        autoHideDuration: 5000,
+        preventDuplicate: true,
+      });
+    };
+
+    window.addEventListener('gatrix:forbidden', handleForbidden);
+    return () => {
+      window.removeEventListener('gatrix:forbidden', handleForbidden);
+    };
+  }, [enqueueSnackbar, t]);
+
   // Handle account suspension notification - immediately redirect to suspended page
   useEffect(() => {
     const handleUserSuspended = (event: CustomEvent) => {

@@ -10,6 +10,7 @@ import express from 'express';
 import { authenticate } from '../../middleware/auth';
 import { requireOrgPermission, requireOrgAdmin } from '../../middleware/rbacMiddleware';
 import { ORG_PERMISSIONS } from '../../types/permissions';
+import { P } from '@gatrix/shared/permissions';
 import { AuthenticatedRequest } from '../../types/auth';
 import { Organisation } from '../../models/Organisation';
 import { ProjectModel } from '../../models/ProjectModel';
@@ -478,7 +479,7 @@ router.delete(
 // GET /api/admin/rbac/roles
 router.get(
   '/roles',
-  requireOrgPermission(ORG_PERMISSIONS.ROLES_WRITE) as any,
+  requireOrgPermission(P.ROLES_READ) as any,
   async (req: any, res) => {
     try {
       const query = db('g_roles')
