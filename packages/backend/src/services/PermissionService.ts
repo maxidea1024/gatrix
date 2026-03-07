@@ -196,8 +196,17 @@ class PermissionService {
     const roles = await db('g_role_bindings')
       .join('g_roles', 'g_role_bindings.roleId', 'g_roles.id')
       .where('g_role_bindings.userId', userId)
-      .select('g_roles.scopeType');
+      .select('g_roles.scopeType', 'g_roles.id as roleId');
     if (roles.length === 0) return SCOPE_LEVELS.project;
+
+    // Check if any role has wildcard (*:*) permission — treat as system-level
+    const roleIds = roles.map((r: any) => r.roleId);
+    const wildcardPerm = await db('g_role_permissions')
+      .whereIn('roleId', roleIds)
+      .where('permission', '*:*')
+      .first();
+    if (wildcardPerm) return SCOPE_LEVELS.system;
+
     return getHighestScopeLevel(roles.map((r: any) => r.scopeType));
   }
 

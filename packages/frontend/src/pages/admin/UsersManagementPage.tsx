@@ -247,18 +247,11 @@ const UsersManagementPage: React.FC = () => {
     return currentUser?.id === user?.id;
   };
 
-  // Helper function to check if user is super admin (admin@gatrix.com)
-  // Super admin cannot be modified by anyone except themselves (name only)
-  const isSuperAdmin = (user: User | null): boolean => {
-    return user?.email === 'admin@gatrix.com';
-  };
-
   // Check if the target user can be modified
-  // Returns true if the user CAN be modified, false if they should be protected
+  // Backend already filters out users with higher scope levels (e.g., Super Admins)
   const canModifyUser = (user: User | null): boolean => {
     if (!user) return false;
-    // Super admin can only be modified by themselves
-    if (isSuperAdmin(user) && !isCurrentUser(user)) return false;
+    if (!canManage) return false;
     return true;
   };
 

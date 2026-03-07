@@ -229,6 +229,14 @@ export class UserModel {
                 .whereIn('r.scopeType', higherScopes);
             });
           }
+          // Also exclude users with wildcard (*:*) permissions (effectively system-level)
+          q.whereNotExists(function (this: any) {
+            this.select('*')
+              .from('g_role_bindings as rb2')
+              .join('g_role_permissions as rp2', 'rb2.roleId', 'rp2.roleId')
+              .whereRaw('rb2.userId = g_users.id')
+              .where('rp2.permission', '*:*');
+          });
         }
         return q;
       };
