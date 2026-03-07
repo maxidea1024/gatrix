@@ -1522,10 +1522,12 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                                 <Typography
                                   variant="subtitle2"
                                   sx={{
-                                    cursor: 'pointer',
-                                    '&:hover': { textDecoration: 'underline' },
+                                    ...(canManage && {
+                                      cursor: 'pointer',
+                                      '&:hover': { textDecoration: 'underline' },
+                                    }),
                                   }}
-                                  onClick={() => handleEdit(template)}
+                                  onClick={canManage ? () => handleEdit(template) : undefined}
                                 >
                                   {template.displayName || template.flowName}
                                 </Typography>
