@@ -1,8 +1,5 @@
 import { config, validateConfig } from './config/env';
 import { createServer } from 'http';
-import { createLogger } from './config/logger';
-
-const logger = createLogger('EdgeServer');
 import app from './app';
 import internalApp from './internal-app';
 import { sdkManager } from './services/sdk-manager';
@@ -10,6 +7,9 @@ import { initEdgeMetrics, sdkInitialized } from './services/edge-metrics';
 import { tokenMirrorService } from './services/token-mirror-service';
 import { tokenUsageTracker } from './services/token-usage-tracker';
 import { metricsAggregator } from './services/metrics-aggregator';
+
+import { createLogger } from './config/logger';
+const logger = createLogger('EdgeServer');
 
 /**
  * Main entry point for Edge server
