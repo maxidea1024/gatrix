@@ -8,7 +8,7 @@ import { Logger } from '../utils/logger';
 import { ErrorCode, createError, isGatrixSDKError } from '../utils/errors';
 import { ApiResponse } from '../types/api';
 import { RetryConfig } from '../types/config';
-import { SdkMetrics } from '../utils/sdkMetrics';
+import { SdkMetrics } from '../utils/sdk-metrics';
 import { sleep } from '../utils/time';
 
 export interface ApiClientConfig {

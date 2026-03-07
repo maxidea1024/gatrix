@@ -5,21 +5,21 @@
 
 import { Logger } from '../utils/logger';
 import { CacheConfig, FeaturesConfig, FeatureFlagConfig } from '../types/config';
-import { GameWorldService } from '../services/GameWorldService';
-import { PopupNoticeService } from '../services/PopupNoticeService';
-import { SurveyService } from '../services/SurveyService';
-import { WhitelistService } from '../services/WhitelistService';
-import { ServiceMaintenanceService } from '../services/ServiceMaintenanceService';
-import { ClientVersionService } from '../services/ClientVersionService';
-import { ServiceNoticeService } from '../services/ServiceNoticeService';
-import { BannerService } from '../services/BannerService';
-import { StoreProductService } from '../services/StoreProductService';
-import { FeatureFlagService } from '../services/FeatureFlagService';
-import { VarsService } from '../services/VarsService';
-import { EnvironmentService } from '../services/EnvironmentService';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { ApiClient } from '../client/ApiClient';
-import { SdkMetrics } from '../utils/sdkMetrics';
+import { GameWorldService } from '../services/game-world-service';
+import { PopupNoticeService } from '../services/popup-notice-service';
+import { SurveyService } from '../services/survey-service';
+import { WhitelistService } from '../services/whitelist-service';
+import { ServiceMaintenanceService } from '../services/service-maintenance-service';
+import { ClientVersionService } from '../services/client-version-service';
+import { ServiceNoticeService } from '../services/service-notice-service';
+import { BannerService } from '../services/banner-service';
+import { StoreProductService } from '../services/store-product-service';
+import { FeatureFlagService } from '../services/feature-flag-service';
+import { VarsService } from '../services/vars-service';
+import { EnvironmentService } from '../services/environment-service';
+import { EnvironmentResolver } from '../utils/environment-resolver';
+import { ApiClient } from '../client/api-client';
+import { SdkMetrics } from '../utils/sdk-metrics';
 import {
   MaintenanceStatus,
   ClientVersion,
@@ -28,8 +28,8 @@ import {
   StoreProduct,
 } from '../types/api';
 import { sleep } from '../utils/time';
-import { MaintenanceWatcher, MaintenanceEventCallback } from './MaintenanceWatcher';
-import { CacheStorageProvider, FileCacheStorageProvider } from './StorageProvider';
+import { MaintenanceWatcher, MaintenanceEventCallback } from './maintenance-watcher';
+import { CacheStorageProvider, FileCacheStorageProvider } from './storage-provider';
 
 export class CacheManager {
   private logger: Logger;

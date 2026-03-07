@@ -8,8 +8,8 @@ import Redis from 'ioredis';
 import { Logger } from '../utils/logger';
 import { RedisConfig } from '../types/config';
 import { StandardEvent, CustomEvent, EventCallback, EventListenerMap } from '../types/events';
-import { CacheManager } from './CacheManager';
-import { SdkMetrics } from '../utils/sdkMetrics';
+import { CacheManager } from './cache-manager';
+import { SdkMetrics } from '../utils/sdk-metrics';
 
 export class EventListener {
   private logger: Logger;

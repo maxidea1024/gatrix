@@ -4,7 +4,7 @@
  * Uses per-environment API pattern: POST /api/v1/server/coupons/:code/redeem
  */
 
-import { ApiClient } from '../client/ApiClient';
+import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
 import { RedeemCouponRequest, RedeemCouponResponse } from '../types/api';
 import { CouponRedeemError, CouponRedeemErrorCode, isGatrixSDKError } from '../utils/errors';

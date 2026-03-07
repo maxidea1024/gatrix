@@ -10,10 +10,10 @@
  * - Services use EnvironmentResolver for consistent environment handling
  */
 
-import { ApiClient } from '../client/ApiClient';
+import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { CacheStorageProvider } from '../cache/StorageProvider';
+import { EnvironmentResolver } from '../utils/environment-resolver';
+import { CacheStorageProvider } from '../cache/storage-provider';
 
 /**
  * Configuration for extracting items from API response

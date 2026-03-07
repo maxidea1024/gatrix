@@ -7,24 +7,24 @@ import { Logger } from './utils/logger';
 import { ErrorCode, createError } from './utils/errors';
 import { GatrixSDKConfig, GatrixSDKInitOptions } from './types/config';
 import { SDK_VERSION } from './version';
-import { ApiClient } from './client/ApiClient';
-import { CouponService } from './services/CouponService';
-import { GameWorldService } from './services/GameWorldService';
-import { PopupNoticeService } from './services/PopupNoticeService';
-import { SurveyService } from './services/SurveyService';
-import { WhitelistService } from './services/WhitelistService';
-import { ServiceMaintenanceService } from './services/ServiceMaintenanceService';
-import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
-import { StoreProductService } from './services/StoreProductService';
-import { FeatureFlagService } from './services/FeatureFlagService';
-import { VarsService } from './services/VarsService';
-import { CacheManager } from './cache/CacheManager';
-import { EventListener } from './cache/EventListener';
+import { ApiClient } from './client/api-client';
+import { CouponService } from './services/coupon-service';
+import { GameWorldService } from './services/game-world-service';
+import { PopupNoticeService } from './services/popup-notice-service';
+import { SurveyService } from './services/survey-service';
+import { WhitelistService } from './services/whitelist-service';
+import { ServiceMaintenanceService } from './services/service-maintenance-service';
+import { ServiceDiscoveryService } from './services/service-discovery-service';
+import { StoreProductService } from './services/store-product-service';
+import { FeatureFlagService } from './services/feature-flag-service';
+import { VarsService } from './services/vars-service';
+import { CacheManager } from './cache/cache-manager';
+import { EventListener } from './cache/event-listener';
 import { EventCallback, SdkEvent } from './types/events';
-import { SdkMetrics } from './utils/sdkMetrics';
-import { createMetricsServer, MetricsServerInstance } from './services/MetricsServer';
-import { createHttpMetricsMiddleware } from './utils/httpMetrics';
-import { MaintenanceEventData } from './cache/MaintenanceWatcher';
+import { SdkMetrics } from './utils/sdk-metrics';
+import { createMetricsServer, MetricsServerInstance } from './services/metrics-server';
+import { createHttpMetricsMiddleware } from './utils/http-metrics';
+import { MaintenanceEventData } from './cache/maintenance-watcher';
 import { InMemoryMetricRegistry } from './impact-metrics/metric-types';
 import type { ImpactMetricsDataSource } from './impact-metrics/metric-types';
 import { MetricsAPI, ImpactMetricsStaticContext } from './impact-metrics/metric-api';
@@ -46,7 +46,7 @@ import {
   Banner,
   StoreProduct,
 } from './types/api';
-import { detectCloudMetadata, CloudMetadata, CloudProvider } from './utils/cloudMetadata';
+import { detectCloudMetadata, CloudMetadata, CloudProvider } from './utils/cloud-metadata';
 
 /**
  * GatrixServerSDK

@@ -9,10 +9,10 @@
  * - In multi-environment mode (edge), environment MUST always be provided
  */
 
-import { ApiClient } from '../client/ApiClient';
+import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { CacheStorageProvider } from '../cache/StorageProvider';
+import { EnvironmentResolver } from '../utils/environment-resolver';
+import { CacheStorageProvider } from '../cache/storage-provider';
 import { ServiceNotice, ServiceNoticeListResponse, ServiceNoticeCategory } from '../types/api';
 
 export interface ServiceNoticeFilters {

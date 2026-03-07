@@ -11,10 +11,10 @@
  * - Metrics are batched and sent periodically (default: 1 minute)
  */
 
-import { ApiClient } from '../client/ApiClient';
+import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/EnvironmentResolver';
-import { CacheStorageProvider } from '../cache/StorageProvider';
+import { EnvironmentResolver } from '../utils/environment-resolver';
+import { CacheStorageProvider } from '../cache/storage-provider';
 import {
   FeatureFlag,
   FeatureSegment,
@@ -22,7 +22,7 @@ import {
   EvaluationResult,
   Variant,
   FlagMetric,
-} from '../types/featureFlags';
+} from '../types/feature-flags';
 import { FeatureFlagError, FeatureFlagErrorCode } from '../utils/errors';
 import { FeatureFlagEvaluator, VALUE_SOURCE } from '@gatrix/evaluator';
 import { SDK_VERSION } from '../version';

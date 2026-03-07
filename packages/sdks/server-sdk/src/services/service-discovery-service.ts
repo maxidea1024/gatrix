@@ -5,7 +5,7 @@
 
 import * as os from 'os';
 import { Logger } from '../utils/logger';
-import { ApiClient } from '../client/ApiClient';
+import { ApiClient } from '../client/api-client';
 import {
   ServiceInstance,
   GetServicesParams,

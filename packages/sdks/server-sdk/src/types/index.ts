@@ -5,4 +5,4 @@
 export * from './config';
 export * from './api';
 export * from './events';
-export * from './featureFlags';
+export * from './feature-flags';

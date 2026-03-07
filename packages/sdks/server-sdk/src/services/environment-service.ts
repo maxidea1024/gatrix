@@ -4,10 +4,10 @@
  * Fetches environment list from backend and tracks changes
  */
 
-import { ApiClient } from '../client/ApiClient';
+import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
 import { EnvironmentInfo, EnvironmentListResponse } from '../types/api';
-import { CacheStorageProvider } from '../cache/StorageProvider';
+import { CacheStorageProvider } from '../cache/storage-provider';
 
 export class EnvironmentService {
   private apiClient: ApiClient;

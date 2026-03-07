@@ -1,4 +1,4 @@
-import { GatrixServerSDK } from './GatrixServerSDK';
+import { GatrixServerSDK } from './gatrix-server-sdk';
 import { MaintenanceInfo, CurrentMaintenanceStatus } from './types/api';
 
 /**

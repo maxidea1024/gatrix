@@ -5,7 +5,7 @@
 import { LoggerConfig } from '../types/config';
 import * as os from 'os';
 
-import { LokiTransport } from './LokiTransport';
+import { LokiTransport } from './loki-transport';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LogFormat = 'pretty' | 'json';

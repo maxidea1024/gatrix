@@ -3,13 +3,13 @@
  * Entry point
  */
 
-export { GatrixServerSDK } from './GatrixServerSDK';
+export { GatrixServerSDK } from './gatrix-server-sdk';
 
 // Export types
 export * from './types';
 
 // Export maintenance watcher types
-export { MaintenanceEventData, MaintenanceStateSnapshot } from './cache/MaintenanceWatcher';
+export { MaintenanceEventData, MaintenanceStateSnapshot } from './cache/maintenance-watcher';
 
 // Export errors
 export {
@@ -27,19 +27,19 @@ export {
 export { Logger, LogLevel, LogFormat, getLogger } from './utils/logger';
 
 // Export environment service for wildcard mode
-export { EnvironmentService } from './services/EnvironmentService';
+export { EnvironmentService } from './services/environment-service';
 
 // Export base service for custom extensions
-export { BaseEnvironmentService } from './services/BaseEnvironmentService';
+export { BaseEnvironmentService } from './services/base-environment-service';
 
 // Export metrics helpers
-export { SdkMetrics } from './utils/sdkMetrics';
+export { SdkMetrics } from './utils/sdk-metrics';
 export {
   createMetricsServer,
   MetricsServerConfig,
   MetricsServerInstance,
-} from './services/MetricsServer';
-export { createHttpMetricsMiddleware, HttpMetricsOptions } from './utils/httpMetrics';
+} from './services/metrics-server';
+export { createHttpMetricsMiddleware, HttpMetricsOptions } from './utils/http-metrics';
 
 // Export Impact Metrics API
 export { MetricsAPI, ImpactMetricsStaticContext } from './impact-metrics/metric-api';
@@ -55,10 +55,10 @@ export {
 } from './impact-metrics/metric-types';
 
 // Export environment resolver
-export { EnvironmentResolver } from './utils/EnvironmentResolver';
+export { EnvironmentResolver } from './utils/environment-resolver';
 
 // Export cloud metadata detection utilities
-export { CloudMetadata, CloudProvider, detectCloudMetadata } from './utils/cloudMetadata';
+export { CloudMetadata, CloudProvider, detectCloudMetadata } from './utils/cloud-metadata';
 
 // Export Feature Flag Evaluator (from @gatrix/shared)
 export { FeatureFlagEvaluator } from '@gatrix/evaluator';
@@ -67,4 +67,4 @@ export { FeatureFlagEvaluator } from '@gatrix/evaluator';
 export { SDK_VERSION } from './version';
 
 // Default export
-export { GatrixServerSDK as default } from './GatrixServerSDK';
+export { GatrixServerSDK as default } from './gatrix-server-sdk';
