@@ -2,7 +2,7 @@
  * FeaturesClient - Feature Flags client for Gatrix SDK
  * Handles feature flag fetching, caching, and access
  */
-import { type EventEmitter } from './EventEmitter';
+import { type EventEmitter } from './event-emitter';
 import { EVENTS } from './events';
 import {
   type GatrixContext,
@@ -22,9 +22,9 @@ import {
   type FlagsChangedEvent,
 } from './types';
 import { fetchEventSource, EventStreamContentType } from '@microsoft/fetch-event-source';
-import { type StorageProvider } from './StorageProvider';
-import { LocalStorageProvider } from './LocalStorageProvider';
-import { InMemoryStorageProvider } from './InMemoryStorageProvider';
+import { type StorageProvider } from './storage-provider';
+import { LocalStorageProvider } from './local-storage-provider';
+import { InMemoryStorageProvider } from './in-memory-storage-provider';
 import {
   uuidv4,
   resolveAbortController,
@@ -33,15 +33,15 @@ import {
   computeEtag,
   isEqualFlag,
 } from './utils';
-import { buildContextQueryParams, SYSTEM_CONTEXT_FIELDS } from './contextUtils';
-import { FlagProxy } from './FlagProxy';
-import { type VariationProvider } from './VariationProvider';
-import { WatchFlagGroup } from './WatchFlagGroup';
-import { type Logger, ConsoleLogger } from './Logger';
-import { Metrics } from './Metrics';
+import { buildContextQueryParams, SYSTEM_CONTEXT_FIELDS } from './context-utils';
+import { FlagProxy } from './flag-proxy';
+import { type VariationProvider } from './variation-provider';
+import { WatchFlagGroup } from './watch-flag-group';
+import { type Logger, ConsoleLogger } from './logger';
+import { Metrics } from './metrics';
 import { GatrixError, GatrixFeatureError } from './errors';
 import { SDK_NAME, SDK_VERSION } from './version';
-import { VALUE_SOURCE } from './valueSource';
+import { VALUE_SOURCE } from './value-source';
 import ky from 'ky';
 
 const STORAGE_KEY_FLAGS = 'flags';

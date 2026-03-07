@@ -2,7 +2,7 @@
  * LocalStorage Provider
  * Uses browser localStorage for persistent storage
  */
-import { type StorageProvider } from './StorageProvider';
+import { type StorageProvider } from './storage-provider';
 
 const STORAGE_PREFIX = 'gatrix:';
 

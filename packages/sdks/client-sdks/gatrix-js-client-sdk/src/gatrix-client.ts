@@ -6,13 +6,13 @@
  * - (future) surveys: Surveys
  * - (future) maintenance: Maintenance status
  */
-import { EventEmitter } from './EventEmitter';
+import { EventEmitter } from './event-emitter';
 import { type GatrixClientConfig, type GatrixSdkStats, type GatrixSdkLightStats } from './types';
-import { FeaturesClient } from './FeaturesClient';
+import { FeaturesClient } from './features-client';
 import { EVENTS } from './events';
 import { SDK_VERSION } from './version';
-import { type Logger, ConsoleLogger } from './Logger';
-import { validateConfig } from './validateConfig';
+import { type Logger, ConsoleLogger } from './logger';
+import { validateConfig } from './validate-config';
 
 export class GatrixClient {
   private emitter: EventEmitter;

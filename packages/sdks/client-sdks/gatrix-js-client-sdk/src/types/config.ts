@@ -1,8 +1,8 @@
 /**
  * SDK configuration type definitions
  */
-import { type StorageProvider } from '../StorageProvider';
-import { type Logger } from '../Logger';
+import { type StorageProvider } from '../storage-provider';
+import { type Logger } from '../logger';
 import { type EvaluatedFlag } from './flag';
 import { type StreamingConfig } from './streaming';
 import { type GatrixContext } from './context';

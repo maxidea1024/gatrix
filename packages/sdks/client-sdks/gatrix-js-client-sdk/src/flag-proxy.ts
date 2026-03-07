@@ -9,7 +9,7 @@
  * - Client is always present (never null).
  */
 import { type EvaluatedFlag, type Variant, type ValueType, type VariationResult } from './types';
-import { type VariationProvider } from './VariationProvider';
+import { type VariationProvider } from './variation-provider';
 
 export class FlagProxy {
   private _flagName: string;

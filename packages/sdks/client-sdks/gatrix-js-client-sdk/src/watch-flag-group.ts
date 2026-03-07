@@ -2,8 +2,8 @@
  * WatchFlagGroup - Group multiple flag watchers for batch management
  * Provides convenience for registering/unregistering multiple watchers at once
  */
-import { type FeaturesClient } from './FeaturesClient';
-import { type FlagProxy } from './FlagProxy';
+import { type FeaturesClient } from './features-client';
+import { type FlagProxy } from './flag-proxy';
 
 export class WatchFlagGroup {
   private client: FeaturesClient;

@@ -4,11 +4,11 @@
  */
 
 // Main client
-export { GatrixClient } from './GatrixClient';
-export { FeaturesClient } from './FeaturesClient';
-export { FlagProxy } from './FlagProxy';
-export { VariationProvider } from './VariationProvider';
-export { WatchFlagGroup } from './WatchFlagGroup';
+export { GatrixClient } from './gatrix-client';
+export { FeaturesClient } from './features-client';
+export { FlagProxy } from './flag-proxy';
+export { VariationProvider } from './variation-provider';
+export { WatchFlagGroup } from './watch-flag-group';
 
 // Events
 export { EVENTS } from './events';
@@ -38,12 +38,12 @@ export type {
 } from './types';
 
 // Storage Providers
-export { StorageProvider } from './StorageProvider';
-export { LocalStorageProvider } from './LocalStorageProvider';
-export { InMemoryStorageProvider } from './InMemoryStorageProvider';
+export { StorageProvider } from './storage-provider';
+export { LocalStorageProvider } from './local-storage-provider';
+export { InMemoryStorageProvider } from './in-memory-storage-provider';
 
 // Version
 export { SDK_VERSION, SDK_NAME } from './version';
 
 // Value source constants
-export { VALUE_SOURCE } from './valueSource';
+export { VALUE_SOURCE } from './value-source';

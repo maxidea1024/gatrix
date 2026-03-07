@@ -8,8 +8,8 @@
  * - Access to undefined flags
  */
 
-import { type Logger } from './Logger';
-import { type EventEmitter } from './EventEmitter';
+import { type Logger } from './logger';
+import { type EventEmitter } from './event-emitter';
 import { EVENTS } from './events';
 import { SDK_NAME, SDK_VERSION } from './version';
 import ky from 'ky';

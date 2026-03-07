@@ -2,7 +2,7 @@
  * In-Memory Storage Provider
  * Uses a simple Map for non-persistent storage
  */
-import { type StorageProvider } from './StorageProvider';
+import { type StorageProvider } from './storage-provider';
 
 export class InMemoryStorageProvider implements StorageProvider {
   private store: Map<string, any> = new Map();
