@@ -64,14 +64,14 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
     },
   });
 
-  // 태그 로드
+  // Tag load
   useEffect(() => {
     if (open) {
       loadTags();
     }
   }, [open]);
 
-  // 사용자 데이터로 폼 초기화
+  // User data to form initialization
   useEffect(() => {
     if (user) {
       reset({
