@@ -4,7 +4,7 @@ import { createLogger } from '../config/logger';
 
 const logger = createLogger('EvaluationHelper');
 import { sdkManager } from '../services/sdkManager';
-import { EvaluationUtils } from '@gatrix/shared';
+import { EvaluationUtils } from '@gatrix/evaluator';
 
 /**
  * Get SDK instance or return 503 error
