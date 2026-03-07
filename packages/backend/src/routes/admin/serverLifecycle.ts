@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import serverLifecycleController from '../../controllers/ServerLifecycleController';
-import { authenticate, requirePermission } from '../../middleware/auth';
-import { PERMISSIONS } from '../../types/permissions';
+import { authenticate, requireEnvPermission } from '../../middleware/auth';
+import { P } from '@gatrix/shared/permissions';
 
 const router = Router();
 
@@ -19,7 +19,7 @@ router.use(authenticate as any);
  */
 router.get(
   '/events',
-  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
+  requireEnvPermission(P.SERVERS_READ) as any,
   serverLifecycleController.getEvents
 );
 
@@ -34,7 +34,7 @@ router.get(
  */
 router.get(
   '/summary',
-  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
+  requireEnvPermission(P.SERVERS_READ) as any,
   serverLifecycleController.getRecentSummary
 );
 

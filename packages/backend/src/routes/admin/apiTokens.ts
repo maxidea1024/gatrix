@@ -1,9 +1,9 @@
 import express from 'express';
 import { body } from 'express-validator';
 import ApiTokensController from '../../controllers/ApiTokensController';
-import { authenticate, requirePermission } from '../../middleware/auth';
+import { authenticate, requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
 import { auditLog } from '../../middleware/auditLog';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@gatrix/shared/permissions';
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ const updateTokenValidation = [
 
 // Apply authentication and permission requirement to all routes
 router.use(authenticate as any);
-router.use(requirePermission([PERMISSIONS.SERVICE_ACCOUNTS_VIEW, PERMISSIONS.SERVICE_ACCOUNTS_MANAGE]) as any);
+router.use(requireProjectPermission([P.SERVICE_ACCOUNTS_READ, P.SERVICE_ACCOUNTS_UPDATE]) as any);
 
 // Routes
 router.get('/', ApiTokensController.getTokens as any);

@@ -1,7 +1,7 @@
 import express from 'express';
-import { auth, requirePermission } from '../../middleware/auth';
+import { auth, requireProjectPermission } from '../../middleware/auth';
 import EnvironmentController from '../../controllers/EnvironmentController';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@gatrix/shared/permissions';
 
 const router = express.Router({ mergeParams: true });
 
@@ -12,10 +12,10 @@ router.use(auth as any);
 // This is needed for AppBar environment selector
 router.get('/', EnvironmentController.getEnvironments);
 
-// Read-only access requires environments.view permission
-const viewPermission = requirePermission([
-  PERMISSIONS.ENVIRONMENTS_VIEW,
-  PERMISSIONS.ENVIRONMENTS_MANAGE,
+// Read-only access requires environments.read permission
+const viewPermission = requireProjectPermission([
+  P.ENVIRONMENTS_READ,
+  P.ENVIRONMENTS_UPDATE,
 ]) as any;
 router.get('/:environmentId', viewPermission, EnvironmentController.getEnvironment);
 router.get(
@@ -29,8 +29,8 @@ router.get(
   EnvironmentController.getEnvironmentRelatedData
 );
 
-// Write access requires environments.manage permission
-const managePermission = requirePermission(PERMISSIONS.ENVIRONMENTS_MANAGE) as any;
+// Write access requires environments.update permission
+const managePermission = requireProjectPermission(P.ENVIRONMENTS_UPDATE) as any;
 router.post('/', managePermission, EnvironmentController.createEnvironment);
 router.put(
   '/:environmentId',

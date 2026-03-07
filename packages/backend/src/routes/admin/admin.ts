@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requirePermission } from '../../middleware/auth';
+import { authenticate, requireOrgPermission } from '../../middleware/auth';
 import { AdminController } from '../../controllers/AdminController';
 import apiTokenRoutes from './apiTokens';
 import {
@@ -10,14 +10,14 @@ import {
   auditUserSuspend,
   auditUserUnsuspend,
 } from '../../middleware/auditLog';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@gatrix/shared/permissions';
 
 const router = Router();
 
 // Permission shorthands
-const usersView = requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any;
-const usersManage = requirePermission(PERMISSIONS.USERS_MANAGE) as any;
-const systemManage = requirePermission(PERMISSIONS.SYSTEM_SETTINGS_MANAGE) as any;
+const usersView = requireOrgPermission([P.USERS_READ, P.USERS_UPDATE]) as any;
+const usersManage = requireOrgPermission(P.USERS_UPDATE) as any;
+const systemManage = requireOrgPermission(P.SYSTEM_SETTINGS_UPDATE) as any;
 
 // All admin routes require authentication and admin privileges
 router.use(authenticate as any);

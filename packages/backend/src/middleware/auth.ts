@@ -120,34 +120,102 @@ export const optionalAuth = async (
   }
 };
 
-export const requirePermission = (permissions: string | string[]) => {
+/**
+ * Require org-level permission.
+ * Checks via permissionService.hasOrgPermission (uses org-scope role bindings).
+ */
+export const requireOrgPermission = (permissions: string | string[]) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     if (!req.user) {
       next(new GatrixError('Authentication required', 401));
       return;
     }
 
-    // Org admin has all permissions
-    const isAdmin = await permissionService.isOrgAdmin(req.user.id, req.user.orgId);
-    if (isAdmin) {
-      next();
-      return;
-    }
-
-    // For now, check org-level permissions for backward compatibility
     const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
-
     for (const perm of requiredPermissions) {
-      const has = await permissionService.hasOrgPermission(req.user.id, req.user.orgId, perm);
-      if (has) {
+      if (await permissionService.hasOrgPermission(req.user.id, req.user.orgId, perm)) {
         next();
         return;
       }
     }
 
-    // DEBUG: Log permission check failure details
-    logger.warn(`[requirePermission] DENIED: userId=${req.user.id}, orgId=${req.user.orgId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
+    logger.warn(`[requireOrgPermission] DENIED: userId=${req.user.id}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
+    next(new GatrixError('Insufficient permissions', 403));
+  };
+};
 
+/**
+ * Require project-level permission.
+ * Expects req.projectId to be set (by orgProjectScope middleware).
+ * Checks via permissionService.hasProjectPermission (uses project-scope role bindings with override chain).
+ */
+export const requireProjectPermission = (permissions: string | string[]) => {
+  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user) {
+      next(new GatrixError('Authentication required', 401));
+      return;
+    }
+
+    const projectId = req.projectId || req.params.projectId;
+    if (!projectId) {
+      next(new GatrixError('Project context required', 400));
+      return;
+    }
+
+    const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+    for (const perm of requiredPermissions) {
+      if (await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)) {
+        next();
+        return;
+      }
+    }
+
+    logger.warn(`[requireProjectPermission] DENIED: userId=${req.user.id}, projectId=${projectId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
+    next(new GatrixError('Insufficient permissions', 403));
+  };
+};
+
+/**
+ * Require environment-level permission.
+ * Expects req.environmentId to be set (by environmentContextMiddleware).
+ * Falls back to project-level check if no environment context is available.
+ */
+export const requireEnvPermission = (permissions: string | string[]) => {
+  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user) {
+      next(new GatrixError('Authentication required', 401));
+      return;
+    }
+
+    const projectId = req.projectId || req.params.projectId;
+    const environmentId = req.environmentId as string | undefined;
+
+    const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+    for (const perm of requiredPermissions) {
+      // If environment context is available, check env-level permission
+      if (environmentId && projectId) {
+        if (await permissionService.hasEnvPermission(req.user.id, req.user.orgId, projectId, environmentId, perm)) {
+          next();
+          return;
+        }
+      }
+      // Fallback to project-level check when no environment context
+      else if (projectId) {
+        if (await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)) {
+          next();
+          return;
+        }
+      }
+      // Fallback to org-level check when no project context
+      else {
+        if (await permissionService.hasOrgPermission(req.user.id, req.user.orgId, perm)) {
+          next();
+          return;
+        }
+      }
+    }
+
+    logger.warn(`[requireEnvPermission] DENIED: userId=${req.user.id}, projectId=${projectId}, envId=${environmentId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
     next(new GatrixError('Insufficient permissions', 403));
   };
 };

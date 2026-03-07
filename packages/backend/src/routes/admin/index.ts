@@ -1,8 +1,8 @@
 import express from 'express';
-import { authenticate, requirePermission } from '../../middleware/auth';
+import { authenticate, requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
 import { environmentContextMiddleware } from '../../middleware/environmentMiddleware';
 import { orgProjectScope } from '../../middleware/orgProjectScope';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@gatrix/shared/permissions';
 
 // Import all admin-related route modules
 import adminRoutes from './admin';
@@ -113,19 +113,19 @@ router.use('/', adminRoutes);
 // User management - requires users.view or users.manage permission
 router.use(
   '/users',
-  requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any,
+  requireOrgPermission([P.USERS_READ, P.USERS_UPDATE]) as any,
   userRoutes
 );
 
 // Security routes - requires security.view or security.manage permission
 router.use(
   '/whitelist',
-  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  requireEnvPermission([P.ACCOUNT_WHITELIST_READ, P.ACCOUNT_WHITELIST_UPDATE]) as any,
   whitelistRoutes
 );
 router.use(
   '/ip-whitelist',
-  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  requireEnvPermission([P.IP_WHITELIST_READ, P.IP_WHITELIST_UPDATE]) as any,
   ipWhitelistRoutes
 );
 
@@ -139,84 +139,84 @@ projectRouter.use(orgProjectScope as any);
 // Feature Flags
 projectRouter.use(
   '/features',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.FEATURES_READ, P.FEATURES_UPDATE]) as any,
   featureRoutes
 );
 
 // Tags
 projectRouter.use(
   '/tags',
-  requirePermission([PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE]) as any,
+  requireProjectPermission([P.TAGS_READ, P.TAGS_UPDATE]) as any,
   tagRoutes
 );
 
 // Environments
 projectRouter.use(
   '/environments',
-  requirePermission([PERMISSIONS.ENVIRONMENTS_VIEW, PERMISSIONS.ENVIRONMENTS_MANAGE]) as any,
+  requireProjectPermission([P.ENVIRONMENTS_READ, P.ENVIRONMENTS_UPDATE]) as any,
   environmentRoutes
 );
 
 // Unknown Flags
 projectRouter.use(
   '/unknown-flags',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.UNKNOWN_FLAGS_READ]) as any,
   unknownFlagsRoutes
 );
 
 // Release Flows
 projectRouter.use(
   '/release-flows',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.RELEASE_FLOWS_READ, P.RELEASE_FLOWS_UPDATE]) as any,
   releaseFlowRoutes
 );
 
 // Change Requests
 projectRouter.use(
   '/change-requests',
-  requirePermission([PERMISSIONS.CHANGE_REQUESTS_VIEW, PERMISSIONS.CHANGE_REQUESTS_MANAGE]) as any,
+  requireEnvPermission([P.CHANGE_REQUESTS_CREATE, P.CHANGE_REQUESTS_APPROVE]) as any,
   changeRequestRoutes
 );
 
 // Impact Metrics
 projectRouter.get(
   '/impact-metrics/available',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.IMPACT_METRICS_READ, P.IMPACT_METRICS_UPDATE]) as any,
   ImpactMetricsController.getAvailableMetrics as any
 );
 projectRouter.get(
   '/impact-metrics/labels',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.IMPACT_METRICS_READ, P.IMPACT_METRICS_UPDATE]) as any,
   ImpactMetricsController.getMetricLabels as any
 );
 projectRouter.get(
   '/impact-metrics',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.IMPACT_METRICS_READ, P.IMPACT_METRICS_UPDATE]) as any,
   ImpactMetricsController.queryTimeSeries as any
 );
 projectRouter.get(
   '/impact-metrics/configs/:flagId',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission([P.IMPACT_METRICS_READ, P.IMPACT_METRICS_UPDATE]) as any,
   ImpactMetricsController.getConfigs.bind(ImpactMetricsController) as any
 );
 projectRouter.post(
   '/impact-metrics/configs',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission(P.IMPACT_METRICS_UPDATE) as any,
   ImpactMetricsController.createConfig.bind(ImpactMetricsController) as any
 );
 projectRouter.put(
   '/impact-metrics/configs/layouts',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission(P.IMPACT_METRICS_UPDATE) as any,
   ImpactMetricsController.updateLayouts.bind(ImpactMetricsController) as any
 );
 projectRouter.put(
   '/impact-metrics/configs/:id',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission(P.IMPACT_METRICS_UPDATE) as any,
   ImpactMetricsController.updateConfig.bind(ImpactMetricsController) as any
 );
 projectRouter.delete(
   '/impact-metrics/configs/:id',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireProjectPermission(P.IMPACT_METRICS_UPDATE) as any,
   ImpactMetricsController.deleteConfig.bind(ImpactMetricsController) as any
 );
 
@@ -225,48 +225,42 @@ projectRouter.delete(
 // Planning Data
 projectRouter.use(
   '/planning-data',
-  requirePermission([PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE]) as any,
+  requireEnvPermission([P.PLANNING_DATA_READ, P.PLANNING_DATA_UPDATE]) as any,
   planningDataRoutes
 );
 
 // Data Management
 projectRouter.use(
   '/data-management',
-  requirePermission([PERMISSIONS.DATA_MANAGEMENT_VIEW, PERMISSIONS.DATA_MANAGEMENT_MANAGE]) as any,
+  requireProjectPermission([P.DATA_READ, P.DATA_UPDATE]) as any,
   dataManagementRoutes
 );
 
 // Service Accounts
 projectRouter.use(
   '/service-accounts',
-  requirePermission([
-    PERMISSIONS.SERVICE_ACCOUNTS_VIEW,
-    PERMISSIONS.SERVICE_ACCOUNTS_MANAGE,
-  ]) as any,
+  requireProjectPermission([P.SERVICE_ACCOUNTS_READ, P.SERVICE_ACCOUNTS_UPDATE]) as any,
   serviceAccountRoutes
 );
 
 // API Tokens
 projectRouter.use(
   '/api-tokens',
-  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  requireProjectPermission([P.SERVICE_ACCOUNTS_READ, P.SERVICE_ACCOUNTS_UPDATE]) as any,
   apiTokenRoutes
 );
 
 // Signal Endpoints
 projectRouter.use(
   '/signal-endpoints',
-  requirePermission([
-    PERMISSIONS.SIGNAL_ENDPOINTS_VIEW,
-    PERMISSIONS.SIGNAL_ENDPOINTS_MANAGE,
-  ]) as any,
+  requireProjectPermission([P.SIGNAL_ENDPOINTS_READ, P.SIGNAL_ENDPOINTS_UPDATE]) as any,
   signalEndpointRoutes
 );
 
 // Actions
 projectRouter.use(
   '/actions',
-  requirePermission([PERMISSIONS.ACTIONS_VIEW, PERMISSIONS.ACTIONS_MANAGE]) as any,
+  requireProjectPermission([P.ACTIONS_READ, P.ACTIONS_UPDATE]) as any,
   actionSetRoutes
 );
 
@@ -275,114 +269,105 @@ projectRouter.use(
 // Client Versions
 projectRouter.use(
   '/client-versions',
-  requirePermission([PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE]) as any,
+  requireEnvPermission([P.CLIENT_VERSIONS_READ, P.CLIENT_VERSIONS_UPDATE]) as any,
   clientVersionRoutes
 );
 
 // Game Worlds
 projectRouter.use(
   '/game-worlds',
-  requirePermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]) as any,
+  requireEnvPermission([P.GAME_WORLDS_READ, P.GAME_WORLDS_UPDATE]) as any,
   gameWorldRoutes
 );
 
 // Maintenance
 projectRouter.use(
   '/maintenance',
-  requirePermission([PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE]) as any,
+  requireEnvPermission([P.MAINTENANCE_READ, P.MAINTENANCE_UPDATE]) as any,
   maintenanceRoutes
 );
 
 // Message Templates
 projectRouter.use(
   '/message-templates',
-  requirePermission([
-    PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
-    PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
-  ]) as any,
+  requireEnvPermission([P.MAINTENANCE_TEMPLATES_READ, P.MAINTENANCE_TEMPLATES_UPDATE]) as any,
   messageTemplateRoutes
 );
 
 // Vars (KV)
 projectRouter.use(
   '/vars',
-  requirePermission([PERMISSIONS.VARS_VIEW, PERMISSIONS.VARS_MANAGE]) as any,
+  requireEnvPermission([P.VARS_READ, P.VARS_UPDATE]) as any,
   varsRoutes
 );
 
 // Service Notices
 projectRouter.use(
   '/service-notices',
-  requirePermission([PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE]) as any,
+  requireEnvPermission([P.SERVICE_NOTICES_READ, P.SERVICE_NOTICES_UPDATE]) as any,
   serviceNoticeRoutes
 );
 
 // Ingame Popup Notices
 projectRouter.use(
   '/ingame-popup-notices',
-  requirePermission([
-    PERMISSIONS.INGAME_POPUP_NOTICES_VIEW,
-    PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE,
-  ]) as any,
+  requireEnvPermission([P.INGAME_POPUPS_READ, P.INGAME_POPUPS_UPDATE]) as any,
   ingamePopupNoticeRoutes
 );
 
 // Surveys
 projectRouter.use(
   '/surveys',
-  requirePermission([PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.SURVEYS_MANAGE]) as any,
+  requireEnvPermission([P.SURVEYS_READ, P.SURVEYS_UPDATE]) as any,
   surveyRoutes
 );
 
 // Reward Templates
 projectRouter.use(
   '/reward-templates',
-  requirePermission([
-    PERMISSIONS.REWARD_TEMPLATES_VIEW,
-    PERMISSIONS.REWARD_TEMPLATES_MANAGE,
-  ]) as any,
+  requireEnvPermission([P.REWARD_TEMPLATES_READ, P.REWARD_TEMPLATES_UPDATE]) as any,
   rewardTemplateRoutes
 );
 
 // Store Products
 projectRouter.use(
   '/store-products',
-  requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any,
+  requireEnvPermission([P.STORE_PRODUCTS_READ, P.STORE_PRODUCTS_UPDATE]) as any,
   storeProductRoutes
 );
 
 // Banners
 projectRouter.use(
   '/banners',
-  requirePermission([PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE]) as any,
+  requireEnvPermission([P.BANNERS_READ, P.BANNERS_UPDATE]) as any,
   bannerRoutes
 );
 
 // Coupon Settings
 projectRouter.use(
   '/coupon-settings',
-  requirePermission([PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE]) as any,
+  requireEnvPermission([P.COUPONS_READ, P.COUPONS_UPDATE]) as any,
   couponSettingsRoutes
 );
 
 // CMS CashShop
 projectRouter.use(
   '/cms/cash-shop',
-  requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any,
+  requireEnvPermission([P.STORE_PRODUCTS_READ, P.STORE_PRODUCTS_UPDATE]) as any,
   cmsCashShopRoutes
 );
 
 // Server Lifecycle Events
 projectRouter.use(
   '/server-lifecycle',
-  requirePermission(PERMISSIONS.SERVERS_VIEW) as any,
+  requireEnvPermission(P.SERVERS_READ) as any,
   serverLifecycleRoutes
 );
 
 // Platform Defaults
 projectRouter.use(
   '/platform-defaults',
-  requirePermission([PERMISSIONS.FEATURE_FLAGS_VIEW, PERMISSIONS.FEATURE_FLAGS_MANAGE]) as any,
+  requireEnvPermission([P.FEATURES_READ, P.FEATURES_UPDATE]) as any,
   platformDefaultsRoutes
 );
 
@@ -394,60 +379,57 @@ router.use('/orgs/:orgId/projects/:projectId', projectRouter);
 // ========================================
 
 // Audit logs
-router.use('/audit-logs', requirePermission(PERMISSIONS.AUDIT_LOGS_VIEW) as any, auditLogRoutes);
+router.use('/audit-logs', requireOrgPermission(P.AUDIT_LOGS_READ) as any, auditLogRoutes);
 
 // Translation
 router.use(
   '/translation',
-  requirePermission([
-    PERMISSIONS.MAINTENANCE_TEMPLATES_VIEW,
-    PERMISSIONS.MAINTENANCE_TEMPLATES_MANAGE,
-  ]) as any,
+  requireOrgPermission([P.TRANSLATION_READ, P.TRANSLATION_UPDATE]) as any,
   translationRoutes
 );
 
 // Jobs and scheduler
 router.use(
   '/jobs',
-  requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
+  requireOrgPermission([P.SCHEDULER_READ, P.SCHEDULER_UPDATE]) as any,
   jobRoutes
 );
 
 // Invitations
 router.use(
   '/invitations',
-  requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any,
+  requireOrgPermission([P.INVITATIONS_READ, P.INVITATIONS_CREATE]) as any,
   invitationRoutes
 );
 
 // Crash events
 router.use(
   '/crash-events',
-  requirePermission(PERMISSIONS.CRASH_EVENTS_VIEW) as any,
+  requireOrgPermission(P.CRASH_EVENTS_READ) as any,
   crashEventRoutes
 );
 
 // Console
-router.use('/console', requirePermission(PERMISSIONS.CONSOLE_ACCESS) as any, consoleRoutes);
+router.use('/console', requireOrgPermission(P.CONSOLE_ACCESS) as any, consoleRoutes);
 
 // Monitoring alerts
 router.use(
   '/monitoring/alerts',
-  requirePermission(PERMISSIONS.MONITORING_VIEW) as any,
+  requireOrgPermission(P.MONITORING_READ) as any,
   monitoringAlertRoutes
 );
 
 // Integrations
 router.use(
   '/integrations',
-  requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any,
+  requireOrgPermission([P.INTEGRATIONS_READ, P.INTEGRATIONS_UPDATE]) as any,
   integrationRoutes
 );
 
 // Queue Monitor
 router.use(
   '/queue-monitor',
-  requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any,
+  requireOrgPermission([P.SCHEDULER_READ, P.SCHEDULER_UPDATE]) as any,
   queueMonitorRoutes
 );
 
