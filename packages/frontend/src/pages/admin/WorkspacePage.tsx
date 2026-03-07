@@ -232,6 +232,7 @@ const WorkspacePage: React.FC = () => {
       setCreateDrawerOpen(false);
       setCreateData({ orgName: '', displayName: '', description: '' });
       loadOrganisations();
+      refreshOrgs();
     } catch (error: any) {
       const message = error?.response?.data?.message || t('rbac.orgs.createFailed');
       enqueueSnackbar(message, { variant: 'error' });
