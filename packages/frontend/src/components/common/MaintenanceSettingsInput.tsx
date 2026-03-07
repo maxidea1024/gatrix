@@ -50,14 +50,14 @@ export interface MaintenanceSettingsInputProps {
   selectedTemplateId: number | '';
   onSelectedTemplateIdChange: (id: number | '') => void;
 
-  // 강제 종료 옵션 (게임월드에서만 사용)
+  // 강제 종료 옵션 (게임월드에서만 Used)
   showForceDisconnect?: boolean;
   forceDisconnect?: boolean;
   onForceDisconnectChange?: (value: boolean) => void;
   gracePeriodMinutes?: number;
   onGracePeriodMinutesChange?: (value: number) => void;
 
-  // 에러 상태
+  // 에러 Status
   messageError?: boolean;
 
   // 필수 여부

@@ -4,18 +4,18 @@ import { ExpressAdapter } from '@bull-board/express';
 import { Queue } from 'bullmq';
 import logger from './logger';
 
-// Bull Board 설정
+// Bull Board Settings
 export class BullBoardConfig {
   private static serverAdapter: ExpressAdapter;
   private static queues: Queue[] = [];
 
   static initialize() {
     try {
-      // Express adapter 생성
+      // Express adapter Create
       this.serverAdapter = new ExpressAdapter();
       this.serverAdapter.setBasePath('/bull-board');
 
-      // Bull Board 생성
+      // Bull Board Create
       createBullBoard({
         queues: [], // 초기에는 빈 배열
         serverAdapter: this.serverAdapter,

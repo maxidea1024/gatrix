@@ -205,7 +205,7 @@ const JobsPage: React.FC = () => {
     // loadData will be called automatically by useEffect
   };
 
-  // 태그 필터 변경 핸들러
+  // 태그 Filter 변경 핸들러
   const handleTagFilterChange = useCallback((tags: Tag[]) => {
     setTagFilter(tags);
     setPage(0);
@@ -521,7 +521,7 @@ const JobsPage: React.FC = () => {
             </Grid>
 
             <Grid size={{ xs: 12, md: 5 }}>
-              {/* 태그 필터 */}
+              {/* 태그 Filter */}
               <Autocomplete
                 multiple
                 sx={{ minWidth: 400 }}

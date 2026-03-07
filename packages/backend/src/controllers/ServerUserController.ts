@@ -17,7 +17,7 @@ export interface ServerUserRequest extends Request {
 }
 
 class ServerUserController {
-  // 사용자 ID로 사용자 정보 조회
+  // Used자 ID로 User info 조회
   static async getUserById(req: ServerUserRequest, res: Response) {
     try {
       const userId = req.params.id;
@@ -53,7 +53,7 @@ class ServerUserController {
     }
   }
 
-  // 여러 사용자 ID로 사용자 정보 조회
+  // 여러 Used자 ID로 User info 조회
   static async getUsersByIds(req: ServerUserRequest, res: Response) {
     try {
       const { userIds } = req.body;
@@ -76,14 +76,14 @@ class ServerUserController {
         });
       }
 
-      // 모든 ID가 숫자인지 확인
+      // 모든 ID가 숫자인지 Confirm
       const validUserIds = userIds.filter((id) => Number.isInteger(id) && id > 0);
 
       if (validUserIds.length === 0) {
         return sendSuccessResponse(res, []);
       }
 
-      // 사용자 정보 조회
+      // User info 조회
       const users = [];
       for (const userId of validUserIds) {
         try {
@@ -103,7 +103,7 @@ class ServerUserController {
           }
         } catch (error) {
           logger.warn(`Failed to get user ${userId}:`, error);
-          // 개별 사용자 조회 실패는 무시하고 계속 진행
+          // 개별 Used자 조회 Failed는 Ignore하고 계속 진행
         }
       }
 
@@ -118,19 +118,19 @@ class ServerUserController {
     }
   }
 
-  // 사용자 동기화 데이터 조회 (채팅 서버용)
+  // Used자 동기화 Query data (채팅 서버용)
   static async syncUsers(req: ServerUserRequest, res: Response) {
     try {
       const { lastSyncAt } = req.query;
 
-      // 기본적으로 최근 24시간 내 업데이트된 사용자 조회
+      // 기본적으로 최근 24시간 내 업데이트된 Used자 조회
       const since = lastSyncAt
         ? new Date(lastSyncAt as string)
         : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
       logger.info('User sync request:', { lastSyncAt, since });
 
-      // 실제 데이터베이스에서 사용자 조회
+      // 실제 데이터베이스에서 Used자 조회
       const users = await UserModel.getUsersForSync(since);
 
       // 채팅 서버에서 기대하는 형식으로 변환

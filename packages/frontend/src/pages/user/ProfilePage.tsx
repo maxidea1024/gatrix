@@ -276,7 +276,7 @@ const ProfilePage: React.FC = () => {
       }
 
       await AuthService.updateProfile(updateData);
-      await refreshAuth(); // 사용자 정보 새로고침
+      await refreshAuth(); // User info Refresh
       enqueueSnackbar(t('profile.profileUpdated'), { variant: 'success' });
       setIsEditing(false);
       setAvatarFile(null);

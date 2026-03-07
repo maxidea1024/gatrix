@@ -2,7 +2,7 @@
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
 export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
 
-// 태그 인터페이스
+// 태그 Interface
 export interface Tag {
   id: number;
   name: string;
@@ -111,7 +111,7 @@ export interface UserFilters {
   role?: 'admin' | 'user';
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   search?: string;
-  tags?: number[]; // 태그 ID 배열로 필터링
+  tags?: number[]; // 태그 ID 배열로 Filter링
 }
 
 // Audit log types

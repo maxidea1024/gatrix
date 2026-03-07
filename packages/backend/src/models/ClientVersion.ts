@@ -84,7 +84,7 @@ export interface BulkCreateClientVersionRequest {
 }
 
 export class ClientVersionModel {
-  // 사용 가능한 버전 목록 조회 (distinct)
+  // Used 가능한 버전 Get list (distinct)
   static async getDistinctVersions(environmentId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
@@ -101,21 +101,21 @@ export class ClientVersionModel {
 
   static async findAll(filters: ClientVersionFilters): Promise<ClientVersionListResult> {
     try {
-      // 기본값 설정
+      // Set default values
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
       const environmentId = filters.environmentId;
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_client_versions as cv')
           .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
           .where('cv.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
         // clientVersion filter - support both single value and array (any_of)
         if (filters?.clientVersion) {
@@ -151,13 +151,13 @@ export class ClientVersionModel {
             const guestModeValues = filters.guestModeAllowed.map((val) => (val ? 1 : 0));
             query.whereIn('cv.guestModeAllowed', guestModeValues);
           } else {
-            // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
+            // TINYINT Type이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
             const guestModeValue = filters.guestModeAllowed ? 1 : 0;
             query.where('cv.guestModeAllowed', guestModeValue);
           }
         }
 
-        // 태그 필터링 - support both any_of and include_all
+        // 태그 Filter링 - support both any_of and include_all
         if (filters?.tags && filters.tags.length > 0) {
           const tagsOperator = filters.tagsOperator || 'any_of';
 
@@ -201,10 +201,10 @@ export class ClientVersionModel {
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('cv.id as total').first();
 
-      // Data 쿼리
+      // Data Query
       const dataQuery = applyFilters(baseQuery())
         .select([
           'cv.*',
@@ -267,7 +267,7 @@ export class ClientVersionModel {
       // 태그 정보 로드
       const tags = await this.getTags(id, trx);
 
-      // 점검 메시지 로케일 정보 로드
+      // 점검 메시지 Locale 정보 로드
       const localesQuery = trx
         ? trx('g_client_version_maintenance_locales')
         : db('g_client_version_maintenance_locales');
@@ -302,7 +302,7 @@ export class ClientVersionModel {
           updatedAt: new Date(),
         });
 
-        // 점검 메시지 로케일 처리
+        // 점검 메시지 Locale 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
             clientVersionId: id,
@@ -339,12 +339,12 @@ export class ClientVersionModel {
             updatedAt: new Date(),
           });
 
-        // 점검 메시지 로케일 처리
+        // 점검 메시지 Locale 처리
         if (maintenanceLocales !== undefined) {
-          // 기존 로케일 삭제
+          // Existing Locale Delete
           await trx('g_client_version_maintenance_locales').where('clientVersionId', id).del();
 
-          // 새 로케일 추가
+          // 새 Locale 추가
           if (maintenanceLocales.length > 0) {
             const localeInserts = maintenanceLocales.map((locale: any) => ({
               clientVersionId: id,
@@ -404,7 +404,7 @@ export class ClientVersionModel {
         }
       });
 
-      // 트랜잭션 완료 후 생성된 데이터 조회
+      // 트랜잭션 완료 후 Create된 Query data
       const results = [];
       for (const cvId of insertedIds) {
         const clientVersion = await this.findById(cvId, environmentId);
@@ -456,10 +456,10 @@ export class ClientVersionModel {
 
       // 언어별 메시지 처리
       if (data.maintenanceLocales && Array.isArray(data.maintenanceLocales)) {
-        // 기존 언어별 메시지 삭제
+        // Existing 언어별 메시지 Delete
         await db('g_client_version_maintenance_locales').whereIn('clientVersionId', data.ids).del();
 
-        // 새로운 언어별 메시지 추가
+        // New 언어별 메시지 추가
         if (data.maintenanceLocales.length > 0) {
           const localeInserts = [];
           for (const id of data.ids) {
@@ -539,7 +539,7 @@ export class ClientVersionModel {
       logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
 
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         const deletedCount = await trx('g_tag_assignments')
           .where('entityType', 'client_version')
           .where('entityId', clientVersionId)

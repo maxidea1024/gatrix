@@ -41,28 +41,28 @@ export class MessageTemplateModel {
     filters: MessageTemplateFilters
   ): Promise<MessageTemplateListResult> {
     try {
-      // 기본값 설정
+      // Set default values
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const environmentId = filters.environmentId;
 
       logger.debug('🔍 MessageTemplate query filters:', { filters });
 
-      // 테스트: 테이블에 데이터가 있는지 확인
+      // 테스트: 테이블에 데이터가 있는지 Confirm
       const testCount = await db('g_message_templates')
         .where('environmentId', environmentId)
         .count('* as count')
         .first();
       logger.debug('🔍 Total records in g_message_templates:', { testCount });
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_message_templates as mt')
           .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
           .where('mt.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
         // Handle createdBy filter (single or multiple)
         if (filters?.createdBy !== undefined) {
@@ -104,7 +104,7 @@ export class MessageTemplateModel {
           });
         }
 
-        // 태그 필터 처리
+        // 태그 Filter 처리
         if (filters?.tags && filters.tags.length > 0) {
           const operator = filters.tags_operator || 'include_all';
 
@@ -134,10 +134,10 @@ export class MessageTemplateModel {
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('mt.id as total').first();
 
-      // Data 쿼리
+      // Data Query
       const dataQuery = applyFilters(baseQuery())
         .select(['mt.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .orderBy('mt.createdAt', 'desc')
@@ -217,7 +217,7 @@ export class MessageTemplateModel {
   static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
-        // 메시지 템플릿 생성
+        // 메시지 템플릿 Create
         const id = generateULID();
         await trx('g_message_templates').insert({
           id,
@@ -299,10 +299,10 @@ export class MessageTemplateModel {
             updatedAt: new Date(),
           });
 
-        // 기존 언어별 메시지 삭제
+        // Existing 언어별 메시지 Delete
         await trx('g_message_template_locales').where('templateId', id).del();
 
-        // 새로운 언어별 메시지 추가
+        // New 언어별 메시지 추가
         if (data.locales && data.locales.length > 0) {
           const localeInserts = data.locales.map((locale: any) => ({
             templateId: id,
@@ -354,7 +354,7 @@ export class MessageTemplateModel {
   static async setTags(templateId: string, tagIds: string[], createdBy?: string): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments')
           .where('entityType', 'message_template')
           .where('entityId', templateId)

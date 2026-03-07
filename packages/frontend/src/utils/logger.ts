@@ -1,7 +1,7 @@
 /**
  * Frontend Logger Utility
  *
- * 프론트엔드에서 사용할 수 있는 로깅 유틸리티
+ * 프론트엔드에서 Used할 수 있는 로깅 Utility
  * 개발 환경에서는 console에 출력하고, 프로덕션에서는 선택적으로 서버에 전송
  */
 
@@ -78,7 +78,7 @@ class Logger {
       this.logToConsole(level, message, data);
     }
 
-    // 서버 로깅이 활성화된 경우 버퍼에 추가
+    // 서버 로깅이 Active화된 경우 버퍼에 추가
     if (this.enableServerLogging) {
       this.addToBuffer(logEntry);
     }
@@ -145,7 +145,7 @@ class Logger {
         body: JSON.stringify({ logs }),
       });
     } catch (error) {
-      // 서버 로깅 실패 시 콘솔에만 출력
+      // 서버 로깅 Failed 시 콘솔에만 출력
       console.error('Failed to send logs to server:', error);
     }
   }
@@ -165,7 +165,7 @@ class Logger {
   }
 
   /**
-   * 현재 로그 버퍼 상태 반환
+   * 현재 로그 버퍼 Status 반환
    */
   getBufferStatus(): { count: number; maxSize: number } {
     return {
@@ -175,7 +175,7 @@ class Logger {
   }
 }
 
-// 싱글톤 인스턴스 생성
+// 싱글톤 인스턴스 Create
 const logger = new Logger();
 
 // 페이지 언로드 시 로그 플러시
@@ -194,7 +194,7 @@ setInterval(
 export default logger;
 
 /**
- * 개발 환경에서만 사용하는 디버그 로거
+ * 개발 환경에서만 Used하는 디버그 로거
  */
 export const devLogger = {
   debug: (message: string, data?: any) => {
@@ -220,7 +220,7 @@ export const devLogger = {
 };
 
 /**
- * 프로덕션에서도 사용하는 중요한 로거
+ * 프로덕션에서도 Used하는 중요한 로거
  */
 export const prodLogger = {
   warn: (message: string, data?: any) => {

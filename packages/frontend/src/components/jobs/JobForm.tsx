@@ -128,7 +128,7 @@ const JobForm: React.FC<JobFormProps> = ({
     setFormData((prev) => ({
       ...prev,
       jobTypeId: jobTypeId,
-      // Job 편집 모드에서는 기존 jobDataMap 유지, 새 생성 시에만 초기화
+      // Job 편집 모드에서는 Existing jobDataMap 유지, 새 Create 시에만 Initialization
       jobDataMap: job ? prev.jobDataMap : {},
     }));
   };

@@ -57,7 +57,7 @@ export interface CreateTokenResponse {
   };
 }
 
-// 토큰 생성 시 사용하는 별도 타입
+// 토큰 Create 시 Used하는 별도 Type
 export interface TokenCreationResponse {
   token: ApiAccessToken;
   plainToken: string;

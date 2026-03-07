@@ -275,7 +275,7 @@ const startServer = async () => {
       logger.warn('Queue service initialization failed, continuing without queues:', error);
     }
 
-    // Initialize ApiTokenUsageService (QueueService 초기화 뒤에 실행)
+    // Initialize ApiTokenUsageService (QueueService Initialization 뒤에 실행)
     try {
       await apiTokenUsageService.initialize();
       logger.info('ApiTokenUsageService initialized successfully');

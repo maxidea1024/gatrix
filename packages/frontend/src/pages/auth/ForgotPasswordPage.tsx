@@ -19,7 +19,7 @@ const ForgotPasswordPage: React.FC = () => {
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
-  // 이메일 유효성 검사 함수
+  // 이메일 Validation 함수
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -29,7 +29,7 @@ const ForgotPasswordPage: React.FC = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
-    setMessage(null); // 기존 메시지 클리어
+    setMessage(null); // Existing 메시지 클리어
 
     if (value.trim() === '') {
       setEmailError(null);
@@ -40,10 +40,10 @@ const ForgotPasswordPage: React.FC = () => {
     }
   };
 
-  // 버튼 활성화 조건
+  // 버튼 Active화 조건
   const isButtonDisabled = isSubmitting || !email.trim() || !!emailError;
 
-  // 백엔드 메시지 키를 번역하는 함수
+  // 백엔드 메시지 키를 Translation하는 함수
   const getTranslatedMessage = (messageKey: string): string => {
     const messageMap: { [key: string]: string } = {
       PASSWORD_RESET_EMAIL_SENT: t('auth.passwordResetEmailSent'),
@@ -66,7 +66,7 @@ const ForgotPasswordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 이미 실시간 유효성 검사로 처리되므로 추가 검사 불필요
+    // 이미 실시간 Validation로 처리되므로 추가 검사 불필요
     if (isButtonDisabled) {
       return;
     }
@@ -79,7 +79,7 @@ const ForgotPasswordPage: React.FC = () => {
 
       if (response.success) {
         setEmailSent(true);
-        // 백엔드에서 메시지 키를 받아서 번역
+        // 백엔드에서 메시지 키를 받아서 Translation
         const translatedMessage = getTranslatedMessage(response.message);
         setMessage({ type: 'success', text: translatedMessage });
       } else {

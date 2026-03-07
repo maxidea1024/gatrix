@@ -18,7 +18,7 @@ export interface AppInstanceInfo {
 
 /**
  * 앱 인스턴스 정보를 관리하는 싱글톤 클래스
- * 백엔드 시작 시 생성되어 시스템 전역에서 사용됩니다.
+ * 백엔드 시작 시 Create되어 시스템 전역에서 Used됩니다.
  */
 class AppInstance {
   private static instance: AppInstance;

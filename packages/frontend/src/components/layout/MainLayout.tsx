@@ -712,9 +712,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [maintenanceStatus.isMaintenance, maintenanceStatus.detail, maintenanceStatus.status]);
 
-  // SSE updates - 백엔드 연결 실패 시 적절히 처리
+  // SSE updates - 백엔드 연결 Failed 시 적절히 처리
   const sseConnection = useSSENotifications({
-    autoConnect: true, // 자동 연결 활성화
+    autoConnect: true, // 자동 연결 Active화
     maxReconnectAttempts: 3, // 재연결 시도 횟수 줄임
     reconnectInterval: 10000, // 재연결 간격 늘림 (10초)
     onEvent: (event) => {
@@ -773,7 +773,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           })
         );
       } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
-        // 초대링크 이벤트를 다른 컴포넌트에 전달
+        // 초대링크 Event를 다른 컴포넌트에 전달
         window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
       }
     },
@@ -810,7 +810,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [loadUnreadMailCount]);
 
-  // 사용자가 변경될 때마다 아바타 이미지 에러 상태 초기화
+  // Used자가 변경될 때마다 아바타 Images 에러 Status Initialization
   useEffect(() => {
     setAvatarImageError(false);
   }, [user?.avatarUrl]);
@@ -1679,7 +1679,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       🔧 {t('maintenance.tooltipTitle')}
                     </Typography>
 
-                    {/* 상태 */}
+                    {/* Status */}
                     <Typography
                       variant="body2"
                       sx={{ mb: 1, display: 'flex', alignItems: 'center' }}
@@ -2048,7 +2048,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         height: 32,
                       }}
                       onError={() => {
-                        // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
+                        // Images 로드 Failed 시 AccountCircle 아이콘으로 대체
                         setAvatarImageError(true);
                       }}
                     >

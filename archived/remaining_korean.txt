@@ -1,0 +1,1690 @@
+﻿
+=== packages/frontend/src/contexts/ChatContext.tsx ===
+59:       // 24?쒓컙 ?대궡??硫붿떆吏留??좎? (1?쒓컙?먯꽌 24?쒓컙?쇰줈 ?곗옣)
+86: // 硫붿떆吏瑜?濡쒖뺄 ?ㅽ넗由ъ???Save (?붾컮?댁뒪 ?곸슜)
+90:     // Existing ??꾩븘??Cancel
+95:     // 500ms ?꾩뿉 Save (?붾컮?댁뒪)
+125:   loadingStartTime: null, // 濡쒕뵫 ?쒖옉 ?쒓컙
+244:       // 硫붿떆吏 Status 蹂寃???localStorage??Save
+262:       // 以묐났 硫붿떆吏 諛⑹?
+280:       // ??硫붿떆吏 異붽? ??localStorage??Save
+302:       // 紐⑤뱺 梨꾨꼸?먯꽌 ?대떦 硫붿떆吏瑜?李얠븘 由ъ븸???뺣낫 ?낅뜲?댄듃
+345:       // ?댁쟾 硫붿떆吏 異붽? ??localStorage??Save
+356:       // 紐⑤뱺 梨꾨꼸?먯꽌 ?대떦 硫붿떆吏瑜?李얠븘 ?ㅻ젅???뺣낫 ?낅뜲?댄듃
+523:       // 梨꾨꼸 紐⑸줉 Refresh???꾪븳 ?뚮옒洹?Settings
+526:         isLoading: true, // Refresh 以묒엫???쒖떆
+557:   // ?붾쾭源? 珥덇린 Status Confirm (??踰덈쭔 ?ㅽ뻾)
+563:   }, []); // 鍮??섏〈??諛곗뿴濡???踰덈쭔 ?ㅽ뻾
+565:   // ?섏씠吏 ?꾪솚 ??硫붿떆吏 Status 蹂댁〈???꾪븳 ref
+568:   // markAsRead Request 異붿쟻???꾪븳 ref
+570:   // 梨꾨꼸蹂?理쒖큹 Refresh ?щ? (Cache ???쒕쾭 硫뷀??곗씠???숆린??
+590:       // ?꾩옱 User info瑜?Settings
+593:       // WebSocket ?곌껐 ?⑥닔???댁젣 ?꾩뿉??useCallback?쇰줈 ?뺤쓽??602:           // ?뵇 硫붿떆吏??User info媛 ?ы븿?섏뼱 ?덈뒗吏 Confirm
+610:           // 硫붿떆吏??User info媛 ?ы븿?섏뼱 ?덉쑝硫?Used
+628:           // 硫붿떆吏??User info媛 ?녾퀬 state?먮룄 ?놁쑝硫?fallback Used
+654:         // ?ㅻ젅??硫붿떆吏 Create Event 由ъ뒪??657:           // ?ㅻ젅??硫붿떆吏??硫붿씤 梨꾪똿??異붽??섏? ?딆쓬
+658:           // ThreadView 而댄룷?뚰듃?먯꽌 蹂꾨룄濡?泥섎━
+661:         // ?ㅻ젅???뺣낫 ?낅뜲?댄듃 Event 由ъ뒪??665:           // ?ㅼ뼇???섑븨 耳?댁뒪瑜?All 泥섎━
+666:           // 1) data.data.data (?꾩옱 援ъ“)
+667:           // 2) data.data (?뺢퇋?붾맂 援ъ“)
+668:           // 3) data (吏곸젒 ?꾨떖??援ъ“)
+683:             // ?먮낯 硫붿떆吏???ㅻ젅???뺣낫 ?낅뜲?댄듃
+697:         // 由ъ븸???낅뜲?댄듃 Event 由ъ뒪??701:           // 硫붿떆吏 由ъ븸???뺣낫瑜??낅뜲?댄듃
+702:           const reactionData = data.data || data; // data.data ?먮뒗 data 吏곸젒 Used
+715:         // ?곌껐 Status Event 由ъ뒪??720:           // ?ъ뿰寃????꾩옱 梨꾨꼸???ㅼ떆 李몄뿬
+753:             // Refresh token ?쒕룄
+758:             // WebSocket ?ъ뿰寃?771:         // 硫붿떆吏 Delete Event 由ъ뒪??783:         // ??댄븨 Event 由ъ뒪??786:           // 5珥????먮룞?쇰줈 ??댄븨 ?몃뵒耳?댄꽣 ?쒓굅 (諛깆뾽 ?덉쟾?μ튂)
+797:       // 珥덇린 梨꾨꼸 濡쒕뵫 ?쒖옉 (Used???숆린??+ WebSocket ?곌껐 + 梨꾨꼸 濡쒕뵫)
+807:       // ?ㅻ젅????댄븨 Event 由ъ뒪??810:         // 5珥????먮룞?쇰줈 ??댄븨 ?몃뵒耳?댄꽣 ?쒓굅 (諛깆뾽 ?덉쟾?μ튂)
+841:       // Used??梨꾨꼸 李몄뿬 Event 由ъ뒪??846:         // ?꾩옱 梨꾨꼸????硫ㅻ쾭媛 ?ㅼ뼱??寃쎌슦
+848:           // ?쒖뒪??硫붿떆吏 異붽?
+850:             id: Date.now(), // ?꾩떆 ID
+854:             userId: 0, // ?쒖뒪??硫붿떆吏
+864:         // 梨꾨꼸 紐⑸줉 Refresh (硫ㅻ쾭 ???낅뜲?댄듃)
+868:       // 珥덈? Response Event 由ъ뒪??(珥덈????щ엺?먭쾶留??쒖떆)
+873:         // 諛깆뿏?쒖뿉??inviterId?먭쾶留??꾩넚?섎?濡? ??Event瑜?諛쏆? ?щ엺? 珥덈????щ엺??874:         // ?곕씪??議곌굔 ?놁씠 硫붿떆吏 ?쒖떆
+887:         // 梨꾨꼸 紐⑸줉 Refresh
+891:       // 梨꾨꼸 珥덈? Event 由ъ뒪??896:         // 珥덈? ??利앷?
+902:         // ?좎뒪??Notification ?쒖떆 (諛깆뿏??硫붿떆吏媛 ?덉쑝硫?Used, ?놁쑝硫?湲곕낯 Translation 硫붿떆吏 ?ъ슜)
+912:           autoHideDuration: 30000, // 30珥????먮룞 ?ロ옒
+931:                       // ?좎뒪???쒓굅 - 梨꾨꼸 吏꾩엯?쇰줈 異⑸텇
+932:                       // 珥덈? ??媛먯냼
+937:                       // 梨꾨꼸 紐⑸줉 Refresh ???대떦 梨꾨꼸濡??대룞
+993:                       // 珥덈? ??媛먯냼
+1029:         // Event 由ъ뒪??Cleanup
+1035:   }, [user?.id]); // user 媛앹껜 ?꾩껜媛 ?꾨땶 id留??섏〈?깆쑝濡?Used
+1037:   // Load messages for a channel - 源쒕묀??諛⑹?瑜??꾪빐 Loading state Settings ?쒓굅
+1050:         // 媛뺤젣 由щ줈?쒓? ?꾨땲怨??대? 硫붿떆吏媛 ?덇퀬, ?대떦 梨꾨꼸???대쾲 ?몄뀡?먯꽌 ??踰??댁긽 Refresh ?섏뿀?쇰㈃ ?ㅽ궢
+1066:         // Current state?먯꽌 Cache??硫붿떆吏 Confirm
+1072:           // Cache??硫붿떆吏瑜?癒쇱? Status??Settings (鍮좊Ⅸ ?뚮뜑留?
+1078:           // 1) 理쒖떊 異붽? 硫붿떆吏留?Confirm (after)
+1083:               limit: 20, // 理쒖떊 20媛쒕쭔 Confirm
+1084:               after: latestCachedMessage.id?.toString(), // 留덉?留?Cache??硫붿떆吏 ?댄썑留?(string)
+1089:               // ??硫붿떆吏媛 ?덉쑝硫?異붽?
+1098:           // 2) 硫뷀??곗씠??threadCount ?? 理쒖떊?붾? ?꾪빐 ?꾩껜 媛깆떊(fetch fresh)
+1119:         // Cache??硫붿떆吏媛 ?녾굅??媛뺤젣 由щ줈?쒖씤 寃쎌슦 ?쒕쾭?먯꽌 濡쒕뵫
+1122:           limit: 50, // 理쒓렐 50媛?硫붿떆吏留?濡쒕뵫
+1148:   // REFRESH_CHANNELS ?≪뀡 泥섎━
+1151:       // 珥덇린 濡쒕뵫???꾨땶 寃쎌슦?먮쭔 Refresh
+1156:       // REFRESH_CHANNELS ?≪뀡?쇰줈 ?명븳 Loading state??寃쎌슦 梨꾨꼸 Refresh
+1190:         // Chat Server ?숆린???쒕룄
+1195:           // ?숆린?????ъ떆??1201:           // ?숆린??Failed?대룄 ?깆? 怨꾩냽 ?숈옉?섎룄濡???1205:         // ?ㅻⅨ ?ㅻ쪟??寃쎌슦 Set default values
+1244:   // WebSocket ?곌껐 ?⑥닔瑜?蹂꾨룄濡?遺꾨━
+1247:       // Authentication ?좏겙 Confirm
+1273:       // 源쒕묀??諛⑹?瑜??꾪빐 Loading state Settings ?쒓굅
+1282:       // 癒쇱? Used?먮? Chat Server???숆린??1288:         // Used???숆린???꾨즺 ??WebSocket ?곌껐
+1295:         // ?숆린??Failed?대룄 梨꾪똿? 怨꾩냽 吏꾪뻾
+1304:       // Used???곗씠?곗? 珥덈? ?섎룄 ?④퍡 濡쒕뱶 (媛쒕퀎 ?ㅻ쪟 泥섎━)
+1312:       // 留덉?留?李몄뿬 梨꾨꼸 ?먮룞 ?좏깮
+1318:           // 梨꾨꼸 ?좏깮 + 硫붿떆吏 濡쒕뵫 + WS join
+1331:       // 源쒕묀??諛⑹?瑜??꾪빐 濡쒕뵫 吏???쒓굅 - 利됱떆 ?꾨즺 泥섎━
+1339:       // 利됱떆 ?꾨즺 泥섎━
+1371:       // 留덉?留?梨꾨꼸 ID Save
+1376:         // 梨꾨꼸???ㅼ젣濡?蹂寃쎈맂 寃쎌슦?먮쭔 硫붿떆吏 濡쒕뵫 - 源쒕묀??諛⑹?瑜??꾪빐 setTimeout ?쒓굅
+1391:         // WebSocket 梨꾨꼸 李몄뿬
+1491:         // 源쒕묀??諛⑹?瑜??꾪빐 ?꾩껜 梨꾨꼸 紐⑸줉 ?ш갚???쒓굅
+1544:         // Request ??Create
+1547:         // ?대? 吏꾪뻾 以묒씤 Request???덉쑝硫??ㅽ궢
+1553:         // ?붾컮?댁뒪瑜??꾪븳 ??Create
+1556:         // Existing ??꾩븘??Cancel
+1561:         // 5珥??꾩뿉 ?ㅽ뻾 (?붾컮?댁뒪 ?쒓컙 ???利앷?)
+1563:           // Request ?쒖옉 ?쒖떆
+1570:             // ?ㅽ듃?뚰겕 ?ㅻ쪟????꾩븘?껋? 議곗슜??泥섎━
+1577:               // ?ㅽ듃?뚰겕 ?ㅻ쪟??寃쎌슦 5珥????ъ떆??1586:             // Request ?꾨즺 ?쒖떆
+1588:             // ??꾩븘??Cleanup
+1657:         // 珥덈? Success ??梨꾨꼸 硫ㅻ쾭 紐⑸줉 Refresh (?꾩슂??寃쎌슦)
+1689:   // ?붾쾭源낆쓣 ?꾪빐 ?꾩뿭???몄텧
+
+=== packages/frontend/src/contexts/I18nContext.tsx ===
+93:     // ?꾨줎?몄뿏??Change language
+96:     // 諛깆뿏?쒖뿉 Used??Language settings ?낅뜲?댄듃 (Login???ъ슜?먮쭔)
+105:       // 諛깆뿏???낅뜲?댄듃 Failed?대룄 ?꾨줎?몄뿏??Change language? ?좎?
+
+=== packages/frontend/src/utils/changeRequestFormatter.ts ===
+50:     // Or more natural Korean: Service 怨듭? Edit: 123
+
+=== packages/frontend/src/utils/dateFormat.ts ===
+21: // Unified format for UI display (Used??Settings怨?蹂꾧컻)
+51: // ?대?: ?ㅼ뼇??臾몄옄?댁쓣 dayjs濡?蹂??(UTC -> Used??timezone)
+101:  * Unified format for UI display (YYYY-MM-DD HH:mm:ss 怨좎젙)
+102:  * ?뚯씠釉? 由ъ뒪???깆뿉???쇨????쒓컙 ?쒖떆瑜??꾪빐 Used
+158:   // 24?쒓컙 誘몃쭔??寃쎌슦 HH:MM:SS ?뺥깭
+163:   // 24?쒓컙 ?댁긽??寃쎌슦 Dd HH:MM:SS ?뺥깭
+184:   /** 珥덈떒???쒖떆 ?щ? (湲곕낯: false, true?대㈃ "5珥??? ?뺥깭濡??쒖떆) */
+186:   /** 湲곗? ?쒓컙 (湲곕낯: ?꾩옱 ?쒓컙) */
+191:  * Relative time format (?? "2 minutes ago", "Just now")
+192:  * @param date ?좎쭨/?쒓컙 媛?193:  * @param options ?듭뀡 (showSeconds: 珥덈떒???쒖떆 ?щ?)
+194:  * @param language ?몄뼱 肄붾뱶 (?듭뀡, i18n???꾩옱 ?몄뼱)
+213:     // Handle future dates (prevent "in ... seconds" or "諛⑷툑 ??)
+238:  * ?좎쭨 鍮꾧탳 Utility
+
+=== packages/frontend/src/utils/linkPreview.ts ===
+4: // URL ?뺢퇋???⑦꽩
+7: // Cache Save??(硫붾え由?罹먯떆)
+9: const CACHE_DURATION = 1000 * 60 * 60; // 1?쒓컙
+11: // URL?먯꽌 誘몃━蹂닿린 ?곗씠?곕? 異붿텧?섎뒗 ?⑥닔 (諛깆뿏??API Used)
+20:     // 諛깆뿏??API ?몄텧
+38:     // API Failed ???대씪?댁뼵???ъ씠???대갚
+43:     // 諛깆뿏??API Failed ???대씪?댁뼵???ъ씠???대갚
+48: // ?대씪?댁뼵???ъ씠???대갚 ?⑥닔 (Existing 濡쒖쭅)
+51:     // 湲곕낯 留곹겕 誘몃━蹂닿린 媛앹껜
+59:     // YouTube 留곹겕 泥섎━
+74:     // GitHub 留곹겕 泥섎━
+89:     // 湲곕낯 泥섎━
+104: // 硫붿떆吏?먯꽌 URL 李얘린
+110: // ?щ윭 URL ?쇨큵 泥섎━
+115:     // Cache??Results Confirm
+128:     // Cache?섏? ?딆? URL?ㅻ쭔 API ?몄텧
+144:             // Cache??Save
+159:     // ?대갚: 媛쒕퀎?곸쑝濡?泥섎━
+171: // URL?먯꽌 ?쒕ぉ 異붿텧 (媛꾨떒??踰꾩쟾)
+177:     // ?뚯씪紐낆씠 ?덈뒗 寃쎌슦
+183:     // Path?먯꽌 ?쒕ぉ 異붿텧
+195: // URL?먯꽌 ?ъ씠?몃챸 異붿텧
+210: // YouTube Videos ID 異붿텧
+223: // GitHub Save???뺣낫 異붿텧 (媛쒖꽑??
+229:       repo: match[2].replace(/\.git$/, ''), // .git ?뺤옣???쒓굅
+235: // GitHub Save?뚮챸 異붿텧 (?섏쐞 ?명솚?깆쓣 ?꾪빐 ?좎?)
+
+=== packages/frontend/src/utils/logger.ts ===
+4:  * ?꾨줎?몄뿏?쒖뿉??Used?????덈뒗 濡쒓퉭 Utility
+5:  * 媛쒕컻 ?섍꼍?먯꽌??console??異쒕젰?섍퀬, ?꾨줈?뺤뀡?먯꽌???좏깮?곸쑝濡??쒕쾭???꾩넚
+31:    * Debug ?덈꺼 濡쒓렇
+38:    * Info ?덈꺼 濡쒓렇
+45:    * Warning ?덈꺼 濡쒓렇
+52:    * Error ?덈꺼 濡쒓렇
+59:    * ?대? 濡쒓렇 泥섎━ 硫붿꽌??71:     // 媛쒕컻 ?섍꼍?먯꽌????긽 肄섏넄??異쒕젰
+76:     // ?꾨줈?뺤뀡?먯꽌??error? warn留?肄섏넄??異쒕젰
+81:     // ?쒕쾭 濡쒓퉭??Active?붾맂 寃쎌슦 踰꾪띁??異붽?
+88:    * 肄섏넄??濡쒓렇 異쒕젰
+111:    * 濡쒓렇 踰꾪띁??異붽?
+116:     // 踰꾪띁 ?ш린 ?쒗븳
+121:     // Error ?덈꺼? 利됱떆 ?쒕쾭???꾩넚
+128:    * 踰꾪띁??濡쒓렇瑜??쒕쾭???꾩넚
+139:       // ?쒕쾭??濡쒓렇 ?꾩넚 (?ㅼ젣 援ы쁽 ??API ?붾뱶?ъ씤???꾩슂)
+148:       // ?쒕쾭 濡쒓퉭 Failed ??肄섏넄?먮쭔 異쒕젰
+154:    * ?섎룞?쇰줈 濡쒓렇 ?뚮윭??161:    * 濡쒓렇 踰꾪띁 ?대━??168:    * ?꾩옱 濡쒓렇 踰꾪띁 Status 諛섑솚
+178: // ?깃????몄뒪?댁뒪 Create
+181: // ?섏씠吏 ?몃줈????濡쒓렇 ?뚮윭??186: // 二쇨린?곸쑝濡?濡쒓렇 ?뚮윭??(5遺꾨쭏??
+197:  * 媛쒕컻 ?섍꼍?먯꽌留?Used?섎뒗 ?붾쾭洹?濡쒓굅
+223:  * ?꾨줈?뺤뀡?먯꽌??Used?섎뒗 以묒슂??濡쒓굅
+
+=== packages/frontend/src/components/chat/AdvancedMessageInput.tsx ===
+23:   isThreadOpen?: boolean; // ?ㅻ젅???대┝ Status瑜??꾨떖諛쏆븘 ?ъ빱??愿由ъ뿉 ?쒖슜
+24:   threadId?: number; // ?ㅻ젅??硫붿떆吏??寃쎌슦 threadId
+52:   // ThreadView ?깆뿉??媛뺤젣濡??ъ빱?ㅺ? ?꾩슂????55:       // ?ㅻ젅?쒓? ?대젮?덉? ?딆쓣 ?뚮쭔 ?ъ빱??63:   // ?몃??먯꽌 focusTrigger媛 蹂寃쎈릺硫??ъ빱???쒕룄 (?ㅻ젅?쒓? ?대젮?덉? ?딆쓣 ?뚮쭔)
+73:   // WebSocket ?곌껐 諛?梨꾨꼸 以鍮??꾨즺 ???낅젰李쎌뿉 ?ъ빱??Existing ?숈옉 ?좎?)
+84:       // ?ㅻ젅?쒓? ?대젮?덉? ?딆쓣 ?뚮쭔 ?먮룞 ?ъ빱??85:       // WebSocket ?곌껐, 梨꾨꼸 議댁옱, 鍮껦ctive??Status媛 ?꾨땺 ?뚮쭔 ?ъ빱??88:       }, 50); // ?쒕젅?대? ??以꾩엫
+98:       // ??댄븨 ?쒖옉
+102:       // 硫붿떆吏媛 鍮꾩뼱?덉쑝硫?利됱떆 ??댄븨 以묒?
+112:     // ??댄븨 以묒씪 ?뚮쭔 ??꾩븘??Settings
+114:       // Existing ??꾩븘???대━??119:       // 3珥?????댄븨 以묒?
+132:   }, [message, channelId, actions]); // isTyping ?섏〈???쒓굅濡?臾댄븳 猷⑦봽 諛⑹?
+202:     // 硫붿떆吏 ?꾩넚 ???낅젰李쎌뿉 ?ъ빱???좎? (??媛뺥솕???ъ빱??
+205:       // 異붽? 蹂댁옣???꾪븳 ??踰덉㎏ ?쒕룄
+220:     // ?대え吏 ?좏깮李?Close
+223:     // Focus back to input with proper cursor position (??媛뺥솕???ъ빱??
+229:       // 異붽? 蹂댁옣???꾪븳 ??踰덉㎏ ?쒕룄
+343:                 borderWidth: '1px', // 湲곕낯 2px?먯꽌 1px濡?以꾩엫
+344:                 borderColor: 'rgba(25, 118, 210, 0.4)', // ?щ챸?꾨? ?믪뿬 ??遺?쒕읇寃?345:                 boxShadow: '0 0 0 1px rgba(25, 118, 210, 0.1)', // 留ㅼ슦 遺?쒕윭??洹몃┝???④낵
+
+=== packages/frontend/src/components/chat/ChannelList.tsx ===
+76:   // 梨꾨꼸 Status ?붾쾭源?(?꾩슂??二쇱꽍 Unregister)
+92:       // ?대? ?좏깮??梨꾨꼸?대㈃ ?꾨Т寃껊룄 ?섏? ?딆쓬
+98:       // New 梨꾨꼸 ?좏깮
+102:       // 梨꾨꼸 蹂寃???硫붿떆吏媛 濡쒕뵫?섎㈃ ?먮룞?쇰줈 ?쎌쓬 泥섎━
+103:       // (ChatElementsMessageList?먯꽌 泥섎━?섎룄濡?蹂寃?
+238:               // 媛?梨꾨꼸 ?꾩씠?쒖쓣 硫붾え?뷀븯??遺덊븘?뷀븳 ?щ젋?붾쭅 諛⑹?
+246:                       py: 0.5, // ?꾩븘???⑤뵫 ??以꾩엫 (1 ??0.5)
+247:                       px: 1, // 醫뚯슦 ?⑤뵫 Settings
+248:                       mx: 1.5, // 醫뚯슦 ?щ갚 ?섎┝
+249:                       my: 0.25, // ?꾩븘??留덉쭊 異붽?濡?媛꾧꺽 議곗젙
+250:                       borderRadius: 0, // ?щ옓 ?ㅽ????쇱슫??254:                             ? 'rgba(255, 255, 255, 0.08)' // ?ㅽ겕 Theme: ?쎄컙 諛앷쾶
+255:                             : 'rgba(0, 0, 0, 0.08)', // ?쇱씠??Theme: ???대몼寃?(0.04 ??0.08)
+256:                         color: 'inherit', // 湲곕낯 ?띿뒪???됱긽 ?좎?
+261:                               : 'rgba(0, 0, 0, 0.12)', // ?쇱씠??Theme ?몃쾭?????대몼寃?(0.08 ??0.12)
+274:                             : 'rgba(0, 0, 0, 0.04)', // ?쇱씠??Theme ?쇰컲 ?몃쾭?????대몼寃?(0.02 ??0.04)
+275:                         borderRadius: 0, // ?몃쾭 ?쒖뿉???쇱슫???좎?
+
+=== packages/frontend/src/components/chat/ChatElementsMessageList.tsx ===
+9: // React Chat Elements?????댁긽 Used?섏? ?딆쓬 (?щ옓 ?ㅽ??쇰줈 吏곸젒 援ы쁽)
+21: // 留덊겕?ㅼ슫 ?ㅽ??쇰쭅???꾪븳 Type ?뺤쓽
+28: // 留덊겕?ㅼ슫 ?뚯떛 ?⑥닔
+33:   // ?뺢퇋???⑦꽩??(?곗꽑?쒖쐞 ?쒖꽌)
+44:   // 紐⑤뱺 留ㅼ튂瑜?李얠븘???꾩튂? ?④퍡 Save
+66:   // ?꾩튂?쒖쑝濡?Sorting
+69:   // 寃뱀튂??留ㅼ튂 ?쒓굅 (癒쇱? ?섏삩 寃??곗꽑)
+80:   // ?띿뒪?몃? ?뚰듃濡?遺꾪븷
+82:     // 留ㅼ튂 ?댁쟾???쇰컲 ?띿뒪??異붽?
+90:     // 留ㅼ튂??遺遺?異붽?
+103:   // ?⑥? ?띿뒪??異붽?
+114: // 留곹겕 誘몃━蹂닿린瑜??ы븿??硫붿떆吏 而댄룷?뚰듃
+119:   // URL 異붿텧 諛?誘몃━蹂닿린 濡쒕뵫
+138:   // 醫뚰몴 ?띿뒪???? "?뱧 ?꾩옱 ?꾩튂: 37.503400, 127.052500" ?먮뒗 "37.5034, 127.0525") 媛먯?
+224: // 留덊겕?ㅼ슫 ?뚮뜑留?而댄룷?뚰듃
+249:                   userSelect: 'text', // 肄붾뱶 釉붾줉 ?띿뒪???좏깮 ?덉슜
+269:                   userSelect: 'text', // ?몃씪??肄붾뱶 ?띿뒪???좏깮 ?덉슜
+327: // ?숈쟻 ?ㅽ???Create ?⑥닔
+342:   /* ?쒖뒪??硫붿떆吏 ?ㅽ???媛쒖꽑 */
+353:   /* 硫붿떆吏 由ъ뒪??諛곌꼍 諛??ㅽ겕濡?*/
+369:   /* ?낅젰李??ㅽ???媛쒖꽑 */
+381:   /* 踰꾪듉 ?ㅽ???媛쒖꽑 */
+413:   // messageInputRef? messageInput? AdvancedMessageInput?쇰줈 ?대룞??416:   // EmojiPicker 愿??state
+426:   // 硫붿씤 梨꾪똿?먯꽌???ㅻ젅??硫붿떆吏(threadId媛 ?덈뒗 硫붿떆吏)瑜??쒖쇅?섍퀬 ?쒖떆
+455:   // Theme???곕Ⅸ ?됱긽 ?뺤쓽
+472:   // ?쎌쓬 泥섎━瑜??꾪븳 ref (以묐났 諛⑹?)
+476:   // ?섎떒 ?щ? 異붿쟻 諛?由ъ궗?댁쫰 愿李곗슜 ref
+482:   // ??硫붿떆吏媛 ?????섎떒???덉쑝硫??먮룞 ?ㅽ겕濡?(?щ옓 ?ㅽ???而⑦뀒?대꼫??
+495:       // ?섎떒?먯꽌 100px ?대궡???덉쑝硫??먮룞 ?ㅽ겕濡?504:     // 珥덇린 ?ㅽ겕濡?泥댄겕
+507:     // 誘몃뵒??肄섑뀗痢?濡쒕뵫 ?꾨즺瑜??꾪븳 異붽? 泥댄겕
+512:       // Images, Videos, iframe ?깆쓽 誘몃뵒???붿냼??李얘린
+524:           // 紐⑤뱺 誘몃뵒?닿? 濡쒕뱶?섏뿀嫄곕굹 留덉?留??붿냼媛 濡쒕뱶?????ㅽ겕濡?泥댄겕
+553:             // iframe??寃쎌슦 ??꾩븘?껊룄 Settings
+556:             // 湲고? ?붿냼??(留곹겕 ?꾨━酉???
+561:         // ?덉쟾?μ튂: 3珥??꾩뿉??紐⑤뱺 誘몃뵒?닿? 濡쒕뱶?섏? ?딆븯?ㅻ㈃ 媛뺤젣濡??ㅽ겕濡?570:     // 誘몃뵒??肄섑뀗痢?泥댄겕瑜??꾪븳 異붽? 吏??573:     // ?쎌쓬 泥섎━ 濡쒖쭅 媛쒖꽑 (以묐났 諛⑹?)
+577:       // ?대? ?쎌쓬 泥섎━??硫붿떆吏硫??ㅽ궢
+582:       // Existing ??꾩븘??Cancel
+587:       // New ??꾩븘??Settings (3珥????쎌쓬 泥섎━)
+589:         // 李쎌씠 ?ъ빱?ㅻ릺???덇퀬, ?ㅽ겕濡ㅼ씠 ?섎떒 洹쇱쿂???덉쓣 ?뚮쭔 ?쎌쓬 泥섎━
+613:   // 肄섑뀗痢??믪씠 蹂???쒖뿉???섎떒 ?좎? (?섎떒???덉뿀??寃쎌슦) - ref 吏곸젒 Used?쇰줈 源쒕묀??諛⑹?
+624:           el.scrollTop = el.scrollHeight; // 利됱떆 bottom
+637:   // ??硫붿떆吏媛 DOM??諛섏쁺??吏곹썑 ?ㅽ겕濡?泥섎━ (??硫붿떆吏??利됱떆, ?ㅻⅨ Used??硫붿떆吏???섎떒???덉쓣 ?뚮쭔)
+649:       // ?닿? 蹂대궦 硫붿떆吏??利됱떆 ?섎떒?쇰줈 ?ㅽ겕濡?652:       // ?ㅻⅨ Used??硫붿떆吏???섎떒???덉쓣 ?뚮쭔 ?먮룞 ?ㅽ겕濡?657:         // useLayoutEffect ?댁뿉??利됱떆 bottom 怨좎젙 (rAF ?놁씠)
+663:   // 梨꾨꼸 蹂寃????섎떒?쇰줈 ?ㅽ겕濡?諛??쎌쓬 Status Initialization - 源쒕묀??諛⑹?瑜??꾪빐 吏???쒓굅
+666:       // ?쎌쓬 Status Initialization
+673:       // 利됱떆 ?ㅽ겕濡ㅽ븯??源쒕묀??諛⑹? - ref 吏곸젒 Used?쇰줈 ?깅뒫 媛쒖꽑
+696:     // AdvancedMessageInput???ъ빱?ㅻ? 泥섎━??699:   // ?ㅽ겕濡??몃뱾??硫붾え?댁젣?댁뀡?쇰줈 ?깅뒫 理쒖쟻??706:   // Theme 蹂寃????ㅽ????낅뜲?댄듃
+711:     // Existing ?ㅽ????쒓굅
+717:     // ???ㅽ???異붽?
+724:       // 而댄룷?뚰듃 ?몃쭏?댄듃 ???ㅽ????쒓굅
+732:   // handleSendMessage? handleKeyPress??AdvancedMessageInput?먯꽌 泥섎━??734:   // ?곷????쒓컙 ?쒖떆 (??꾩〈 + ?몄뼱 吏??
+741:     const currentLanguage = i18n.language || 'ko'; // Default values???쒓뎅?대줈 Settings
+756:         // 1二쇱씪 ?댁긽?대㈃ ?좎쭨 ?쒖떆 (Used????꾩〈 ?곸슜)
+775:       // ?곸뼱 (Default values)
+798:       avatarUrl: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl ?꾨뱶留?Used
+802:   // ?щ옓 ?ㅽ???硫붿떆吏 ?뚮뜑留곸쓣 ?꾪빐 吏곸젒 JSX?먯꽌 泥섎━
+804:   // Headers 而댄룷?뚰듃?ㅼ쓣 ??긽 硫붾え??(議곌굔遺 hooks 諛⑹?)
+846:   // 硫붿씤 Headers 而댄룷?뚰듃????긽 硫붾え??888:   // 源쒕묀??諛⑹?瑜??꾪빐 Loading state 泥댄겕 ?쒓굅
+892:         {/* Header - 硫붾え?붾맂 而댄룷?뚰듃 Used */}
+979:       {/* Header - 硫붾え?붾맂 而댄룷?뚰듃 Used */}
+997:           // 而ㅼ뒪? ?ㅽ겕濡ㅻ컮 ?ㅽ???1006:           // ?좎쭨 援щ텇??泥댄겕
+1014:               {/* ?좎쭨 援щ텇??*/}
+1059:               {/* 硫붿떆吏 */}
+1069:                   userSelect: 'text', // 硫붿떆吏 而⑦뀒?대꼫?먯꽌 ?띿뒪???좏깮 ?덉슜
+1134:                       userSelect: 'text', // ?띿뒪???좏깮 ?덉슜
+1135:                       cursor: 'text', // ?띿뒪??而ㅼ꽌 ?쒖떆
+1137:                     onClick={(e) => e.stopPropagation()} // ?대┃ Event ?꾪뙆 諛⑹?
+1142:                   {/* 由ъ븸???쒖떆 */}
+1211:                       {/* 諛섏쓳 異붽? 踰꾪듉 */}
+1237:                   {/* 硫붿떆吏 ?≪뀡 踰꾪듉??(?몃쾭 ???쒖떆) */}
+1258:                     {/* ?ㅻ젅???쒖옉 踰꾪듉 */}
+1279:                     {/* ?붾낫湲?踰꾪듉 */}
+1283:                         // ?붾낫湲?硫붾돱 (異뷀썑 援ы쁽)
+1297:                     {/* 由ъ븸??異붽? 踰꾪듉??*/}
+1317:                   {/* ?듦? ?뺣낫 ?쒖떆 */}
+1336:                   {/* ?ㅻ젅???듦? ???쒖떆 - Slack style */}
+1345:                         mt: 0.5, // 1 ??0.5濡?以꾩엫
+1352:                         px: 1, // 醫뚯슦 ?⑤뵫留??좎?
+1353:                         py: 0.5, // ?곹븯 ?⑤뵫 以꾩엫 (1 ??0.5)
+1355:                         border: '1px solid transparent', // 湲곕낯 Status?먯꽌???щ챸???뚮몢由?1356:                         backgroundColor: 'transparent', // 湲곕낯 Status?먯꽌???щ챸??諛곌꼍
+1374:                       {/* ?볤? 媛쒖닔? ?ㅻ젅??蹂닿린 ?띿뒪??*/}
+1376:                         {/* ?볤? 媛쒖닔????긽 ?쒖떆 */}
+1389:                         {/* ?쒓컙/?ㅻ젅??蹂닿린 ?띿뒪??而⑦뀒?대꼫 - 媛숈? ?꾩튂?먯꽌 ?꾪솚 */}
+1391:                           {/* 留덉?留??볤? ?쒓컙 (湲곕낯 Status) */}
+1406:                           {/* ?ㅻ젅??蹂닿린 ?띿뒪??(?몃쾭 Status) - ?쒓컙 ?띿뒪?몄? 媛숈? ?꾩튂 */}
+1461:         {/* 諛섏쓳 異붽???EmojiPicker */}
+1478:         {/* ??댄븨 ?몃뵒耳?댄꽣 - ?낅젰李??꾨옒???꾩튂 */}
+1542: // React.memo濡?遺덊븘?뷀븳 由щ젋?붾쭅 諛⑹?
+
+=== packages/frontend/src/components/chat/ChatSkeleton.tsx ===
+42:       {/* ?곷떒 Headers ?ㅼ펷?덊넠 */}
+61:       {/* 硫붿씤 肄섑뀗痢??곸뿭 */}
+63:         {/* ?ъ씠?쒕컮 ?ㅼ펷?덊넠 */}
+74:             {/* 梨꾨꼸 紐⑸줉 Headers */}
+80:             {/* 梨꾨꼸 紐⑸줉 ?ㅼ펷?덊넠 */}
+94:         {/* 梨꾪똿 ?곸뿭 ?ㅼ펷?덊넠 */}
+96:           {/* 梨꾪똿 Headers */}
+114:           {/* 硫붿떆吏 ?곸뿭 */}
+135:           {/* ?낅젰 ?곸뿭 */}
+153:       {/* Loading state ?쒖떆 - ?곷떒 怨좎젙 硫붿떆吏 ?쒓굅, 吏꾪뻾瑜좊쭔 ?쒖떆 */}
+
+=== packages/frontend/src/components/chat/EmojiPicker.tsx ===
+407:     // onClose??AdvancedMessageInput?먯꽌 泥섎━?섎?濡??ш린?쒕뒗 ?몄텧?섏? ?딆쓬
+415:   // ???쇱빱媛 ?대젮?덈뒗 ?숈븞?먮쭔 Modal backdrop??blur瑜?鍮껦ctive??442:       {/* 而ㅼ뒪? ?ㅽ???異붽? */}
+445:           /* ???대え吏 ?쇱빱媛 ?대젮?덈뒗 ?숈븞?먮쭔 blur ?쒓굅 */
+478:             width: 420, // ?щ옓 ?ㅽ??쇰줈 ???볤쾶
+479:             height: 520, // ?몃줈 ?믪씠 ?뺤옣?섏뿬 ?대? ?ㅽ겕濡?諛⑹?
+488:           {/* ?щ옓 ?ㅽ????몃줈 移댄뀒怨좊━ ?ъ씠?쒕컮 */}
+567:           {/* 硫붿씤 而⑦뀗痢??곸뿭 */}
+615:             {/* 移댄뀒怨좊━ ?쒕ぉ */}
+
+=== packages/frontend/src/components/chat/FileUpload.tsx ===
+153:       // ?꾩튂 怨듭쑀 Success ?좎뒪???쒓굅 - 遺덊븘?뷀븳 吏?遺꾪븿 諛⑹?
+
+=== packages/frontend/src/components/chat/InvitationManager.tsx ===
+82:   // 諛쏆? 珥덈? Get list
+108:   // 蹂대궦 珥덈? Get list
+130:   // 珥덈? Response (?섎씫/嫄곗젅)
+147:           // ?섎씫 ?쒖뿉???좎뒪?????梨꾨꼸 吏꾩엯, 嫄곗젅 ?쒖뿉留??좎뒪???쒖떆
+155:           // 珥덈? ?섎씫 ???대떦 梨꾨꼸濡??먮룞 ?대룞
+157:             // 梨꾨꼸 紐⑸줉 Refresh???꾪빐 遺紐?而댄룷?뚰듃??Notification
+161:               // Callback???녿뒗 寃쎌슦?먮쭔 ?섏씠吏 ?대룞
+197:   // 珥덈? Cancel
+236:   // Dialog ?대┫ ???곗씠??濡쒕뱶
+246:   // Status蹂??됱긽 諛??꾩씠肄?270:   // 諛쏆? 珥덈? ?뚮뜑留?340:   // 蹂대궦 珥덈? ?뚮뜑留?406:           height: '70vh', // 怨좎젙 ?믪씠
+
+=== packages/frontend/src/components/chat/LinkPreviewCard.tsx ===
+91:       {/* Close 踰꾪듉 */}
+115:       {/* Images/Videos 誘몃━蹂닿린 */}
+131:         {/* ?ъ씠?몃챸怨?Type */}
+165:         {/* ?쒕ぉ */}
+185:         {/* ?ㅻ챸 */}
+204:         {/* 硫뷀??곗씠??(?묒꽦?? ?쎄린?쒓컙) */}
+
+=== packages/frontend/src/components/chat/MessageList.tsx ===
+100:       // User info ?덉쟾?섍쾶 媛?몄삤湲?
+=== packages/frontend/src/components/chat/NotificationManager.tsx ===
+216:         // ?좎뒪???쒓굅 - ChatContext?먯꽌 泥섎━?섎?濡?以묐났 諛⑹?
+226:       // Event 由ъ뒪??Register (channel_invitation? ChatContext?먯꽌 泥섎━)
+230:       // ?대┛??
+=== packages/frontend/src/components/chat/PrivacySettings.tsx ===
+59:   // ?꾩옱 Load settings
+117:   // Dialog ?대┫ ??Load settings
+
+=== packages/frontend/src/components/chat/SimpleMessageList.tsx ===
+40:     // 珥덇린 ?ㅽ겕濡?43:     // 誘몃뵒??肄섑뀗痢?濡쒕뵫 ?꾨즺瑜??꾪븳 異붽? 泥댄겕
+48:       // Images, Videos, iframe ?깆쓽 誘몃뵒???붿냼??李얘린
+94:         // ?덉쟾?μ튂: 3珥??꾩뿉??紐⑤뱺 誘몃뵒?닿? 濡쒕뱶?섏? ?딆븯?ㅻ㈃ 媛뺤젣濡??ㅽ겕濡?103:     // 誘몃뵒??肄섑뀗痢?泥댄겕瑜??꾪븳 異붽? 吏??
+=== packages/frontend/src/components/chat/ThreadView.tsx ===
+30: // ?ㅻ젅?쒖뿉?쒕룄 留곹겕 誘몃━蹂닿린/?띿뒪???뚮뜑留곸쓣 ?숈씪?섍쾶 吏?먰븯湲??꾪븳 怨듭슜 而댄룷?뚰듃
+87:   // ?ㅻ젅????댄븨 Used?먮뱾
+101:   // ?띿뒪?몄뿉??醫뚰몴 異붿텧 (?? "?뱧 ?꾩옱 ?꾩튂: 37.503400, 127.052500" ?먮뒗 "37.5034, 127.0525")
+141:   // ?ㅻ젅?쒓? ?대┫ ???낅젰李쎌뿉 ?ъ빱??Settings
+143:     // ?ㅻ젅?쒓? 泥섏쓬 留덉슫?몃맆 ?뚮쭔 ?ъ빱??Settings
+147:         // ?대? ?ъ빱?ㅺ? ?덉? ?딆쓣 ?뚮쭔 ?ъ빱??Settings
+150:     }, 150); // 硫붿씤 ?낅젰李쎌쓽 ?ъ빱??Settings蹂대떎 ??쾶 ?ㅽ뻾
+153:   }, []); // ?섏〈??諛곗뿴??鍮꾩썙??留덉슫???쒖뿉留??ㅽ뻾
+158:     // ?ㅻ젅??硫붿떆吏 諛?由ъ븸???ㅼ떆媛??낅뜲?댄듃 由ъ뒪??異붽?
+161:       const payload = event?.data || event; // ?쒕쾭?먯꽌 ???먮낯 payload
+163:       const newThreadMessage = payload?.data; // ?ㅼ젣 ??硫붿떆吏 媛앹껜
+171:         // New ?ㅻ젅??硫붿떆吏瑜??꾩옱 紐⑸줉??異붽?
+180:       // ?대떦 硫붿떆吏媛 ?ㅻ젅??紐⑸줉???덉쑝硫?由ъ븸?섎쭔 援먯껜
+184:     // WebSocket Event 由ъ뒪??Register (?깃????몄뒪?댁뒪)
+189:     // 而댄룷?뚰듃 ?몃쭏?댄듃 ??由ъ뒪???쒓굅
+199:       // ?ㅻ젅??硫붿떆吏 濡쒕뱶
+431:                     {/* ?꾩튂/醫뚰몴媛 ?덈뒗 寃쎌슦 援ш?留??꾨쿋??*/}
+688:         {/* ?ㅻ젅????댄븨 ?몃뵒耳?댄꽣 - ?낅젰李??꾨옒???꾩튂 */}
+
+=== packages/frontend/src/components/chat/UserSearchDialog.tsx ===
+46:   channelId?: number; // 梨꾨꼸 ID 異붽?
+68:   // Search ?낅젰李?ref
+71:   // 梨꾨꼸 硫ㅻ쾭 議고쉶
+84:         console.log('Channel data response:', data); // ?붾쾭源낆슜
+86:           // members 諛곗뿴?먯꽌 userId 異붿텧
+90:           console.log('Channel member IDs:', memberIds); // ?붾쾭源낆슜
+101:   // 梨꾨꼸??pending invitation 議고쉶
+114:         console.log('Pending invitations response:', data); // ?붾쾭源낆슜
+119:           console.log('Pending invited user IDs:', invitedUserIds); // ?붾쾭源낆슜
+130:   // Search API ?몄텧
+143:       console.log('User search response:', response); // ?붾쾭源낆슜
+146:         // API Response 援ъ“???곕씪 ?곸젅??泥섎━
+150:           // response.data媛 吏곸젒 諛곗뿴??寃쎌슦
+153:           // response.data.data媛 諛곗뿴??寃쎌슦
+161:         // ?쒖쇅??Used?먮뱾 Filter留?180:   // ?붾컮?댁뒪??Search ?⑥닔 (300ms 吏??
+190:   // Search??蹂寃????붾컮?댁뒪??寃???ㅽ뻾
+193:       // 理쒖냼 2湲???댁긽???뚮쭔 Search
+196:       // Search?닿? 吏㏃쑝硫?Results Initialization
+206:   // Dialog ?대┫ ??梨꾨꼸 硫ㅻ쾭 諛?pending invitation 議고쉶
+214:   // Dialog媛 ?대┫ ??Search ?낅젰李쎌뿉 ?ъ빱??217:       // Dialog ?좊땲硫붿씠?섏씠 ?꾨즺?????ъ빱??Settings
+228:   // Dialog ?ロ옄 ??Status Initialization
+239:   // Used??珥덈? 泥섎━
+246:       // 珥덈? Success ??pending invitation 紐⑸줉??異붽?
+249:       // 癒쇱? Dialog瑜??リ퀬 ?좎뒪?몃? ?쒖떆 (backdrop??媛?ㅼ?吏 ?딅룄濡?
+252:       // Dialog媛 ?ロ엺 ???좎뒪???쒖떆
+266:           // ?대? 硫ㅻ쾭??寃쎌슦 - 硫ㅻ쾭 紐⑸줉 Refresh
+272:           // ?대? 珥덈???寃쎌슦 - pending invitation 紐⑸줉 Refresh
+277:           // 湲고? ?ㅻ쪟
+300:           minHeight: 500, // 理쒖냼 ?믪씠瑜??섎젮???덉젙??301:           maxHeight: 600, // 理쒕? ?믪씠 ?쒗븳
+323:           minHeight: 350, // 理쒖냼 ?믪씠 Settings?쇰줈 ?덉젙??326:           paddingTop: 3, // ?쀫?遺??⑤뵫 利앷?濡??뚮몢由??섎┝ 諛⑹?
+327:           overflow: 'visible', // overflow Settings?쇰줈 ?뚮몢由??쒖떆 蹂댁옣
+356:         {/* Search Results ?곸뿭 - 怨좎젙 ?믪씠濡??덉젙??*/}
+360:             minHeight: 280, // 怨좎젙 ?믪씠濡??ㅼ뜦??諛⑹?
+434:                       // ?대? 硫ㅻ쾭??寃쎌슦
+446:                       // 珥덈? Pending??寃쎌슦
+469:                       // 珥덈? 媛?ν븳 寃쎌슦
+
+=== packages/frontend/src/components/common/ColorPicker.tsx ===
+24: // 誘몃━ ?뺤쓽???됱긽 ?붾젅??48: // ?쒕뜡 ?됱긽 Create
+161:           {/* 誘몃━ ?뺤쓽???됱긽 ?붾젅??*/}
+192:           {/* 而ㅼ뒪? ?됱긽 ?좏깮 */}
+226:           {/* ?≪뀡 踰꾪듉 */}
+
+=== packages/frontend/src/components/common/JsonEditor.tsx ===
+103:       // ?먮뵒???듭뀡 Settings
+119:       // ?먮뵒??DOM ?붿냼???ъ빱???ㅽ????쒓굅
+126:       // ?щ㎎???⑥텞??Settings
+154:   // value prop??蹂寃쎈맆 ??而ㅼ꽌 ?꾩튂 蹂댁〈
+
+=== packages/frontend/src/components/common/MaintenanceSettingsInput.tsx ===
+30:   // ?먭? ?쒖옉/醫낅즺 ?좎쭨
+36:   // 硫붿떆吏 ?뚯뒪 ?좏깮
+40:   // 吏곸젒 ?낅젰 紐⑤뱶
+48:   // ?쒗뵆由?紐⑤뱶
+53:   // 媛뺤젣 醫낅즺 ?듭뀡 (寃뚯엫?붾뱶?먯꽌留?Used)
+60:   // ?먮윭 Status
+63:   // ?꾩닔 ?щ?
+66:   // ?ㅽ??쇰쭅
+208:         {/* ?먭? ?쒖옉?쇨낵 醫낅즺??*/}
+225:         {/* 援щ텇??*/}
+236:         {/* 硫붿떆吏 ?뚯뒪 ?좏깮 */}
+251:         {/* 吏곸젒 ?낅젰 紐⑤뱶 */}
+273:         {/* ?쒗뵆由?紐⑤뱶 */}
+302:             {/* ?좏깮???쒗뵆由?誘몃━蹂닿린 */}
+348:         {/* 媛뺤젣 醫낅즺 ?듭뀡 (showForceDisconnect媛 true???뚮쭔 ?쒖떆) */}
+351:             {/* 援щ텇??*/}
+
+=== packages/frontend/src/components/common/MultiLanguageMessageInput.tsx ===
+25:   // 湲곕낯 硫붿떆吏
+33:   // ?ㅺ뎅??吏???щ?
+39:   // ?몄뼱蹂?硫붿떆吏
+44:   // Translation 湲곕뒫
+49:   // ?ㅽ??쇰쭅
+125:         // Translation Results瑜?locales???곸슜
+142:         // Translation Results ?곸슜 (遺紐?而댄룷?뚰듃?먯꽌 ?먮룞?쇰줈 supportsMultiLanguage瑜?true濡?Settings??
+171:           {/* 湲곕낯 硫붿떆吏 */}
+185:           {/* ?몄뼱蹂?硫붿떆吏 Used ?щ? 諛?Translation 踰꾪듉 */}
+204:             {/* Translation 踰꾪듉 */}
+229:           {/* ?몄뼱蹂?硫붿떆吏 */}
+245:               {/* 紐⑤뱺 ?몄뼱蹂?硫붿떆吏 ?낅젰 */}
+
+=== packages/frontend/src/components/common/TimezoneSelector.tsx ===
+39:     // ?쒕쾭 ?쒓컙 ?숆린???쒖옉
+42:     // ?쒕쾭 ?쒓컙 ?낅뜲?댄듃 由ъ뒪??Register
+49:     // 1珥덈쭏???꾩옱 ?쒕쾭 ?쒓컙怨??낇????낅뜲?댄듃
+86:       {/* ?쒕쾭 ?쒓컙 ?쒖떆 (?대┃ 媛?? */}
+124:       {/* Timezone Settings ?앹삤踰?*/}
+158:               {/* ?꾩옱 ?쒓컙 ?뺣낫 */}
+182:               {/* ?쒕쾭 ?낇???*/}
+196:               {/* Timezone ?좏깮 */}
+223:               {/* ?꾩옱 ?좏깮??timezone ?뺣낫 */}
+
+=== packages/frontend/src/components/jobs/DynamicJobDataForm.tsx ===
+40:   // ?ㅽ궎留덇? 蹂寃쎈맆 ?뚮쭔 Set default values
+48:     // Default values???꾩슂???꾨뱶留?泥섎━
+53:       // ?꾨뱶??媛믪씠 ?녾퀬 Default values???덈뒗 寃쎌슦?먮쭔 Set default values
+61:       // Default values???덇퀬 ?꾩옱 媛믪씠 ?녿뒗 寃쎌슦?먮쭔 Settings
+75:   }, [jobSchema]); // jobSchema留??섏〈?깆쑝濡?Settings
+261:                   // ?좏슚?섏? ?딆? JSON??寃쎌슦 臾몄옄?대줈 Save
+295:   // HTTP Request Type?몄? Confirm
+301:   // ?꾨뱶 ?쒖꽌 ?뺤쓽 (HTTP Request??寃쎌슦)
+313:       {/* GET Request????body ?꾨뱶媛 ?④꺼議뚮떎???덈궡 硫붿떆吏 */}
+333:         // GET Request????body ?꾨뱶 ?④린湲?
+=== packages/frontend/src/components/jobs/JobForm.tsx ===
+81:       // Job ?몄쭛 紐⑤뱶?먯꽌 jobDataMap??鍮꾩뼱?덉쑝硫??곸꽭 ?뺣낫瑜??ㅼ떆 議고쉶
+131:       // Job ?몄쭛 紐⑤뱶?먯꽌??Existing jobDataMap ?좎?, ??Create ?쒖뿉留?Initialization
+
+=== packages/frontend/src/components/layout/MainLayout.tsx ===
+715:   // SSE updates - 諛깆뿏???곌껐 Failed ???곸젅??泥섎━
+717:     autoConnect: true, // ?먮룞 ?곌껐 Active??718:     maxReconnectAttempts: 3, // ?ъ뿰寃??쒕룄 ?잛닔 以꾩엫
+719:     reconnectInterval: 10000, // ?ъ뿰寃?媛꾧꺽 ?섎┝ (10珥?
+776:         // 珥덈?留곹겕 Event瑜??ㅻⅨ 而댄룷?뚰듃???꾨떖
+813:   // Used?먭? 蹂寃쎈맆 ?뚮쭏???꾨컮? Images ?먮윭 Status Initialization
+896:     // ?쒕툕硫붾돱媛 ?덈뒗 寃쎌슦
+1081:     // ?쇰컲 硫붾돱 ?꾩씠??1129:     // ?ъ씠?쒕컮媛 ?묓??덉쓣 ?뚮쭔 ?댄똻 ?쒖떆
+1163:       {/* 濡쒓퀬 諛??좉? 踰꾪듉 ?곸뿭 - AppBar? ?숈씪???믪씠 */}
+1256:       {/* 硫붾돱 ?곸뿭 - ?ㅽ겕濡?媛??*/}
+1556:       {/* ?ъ씠?쒕컮 - ?꾩껜 ?믪씠 李⑥? (admin only) */}
+1566:         {/* 紐⑤컮???쒕줈??*/}
+1589:         {/* ?곗뒪?ы넲 ?쒕줈??- ?꾩껜 ?믪씠 */}
+1618:       {/* ?ㅻⅨ履??곸뿭: AppBar + 硫붿씤 而⑦뀗痢?*/}
+1627:         {/* ?곷떒 諛?- ?ъ씠?쒕컮 ?놁뿉 ?꾩튂 */}
+1670:             {/* ?먭? 諛곕꼫 - AppBar ?대? */}
+1708:                     {/* ?좏삎 */}
+1727:                     {/* ?쒖옉 ?쒓컙 */}
+1737:                     {/* 醫낅즺 ?쒓컙 */}
+1747:                     {/* ?뚯슂 ?쒓컙 */}
+1769:                     {/* 硫붿떆吏 */}
+1986:               {/* 援щ텇??*/}
+2001:               {/* 援щ텇??*/}
+2027:               {/* 援щ텇??*/}
+2051:                         // Images 濡쒕뱶 Failed ??AccountCircle ?꾩씠肄섏쑝濡??泥?2088:                   {/* 援щ텇??*/}
+2244:         {/* 硫붿씤 而⑦뀗痢?*/}
+
+=== packages/frontend/src/pages/admin/ApiTokensPage.tsx ===
+560:   // ?좏겙 ?대쫫 Validation
+562:     return name.trim().length >= 3; // 理쒖냼 3???댁긽
+565:   // ?좏슚湲곌컙 Validation ?⑥닔
+608:       console.log('Create token response:', response); // ?붾쾭源낆슜
+621:       // Create Dialog瑜?癒쇱? Close
+625:       // 諛깆뿏??Response 援ъ“ Confirm 諛??좏겙 媛?異붿텧
+627:       console.log('Create response structure:', response); // ?붾쾭源낆슜
+628:       console.log('Extracted token value:', tokenValue); // ?붾쾭源낆슜
+630:       // Status瑜??쒖꽌?濡?Settings?섏뿬 Dialog媛 ?뺤떎???대━?꾨줉 ??634:       // ?ㅼ쓬 ?뚮뜑留??ъ씠?댁뿉??Dialog Open
+639:       // ?좏겙 紐⑸줉? 諛깃렇?쇱슫?쒖뿉??Refresh (await ?쒓굅)
+713:       console.log('Regenerate token response:', response); // ?붾쾭源낆슜
+715:       // 諛깆뿏??Response 援ъ“ Confirm 諛??좏겙 媛?異붿텧
+717:       console.log('Regenerate response structure:', response); // ?붾쾭源낆슜
+718:       console.log('Extracted token value:', tokenValue); // ?붾쾭源낆슜
+728:       // Status瑜??쒖꽌?濡?Settings?섏뿬 Dialog媛 ?뺤떎???대━?꾨줉 ??732:       // ?ㅼ쓬 ?뚮뜑留??ъ씠?댁뿉??Dialog Open
+
+=== packages/frontend/src/pages/admin/AuditLogsPage.tsx ===
+161:   // ?섏씠吏 State management (localStorage ?곕룞)
+203:   // Filters - localStorage?먯꽌 蹂듭썝
+206:   // ?숈쟻 Filter Status
+210:   // Debouncing??Search??(500ms 吏??
+348:     updatePage(newPage + 1); // MUI??0遺???쒖옉, ?곕━??1遺???쒖옉
+368:   // ?섏씠吏 濡쒕뱶 ??pageState.filters?먯꽌 activeFilters 蹂듭썝
+380:     // action Filter 蹂듭썝
+390:     // resource_type Filter 蹂듭썝
+402:     // ip_address Filter 蹂듭썝
+1310:                 page={pageState.page - 1} // MUI??0遺???쒖옉
+
+=== packages/frontend/src/pages/admin/ClientVersionsPage.tsx ===
+155: // HSV瑜?RGB濡?蹂?섑븯???⑥닔
+194: // 踰꾩쟾蹂??됱긽??HSV 湲곕컲?쇰줈 ?ㅼ뼇?섍쾶 Create?섎뒗 ?⑥닔 (?⑷툑鍮??쒖슜)
+199:   // 媛쒖꽑???댁떆 ?⑥닔 (??洹좊벑??遺꾪룷)
+204:     hash = hash & hash; // 32鍮꾪듃 Convert to integer
+207:   // ?⑷툑鍮?? ??0.618)瑜??쒖슜???됱긽 遺꾪룷濡???洹좊벑?섍퀬 ?꾨쫫?ㅼ슫 ?됱긽 Create
+209:   const baseHue = (Math.abs(hash) * goldenRatio) % 1; // 0-1 ?ъ씠 媛?210:   const hue = baseHue * 360; // 0-359?꾨줈 蹂??212:   // ?댁떆???ㅻⅨ 遺遺꾩쓣 ?쒖슜??梨꾨룄? 紐낅룄 蹂??216:   // ?ㅽ겕紐⑤뱶???곕씪 梨꾨룄? 紐낅룄 議곗젙
+219:     // ?ㅽ겕紐⑤뱶: ?좊챸?섎㈃?쒕룄 ?덉뿉 遺???녿뒗 ?됱긽
+220:     saturation = 0.75 + (saturationSeed % 20) / 100; // 75-95% 梨꾨룄
+221:     value = 0.65 + (valueSeed % 25) / 100; // 65-90% 紐낅룄
+223:     // ?쇱씠?몃え?? 諛앷퀬 源붾걫???됱긽
+224:     saturation = 0.7 + (saturationSeed % 25) / 100; // 70-95% 梨꾨룄
+225:     value = 0.8 + (valueSeed % 15) / 100; // 80-95% 紐낅룄
+228:   // HSV瑜?RGB濡?蹂??231:   // 諛곌꼍??Create
+234:   // WCAG 2.1 湲곗????곕Ⅸ ???뺥솗???鍮?怨꾩궛
+241:   // 4.5:1 ?鍮꾩쑉???꾪븳 ?띿뒪???됱긽 寃곗젙
+250: // Existing MUI ?됱긽 ?쒖뒪?쒓낵???명솚?깆쓣 ?꾪븳 ?⑥닔 (fallback??
+254:   // 媛꾨떒???댁떆 ?⑥닔
+259:     hash = hash & hash; // 32鍮꾪듃 Convert to integer
+262:   // Used 媛?ν븳 ?됱긽 諛곗뿴
+272:   // ?댁떆媛믪쓣 ?됱긽 ?몃뜳?ㅻ줈 蹂??353:   // ?섏씠吏 State management (localStorage ?곕룞)
+373:   // SWR濡??곗씠??濡쒕뵫
+402:   // 珥덇린 Loading state 異붿쟻
+410:   // ?좏깮 愿由?421:   // ?먭? 愿??Status
+425:   // 硫붿떆吏 ?낅젰 諛⑹떇
+428:   // 吏곸젒 ?낅젰
+433:   // ?쒗뵆由??좏깮
+442:   // ?쒓렇 愿??Status
+462:   // ?숈쟻 Filter Status
+466:   // ?대낫?닿린 硫붾돱 Status
+472:   // SDK 媛?대뱶 Status
+542:   // 硫붿떆吏 ?쒗뵆由?濡쒕뱶 (SWR濡?蹂寃??덉젙?댁?留??쇰떒 ?좎?)
+554:   // Filter 蹂寃??몃뱾??562:   // ?숈쟻 Filter ?뺤쓽
+626:   // ?숈쟻 Filter 異붽? ?몃뱾??631:   // ?숈쟻 Filter ?쒓굅 ?몃뱾??636:   // ?숈쟻 Filter 蹂寃??몃뱾??641:   // ?숈쟻 Filter ?곗궛??蹂寃??몃뱾??649:   // Search??蹂寃??몃뱾??654:       // activeFilters瑜?newFilters??諛섏쁺
+669:   // ?섏씠吏 濡쒕뱶 ??pageState.filters?먯꽌 activeFilters 蹂듭썝
+681:     // version Filter 蹂듭썝
+691:     // platform Filter 蹂듭썝
+701:     // clientStatus Filter 蹂듭썝
+711:     // guestModeAllowed Filter 蹂듭썝
+723:     // tags Filter 蹂듭썝
+739:   // activeFilters媛 蹂寃쎈맆 ?뚮쭏??pageState.filters ?낅뜲?댄듃
+741:     if (!filtersInitialized) return; // Initialization ?꾩뿉???ㅽ뻾?섏? ?딆쓬
+744:       search: pageState.filters?.search, // Search?대뒗 ?좎?
+756:     // Filter媛 ?ㅼ젣濡?蹂寃쎈릺?덉쓣 ?뚮쭔 ?낅뜲?댄듃
+762:   }, [activeFilters, filtersInitialized]); // pageState.filters? updateFilters瑜??섏〈?깆뿉???쒓굅
+764:   // Sorting? 怨좎젙 (踰꾩쟾 ?대┝李⑥닚, ?뚮옯Form ?대┝李⑥닚)
+765:   // Sorting 蹂寃?湲곕뒫 鍮껦ctive??767:   // ?섏씠吏 蹂寃??몃뱾??770:       updatePage(newPage + 1); // MUI??0遺???쒖옉, ?곕━??1遺???쒖옉
+775:   // ?섏씠吏 ?ш린 蹂寃??몃뱾??784:   // ?좏깮 愿由?806:   // Delete ?몃뱾??824:       mutateVersions(); // SWR cache 媛깆떊
+825:       mutateClientVersions(projectApiPath); // 紐⑤뱺 client versions Cache 媛깆떊
+834:   // ?쇨큵 Status 蹂寃??몃뱾??838:     // ?먭? Status????Validate required fields
+858:         // ?먭? Status???뚮쭔 ?먭? 愿???곗씠???ы븿
+878:       // Localization??硫붿떆吏 Create
+888:       // ?먭? 愿??Status Initialization
+896:       mutateVersions(); // SWR cache 媛깆떊
+897:       mutateClientVersions(projectApiPath); // 紐⑤뱺 client versions Cache 媛깆떊
+919:   // ?쇨큵 Delete ?몃뱾??933:       mutateVersions(); // SWR cache 媛깆떊
+934:       mutateClientVersions(projectApiPath); // 紐⑤뱺 client versions Cache 媛깆떊
+943:   // ?대낫?닿린 ?⑥닔??956:           // JSON ?대낫?닿린
+960:           ); // 媛숈? ?곗씠??Used
+980:           // XLSX ?대낫?닿린
+1000:           // XLSX ?뚰겕遺?Create
+1005:           // 而щ읆 ?덈퉬 ?먮룞 議곗젙
+1011:           // XLSX ?뚯씪 Create
+1048:   // ?좏깮????ぉ ?대낫?닿린
+1088:             // CSV ?곗씠??1125:           // XLSX ?대낫?닿린 - ?좏깮????ぉ??1178:           // XLSX ?뚰겕遺?Create
+1183:           // 而щ읆 ?덈퉬 ?먮룞 議곗젙
+1189:           // XLSX ?뚯씪 Create
+1226:   // 踰꾩쟾 蹂듭궗 ?몃뱾??1234:       // 蹂듭궗???곗씠??以鍮?(踰꾩쟾 ?꾨뱶??鍮꾩?)
+1236:         id: clientVersion.id, // ?곸꽭 ?ъ“??maintenanceLocales ?ы븿)瑜??꾪빐 ?먮낯 id瑜??꾨떖. Save ?쒖뿉??isCopyMode濡??좉퇋 Create 泥섎━??1238:         clientVersion: '', // 踰꾩쟾? 鍮꾩썙??1256:       // Form Dialog瑜??닿퀬 蹂듭궗???곗씠?곕줈 Initialization
+1265:   // ?쒓렇 愿???몃뱾??1289:         // ?꾩슂??紐⑸줉 Refresh
+1290:         mutateVersions(); // SWR cache 媛깆떊
+1291:         mutateClientVersions(projectApiPath); // 紐⑤뱺 client versions Cache 媛깆떊
+1634:       {/* ?쇨큵 ?묒뾽 ?대컮 */}
+1733:       {/* ?뚯씠釉?*/}
+1847:             {/* Pagination - ?곗씠?곌? ?덉쓣 ?뚮쭔 ?쒖떆 */}
+1851:                 page={pageState.page - 1} // MUI??0遺???쒖옉
+1984:       {/* ?쇨큵 Status 蹂寃?Drawer */}
+2044:           {/* ?먭? 愿???꾨뱶??*/}
+2076:                   {/* ?먭? ?쒖옉??*/}
+2091:                   {/* ?먭? 醫낅즺??*/}
+2106:                   {/* 援щ텇??*/}
+2117:                   {/* 硫붿떆吏 ?뚯뒪 ?좏깮 */}
+2135:                   {/* ?쒗뵆由??좏깮 */}
+2165:                   {/* 吏곸젒 ?낅젰 */}
+2222:       {/* ?대씪?댁뼵??踰꾩쟾 異붽?/?몄쭛 Form */}
+2231:           mutateVersions(); // SWR cache 媛깆떊
+2232:           mutateClientVersions(projectApiPath); // 紐⑤뱺 client versions Cache 媛깆떊
+2241:       {/* ?대씪?댁뼵??踰꾩쟾 媛꾪렪 異붽? Form */}
+2248:           mutateVersions(); // SWR cache 媛깆떊
+2249:           mutateClientVersions(projectApiPath); // 紐⑤뱺 client versions Cache 媛깆떊
+2254:       {/* ?뚮옯Form Set default values Dialog */}
+2260:       {/* ?쇨큵 Delete Confirm Drawer */}
+2391:       {/* ?쒓렇 愿由?Drawer */}
+
+=== packages/frontend/src/pages/admin/CustomQueueMonitorPage.tsx ===
+114:       const interval = setInterval(fetchQueues, 5000); // 5珥덈쭏??媛깆떊
+248:         {/* ???듦퀎 移대뱶??*/}
+284:         {/* ?좏깮???먯쓽 ?곸꽭 ?뺣낫 */}
+393:       {/* ?묒뾽 ?곸꽭 Dialog */}
+
+=== packages/frontend/src/pages/admin/GameWorldsPage.tsx ===
+379:   // Debouncing??Search??(500ms 吏??
+382:   // ?숈쟻 Filter Status
+407:   // ?먭? ?좉? Dialog Status
+442:   // 硫붿떆吏 ?쒗뵆由?愿??state
+447:   // 寃뚯엫?붾뱶 ?몄쭛 Form??state
+580:   // SDK 媛?대뱶 Status
+583:   // ?먭? 硫붿떆吏 Locale 愿由??⑥닔??598:   // ?몄뼱蹂?硫붿떆吏 Used ?щ? 蹂寃?603:       // Active???? Existing 媛믪쓣 蹂댁〈?섎㈃???꾨씫???몄뼱留?異붽?
+611:       // 鍮껦ctive???? ?낅젰媛믪? ?좎??섍퀬 UI留??④? (state/form 媛믪? 嫄대뱶由ъ? ?딆쓬)
+616:   // Used 媛?ν븳 ?몄뼱 紐⑸줉
+629:   // ?좎쭨 Locale Settings
+646:   // ?숈쟻 Filter ?뺤쓽
+665:   // ?숈쟻 Filter ?몃뱾??767:     // allRegistryTags媛 濡쒕뱶???꾩뿉留?寃뚯엫?붾뱶瑜?濡쒕뱶
+814:     // ?대? Loading?대㈃ 以묐났 Request 諛⑹?
+821:       // ?쒓렇 Filter?먯꽌 ?쒓렇 ID 異붿텧
+830:         // ?쒕쾭 Controller??tagIds(?쇳몴援щ텇)瑜?湲곕???840:       // ?ㅽ듃?뚰겕 ?ㅻ쪟??寃쎌슦?먮쭔 toast ?쒖떆
+895:     // ?몄뼱蹂?硫붿떆吏媛 ?덈뒗吏 Confirm
+998:     // worldServerAddress ?꾩닔 泥댄겕 諛??뺤떇 Validation (?쇰컲 URL ?먮뒗 host[:port] ?덉슜)
+1011:     // ?먭? 紐⑤뱶????湲곕낯 ?먭? 硫붿떆吏 ?꾩닔 泥댄겕
+1019:     // ?먭? 紐⑤뱶????湲곌컙 諛??좎삁?쒓컙 Validation
+1067:       // Tag 媛앹껜?먯꽌 ID 異붿텧
+1240:     // ?먭? Active?붿떆 Existing ?먭? Settings 媛?몄삤湲?1306:         // ?먭? Active?? ?먭? ?꾩슜 API Used
+1307:         // NOTE: ?좎쭨 ?꾨뱶??媛믪씠 ?덉쑝硫?洹몃?濡? ?놁쑝硫?null濡??꾩넚?댁빞 DB??Save??1316:         // 硫붿떆吏 ?뚯뒪???곕씪 遺꾧린
+1318:           // ?쒗뵆由?紐⑤뱶: templateId ?꾩넚
+1321:           // 吏곸젒 ?낅젰 紐⑤뱶: 硫붿떆吏 吏곸젒 ?꾩넚
+1339:         // ?먭? Unregister: ?먭? ?꾩슜 API Used
+2033:               {/* ?먭? Settings Form */}
+2140:               {/* Confirm ?낅젰 */}
+
+=== packages/frontend/src/pages/admin/JobsPage.tsx ===
+171:   // ?쒓렇 濡쒕뵫
+208:   // ?쒓렇 Filter 蹂寃??몃뱾??214:   // ?섏씠吏 蹂寃??몃뱾??219:   // ?섏씠吏 ?ш린 蹂寃??몃뱾??299:       // 409 ?먮윭 (?대쫫 以묐났) 泥섎━
+321:   // ?띿뒪??湲몄씠 ?쒗븳 ?⑥닔
+524:               {/* ?쒓렇 Filter */}
+
+=== packages/frontend/src/pages/admin/MaintenancePage.tsx ===
+100:   const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // ?좎삁?쒓컙 (遺? - Default values 5遺?266:         // ?먭? 以묒씪 ?뚮쭔 Existing Settings??遺덈윭??(SSE)
+280:           // ?먭? 以묒씠 ?꾨땲硫?源⑤걮??Status濡?Initialization
+291:   // ?쒓컙 Validation ?⑥닔
+295:     // 醫낅즺 ?쒓컙??怨쇨굅??寃쎌슦: ?먮윭
+304:     // ?쒖옉 ?쒓컙??Settings?섏? ?딆븯怨?醫낅즺 ?쒓컙留??ㅼ젙??寃쎌슦 (利됱떆 ?쒖옉)
+306:       // 利됱떆 ?쒖옉?대?濡??꾩옱 ?쒓컙遺??醫낅즺 ?쒓컙源뚯???湲곌컙 怨꾩궛
+309:       // 理쒖냼 5遺?Validation
+321:       // ?좎삁?쒓컙 Validation (kickExistingPlayers媛 Active?붾맂 寃쎌슦)
+336:     // ?쒖옉 ?쒓컙??Settings??寃쎌슦
+338:       // 醫낅즺 ?쒓컙???쒖옉 ?쒓컙蹂대떎 ?대Ⅸ吏 Confirm
+347:       // 醫낅즺 ?쒓컙??Settings??寃쎌슦 湲곌컙 Validation
+351:         // 理쒖냼 5遺?Validation
+360:         // ?좎삁?쒓컙 Validation (kickExistingPlayers媛 Active?붾맂 寃쎌슦)
+377:   // ?쒖옉 ?쒓컙??怨쇨굅?몄? Confirm?섎뒗 Helper function
+384:     // ?쒓컙 Validation
+443:     // ?쒓컙 Validation
+514:           {/* 醫뚯륫 Settings ?곸뿭 */}
+602:                           {/* ?먭? 湲곌컙 */}
+741:                           {/* 媛뺤젣醫낅즺 ?듭뀡 */}
+769:                           {/* Settings???뺣낫 */}
+797:                           {/* Settings ?쒓컙 */}
+941:                         {/* 泥댄겕諛뺤뒪 ?곸뿭 */}
+966:                         {/* ?좎삁?쒓컙 Settings ?곸뿭 */}
+998:                     {/* 援щ텇??*/}
+1125:                             // 紐⑤뱺 ?몄뼱 ?먮룞 異붽?
+1149:                           // Translation Results媛 ?덉쑝硫??먮룞?쇰줈 ?ㅺ뎅??吏??Active??1167:                 {/* Actions???곗륫 ?곸뿭?쇰줈 ?대룞 */}
+1172:           {/* ?곗륫 ?≪뀡 踰꾪듉 ?곸뿭 */}
+1190:                     // ?쒓컙 Validation 癒쇱? ?ㅽ뻾
+1226:                         // ?쒓컙 Validation 癒쇱? ?ㅽ뻾
+1376:                     {/* ?먭? 湲곌컙 */}
+1471:                     {/* 媛뺤젣醫낅즺 ?듭뀡 */}
+1529:                     {/* Settings???뺣낫 (Dialog?먯꽌???꾩옱 Used?? */}
+
+=== packages/frontend/src/pages/admin/MessageTemplatesPage.tsx ===
+203:   const [page, setPage] = useState(0); // SimplePagination? 0-based
+209:   // Debouncing??Search??(500ms 吏??
+212:   // ?숈쟻 Filter Status (localStorage?먯꽌 蹂듭썝)
+223:   // ?숈쟻 Filter?먯꽌 媛?異붿텧 (useMemo濡?李몄“ ?덉젙??
+244:   // Filter瑜?臾몄옄?대줈 蹂?섑븯???섏〈??諛곗뿴??Used
+256:   // ?좏깮 愿??283:   // ?쒓렇 愿??Status
+373:   // Form ?꾨뱶 ref??422:   // ?쒓렇 濡쒕뵫
+437:   // ?숈쟻 Filter ?뺤쓽
+468:   // ?숈쟻 Filter ?몃뱾??488:   // ?섏씠吏 蹂寃??몃뱾??493:   // ?섏씠吏 ?ш린 蹂寃??몃뱾??500:   // ?좏깮 愿???몃뱾??518:         // ?꾩껜 ?좏깮 Update state
+528:   // ?쇨큵 Delete
+552:   // ?쇨큵 Used 媛??遺덇? 蹂寃?590:   // 媛쒕퀎 Delete
+644:   // ?쒓렇 愿???몃뱾??668:         // ?꾩슂??紐⑸줉 Refresh
+718:       // ?쒓렇 Settings
+726:         // ?쒓렇媛 ?놁쑝硫?Remove all existing tags
+735:       // Handle duplicate name error - ??媛吏 ?ㅻ쪟 援ъ“ All 泥섎━
+916:               {/* Search 而⑦듃濡ㅼ쓣 留??욎쑝濡??대룞?섍퀬 媛쒖꽑 */}
+1002:       {/* ?쇨큵 ?묒뾽 ?대컮 */}
+1191:           // Drawer媛 ?대┛ ???대쫫 ?꾨뱶???ъ빱??1222:             {/* ?ㅺ뎅??硫붿떆吏 ?낅젰 而댄룷?뚰듃 */}
+1253:                 // Translation Results媛 ?덉쑝硫??먮룞?쇰줈 ?ㅺ뎅??吏??Active??1267:             {/* ?쒓렇 ?좏깮 */}
+1351:       {/* 媛쒕퀎 Delete Confirm Drawer */}
+1397:       {/* ?쇨큵 Delete Confirm Drawer */}
+1443:       {/* ?쒓렇 愿由?Dialog */}
+
+=== packages/frontend/src/pages/admin/RealtimeEventsPage.tsx ===
+211:   // ?숈쟻 Filter Status
+214:   // ?숈쟻 Filter?먯꽌 媛?異붿텧
+728:   // ?숈쟻 Filter ?뺤쓽
+768:   // ?숈쟻 Filter ?몃뱾??
+=== packages/frontend/src/pages/admin/SchedulerPage.tsx ===
+72: // ?ㅼ?以?Event Type ?뺤쓽
+85: // Job 諛?Trigger Type ?뺤쓽 (Quartzmin ?ㅽ???
+137:   repeatCount: number; // -1? 臾댄븳 諛섎났
+170:     cronExpression: '0 0 12 * * ?', // 留ㅼ씪 ?뺤삤
+184:   // ?ㅼ?以?Event 濡쒕뵫 (?ㅼ젣濡쒕뒗 API?먯꽌 媛?몄샂)
+188:       // ?꾩떆 ?곗씠??231:   // 罹섎┛??Event ?몃뱾??294:     // 醫낅즺 ?쒓컙???쒖옉 ?쒓컙蹂대떎 ?댁쟾?몄? Confirm
+302:       // ?꾩떆 援ы쁽 (?ㅼ젣濡쒕뒗 API ?몄텧)
+327:       // ?꾩떆 援ы쁽 (?ㅼ젣濡쒕뒗 API ?몄텧)
+337:   // ?꾩옱 ?몄뼱???곕Ⅸ Locale Settings
+341:   // FullCalendar Locale ?좏깮
+354:   // FullCalendar 踰꾪듉 ?띿뒪???좏깮
+470:             {/* 湲곕낯 ?뺣낫 */}
+653:             {/* ?쒓컙 踰붿쐞 Settings */}
+677:             {/* ?붿씪 ?좏깮 */}
+739:               {/* 湲곕낯 Count Parameters */}
+771:               {/* 異붽? Parameters */}
+
+=== packages/frontend/src/pages/admin/UsersManagementPage.tsx ===
+130: // SSE??MainLayout?먯꽌 ?꾩뿭?쇰줈 泥섎━?섎?濡??ш린?쒕뒗 ?쒓굅
+258:   // ?대┰蹂대뱶 蹂듭궗 ?⑥닔
+267:   // ?섏씠吏 State management (URL params ?곕룞)
+279:   // ?숈쟻 Filter Status
+283:   // Debouncing??Search??286:   // SWR濡??곗씠??濡쒕뵫
+304:   // 珥덇린 Loading state 異붿쟻
+312:   // ?숈쟻 Filter?먯꽌 媛?異붿텧 (useMemo濡?李몄“ ?덉젙??
+338:   // 諛곗뿴??臾몄옄?대줈 蹂?섑븯???섏〈??諛곗뿴??Used
+343:   // ?쇨큵 ?좏깮 愿??Status
+364:   // 珥덈? 愿??Status
+473:   // ?대찓??Authentication 愿??Status
+528:   // ?꾩옱 珥덈? ?뺣낫 濡쒕뱶
+540:   // SWR???먮룞?쇰줈 ?곗씠?곕? 濡쒕뱶?섎?濡?fetchUsers ?⑥닔 ?쒓굅
+542:   // 珥덈?留곹겕 Event 泥섎━ (MainLayout?먯꽌 ?꾨떖諛쏆쓬)
+547:         // 珥덈?留곹겕 Status媛 蹂寃쎈릺硫??꾩옱 珥덈? ?뺣낫瑜??ㅼ떆 濡쒕뱶
+570:     loadCurrentInvitation(); // 珥덈? 湲곕뒫 Active??573:   // ?숈쟻 Filter ?뺤쓽
+616:   // ?섏씠吏 濡쒕뱶 ??pageState.filters?먯꽌 activeFilters 蹂듭썝
+628:     // status Filter 蹂듭썝
+638:     // role Filter 蹂듭썝
+648:     // tags Filter 蹂듭썝
+664:   // activeFilters 蹂寃???pageState.filters ?낅뜲?댄듃
+691:   // ?숈쟻 Filter ?몃뱾??708:   // 泥댄겕諛뺤뒪 ?몃뱾??727:   // ?쇨큵 泥섎━ ?몃뱾??731:     // ?ㅽ뵂 ??媛?Initialization (?댁쟾???좏깮??媛??좎? 諛⑹?)
+738:   // ?쇨큵 ?묒뾽 Save 踰꾪듉 Active??議곌굔 Confirm
+746:         // ?쒓렇??鍮?諛곗뿴???덉슜 (?쒓렇 ?쒓굅 紐⑹쟻)
+798:       mutateUsers(); // SWR cache 媛깆떊
+821:           mutateUsers(); // SWR cache 媛깆떊
+845:           mutateUsers(); // SWR cache 媛깆떊
+945:           mutateUsers(); // SWR cache 媛깆떊
+1219:       mutateUsers(); // SWR cache 媛깆떊
+1223:       // API ?ㅻ쪟 Response?먯꽌 援ъ껜?곸씤 硫붿떆吏 異붿텧
+1252:         mutateUsers(); // SWR cache 媛깆떊
+1255:         // API ?ㅻ쪟 Response?먯꽌 援ъ껜?곸씤 硫붿떆吏 異붿텧
+1262:   // ?대찓??媛뺤젣 Authentication 泥섎━
+1268:       mutateUsers(); // SWR cache 媛깆떊
+1269:       // ?몄쭛 Form???대젮?덈떎硫?Update data
+1284:   // ?대찓??Resend verification email
+1299:     // Form ?곗씠??Initialization
+1324:     // 釉뚮씪?곗? ?먮룞?꾩꽦??諛⑹??섍린 ?꾪빐 ?쎄컙??吏?????ㅼ떆 Initialization
+1411:       mutateUsers(); // SWR cache 媛깆떊
+1414:       // API ?ㅻ쪟 Response?먯꽌 援ъ껜?곸씤 硫붿떆吏 異붿텧
+1420:   // 珥덈? 愿???몃뱾??1424:       setInvitationDialogOpen(false); // 珥덈? Form Close
+1425:       await loadCurrentInvitation(); // ?꾩옱 珥덈? ?뺣낫 Refresh
+1426:       // Success ?좎뒪?몃뒗 SSE Event?먯꽌 泥섎━ (以묐났 諛⑹?)
+1441:       // Success ?좎뒪?몃뒗 SSE Event?먯꽌 泥섎━ (以묐났 諛⑹?)
+1677:         {/* 踰꾪듉 洹몃９ */}
+1752:       {/* ?쇨큵 ?묒뾽 ?대컮 - 紐⑸줉 ?꾨줈 ?대룞 */}
+2820:             {/* ?대찓??Authentication Status 諛??≪뀡 */}
+3402:           zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)蹂대떎 ?믨쾶
+3506:                       zIndex: 1500, // Drawer蹂대떎 ?믪? zIndex
+3561:           {/* 怨듯넻 ???誘몃━蹂닿린 (Delete ???≪뀡?먮룄 ?쒖떆) */}
+3624:               {/* Delete ???Used??紐⑸줉 */}
+
+=== packages/frontend/src/pages/admin/WhitelistPage.tsx ===
+79:   // ?섏씠吏 State management (localStorage ?곕룞)
+120:   // Debouncing??Search??(500ms 吏??
+204:       // ?덉쟾???곗씠???묎렐
+212:         // ?ㅻ쪟 硫붿떆吏瑜?Used?먯뿉寃??쒖떆?섏? ?딆쓬 (?쒕쾭 Response 援ъ“ 臾몄젣?????덉쓬)
+262:       updatePage(newPage + 1); // MUI??0遺???쒖옉, ?곕━??1遺???쒖옉
+281:     // selectedWhitelist??Dialog媛 ?ロ옄 ?뚭퉴吏 ?좎?
+309:   // 蹂듭궗 湲곕뒫
+329:     // 怨꾩젙ID ?꾨뱶???ъ빱??348:       // 怨꾩젙ID ?꾨뱶???ъ빱??386:     // 怨꾩젙 ID Validation
+395:     // Used紐⑹쟻 ?꾩닔 寃??431:       // ?덉쟾?섍쾶 紐⑸줉 ?ㅼ떆 濡쒕뱶
+
+=== packages/frontend/src/pages/auth/ForgotPasswordPage.tsx ===
+22:   // ?대찓??Validation ?⑥닔
+28:   // ?대찓???낅젰 ?몃뱾??32:     setMessage(null); // Existing 硫붿떆吏 ?대━??43:   // 踰꾪듉 Active??議곌굔
+46:   // 諛깆뿏??硫붿떆吏 ?ㅻ? Translation?섎뒗 ?⑥닔
+69:     // ?대? ?ㅼ떆媛?Validation濡?泥섎━?섎?濡?異붽? 寃??遺덊븘??82:         // 諛깆뿏?쒖뿉??硫붿떆吏 ?ㅻ? 諛쏆븘??Translation
+
+=== packages/frontend/src/pages/auth/LoginPage.tsx ===
+50: // Used??移쒗솕?곸씤 ?ㅻ쪟 硫붿떆吏 ?⑥닔
+57:   // Status 肄붾뱶蹂?硫붿떆吏
+87:   // ?ㅽ듃?뚰겕 ?ㅻ쪟
+92:   // 湲곕낯 硫붿떆吏
+188:     mode: 'onChange', // ?ㅼ떆媛?validation Active??196:   // ?꾩옱 ?대찓??媛?媛먯떆
+217:       // 湲곗뼲???대찓?쇨낵 Settings??All ?덉쓣 ?뚮쭔 Form???ㅼ젙
+225:         // 湲곗뼲??Settings???녾굅??遺덉씪移섑븯硫?Initialization
+259:       // 理쒖냼 2珥??湲?268:       // 理쒖냼 2珥덇? 吏?섏? ?딆븯?ㅻ㈃ 異붽? ?湲?342:     // 理쒖냼 2珥??湲?345:     // ??꾩븘??Settings (30珥?
+351:     // ?섏씠吏 ?대룞 ?꾩뿉 ??꾩븘???뺣낫瑜?sessionStorage??Save
+382:   // ?대찓??湲곗뼲?섍린 泥댄겕諛뺤뒪 蹂寃??몃뱾??385:       // 泥댄겕?섎젮怨?????蹂댁븞 寃쎄퀬 ?쒖떆
+389:       // 泥댄겕 Unregister???뚮뒗 利됱떆 ?곸슜?섍퀬 Save???대찓?쇰룄 Delete
+395:   // 蹂댁븞 寃쎄퀬 Confirm ??402:   // 蹂댁븞 寃쎄퀬 Cancel ??884:                 disabled={true} // ?꾩떆 鍮껦ctive??913:                 disabled={true} // ?꾩떆 鍮껦ctive??940:       {/* 蹂댁븞 寃쎄퀬 ??붿긽??*/}
+
+=== packages/frontend/src/pages/auth/LogoutPage.tsx ===
+41:       // 2珥???Login ?섏씠吏濡??대룞
+56:     navigate(-1); // ?댁쟾 ?섏씠吏濡??뚯븘媛湲?64:   // ?섏씠吏 濡쒕뱶 ???먮룞?쇰줈 Logout ?쒖옉?섏? ?딆쓬 (Used??Confirm ?꾩슂)
+66:     // URL Parameters濡??먮룞 Logout ?щ? Confirm
+
+=== packages/frontend/src/pages/auth/OAuthCallbackPage.tsx ===
+13:     // ??꾩븘??Settings (30珥?
+20:         // Success ????꾩븘???대━??64:     // 而댄룷?뚰듃 ?몃쭏?댄듃 ????꾩븘???대━??
+=== packages/frontend/src/pages/auth/RegisterPage.tsx ===
+65:   // 珥덈? 愿??Status
+109:     mode: 'onChange', // ?ㅼ떆媛?Validation???꾪빐 onChange濡?蹂寃?141:   // 珥덈? ?좏겙 Confirm
+169:         // 珥덈? 留곹겕媛 ?좏슚?섏? ?딆? 寃쎌슦 ?꾩슜 ?섏씠吏濡?由щ떎?대젆??174:       // 404??湲고? ?먮윭??寃쎌슦???좏슚?섏? ?딆? 珥덈?濡?泥섎━
+231:       // API ?몄텧
+233:         // 珥덈?瑜??듯븳 媛??241:         // ?쇰컲 媛??249:       // Success ??理쒖냼 2珥??湲?256:       // Success ?쒖뿉留?Error message 吏?곌린
+261:       // ?먮윭 ?쒖뿉??理쒖냼 2珥??湲?292:     // 理쒖냼 2珥??湲?295:     // ??꾩븘??Settings (30珥?
+301:     // ?섏씠吏 ?대룞 ?꾩뿉 ??꾩븘???뺣낫瑜?sessionStorage??Save
+321:     // ?꾩떆 鍮껦ctive??326:     // ?꾩떆 鍮껦ctive??1109:                 disabled={true} // ?꾩떆 鍮껦ctive??1138:                 disabled={true} // ?꾩떆 鍮껦ctive??
+=== packages/frontend/src/pages/auth/ResetPasswordPage.tsx ===
+39:   // 諛깆뿏??硫붿떆吏 ?ㅻ? Translation?섎뒗 ?⑥닔
+
+=== packages/frontend/src/pages/chat/ChatPage.tsx ===
+74:   // 諛섏쓳??釉뚮젅?댄겕?ъ씤??(1200px ?댁긽?먯꽌 ?ъ씠?쒕컮?댁궗?대뱶, 誘몃쭔?먯꽌 ?ㅽ깮)
+81:     return saved !== null ? JSON.parse(saved) : true; // Default values: ?대┛ Status
+95:   // New Dialog Status??173:   // Loading state Confirm - 珥덇린 Loading?닿굅??梨꾨꼸???놁쑝硫??ㅼ펷?덊넠 ?쒖떆
+174:   // ?ㅼ펷?덊넠 ?꾩쟾 ?쒓굅 - 諛붾줈 梨꾪똿 UI ?쒖떆
+177:   // Loading state ?붾쾭源?(?꾩슂??二쇱꽍 Unregister)
+185:   // ?ㅻ젅??愿??Status
+189:   // ?ㅻ젅??酉?紐⑤뱶 寃곗젙 (???붾㈃: ?ъ씠?쒕컮?댁궗?대뱶, ?묒? ?붾㈃: ?ㅽ깮)
+257:       // WebSocket ?곌껐??Status?먯꽌留?join ?쒕룄
+283:   // ?곌껐???딆뼱議뚯쓣 ??join Status Initialization
+291:   // localStorage???ъ씠?쒕컮 Status Save
+319:       // Create??梨꾨꼸濡??먮룞 ?대룞
+335:   // 梨꾨꼸 蹂寃??? ?댁쟾 梨꾨꼸???대┛ ?ㅻ젅?쒕뒗 ?リ퀬, ??梨꾨꼸?먯꽌 留덉?留됱쑝濡??대젮?덈뜕 ?ㅻ젅?쒕? 蹂듭썝
+337:     // Close (?댁쟾 梨꾨꼸???ㅻ젅?쒓? ?⑥븘?덈뒗 踰꾧렇 諛⑹?)
+347:     if (!lastId) return; // ??梨꾨꼸?먯꽌 蹂듭썝???ㅻ젅?쒓? ?놁쑝硫?醫낅즺
+352:       // ?ㅻ젅??蹂듭썝 ???쎄컙???쒕젅?대? 二쇱뼱 硫붿씤 ?낅젰李??ъ빱?ㅼ? 異⑸룎 諛⑹?
+359:       // 硫붿떆吏媛 ?꾩쭅 濡쒕뱶?섏? ?딆? 寃쎌슦, 濡쒕뵫 ???대룄濡??덉빟?대몺
+364:   // 硫붿떆吏 濡쒕뵫 ?꾨즺 ?? Pending???ㅻ젅?쒓? ?덉쑝硫??먮룞?쇰줈 Open
+393:       // ?먮윭??ChatContext?먯꽌 泥섎━?섎?濡??ш린?쒕뒗 蹂꾨룄 ?좎뒪???쒖떆?섏? ?딆쓬
+394:       // ChatContext??SET_ERROR ?≪뀡?쇰줈 ?먮윭媛 Settings?섍퀬 ?섎떒??Snackbar?먯꽌 ?쒖떆??400:   // Used??珥덈? ?몃뱾??415:   // Used??Status 蹂寃??몃뱾??418:       // WebSocket???듯빐 ?쒕쾭??Update state
+434:   // ?ㅻ젅??愿???몃뱾??447:       // Used?먭? 紐낆떆?곸쑝濡??レ쑝硫??대떦 梨꾨꼸???먮룞 蹂듭썝? 鍮꾩?
+467:   // ?ㅼ펷?덊넠 ?쒓굅 - ??긽 梨꾪똿 UI ?쒖떆
+495:           {/* ?뱀냼耳??곌껐 Status */}
+524:       {/* Main Chat Interface - 源쒕묀??諛⑹?瑜??꾪빐 Fade ?쒓굅 */}
+529:           minHeight: 0, // 以묒슂: flex ?꾩씠?쒖씠 異뺤냼?????덈룄濡???536:             width: isSidebarOpen ? 300 : 48, // ?ロ엺 Status?먯꽌??踰꾪듉 怨듦컙 ?뺣낫
+546:           {/* ?좉? 踰꾪듉 */}
+569:           {/* 梨꾨꼸 紐⑸줉 */}
+576:               {/* ?섎떒 湲곕뒫 踰꾪듉??*/}
+579:                   {/* ??Status Settings 踰꾪듉 */}
+597:                   {/* 珥덈? 愿由?踰꾪듉 */}
+622:                   {/* ?꾨씪?대쾭??Settings 踰꾪듉 */}
+654:           {/* Main Chat - ?ㅽ깮 紐⑤뱶?먯꽌 ?ㅻ젅?쒓? ?대━硫??④? */}
+697:           {/* Thread Panel - ?ъ씠?쒕컮 紐⑤뱶 (由ъ궗?댁쫰 媛?? */}
+742:           {/* Thread Panel - ?ㅽ깮 紐⑤뱶 (?꾩껜 ?붾㈃ ?ㅻ쾭?덉씠) */}
+756:                 {/* ?ㅻ줈媛湲?Headers */}
+774:                 {/* ?ㅻ젅??而⑦뀗痢?*/}
+938:       {/* New Dialog??*/}
+961:           // 珥덈? ?섎씫 ??梨꾨꼸 紐⑸줉 Refresh ???대떦 梨꾨꼸濡??대룞
+971:             // 梨꾨꼸 ?꾪솚
+974:             // 珥덈? 愿由?李?Close
+980:             // Failed?대룄 梨꾨꼸 ?꾪솚? ?쒕룄
+
+=== packages/frontend/src/pages/game/ServiceNoticesPreviewPage.tsx ===
+34: // Game UI color palette (based on ???빐?쒕? ?⑤씪???ㅻ━吏?
+
+=== packages/frontend/src/hooks/useDebounce.ts ===
+4:  * Debouncing ??5:  * @param value Debouncing??媛?6:  * @param delay 吏???쒓컙 (諛由ъ큹)
+7:  * @returns Debouncing??媛?26:  * Debouncing??Callback ??27:  * @param callback ?ㅽ뻾??Callback ?⑥닔
+28:  * @param delay 吏???쒓컙 (諛由ъ큹)
+29:  * @param deps ?섏〈??諛곗뿴
+30:  * @returns Debouncing??Callback ?⑥닔
+
+=== packages/frontend/src/hooks/usePageState.ts ===
+20:   // URL params?먯꽌 珥덇린 Status瑜?利됱떆 ?쎌뼱??Settings (?뚮뜑留??꾩뿉 ?ㅽ뻾)
+28:       // filters???섎㉧吏 紐⑤뱺 params
+32:           // 諛곗뿴 泥섎━: 媛숈? ?ㅺ? ?щ윭 媛??덉쑝硫?諛곗뿴濡?55:   // URL params??Status Save
+65:         // page, limit, sortBy, sortOrder 異붽?
+71:         // filters 異붽?
+76:                 // 諛곗뿴? 媛숈? ?ㅻ줈 ?щ윭 踰?異붽?
+102:   // 媛쒕퀎 Update state ?⑥닔??112:       savePageState({ limit, page: 1 }); // ?섏씠吏 ?ш린 蹂寃???泥??섏씠吏濡?119:       savePageState({ sortBy, sortOrder, page: 1 }); // Sorting 蹂寃???泥??섏씠吏濡?126:       savePageState({ filters, page: 1 }); // Filter 蹂寃???泥??섏씠吏濡?
+=== packages/frontend/src/hooks/useSSENotifications.ts ===
+20:   skipInvitationNotifications?: boolean; // 珥덈?留곹겕 Notification ?ㅽ궢 ?듭뀡
+46:   const maxReconnectReachedRef = useRef(false); // 理쒕? ?ъ뿰寃??쒕룄 ?꾨떖 ?щ? 異붿쟻
+75:     // 理쒕? ?ъ뿰寃??쒕룄???꾨떖?덈떎硫??곌껐 ?쒕룄?섏? ?딆쓬
+103:         maxReconnectReachedRef.current = false; // ?곌껐 Success ???뚮옒洹?由ъ뀑
+125:         // EventSource媛 ?먮룞?쇰줈 ?ъ뿰寃곗쓣 ?쒕룄?섎?濡??ш린?쒕뒗 ?곌껐???リ퀬 ?섎룞?쇰줈 ?ъ뿰寃?愿由?131:         // ?대? 理쒕? ?ъ뿰寃??쒕룄???꾨떖?덈떎硫????댁긽 ?쒕룄?섏? ?딆쓬
+142:           // 理쒕? ?ъ뿰寃??쒕룄???꾨떖?덉쓣 ????踰덈쭔 ?먮윭 ?좎뒪???쒖떆
+183:   // ?섎룞?쇰줈 ?곌껐 ?ъ떆??(理쒕? ?ъ뿰寃??쒕룄 ?뚮옒洹?由ъ뀑)
+195:     // ?대? 理쒕? ?ъ뿰寃??쒕룄???꾨떖?덈떎硫????댁긽 ?쒕룄?섏? ?딆쓬
+207:       // ?ъ뿰寃??쒕룄 ?꾩뿉 Existing ?곌껐 Cleanup (disconnect ?⑥닔 Used?섏? ?딆쓬 - ?뚮옒洹?由ъ뀑 諛⑹?)
+
+=== packages/backend/src/config/bullboard.ts ===
+20:         queues: [], // 珥덇린?먮뒗 鍮?諛곗뿴
+37:         // Bull Board????異붽?
+
+=== packages/backend/src/config/index.ts ===
+38:     expiresIn: process.env.JWT_EXPIRES_IN || '30d', // ?꾩떆濡?30?쇰줈 ?곗옣
+
+=== packages/backend/src/config/knex.ts ===
+80:   debug: config.database.debug, // .env??DB_DEBUG Settings?쇰줈 ?쒖뼱
+103: // Knex ?몄뒪?댁뒪 Create
+
+=== packages/backend/src/constants/cacheKeys.ts ===
+4:  * 以묒븰 吏묒쨷??Cache ??愿由?5:  * 紐⑤뱺 Cache ?ㅻ뒗 ???뚯씪?먯꽌 愿由ы븯???쇨??깃낵 ?좎?蹂댁닔?깆쓣 ?μ긽?쒗궢?덈떎.
+44:  * 寃뚯엫?붾뱶 愿??Cache ??48:    * 怨듦컻 寃뚯엫?붾뱶 紐⑸줉 (?대씪?댁뼵??API??
+49:    * - ?쒖떆 媛?ν븯怨??먭? 以묒씠 ?꾨땶 ?붾뱶??50:    * - TTL: 10遺?55:    * 愿由ъ옄??寃뚯엫?붾뱶 紐⑸줉
+56:    * - 紐⑤뱺 ?붾뱶 (?④?/?먭? ?ы븿)
+57:    * - TTL: 5遺?62:    * ?뱀젙 寃뚯엫?붾뱶 ?곸꽭 ?뺣낫
+63:    * @param id 寃뚯엫?붾뱶 ID
+68:    * ?붾뱶 ID濡?寃뚯엫?붾뱶 議고쉶
+69:    * @param worldId ?붾뱶 ID
+75:  * ?대씪?댁뼵??踰꾩쟾 愿??Cache ??79:    * 梨꾨꼸蹂??대씪?댁뼵??踰꾩쟾 ?뺣낫
+80:    * @param channel 梨꾨꼸紐?81:    * @param subChannel ?쒕툕梨꾨꼸紐?86:    * 紐⑤뱺 ?대씪?댁뼵??踰꾩쟾 紐⑸줉
+91:    * Active?붾맂 ?대씪?댁뼵??踰꾩쟾留?97:  * Used??愿??Cache ??101:    * Used???꾨줈???뺣낫
+102:    * @param userId Used??ID
+107:    * Used??沅뚰븳 ?뺣낫
+108:    * @param userId Used??ID
+113:    * Used???몄뀡 ?뺣낫
+114:    * @param sessionId ?몄뀡 ID
+120:  * ?쒓렇 愿??Cache ??124:    * 紐⑤뱺 ?쒓렇 紐⑸줉
+129:    * ?뷀떚?곕퀎 ?쒓렇 紐⑸줉
+130:    * @param entityType ?뷀떚??Type (game_world, user ??
+131:    * @param entityId ?뷀떚??ID
+137:  * ?붿씠?몃━?ㅽ듃 愿??Cache ??141:    * 紐⑤뱺 ?붿씠?몃━?ㅽ듃 ??ぉ
+146:    * Active?붾맂 ?붿씠?몃━?ㅽ듃 ??ぉ留?151:    * ?뱀젙 IP???붿씠?몃━?ㅽ듃 Status
+152:    * @param ip IP 二쇱냼
+158:  * ?먭? 愿??Cache ??162:    * ?꾩옱 ?먭? Status
+167:    * ?먭? ?쒗뵆由?紐⑸줉
+173:  * 硫붿떆吏 ?쒗뵆由?愿??Cache ??177:    * 紐⑤뱺 硫붿떆吏 ?쒗뵆由?182:    * Type蹂?硫붿떆吏 ?쒗뵆由?183:    * @param type ?쒗뵆由?Type
+189:  * Translation 愿??Cache ??193:    * ?먮Ц ?띿뒪???댁떆 + ????몄뼱蹂?Translation Results
+194:    * @param hash ?먮Ц ?띿뒪??sha256 ?댁떆
+195:    * @param lang ????몄뼱 肄붾뱶
+200:    * Detect language Results (?먮Ц ?띿뒪???댁떆 湲곕컲)
+201:    * @param hash ?먮Ц ?띿뒪??sha256 ?댁떆
+207:  * ?묒뾽(Job) 愿??Cache ??211:    * 紐⑤뱺 ?묒뾽 紐⑸줉
+216:    * ?묒뾽 Type 紐⑸줉
+221:    * ?뱀젙 ?묒뾽 ?곸꽭 ?뺣낫
+222:    * @param jobId ?묒뾽 ID
+228:  * 媛먯궗 濡쒓렇 愿??Cache ??232:    * 理쒓렐 媛먯궗 濡쒓렇 (Pagination)
+233:    * @param page ?섏씠吏 踰덊샇
+234:    * @param limit ?섏씠吏 ?ш린
+239:    * Used?먮퀎 媛먯궗 濡쒓렇
+240:    * @param userId Used??ID
+241:    * @param page ?섏씠吏 踰덊샇
+411:  * Cache ?⑦꽩 (?⑦꽩 湲곕컲 Delete??
+415:    * 紐⑤뱺 寃뚯엫?붾뱶 愿??Cache
+420:    * 紐⑤뱺 ?대씪?댁뼵??踰꾩쟾 愿??Cache
+425:    * ?뱀젙 Used??愿??紐⑤뱺 Cache
+426:    * @param userId Used??ID
+431:    * 紐⑤뱺 ?쒓렇 愿??Cache
+436:    * 紐⑤뱺 ?붿씠?몃━?ㅽ듃 愿??Cache
+441:    * 紐⑤뱺 ?먭? 愿??Cache
+446:    * 紐⑤뱺 硫붿떆吏 ?쒗뵆由?愿??Cache
+451:    * 紐⑤뱺 ?묒뾽 愿??Cache
+456:    * 紐⑤뱺 媛먯궗 濡쒓렇 愿??Cache
+461:    * 紐⑤뱺 Translation 愿??Cache
+466:    * ?뱀젙 ?섍꼍??紐⑤뱺 Cache
+467:    * @param environmentId ?섍꼍 ULID
+472:    * 紐⑤뱺 ?섍꼍???뱀젙 ?⑦꽩 Cache
+473:    * @param pattern Cache ?⑦꽩
+479:  * Cache TTL Constants (諛由ъ큹)
+483:    * 1遺?488:    * 5遺?493:    * 10遺?498:    * 30遺?503:    * 1?쒓컙
+508:    * 1??514:  * 湲곕낯 Cache Settings
+518:    * 寃뚯엫?붾뱶 怨듦컻 紐⑸줉 TTL
+523:    * ?대씪?댁뼵??踰꾩쟾 TTL
+528:    * Used???꾨줈??TTL
+533:    * ?쒓렇 紐⑸줉 TTL
+538:    * ?붿씠?몃━?ㅽ듃 TTL
+543:    * ?먭? Status TTL
+548:    * ?멸쾶???앹뾽 怨듭? TTL (Server SDK??
+553:    * ?ㅻЦ 紐⑸줉 TTL (Server SDK??
+558:    * ?ㅻЦ Settings TTL (Server SDK??
+568:    * Service 怨듭? TTL (Server SDK??- Edge)
+573:    * 諛곕꼫 TTL (Server SDK??- Edge)
+578:    * ?ㅽ넗???곹뭹 TTL (Server SDK??
+
+=== packages/backend/src/constants/headers.ts ===
+2:  * HTTP Headers ?대쫫 Constants
+3:  * 紐⑤뱺 Headers ?대쫫??以묒븰?먯꽌 愿由ы븯???섎뱶肄붾뵫??諛⑹??⑸땲??
+7:  * ?쒖? HTTP Headers
+41:    * If-None-Match Headers (ETag??
+47:  * 而ㅼ뒪? API Headers
+51:    * API ?좏겙 Headers
+56:    * ?좏뵆由ъ??댁뀡 ?대쫫 Headers
+61:    * ?섍꼍 ?대쫫 Headers (SDK??
+66:    * Used??ID Headers (Chat Server??
+81:    * ?대씪?댁뼵???곌껐 ID Headers (SDK??
+86:    * SDK 踰꾩쟾 Headers (SDK ?대쫫/踰꾩쟾)
+91:    * ?몄뀡 ID Headers (SDK??
+96:    * ?쇱쿂 而⑦뀓?ㅽ듃 Headers (JSON stringified context)
+101:    * 而⑦뀓?ㅽ듃 ?댁떆 Headers (Context optimization)
+106:    * ?대씪?댁뼵??踰꾩쟾 Headers
+111:    * ?뚮옯Form Headers
+117:  * Cache 愿??Headers
+126:    * Cache ??Headers
+132:  * 蹂댁븞 Headers
+162:  * CORS 愿??Headers
+187:  * 紐⑤뱺 Headers瑜??섎굹濡??⑹튇 媛앹껜
+198:  * Headers 媛?Constants
+202:    * Bearer ?좏겙 ?묐몢??212:    * Cache Status 媛?218:    * 蹂댁븞 Headers Default values
+227:  * CORS?먯꽌 ?덉슜??Headers 紐⑸줉
+
+=== packages/backend/src/controllers/AdminController.ts ===
+188:       // ?쒓렇 Settings
+240:       // ?쒓렇 Settings (tagIds媛 ?쒓났??寃쎌슦?먮쭔)
+244:         // ?쒓렇 ?낅뜲?댄듃 ??User info瑜??ㅼ떆 濡쒕뱶?섏뿬 理쒖떊 ?쒓렇 ?뺣낫 ?ы븿
+374:       // ?대? Authentication??寃쎌슦 Confirm
+379:       // ?대찓??Authentication Update state
+386:       // Cache ?대━??
+=== packages/backend/src/controllers/AdminInvitationController.ts ===
+14:   // Used??珥덈? Create
+16:     // ?낅젰 Validation
+27:     const { email, expirationHours = 168, autoJoinConfig } = req.body; // Default values: 168?쒓컙(7??
+38:     // ?대? Register??Used?먯씤吏 Confirm
+50:     // ?대찓?쇱씠 ?쒓났??寃쎌슦?먮쭔 Existing 珥덈? Confirm
+67:     // ??珥덈? Create
+71:     expiresAt.setTime(expiresAt.getTime() + expirationHours * 60 * 60 * 1000); // Settings???쒓컙 ??Expired
+76:       email: email || null, // ?대찓?쇱씠 ?놁쑝硫?null濡?Save
+95:     // PubSub???듯빐 紐⑤뱺 ?몄뒪?댁뒪媛 ?섏떊 ??媛곸옄 SSE濡??꾪뙆 (?먯떊 ?쒖쇅)
+104:         excludeUsers: [req.user!.id], // ?먯떊? ?쒖쇅
+109:       // Failed?대룄 珥덈? Create Response? ?뺤긽 諛섑솚
+120:   // ?꾩옱 Active 珥덈? 議고쉶
+128:         .first(); // 媛??理쒓렐??Active 珥덈? ?섎굹留?媛?몄삤湲?160:   // 珥덈? Get list
+190:   // 珥덈? Delete
+207:       // PubSub???듯빐 紐⑤뱺 ?몄뒪?댁뒪媛 ?섏떊 ??媛곸옄 SSE濡??꾪뙆 (?먯떊 ?쒖쇅)
+216:           excludeUsers: [req.user!.id], // ?먯떊? ?쒖쇅
+221:         // Failed?대룄 Response? ?뺤긽?곸쑝濡?蹂대깂
+240: // ?낅젰 Validation Middleware
+250:     .isInt({ min: 1, max: 8760 }) // 理쒖냼 1?쒓컙, 理쒕? 1??365*24)
+
+=== packages/backend/src/controllers/ChatChannelController.ts ===
+10:  * Frontend? Chat Server ?ъ씠???꾨줉????븷
+16:    * Used?먯쓽 梨꾨꼸 Get list
+29:       // Chat Server?먯꽌 Used??梨꾨꼸 Get list
+34:         data: response, // Chat Server??Response??洹몃?濡??꾨떖 (data: [], pagination: {...})
+46:    * 梨꾨꼸 Create
+69:       // ?꾩떆: Chat Server ???吏곸젒 Response (Chat Server 臾몄젣 ?닿껐 ???먮났)
+71:         id: Date.now(), // ?꾩떆 ID
+104:    * 梨꾨꼸 ?뺣낫 議고쉶
+119:       // Chat Server?먯꽌 梨꾨꼸 ?뺣낫 議고쉶
+144:    * 梨꾨꼸 硫붿떆吏 議고쉶
+160:       // Chat Server?먯꽌 梨꾨꼸 硫붿떆吏 議고쉶
+183:    * Used??Get list
+198:       // Chat Server?먯꽌 Used??Get list
+
+=== packages/backend/src/controllers/ChatSyncController.ts ===
+13:    * ?꾩옱 Used?먮? Chat Server???숆린??27:       // User info 議고쉶
+36:       // Chat Server??User info ?숆린??40:         username: user.email, // Backend User Model?먮뒗 username??None
+70:    * ?뱀젙 Used?먮? Chat Server???숆린??(Admin only)
+84:       // User info 議고쉶
+93:       // Chat Server??User info ?숆린??101:         status: 'offline', // 愿由ъ옄媛 ?숆린?뷀븯??寃쎌슦 Default values
+127:    * 紐⑤뱺 Used?먮? Chat Server???숆린??(Admin only)
+130:    * ?댁젣 ?꾨줉?쒕? ?듯빐 泥섎━?⑸땲??
+131:    * ?ㅼ젣 Request: POST /api/v1/users/sync-users
+135:       // 紐⑤뱺 Active Used??議고쉶
+149:       // Used???곗씠??蹂??162:       // ?꾨줉?쒕? ?듯빐 bulk sync Request
+185:    * Chat Server ?곌껐 Status Confirm
+210:    * Chat WebSocket ?곌껐???좏겙 諛쒓툒
+224:       // User info 議고쉶
+233:       // 癒쇱? Used?먮? Chat Server???숆린??238:           username: user.email, // email??username?쇰줈 Used
+242:           status: 'online', // Default values?쇰줈 online Settings
+251:       // Chat Server??JWT ?좏겙 Create
+256:           username: user.email, // email??username?쇰줈 Used
+260:           exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24?쒓컙
+271:             username: user.email, // email??username?쇰줈 Used
+
+=== packages/backend/src/controllers/ClientVersionController.ts ===
+64:   // ?먭? 愿???꾨뱶
+115:   // ?먭? 愿???꾨뱶
+180:   _t: Joi.string().optional(), // Cache 諛⑹?????꾩뒪?ы봽
+183: // ?대낫?닿린 ?꾩슜 ?ㅽ궎留?(limit ?쒗븳 None)
+218:   // ?먭? 愿???꾨뱶??246:   // ?먭? 愿???꾨뱶
+288:   // ?쒓렇 ?꾨뱶 異붽? - ?꾩슂???꾨뱶留?諛쏆쓬
+302:   // Used 媛?ν븳 踰꾩쟾 Get list (distinct)
+320:   // ?대씪?댁뼵??踰꾩쟾 Get list
+340:     // Filter 議곌굔 Settings
+343:       // guestModeAllowed??boolean?대?濡?false???좏슚??媛?350:         // guestModeAllowed???대? Joi?먯꽌 boolean ?먮뒗 boolean[]濡?蹂?섎맖
+351:         // ?ㅻⅨ ?꾨뱶??洹몃?濡?Used
+353:         // Type ?덉쟾?섍쾶 ?좊떦
+379:   // ?대씪?댁뼵??踰꾩쟾 Get details
+404:   // ?대씪?댁뼵??踰꾩쟾 Create
+462:   // ?대씪?댁뼵??踰꾩쟾 媛꾪렪 Create
+558:   // ?대씪?댁뼵??踰꾩쟾 Edit
+589:       createdBy: userId, // maintenanceLocales ?덈줈 Create ???꾩슂
+637:   // ?대씪?댁뼵??踰꾩쟾 Delete
+684:   // ?쇨큵 Status 蹂寃?761:   // 梨꾨꼸 Get list
+772:   // ?대씪?댁뼵??踰꾩쟾 ?쒓렇 Settings
+800:   // ?대씪?댁뼵??踰꾩쟾 ?쒓렇 議고쉶
+819:   // ?대씪?댁뼵??踰꾩쟾 ?대낫?닿린 (CSV)
+831:       // 紐⑤뱺 ?곗씠?곕? 媛?몄삤湲??꾪빐 留ㅼ슦 ??limit Used
+834:         limit: 50000, // 異⑸텇????媛?
+=== packages/backend/src/controllers/GameWorldController.ts ===
+26:   // ?먭? 愿???꾨뱶
+68:   // ?먭? 愿???꾨뱶
+173:           // OR 議곌굔: ?좏깮???쒓렇 以??섎굹?쇰룄 媛吏?寃뚯엫?붾뱶 諛섑솚
+179:           // AND 議곌굔: ?좏깮??紐⑤뱺 ?쒓렇瑜?媛吏?寃뚯엫?붾뱶留?諛섑솚
+
+=== packages/backend/src/controllers/jobController.ts ===
+26:     // Pagination 泥섎━
+30:     // page Parameters媛 ?덉쑝硫?offset 怨꾩궛
+91:     // Job Type 議댁옱 ?щ? Confirm
+99:     // Job ?대쫫 以묐났 Validation
+109:     // Used??ID 媛?몄삤湲?(Authentication???ъ슜??
+144:     // Job 議댁옱 ?щ? Confirm
+152:     // Used??ID 媛?몄삤湲?(Authentication???ъ슜??
+155:     // Job ?대쫫 以묐났 Validation (?대쫫??蹂寃쎈릺??寃쎌슦?먮쭔)
+195:     // Job 議댁옱 ?щ? Confirm
+209: // Job ?섎룞 ?ㅽ뻾 (?꾩떆 援ы쁽)
+214: // Job ?ㅽ뻾 ?대젰 議고쉶 (?꾩떆 援ы쁽)
+219: // Job ?쒓렇 Settings
+244: // Job ?쒓렇 議고쉶
+
+=== packages/backend/src/controllers/jobExecutionController.ts ===
+7: // Job ?ㅽ뻾 ?대젰 Get list
+37: // Job ?ㅽ뻾 ?대젰 Get details
+64: // Job ?ㅽ뻾 ?듦퀎 議고쉶
+
+=== packages/backend/src/controllers/jobTypeController.ts ===
+26:     // ?ㅻ쪟 諛쒖깮 ???섎뱶肄붾뵫???곗씠??諛섑솚
+
+=== packages/backend/src/controllers/LinkPreviewController.ts ===
+4: // Type? ?꾨윴?몄뿏?쒖쓽 LinkPreview? ?명솚?섎룄濡??뺤쓽
+48:   // ?곗꽑?쒖쐞: apple-touch-icon -> icon -> shortcut icon
+91:   // ?좏삎 異붿젙
+98:   // YouTube ?뱁솕 泥섎━ (?몃꽕??蹂댁옣)
+103:       // 怨좏솕吏?-> ?쒖? ?쒖쑝濡??쒕룄
+108:       // ?곗꽑 泥?踰덉㎏瑜?Used (?꾨윴?몄뿉??onError濡??먯뿰 泥섎━)
+147:         // ?쇰? ?ъ씠?멸? 403??諛섑솚?섎뒗 寃쎌슦媛 ?덉쑝誘濡? 寃???꾩슂
+179:       // 怨쇰룄??Request 諛⑹?: 理쒕? 10媛쒕줈 ?쒗븳
+
+=== packages/backend/src/controllers/MessageTemplateController.ts ===
+44:       // tags Parameters 泥섎━ (諛곗뿴濡?蹂??
+182:   // 硫붿떆吏 ?쒗뵆由??쒓렇 Settings
+206:   // 硫붿떆吏 ?쒗뵆由??쒓렇 議고쉶
+
+=== packages/backend/src/controllers/PlatformDefaultsController.ts ===
+24:    * 紐⑤뱺 ?뚮옯Form??Default values 議고쉶
+38:    * ?뱀젙 ?뚮옯Form??Default values 議고쉶
+61:    * ?뱀젙 ?뚮옯Form??Set default values
+98:    * 紐⑤뱺 ?뚮옯Form??Default values ?쇨큵 Settings
+126:    * ?뱀젙 ?뚮옯Form??Default values Delete
+
+=== packages/backend/src/controllers/PublicInvitationController.ts ===
+15:   // 珥덈? Verify token (Public API)
+27:       // 珥덈? ?뺣낫 議고쉶
+52:       // ?대? Used??珥덈??몄? Confirm
+92:   // 珥덈? ?섎씫 諛?Used??Register (Public API)
+94:     // ?낅젰 Validation
+115:       // 珥덈? ?뺣낫 議고쉶 諛?Validation
+140:       // ?대? Used??珥덈??몄? Confirm
+148:       // ?대찓?쇱씠 珥덈???吏?뺣맂 寃쎌슦 ?쇱튂?섎뒗吏 Confirm
+156:       // ?대? Register??Used?먯씤吏 Confirm
+165:       // Used?먮챸 以묐났 Confirm
+174:       // 鍮꾨?踰덊샇 ?댁떆??188:           status: 'active', // 珥덈?瑜??듯븳 媛?낆? 諛붾줈 Active??189:           emailVerified: true, // 珥덈?瑜??듯븳 媛?낆? ?대찓??Authentication ?꾨즺濡?泥섎━
+228: // 珥덈? ?섎씫 Validation 洹쒖튃
+
+=== packages/backend/src/controllers/ServerAuthController.ts ===
+35:       // User info 議고쉶
+45:       // Used?먭? Active Status?몄? Confirm
+84:   // Used??ID濡?User info 議고쉶
+
+=== packages/backend/src/controllers/ServerChatController.ts ===
+10: // 硫붾え由ъ뿉 梨꾪똿 ?쒕쾭 ?뺣낫 Save (?ㅼ젣濡쒕뒗 DB Used)
+15:   // 梨꾪똿 ?쒕쾭 Register
+28:       // ?쒕쾭 ?뺣낫 Save
+68:   // 梨꾪똿 ?쒕쾭 Register Unregister
+
+=== packages/backend/src/controllers/ServerFileController.ts ===
+79:       // Generate upload path (??????援ъ“)
+89:       // In production environment AWS S3, Google Cloud Storage ?깆쓽 presigned URL??Create
+90:       // ?ш린?쒕뒗 濡쒖뺄 ?낅줈??URL???쒕??덉씠??95:       // ?낅줈???뺣낫瑜??꾩떆 Save (?ㅼ젣濡쒕뒗 Redis??DB?????
+96:       // ?ш린?쒕뒗 硫붾え由ъ뿉 Save?섎뒗 寃껋쑝濡??쒕??덉씠??104:         expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1?쒓컙 ??Expired
+135:   // ?낅줈?쒕맂 ?뚯씪 ?뺣낫 議고쉶
+147:       // ?ㅼ젣濡쒕뒗 DB?먯꽌 ?뚯씪 ?뺣낫 議고쉶
+148:       // ?ш린?쒕뒗 ?쒕??덉씠??
+=== packages/backend/src/controllers/ServerNotificationController.ts ===
+12:   // Notification ?꾩넚
+25:       // 吏?먮릺??Notification Type Validation
+34:       // Notification ?곗씠??援ъ꽦
+48:         targetUsers: [userId], // ?뱀젙 Used?먯뿉寃뚮쭔 ?꾩넚
+51:       // PubSub???듯빐 ???몄뒪?댁뒪???꾪뙆 ??媛??몄뒪?댁뒪媛 ?먯떊??SSE ?대씪?댁뼵?몃줈 ?ъ븘??53:       const sentCount = 0; // fan-out? 鍮꾨룞湲곗쟻?쇰줈 媛??몄뒪?댁뒪?먯꽌 泥섎━??80:   // ?щ윭 Used?먯뿉寃?Notification ?꾩넚
+93:       // 理쒕? 1000紐낃퉴吏留??덉슜
+101:       // 吏?먮릺??Notification Type Validation
+110:       // Notification ?곗씠??援ъ꽦
+126:       // PubSub?쇰줈 ???몄뒪?댁뒪???꾪뙆 ??媛??몄뒪?댁뒪媛 ?먯떊??SSE ?대씪?댁뼵?몃줈 ?ъ븘??128:       const sentCount = 0; // fan-out? 鍮꾨룞湲곗쟻?쇰줈 媛??몄뒪?댁뒪?먯꽌 泥섎━??
+=== packages/backend/src/controllers/ServerUserController.ts ===
+20:   // Used??ID濡?User info 議고쉶
+56:   // ?щ윭 Used??ID濡?User info 議고쉶
+71:       // 理쒕? 100媛쒓퉴吏留??덉슜
+79:       // 紐⑤뱺 ID媛 ?レ옄?몄? Confirm
+86:       // User info 議고쉶
+106:           // 媛쒕퀎 Used??議고쉶 Failed??Ignore?섍퀬 怨꾩냽 吏꾪뻾
+121:   // Used???숆린??Query data (梨꾪똿 ?쒕쾭??
+126:       // 湲곕낯?곸쑝濡?理쒓렐 24?쒓컙 ???낅뜲?댄듃??Used??議고쉶
+133:       // ?ㅼ젣 ?곗씠?곕쿋?댁뒪?먯꽌 Used??議고쉶
+136:       // 梨꾪똿 ?쒕쾭?먯꽌 湲곕??섎뒗 ?뺤떇?쇰줈 蹂??
+=== packages/backend/src/controllers/TranslationController.ts ===
+11: // ?⑥씪 Translation Request ?ㅽ궎留?23: // ?ㅼ쨷 Translation Request ?ㅽ궎留?41: // Detect language Request ?ㅽ궎留?51:    * ?⑥씪 ?몄뼱 Translation
+75:    * ?ㅼ쨷 ?몄뼱 Translation
+
+=== packages/backend/src/controllers/UserController.ts ===
+198:     // ?쒓렇 Settings (tagIds媛 ?쒓났??寃쎌슦?먮쭔)
+204:       // ?쒓렇 ?낅뜲?댄듃 ??User info瑜??ㅼ떆 濡쒕뱶?섏뿬 理쒖떊 ?쒓렇 ?뺣낫 ?ы븿
+332:   // Used??Search (梨꾪똿 ?쒖뒪?쒖슜)
+388:     // Chat Server??User info ?숆린??(諛깃렇?쇱슫?쒖뿉???ㅽ뻾)
+403:       // Chat Server ?숆린??Failed??濡쒓렇留??④린怨?Used?먯뿉寃뚮뒗 Success Response
+414:   // ?쒓렇 愿???붾뱶?ъ씤?몃뱾
+492:   // 愿由ъ옄媛 Force verify user email
+508:   // Used?먯뿉寃??대찓??Resend verification email
+
+=== packages/backend/src/controllers/WhitelistController.ts ===
+110:   _t: Joi.string().optional(), // Cache 諛⑹?????꾩뒪?ы봽
+279:   // ?붿씠?몃━?ㅽ듃 ?쒓렇 Settings
+296:   // ?붿씠?몃━?ㅽ듃 ?쒓렇 議고쉶
+330:   // ?붿씠?몃━?ㅽ듃 ?뚯뒪??
+=== packages/backend/src/index.ts ===
+278:     // Initialize ApiTokenUsageService (QueueService Initialization ?ㅼ뿉 ?ㅽ뻾)
+357:     // Start HTTP server (WebSocket?? 筌?쑵???뺤쒔?癒?퐣 筌욊낯??筌ｌ꼶??
+
+=== packages/backend/src/middleware/auditLog.ts ===
+51:         // Resource ID 寃곗젙 (?占쎌껌?占쎌꽌 ?占쎈뒗 ?占쎈떟?占쎌꽌)
+437: // 湲곕낯 auditLog ?占쎌닔占??占쏙옙??占쎄퀬 媛쒕퀎 誘몃뱾?占쎌뼱???占쎄굅
+438: // 占??占쎌슦?占쎌뿉??auditLog占?吏곸젒 ?占쎌슜?占쎈룄占?蹂占?
+
+=== packages/backend/src/middleware/errorHandler.ts ===
+31:     //TODO 媛쒕컻 ?占쎄꼍?占쎌꽌占?callstack??異붿쟻?占쎈뒗占?
+
+=== packages/backend/src/middleware/requestLogger.ts ===
+63:   // 媛쒕컻 ?占쎄꼍?占쎌꽌占?異뷂옙? ?占쎈낫 濡쒓퉭
+65:     // Query parameters 異뷂옙?
+70:     // Request body 異뷂옙? (Content-Type??application/json??寃쎌슦占?
+92:     // 媛쒕컻 ?占쎄꼍?占쎌꽌占?response body 異뷂옙? (Content-Type??application/json??寃쎌슦占?
+98:           // Buffer占?臾몄옄?占쎈줈 蹂??          responseText = chunk.toString('utf8');
+102:           // ?占쏙옙? 媛앹껜??寃쎌슦 洹몌옙?占??占쎌슜
+106:         // 臾몄옄?占쎌씤 寃쎌슦 JSON ?占쎌떛 ?占쎈룄
+111:         // JSON ?占쎌떛 ?占쏀뙣??Ignore
+
+=== packages/backend/src/models/AccountWhitelist.ts ===
+302:           // JSON ?뚯떛 Failed ??臾몄옄?댁쓣 諛곗뿴濡?蹂??304:           // ?쇳몴濡?援щ텇??臾몄옄?댁쓣 諛곗뿴濡?蹂??358:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+
+=== packages/backend/src/models/ClientVersion.ts ===
+87:   // Used 媛?ν븳 踰꾩쟾 Get list (distinct)
+111:       // 湲곕낯 Query 鍮뚮뜑 with environment filter
+118:       // Filter ?곸슜 ?⑥닔
+154:             // TINYINT Type?대?濡?boolean???レ옄濡?蹂??(true -> 1, false -> 0)
+160:         // ?쒓렇 Filter留?- support both any_of and include_all
+165:             // AND 議곌굔: 紐⑤뱺 ?쒓렇瑜??ы븿?댁빞 ??177:             // OR 議곌굔: ?쒓렇 以??섎굹?쇰룄 ?ы븿?섎㈃ ??220:       // 蹂묐젹 ?ㅽ뻾
+225:       // 媛??대씪?댁뼵??踰꾩쟾??????쒓렇 ?뺣낫 濡쒕뱶
+267:       // ?쒓렇 ?뺣낫 濡쒕뱶
+270:       // ?먭? 硫붿떆吏 Locale ?뺣낫 濡쒕뱶
+292:         // tags? maintenanceLocales ?꾨뱶??蹂꾨룄 ?뚯씠釉붿뿉??愿由ы븯誘濡??쒓굅
+305:         // ?먭? 硫붿떆吏 Locale 泥섎━
+331:         // tags? maintenanceLocales ?꾨뱶??蹂꾨룄 ?뚯씠釉붿뿉??愿由ы븯誘濡??쒓굅
+342:         // ?먭? 硫붿떆吏 Locale 泥섎━
+347:           // ??Locale 異붽?
+380:   // 異붽? 硫붿꽌?쒕뱾
+388:       // 癒쇱? 紐⑤뱺 ?곗씠?곕? ?쎌엯
+391:           // tags ?꾨뱶??蹂꾨룄 ?뚯씠釉붿뿉??愿由ы븯誘濡??쒓굅
+407:       // ?몃옖??뀡 ?꾨즺 ??Create??Query data
+415:           // 湲곕낯 媛앹껜?쇰룄 諛섑솚?섏뿬 null 諛⑹?
+435:       // ?먭? 愿???꾨뱶??異붽?
+457:       // ?몄뼱蹂?硫붿떆吏 泥섎━
+459:         // Existing ?몄뼱蹂?硫붿떆吏 Delete
+462:         // New ?몄뼱蹂?硫붿떆吏 異붽?
+532:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+542:         // Existing ?쒓렇 ?좊떦 Delete
+552:         // ???쒓렇 ?좊떦 異붽?
+
+=== packages/backend/src/models/GameWorld.ts ===
+133:     // ?먭? 硫붿떆吏 Locale ?뺣낫 濡쒕뱶
+225:       // 媛?寃뚯엫?붾뱶?????maintenanceLocales 異붽?
+268:         // maintenanceLocales ?꾨뱶??蹂꾨룄 ?뚯씠釉붿뿉??愿由ы븯誘濡??쒓굅
+291:         // ?좎쭨 ?꾨뱶?ㅼ쓣 MySQL DATETIME ?뺤떇?쇰줈 蹂??303:         // ?먭? 硫붿떆吏 Locale 泥섎━
+339:         // maintenanceLocales ?꾨뱶??蹂꾨룄 ?뚯씠釉붿뿉??愿由ы븯誘濡??쒓굅
+346:             // customPayload, infraSettings??JSON 臾몄옄?대줈 蹂??355:         // ?좎쭨 ?꾨뱶?ㅼ쓣 MySQL DATETIME ?뺤떇?쇰줈 蹂??372:         // ?먭? 硫붿떆吏 Locale 泥섎━
+377:           // ??Locale 異붽?
+
+=== packages/backend/src/models/IpWhitelist.ts ===
+61:       // 湲곕낯 Query 鍮뚮뜑 with environment filter
+68:       // Filter ?곸슜 ?⑥닔
+70:         // 湲곕낯 議곌굔: Expired?섏? ?딆? ??ぉ留?106:       // 蹂묐젹 ?ㅽ뻾
+186:   // ??留ㅽ븨 ?⑥닔
+204:   // 異붽? 硫붿꽌?쒕뱾
+217:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+221:         // Existing ?쒓렇 ?좊떦 Delete
+227:         // ???쒓렇 ?좊떦 異붽?
+
+=== packages/backend/src/models/Job.ts ===
+43: // JSON ?뚯떛 Utility ?⑥닔
+45:   // ?대? 媛앹껜??寃쎌슦 洹몃?濡?諛섑솚
+50:   // null?대굹 undefined??寃쎌슦 鍮?媛앹껜 諛섑솚
+55:   // 臾몄옄?댁씤 寃쎌슦 JSON ?뚯떛 ?쒕룄
+69:   // 湲고? Type??寃쎌슦 洹몃?濡?諛섑솚
+73: // JSON 臾몄옄?댄솕 Utility ?⑥닔
+76:     // ?대? 臾몄옄?댁씤 寃쎌슦, JSON?몄? Confirm
+79:       return data; // ?대? ?좏슚??JSON 臾몄옄??81:       // ?좏슚?섏? ?딆? JSON?대㈃ ?ㅼ떆 stringify
+96:       // 湲곕낯 Query 鍮뚮뜑 with environment filter
+104:       // Filter ?곸슜 ?⑥닔
+128:       // Data Query - ?쒓렇 ?뺣낫 ?ы븿
+143:       // 蹂묐젹 ?ㅽ뻾
+148:       // Job Results 留ㅽ븨
+168:       // 媛?Job??????쒓렇 ?뺣낫 議고쉶
+183:         // Job蹂꾨줈 ?쒓렇 洹몃９??197:         // Job???쒓렇 ?뺣낫 異붽?
+231:       // ?쒓렇 ?뺣낫 議고쉶
+280:       // ?쒓렇 ?곌껐
+318:       // ?쒓렇 ?낅뜲?댄듃
+320:         // Existing ?쒓렇 ?곌껐 Delete
+323:         // ???쒓렇 ?곌껐 異붽?
+347:       // ?쒓렇 ?좊떦 Delete
+361:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+365:         // Existing ?쒓렇 ?좊떦 Delete
+368:         // ???쒓렇 ?좊떦 異붽?
+
+=== packages/backend/src/models/JobType.ts ===
+41:   // ?덉쟾??JSON ?뚯떛 硫붿꽌??45:     // ?대? 媛앹껜??寃쎌슦 洹몃?濡?諛섑솚
+50:     // 臾몄옄?댁씤 寃쎌슦 JSON ?뚯떛 ?쒕룄
+
+=== packages/backend/src/models/MessageTemplate.ts ===
+51:       // ?뚯뒪?? ?뚯씠釉붿뿉 ?곗씠?곌? ?덈뒗吏 Confirm
+58:       // 湲곕낯 Query 鍮뚮뜑 with environment filter
+65:       // Filter ?곸슜 ?⑥닔
+107:         // ?쒓렇 Filter 泥섎━
+112:             // OR 議곌굔: ?좏깮???쒓렇 以??섎굹?쇰룄 媛吏??쒗뵆由?諛섑솚
+121:             // AND 議곌굔: ?좏깮??紐⑤뱺 ?쒓렇瑜?媛吏??쒗뵆由용쭔 諛섑솚
+147:       // 蹂묐젹 ?ㅽ뻾
+152:       // 媛?硫붿떆吏 ?쒗뵆由우뿉 ?쒓렇 ?뺣낫? locales ?뺣낫 異붽?
+200:       // locales ?뺣낫 異붽?
+220:         // 硫붿떆吏 ?쒗뵆由?Create
+242:         // ?몄뼱蹂?硫붿떆吏 泥섎━
+260:           // 吏곸젒 ID? 湲곕낯 ?뺣낫瑜?諛섑솚
+287:         // 硫붿떆吏 ?쒗뵆由??낅뜲?댄듃
+302:         // Existing ?몄뼱蹂?硫붿떆吏 Delete
+305:         // New ?몄뼱蹂?硫붿떆吏 異붽?
+337:   // 異붽? 硫붿꽌?쒕뱾
+353:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+357:         // Existing ?쒓렇 ?좊떦 Delete
+363:         // ???쒓렇 ?좊떦 異붽?
+
+=== packages/backend/src/models/TagAssignment.ts ===
+29:           createdBy: createdBy || '', // Default values?쇰줈 1 Used (?쒖뒪???ъ슜??
+
+=== packages/backend/src/models/User.ts ===
+58:         // ?쒓렇 ?뺣낫 濡쒕뱶
+393:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+424:         // Existing ?쒓렇 ?좊떦 Delete
+427:         // ???쒓렇 ?좊떦 異붽?
+540:         .where('status', 'active') // Active Used?먮쭔 ?숆린??
+=== packages/backend/src/routes/admin/clientVersionRoutes.ts ===
+8: // 紐⑤뱺 ?占쎌슦?占쎌뿉 ?占쎌쬆 誘몃뱾?占쎌뼱 ?占쎌슜
+13: // 硫뷂옙??占쎌씠???占쎌슦??(/:id蹂대떎 癒쇽옙? ?占쎌쓽?占쎌빞 ??
+14: // ?占쎈옯??Get list (愿由ъ옄占?
+17: // ?占쎌슜 媛?占쏀븳 踰꾩쟾 Get list (愿由ъ옄占?
+23: // ?占쎈씪?占쎌뼵??踰꾩쟾 Get list (愿由ъ옄占?
+26: // ?占쎈씪?占쎌뼵??踰꾩쟾 ?占쎈낫?占쎄린 (愿由ъ옄占?
+29: // ?占쎄큵 ?占쏀깭 蹂占?(愿由ъ옄占?
+32: // ?占쎈씪?占쎌뼵??踰꾩쟾 ?占쎌꽭 議고쉶 (愿由ъ옄占?
+35: // ?占쎈씪?占쎌뼵??踰꾩쟾 ?占쎌꽦 (愿由ъ옄占?
+49: // ?占쎈씪?占쎌뼵??踰꾩쟾 媛꾪렪 ?占쎌꽦 (愿由ъ옄占?
+62: // ?占쎈씪?占쎌뼵??踰꾩쟾 ?占쎌젙 (愿由ъ옄占?
+76: // ?占쎈씪?占쎌뼵??踰꾩쟾 ??占쏙옙 (愿由ъ옄占?
+89: // ?占쎄렇 愿???占쎌슦??(愿由ъ옄占?
+
+=== packages/backend/src/routes/admin/gameWorlds.ts ===
+24:  *     description: 愿由ъ옄 沅뚰븳?쇰줈 寃뚯엫?붾뱶瑜?議고쉶/Create/Edit/Delete?섎뒗 ?붾뱶?ъ씤?몄엯?덈떎.
+28:  *       summary: 寃뚯엫?붾뱶 Get list
+36:  *           description: worldId, name, description, tags ?꾨뱶?????遺遺??쇱튂 Search??40:  *           description: ?몄텧 ?щ?濡?Filter留?44:  *           description: ?먭? ?щ?濡?Filter留?48:  *           description: ?쇳몴(,) 援щ텇 ?쒓렇 臾몄옄?? 紐⑤뱺 ?쒓렇瑜??ы븿?섎뒗 ??ぉ留?諛섑솚?⑸땲??
+52:  *           description: ?쇳몴(,) 援щ텇???쒓렇 ID 紐⑸줉. ?쒕쾭媛 媛???ぉ???쒓렇瑜?議고쉶????Filter留곹빀?덈떎.
+59:  *           description: any_of(OR) ?먮뒗 include_all(AND) 諛⑹떇?쇰줈 tagIds Filter瑜??곸슜?⑸땲??
+80:  *                   summary: 湲곕낯 ?덉떆
+95:  *           description: Authentication ?꾩슂
+97:  *       summary: 寃뚯엫?붾뱶 Create
+155:  *           description: worldId 以묐났 ?깆쑝濡??명븳 異⑸룎
+158:  *       summary: ID濡?寃뚯엫?붾뱶 議고쉶
+169:  *           description: 議고쉶 Success
+183:  *           description: Does not exist 由ъ냼??186:  *       summary: 寃뚯엫?붾뱶 Edit
+241:  *           description: Does not exist 由ъ냼??243:  *       summary: 寃뚯엫?붾뱶 Delete
+260:  *           description: Does not exist 由ъ냼??263:  *       summary: ?몄텧 ?щ? ?좉?
+274:  *           description: ?좉? Success
+277:  *       summary: ?먭? ?щ? ?좉?
+288:  *           description: ?좉? Success
+291:  *       summary: 寃뚯엫?붾뱶 Cache 臾댄슚??297:  *           description: Cache 臾댄슚??Success
+
+=== packages/backend/src/routes/admin/ipWhitelist.ts ===
+74: // bulk delete 疫꿸퀡????닌뗭겱??? ??놁벉
+
+=== packages/backend/src/routes/admin/jobs.ts ===
+24: // 紐⑤뱺 Route??Authentication 諛?Admin permission required
+38:     // Job Create ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?앸왂
+81: // ?쒕쾭蹂?Route???쒓굅??82: // Job ?쒓렇 愿由?Route
+95: // Job Executions Route (援ъ껜?곸씤 ?쇱슦?몃? 癒쇱? ?뺤쓽)
+
+=== packages/backend/src/routes/admin/messageTemplates.ts ===
+16:     // 筌롫뗄?놅쭪? ??쀫탣????밴쉐 ??뽯퓠??ID揶쎛 ?袁⑹춦 ??곸몵沃샕嚥?getResourceId ??볤탢
+54: // ??볥젃 ?온????깆뒭??(?온?귐딆쁽筌?
+
+=== packages/backend/src/routes/admin/tags.ts ===
+15:     // ??볥젃 ??밴쉐 ??뽯퓠??ID揶쎛 ?袁⑹춦 ??곸몵沃샕嚥?getResourceId ??볤탢
+
+=== packages/backend/src/routes/admin/whitelist.ts ===
+18:     // ?占쎌씠?占쎈━?占쏀듃 ?占쎌꽦 ?占쎌뿉??ID媛 ?占쎌쭅 ?占쎌쑝誘占?getResourceId ?占쎄굅
+71: // ?占쎌씠?占쎈━?占쏀듃 ?占쎌뒪???占쎌슦??router.post('/test', WhitelistController.testWhitelist);
+73: // ?占쎄렇 愿???占쎌슦??(愿由ъ옄占?
+
+=== packages/backend/src/routes/analytics.ts ===
+9: // Event Lens ?쒕쾭 URL
+
+=== packages/backend/src/routes/chat/index.ts ===
+25: // 梨꾪똿?쒕쾭 Settings
+28: // Backend -> Chat Server ?뱀닔 ?좏겙 Used (?곗씠?곕쿋?댁뒪?먯꽌 媛?몄삤吏 ?딅뒗 誘몃━ ?쎌냽??媛?
+34: // 紐⑤뱺 梨꾪똿 Route??Authentication ?꾩슂 (?붾쾭源?濡쒓퉭 異붽?)
+45: // Chat Server ?곌껐 ?뚯뒪???붾뱶?ъ씤??(Authentication ?놁씠 ?묎렐 媛??
+72: // 諛깆뿏???꾩슜 ?붾뱶?ъ씤??(?꾨줉???꾩뿉 泥섎━)
+75: // ?섎㉧吏 紐⑤뱺 梨꾪똿 Request? ?꾨줉?쒕줈 泥섎━
+76: // - /sync-user, /sync-users, /channels/*, /users, /invitations/* ??78: // ?꾨줉?쒕줈 ?꾨떖??Request?ㅼ쓣 ?꾪븳 濡쒓퉭 Middleware
+80:   // ?대? 泥섎━??Route?ㅼ? ?ㅽ궢
+103:     // ?꾨줉???꾨떖 ?щ? Confirm???꾪븳 濡쒓렇
+110: // ?꾨줉??Settings (?곌껐 ?꾩닔 諛⑹?)
+114:   timeout: 10000, // ??꾩븘???⑥텞
+117:   // Path ?ъ옉?? /chat/* ??/*
+122:   // ?곌껐 ? Settings (?곌껐 ?꾩닔 諛⑹?)
+123:   agent: false, // ?곌껐 ?촗sed 鍮껦ctive??124:   keepAlive: false, // Keep-Alive 鍮껦ctive??126:   // Headers ?꾨떖 Settings
+130:     // Backend -> Chat Server ?뱀닔 ?좏겙 異붽? (媛??以묒슂!)
+134:     // User info Headers 異붽? (Chat Server?먯꽌 Used)
+145:       // Used???숆린?붾뒗 諛깃렇?쇱슫?쒖뿉??鍮꾨룞湲곕줈 泥섎━ (Request??Non-blocking)
+148:       // ?뵇 User info ?붾쾭源?179:     // POST body Edit (以묒슂!)
+183:   // ?먮윭 ?몃뱾留?201: // ?꾩떆 ?뚯뒪?? 媛꾨떒???꾨줉??Middleware
+207:     // 梨꾪똿?쒕쾭濡?吏곸젒 Request
+210:     // URL 留ㅽ븨: /sync-user -> /users/upsert (Chat Server Controller??留욎땄)
+220:     // Used???숆린??Request??寃쎌슦 User info 異붽?
+225:       // DB?먯꽌 理쒖떊 User info 議고쉶 (avatarUrl ?ы븿)
+
+=== packages/backend/src/routes/public/invitations.ts ===
+9: // GET /api/v1/invitations/validate/:token - 珥덈? Verify token (Public API)
+12: // POST /api/v1/invitations/accept/:token - 珥덈? ?섎씫 諛?Used??Register (Public API)
+
+=== packages/backend/src/routes/server/index.ts ===
+75: router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT Verify token (API Token 遺덊븘??
+
+=== packages/backend/src/routes/users.ts ===
+129:  *                 name: "?띻만??
+156: // 紐⑤뱺 Route??Authentication Middleware ?곸슜
+159: // Used??Search (梨꾪똿 ?쒖뒪?쒖슜)
+166: // ?꾩옱 User info 議고쉶
+173: // ?꾩옱 User info ?낅뜲?댄듃
+
+=== packages/backend/src/scripts/executeSql.ts ===
+28:         multipleStatements: true, // SQL ?뚯씪?먯꽌 ?щ윭 臾몄옣 ?ㅽ뻾 ?덉슜
+66:     // SQL ?댁슜???몃?肄쒕줎?쇰줈 遺꾨━?섏뿬 媛쒕퀎 臾몄옣?쇰줈 ?ㅽ뻾
+90:         continue; // 鍮?臾몄옣 嫄대꼫?곌린
+106:               // SELECT Query Results 異쒕젰
+124:         // ?먮윭媛 諛쒖깮?대룄 怨꾩냽 吏꾪뻾 (?듭뀡?쇰줈 以묐떒???섎룄 ?덉쓬)
+138:     // SQL 臾몄옣???몃?肄쒕줎?쇰줈 遺꾨━?섎릺, Remove comments and empty lines
+146:       // 鍮?以꾩씠??二쇱꽍 以?嫄대꼫?곌린
+151:       // 以???二쇱꽍 ?쒓굅
+157:       // ?몃?肄쒕줎?쇰줈 ?앸굹硫?臾몄옣 ?꾨즺
+167:     // 留덉?留?臾몄옣???몃?肄쒕줎 ?놁씠 ?앸궃 寃쎌슦
+180:   // 紐낅졊???몄닔 ?뚯떛
+273: // ?ㅽ겕由쏀듃媛 吏곸젒 ?ㅽ뻾???뚮쭔 main ?⑥닔 ?몄텧
+
+=== packages/backend/src/services/AuthService.ts ===
+201:       // OAuth Used?먮뱾? 鍮꾨?踰덊샇 蹂寃?遺덇?
+213:         // local Used?먯씤??passwordHash媛 ?녿뒗 寃쎌슦 (?곗씠??遺덉씪移?
+243:       // 1. 蹂댁븞 由ъ뀑 ?좏겙 Create
+246:       const expiresAt = new Date(Date.now() + 3600000); // 1?쒓컙 ??Expired
+248:       // 2. ?곗씠?곕쿋?댁뒪??Save token
+256:       // 3. ?대찓??諛쒖넚
+259:       // QueueService瑜??듯빐 ?대찓??諛쒖넚 (鍮꾨룞湲?
+
+=== packages/backend/src/services/BaiduOAuth.ts ===
+52:    * Authorization Code濡?Access Token ?띾뱷
+82:    * Access Token?쇰줈 User info ?띾뱷
+106:    * ?꾩껜 OAuth ?뚮줈??泥섎━
+
+=== packages/backend/src/services/ChatServerService.ts ===
+28:     // Settings?먯꽌 API ?좏겙 媛?몄삤湲?39:         'X-API-Token': this.serviceToken, // Backend -> Chat Server ?뱀닔 ?좏겙 Used
+43:     // Response ?명꽣?됲꽣濡?Error handling
+66:    * API ?좏겙???대? Headers??Settings?섏뼱 ?덉쑝誘濡?異붽? Authentication 遺덊븘??70:    * User info瑜?Chat Server???숆린??92:    * Used?먭? Chat Server???숆린?붾릺???덈뒗吏 Confirm?섍퀬, ?놁쑝硫??숆린??96:       // 癒쇱? Used?먭? 議댁옱?섎뒗吏 Confirm
+100:         // Used?먭? ?대? 議댁옱?섎㈃ ?숆린???ㅽ궢
+104:       // Confirm Failed?섎㈃ ?숆린???쒕룄
+108:     // Used?먭? ?녾굅??Confirm Failed??寃쎌슦 ?숆린??113:    * ?щ윭 Used?먮? ??踰덉뿉 ?숆린??(媛쒖꽑??bulk 泥섎━)
+145:    * Used??Update state
+168:    * Used??Delete
+188:    * Chat WebSocket ?좏겙 Create
+208:    * Used??梨꾨꼸 Get list
+212:       // Chat Server??/api/v1/channels/my ?붾뱶?ъ씤??Used
+213:       // Used??ID瑜?Headers濡??꾨떖
+224:       // Chat Server??Return response structure as-is (data: [], pagination: {...})
+233:    * 梨꾨꼸 Create
+256:    * 梨꾨꼸 ?뺣낫 議고쉶
+274:    * 梨꾨꼸 硫붿떆吏 議고쉶
+300:    * Chat Server ?곌껐 Status Confirm
+312:    * Used??Get list
+
+=== packages/backend/src/services/ClientVersionService.ts ===
+59:   // ?먭? 愿???꾨뱶??121:   // Used 媛?ν븳 踰꾩쟾 Get list (distinct)
+181:     // Search 議곌굔 援ъ꽦
+228:     // ?좎쭨 Filter 援ы쁽
+261:     // ?꾩껜 Search - 媛꾨떒??援ы쁽
+263:       // Search?닿? ?덉쑝硫??ㅻⅨ Filter??Ignore?섍퀬 寃?됰쭔 ?섑뻾
+265:       // ?щ윭 ?꾨뱶?먯꽌 Search?섎뒗 濡쒖쭅? Model?먯꽌 泥섎━
+373:     // 以묐났 泥댄겕
+391:     // 諛쏆? ?곗씠?곕? 媛??뚮옯Form蹂꾨줈 ?대씪?댁뼵??踰꾩쟾 諛곗뿴濡?蹂??411:     // ?쒓렇媛 ?덈뒗 寃쎌슦 媛?Create??Set tags for client versions
+413:       const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id); // null/undefined ?쒓굅
+416:         // 媛?Create??Set tags for client versions
+423:               // ?쒓렇 Settings Failed???꾩껜 ?묒뾽??以묐떒?섏? ?딆쓬
+
+=== packages/backend/src/services/EmailService.ts ===
+38:       // SendGrid Settings Confirm (?곗꽑?쒖쐞 1)
+46:       // SMTP Settings Confirm (?곗꽑?쒖쐞 2)
+62:       // Settings???녿뒗 寃쎌슦 肄섏넄 異쒕젰 (媛쒕컻??
+158:     // 媛쒕컻 ?섍꼍?먯꽌??肄섏넄???대찓???댁슜 異쒕젰
+170:     return true; // 媛쒕컻 ?섍꼍?먯꽌??Success?쇰줈 泥섎━
+
+=== packages/backend/src/services/IpWhitelistService.ts ===
+17: // CIDR 留ㅼ묶 ?⑥닔
+19:   // ?⑥닚 IP 二쇱냼??寃쎌슦 (CIDR ?쒓린媛 ?꾨땶 寃쎌슦)
+28:     // IPv4 二쇱냼瑜?32鍮꾪듃 Convert to integer
+395:         // CIDR 留ㅼ묶 濡쒖쭅 援ы쁽
+
+=== packages/backend/src/services/jobs/HttpRequestJob.ts ===
+30:         validateStatus: validateStatus || ((status) => status < 500), // 5xx ?먮윭留?Failed濡?泥섎━
+33:       // Request 蹂몃Ц Settings
+39:           // JSON Request??寃쎌슦 Content-Type Settings
+70:       // HTTP Request ?ㅽ뻾
+109:       // Axios ?먮윭??寃쎌슦 Response ?뺣낫???ы븿
+
+=== packages/backend/src/services/jobs/JobFactory.ts ===
+5: // Job ?ㅽ뻾 Results Interface
+13: // Job ?ㅽ뻾 而⑦뀓?ㅽ듃
+25: // 湲곕낯 Job Interface
+108: // Job ?ㅽ뻾湲?
+=== packages/backend/src/services/jobs/LogMessageJob.ts ===
+27:       // ?좏슚??濡쒓렇 ?덈꺼 Validation
+35:       // 濡쒓렇 硫뷀??곗씠??援ъ꽦
+43:       // Used???뺤쓽 硫뷀??곗씠??異붽?
+48:       // 濡쒓렇 ?덈꺼???곕씪 濡쒓렇 湲곕줉
+
+=== packages/backend/src/services/jobs/MailSendJob.ts ===
+15:       // 硫붿씪 ?꾩넚 Settings (Get from environment variables)
+26:       // 硫붿씪 ?듭뀡 援ъ꽦
+51:       // 硫붿씪 ?꾩넚
+
+=== packages/backend/src/services/jobs/SshCommandJob.ts ===
+29:         // ?곌껐 Settings
+37:         // Authentication 諛⑸쾿 Settings
+46:         // ??꾩븘??Settings
+126:         // SSH ?곌껐 ?쒖옉
+
+=== packages/backend/src/services/PasswordResetService.ts ===
+33:       // Used??Confirm
+41:         // Register?섏? ?딆? ?대찓?쇱뿉 ????ㅻ쪟 諛섑솚
+48:       // authType??local???꾨땶 寃쎌슦 鍮꾨?踰덊샇 由ъ뀑 遺덇?
+56:       // Existing 誘퇥sed ?좏겙?ㅼ쓣 Expired?쒗궡
+62:       // ??由ъ뀑 ?좏겙 Create (32諛붿씠???쒕뜡 臾몄옄??
+64:       const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1?쒓컙 ??Expired
+66:       // ?좏겙???곗씠?곕쿋?댁뒪??Save
+73:       // ?대찓??諛쒖넚
+152:       // ??鍮꾨?踰덊샇 ?댁떆
+155:       // ?몃옖??뀡?쇰줈 鍮꾨?踰덊샇 ?낅뜲?댄듃 諛??좏겙 Used 泥섎━
+157:         // 鍮꾨?踰덊샇 ?낅뜲?댄듃
+162:         // ?좏겙??Used?⑥쑝濡??쒖떆
+167:         // ?대떦 Used?먯쓽 ?ㅻⅨ Mark all tokens as used
+
+=== packages/backend/src/services/PlatformDefaultsService.ts ===
+19:    * 紐⑤뱺 ?뚮옯Form??Default values 議고쉶
+35:    * ?뱀젙 ?뚮옯Form??Default values 議고쉶
+51:    * ?뚮옯Form蹂?Set default values
+76:    * 紐⑤뱺 ?뚮옯Form??Default values ?쇨큵 Settings
+98:    * ?뱀젙 ?뚮옯Form??Default values Delete
+122:    * ?대씪?댁뼵??踰꾩쟾 ?곗씠?곗뿉 Default values ?곸슜
+
+=== packages/backend/src/services/QueueService.ts ===
+449:       // ?대찓??諛쒖넚 濡쒖쭅 援ы쁽
+452:       // 媛쒕컻 ?섍꼍?먯꽌??Ethereal Email Used
+
+=== packages/backend/src/services/sseNotificationService.ts ===
+144:       // SSE ?쒖? ?뺤떇: data: {JSON}\n\n
+
+=== packages/backend/src/services/TranslationService.ts ===
+26:    * 臾대즺 援ш? Translation API瑜?Used?섏뿬 ?띿뒪??踰덉뿭
+36:       // Cache 議고쉶 (?낅젰 Based on original text hash)
+58:       // Language code mapping (援ш? Translation API ?뺤떇?쇰줈)
+70:       // 癒쇱? Detect language
+77:       // ?뚯뒪 ?몄뼱? ?寃??몄뼱媛 媛숈? 寃쎌슦?먮쭔 ?먮낯 諛섑솚 (?뺥솗???쇱튂?섎뒗 寃쎌슦留?
+93:       // 援ш? Translation API ?몄텧 (臾대즺 踰꾩쟾)
+113:       // Response ?뚯떛
+146:       // Translation Failed ???먮낯 ?띿뒪??諛섑솚
+156:    * ?щ윭 ?몄뼱濡??숈떆 Translation
+202:       // Cache 議고쉶
+217:         q: base, // 泥섏쓬 100?먮쭔 Used
+
+=== packages/backend/src/services/userService.ts ===
+205:       // ?뱀씤 ?대찓??諛쒖넚
+213:         // ?대찓??諛쒖넚 Failed??濡쒓렇留??④린怨??꾩껜 ?꾨줈?몄뒪??怨꾩냽 吏꾪뻾
+263:   // ?쒓렇 愿??硫붿꽌?쒕뱾
+327:   // 愿由ъ옄媛 Force verify user email
+353:   // Used?먯뿉寃??대찓??Resend verification email
+365:       // ?대찓??Authentication 硫붿씪 諛쒖넚 (?꾩옱???곗뺨 ?대찓?쇰줈 ?泥?
+
+=== packages/backend/src/services/UserTagService.ts ===
+8:   // Used???쒓렇 議고쉶
+18:   // Used???쒓렇 Settings (Existing ?쒓렇 All 援먯껜)
+37:   // Used?먯뿉寃??쒓렇 異붽?
+56:   // Used?먯뿉???쒓렇 ?쒓굅
+
+=== packages/backend/src/services/WeChatOAuth.ts ===
+45:    * Authorization Code濡?Access Token ?띾뱷
+70:    * Access Token?쇰줈 User info ?띾뱷
+94:    * ?꾩껜 OAuth ?뚮줈??泥섎━
+
+=== packages/backend/src/utils/AppInstance.ts ===
+20:  * ???몄뒪?댁뒪 ?뺣낫瑜?愿由ы븯???깃????대옒??21:  * 諛깆뿏???쒖옉 ??Create?섏뼱 ?쒖뒪???꾩뿭?먯꽌 Used?⑸땲??
+52:    * ?깃????몄뒪?댁뒪 諛섑솚
+62:    * ?몄뒪?댁뒪 ID 諛섑솚
+69:    * ?꾩껜 ?몄뒪?댁뒪 ?뺣낫 諛섑솚 (uptime ?낅뜲?댄듃)
+79:    * ?몄뒪?댁뒪 ?뺣낫瑜?濡쒓렇 ?뺥깭濡?諛섑솚
+94:    * ?몄뒪?댁뒪 ?붿빟 ?뺣낫 諛섑솚 (吏㏃? ?뺥깭)
+101:    * ?ъ뒪泥댄겕???뺣낫 諛섑솚
+117: // ?꾩뿭?먯꽌 ?쎄쾶 ?묎렐?????덈룄濡?export
+120: // ?몄쓽 ?⑥닔??
+=== packages/backend/src/utils/dateUtils.ts ===
+4:  * 紐⑤뱺 ?좎쭨??UTC濡?Save?섎ŉ, MySQL DATETIME ?뺤떇?쇰줈 蹂?섎맗?덈떎.
+12:  * ISO 8601 ?좎쭨 臾몄옄?댁쓣 MySQL DATETIME ?뺤떇(UTC)?쇰줈 蹂??14:  * @param dateValue - ISO 8601 ?뺤떇???좎쭨 臾몄옄???먮뒗 Date 媛앹껜
+15:  * @returns MySQL DATETIME format string (YYYY-MM-DD HH:MM:SS) ?먮뒗 null
+19:  * convertToMySQLDateTime("2025-09-15T15:00:00+09:00") // "2025-09-15 06:00:00" (UTC濡?蹂??
+30:     // ?좏슚???좎쭨?몄? Confirm
+36:     // UTC time?쇰줈 MySQL DATETIME ?뺤떇 蹂?? YYYY-MM-DD HH:MM:SS
+45:  * ?꾩옱 ?쒓컙??MySQL DATETIME ?뺤떇(UTC)?쇰줈 諛섑솚
+47:  * @returns ?꾩옱 UTC time??MySQL DATETIME format string
+57:  * 媛앹껜???좎쭨 ?꾨뱶?ㅼ쓣 MySQL DATETIME ?뺤떇?쇰줈 蹂??59:  * @param data - 蹂?섑븷 ?곗씠??媛앹껜
+61:  * @returns ?좎쭨 ?꾨뱶媛 蹂?섎맂 New 媛앹껜
+95:  * ?쇰컲?곸씤 ?뷀떚???좎쭨 ?꾨뱶??107:  * MySQL?먯꽌 諛섑솚??DATETIME??Convert to ISO 8601 format (for frontend)
+110:  * @returns ISO 8601 ?뺤떇 臾몄옄???먮뒗 null
+153:     // MySQL DATETIME? UTC濡?Save?섏뼱 ?덉쑝誘濡?'Z'add to indicate UTC
+170:  * 媛앹껜???좎쭨 ?꾨뱶?ㅼ쓣 MySQL DATETIME?먯꽌 ISO 8601 ?뺤떇?쇰줈 蹂??(?꾨줎?몄뿏??Response??
+172:  * @param data - 蹂?섑븷 ?곗씠??媛앹껜
+174:  * @returns ?좎쭨 ?꾨뱶媛 蹂?섎맂 New 媛앹껜
+192:  * ??꾩〈 ?뺣낫
+203:  * MySQL DATETIME 臾몄옄?댁쓣 吏?뺣맂 ??꾩〈?쇰줈 蹂??220:     // MySQL DATETIME? UTC濡?Save?섎?濡?'Z'瑜?遺숈뿬??UTC濡??뚯떛
+256:  * ?곗씠?곕쿋?댁뒪 For settings verification ?⑥닔
+
+=== packages/backend/src/utils/dbTimezoneCheck.ts ===
+23:     // Node.js ?쒓컙 Confirm
+
+=== packages/backend/src/utils/enhancedAuditLog.ts ===
+74:         // Resource ID 寃곗젙 (Request?먯꽌 ?먮뒗 Response?먯꽌)
+
+
+TOTAL: 126 files, 1687 lines with Korean comments

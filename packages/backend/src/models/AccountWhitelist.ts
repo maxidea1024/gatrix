@@ -299,7 +299,7 @@ export class WhitelistModel {
         try {
           tags = JSON.parse(row.tags);
         } catch (error) {
-          // JSON 파싱 실패 시 문자열을 배열로 변환
+          // JSON 파싱 Failed 시 문자열을 배열로 변환
           logger.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
           // 쉼표로 구분된 문자열을 배열로 변환
           tags = row.tags

@@ -6,7 +6,7 @@ import {
   PersonAdd as PersonAddIcon,
   SentimentSatisfiedAlt as AddReactionIcon,
 } from '@mui/icons-material';
-// React Chat Elements는 더 이상 사용하지 않음 (슬랙 스타일로 직접 구현)
+// React Chat Elements는 더 이상 Used하지 않음 (슬랙 스타일로 직접 구현)
 import moment from 'moment-timezone';
 import { getStoredTimezone } from '../../utils/dateFormat';
 import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
@@ -18,7 +18,7 @@ import EmojiPicker from './EmojiPicker';
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
-// 마크다운 스타일링을 위한 타입 정의
+// 마크다운 스타일링을 위한 Type 정의
 interface MessagePart {
   type: 'text' | 'code' | 'codeBlock' | 'bold' | 'italic' | 'strikethrough' | 'underline' | 'link';
   content: string;
@@ -41,7 +41,7 @@ const parseMarkdown = (text: string): MessagePart[] => {
     { type: 'underline' as const, regex: /__([^_]+)__/g },
   ];
 
-  // 모든 매치를 찾아서 위치와 함께 저장
+  // 모든 매치를 찾아서 위치와 함께 Save
   const matches: Array<{
     type: MessagePart['type'];
     content: string;
@@ -63,7 +63,7 @@ const parseMarkdown = (text: string): MessagePart[] => {
     }
   });
 
-  // 위치순으로 정렬
+  // 위치순으로 Sorting
   matches.sort((a, b) => a.start - b.start);
 
   // 겹치는 매치 제거 (먼저 나온 것 우선)
@@ -324,7 +324,7 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
   );
 };
 
-// 동적 스타일 생성 함수
+// 동적 스타일 Create 함수
 const createCustomStyles = (isDark: boolean) => `
   .rce-mbox-text {
     color: ${isDark ? '#e8eaed' : '#000000'} !important;
@@ -452,7 +452,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   }, [state.messages, channelId]);
   const typingUsers = state.typingUsers[channelId] || [];
 
-  // 테마에 따른 색상 정의
+  // Theme에 따른 색상 정의
   const colors = {
     chatBackground: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
     inputBackground: theme.palette.mode === 'dark' ? '#2a2d3a' : '#f8f9fa',
@@ -509,7 +509,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       const messageContainer = messagesContainerRef.current;
       if (!messageContainer) return;
 
-      // 이미지, 비디오, iframe 등의 미디어 요소들 찾기
+      // Images, Videos, iframe 등의 미디어 요소들 찾기
       const mediaElements = messageContainer.querySelectorAll(
         'img, video, iframe, [data-link-preview="container"], [data-link-preview="loaded"], [data-link-preview="loading"]'
       );
@@ -550,7 +550,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             const iframe = element as HTMLIFrameElement;
             iframe.addEventListener('load', handleMediaLoad, { once: true });
             iframe.addEventListener('error', handleMediaLoad, { once: true });
-            // iframe의 경우 타임아웃도 설정
+            // iframe의 경우 타임아웃도 Settings
             setTimeout(handleMediaLoad, 1000);
           } else {
             // 기타 요소들 (링크 프리뷰 등)
@@ -579,12 +579,12 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         return;
       }
 
-      // 기존 타임아웃 취소
+      // Existing 타임아웃 Cancel
       if (markAsReadTimeoutRef.current) {
         clearTimeout(markAsReadTimeoutRef.current);
       }
 
-      // 새로운 타임아웃 설정 (3초 후 읽음 처리)
+      // New 타임아웃 Settings (3초 후 읽음 처리)
       markAsReadTimeoutRef.current = setTimeout(() => {
         // 창이 포커스되어 있고, 스크롤이 하단 근처에 있을 때만 읽음 처리
         const messageContainer = messagesContainerRef.current;
@@ -610,7 +610,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     };
   }, [messages, channelId, actions]);
 
-  // 콘텐츠 높이 변화 시에도 하단 유지 (하단에 있었던 경우) - ref 직접 사용으로 깜빡임 방지
+  // 콘텐츠 높이 변화 시에도 하단 유지 (하단에 있었던 경우) - ref 직접 Used으로 깜빡임 방지
   useEffect(() => {
     const el = messagesContainerRef.current;
     if (!el) return;
@@ -634,7 +634,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       resizeObserverRef.current = null;
     };
   }, []);
-  // 새 메시지가 DOM에 반영된 직후 스크롤 처리 (내 메시지는 즉시, 다른 사용자 메시지는 하단에 있을 때만)
+  // 새 메시지가 DOM에 반영된 직후 스크롤 처리 (내 메시지는 즉시, 다른 Used자 메시지는 하단에 있을 때만)
   useLayoutEffect(() => {
     if (messages.length === 0) return;
 
@@ -649,7 +649,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       // 내가 보낸 메시지는 즉시 하단으로 스크롤
       container.scrollTop = container.scrollHeight;
     } else {
-      // 다른 사용자 메시지는 하단에 있을 때만 자동 스크롤
+      // 다른 Used자 메시지는 하단에 있을 때만 자동 스크롤
       const { scrollTop, scrollHeight, clientHeight } = container;
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
@@ -660,17 +660,17 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     }
   }, [messages.length, state.user?.id]);
 
-  // 채널 변경 시 하단으로 스크롤 및 읽음 상태 초기화 - 깜빡임 방지를 위해 지연 제거
+  // 채널 변경 시 하단으로 스크롤 및 읽음 Status Initialization - 깜빡임 방지를 위해 지연 제거
   useEffect(() => {
     if (currentChannel) {
-      // 읽음 상태 초기화
+      // 읽음 Status Initialization
       lastReadMessageIdRef.current = null;
       if (markAsReadTimeoutRef.current) {
         clearTimeout(markAsReadTimeoutRef.current);
         markAsReadTimeoutRef.current = null;
       }
 
-      // 즉시 스크롤하여 깜빡임 방지 - ref 직접 사용으로 성능 개선
+      // 즉시 스크롤하여 깜빡임 방지 - ref 직접 Used으로 성능 개선
       requestAnimationFrame(() => {
         const messageContainer = messagesContainerRef.current;
         if (messageContainer) {
@@ -703,12 +703,12 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     wasAtBottomRef.current = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
   }, []);
 
-  // 테마 변경 시 스타일 업데이트
+  // Theme 변경 시 스타일 업데이트
   useEffect(() => {
     const isDark = theme.palette.mode === 'dark';
     const customStyles = createCustomStyles(isDark);
 
-    // 기존 스타일 제거
+    // Existing 스타일 제거
     const existingStyle = document.getElementById('chat-custom-styles');
     if (existingStyle) {
       existingStyle.remove();
@@ -738,7 +738,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     const messageTime = moment(timestamp).tz(userTimezone);
     const diffInSeconds = now.diff(messageTime, 'seconds');
 
-    const currentLanguage = i18n.language || 'ko'; // 기본값을 한국어로 설정
+    const currentLanguage = i18n.language || 'ko'; // Default values을 한국어로 Settings
 
     if (currentLanguage === 'ko') {
       if (diffInSeconds < 60) {
@@ -753,7 +753,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         const days = Math.floor(diffInSeconds / 86400);
         return `${days}일 전`;
       } else {
-        // 1주일 이상이면 날짜 표시 (사용자 타임존 적용)
+        // 1주일 이상이면 날짜 표시 (Used자 타임존 적용)
         return messageTime.format('M월 D일');
       }
     } else if (currentLanguage === 'zh') {
@@ -772,7 +772,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         return messageTime.format('M月D日');
       }
     } else {
-      // 영어 (기본값)
+      // 영어 (Default values)
       if (diffInSeconds < 60) {
         return 'just now';
       } else if (diffInSeconds < 3600) {
@@ -795,13 +795,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     const userName = user?.username || user?.name || `User${userId}`;
     return {
       name: userName,
-      avatarUrl: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl 필드만 사용
+      avatarUrl: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl 필드만 Used
     };
   };
 
   // 슬랙 스타일 메시지 렌더링을 위해 직접 JSX에서 처리
 
-  // 헤더 컴포넌트들을 항상 메모화 (조건부 hooks 방지)
+  // Headers 컴포넌트들을 항상 메모화 (조건부 hooks 방지)
   const EmptyStateHeader = React.useMemo(
     () => (
       <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
@@ -843,7 +843,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     [currentChannel?.name, currentChannel?.description, t, onInviteUser]
   );
 
-  // 메인 헤더 컴포넌트도 항상 메모화
+  // 메인 Headers 컴포넌트도 항상 메모화
   const ChatHeader = React.useMemo(
     () => (
       <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
@@ -885,11 +885,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     [currentChannel?.name, currentChannel?.memberCount, t, onInviteUser]
   );
 
-  // 깜빡임 방지를 위해 로딩 상태 체크 제거
+  // 깜빡임 방지를 위해 Loading state 체크 제거
   if (messages.length === 0) {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Header - 메모화된 컴포넌트 사용 */}
+        {/* Header - 메모화된 컴포넌트 Used */}
         {EmptyStateHeader}
 
         {/* Empty state */}
@@ -976,7 +976,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header - 메모화된 컴포넌트 사용 */}
+      {/* Header - 메모화된 컴포넌트 Used */}
       {ChatHeader}
 
       {/* Messages - Slack Style */}
@@ -1134,7 +1134,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       userSelect: 'text', // 텍스트 선택 허용
                       cursor: 'text', // 텍스트 커서 표시
                     }}
-                    onClick={(e) => e.stopPropagation()} // 클릭 이벤트 전파 방지
+                    onClick={(e) => e.stopPropagation()} // 클릭 Event 전파 방지
                   >
                     <MessageWithPreview content={message.content} theme={theme} />
                   </Typography>
@@ -1352,8 +1352,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                         px: 1, // 좌우 패딩만 유지
                         py: 0.5, // 상하 패딩 줄임 (1 → 0.5)
                         borderRadius: 0,
-                        border: '1px solid transparent', // 기본 상태에서는 투명한 테두리
-                        backgroundColor: 'transparent', // 기본 상태에서는 투명한 배경
+                        border: '1px solid transparent', // 기본 Status에서는 투명한 테두리
+                        backgroundColor: 'transparent', // 기본 Status에서는 투명한 배경
                         position: 'relative',
                         '&:hover': {
                           border: `1px solid ${theme.palette.primary.main}20`,
@@ -1388,7 +1388,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
                         {/* 시간/스레드 보기 텍스트 컨테이너 - 같은 위치에서 전환 */}
                         <Box sx={{ position: 'relative' }}>
-                          {/* 마지막 댓글 시간 (기본 상태) */}
+                          {/* 마지막 댓글 시간 (기본 Status) */}
                           {message.lastThreadMessageAt && (
                             <Typography
                               variant="caption"
@@ -1403,7 +1403,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                             </Typography>
                           )}
 
-                          {/* 스레드 보기 텍스트 (호버 상태) - 시간 텍스트와 같은 위치 */}
+                          {/* 스레드 보기 텍스트 (호버 Status) - 시간 텍스트와 같은 위치 */}
                           <Typography
                             variant="caption"
                             className="thread-view-text"

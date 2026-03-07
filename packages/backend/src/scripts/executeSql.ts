@@ -103,7 +103,7 @@ class SqlExecutor {
           if (Array.isArray(results) && results.length > 0) {
             if (options.verbose) {
               logger.info(`✅ Executed successfully. Rows returned: ${results.length}`);
-              // SELECT 쿼리 결과 출력
+              // SELECT Query Results 출력
               if (statement.trim().toUpperCase().startsWith('SELECT')) {
                 console.table(results);
               }
@@ -135,7 +135,7 @@ class SqlExecutor {
   }
 
   private splitSqlStatements(sqlContent: string): string[] {
-    // SQL 문장을 세미콜론으로 분리하되, 주석과 빈 줄을 제거
+    // SQL 문장을 세미콜론으로 분리하되, Remove comments and empty lines
     const statements: string[] = [];
     const lines = sqlContent.split('\n');
     let currentStatement = '';

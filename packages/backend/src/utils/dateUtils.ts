@@ -1,7 +1,7 @@
 /**
- * 날짜 변환 유틸리티
+ * Date conversion Utility
  *
- * 모든 날짜는 UTC로 저장되며, MySQL DATETIME 형식으로 변환됩니다.
+ * 모든 날짜는 UTC로 Save되며, MySQL DATETIME 형식으로 변환됩니다.
  */
 
 import { createLogger } from '../config/logger';
@@ -12,7 +12,7 @@ const logger = createLogger('dateUtils');
  * ISO 8601 날짜 문자열을 MySQL DATETIME 형식(UTC)으로 변환
  *
  * @param dateValue - ISO 8601 형식의 날짜 문자열 또는 Date 객체
- * @returns MySQL DATETIME 형식 문자열 (YYYY-MM-DD HH:MM:SS) 또는 null
+ * @returns MySQL DATETIME format string (YYYY-MM-DD HH:MM:SS) 또는 null
  *
  * @example
  * convertToMySQLDateTime("2025-09-15T15:00:00.000Z") // "2025-09-15 15:00:00"
@@ -27,13 +27,13 @@ export function convertToMySQLDateTime(dateValue: string | Date | null | undefin
   try {
     const date = new Date(dateValue);
 
-    // 유효한 날짜인지 확인
+    // 유효한 날짜인지 Confirm
     if (isNaN(date.getTime())) {
       logger.warn(`Invalid date value: ${dateValue}`);
       return null;
     }
 
-    // UTC 시간으로 MySQL DATETIME 형식 변환: YYYY-MM-DD HH:MM:SS
+    // UTC time으로 MySQL DATETIME 형식 변환: YYYY-MM-DD HH:MM:SS
     return date.toISOString().slice(0, 19).replace('T', ' ');
   } catch (error) {
     logger.error(`Error converting date: ${dateValue}`, error);
@@ -44,7 +44,7 @@ export function convertToMySQLDateTime(dateValue: string | Date | null | undefin
 /**
  * 현재 시간을 MySQL DATETIME 형식(UTC)으로 반환
  *
- * @returns 현재 UTC 시간의 MySQL DATETIME 형식 문자열
+ * @returns 현재 UTC time의 MySQL DATETIME format string
  *
  * @example
  * getCurrentMySQLDateTime() // "2025-09-23 05:30:15"
@@ -57,8 +57,8 @@ export function getCurrentMySQLDateTime(): string {
  * 객체의 날짜 필드들을 MySQL DATETIME 형식으로 변환
  *
  * @param data - 변환할 데이터 객체
- * @param dateFields - 변환할 날짜 필드명 배열
- * @returns 날짜 필드가 변환된 새로운 객체
+ * @param dateFields - Array of date field names to convert
+ * @returns 날짜 필드가 변환된 New 객체
  *
  * @example
  * const userData = {
@@ -104,9 +104,9 @@ export const COMMON_DATE_FIELDS = {
 } as const;
 
 /**
- * MySQL에서 반환된 DATETIME을 ISO 8601 형식으로 변환 (프론트엔드용)
+ * MySQL에서 반환된 DATETIME을 Convert to ISO 8601 format (for frontend)
  *
- * @param mysqlDateTime - MySQL DATETIME 형식 문자열 또는 Date 객체
+ * @param mysqlDateTime - MySQL DATETIME format string or Date object
  * @returns ISO 8601 형식 문자열 또는 null
  *
  * @example
@@ -150,7 +150,7 @@ export function convertFromMySQLDateTime(
       return mysqlDateTime;
     }
 
-    // MySQL DATETIME은 UTC로 저장되어 있으므로 'Z'를 추가하여 UTC임을 명시
+    // MySQL DATETIME은 UTC로 Save되어 있으므로 'Z'add to indicate UTC
     const isoString = mysqlDateTime.replace(' ', 'T') + '.000Z';
     const date = new Date(isoString);
 
@@ -167,11 +167,11 @@ export function convertFromMySQLDateTime(
 }
 
 /**
- * 객체의 날짜 필드들을 MySQL DATETIME에서 ISO 8601 형식으로 변환 (프론트엔드 응답용)
+ * 객체의 날짜 필드들을 MySQL DATETIME에서 ISO 8601 형식으로 변환 (프론트엔드 Response용)
  *
  * @param data - 변환할 데이터 객체
- * @param dateFields - 변환할 날짜 필드명 배열
- * @returns 날짜 필드가 변환된 새로운 객체
+ * @param dateFields - Array of date field names to convert
+ * @returns 날짜 필드가 변환된 New 객체
  */
 export function convertDateFieldsFromMySQL<T extends Record<string, any>>(
   data: T,
@@ -202,9 +202,9 @@ export const TIMEZONE = {
 /**
  * MySQL DATETIME 문자열을 지정된 타임존으로 변환
  *
- * @param mysqlDateTimeStr - MySQL DATETIME 형식 문자열 (YYYY-MM-DD HH:MM:SS)
- * @param timezone - 변환할 타임존 (기본값: Asia/Seoul)
- * @returns 타임존이 적용된 포맷된 날짜 문자열 (YYYY-MM-DD HH:MM:SS)
+ * @param mysqlDateTimeStr - MySQL DATETIME format string (YYYY-MM-DD HH:MM:SS)
+ * @param timezone - Timezone to convert to (Default values: Asia/Seoul)
+ * @returns Formatted date string with timezone applied (YYYY-MM-DD HH:MM:SS)
  *
  * @example
  * convertMySQLDateTimeToTimezone("2025-10-30 08:30:00", "Asia/Seoul") // "2025-10-30 17:30:00"
@@ -217,7 +217,7 @@ export function convertMySQLDateTimeToTimezone(
   if (!mysqlDateTimeStr) return null;
 
   try {
-    // MySQL DATETIME은 UTC로 저장되므로 'Z'를 붙여서 UTC로 파싱
+    // MySQL DATETIME은 UTC로 Save되므로 'Z'를 붙여서 UTC로 파싱
     const date = new Date(mysqlDateTimeStr + 'Z');
 
     if (isNaN(date.getTime())) {
@@ -225,7 +225,7 @@ export function convertMySQLDateTimeToTimezone(
       return null;
     }
 
-    // 지정된 타임존으로 포맷
+    // Format with specified timezone
     const formatter = new Intl.DateTimeFormat('sv-SE', {
       timeZone: timezone,
       year: 'numeric',
@@ -253,9 +253,9 @@ export function convertMySQLDateTimeToTimezone(
 }
 
 /**
- * 데이터베이스 설정 확인용 함수
+ * 데이터베이스 For settings verification 함수
  *
- * @returns 현재 시간 정보 객체
+ * @returns Current time info object
  */
 export function getTimeInfo() {
   const now = new Date();

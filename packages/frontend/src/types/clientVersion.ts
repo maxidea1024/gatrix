@@ -1,4 +1,4 @@
-// 클라이언트 상태 enum
+// 클라이언트 Status enum
 export enum ClientStatus {
   ONLINE = 'ONLINE',
   OFFLINE = 'OFFLINE',
@@ -9,7 +9,7 @@ export enum ClientStatus {
   MAINTENANCE = 'MAINTENANCE',
 }
 
-// 클라이언트 상태 라벨 매핑
+// 클라이언트 Status 라벨 매핑
 export const ClientStatusLabels: Record<ClientStatus, string> = {
   [ClientStatus.ONLINE]: 'clientVersions.status.online',
   [ClientStatus.OFFLINE]: 'clientVersions.status.offline',
@@ -20,7 +20,7 @@ export const ClientStatusLabels: Record<ClientStatus, string> = {
   [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
 };
 
-// 클라이언트 상태 색상 매핑
+// 클라이언트 Status 색상 매핑
 export const ClientStatusColors: Record<
   ClientStatus,
   'success' | 'error' | 'warning' | 'info' | 'default'
@@ -34,7 +34,7 @@ export const ClientStatusColors: Record<
   [ClientStatus.MAINTENANCE]: 'warning',
 };
 
-// 클라이언트 버전 인터페이스
+// 클라이언트 버전 Interface
 export interface ClientVersionMaintenanceLocale {
   lang: 'ko' | 'en' | 'zh';
   message: string;
@@ -69,7 +69,7 @@ export interface ClientVersion {
   updatedByEmail?: string;
 }
 
-// 클라이언트 버전 생성/수정 데이터
+// 클라이언트 버전 Create/Edit 데이터
 export interface ClientVersionFormData {
   platform: string;
   clientVersion: string;
@@ -90,7 +90,7 @@ export interface ClientVersionFormData {
   tags?: { id: number; name: string; color: string }[];
 }
 
-// 간편 추가를 위한 플랫폼별 설정
+// 간편 추가를 위한 플랫Form별 Settings
 export interface PlatformSpecificSettings {
   platform: string;
   gameServerAddress: string;
@@ -99,7 +99,7 @@ export interface PlatformSpecificSettings {
   patchAddressForWhiteList?: string;
 }
 
-// 간편 추가 폼 데이터
+// 간편 추가 Form 데이터
 export interface BulkCreateFormData {
   clientVersion: string;
   clientStatus: ClientStatus;
@@ -116,7 +116,7 @@ export interface BulkCreateFormData {
   tags?: { id: number; name: string; color: string }[];
 }
 
-// 클라이언트 버전 필터
+// 클라이언트 버전 Filter
 export interface ClientVersionFilters {
   version?: string | string[];
   platform?: string | string[];
@@ -141,7 +141,7 @@ export interface ClientVersionFilters {
   tagsOperator?: 'any_of' | 'include_all';
 }
 
-// 클라이언트 버전 정렬 옵션
+// 클라이언트 버전 Sorting 옵션
 export type ClientVersionSortField =
   | 'id'
   | 'platform'
@@ -152,7 +152,7 @@ export type ClientVersionSortField =
 
 export type SortOrder = 'ASC' | 'DESC';
 
-// 클라이언트 버전 목록 응답
+// 클라이언트 버전 목록 Response
 export interface ClientVersionListResponse {
   clientVersions: ClientVersion[];
   total: number;
@@ -161,7 +161,7 @@ export interface ClientVersionListResponse {
   totalPages: number;
 }
 
-// 일괄 상태 변경 요청
+// 일괄 Status 변경 Request
 export interface BulkStatusUpdateRequest {
   ids: number[];
   clientStatus: ClientStatus;
@@ -174,7 +174,7 @@ export interface BulkStatusUpdateRequest {
   messageTemplateId?: number;
 }
 
-// 페이지네이션 설정
+// Pagination Settings
 export interface ClientVersionPagination {
   page: number;
   limit: number;
@@ -192,7 +192,7 @@ export interface ClientVersionTableColumn {
   format?: (value: any, row: ClientVersion) => React.ReactNode;
 }
 
-// 폼 필드 정의
+// Form 필드 정의
 export interface ClientVersionFormField {
   name: keyof ClientVersionFormData;
   label: string;
@@ -209,7 +209,7 @@ export interface ClientVersionFormField {
   };
 }
 
-// API 응답 타입
+// API Response Type
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -217,7 +217,7 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-// 메타데이터 응답
+// 메타데이터 Response
 export interface ClientVersionMetadata {
   platforms: string[];
 }
@@ -229,14 +229,14 @@ export const CLIENT_VERSION_STORAGE_KEYS = {
   SORT: 'clientVersionSort',
 } as const;
 
-// 기본값
+// Default values
 export const CLIENT_VERSION_DEFAULTS = {
   PAGE_SIZE: 10,
   SORT_BY: 'createdAt' as ClientVersionSortField,
   SORT_ORDER: 'DESC' as SortOrder,
 } as const;
 
-// 폼 유효성 검사 규칙
+// Form Validation 규칙
 export const CLIENT_VERSION_VALIDATION = {
   PLATFORM: {
     MIN_LENGTH: 1,

@@ -45,7 +45,7 @@ const PRESET_COLORS = [
   '#000000',
 ];
 
-// 랜덤 색상 생성
+// 랜덤 색상 Create
 const generateRandomColor = () =>
   `#${Math.floor(Math.random() * 0xffffff)
     .toString(16)

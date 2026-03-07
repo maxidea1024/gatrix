@@ -185,7 +185,7 @@ export class AdminController {
 
       let user = await UserService.createUser(userData);
 
-      // 태그 설정
+      // 태그 Settings
       if (tagIds && tagIds.length > 0) {
         await UserTagService.setUserTags(user.id, tagIds, req.user.userId);
       }
@@ -237,11 +237,11 @@ export class AdminController {
       }
       let user = await UserService.updateUser(userId, updates);
 
-      // 태그 설정 (tagIds가 제공된 경우에만)
+      // 태그 Settings (tagIds가 제공된 경우에만)
       if (tagIds !== undefined) {
         await UserTagService.setUserTags(userId, tagIds, req.user.userId);
 
-        // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+        // 태그 업데이트 후 User info를 다시 로드하여 최신 태그 정보 포함
         user = await UserService.getUserById(userId);
       }
 
@@ -365,25 +365,25 @@ export class AdminController {
         throw new GatrixError('Invalid user ID', 400);
       }
 
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await db('g_users').where('id', userId).first();
       if (!user) {
         throw new GatrixError('User not found', 404);
       }
 
-      // 이미 인증된 경우 확인
+      // 이미 Authentication된 경우 Confirm
       if (user.emailVerified) {
         throw new GatrixError('Email is already verified', 400);
       }
 
-      // 이메일 인증 상태 업데이트
+      // 이메일 Authentication Update state
       await db('g_users').where('id', userId).update({
         emailVerified: 1,
         emailVerifiedAt: new Date(),
         updatedAt: new Date(),
       });
 
-      // 캐시 클리어
+      // Cache 클리어
       clearAllCache();
 
       res.json({

@@ -10,7 +10,7 @@ const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.pn
 
 export class ChatSyncController {
   /**
-   * 현재 사용자를 Chat Server에 동기화
+   * 현재 Used자를 Chat Server에 동기화
    * POST /api/v1/chat/sync-user
    */
   static async syncCurrentUser(req: AuthenticatedRequest, res: Response) {
@@ -24,7 +24,7 @@ export class ChatSyncController {
         });
       }
 
-      // 사용자 정보 조회
+      // User info 조회
       const user = await UserModel.findById(userId);
       if (!user) {
         return res.status(404).json({
@@ -33,11 +33,11 @@ export class ChatSyncController {
         });
       }
 
-      // Chat Server에 사용자 정보 동기화
+      // Chat Server에 User info 동기화
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUser({
         id: user.id,
-        username: user.email, // Backend User 모델에는 username이 없음
+        username: user.email, // Backend User Model에는 username이 None
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
@@ -67,7 +67,7 @@ export class ChatSyncController {
   }
 
   /**
-   * 특정 사용자를 Chat Server에 동기화 (관리자 전용)
+   * 특정 Used자를 Chat Server에 동기화 (Admin only)
    * POST /api/v1/chat/sync-user/:userId
    */
   static async syncUser(req: AuthenticatedRequest, res: Response) {
@@ -81,7 +81,7 @@ export class ChatSyncController {
         });
       }
 
-      // 사용자 정보 조회
+      // User info 조회
       const user = await UserModel.findById(targetUserId);
       if (!user) {
         return res.status(404).json({
@@ -90,7 +90,7 @@ export class ChatSyncController {
         });
       }
 
-      // Chat Server에 사용자 정보 동기화
+      // Chat Server에 User info 동기화
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUser({
         id: user.id,
@@ -98,7 +98,7 @@ export class ChatSyncController {
         name: user.name || user.email,
         email: user.email,
         avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
-        status: 'offline', // 관리자가 동기화하는 경우 기본값
+        status: 'offline', // 관리자가 동기화하는 경우 Default values
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
         updatedAt: user.updatedAt?.toISOString(),
@@ -124,15 +124,15 @@ export class ChatSyncController {
   }
 
   /**
-   * 모든 사용자를 Chat Server에 동기화 (관리자 전용)
+   * 모든 Used자를 Chat Server에 동기화 (Admin only)
    * POST /api/v1/chat/sync-all-users
    *
    * 이제 프록시를 통해 처리됩니다.
-   * 실제 요청: POST /api/v1/users/sync-users
+   * 실제 Request: POST /api/v1/users/sync-users
    */
   static async syncAllUsers(req: AuthenticatedRequest, res: Response) {
     try {
-      // 모든 활성 사용자 조회
+      // 모든 Active Used자 조회
       const result = await UserModel.findAll(1, 1000, { status: 'active' });
       const users = result.users;
 
@@ -146,7 +146,7 @@ export class ChatSyncController {
         });
       }
 
-      // 사용자 데이터 변환
+      // Used자 데이터 변환
       const userData = users.map((user) => ({
         id: user.id,
         username: user.email,
@@ -159,7 +159,7 @@ export class ChatSyncController {
         updatedAt: user.updatedAt?.toISOString(),
       }));
 
-      // 프록시를 통해 bulk sync 요청
+      // 프록시를 통해 bulk sync Request
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUsers(userData);
 
@@ -182,7 +182,7 @@ export class ChatSyncController {
   }
 
   /**
-   * Chat Server 연결 상태 확인
+   * Chat Server 연결 Status Confirm
    * GET /api/v1/chat/health
    */
   static async healthCheck(req: Request, res: Response) {
@@ -221,7 +221,7 @@ export class ChatSyncController {
         });
       }
 
-      // 사용자 정보 조회
+      // User info 조회
       const user = await UserModel.findById(userId);
       if (!user) {
         return res.status(404).json({
@@ -230,16 +230,16 @@ export class ChatSyncController {
         });
       }
 
-      // 먼저 사용자를 Chat Server에 동기화
+      // 먼저 Used자를 Chat Server에 동기화
       try {
         const chatServerService = ChatServerService.getInstance();
         await chatServerService.syncUser({
           id: user.id,
-          username: user.email, // email을 username으로 사용
+          username: user.email, // email을 username으로 Used
           name: user.name,
           email: user.email,
           avatarUrl: user.avatarUrl || undefined,
-          status: 'online', // 기본값으로 online 설정
+          status: 'online', // Default values으로 online Settings
         });
       } catch (syncError) {
         logger.warn(
@@ -248,12 +248,12 @@ export class ChatSyncController {
         );
       }
 
-      // Chat Server용 JWT 토큰 생성
+      // Chat Server용 JWT 토큰 Create
       const jwt = require('jsonwebtoken');
       const chatToken = jwt.sign(
         {
           userId: user.id,
-          username: user.email, // email을 username으로 사용
+          username: user.email, // email을 username으로 Used
           name: user.name,
           email: user.email,
           iat: Math.floor(Date.now() / 1000),
@@ -268,7 +268,7 @@ export class ChatSyncController {
           token: chatToken,
           user: {
             id: user.id,
-            username: user.email, // email을 username으로 사용
+            username: user.email, // email을 username으로 Used
             name: user.name,
             email: user.email,
           },

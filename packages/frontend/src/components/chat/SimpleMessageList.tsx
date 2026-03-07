@@ -45,7 +45,7 @@ const SimpleMessageList: React.FC<MessageListProps> = ({ channelId, onSendMessag
       const messageContainer = messagesEndRef.current?.parentElement;
       if (!messageContainer) return;
 
-      // 이미지, 비디오, iframe 등의 미디어 요소들 찾기
+      // Images, Videos, iframe 등의 미디어 요소들 찾기
       const mediaElements = messageContainer.querySelectorAll(
         'img, video, iframe, [data-link-preview="container"], [data-link-preview="loaded"], [data-link-preview="loading"]'
       );

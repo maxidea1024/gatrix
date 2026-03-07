@@ -65,7 +65,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set<number>());
   const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(new Set<number>());
 
-  // 검색 입력창 ref
+  // Search 입력창 ref
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // 채널 멤버 조회
@@ -127,7 +127,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   };
 
-  // 검색 API 호출
+  // Search API 호출
   const searchUsers = async (query: string) => {
     if (query.length < 2) {
       setSearchResults([]);
@@ -143,7 +143,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       console.log('User search response:', response); // 디버깅용
 
       if (response.success && response.data) {
-        // API 응답 구조에 따라 적절히 처리
+        // API Response 구조에 따라 적절히 처리
         let users: User[] = [];
 
         if (Array.isArray(response.data)) {
@@ -158,7 +158,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           return;
         }
 
-        // 제외할 사용자들 필터링
+        // 제외할 Used자들 Filter링
         const filteredUsers = users.filter((user: User) => !excludeUserIds.includes(user.id));
         setSearchResults(filteredUsers);
       } else {
@@ -177,7 +177,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   };
 
-  // 디바운스된 검색 함수 (300ms 지연)
+  // 디바운스된 Search 함수 (300ms 지연)
   const debouncedSearch = useCallback(
     debounce((query: string) => {
       if (query.trim().length >= 2) {
@@ -187,13 +187,13 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     [excludeUserIds]
   );
 
-  // 검색어 변경 시 디바운스된 검색 실행
+  // Search어 변경 시 디바운스된 검색 실행
   useEffect(() => {
     if (searchQuery.trim().length >= 2) {
-      // 최소 2글자 이상일 때만 검색
+      // 최소 2글자 이상일 때만 Search
       debouncedSearch(searchQuery.trim());
     } else {
-      // 검색어가 짧으면 결과 초기화
+      // Search어가 짧으면 Results Initialization
       setSearchResults([]);
       debouncedSearch.cancel();
     }
@@ -203,7 +203,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     };
   }, [searchQuery, debouncedSearch]);
 
-  // 다이얼로그 열릴 때 채널 멤버 및 pending invitation 조회
+  // Dialog 열릴 때 채널 멤버 및 pending invitation 조회
   useEffect(() => {
     if (open && channelId) {
       fetchChannelMembers();
@@ -211,10 +211,10 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   }, [open, channelId]);
 
-  // 다이얼로그가 열릴 때 검색 입력창에 포커스
+  // Dialog가 열릴 때 Search 입력창에 포커스
   useEffect(() => {
     if (open) {
-      // 다이얼로그 애니메이션이 완료된 후 포커스 설정
+      // Dialog 애니메이션이 완료된 후 포커스 Settings
       const timer = setTimeout(() => {
         if (searchInputRef.current) {
           searchInputRef.current.focus();
@@ -225,7 +225,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   }, [open]);
 
-  // 다이얼로그 닫힐 때 상태 초기화
+  // Dialog 닫힐 때 Status Initialization
   useEffect(() => {
     if (!open) {
       setSearchQuery('');
@@ -236,20 +236,20 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   }, [open]);
 
-  // 사용자 초대 처리
+  // Used자 초대 처리
   const handleInviteUser = async (userId: number) => {
     setInvitingUsers((prev) => new Set<number>(prev).add(userId));
 
     try {
       await onInviteUser(userId);
 
-      // 초대 성공 시 pending invitation 목록에 추가
+      // 초대 Success 시 pending invitation 목록에 추가
       setPendingInvitedUsers((prev) => new Set(prev).add(userId));
 
-      // 먼저 다이얼로그를 닫고 토스트를 표시 (backdrop에 가려지지 않도록)
+      // 먼저 Dialog를 닫고 토스트를 표시 (backdrop에 가려지지 않도록)
       onClose();
 
-      // 다이얼로그가 닫힌 후 토스트 표시
+      // Dialog가 닫힌 후 토스트 표시
       setTimeout(() => {
         enqueueSnackbar(t('chat.invitationSent'), { variant: 'success' });
       }, 100);
@@ -263,13 +263,13 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       switch (errorCode) {
         case ErrorCodes.CHANNEL_MEMBER_EXISTS:
         case ErrorCodes.ALREADY_MEMBER:
-          // 이미 멤버인 경우 - 멤버 목록 새로고침
+          // 이미 멤버인 경우 - 멤버 목록 Refresh
           await fetchChannelMembers();
           enqueueSnackbar(t('chat.alreadyMember'), { variant: 'info' });
           break;
         case ErrorCodes.INVITATION_PENDING:
         case ErrorCodes.ALREADY_INVITED:
-          // 이미 초대된 경우 - pending invitation 목록 새로고침
+          // 이미 초대된 경우 - pending invitation 목록 Refresh
           await fetchPendingInvitations();
           enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });
           break;
@@ -320,11 +320,11 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
 
       <DialogContent
         sx={{
-          minHeight: 350, // 최소 높이 설정으로 안정화
+          minHeight: 350, // 최소 높이 Settings으로 안정화
           display: 'flex',
           flexDirection: 'column',
           paddingTop: 3, // 윗부분 패딩 증가로 테두리 잘림 방지
-          overflow: 'visible', // overflow 설정으로 테두리 표시 보장
+          overflow: 'visible', // overflow Settings으로 테두리 표시 보장
         }}
       >
         <TextField
@@ -353,7 +353,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           }}
         />
 
-        {/* 검색 결과 영역 - 고정 높이로 안정화 */}
+        {/* Search Results 영역 - 고정 높이로 안정화 */}
         <Box
           sx={{
             flex: 1,
@@ -443,7 +443,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                         );
                       }
 
-                      // 초대 대기 중인 경우
+                      // 초대 Pending인 경우
                       if (isPendingInvited) {
                         return (
                           <Button

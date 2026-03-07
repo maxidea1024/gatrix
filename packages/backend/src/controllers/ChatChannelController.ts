@@ -13,7 +13,7 @@ export class ChatChannelController {
   private static chatServerService = ChatServerService.getInstance();
 
   /**
-   * 사용자의 채널 목록 조회
+   * Used자의 채널 Get list
    */
   static async getMyChannels(req: Request, res: Response): Promise<void> {
     try {
@@ -26,12 +26,12 @@ export class ChatChannelController {
         return;
       }
 
-      // Chat Server에서 사용자 채널 목록 조회
+      // Chat Server에서 Used자 채널 Get list
       const response = await ChatChannelController.chatServerService.getUserChannels(user.userId);
 
       res.json({
         success: true,
-        data: response, // Chat Server의 응답을 그대로 전달 (data: [], pagination: {...})
+        data: response, // Chat Server의 Response을 그대로 전달 (data: [], pagination: {...})
       });
     } catch (error) {
       logger.error('Error getting user channels:', error);
@@ -43,7 +43,7 @@ export class ChatChannelController {
   }
 
   /**
-   * 채널 생성
+   * 채널 Create
    */
   static async createChannel(req: Request, res: Response): Promise<void> {
     try {
@@ -66,7 +66,7 @@ export class ChatChannelController {
         return;
       }
 
-      // 임시: Chat Server 대신 직접 응답 (Chat Server 문제 해결 후 원복)
+      // 임시: Chat Server 대신 직접 Response (Chat Server 문제 해결 후 원복)
       const channel = {
         id: Date.now(), // 임시 ID
         name,
@@ -180,7 +180,7 @@ export class ChatChannelController {
   }
 
   /**
-   * 사용자 목록 조회
+   * Used자 Get list
    */
   static async getUsers(req: Request, res: Response): Promise<void> {
     try {
@@ -195,7 +195,7 @@ export class ChatChannelController {
 
       const { search } = req.query;
 
-      // Chat Server에서 사용자 목록 조회
+      // Chat Server에서 Used자 Get list
       const users = await ChatChannelController.chatServerService.getUsers(
         user.userId,
         search as string

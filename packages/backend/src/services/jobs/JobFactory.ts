@@ -2,7 +2,7 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('JobFactory');
 
-// Job 실행 결과 인터페이스
+// Job 실행 Results Interface
 export interface JobExecutionResult {
   success: boolean;
   data?: any;
@@ -22,7 +22,7 @@ export interface JobExecutionContext {
   timeoutSeconds: number;
 }
 
-// 기본 Job 인터페이스
+// 기본 Job Interface
 export abstract class BaseJob {
   protected context: JobExecutionContext;
 

@@ -12,7 +12,7 @@ import {
   ErrorCodes,
 } from '../utils/apiResponse';
 
-// Job 목록 조회
+// Job Get list
 export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { jobTypeId, isEnabled, search, limit = 20, offset = 0, page } = req.query;
@@ -23,11 +23,11 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
     if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
     if (search) filters.search = search as string;
 
-    // 페이지네이션 처리
+    // Pagination 처리
     const limitNum = parseInt(limit as string) || 20;
     let offsetNum = parseInt(offset as string) || 0;
 
-    // page 파라미터가 있으면 offset 계산
+    // page Parameters가 있으면 offset 계산
     if (page) {
       const pageNum = parseInt(page as string) || 1;
       offsetNum = (pageNum - 1) * limitNum;
@@ -53,7 +53,7 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// Job 상세 조회
+// Job Get details
 export const getJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -76,19 +76,19 @@ export const getJob = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// Job 생성
+// Job Create
 export const createJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name, jobTypeId, jobDataMap, memo, isEnabled, tagIds } = req.body;
 
-    // 필수 필드 검증
+    // Validate required fields
     if (!name || !jobTypeId) {
       return sendBadRequest(res, 'Name and jobTypeId are required', {
         fields: ['name', 'jobTypeId'],
       });
     }
 
-    // Job 타입 존재 여부 확인
+    // Job Type 존재 여부 Confirm
     const jobType = await JobTypeModel.findById(jobTypeId);
     if (!jobType) {
       return sendBadRequest(res, 'Invalid job type', { field: 'jobTypeId' });
@@ -96,7 +96,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId || 'development';
 
-    // Job 이름 중복 검증
+    // Job 이름 중복 Validation
     const existingJob = await JobModel.findByName(name, environmentId);
     if (existingJob) {
       return sendConflict(
@@ -106,7 +106,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       );
     }
 
-    // 사용자 ID 가져오기 (인증된 사용자)
+    // Used자 ID 가져오기 (Authentication된 사용자)
     const userId = (req as any).user?.userId;
 
     const jobData: CreateJobData = {
@@ -129,7 +129,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// Job 수정
+// Job Edit
 export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -141,7 +141,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId || 'development';
 
-    // Job 존재 여부 확인
+    // Job 존재 여부 Confirm
     const existingJob = await JobModel.findById(jobId, environmentId);
     if (!existingJob) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -149,10 +149,10 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const { name, jobTypeId, jobDataMap, memo, isEnabled, tagIds } = req.body;
 
-    // 사용자 ID 가져오기 (인증된 사용자)
+    // Used자 ID 가져오기 (Authentication된 사용자)
     const userId = (req as any).user?.userId;
 
-    // Job 이름 중복 검증 (이름이 변경되는 경우에만)
+    // Job 이름 중복 Validation (이름이 변경되는 경우에만)
     const existingJobByName = await JobModel.findByName(name, environmentId);
     if (existingJobByName && existingJobByName.id !== jobId) {
       return sendConflict(
@@ -180,7 +180,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-// Job 삭제
+// Job Delete
 export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -192,7 +192,7 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
 
     const environmentId = req.environmentId || 'development';
 
-    // Job 존재 여부 확인
+    // Job 존재 여부 Confirm
     const existingJob = await JobModel.findById(jobId, environmentId);
     if (!existingJob) {
       return sendNotFound(res, 'Job not found', ErrorCodes.RESOURCE_NOT_FOUND);
@@ -216,7 +216,7 @@ export const getJobExecutions = async (_req: AuthenticatedRequest, res: Response
   return sendSuccessResponse(res, []);
 };
 
-// Job 태그 설정
+// Job 태그 Settings
 export const setJobTags = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;

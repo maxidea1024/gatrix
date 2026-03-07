@@ -73,7 +73,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
       (channel.description && channel.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // 채널 상태 디버깅 (필요시 주석 해제)
+  // 채널 Status 디버깅 (필요시 주석 Unregister)
   // console.log('🔍 ChannelList Debug:', {
   //   'state.channels': state.channels,
   //   'state.channels.length': state.channels.length,
@@ -95,7 +95,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
         return;
       }
 
-      // 새로운 채널 선택
+      // New 채널 선택
       console.log('✅ Calling setCurrentChannel with:', channel.id);
       actions.setCurrentChannel(channel.id);
 
@@ -244,21 +244,21 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
                     onClick={() => handleChannelClick(channel)}
                     sx={{
                       py: 0.5, // 위아래 패딩 더 줄임 (1 → 0.5)
-                      px: 1, // 좌우 패딩 설정
+                      px: 1, // 좌우 패딩 Settings
                       mx: 1.5, // 좌우 여백 늘림
                       my: 0.25, // 위아래 마진 추가로 간격 조정
                       borderRadius: 0, // 슬랙 스타일 라운드
                       '&.Mui-selected': {
                         backgroundColor: (theme) =>
                           theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.08)' // 다크 테마: 약간 밝게
-                            : 'rgba(0, 0, 0, 0.08)', // 라이트 테마: 더 어둡게 (0.04 → 0.08)
+                            ? 'rgba(255, 255, 255, 0.08)' // 다크 Theme: 약간 밝게
+                            : 'rgba(0, 0, 0, 0.08)', // 라이트 Theme: 더 어둡게 (0.04 → 0.08)
                         color: 'inherit', // 기본 텍스트 색상 유지
                         '&:hover': {
                           backgroundColor: (theme) =>
                             theme.palette.mode === 'dark'
                               ? 'rgba(255, 255, 255, 0.12)'
-                              : 'rgba(0, 0, 0, 0.12)', // 라이트 테마 호버도 더 어둡게 (0.08 → 0.12)
+                              : 'rgba(0, 0, 0, 0.12)', // 라이트 Theme 호버도 더 어둡게 (0.08 → 0.12)
                         },
                         '& .MuiListItemIcon-root': {
                           color: 'inherit',
@@ -271,7 +271,7 @@ const ChannelList: React.FC<ChannelListProps> = ({ onCreateChannel, onChannelSet
                         backgroundColor: (theme) =>
                           theme.palette.mode === 'dark'
                             ? 'rgba(255, 255, 255, 0.04)'
-                            : 'rgba(0, 0, 0, 0.04)', // 라이트 테마 일반 호버도 더 어둡게 (0.02 → 0.04)
+                            : 'rgba(0, 0, 0, 0.04)', // 라이트 Theme 일반 호버도 더 어둡게 (0.02 → 0.04)
                         borderRadius: 0, // 호버 시에도 라운드 유지
                       },
                     }}

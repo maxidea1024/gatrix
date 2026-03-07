@@ -195,13 +195,13 @@ export class UserController {
 
     let user = await UserService.updateUser(userId, userData);
 
-    // 태그 설정 (tagIds가 제공된 경우에만)
+    // 태그 Settings (tagIds가 제공된 경우에만)
     if (tagIds !== undefined) {
       logger.debug('Setting user tags:', { userId, tagIds, updatedBy });
       await UserTagService.setUserTags(userId, tagIds, updatedBy!);
       logger.debug('User tags set successfully');
 
-      // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+      // 태그 업데이트 후 User info를 다시 로드하여 최신 태그 정보 포함
       user = await UserService.getUserById(userId);
     } else {
       logger.debug('No tagIds provided, skipping tag update');
@@ -329,7 +329,7 @@ export class UserController {
     });
   });
 
-  // 사용자 검색 (채팅 시스템용)
+  // Used자 Search (채팅 시스템용)
   static searchUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { q: query, limit = 20, orgId } = req.query;
 
@@ -385,7 +385,7 @@ export class UserController {
 
     const user = await UserService.updateUser(req.user.userId, value);
 
-    // Chat Server에 사용자 정보 동기화 (백그라운드에서 실행)
+    // Chat Server에 User info 동기화 (백그라운드에서 실행)
     try {
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUser({
@@ -400,7 +400,7 @@ export class UserController {
         updatedAt: user.updatedAt?.toISOString(),
       });
     } catch (error) {
-      // Chat Server 동기화 실패는 로그만 남기고 사용자에게는 성공 응답
+      // Chat Server 동기화 Failed는 로그만 남기고 Used자에게는 Success Response
       logger.error('Failed to sync user to Chat Server:', error);
     }
 
@@ -489,7 +489,7 @@ export class UserController {
     });
   });
 
-  // 관리자가 사용자 이메일을 강제 인증 처리
+  // 관리자가 Force verify user email
   static verifyUserEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.params.id;
 
@@ -505,7 +505,7 @@ export class UserController {
     });
   });
 
-  // 사용자에게 이메일 인증 메일 재전송
+  // Used자에게 이메일 Resend verification email
   static resendVerificationEmail = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.params.id;

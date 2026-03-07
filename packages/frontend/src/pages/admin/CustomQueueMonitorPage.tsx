@@ -390,7 +390,7 @@ const CustomQueueMonitorPage: React.FC = () => {
         </MenuItem>
       </Menu>
 
-      {/* 작업 상세 다이얼로그 */}
+      {/* 작업 상세 Dialog */}
       <Dialog open={jobDialogOpen} onClose={() => setJobDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>작업 상세 정보</DialogTitle>
         <DialogContent>

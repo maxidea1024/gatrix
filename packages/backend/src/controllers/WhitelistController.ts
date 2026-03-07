@@ -107,7 +107,7 @@ const getWhitelistsQuerySchema = Joi.object({
   createdBy: Joi.string().optional(),
   search: Joi.string().optional(),
   tags: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).optional(),
-  _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
+  _t: Joi.string().optional(), // Cache 방지용 타임스탬프
 }).options({ stripUnknown: true });
 
 export class WhitelistController {
@@ -276,7 +276,7 @@ export class WhitelistController {
     });
   });
 
-  // 화이트리스트 태그 설정
+  // 화이트리스트 태그 Settings
   static setTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const { tagIds } = req.body;

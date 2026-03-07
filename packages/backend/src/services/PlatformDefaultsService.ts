@@ -16,7 +16,7 @@ const PLATFORM_DEFAULTS_KEY = 'platform_defaults';
 
 export class PlatformDefaultsService {
   /**
-   * 모든 플랫폼의 기본값 조회
+   * 모든 플랫Form의 Default values 조회
    */
   static async getAllDefaults(environmentId: string): Promise<PlatformDefaultsMap> {
     try {
@@ -32,7 +32,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 특정 플랫폼의 기본값 조회
+   * 특정 플랫Form의 Default values 조회
    */
   static async getPlatformDefaults(
     platform: string,
@@ -48,7 +48,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 플랫폼별 기본값 설정
+   * 플랫Form별 Set default values
    */
   static async setPlatformDefaults(
     platform: string,
@@ -73,7 +73,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 모든 플랫폼의 기본값 일괄 설정
+   * 모든 플랫Form의 Default values 일괄 Settings
    */
   static async setAllDefaults(
     defaultsMap: PlatformDefaultsMap,
@@ -95,7 +95,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 특정 플랫폼의 기본값 삭제
+   * 특정 플랫Form의 Default values Delete
    */
   static async deletePlatformDefaults(
     platform: string,
@@ -119,7 +119,7 @@ export class PlatformDefaultsService {
   }
 
   /**
-   * 클라이언트 버전 데이터에 기본값 적용
+   * 클라이언트 버전 데이터에 Default values 적용
    */
   static async applyDefaultsToClientVersion(
     platform: string,

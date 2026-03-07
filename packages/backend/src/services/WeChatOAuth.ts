@@ -27,7 +27,7 @@ export class WeChatOAuthService {
   private static readonly AUTH_URL = 'https://open.weixin.qq.com/connect/qrconnect';
 
   /**
-   * WeChat OAuth 인증 URL 생성
+   * WeChat OAuth Authentication URL Create
    */
   static getAuthUrl(redirectUri: string, state?: string): string {
     const params = new URLSearchParams({
@@ -67,7 +67,7 @@ export class WeChatOAuthService {
   }
 
   /**
-   * Access Token으로 사용자 정보 획득
+   * Access Token으로 User info 획득
    */
   static async getUserInfo(accessToken: string, openid: string): Promise<WeChatProfile> {
     try {

@@ -39,7 +39,7 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* 상단 헤더 스켈레톤 */}
+      {/* 상단 Headers 스켈레톤 */}
       <Paper
         elevation={1}
         sx={{
@@ -71,7 +71,7 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
           }}
         >
           <Box sx={{ p: 2 }}>
-            {/* 채널 목록 헤더 */}
+            {/* 채널 목록 Headers */}
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
               <Skeleton variant="text" width="70%" height={24} />
               <Skeleton variant="circular" width={24} height={24} />
@@ -93,7 +93,7 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
 
         {/* 채팅 영역 스켈레톤 */}
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* 채팅 헤더 */}
+          {/* 채팅 Headers */}
           <Paper
             elevation={0}
             sx={{
@@ -150,7 +150,7 @@ const ChatSkeleton: React.FC<ChatSkeletonProps> = ({ stage }) => {
         </Box>
       </Box>
 
-      {/* 로딩 상태 표시 - 상단 고정 메시지 제거, 진행률만 표시 */}
+      {/* Loading state 표시 - 상단 고정 메시지 제거, 진행률만 표시 */}
       <Box
         sx={{
           position: 'fixed',

@@ -41,7 +41,7 @@ export class MessageTemplateController {
         | 'include_all'
         | undefined;
 
-      // tags 파라미터 처리 (배열로 변환)
+      // tags Parameters 처리 (배열로 변환)
       let tagIds: string[] | undefined;
       if (tags) {
         tagIds = Array.isArray(tags) ? tags : [tags];
@@ -50,7 +50,7 @@ export class MessageTemplateController {
 
       const environmentId = req.environmentId || 'development';
 
-      // MessageTemplateModel 사용
+      // MessageTemplateModel Used
       const result = await MessageTemplateModel.findAllWithPagination({
         environmentId,
         createdBy: createdByValue,
@@ -179,7 +179,7 @@ export class MessageTemplateController {
     }
   }
 
-  // 메시지 템플릿 태그 설정
+  // 메시지 템플릿 태그 Settings
   static async setTags(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;

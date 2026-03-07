@@ -90,19 +90,18 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   } catch {}
 
   const changeLanguage = async (lang: Language) => {
-    // 프론트엔드 언어 변경
+    // Change frontend language
     i18nInstance.changeLanguage(lang);
 
-    // 백엔드에 사용자 언어 설정 업데이트 (로그인된 사용자만)
+    // Update user language preference on backend (only for logged-in users)
     try {
       const token = localStorage.getItem('token');
       if (token) {
         await UserService.updateLanguage(lang);
-        console.log(`✅ User language preference updated to: ${lang}`);
+        // Language preference updated successfully
       }
     } catch (error) {
-      console.warn('⚠️ Failed to update user language preference:', error);
-      // 백엔드 업데이트 실패해도 프론트엔드 언어 변경은 유지
+      // Backend update failed, but frontend language change is preserved
     }
   };
 

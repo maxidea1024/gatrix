@@ -8,7 +8,7 @@ export class SshCommandJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
     return new Promise((resolve, reject) => {
       try {
-        // 필수 필드 검증
+        // Validate required fields
         this.validateRequiredFields(['host', 'username', 'command']);
 
         const {
@@ -26,7 +26,7 @@ export class SshCommandJob extends BaseJob {
         let errorOutput = '';
         let isResolved = false;
 
-        // 연결 설정
+        // 연결 Settings
         const connectConfig: any = {
           host,
           port,
@@ -34,7 +34,7 @@ export class SshCommandJob extends BaseJob {
           readyTimeout: timeout,
         };
 
-        // 인증 방법 설정
+        // Authentication 방법 Settings
         if (privateKey) {
           connectConfig.privateKey = privateKey;
         } else if (password) {
@@ -43,7 +43,7 @@ export class SshCommandJob extends BaseJob {
           throw new Error('Either password or privateKey must be provided');
         }
 
-        // 타임아웃 설정
+        // 타임아웃 Settings
         const timeoutId = setTimeout(() => {
           if (!isResolved) {
             isResolved = true;

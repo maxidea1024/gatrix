@@ -97,7 +97,7 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
       const currentUser = state.user;
       const direction = msg.userId === currentUser?.id ? 'outgoing' : 'incoming';
 
-      // 사용자 정보 안전하게 가져오기
+      // User info 안전하게 가져오기
       const messageUser = state.users[msg.userId];
       const senderName = messageUser?.username || messageUser?.name || `User ${msg.userId}`;
 

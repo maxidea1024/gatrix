@@ -15,7 +15,7 @@ export class LogMessageJob extends BaseJob {
     try {
       const data = this.context.jobDataMap as LogMessageJobData;
 
-      // 필수 필드 검증
+      // Validate required fields
       if (!data.message) {
         throw new Error('Log message is required');
       }
@@ -24,7 +24,7 @@ export class LogMessageJob extends BaseJob {
         throw new Error('Log level is required');
       }
 
-      // 유효한 로그 레벨 검증
+      // 유효한 로그 레벨 Validation
       const validLevels = ['debug', 'info', 'warn', 'error'];
       if (!validLevels.includes(data.level)) {
         throw new Error(
@@ -40,7 +40,7 @@ export class LogMessageJob extends BaseJob {
         category: data.category || 'job',
       };
 
-      // 사용자 정의 메타데이터 추가
+      // Used자 정의 메타데이터 추가
       if (data.metadata && typeof data.metadata === 'object') {
         Object.assign(logMetadata, data.metadata);
       }

@@ -35,7 +35,7 @@ export class EmailService {
 
   private initializeEmailProvider(): void {
     try {
-      // SendGrid 설정 확인 (우선순위 1)
+      // SendGrid Settings Confirm (우선순위 1)
       if (process.env.SENDGRID_API_KEY) {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         this.emailProvider = 'sendgrid';
@@ -43,7 +43,7 @@ export class EmailService {
         return;
       }
 
-      // SMTP 설정 확인 (우선순위 2)
+      // SMTP Settings Confirm (우선순위 2)
       if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
         this.transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
@@ -59,7 +59,7 @@ export class EmailService {
         return;
       }
 
-      // 설정이 없는 경우 콘솔 출력 (개발용)
+      // Settings이 없는 경우 콘솔 출력 (개발용)
       this.emailProvider = 'console';
       logger.warn('No email provider configured. Emails will be logged to console.');
     } catch (error) {
@@ -167,7 +167,7 @@ export class EmailService {
       logger.info('===============================================\n');
     }
 
-    return true; // 개발 환경에서는 성공으로 처리
+    return true; // 개발 환경에서는 Success으로 처리
   }
 
   /**

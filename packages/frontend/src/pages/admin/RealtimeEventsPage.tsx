@@ -208,10 +208,10 @@ const RealtimeEventsPage: React.FC = () => {
   const latestEventTimestampRef = useRef<Date | null>(null);
   const isInitialLoadRef = useRef<boolean>(true);
 
-  // 동적 필터 상태
+  // 동적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  // 동적 필터에서 값 추출
+  // 동적 Filter에서 값 추출
   const eventTypeFilter =
     (activeFilters.find((f) => f.key === 'action')?.value as string | string[]) || '';
   const eventTypeOperator = activeFilters.find((f) => f.key === 'action')?.operator;
@@ -725,7 +725,7 @@ const RealtimeEventsPage: React.FC = () => {
     new Set(events.map((e) => e.entityType).filter(Boolean))
   ).sort();
 
-  // 동적 필터 정의
+  // 동적 Filter 정의
   const availableFilterDefinitions: FilterDefinition[] = [
     {
       key: 'action',
@@ -765,7 +765,7 @@ const RealtimeEventsPage: React.FC = () => {
     loadEvents();
   };
 
-  // 동적 필터 핸들러
+  // 동적 Filter 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
   };

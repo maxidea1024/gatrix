@@ -62,7 +62,7 @@ const RegisterPage: React.FC = () => {
     return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
   }, []);
 
-  // 초대 관련 상태
+  // 초대 관련 Status
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [invitationLoading, setInvitationLoading] = useState(false);
@@ -106,7 +106,7 @@ const RegisterPage: React.FC = () => {
     setValue,
   } = useForm<RegisterData & { confirmPassword: string }>({
     resolver: resolver as any,
-    mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
+    mode: 'onChange', // 실시간 Validation을 위해 onChange로 변경
     defaultValues: {
       name: '',
       email: '',
@@ -138,7 +138,7 @@ const RegisterPage: React.FC = () => {
     }
   }, [watchedPassword, trigger]);
 
-  // 초대 토큰 확인
+  // 초대 토큰 Confirm
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('invite');
@@ -246,14 +246,14 @@ const RegisterPage: React.FC = () => {
         });
       }
 
-      // 성공 시 최소 2초 대기
+      // Success 시 최소 2초 대기
       const elapsed = Date.now() - startTime;
       const remainingTime = Math.max(0, 2000 - elapsed);
       if (remainingTime > 0) {
         await new Promise((resolve) => setTimeout(resolve, remainingTime));
       }
 
-      // 성공 시에만 에러 메시지 지우기
+      // Success 시에만 Error message 지우기
       setRegisterError(null);
       setRegisteredEmail(data.email); // Save registered email
       setRegisterSuccess(true);
@@ -292,13 +292,13 @@ const RegisterPage: React.FC = () => {
     // 최소 2초 대기
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // 타임아웃 설정 (30초)
+    // 타임아웃 Settings (30초)
     const timeout = setTimeout(() => {
       setOauthLoading(null);
       setRegisterError(t('auth.errors.oauthTimeout'));
     }, 30000);
 
-    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
+    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 Save
     sessionStorage.setItem('oauthTimeout', timeout.toString());
     sessionStorage.setItem('oauthProvider', provider);
 
@@ -318,12 +318,12 @@ const RegisterPage: React.FC = () => {
   };
 
   const handleWeChatLogin = () => {
-    // 임시 비활성화
+    // 임시 비Active화
     console.log('WeChat login not available yet');
   };
 
   const handleBaiduLogin = () => {
-    // 임시 비활성화
+    // 임시 비Active화
     console.log('Baidu login not available yet');
   };
 
@@ -1106,7 +1106,7 @@ const RegisterPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // 임시 비Active화
                 sx={{
                   width: 56,
                   height: 56,
@@ -1135,7 +1135,7 @@ const RegisterPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // 임시 비Active화
                 sx={{
                   width: 56,
                   height: 56,

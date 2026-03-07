@@ -21,7 +21,7 @@ const allDefaultsSchema = Joi.object().pattern(
 
 export class PlatformDefaultsController {
   /**
-   * 모든 플랫폼의 기본값 조회
+   * 모든 플랫Form의 Default values 조회
    * GET /api/v1/admin/platform-defaults
    */
   static getAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -35,7 +35,7 @@ export class PlatformDefaultsController {
   });
 
   /**
-   * 특정 플랫폼의 기본값 조회
+   * 특정 플랫Form의 Default values 조회
    * GET /api/v1/admin/platform-defaults/:platform
    */
   static getPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -58,7 +58,7 @@ export class PlatformDefaultsController {
   });
 
   /**
-   * 특정 플랫폼의 기본값 설정
+   * 특정 플랫Form의 Set default values
    * PUT /api/v1/admin/platform-defaults/:platform
    */
   static setPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -95,7 +95,7 @@ export class PlatformDefaultsController {
   });
 
   /**
-   * 모든 플랫폼의 기본값 일괄 설정
+   * 모든 플랫Form의 Default values 일괄 Settings
    * PUT /api/v1/admin/platform-defaults
    */
   static setAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -123,7 +123,7 @@ export class PlatformDefaultsController {
   });
 
   /**
-   * 특정 플랫폼의 기본값 삭제
+   * 특정 플랫Form의 Default values Delete
    * DELETE /api/v1/admin/platform-defaults/:platform
    */
   static deletePlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {

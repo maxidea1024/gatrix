@@ -52,22 +52,22 @@ export class IpWhitelistModel {
     filters: IpWhitelistFilters = { environmentId: '' }
   ): Promise<IpWhitelistListResponse> {
     try {
-      // 기본값 설정
+      // Set default values
       const pageNum = Number(page) || 1;
       const limitNum = Number(limit) || 10;
       const offset = (pageNum - 1) * limitNum;
       const environmentId = filters.environmentId;
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_ip_whitelist as iw')
           .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
           .where('iw.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
-        // 기본 조건: 만료되지 않은 항목만
+        // 기본 조건: Expired되지 않은 항목만
         query.where(function (this: any) {
           this.whereNull('iw.endDate').orWhere('iw.endDate', '>', new Date());
         });
@@ -93,10 +93,10 @@ export class IpWhitelistModel {
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('iw.id as total').first();
 
-      // Data 쿼리
+      // Data Query
       const dataQuery = applyFilters(baseQuery())
         .select(['iw.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .orderBy('iw.createdAt', 'desc')
@@ -218,7 +218,7 @@ export class IpWhitelistModel {
   static async setTags(whitelistId: string, tagIds: string[]): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments')
           .where('entityType', 'whitelist')
           .where('entityId', whitelistId)

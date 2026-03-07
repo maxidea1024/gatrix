@@ -210,7 +210,7 @@ export class UserService {
           email: user.email,
         });
       } catch (emailError) {
-        // 이메일 발송 실패는 로그만 남기고 전체 프로세스는 계속 진행
+        // 이메일 발송 Failed는 로그만 남기고 전체 프로세스는 계속 진행
         logger.error('Failed to send approval email:', {
           userId,
           email: user.email,
@@ -272,7 +272,7 @@ export class UserService {
 
   static async setUserTags(userId: string, tagIds: string[], updatedBy: string): Promise<void> {
     try {
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await UserModel.findById(userId);
       if (!user) {
         throw new GatrixError('User not found', 404);
@@ -290,7 +290,7 @@ export class UserService {
 
   static async addUserTag(userId: string, tagId: string, createdBy: string): Promise<void> {
     try {
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await UserModel.findById(userId);
       if (!user) {
         throw new GatrixError('User not found', 404);
@@ -308,7 +308,7 @@ export class UserService {
 
   static async removeUserTag(userId: string, tagId: string): Promise<void> {
     try {
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await UserModel.findById(userId);
       if (!user) {
         throw new GatrixError('User not found', 404);
@@ -324,7 +324,7 @@ export class UserService {
     }
   }
 
-  // 관리자가 사용자 이메일을 강제 인증 처리
+  // 관리자가 Force verify user email
   static async verifyUserEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
@@ -350,7 +350,7 @@ export class UserService {
     }
   }
 
-  // 사용자에게 이메일 인증 메일 재전송
+  // Used자에게 이메일 Resend verification email
   static async resendVerificationEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
@@ -362,7 +362,7 @@ export class UserService {
         throw new GatrixError('User email is already verified', 400);
       }
 
-      // 이메일 인증 메일 발송 (현재는 웰컴 이메일로 대체)
+      // 이메일 Authentication 메일 발송 (현재는 웰컴 이메일로 대체)
       try {
         await EmailService.sendWelcomeEmail(user.email, user.name);
         logger.info('Verification email sent:', {

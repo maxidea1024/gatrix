@@ -9,12 +9,12 @@ export interface ServerNotificationRequest extends Request {
 }
 
 class ServerNotificationController {
-  // 알림 전송
+  // Notification 전송
   static async sendNotification(req: ServerNotificationRequest, res: Response) {
     try {
       const { userId, type, title, content, channelId, messageId, metadata } = req.body;
 
-      // 필수 필드 검증
+      // Validate required fields
       if (!userId || !type || !title || !content) {
         return res.status(400).json({
           success: false,
@@ -22,7 +22,7 @@ class ServerNotificationController {
         });
       }
 
-      // 지원되는 알림 타입 검증
+      // 지원되는 Notification Type Validation
       const supportedTypes = ['message', 'mention', 'channel_invite', 'system'];
       if (!supportedTypes.includes(type)) {
         return res.status(400).json({
@@ -31,7 +31,7 @@ class ServerNotificationController {
         });
       }
 
-      // 알림 데이터 구성
+      // Notification 데이터 구성
       const notificationData = {
         type: 'chat_notification',
         data: {
@@ -45,7 +45,7 @@ class ServerNotificationController {
           timestamp: new Date().toISOString(),
         },
         timestamp: new Date(),
-        targetUsers: [userId], // 특정 사용자에게만 전송
+        targetUsers: [userId], // 특정 Used자에게만 전송
       };
 
       // PubSub을 통해 전 인스턴스에 전파 → 각 인스턴스가 자신의 SSE 클라이언트로 팬아웃
@@ -77,12 +77,12 @@ class ServerNotificationController {
     }
   }
 
-  // 여러 사용자에게 알림 전송
+  // 여러 Used자에게 Notification 전송
   static async sendBulkNotification(req: ServerNotificationRequest, res: Response) {
     try {
       const { userIds, type, title, content, channelId, messageId, metadata } = req.body;
 
-      // 필수 필드 검증
+      // Validate required fields
       if (!Array.isArray(userIds) || userIds.length === 0 || !type || !title || !content) {
         return res.status(400).json({
           success: false,
@@ -98,7 +98,7 @@ class ServerNotificationController {
         });
       }
 
-      // 지원되는 알림 타입 검증
+      // 지원되는 Notification Type Validation
       const supportedTypes = ['message', 'mention', 'channel_invite', 'system'];
       if (!supportedTypes.includes(type)) {
         return res.status(400).json({
@@ -107,7 +107,7 @@ class ServerNotificationController {
         });
       }
 
-      // 알림 데이터 구성
+      // Notification 데이터 구성
       const notificationData = {
         type: 'chat_notification',
         data: {

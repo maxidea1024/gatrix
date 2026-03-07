@@ -198,7 +198,7 @@ export class AuthService {
         throw new GatrixError('User not found', 404);
       }
 
-      // OAuth 사용자들은 비밀번호 변경 불가
+      // OAuth Used자들은 비밀번호 변경 불가
       if (user.authType !== 'local') {
         throw new GatrixError('Password change is not available for OAuth users', 400);
       }
@@ -210,7 +210,7 @@ export class AuthService {
           throw new GatrixError('Current password is incorrect', 400);
         }
       } else {
-        // local 사용자인데 passwordHash가 없는 경우 (데이터 불일치)
+        // local Used자인데 passwordHash가 없는 경우 (데이터 불일치)
         throw new GatrixError('Password not set for this account', 400);
       }
 
@@ -240,12 +240,12 @@ export class AuthService {
         return;
       }
 
-      // 1. 보안 리셋 토큰 생성
+      // 1. 보안 리셋 토큰 Create
       const crypto = require('crypto');
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 만료
+      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 Expired
 
-      // 2. 데이터베이스에 토큰 저장
+      // 2. 데이터베이스에 Save token
       await db('g_password_reset_tokens').insert({
         userId: user.id,
         token: resetToken,

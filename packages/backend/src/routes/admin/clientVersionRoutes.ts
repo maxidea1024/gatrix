@@ -11,16 +11,16 @@ router.use((req, res, next) => {
 });
 
 // 메�??�이???�우??(/:id보다 먼�? ?�의?�야 ??
-// ?�랫??목록 조회 (관리자�?
+// ?�랫??Get list (관리자�?
 router.get('/meta/platforms' as any, ClientVersionController.getPlatforms as any);
 
-// ?�용 가?�한 버전 목록 조회 (관리자�?
+// ?�용 가?�한 버전 Get list (관리자�?
 router.get(
   '/meta/versions' as any,
   ClientVersionController.getAvailableVersions as any
 );
 
-// ?�라?�언??버전 목록 조회 (관리자�?
+// ?�라?�언??버전 Get list (관리자�?
 router.get('/' as any, ClientVersionController.getClientVersions as any);
 
 // ?�라?�언??버전 ?�보?�기 (관리자�?

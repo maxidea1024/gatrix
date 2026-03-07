@@ -7,12 +7,12 @@ const logger = createLogger('MailSendJob');
 export class MailSendJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
     try {
-      // 필수 필드 검증
+      // Validate required fields
       this.validateRequiredFields(['to', 'subject', 'body']);
 
       const { to, cc, bcc, subject, body, attachments } = this.context.jobDataMap;
 
-      // 메일 전송 설정 (환경변수에서 가져오기)
+      // 메일 전송 Settings (Get from environment variables)
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'localhost',
         port: parseInt(process.env.SMTP_PORT || '587'),

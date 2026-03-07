@@ -118,7 +118,7 @@ async function prepareClientVersionForSDK(
 }
 
 export class ClientVersionService {
-  // 사용 가능한 버전 목록 조회 (distinct)
+  // Used 가능한 버전 Get list (distinct)
   static async getAvailableVersions(environmentId: string): Promise<string[]> {
     try {
       const versions = await ClientVersionModel.getDistinctVersions(environmentId);
@@ -178,7 +178,7 @@ export class ClientVersionService {
     const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
     const offset = (page - 1) * limit;
 
-    // 검색 조건 구성
+    // Search 조건 구성
     const whereConditions: any = { environmentId };
 
     if (filters.version) {
@@ -225,7 +225,7 @@ export class ClientVersionService {
       whereConditions.updatedBy = filters.updatedBy;
     }
 
-    // 날짜 필터 구현
+    // 날짜 Filter 구현
     if (filters.createdAtFrom || filters.createdAtTo) {
       const dateFilters: any = { environmentId };
       if (filters.createdAtFrom) {
@@ -258,11 +258,11 @@ export class ClientVersionService {
       };
     }
 
-    // 전체 검색 - 간단한 구현
+    // 전체 Search - 간단한 구현
     if (filters.search) {
-      // 검색어가 있으면 다른 필터는 무시하고 검색만 수행
+      // Search어가 있으면 다른 Filter는 Ignore하고 검색만 수행
       const searchConditions: any = { environmentId };
-      // 여러 필드에서 검색하는 로직은 모델에서 처리
+      // 여러 필드에서 Search하는 로직은 Model에서 처리
       searchConditions.search = filters.search;
       const result = await ClientVersionModel.findAll({
         ...searchConditions,
@@ -287,7 +287,7 @@ export class ClientVersionService {
       };
     }
 
-    // ClientVersionModel 사용
+    // ClientVersionModel Used
     const result = await ClientVersionModel.findAll({
       environmentId,
       clientVersion: filters.version,
@@ -388,7 +388,7 @@ export class ClientVersionService {
       throw new Error(`DUPLICATE_CLIENT_VERSIONS:${duplicates.join(', ')}`);
     }
 
-    // 받은 데이터를 각 플랫폼별로 클라이언트 버전 배열로 변환
+    // 받은 데이터를 각 플랫Form별로 클라이언트 버전 배열로 변환
     const clientVersions = data.platforms.map((platform: any) => ({
       environmentId,
       platform: platform.platform,
@@ -408,19 +408,19 @@ export class ClientVersionService {
 
     const result = await ClientVersionModel.bulkCreate(clientVersions, environmentId);
 
-    // 태그가 있는 경우 각 생성된 클라이언트 버전에 태그 설정
+    // 태그가 있는 경우 각 Create된 Set tags for client versions
     if (data.tags && Array.isArray(data.tags) && data.tags.length > 0) {
       const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id); // null/undefined 제거
 
       if (tagIds.length > 0) {
-        // 각 생성된 클라이언트 버전에 태그 설정
+        // 각 Create된 Set tags for client versions
         for (const clientVersion of result) {
           if (clientVersion && clientVersion.id) {
             try {
               await ClientVersionModel.setTags(clientVersion.id, tagIds, data.createdBy);
             } catch (error) {
               logger.error(`Failed to set tags for client version ${clientVersion.id}:`, error);
-              // 태그 설정 실패는 전체 작업을 중단하지 않음
+              // 태그 Settings Failed는 전체 작업을 중단하지 않음
             }
           } else {
             logger.warn('Skipping tag setting for invalid client version:', clientVersion);

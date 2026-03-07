@@ -130,7 +130,7 @@ export class GameWorldModel {
       return null;
     }
 
-    // 점검 메시지 로케일 정보 로드
+    // 점검 메시지 Locale 정보 로드
     const maintenanceLocales = await conn('g_game_world_maintenance_locales')
       .where('gameWorldId', id)
       .select('lang', 'message');
@@ -300,7 +300,7 @@ export class GameWorldModel {
         convertedData.id = newId;
         await trx('g_game_worlds').insert(convertedData);
 
-        // 점검 메시지 로케일 처리
+        // 점검 메시지 Locale 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
             gameWorldId: newId,
@@ -369,12 +369,12 @@ export class GameWorldModel {
             .update(convertedUpdateData);
         }
 
-        // 점검 메시지 로케일 처리
+        // 점검 메시지 Locale 처리
         if (maintenanceLocales !== undefined) {
-          // 기존 로케일 삭제
+          // Existing Locale Delete
           await trx('g_game_world_maintenance_locales').where('gameWorldId', id).del();
 
-          // 새 로케일 추가
+          // 새 Locale 추가
           if (maintenanceLocales.length > 0) {
             const localeInserts = maintenanceLocales.map((locale: any) => ({
               gameWorldId: id,

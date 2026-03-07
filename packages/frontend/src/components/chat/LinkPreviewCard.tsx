@@ -88,7 +88,7 @@ const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
       }}
       onClick={handleOpenLink}
     >
-      {/* 닫기 버튼 */}
+      {/* Close 버튼 */}
       {showCloseButton && onClose && (
         <IconButton
           size="small"
@@ -112,7 +112,7 @@ const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
         </IconButton>
       )}
 
-      {/* 이미지/비디오 미리보기 */}
+      {/* Images/Videos 미리보기 */}
       {linkPreview.image && !imageError && (
         <CardMedia
           component={isVideoUrl(linkPreview.image) ? 'video' : 'img'}
@@ -128,7 +128,7 @@ const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({
       )}
 
       <CardContent sx={{ padding: '12px !important' }}>
-        {/* 사이트명과 타입 */}
+        {/* 사이트명과 Type */}
         <Box display="flex" alignItems="center" gap={1} mb={1}>
           {linkPreview.favicon && (
             <Avatar src={linkPreview.favicon} sx={{ width: 16, height: 16 }} />

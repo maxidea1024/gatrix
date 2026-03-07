@@ -76,7 +76,7 @@ const WhitelistPage: React.FC = () => {
   // Refs for form focus
   const accountIdFieldRef = useRef<HTMLInputElement>(null);
 
-  // 페이지 상태 관리 (localStorage 연동)
+  // 페이지 State management (localStorage 연동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -117,7 +117,7 @@ const WhitelistPage: React.FC = () => {
   // Tab state
   const [currentTab, setCurrentTab] = useState(getInitialTab);
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // Debouncing된 Search어 (500ms 지연)
   const debouncedSearch = useDebounce(pageState.filters?.search || '', 500);
 
   // State
@@ -209,7 +209,7 @@ const WhitelistPage: React.FC = () => {
         console.error('Invalid response structure:', result);
         setWhitelists([]);
         setTotal(0);
-        // 오류 메시지를 사용자에게 표시하지 않음 (서버 응답 구조 문제일 수 있음)
+        // 오류 메시지를 Used자에게 표시하지 않음 (서버 Response 구조 문제일 수 있음)
       }
     } catch (error: any) {
       console.error('Error loading whitelists:', error);
@@ -278,7 +278,7 @@ const WhitelistPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    // selectedWhitelist는 다이얼로그가 닫힐 때까지 유지
+    // selectedWhitelist는 Dialog가 닫힐 때까지 유지
   };
 
   // Toggle whitelist status
@@ -383,7 +383,7 @@ const WhitelistPage: React.FC = () => {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    // 계정 ID 유효성 검사
+    // 계정 ID Validation
     if (
       !formData.accountId ||
       formData.accountId.trim().length < 4 ||
@@ -392,7 +392,7 @@ const WhitelistPage: React.FC = () => {
       errors.accountId = t('whitelist.form.accountIdValidation');
     }
 
-    // 사용목적 필수 검사
+    // Used목적 필수 검사
     if (!formData.purpose || formData.purpose.trim().length === 0) {
       errors.purpose = t('whitelist.form.purposeRequired');
     }

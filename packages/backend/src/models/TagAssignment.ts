@@ -26,7 +26,7 @@ export default class TagAssignmentModel {
           tagId,
           entityType,
           entityId,
-          createdBy: createdBy || '', // 기본값으로 1 사용 (시스템 사용자)
+          createdBy: createdBy || '', // Default values으로 1 Used (시스템 사용자)
         }));
         await trx('g_tag_assignments').insert(insertData);
       }

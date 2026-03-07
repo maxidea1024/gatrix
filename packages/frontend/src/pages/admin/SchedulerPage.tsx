@@ -69,7 +69,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 
-// 스케줄 이벤트 타입 정의
+// 스케줄 Event Type 정의
 interface ScheduleEvent {
   id: string;
   title: string;
@@ -82,7 +82,7 @@ interface ScheduleEvent {
   textColor?: string;
 }
 
-// Job 및 Trigger 타입 정의 (Quartzmin 스타일)
+// Job 및 Trigger Type 정의 (Quartzmin 스타일)
 interface JobDetail {
   id: string;
   name: string;
@@ -181,7 +181,7 @@ const SchedulerPage: React.FC = () => {
     jobDataMap: {},
   });
 
-  // 스케줄 이벤트 로딩 (실제로는 API에서 가져옴)
+  // 스케줄 Event 로딩 (실제로는 API에서 가져옴)
   const loadEvents = async () => {
     setLoading(true);
     try {
@@ -228,7 +228,7 @@ const SchedulerPage: React.FC = () => {
     loadEvents();
   }, []);
 
-  // 캘린더 이벤트 핸들러
+  // 캘린더 Event 핸들러
   const handleDateSelect = (selectInfo: any) => {
     setSelectedDate(selectInfo.start);
     setEditingEvent(null);
@@ -291,7 +291,7 @@ const SchedulerPage: React.FC = () => {
       return;
     }
 
-    // 종료 시간이 시작 시간보다 이전인지 확인
+    // 종료 시간이 시작 시간보다 이전인지 Confirm
     if (formData.end && formData.end <= formData.start) {
       enqueueSnackbar(t('scheduler.endTimeAfterStart'), { variant: 'error' });
       return;
@@ -334,11 +334,11 @@ const SchedulerPage: React.FC = () => {
     }
   };
 
-  // 현재 언어에 따른 로케일 설정
+  // 현재 언어에 따른 Locale Settings
   const currentLanguage = i18n.language;
   moment.locale(currentLanguage);
 
-  // FullCalendar 로케일 선택
+  // FullCalendar Locale 선택
   const getCalendarLocale = () => {
     switch (currentLanguage) {
       case 'en':
@@ -650,7 +650,7 @@ const SchedulerPage: React.FC = () => {
               </Grid>
             </Grid>
 
-            {/* 시간 범위 설정 */}
+            {/* 시간 범위 Settings */}
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid size={{ xs: 6 }}>
                 <TextField
@@ -736,7 +736,7 @@ const SchedulerPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* 기본 Count 파라미터 */}
+              {/* 기본 Count Parameters */}
               <Grid container spacing={2} sx={{ mb: 1 }}>
                 <Grid size={{ xs: 4 }}>
                   <TextField fullWidth size="small" value="Count" disabled />
@@ -768,7 +768,7 @@ const SchedulerPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* 추가 파라미터 */}
+              {/* 추가 Parameters */}
               <Grid container spacing={2}>
                 <Grid size={{ xs: 4 }}>
                   <TextField fullWidth size="small" placeholder="Parameter Name" />

@@ -10,7 +10,7 @@ export interface ServerAuthRequest extends Request {
 }
 
 class ServerAuthController {
-  // JWT 토큰 검증
+  // JWT Verify token
   static async verifyToken(req: ServerAuthRequest, res: Response) {
     try {
       const { token } = req.body;
@@ -22,7 +22,7 @@ class ServerAuthController {
         });
       }
 
-      // JWT 토큰 검증
+      // JWT Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
       if (!decoded || !decoded.userId) {
@@ -32,7 +32,7 @@ class ServerAuthController {
         });
       }
 
-      // 사용자 정보 조회
+      // User info 조회
       const user = await UserService.getUserById(decoded.userId);
 
       if (!user) {
@@ -42,7 +42,7 @@ class ServerAuthController {
         });
       }
 
-      // 사용자가 활성 상태인지 확인
+      // Used자가 Active Status인지 Confirm
       if (user.status !== 'active') {
         return res.status(401).json({
           success: false,
@@ -81,7 +81,7 @@ class ServerAuthController {
     }
   }
 
-  // 사용자 ID로 사용자 정보 조회
+  // Used자 ID로 User info 조회
   static async getUserById(req: ServerAuthRequest, res: Response) {
     try {
       const userId = req.params.id;

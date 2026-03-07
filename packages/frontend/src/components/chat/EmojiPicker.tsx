@@ -412,7 +412,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         .flat()
         .filter((emoji) => emoji.includes(searchQuery))
     : emojiCategories[selectedCategory as keyof typeof emojiCategories] || [];
-  // 이 피커가 열려있는 동안에만 모달 backdrop의 blur를 비활성화
+  // 이 피커가 열려있는 동안에만 Modal backdrop의 blur를 비Active화
   useEffect(() => {
     if (open) {
       document.body.classList.add('no-backdrop-blur');

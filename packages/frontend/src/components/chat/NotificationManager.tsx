@@ -223,7 +223,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
         enqueueSnackbar('An invitation was cancelled', { variant: 'warning' });
       };
 
-      // 이벤트 리스너 등록 (channel_invitation은 ChatContext에서 처리)
+      // Event 리스너 Register (channel_invitation은 ChatContext에서 처리)
       webSocketService.on('invitation_response', handleInvitationResponse);
       webSocketService.on('invitation_cancelled', handleInvitationCancelled);
 

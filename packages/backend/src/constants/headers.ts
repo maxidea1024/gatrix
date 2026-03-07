@@ -1,190 +1,190 @@
 /**
- * HTTP 헤더 이름 상수
- * 모든 헤더 이름을 중앙에서 관리하여 하드코딩을 방지합니다.
+ * HTTP Headers 이름 Constants
+ * 모든 Headers 이름을 중앙에서 관리하여 하드코딩을 방지합니다.
  */
 
 /**
- * 표준 HTTP 헤더
+ * 표준 HTTP Headers
  */
 export const STANDARD_HEADERS = {
   /**
-   * Authorization 헤더
+   * Authorization Headers
    */
   AUTHORIZATION: 'authorization',
 
   /**
-   * Content-Type 헤더
+   * Content-Type Headers
    */
   CONTENT_TYPE: 'content-type',
 
   /**
-   * User-Agent 헤더
+   * User-Agent Headers
    */
   USER_AGENT: 'user-agent',
 
   /**
-   * Accept 헤더
+   * Accept Headers
    */
   ACCEPT: 'accept',
 
   /**
-   * Cache-Control 헤더
+   * Cache-Control Headers
    */
   CACHE_CONTROL: 'cache-control',
 
   /**
-   * X-Requested-With 헤더
+   * X-Requested-With Headers
    */
   X_REQUESTED_WITH: 'x-requested-with',
 
   /**
-   * If-None-Match 헤더 (ETag용)
+   * If-None-Match Headers (ETag용)
    */
   IF_NONE_MATCH: 'if-none-match',
 } as const;
 
 /**
- * 커스텀 API 헤더
+ * 커스텀 API Headers
  */
 export const API_HEADERS = {
   /**
-   * API 토큰 헤더
+   * API 토큰 Headers
    */
   X_API_TOKEN: 'x-api-token',
 
   /**
-   * 애플리케이션 이름 헤더
+   * 애플리케이션 이름 Headers
    */
   X_APPLICATION_NAME: 'x-application-name',
 
   /**
-   * 환경 이름 헤더 (SDK용)
+   * 환경 이름 Headers (SDK용)
    */
   X_ENVIRONMENT: 'x-environment-id',
 
   /**
-   * 사용자 ID 헤더 (Chat Server용)
+   * Used자 ID Headers (Chat Server용)
    */
   X_USER_ID: 'x-user-id',
 
   /**
-   * Chat Server ID 헤더
+   * Chat Server ID Headers
    */
   X_CHAT_SERVER_ID: 'x-chat-server-id',
 
   /**
-   * 요청 ID 헤더
+   * Request ID Headers
    */
   X_REQUEST_ID: 'x-request-id',
 
   /**
-   * 클라이언트 연결 ID 헤더 (SDK용)
+   * 클라이언트 연결 ID Headers (SDK용)
    */
   X_CONNECTION_ID: 'x-connection-id',
 
   /**
-   * SDK 버전 헤더 (SDK 이름/버전)
+   * SDK 버전 Headers (SDK 이름/버전)
    */
   X_SDK_VERSION: 'x-sdk-version',
 
   /**
-   * 세션 ID 헤더 (SDK용)
+   * 세션 ID Headers (SDK용)
    */
   X_SESSION_ID: 'x-session-id',
 
   /**
-   * 피처 컨텍스트 헤더 (JSON stringified context)
+   * 피처 컨텍스트 Headers (JSON stringified context)
    */
   X_GATRIX_FEATURE_CONTEXT: 'x-gatrix-feature-context',
 
   /**
-   * 컨텍스트 해시 헤더 (Context optimization)
+   * 컨텍스트 해시 Headers (Context optimization)
    */
   X_GATRIX_CONTEXT_HASH: 'x-gatrix-context-hash',
 
   /**
-   * 클라이언트 버전 헤더
+   * 클라이언트 버전 Headers
    */
   X_CLIENT_VERSION: 'x-client-version',
 
   /**
-   * 플랫폼 헤더
+   * 플랫Form Headers
    */
   X_PLATFORM: 'x-platform',
 } as const;
 
 /**
- * 캐시 관련 헤더
+ * Cache 관련 Headers
  */
 export const CACHE_HEADERS = {
   /**
-   * 캐시 상태 헤더 (HIT/MISS)
+   * Cache Status Headers (HIT/MISS)
    */
   X_CACHE: 'x-cache',
 
   /**
-   * 캐시 키 헤더
+   * Cache 키 Headers
    */
   X_CACHE_KEY: 'x-cache-key',
 } as const;
 
 /**
- * 보안 헤더
+ * 보안 Headers
  */
 export const SECURITY_HEADERS = {
   /**
-   * X-Frame-Options 헤더
+   * X-Frame-Options Headers
    */
   X_FRAME_OPTIONS: 'x-frame-options',
 
   /**
-   * X-XSS-Protection 헤더
+   * X-XSS-Protection Headers
    */
   X_XSS_PROTECTION: 'x-xss-protection',
 
   /**
-   * X-Content-Type-Options 헤더
+   * X-Content-Type-Options Headers
    */
   X_CONTENT_TYPE_OPTIONS: 'x-content-type-options',
 
   /**
-   * Referrer-Policy 헤더
+   * Referrer-Policy Headers
    */
   REFERRER_POLICY: 'referrer-policy',
 
   /**
-   * Content-Security-Policy 헤더
+   * Content-Security-Policy Headers
    */
   CONTENT_SECURITY_POLICY: 'content-security-policy',
 } as const;
 
 /**
- * CORS 관련 헤더
+ * CORS 관련 Headers
  */
 export const CORS_HEADERS = {
   /**
-   * Access-Control-Allow-Origin 헤더
+   * Access-Control-Allow-Origin Headers
    */
   ACCESS_CONTROL_ALLOW_ORIGIN: 'access-control-allow-origin',
 
   /**
-   * Access-Control-Allow-Methods 헤더
+   * Access-Control-Allow-Methods Headers
    */
   ACCESS_CONTROL_ALLOW_METHODS: 'access-control-allow-methods',
 
   /**
-   * Access-Control-Allow-Headers 헤더
+   * Access-Control-Allow-Headers Headers
    */
   ACCESS_CONTROL_ALLOW_HEADERS: 'access-control-allow-headers',
 
   /**
-   * Access-Control-Allow-Credentials 헤더
+   * Access-Control-Allow-Credentials Headers
    */
   ACCESS_CONTROL_ALLOW_CREDENTIALS: 'access-control-allow-credentials',
 } as const;
 
 /**
- * 모든 헤더를 하나로 합친 객체
+ * 모든 Headers를 하나로 합친 객체
  */
 export const HEADERS = {
   ...STANDARD_HEADERS,
@@ -195,7 +195,7 @@ export const HEADERS = {
 } as const;
 
 /**
- * 헤더 값 상수
+ * Headers 값 Constants
  */
 export const HEADER_VALUES = {
   /**
@@ -209,13 +209,13 @@ export const HEADER_VALUES = {
   APPLICATION_JSON: 'application/json',
 
   /**
-   * 캐시 상태 값
+   * Cache Status 값
    */
   CACHE_HIT: 'HIT',
   CACHE_MISS: 'MISS',
 
   /**
-   * 보안 헤더 기본값
+   * 보안 Headers Default values
    */
   FRAME_OPTIONS_SAMEORIGIN: 'SAMEORIGIN',
   XSS_PROTECTION_BLOCK: '1; mode=block',
@@ -224,7 +224,7 @@ export const HEADER_VALUES = {
 } as const;
 
 /**
- * CORS에서 허용할 헤더 목록
+ * CORS에서 허용할 Headers 목록
  */
 export const ALLOWED_HEADERS: string[] = [
   HEADERS.CONTENT_TYPE,

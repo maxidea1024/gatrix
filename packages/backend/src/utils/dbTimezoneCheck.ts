@@ -1,5 +1,5 @@
 /**
- * 데이터베이스 시간대 설정 확인 유틸리티
+ * Database timezone settings verification utility
  */
 
 import db from '../config/knex';
@@ -8,19 +8,19 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('dbTimezoneCheck');
 
 /**
- * MySQL 시간대 설정 확인
+ * Check MySQL timezone settings
  */
 export async function checkDatabaseTimezone() {
   try {
-    // 현재 MySQL 시간대 설정 확인
+    // Check current MySQL timezone settings
     const [timezoneResult] = await db.raw(
       'SELECT @@global.time_zone as global_tz, @@session.time_zone as session_tz'
     );
 
-    // 현재 MySQL 시간 확인
+    // Check current MySQL time
     const [timeResult] = await db.raw('SELECT NOW() as mysql_now, UTC_TIMESTAMP() as mysql_utc');
 
-    // Node.js 시간 확인
+    // Node.js 시간 Confirm
     const nodeNow = new Date();
     const nodeUTC = new Date().toISOString();
 
@@ -40,7 +40,7 @@ export async function checkDatabaseTimezone() {
 
     logger.info('Database timezone check:', info);
 
-    // 권장사항 체크
+    // Check recommendations
     const recommendations = [];
 
     if (timezoneResult.global_tz !== 'UTC' && timezoneResult.global_tz !== '+00:00') {
@@ -66,16 +66,16 @@ export async function checkDatabaseTimezone() {
 }
 
 /**
- * 데이터베이스 시간대를 UTC로 설정
+ * Set database timezone to UTC
  */
 export async function setDatabaseTimezoneToUTC() {
   try {
-    // 세션 시간대를 UTC로 설정
+    // Set session timezone to UTC
     await db.raw('SET SESSION time_zone = "+00:00"');
 
     logger.info('✅ Database session timezone set to UTC');
 
-    // 설정 확인
+    // Settings Confirm
     await checkDatabaseTimezone();
   } catch (error) {
     logger.error('Error setting database timezone to UTC:', error);
@@ -84,11 +84,11 @@ export async function setDatabaseTimezoneToUTC() {
 }
 
 /**
- * 날짜 저장/조회 테스트
+ * Date save/query test
  */
 export async function testDateHandling() {
   try {
-    const testDate = new Date('2025-09-15T15:00:00.000Z'); // UTC 시간
+    const testDate = new Date('2025-09-15T15:00:00.000Z'); // UTC time
     const mysqlFormat = testDate.toISOString().slice(0, 19).replace('T', ' ');
 
     logger.info('Date handling test:', {
@@ -97,7 +97,7 @@ export async function testDateHandling() {
       reconstructed: new Date(mysqlFormat + 'Z').toISOString(),
     });
 
-    // 실제 데이터베이스에 저장/조회 테스트 (임시 테이블 사용)
+    // Test save/query against actual database (using temp table)
     await db.raw(`
       CREATE TEMPORARY TABLE test_dates (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -107,13 +107,13 @@ export async function testDateHandling() {
       )
     `);
 
-    // 데이터 삽입
+    // Insert data
     await db.raw('INSERT INTO test_dates (test_datetime, test_timestamp) VALUES (?, ?)', [
       mysqlFormat,
       mysqlFormat,
     ]);
 
-    // 데이터 조회
+    // Query data
     const [result] = await db.raw('SELECT * FROM test_dates LIMIT 1');
 
     logger.info('Database date test result:', {
@@ -122,7 +122,7 @@ export async function testDateHandling() {
       timestamp_reconstructed: new Date(result.test_timestamp).toISOString(),
     });
 
-    // 임시 테이블 삭제
+    // Drop temporary table
     await db.raw('DROP TEMPORARY TABLE test_dates');
 
     return result;

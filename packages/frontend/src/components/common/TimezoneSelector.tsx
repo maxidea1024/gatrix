@@ -39,7 +39,7 @@ const TimezoneSelector: React.FC = () => {
     // 서버 시간 동기화 시작
     timeService.startSync();
 
-    // 서버 시간 업데이트 리스너 등록
+    // 서버 시간 업데이트 리스너 Register
     const handleServerTimeUpdate = (data: ServerTimeData) => {
       setServerTimeData(data);
     };
@@ -121,7 +121,7 @@ const TimezoneSelector: React.FC = () => {
         />
       </Tooltip>
 
-      {/* Timezone 설정 팝오버 */}
+      {/* Timezone Settings 팝오버 */}
       <Popover
         open={open}
         anchorEl={anchorEl}

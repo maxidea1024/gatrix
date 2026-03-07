@@ -177,10 +177,10 @@ const getClientVersionsQuerySchema = Joi.object({
   search: Joi.string().optional(),
   tags: Joi.array().items(Joi.string()).optional(),
   tagsOperator: Joi.string().valid('any_of', 'include_all').optional().default('any_of'),
-  _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
+  _t: Joi.string().optional(), // Cache 방지용 타임스탬프
 });
 
-// 내보내기 전용 스키마 (limit 제한 없음)
+// 내보내기 전용 스키마 (limit 제한 None)
 const exportClientVersionsQuerySchema = Joi.object({
   version: Joi.string().optional(),
   platform: Joi.string().optional(),
@@ -299,7 +299,7 @@ const bulkCreateClientVersionSchema = Joi.object({
 });
 
 export class ClientVersionController {
-  // 사용 가능한 버전 목록 조회 (distinct)
+  // Used 가능한 버전 Get list (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
       const environmentId = req.environmentId || 'development';
@@ -317,7 +317,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 목록 조회
+  // 클라이언트 버전 Get list
   static async getClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = getClientVersionsQuerySchema.validate(req.query);
     if (error) {
@@ -337,7 +337,7 @@ export class ClientVersionController {
       sortOrder,
     };
 
-    // 필터 조건 설정
+    // Filter 조건 Settings
     Object.keys(filterParams).forEach((key) => {
       const value = filterParams[key];
       // guestModeAllowed는 boolean이므로 false도 유효한 값
@@ -348,9 +348,9 @@ export class ClientVersionController {
         const processedValue: any = value;
 
         // guestModeAllowed는 이미 Joi에서 boolean 또는 boolean[]로 변환됨
-        // 다른 필드는 그대로 사용
+        // 다른 필드는 그대로 Used
 
-        // 타입 안전하게 할당
+        // Type 안전하게 할당
         if (key === 'guestModeAllowed') {
           (filters as any).guestModeAllowed = processedValue;
         } else if (key === 'tags') {
@@ -376,7 +376,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 상세 조회
+  // 클라이언트 버전 Get details
   static async getClientVersionById(req: AuthenticatedRequest, res: Response) {
     const id = req.params.id;
     if (!id) {
@@ -401,7 +401,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 생성
+  // 클라이언트 버전 Create
   static async createClientVersion(req: AuthenticatedRequest, res: Response) {
     const { error, value } = createClientVersionSchema.validate(req.body);
     if (error) {
@@ -459,7 +459,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 간편 생성
+  // 클라이언트 버전 간편 Create
   static async bulkCreateClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkCreateClientVersionSchema.validate(req.body);
     if (error) {
@@ -555,7 +555,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 수정
+  // 클라이언트 버전 Edit
   static async updateClientVersion(req: AuthenticatedRequest, res: Response) {
     const id = req.params.id;
     if (!id) {
@@ -586,7 +586,7 @@ export class ClientVersionController {
       // Convert ISO 8601 datetime to MySQL DATETIME format
       maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
-      createdBy: userId, // maintenanceLocales 새로 생성 시 필요
+      createdBy: userId, // maintenanceLocales 새로 Create 시 필요
       updatedBy: userId,
     };
 
@@ -634,7 +634,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 삭제
+  // 클라이언트 버전 Delete
   static async deleteClientVersion(req: AuthenticatedRequest, res: Response) {
     const id = req.params.id;
     if (!id) {
@@ -681,7 +681,7 @@ export class ClientVersionController {
     }
   }
 
-  // 일괄 상태 변경
+  // 일괄 Status 변경
   static async bulkUpdateStatus(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkUpdateStatusSchema.validate(req.body);
     if (error) {
@@ -758,7 +758,7 @@ export class ClientVersionController {
     }
   }
 
-  // 채널 목록 조회
+  // 채널 Get list
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
     const environmentId = req.environmentId || 'development';
     const platforms = await ClientVersionService.getPlatforms(environmentId);
@@ -769,7 +769,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 태그 설정
+  // 클라이언트 버전 태그 Settings
   static async setTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -828,7 +828,7 @@ export class ClientVersionController {
 
     try {
       const environmentId = req.environmentId || 'development';
-      // 모든 데이터를 가져오기 위해 매우 큰 limit 사용
+      // 모든 데이터를 가져오기 위해 매우 큰 limit Used
       const result = await ClientVersionService.getAllClientVersions(environmentId, value, {
         page: 1,
         limit: 50000, // 충분히 큰 값

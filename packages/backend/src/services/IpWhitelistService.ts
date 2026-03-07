@@ -25,7 +25,7 @@ function ipMatchesCIDR(ip: string, cidr: string): boolean {
     const [network, prefixLength] = cidr.split('/');
     const prefix = parseInt(prefixLength, 10);
 
-    // IPv4 주소를 32비트 정수로 변환
+    // IPv4 주소를 32비트 Convert to integer
     const ipToInt = (ipAddr: string): number => {
       return ipAddr.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
     };

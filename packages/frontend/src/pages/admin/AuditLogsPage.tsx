@@ -158,7 +158,7 @@ const AuditLogsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
 
-  // 페이지 상태 관리 (localStorage 연동)
+  // 페이지 State management (localStorage 연동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -203,11 +203,11 @@ const AuditLogsPage: React.FC = () => {
   // Filters - localStorage에서 복원
   const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
 
-  // 동적 필터 상태
+  // 동적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // Debouncing된 Search어 (500ms 지연)
   const debouncedUserFilter = useDebounce(userFilter, 500);
 
   // Column configuration
@@ -377,7 +377,7 @@ const AuditLogsPage: React.FC = () => {
     const restoredFilters: ActiveFilter[] = [];
     const filters = pageState.filters;
 
-    // action 필터 복원
+    // action Filter 복원
     if (filters.action) {
       restoredFilters.push({
         key: 'action',
@@ -387,7 +387,7 @@ const AuditLogsPage: React.FC = () => {
       });
     }
 
-    // resource_type 필터 복원
+    // resource_type Filter 복원
     if (filters.resource_type) {
       restoredFilters.push({
         key: 'resource_type',
@@ -399,7 +399,7 @@ const AuditLogsPage: React.FC = () => {
       });
     }
 
-    // ip_address 필터 복원
+    // ip_address Filter 복원
     if (filters.ip_address) {
       restoredFilters.push({
         key: 'ip_address',

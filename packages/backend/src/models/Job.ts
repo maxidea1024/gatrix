@@ -40,7 +40,7 @@ export interface UpdateJobData {
   updatedBy: string;
 }
 
-// JSON 파싱 유틸리티 함수
+// JSON 파싱 Utility 함수
 const safeJsonParse = (input: any): any => {
   // 이미 객체인 경우 그대로 반환
   if (typeof input === 'object' && input !== null) {
@@ -66,14 +66,14 @@ const safeJsonParse = (input: any): any => {
     }
   }
 
-  // 기타 타입인 경우 그대로 반환
+  // 기타 Type인 경우 그대로 반환
   return input;
 };
 
-// JSON 문자열화 유틸리티 함수
+// JSON 문자열화 Utility 함수
 const safeJsonStringify = (data: any): string => {
   if (typeof data === 'string') {
-    // 이미 문자열인 경우, JSON인지 확인
+    // 이미 문자열인 경우, JSON인지 Confirm
     try {
       JSON.parse(data);
       return data; // 이미 유효한 JSON 문자열
@@ -88,12 +88,12 @@ const safeJsonStringify = (data: any): string => {
 export class JobModel {
   static async findAllWithPagination(filters: JobFilters): Promise<JobListResult> {
     try {
-      // 기본값 설정
+      // Set default values
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 20;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const environmentId = filters.environmentId;
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_jobs as j')
           .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
@@ -101,7 +101,7 @@ export class JobModel {
           .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id')
           .where('j.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
         if (filters?.jobTypeId) {
           query.where('j.jobTypeId', filters.jobTypeId);
@@ -122,10 +122,10 @@ export class JobModel {
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('j.id as total').first();
 
-      // Data 쿼리 - 태그 정보 포함
+      // Data Query - 태그 정보 포함
       const dataQuery = applyFilters(baseQuery())
         .select([
           'j.*',
@@ -145,7 +145,7 @@ export class JobModel {
 
       const total = countResult?.total || 0;
 
-      // Job 결과 매핑
+      // Job Results 매핑
       const jobs = dataResults.map((row: any) => ({
         id: row.id,
         name: row.name,
@@ -317,7 +317,7 @@ export class JobModel {
 
       // 태그 업데이트
       if (jobData.tagIds !== undefined) {
-        // 기존 태그 연결 삭제
+        // Existing 태그 연결 Delete
         await trx('g_tag_assignments').where('entityType', 'job').where('entityId', id).del();
 
         // 새 태그 연결 추가
@@ -344,10 +344,10 @@ export class JobModel {
   static async delete(id: string, environmentId: string): Promise<void> {
     const trx = await db.transaction();
     try {
-      // 태그 할당 삭제
+      // 태그 할당 Delete
       await trx('g_tag_assignments').where('entityType', 'job').where('entityId', id).del();
 
-      // Job 삭제
+      // Job Delete
       await trx('g_jobs').where('id', id).where('environmentId', environmentId).del();
 
       await trx.commit();
@@ -362,7 +362,7 @@ export class JobModel {
   static async setTags(jobId: string, tagIds: string[], createdBy?: string): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments').where('entityType', 'job').where('entityId', jobId).del();
 
         // 새 태그 할당 추가

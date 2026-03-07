@@ -1,4 +1,4 @@
-// 태그 인터페이스
+// 태그 Interface
 export interface Tag {
   id: string;
   name: string;
@@ -8,13 +8,13 @@ export interface Tag {
   updatedAt?: string;
 }
 
-// 사용자 역할
+// Used자 역할
 export type UserRole = 'admin' | 'user';
 
-// 사용자 상태
+// Used자 Status
 export type UserStatus = 'pending' | 'active' | 'suspended' | 'deleted';
 
-// 기본 사용자 인터페이스
+// 기본 Used자 Interface
 export interface User {
   id: string;
   name: string;
@@ -34,7 +34,7 @@ export interface User {
   tags?: Tag[];
 }
 
-// 사용자 생성 데이터
+// Used자 Create 데이터
 export interface CreateUserData {
   name: string;
   email: string;
@@ -45,7 +45,7 @@ export interface CreateUserData {
   tags?: string[]; // Tag ID array
 }
 
-// 사용자 업데이트 데이터
+// Used자 업데이트 데이터
 export interface UpdateUserData {
   name?: string;
   email?: string;
@@ -56,7 +56,7 @@ export interface UpdateUserData {
   tags?: string[]; // Tag ID array
 }
 
-// 사용자 필터
+// Used자 Filter
 export interface UserFilters {
   role?: UserRole;
   status?: UserStatus;
@@ -64,7 +64,7 @@ export interface UserFilters {
   tags?: string[]; // Filter by tag IDs
 }
 
-// 사용자 목록 응답
+// Used자 목록 Response
 export interface UserListResponse {
   users: User[];
   total: number;
@@ -73,7 +73,7 @@ export interface UserListResponse {
   totalPages: number;
 }
 
-// 사용자 통계
+// Used자 통계
 export interface UserStats {
   total: number;
   active: number;
@@ -82,14 +82,14 @@ export interface UserStats {
   admins: number;
 }
 
-// API 응답 래퍼
+// API Response 래퍼
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
 }
 
-// 사용자 기본값
+// Used자 Default values
 export const USER_DEFAULTS = {
   PAGE_SIZE: 10,
   SORT_BY: 'createdAt',

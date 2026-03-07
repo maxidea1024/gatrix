@@ -557,12 +557,12 @@ const ApiTokensPage: React.FC = () => {
     setPage(0); // Reset to first page when sorting
   };
 
-  // 토큰 이름 유효성 검사
+  // 토큰 이름 Validation
   const isValidTokenName = (name: string): boolean => {
     return name.trim().length >= 3; // 최소 3자 이상
   };
 
-  // 유효기간 검증 함수
+  // 유효기간 Validation 함수
   const validateExpiresAt = (
     expiresAt: string | undefined
   ): { isValid: boolean; warning: string | null } => {
@@ -618,25 +618,25 @@ const ApiTokensPage: React.FC = () => {
         isNew: true,
       };
 
-      // 생성 다이얼로그를 먼저 닫기
+      // Create Dialog를 먼저 Close
       setCreateDialogOpen(false);
       resetForm();
 
-      // 백엔드 응답 구조 확인 및 토큰 값 추출
+      // 백엔드 Response 구조 Confirm 및 토큰 값 추출
       const tokenValue = (response as any)?.data?.tokenValue || (response as any)?.tokenValue || '';
       console.log('Create response structure:', response); // 디버깅용
       console.log('Extracted token value:', tokenValue); // 디버깅용
 
-      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
+      // Status를 순서대로 Settings하여 Dialog가 확실히 열리도록 함
       setNewTokenInfo(tokenInfo);
       setNewTokenValue(tokenValue);
 
-      // 다음 렌더링 사이클에서 다이얼로그 열기
+      // 다음 렌더링 사이클에서 Dialog Open
       setTimeout(() => {
         setNewTokenDialogOpen(true);
       }, 0);
 
-      // 토큰 목록은 백그라운드에서 새로고침 (await 제거)
+      // 토큰 목록은 백그라운드에서 Refresh (await 제거)
       loadTokens().catch(console.error);
 
       enqueueSnackbar(t('apiTokens.createSuccess'), { variant: 'success' });
@@ -712,7 +712,7 @@ const ApiTokensPage: React.FC = () => {
       );
       console.log('Regenerate token response:', response); // 디버깅용
 
-      // 백엔드 응답 구조 확인 및 토큰 값 추출
+      // 백엔드 Response 구조 Confirm 및 토큰 값 추출
       const tokenValue = (response as any)?.data?.tokenValue || (response as any)?.tokenValue || '';
       console.log('Regenerate response structure:', response); // 디버깅용
       console.log('Extracted token value:', tokenValue); // 디버깅용
@@ -725,11 +725,11 @@ const ApiTokensPage: React.FC = () => {
         isNew: false,
       };
 
-      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
+      // Status를 순서대로 Settings하여 Dialog가 확실히 열리도록 함
       setNewTokenInfo(tokenInfo);
       setNewTokenValue(tokenValue);
 
-      // 다음 렌더링 사이클에서 다이얼로그 열기
+      // 다음 렌더링 사이클에서 Dialog Open
       setTimeout(() => {
         setNewTokenDialogOpen(true);
       }, 0);

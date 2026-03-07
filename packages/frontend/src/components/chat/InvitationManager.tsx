@@ -79,7 +79,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
   const [loading, setLoading] = useState(false);
   const [processingInvitations, setProcessingInvitations] = useState<Set<number>>(new Set());
 
-  // 받은 초대 목록 조회
+  // 받은 초대 Get list
   const fetchReceivedInvitations = async () => {
     try {
       const response = await fetch('/api/v1/chat/invitations/received', {
@@ -105,7 +105,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     }
   };
 
-  // 보낸 초대 목록 조회
+  // 보낸 초대 Get list
   const fetchSentInvitations = async () => {
     try {
       const response = await fetch('/api/v1/chat/invitations/sent', {
@@ -127,7 +127,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     }
   };
 
-  // 초대 응답 (수락/거절)
+  // 초대 Response (수락/거절)
   const respondToInvitation = async (invitationId: number, action: 'accept' | 'decline') => {
     setProcessingInvitations((prev) => new Set(prev).add(invitationId));
 
@@ -154,11 +154,11 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
 
           // 초대 수락 시 해당 채널로 자동 이동
           if (action === 'accept' && data.channelId) {
-            // 채널 목록 새로고침을 위해 부모 컴포넌트에 알림
+            // 채널 목록 Refresh을 위해 부모 컴포넌트에 Notification
             if (onInvitationAccepted) {
               onInvitationAccepted(data.channelId);
             } else {
-              // 콜백이 없는 경우에만 페이지 이동
+              // Callback이 없는 경우에만 페이지 이동
               window.location.href = `/chat?channel=${data.channelId}`;
             }
           }
@@ -194,7 +194,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     }
   };
 
-  // 초대 취소
+  // 초대 Cancel
   const cancelInvitation = async (invitationId: number) => {
     setProcessingInvitations((prev) => new Set(prev).add(invitationId));
 
@@ -233,7 +233,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     }
   };
 
-  // 다이얼로그 열릴 때 데이터 로드
+  // Dialog 열릴 때 데이터 로드
   useEffect(() => {
     if (open) {
       setLoading(true);
@@ -243,7 +243,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({
     }
   }, [open]);
 
-  // 상태별 색상 및 아이콘
+  // Status별 색상 및 아이콘
   const getStatusChip = (status: string) => {
     switch (status) {
       case 'pending':

@@ -421,7 +421,7 @@ export class UserModel {
   ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments').where('entityType', 'user').where('entityId', userId).del();
 
         // 새 태그 할당 추가
@@ -537,7 +537,7 @@ export class UserModel {
           'createdAt',
           'updatedAt',
         ])
-        .where('status', 'active') // 활성 사용자만 동기화
+        .where('status', 'active') // Active Used자만 동기화
         .whereNot('authType', 'service-account')
         .andWhere(function () {
           this.where('updatedAt', '>=', since).orWhere('createdAt', '>=', since);

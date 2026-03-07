@@ -264,7 +264,7 @@ const UsersManagementPage: React.FC = () => {
     );
   };
 
-  // 페이지 상태 관리 (URL params 연동)
+  // 페이지 State management (URL params 연동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -276,11 +276,11 @@ const UsersManagementPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 동적 필터 상태
+  // 동적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 디바운싱된 검색어
+  // Debouncing된 Search어
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // SWR로 데이터 로딩
@@ -301,7 +301,7 @@ const UsersManagementPage: React.FC = () => {
   const total = useMemo(() => usersData?.total || 0, [usersData]);
   const loading = isLoadingUsers || isLoadingTags;
 
-  // 초기 로딩 상태 추적
+  // 초기 Loading state 추적
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   useEffect(() => {
     if (!loading && isInitialLoad) {
@@ -309,7 +309,7 @@ const UsersManagementPage: React.FC = () => {
     }
   }, [loading, isInitialLoad]);
 
-  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
+  // 동적 Filter에서 값 추출 (useMemo로 참조 안정화)
   const statusFilter = useMemo(
     () => (activeFilters.find((f) => f.key === 'status')?.value as string[]) || [],
     [activeFilters]
@@ -335,12 +335,12 @@ const UsersManagementPage: React.FC = () => {
     [activeFilters]
   );
 
-  // 배열을 문자열로 변환하여 의존성 배열에 사용
+  // 배열을 문자열로 변환하여 의존성 배열에 Used
   const statusFilterString = useMemo(() => statusFilter.join(','), [statusFilter]);
   const roleFilterString = useMemo(() => roleFilter.join(','), [roleFilter]);
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
-  // 일괄 선택 관련 상태
+  // 일괄 선택 관련 Status
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [bulkActionType, setBulkActionType] = useState<
@@ -361,7 +361,7 @@ const UsersManagementPage: React.FC = () => {
   });
   const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
-  // 초대 관련 상태
+  // 초대 관련 Status
   const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
   const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
 
@@ -470,7 +470,7 @@ const UsersManagementPage: React.FC = () => {
     selectedEnvironments: [],
   });
 
-  // 이메일 인증 관련 상태
+  // 이메일 Authentication 관련 Status
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
   // Default column configuration
@@ -539,12 +539,12 @@ const UsersManagementPage: React.FC = () => {
 
   // SWR이 자동으로 데이터를 로드하므로 fetchUsers 함수 제거
 
-  // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
+  // 초대링크 Event 처리 (MainLayout에서 전달받음)
   useEffect(() => {
     const handleInvitationChange = (event: CustomEvent) => {
       const sseEvent = event.detail;
       if (sseEvent.type === 'invitation_created' || sseEvent.type === 'invitation_deleted') {
-        // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
+        // 초대링크 Status가 변경되면 현재 초대 정보를 다시 로드
         loadCurrentInvitation();
       }
     };
@@ -567,10 +567,10 @@ const UsersManagementPage: React.FC = () => {
       }
     };
     loadTags();
-    loadCurrentInvitation(); // 초대 기능 활성화
+    loadCurrentInvitation(); // 초대 기능 Active화
   }, []);
 
-  // 동적 필터 정의
+  // 동적 Filter 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
@@ -625,7 +625,7 @@ const UsersManagementPage: React.FC = () => {
     const restoredFilters: ActiveFilter[] = [];
     const filters = pageState.filters;
 
-    // status 필터 복원
+    // status Filter 복원
     if (filters.status) {
       restoredFilters.push({
         key: 'status',
@@ -635,7 +635,7 @@ const UsersManagementPage: React.FC = () => {
       });
     }
 
-    // role 필터 복원
+    // role Filter 복원
     if (filters.role) {
       restoredFilters.push({
         key: 'role',
@@ -645,7 +645,7 @@ const UsersManagementPage: React.FC = () => {
       });
     }
 
-    // tags 필터 복원
+    // tags Filter 복원
     if (filters.tags) {
       restoredFilters.push({
         key: 'tags',
@@ -688,7 +688,7 @@ const UsersManagementPage: React.FC = () => {
     }
   }, [activeFilters, filtersInitialized, pageState.filters, updateFilters]);
 
-  // 동적 필터 핸들러
+  // 동적 Filter 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
   };
@@ -728,14 +728,14 @@ const UsersManagementPage: React.FC = () => {
   const handleBulkAction = (
     actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete'
   ) => {
-    // 오픈 시 값 초기화 (이전에 선택한 값 유지 방지)
+    // 오픈 시 값 Initialization (이전에 선택한 값 유지 방지)
     setBulkActionType(actionType);
     setBulkActionValue('');
     setBulkActionTags([]);
     setBulkActionDialogOpen(true);
   };
 
-  // 일괄 작업 저장 버튼 활성화 조건 확인
+  // 일괄 작업 Save 버튼 Active화 조건 Confirm
   const isBulkActionValid = () => {
     switch (bulkActionType) {
       case 'status':
@@ -1220,7 +1220,7 @@ const UsersManagementPage: React.FC = () => {
       setReviewDialog({ open: false, saving: false });
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
-      // API 오류 응답에서 구체적인 메시지 추출
+      // API 오류 Response에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
       setReviewDialog((prev) => ({ ...prev, saving: false }));
@@ -1252,21 +1252,21 @@ const UsersManagementPage: React.FC = () => {
         mutateUsers(); // SWR cache 갱신
         setDeleteConfirmDialog({ open: false, user: null, inputValue: '' });
       } catch (error: any) {
-        // API 오류 응답에서 구체적인 메시지 추출
+        // API 오류 Response에서 구체적인 메시지 추출
         const errorMessage = error.error?.message || error.message || t('users.deleteError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
 
-  // 이메일 강제 인증 처리
+  // 이메일 강제 Authentication 처리
   const handleVerifyUserEmail = async (userId: number) => {
     try {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
       enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
-      // 편집 폼이 열려있다면 데이터 업데이트
+      // 편집 Form이 열려있다면 Update data
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
         setEditUserDialog((prev) => ({
           ...prev,
@@ -1281,7 +1281,7 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  // 이메일 인증 메일 재전송
+  // 이메일 Resend verification email
   const handleResendVerificationEmail = async (userId: number) => {
     try {
       setEmailVerificationLoading(true);
@@ -1296,7 +1296,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleAddUser = async () => {
-    // 폼 데이터 초기화
+    // Form 데이터 Initialization
     setNewUserData({
       name: '',
       email: '',
@@ -1321,7 +1321,7 @@ const UsersManagementPage: React.FC = () => {
       }
     }
 
-    // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
+    // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 Initialization
     setTimeout(() => {
       setNewUserData({
         name: '',
@@ -1377,7 +1377,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleCreateUser = async () => {
-    // 폼 검증
+    // Form Validation
     if (!validateNewUserForm()) {
       return;
     }
@@ -1411,7 +1411,7 @@ const UsersManagementPage: React.FC = () => {
       mutateUsers(); // SWR cache 갱신
       handleCloseAddUserDialog();
     } catch (error: any) {
-      // API 오류 응답에서 구체적인 메시지 추출
+      // API 오류 Response에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.createError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
@@ -1421,9 +1421,9 @@ const UsersManagementPage: React.FC = () => {
   const handleCreateInvitation = async (data: CreateInvitationRequest) => {
     try {
       const response = await invitationService.createInvitation(data);
-      setInvitationDialogOpen(false); // 초대 폼 닫기
-      await loadCurrentInvitation(); // 현재 초대 정보 새로고침
-      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
+      setInvitationDialogOpen(false); // 초대 Form Close
+      await loadCurrentInvitation(); // 현재 초대 정보 Refresh
+      // Success 토스트는 SSE Event에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to create invitation:', error);
       enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', {
@@ -1438,7 +1438,7 @@ const UsersManagementPage: React.FC = () => {
     try {
       await invitationService.deleteInvitation(currentInvitation.id);
       setCurrentInvitation(null);
-      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
+      // Success 토스트는 SSE Event에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to delete invitation:', error);
       enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', {
@@ -2817,7 +2817,7 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* 이메일 인증 상태 및 액션 */}
+            {/* 이메일 Authentication Status 및 액션 */}
             {editUserDialog.user && !isCurrentUser(editUserDialog.user) && (
               <Box
                 sx={{
@@ -3558,7 +3558,7 @@ const UsersManagementPage: React.FC = () => {
             </Box>
           )}
 
-          {/* 공통 대상 미리보기 (삭제 외 액션에도 표시) */}
+          {/* 공통 대상 미리보기 (Delete 외 액션에도 표시) */}
           {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
@@ -3621,7 +3621,7 @@ const UsersManagementPage: React.FC = () => {
                 {t('users.bulkDeleteConfirm', { count: selectedUsers.size })}
               </Typography>
 
-              {/* 삭제 대상 사용자 목록 */}
+              {/* Delete 대상 Used자 목록 */}
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
                 {t('users.deleteTargetUsers')}:
               </Typography>

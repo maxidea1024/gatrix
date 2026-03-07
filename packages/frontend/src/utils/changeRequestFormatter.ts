@@ -47,7 +47,7 @@ export const formatChangeRequestTitle = (title: string, t: TFunction): string =>
     else if (action === 'Delete') actionLocalized = t('common.delete');
 
     // Format: [Service Notice] Update: 123
-    // Or more natural Korean: 서비스 공지 수정: 123
+    // Or more natural Korean: Service 공지 Edit: 123
     // Let's stick to a bracket format for clarity but localized
     let identifierLocalized = identifier;
     if (identifier === 'New Item') {

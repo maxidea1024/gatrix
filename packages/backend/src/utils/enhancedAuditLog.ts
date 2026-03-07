@@ -24,7 +24,7 @@ export interface EnhancedAuditLogOptions {
 
 /**
  * Enhanced audit log middleware that captures detailed before/after state
- * Follows 육하원칙 (5W1H): Who, What, When, Where, Why, How
+ * Follows 5W1H principle (5W1H): Who, What, When, Where, Why, How
  */
 export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -71,7 +71,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           return;
         }
 
-        // Resource ID 결정 (요청에서 또는 응답에서)
+        // Resource ID 결정 (Request에서 또는 Response에서)
         let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
