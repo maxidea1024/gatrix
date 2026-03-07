@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { consoleService } from '../services/console-service';
 import { pubSubService } from '../services/pub-sub-service';
 import { AuditLogModel } from '../models/audit-log';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('SystemConsoleController');
 
 export class SystemConsoleController {

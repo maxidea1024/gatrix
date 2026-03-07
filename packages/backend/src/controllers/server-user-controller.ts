@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/user-service';
 import { UserModel } from '../models/user';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ServerUserController');
 import {
   sendBadRequest,
   sendNotFound,
@@ -11,6 +8,9 @@ import {
   sendSuccessResponse,
   ErrorCodes,
 } from '../utils/api-response';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ServerUserController');
 
 export interface ServerUserRequest extends Request {
   apiToken?: any;

@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/vars';
 import { pubSubService } from '../services/pub-sub-service';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('MaintenanceController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
 import { AuthenticatedRequest } from '../types/auth';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('MaintenanceController');
 
 export interface MaintenancePayload {
   isMaintenance: boolean;

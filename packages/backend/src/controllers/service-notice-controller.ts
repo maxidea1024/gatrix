@@ -8,10 +8,10 @@ import {
   sendSuccessResponse,
   ErrorCodes,
 } from '../utils/api-response';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ServiceNoticeController');
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ServiceNoticeController');
 
 class ServiceNoticeController {
   /**

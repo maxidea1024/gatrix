@@ -6,9 +6,9 @@ import { UserModel } from '../models/user';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Knex } from 'knex';
-import { createLogger } from '../config/logger';
 import { UserOnboardingService } from '../services/user-onboarding-service';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('PublicInvitationController');
 
 export class PublicInvitationController {

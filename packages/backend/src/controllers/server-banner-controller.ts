@@ -1,11 +1,11 @@
 import { Response } from 'express';
 import { BannerModel } from '../models/banner';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ServerBannerController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ServerBannerController');
 
 /**
  * Server SDK Banner Controller

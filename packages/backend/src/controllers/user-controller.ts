@@ -6,10 +6,10 @@ import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { UserModel } from '../models/user';
 import Joi from 'joi';
-import { createLogger } from '../config/logger';
 import { UserOnboardingService } from '../services/user-onboarding-service';
 import { permissionService } from '../services/permission-service';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('UserController');
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
