@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { MessageModel } from '../models/Message';
-import { ChannelModel } from '../models/Channel';
+import { MessageModel } from '../models/message';
+import { ChannelModel } from '../models/channel';
 import { CreateMessageData, UpdateMessageData, SearchQuery } from '../types/chat';
-import { getMetrics } from '../services/MetricsService';
+import { getMetrics } from '../services/metrics-service';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('MessageController');

@@ -3,7 +3,7 @@
  * Tests all operators with normal and inverted cases, edge cases, and type coercion.
  */
 import { describe, it, expect } from 'vitest';
-import { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
+import { FeatureFlagEvaluator } from './feature-flag-evaluator';
 import type {
   FeatureFlag,
   EvaluationContext,

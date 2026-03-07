@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { authenticateApiToken } from './apiAuth';
-import { UserModel } from '../models/User';
+import { authenticateApiToken } from './api-auth';
+import { UserModel } from '../models/user';
 import { createLogger } from '../config/logger';
 import { HEADERS } from '../constants/headers';
 
 const logger = createLogger('Auth');
 
 // JWT 시스템을 API Token으로 완전 교체
-export * from './apiAuth';
+export * from './api-auth';
 
 // Backend -> Chat Server 특수 토큰 (환경변수에서 가져옴)
 const BACKEND_SERVICE_TOKEN =
@@ -159,7 +159,7 @@ export const authenticate = async (
   }
 };
 
-export { requireAdmin } from './apiAuth';
+export { requireAdmin } from './api-auth';
 
 // 기존 미들웨어들 (임시로 간단한 구현)
 export const rateLimiter = (windowMs: number, maxRequests: number) => {

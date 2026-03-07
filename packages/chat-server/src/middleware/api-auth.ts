@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiTokenService, ApiToken } from '../services/ApiTokenService';
+import { ApiTokenService, ApiToken } from '../services/api-token-service';
 import { createLogger } from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import jwt from 'jsonwebtoken';

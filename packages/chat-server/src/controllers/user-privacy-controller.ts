@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserPrivacySettingsModel, UpdatePrivacySettingsData } from '../models/UserPrivacySettings';
+import { UserPrivacySettingsModel, UpdatePrivacySettingsData } from '../models/user-privacy-settings';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('UserPrivacyController');

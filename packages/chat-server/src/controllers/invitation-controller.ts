@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { ChannelInvitationModel } from '../models/ChannelInvitation';
-import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
-import { ChannelModel } from '../models/Channel';
-import { UserModel, ChatUser } from '../models/User';
+import { ChannelInvitationModel } from '../models/channel-invitation';
+import { UserPrivacySettingsModel } from '../models/user-privacy-settings';
+import { ChannelModel } from '../models/channel';
+import { UserModel, ChatUser } from '../models/user';
 import { redisManager } from '../config/redis';
 import { createLogger } from '../config/logger';
 
@@ -205,7 +205,7 @@ export class InvitationController {
       // Send real-time notification to invitee
       try {
         // Dynamically import BroadcastService to resolve circular import issues
-        const BroadcastServiceModule = await import('../services/BroadcastService');
+        const BroadcastServiceModule = await import('../services/broadcast-service');
         const BroadcastService = BroadcastServiceModule.default;
         const broadcastService = BroadcastService.getInstance();
 
@@ -241,7 +241,7 @@ export class InvitationController {
       );
 
       // Send notification to Gatrix main server as well
-      const { gatrixApiService } = require('../services/GatrixApiService');
+      const { gatrixApiService } = require('../services/gatrix-api-service');
       await gatrixApiService.sendNotification({
         userId: inviteeId,
         type: 'channel_invite',
@@ -335,7 +335,7 @@ export class InvitationController {
         await ChannelModel.addMember(invitation.channelId, userId, 'member');
 
         // Notify channel members about new member joining
-        const { BroadcastService } = require('../services/BroadcastService');
+        const { BroadcastService } = require('../services/broadcast-service');
         const broadcastService = BroadcastService.getInstance();
 
         await broadcastService.broadcastToChannel(invitation.channelId, 'user_joined_channel', {
@@ -347,7 +347,7 @@ export class InvitationController {
       }
 
       // Notify inviter about response
-      const { BroadcastService } = require('../services/BroadcastService');
+      const { BroadcastService } = require('../services/broadcast-service');
       const broadcastService = BroadcastService.getInstance();
 
       await broadcastService.broadcastToUser(invitation.inviterId, 'invitation_response', {
@@ -613,7 +613,7 @@ export class InvitationController {
       const cancelledInvitation = await ChannelInvitationModel.cancel(invitationIdNum, userId);
 
       // Notify invitee about cancellation
-      const { BroadcastService } = require('../services/BroadcastService');
+      const { BroadcastService } = require('../services/broadcast-service');
       const broadcastService = BroadcastService.getInstance();
 
       await broadcastService.broadcastToUser(

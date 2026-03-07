@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { MessageReactionController } from '../controllers/MessageReactionController';
+import { MessageReactionController } from '../controllers/message-reaction-controller';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();

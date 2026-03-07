@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ApiTokenService } from '../services/ApiTokenService';
+import { ApiTokenService } from '../services/api-token-service';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('ApiTokenController');

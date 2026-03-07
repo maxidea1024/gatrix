@@ -5,26 +5,26 @@
  */
 
 import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
-import { Strategy } from './Strategy';
-import { DefaultStrategy } from './DefaultStrategy';
-import { FlexibleRolloutStrategy } from './FlexibleRolloutStrategy';
-import { UserWithIdStrategy } from './UserWithIdStrategy';
-import { GradualRolloutUserIdStrategy } from './GradualRolloutUserIdStrategy';
-import { GradualRolloutRandomStrategy } from './GradualRolloutRandomStrategy';
-import { GradualRolloutSessionIdStrategy } from './GradualRolloutSessionIdStrategy';
-import { RemoteAddressStrategy } from './RemoteAddressStrategy';
-import { ApplicationHostnameStrategy } from './ApplicationHostnameStrategy';
+import { Strategy } from './strategy';
+import { DefaultStrategy } from './default-strategy';
+import { FlexibleRolloutStrategy } from './flexible-rollout-strategy';
+import { UserWithIdStrategy } from './user-with-id-strategy';
+import { GradualRolloutUserIdStrategy } from './gradual-rollout-user-id-strategy';
+import { GradualRolloutRandomStrategy } from './gradual-rollout-random-strategy';
+import { GradualRolloutSessionIdStrategy } from './gradual-rollout-session-id-strategy';
+import { RemoteAddressStrategy } from './remote-address-strategy';
+import { ApplicationHostnameStrategy } from './application-hostname-strategy';
 
 // Re-export all strategy classes
-export { Strategy } from './Strategy';
-export { DefaultStrategy } from './DefaultStrategy';
-export { FlexibleRolloutStrategy } from './FlexibleRolloutStrategy';
-export { UserWithIdStrategy } from './UserWithIdStrategy';
-export { GradualRolloutUserIdStrategy } from './GradualRolloutUserIdStrategy';
-export { GradualRolloutRandomStrategy } from './GradualRolloutRandomStrategy';
-export { GradualRolloutSessionIdStrategy } from './GradualRolloutSessionIdStrategy';
-export { RemoteAddressStrategy } from './RemoteAddressStrategy';
-export { ApplicationHostnameStrategy } from './ApplicationHostnameStrategy';
+export { Strategy } from './strategy';
+export { DefaultStrategy } from './default-strategy';
+export { FlexibleRolloutStrategy } from './flexible-rollout-strategy';
+export { UserWithIdStrategy } from './user-with-id-strategy';
+export { GradualRolloutUserIdStrategy } from './gradual-rollout-user-id-strategy';
+export { GradualRolloutRandomStrategy } from './gradual-rollout-random-strategy';
+export { GradualRolloutSessionIdStrategy } from './gradual-rollout-session-id-strategy';
+export { RemoteAddressStrategy } from './remote-address-strategy';
+export { ApplicationHostnameStrategy } from './application-hostname-strategy';
 export { normalizedStrategyValue } from './util';
 
 // ==================== Strategy Registry ====================

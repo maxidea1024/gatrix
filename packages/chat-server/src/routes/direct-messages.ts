@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { DirectMessageController } from '../controllers/DirectMessageController';
+import { DirectMessageController } from '../controllers/direct-message-controller';
 import { authenticate, rateLimiter } from '../middleware/auth';
 
 const router = Router();

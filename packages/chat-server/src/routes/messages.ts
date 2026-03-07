@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { MessageController } from '../controllers/MessageController';
+import { MessageController } from '../controllers/message-controller';
 import { authenticate, rateLimiter, validateInput } from '../middleware/auth';
 import Joi from 'joi';
 

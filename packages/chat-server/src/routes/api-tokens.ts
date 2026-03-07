@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { ApiTokenController } from '../controllers/ApiTokenController';
-import { authenticateApiToken, requireAdmin } from '../middleware/apiAuth';
+import { ApiTokenController } from '../controllers/api-token-controller';
+import { authenticateApiToken, requireAdmin } from '../middleware/api-auth';
 
 const router = Router();
 

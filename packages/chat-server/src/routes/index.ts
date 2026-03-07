@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import channelsRouter from './channels';
 import messagesRouter from './messages';
-import messageReactionsRouter from './messageReactions';
+import messageReactionsRouter from './message-reactions';
 import privacyRouter from './privacy';
 import invitationsRouter from './invitations';
 import directMessagesRouter from './direct-messages';
 import usersRouter from './users';
-import apiTokenRouter from './apiTokens';
+import apiTokenRouter from './api-tokens';
 
 import { errorHandler } from '../middleware/auth';
 

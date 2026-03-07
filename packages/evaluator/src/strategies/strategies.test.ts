@@ -3,14 +3,14 @@
  * Tests all strategy types with isEnabled and isEnabledWithDetails.
  */
 import { describe, it, expect } from 'vitest';
-import { DefaultStrategy } from './DefaultStrategy';
-import { FlexibleRolloutStrategy } from './FlexibleRolloutStrategy';
-import { UserWithIdStrategy } from './UserWithIdStrategy';
-import { GradualRolloutUserIdStrategy } from './GradualRolloutUserIdStrategy';
-import { GradualRolloutRandomStrategy } from './GradualRolloutRandomStrategy';
-import { GradualRolloutSessionIdStrategy } from './GradualRolloutSessionIdStrategy';
-import { RemoteAddressStrategy } from './RemoteAddressStrategy';
-import { ApplicationHostnameStrategy } from './ApplicationHostnameStrategy';
+import { DefaultStrategy } from './default-strategy';
+import { FlexibleRolloutStrategy } from './flexible-rollout-strategy';
+import { UserWithIdStrategy } from './user-with-id-strategy';
+import { GradualRolloutUserIdStrategy } from './gradual-rollout-user-id-strategy';
+import { GradualRolloutRandomStrategy } from './gradual-rollout-random-strategy';
+import { GradualRolloutSessionIdStrategy } from './gradual-rollout-session-id-strategy';
+import { RemoteAddressStrategy } from './remote-address-strategy';
+import { ApplicationHostnameStrategy } from './application-hostname-strategy';
 import { evaluateStrategyWithDetails, getStrategy } from './index';
 import { normalizedStrategyValue } from './util';
 import type { EvaluationContext, StrategyParameters } from '@gatrix/shared';

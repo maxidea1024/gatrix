@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { ChannelModel } from '../models/Channel';
-import { MessageModel } from '../models/Message';
+import { ChannelModel } from '../models/channel';
+import { MessageModel } from '../models/message';
 import { CreateChannelData, UpdateChannelData } from '../types/chat';
-import { getMetrics } from '../services/MetricsService';
+import { getMetrics } from '../services/metrics-service';
 import logger from '../config/logger';
 
 export class ChannelController {

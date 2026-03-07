@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ChannelModel } from '../models/Channel';
-import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
+import { ChannelModel } from '../models/channel';
+import { UserPrivacySettingsModel } from '../models/user-privacy-settings';
 import { redisClient } from '../config/redis';
 import { createLogger } from '../config/logger';
 
@@ -127,7 +127,7 @@ export class DirectMessageController {
       );
 
       // 대상 사용자에게 새 DM 알림
-      const { BroadcastService } = require('../services/BroadcastService');
+      const { BroadcastService } = require('../services/broadcast-service');
       const broadcastService = BroadcastService.getInstance();
 
       await broadcastService.broadcastToUser(targetUserId, 'new_direct_message', {

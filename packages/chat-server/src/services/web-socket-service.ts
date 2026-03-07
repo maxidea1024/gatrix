@@ -5,10 +5,10 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 import { config } from '../config';
 import { redisManager } from '../config/redis';
-import BroadcastService from './BroadcastService';
-import { getMetrics } from './MetricsService';
-import { CacheService } from './CacheService';
-import { UserService } from './UserService';
+import BroadcastService from './broadcast-service';
+import { getMetrics } from './metrics-service';
+import { CacheService } from './cache-service';
+import { UserService } from './user-service';
 import { createLogger } from '../config/logger';
 import { SocketUser, WebSocketEvent } from '../types/chat';
 
@@ -291,7 +291,7 @@ export class WebSocketService {
     channelId: number
   ): Promise<void> {
     // 채널 권한 검사
-    const { ChannelModel } = require('../models/Channel');
+    const { ChannelModel } = require('../models/channel');
 
     try {
       const channel = await ChannelModel.findById(channelId);

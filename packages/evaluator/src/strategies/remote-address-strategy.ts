@@ -6,7 +6,7 @@
  */
 
 import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
-import { Strategy } from './Strategy';
+import { Strategy } from './strategy';
 
 /**
  * Convert IPv4 address to 32-bit unsigned integer.

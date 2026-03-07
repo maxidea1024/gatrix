@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { InvitationController } from '../controllers/InvitationController';
+import { InvitationController } from '../controllers/invitation-controller';
 import { authenticate, rateLimiter } from '../middleware/auth';
 
 const router = Router();

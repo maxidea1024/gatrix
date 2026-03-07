@@ -3,8 +3,8 @@
  * Exports evaluator and all evaluation-related utilities.
  * Type definitions are re-exported from @gatrix/shared.
  */
-export { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
-export { EvaluationUtils, truncateToMinute, buildContextQueryParams } from './EvaluationUtils';
+export { FeatureFlagEvaluator } from './feature-flag-evaluator';
+export { EvaluationUtils, truncateToMinute, buildContextQueryParams } from './evaluation-utils';
 export {
   getStrategy,
   evaluateStrategyIsEnabled,

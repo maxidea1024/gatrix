@@ -6,7 +6,7 @@
  * - Actual variant name: when a specific variant is selected
  */
 import { describe, it, expect } from 'vitest';
-import { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
+import { FeatureFlagEvaluator } from './feature-flag-evaluator';
 import type { FeatureFlag, EvaluationContext, FeatureSegment } from '@gatrix/shared';
 
 const emptySegmentsMap = new Map<string, FeatureSegment>();

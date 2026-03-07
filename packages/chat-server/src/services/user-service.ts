@@ -1,5 +1,5 @@
 import { databaseManager } from '../config/database';
-import { CacheService } from './CacheService';
+import { CacheService } from './cache-service';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('UserService');

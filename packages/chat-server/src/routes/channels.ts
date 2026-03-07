@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { ChannelController } from '../controllers/ChannelController';
-import { MessageController } from '../controllers/MessageController';
-import { InvitationController } from '../controllers/InvitationController';
+import { ChannelController } from '../controllers/channel-controller';
+import { MessageController } from '../controllers/message-controller';
+import { InvitationController } from '../controllers/invitation-controller';
 import { authenticate, rateLimiter, validateInput } from '../middleware/auth';
 import Joi from 'joi';
 

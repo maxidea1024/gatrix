@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { MessageReactionModel } from '../models/MessageReaction';
-import { MessageModel } from '../models/Message';
+import { MessageReactionModel } from '../models/message-reaction';
+import { MessageModel } from '../models/message';
 import { createLogger } from '../config/logger';
-// import { WebSocketService } from '../services/WebSocketService';
+// import { WebSocketService } from '../services/web-socket-service';
 
 const logger = createLogger('MessageReactionController');
 
@@ -41,7 +41,7 @@ export class MessageReactionController {
 
       // WebSocket으로 실시간 업데이트 전송
       try {
-        const { BroadcastService } = require('../services/BroadcastService');
+        const { BroadcastService } = require('../services/broadcast-service');
         const broadcastService = BroadcastService.getInstance();
 
         if (broadcastService) {
@@ -64,11 +64,11 @@ export class MessageReactionController {
       // 리액션 알림 전송 (메시지 작성자가 자신의 메시지에 리액션한 경우 제외)
       if (result.action === 'added' && message.userId !== userId) {
         try {
-          const { GatrixApiService } = require('../services/GatrixApiService');
+          const { GatrixApiService } = require('../services/gatrix-api-service');
           const gatrixApi = GatrixApiService.getInstance();
 
           // 리액션을 추가한 사용자 정보 가져오기
-          const { UserService } = require('../services/UserService');
+          const { UserService } = require('../services/user-service');
           const reactingUser = await UserService.getUserById(userId);
 
           await gatrixApi.sendNotification({
@@ -197,7 +197,7 @@ export class MessageReactionController {
 
       // WebSocket으로 실시간 업데이트 전송
       try {
-        const { BroadcastService } = require('../services/BroadcastService');
+        const { BroadcastService } = require('../services/broadcast-service');
         const broadcastService = BroadcastService.getInstance();
 
         if (broadcastService) {

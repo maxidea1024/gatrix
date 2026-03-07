@@ -6,7 +6,7 @@
  */
 
 import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
-import { Strategy } from './Strategy';
+import { Strategy } from './strategy';
 import { normalizedStrategyValue } from './util';
 
 export class FlexibleRolloutStrategy extends Strategy {

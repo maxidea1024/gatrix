@@ -6,7 +6,7 @@
 
 import { hostname } from 'os';
 import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
-import { Strategy } from './Strategy';
+import { Strategy } from './strategy';
 
 export class ApplicationHostnameStrategy extends Strategy {
   private readonly currentHostname: string;

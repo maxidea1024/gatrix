@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserPrivacyController } from '../controllers/UserPrivacyController';
+import { UserPrivacyController } from '../controllers/user-privacy-controller';
 import { authenticate, rateLimiter } from '../middleware/auth';
 
 const router = Router();

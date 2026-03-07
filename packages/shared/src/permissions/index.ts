@@ -49,4 +49,4 @@ export {
 } from './categories';
 
 // Role Label inference
-export { inferRoleLabelKey, getRoleLabelColor } from './roleLabel';
+export { inferRoleLabelKey, getRoleLabelColor } from './role-label';

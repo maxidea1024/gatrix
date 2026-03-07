@@ -4,7 +4,7 @@
  */
 
 import { EvaluationContext, StrategyParameters, StrategyEvaluationResult } from '@gatrix/shared';
-import { Strategy } from './Strategy';
+import { Strategy } from './strategy';
 
 export class DefaultStrategy extends Strategy {
   constructor() {

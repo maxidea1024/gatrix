@@ -8,7 +8,7 @@ import trackRoutes from './routes/track';
 import insightsRoutes from './routes/insights';
 import logger from './utils/logger';
 
-import { initMetrics } from './services/MetricsService';
+import { initMetrics } from './services/metrics-service';
 
 export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify({
