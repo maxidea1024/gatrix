@@ -115,6 +115,27 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
     // Add the creator as org admin member
     await Organisation.addMember(org.id, req.user.id, 'admin');
 
+    // Auto-bind Manager role (with *:*) at org scope so creator has full access
+    try {
+      const managerRole = await db('g_roles')
+        .where('roleName', 'Manager')
+        .first();
+      if (managerRole) {
+        await db('g_role_bindings').insert({
+          id: generateULID(),
+          userId: req.user.id,
+          roleId: managerRole.id,
+          scopeType: 'org',
+          scopeId: org.id,
+          createdAt: db.raw('UTC_TIMESTAMP()'),
+        });
+        // Invalidate permission cache for the creator
+        await permissionService.invalidateUserCache(req.user.id);
+      }
+    } catch (bindErr) {
+      logger.warn('Failed to auto-bind Manager role for org creator:', bindErr);
+    }
+
     res.status(201).json({ success: true, data: org });
   } catch (error) {
     logger.error('Error creating organisation:', error);
