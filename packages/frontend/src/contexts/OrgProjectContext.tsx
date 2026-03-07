@@ -374,10 +374,10 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
 
   // Fetch projects when org changes
   useEffect(() => {
-    if (currentOrgId) {
+    if (isAuthenticated && currentOrgId) {
       loadProjects();
     }
-  }, [currentOrgId, loadProjects]);
+  }, [isAuthenticated, currentOrgId, loadProjects]);
 
   // Auto-poll when noOrgAccess — check every 15s if access has been granted
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
