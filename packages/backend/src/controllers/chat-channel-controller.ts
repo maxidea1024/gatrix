@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { ChatServerService } from '../services/chat-server-service';
-import { createLogger } from '../config/logger';
 import { JWTPayload } from '../types/auth';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ChatChannelController');
 
 /**

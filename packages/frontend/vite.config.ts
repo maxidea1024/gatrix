@@ -214,9 +214,37 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
-        // Hardening: eliminate dynamic code-splitting to avoid runtime init-order issues across chunks
-        inlineDynamicImports: true,
-        manualChunks: undefined,
+        manualChunks: {
+          // Core React runtime - cached long-term
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          // MUI core
+          'vendor-mui': [
+            '@mui/material',
+            '@mui/icons-material',
+            '@mui/lab',
+            '@mui/system',
+            '@emotion/react',
+            '@emotion/styled',
+          ],
+          // MUI data components
+          'vendor-mui-x': [
+            '@mui/x-data-grid',
+            '@mui/x-date-pickers',
+            '@mui/x-date-pickers-pro',
+          ],
+          // Monaco editor - very large, used only in specific pages
+          'vendor-monaco': ['monaco-editor', '@monaco-editor/react'],
+          // Chart libraries
+          'vendor-charts': ['chart.js', 'react-chartjs-2'],
+          // Calendar
+          'vendor-calendar': [
+            '@fullcalendar/core',
+            '@fullcalendar/daygrid',
+            '@fullcalendar/interaction',
+            '@fullcalendar/react',
+            '@fullcalendar/timegrid',
+          ],
+        },
       },
     },
   },

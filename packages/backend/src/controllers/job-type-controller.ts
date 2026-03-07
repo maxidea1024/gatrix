@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { JobTypeModel } from '../models/job-type';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('jobTypeController');
 
 // Job Type Get list

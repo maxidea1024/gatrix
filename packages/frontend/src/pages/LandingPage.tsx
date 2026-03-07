@@ -20,9 +20,14 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useTheme as useAppTheme } from '@/contexts/ThemeContext';
 import { useI18n } from '@/contexts/I18nContext';
-import moment from 'moment-timezone';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import dayjsTimezone from 'dayjs/plugin/timezone';
 import { setStoredTimezone } from '@/utils/dateFormat';
 import { ThemeMode } from '@/types';
+
+dayjs.extend(utc);
+dayjs.extend(dayjsTimezone);
 
 const LandingPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -40,10 +45,10 @@ const LandingPage: React.FC = () => {
   const [selectedTimezone, setSelectedTimezone] = useState(browserTimezone);
   const [selectedTheme, setSelectedTheme] = useState<ThemeMode>(mode);
 
-  const timezoneOptions = moment.tz.names();
+  const timezoneOptions = Intl.supportedValuesOf('timeZone');
 
   const formatTimezone = (tz: string) => {
-    const offset = moment.tz(tz).format('Z');
+    const offset = dayjs().tz(tz).format('Z');
     return `${tz} (UTC${offset})`;
   };
 
@@ -239,7 +244,7 @@ const LandingPage: React.FC = () => {
                     <Box>
                       <Typography variant="body2">{option}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        UTC{moment.tz(option).format('Z')}
+                        UTC{dayjs().tz(option).format('Z')}
                       </Typography>
                     </Box>
                   </li>

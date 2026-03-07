@@ -3,13 +3,13 @@ import ClientVersionService from '../services/client-version-service';
 import { ClientVersionModel } from '../models/client-version';
 import VarsModel from '../models/vars';
 import { TagService } from '../services/tag-service';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ServerClientVersionController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
 import { resolvePassiveData } from '../utils/passive-data-utils';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ServerClientVersionController');
 
 /**
  * Server SDK Client Version Controller

@@ -6,13 +6,13 @@ import { AuditLogModel } from '../models/audit-log';
 import { UserModel } from '../models/user';
 import { GatrixError } from '../middleware/error-handler';
 import { clearAllCache } from '../middleware/response-cache';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('AdminController');
 import db from '../config/knex';
 import Joi from 'joi';
 import { pubSubService } from '../services/pub-sub-service';
 import { permissionService } from '../services/permission-service';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('AdminController');
 
 export class AdminController {
   // Dashboard and statistics

@@ -3,8 +3,8 @@ import { AuthenticatedRequest } from '../types/auth';
 import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { PlanningDataService } from '../services/planning-data-service';
 import { pubSubService } from '../services/pub-sub-service';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('PlanningDataController');
 
 // Helper to get environment from request

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { CssBaseline, Box, GlobalStyles, IconButton } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
@@ -32,113 +32,111 @@ import { PlanningDataProvider } from './contexts/PlanningDataContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { OrgProjectProvider } from './contexts/OrgProjectContext';
 
-// Components
+// Components - always needed for app shell
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './contexts/AuthContext';
 
-// Layout Components
+// Layout Components - always needed for app shell
 import { MainLayout } from './components/layout/MainLayout';
 import { EnvironmentAwareLayout } from './components/layout/EnvironmentAwareLayout';
 
+// ============================================================
+// Lazy-loaded Pages - each becomes a separate chunk
+// ============================================================
+
 // Pages - Auth
-import LoginPage from './pages/auth/LoginPage';
-import LogoutPage from './pages/auth/LogoutPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import PendingApprovalPage from './pages/auth/PendingApprovalPage';
-import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
-import SessionExpiredPage from './pages/auth/SessionExpiredPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
-import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
-import InvalidInvitePage from './pages/auth/InvalidInvitePage';
+const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'));
+const LogoutPage = React.lazy(() => import('./pages/auth/LogoutPage'));
+const RegisterPage = React.lazy(() => import('./pages/auth/RegisterPage'));
+const PendingApprovalPage = React.lazy(() => import('./pages/auth/PendingApprovalPage'));
+const AccountSuspendedPage = React.lazy(() => import('./pages/auth/AccountSuspendedPage'));
+const SessionExpiredPage = React.lazy(() => import('./pages/auth/SessionExpiredPage'));
+const ForgotPasswordPage = React.lazy(() => import('./pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = React.lazy(() => import('./pages/auth/ResetPasswordPage'));
+const OAuthCallbackPage = React.lazy(() => import('./pages/auth/OAuthCallbackPage'));
+const InvalidInvitePage = React.lazy(() => import('./pages/auth/InvalidInvitePage'));
 
 // Pages - Common
-import DashboardPage from './pages/common/DashboardPage';
-import NotFoundPage from './pages/common/NotFoundPage';
-import UnauthorizedPage from './pages/common/UnauthorizedPage';
-import LandingPage from './pages/LandingPage';
+const DashboardPage = React.lazy(() => import('./pages/common/DashboardPage'));
+const NotFoundPage = React.lazy(() => import('./pages/common/NotFoundPage'));
+const UnauthorizedPage = React.lazy(() => import('./pages/common/UnauthorizedPage'));
+const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 
 // Pages - User
-import ProfilePage from './pages/user/ProfilePage';
-import SettingsPage from './pages/SettingsPage';
-import TagsPage from './pages/settings/TagsPage';
-import SystemSettingsPage from './pages/settings/SystemSettingsPage';
+const ProfilePage = React.lazy(() => import('./pages/user/ProfilePage'));
+const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
+const TagsPage = React.lazy(() => import('./pages/settings/TagsPage'));
+const SystemSettingsPage = React.lazy(() => import('./pages/settings/SystemSettingsPage'));
 
 // Pages - Admin
-import UsersManagementPage from './pages/admin/UsersManagementPage';
-import GameWorldsPage from './pages/admin/GameWorldsPage';
-import WhitelistPage from './pages/admin/WhitelistPage';
-import ClientVersionsPage from './pages/admin/ClientVersionsPage';
-import AuditLogsPage from './pages/admin/AuditLogsPage';
-import MaintenancePage from './pages/admin/MaintenancePage';
-import PlayerConnectionsPage from './pages/admin/PlayerConnectionsPage';
-
-import MessageTemplatesPage from './pages/admin/MessageTemplatesPage';
-import SchedulerPage from './pages/admin/SchedulerPage';
-
-import JobsPage from './pages/admin/JobsPage';
-import QueueMonitorPage from './pages/admin/QueueMonitorPage';
-import CustomQueueMonitorPage from './pages/admin/CustomQueueMonitorPage';
-
-import ApiTokensPage from './pages/admin/ApiTokensPage';
-import CrashEventsPage from './pages/admin/CrashEventsPage';
-import ChatPage from './pages/chat/ChatPage';
-import MailboxPage from './pages/mailbox/MailboxPage';
-import SystemConsolePage from './pages/admin/SystemConsolePage';
-import LogsPage from './pages/monitoring/LogsPage';
-import AlertsPage from './pages/monitoring/AlertsPage';
-
-import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
-import ServerListPage from './pages/admin/ServerListPage';
-import ServerLifecyclePage from './pages/admin/ServerLifecyclePage';
-import ChangeRequestsPage from './pages/admin/ChangeRequestsPage';
-import ChangeRequestDetailPage from './pages/admin/ChangeRequestDetailPage';
-import OpenApiPage from './pages/admin/OpenApiPage';
-import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
-import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
-import DataManagementPage from './pages/admin/DataManagementPage';
-import GatrixEdgesPage from './pages/admin/GatrixEdgesPage';
-import EnvironmentsPage from './pages/settings/EnvironmentsPage';
-import KeyValuePage from './pages/settings/KeyValuePage';
-import IntegrationsPage from './pages/settings/IntegrationsPage';
-import IntegrationsSdksPage from './pages/settings/IntegrationsSdksPage';
-import CreateIntegrationPage from './pages/settings/CreateIntegrationPage';
-import EditIntegrationPage from './pages/settings/EditIntegrationPage';
-import SignalEndpointsPage from './pages/admin/SignalEndpointsPage';
-import ActionSetsPage from './pages/admin/ActionSetsPage';
-import ServiceAccountsPage from './pages/admin/ServiceAccountsPage';
-import RolesPage from './pages/admin/RolesPage';
-import GroupsPage from './pages/admin/GroupsPage';
-
-import ProjectsPage from './pages/admin/ProjectsPage';
-import WorkspacePage from './pages/admin/WorkspacePage';
-// import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
+const UsersManagementPage = React.lazy(() => import('./pages/admin/UsersManagementPage'));
+const GameWorldsPage = React.lazy(() => import('./pages/admin/GameWorldsPage'));
+const WhitelistPage = React.lazy(() => import('./pages/admin/WhitelistPage'));
+const ClientVersionsPage = React.lazy(() => import('./pages/admin/ClientVersionsPage'));
+const AuditLogsPage = React.lazy(() => import('./pages/admin/AuditLogsPage'));
+const MaintenancePage = React.lazy(() => import('./pages/admin/MaintenancePage'));
+const PlayerConnectionsPage = React.lazy(() => import('./pages/admin/PlayerConnectionsPage'));
+const MessageTemplatesPage = React.lazy(() => import('./pages/admin/MessageTemplatesPage'));
+const SchedulerPage = React.lazy(() => import('./pages/admin/SchedulerPage'));
+const JobsPage = React.lazy(() => import('./pages/admin/JobsPage'));
+const QueueMonitorPage = React.lazy(() => import('./pages/admin/QueueMonitorPage'));
+const CustomQueueMonitorPage = React.lazy(() => import('./pages/admin/CustomQueueMonitorPage'));
+const ApiTokensPage = React.lazy(() => import('./pages/admin/ApiTokensPage'));
+const CrashEventsPage = React.lazy(() => import('./pages/admin/CrashEventsPage'));
+const ChatPage = React.lazy(() => import('./pages/chat/ChatPage'));
+const MailboxPage = React.lazy(() => import('./pages/mailbox/MailboxPage'));
+const SystemConsolePage = React.lazy(() => import('./pages/admin/SystemConsolePage'));
+const LogsPage = React.lazy(() => import('./pages/monitoring/LogsPage'));
+const AlertsPage = React.lazy(() => import('./pages/monitoring/AlertsPage'));
+const RealtimeEventsPage = React.lazy(() => import('./pages/admin/RealtimeEventsPage'));
+const ServerListPage = React.lazy(() => import('./pages/admin/ServerListPage'));
+const ServerLifecyclePage = React.lazy(() => import('./pages/admin/ServerLifecyclePage'));
+const ChangeRequestsPage = React.lazy(() => import('./pages/admin/ChangeRequestsPage'));
+const ChangeRequestDetailPage = React.lazy(() => import('./pages/admin/ChangeRequestDetailPage'));
+const OpenApiPage = React.lazy(() => import('./pages/admin/OpenApiPage'));
+const GrafanaDashboardPage = React.lazy(() => import('./pages/admin/GrafanaDashboardPage'));
+const EventLensProjectsPage = React.lazy(() => import('./pages/admin/EventLensProjectsPage'));
+const DataManagementPage = React.lazy(() => import('./pages/admin/DataManagementPage'));
+const GatrixEdgesPage = React.lazy(() => import('./pages/admin/GatrixEdgesPage'));
+const EnvironmentsPage = React.lazy(() => import('./pages/settings/EnvironmentsPage'));
+const KeyValuePage = React.lazy(() => import('./pages/settings/KeyValuePage'));
+const IntegrationsPage = React.lazy(() => import('./pages/settings/IntegrationsPage'));
+const IntegrationsSdksPage = React.lazy(() => import('./pages/settings/IntegrationsSdksPage'));
+const CreateIntegrationPage = React.lazy(() => import('./pages/settings/CreateIntegrationPage'));
+const EditIntegrationPage = React.lazy(() => import('./pages/settings/EditIntegrationPage'));
+const SignalEndpointsPage = React.lazy(() => import('./pages/admin/SignalEndpointsPage'));
+const ActionSetsPage = React.lazy(() => import('./pages/admin/ActionSetsPage'));
+const ServiceAccountsPage = React.lazy(() => import('./pages/admin/ServiceAccountsPage'));
+const RolesPage = React.lazy(() => import('./pages/admin/RolesPage'));
+const GroupsPage = React.lazy(() => import('./pages/admin/GroupsPage'));
+const ProjectsPage = React.lazy(() => import('./pages/admin/ProjectsPage'));
+const WorkspacePage = React.lazy(() => import('./pages/admin/WorkspacePage'));
 
 // Pages - Game
-import ServiceNoticesPage from './pages/game/ServiceNoticesPage';
-import ServiceNoticesPreviewPage from './pages/game/ServiceNoticesPreviewPage';
-import IngamePopupNoticesPage from './pages/game/IngamePopupNoticesPage';
-import CouponsPage from './pages/game/CouponsPage';
-import CouponSettingsPage from './pages/game/CouponSettingsPage';
-import CouponUsagePage from './pages/game/CouponUsagePage';
-import SurveysPage from './pages/game/SurveysPage';
-import RewardTemplatesPage from './pages/game/RewardTemplatesPage';
-import StoreProductsPage from './pages/game/StoreProductsPage';
-import BannerManagementPage from './pages/game/BannerManagementPage';
-import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
-import LiveEventPage from './pages/game/LiveEventPage';
-import PlanningDataPage from './pages/game/PlanningDataPage';
-import PlanningDataHistoryPage from './pages/game/PlanningDataHistoryPage';
-import FeatureFlagsPage from './pages/features/FeatureFlagsPage';
-import FeatureFlagDetailPage from './pages/features/FeatureFlagDetailPage';
-import FeatureSegmentsPage from './pages/features/FeatureSegmentsPage';
-import FeatureContextFieldsPage from './pages/features/FeatureContextFieldsPage';
-import FeatureFlagTypesPage from './pages/features/FeatureFlagTypesPage';
-import FeatureNetworkPage from './pages/features/FeatureNetworkPage';
-import UnknownFlagsPage from './pages/features/UnknownFlagsPage';
-import ReleaseFlowTemplatesPage from './pages/features/ReleaseFlowTemplatesPage';
-import ImpactMetricsPage from './pages/features/ImpactMetricsPage';
+const ServiceNoticesPage = React.lazy(() => import('./pages/game/ServiceNoticesPage'));
+const ServiceNoticesPreviewPage = React.lazy(() => import('./pages/game/ServiceNoticesPreviewPage'));
+const IngamePopupNoticesPage = React.lazy(() => import('./pages/game/IngamePopupNoticesPage'));
+const CouponsPage = React.lazy(() => import('./pages/game/CouponsPage'));
+const CouponSettingsPage = React.lazy(() => import('./pages/game/CouponSettingsPage'));
+const CouponUsagePage = React.lazy(() => import('./pages/game/CouponUsagePage'));
+const SurveysPage = React.lazy(() => import('./pages/game/SurveysPage'));
+const RewardTemplatesPage = React.lazy(() => import('./pages/game/RewardTemplatesPage'));
+const StoreProductsPage = React.lazy(() => import('./pages/game/StoreProductsPage'));
+const BannerManagementPage = React.lazy(() => import('./pages/game/BannerManagementPage'));
+const HotTimeButtonEventPage = React.lazy(() => import('./pages/game/HotTimeButtonEventPage'));
+const LiveEventPage = React.lazy(() => import('./pages/game/LiveEventPage'));
+const PlanningDataPage = React.lazy(() => import('./pages/game/PlanningDataPage'));
+const PlanningDataHistoryPage = React.lazy(() => import('./pages/game/PlanningDataHistoryPage'));
+const FeatureFlagsPage = React.lazy(() => import('./pages/features/FeatureFlagsPage'));
+const FeatureFlagDetailPage = React.lazy(() => import('./pages/features/FeatureFlagDetailPage'));
+const FeatureSegmentsPage = React.lazy(() => import('./pages/features/FeatureSegmentsPage'));
+const FeatureContextFieldsPage = React.lazy(() => import('./pages/features/FeatureContextFieldsPage'));
+const FeatureFlagTypesPage = React.lazy(() => import('./pages/features/FeatureFlagTypesPage'));
+const FeatureNetworkPage = React.lazy(() => import('./pages/features/FeatureNetworkPage'));
+const UnknownFlagsPage = React.lazy(() => import('./pages/features/UnknownFlagsPage'));
+const ReleaseFlowTemplatesPage = React.lazy(() => import('./pages/features/ReleaseFlowTemplatesPage'));
+const ImpactMetricsPage = React.lazy(() => import('./pages/features/ImpactMetricsPage'));
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -395,6 +393,7 @@ const AppContent: React.FC = () => {
                     >
                       <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
                         <FirstVisitGuard>
+                          <Suspense fallback={<LoadingIndicator />}>
                           <Routes>
                             {/* Public Routes */}
                             <Route path="/login" element={<LoginPage />} />
@@ -750,6 +749,7 @@ const AppContent: React.FC = () => {
                             {/* 404 Route */}
                             <Route path="*" element={<NotFoundPage />} />
                           </Routes>
+                          </Suspense>
                         </FirstVisitGuard>
                       </Router>
                     </SnackbarProvider>

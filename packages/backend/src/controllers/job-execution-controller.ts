@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { JobExecutionModel } from '../models/job-execution';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('jobExecutionController');
 
 // Job 실행 이력 Get list

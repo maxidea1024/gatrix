@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ServerChatController');
 
 export interface ServerChatRequest extends Request {

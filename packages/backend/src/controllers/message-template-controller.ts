@@ -48,7 +48,7 @@ export class MessageTemplateController {
       }
       const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
 
       // MessageTemplateModel Used
       const result = await MessageTemplateModel.findAllWithPagination({
@@ -73,7 +73,7 @@ export class MessageTemplateController {
   static async get(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const data = await MessageTemplateModel.findById(id, environmentId);
       if (!data) return res.status(404).json({ success: false, message: 'Not found' });
       res.json({ success: true, data });
@@ -85,7 +85,7 @@ export class MessageTemplateController {
   static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const body = req.body as MessageTemplate;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
 
       // Check for duplicate name
       const existing = await MessageTemplateModel.findByName(body.name);
@@ -119,7 +119,7 @@ export class MessageTemplateController {
     try {
       const id = req.params.id;
       const body = req.body as MessageTemplate;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
 
       // Check for duplicate name (excluding current template)
       const existing = await MessageTemplateModel.findByName(body.name, id);
@@ -153,7 +153,7 @@ export class MessageTemplateController {
   static async remove(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const id = req.params.id;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       await MessageTemplateModel.delete(id, environmentId);
       res.json({ success: true });
     } catch (e) {
@@ -165,7 +165,7 @@ export class MessageTemplateController {
     try {
       const { ids } = req.body;
 
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
 
       // Delete all templates
       await Promise.all(ids.map((id: any) => MessageTemplateModel.delete(id, environmentId)));

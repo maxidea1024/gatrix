@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { pubSubService } from '../services/pub-sub-service';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ServerNotificationController');
 
 export interface ServerNotificationRequest extends Request {

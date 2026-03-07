@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import VarsModel from '../models/vars';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ServiceDiscoveryConfigController');
 
 /**

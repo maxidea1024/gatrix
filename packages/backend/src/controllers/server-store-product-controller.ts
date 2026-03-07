@@ -1,12 +1,12 @@
 import { Response } from 'express';
 import StoreProductService, { StoreProduct } from '../services/store-product-service';
 import { TagService } from '../services/tag-service';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ServerStoreProductController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cache-keys';
 import { respondWithEtagCache } from '../utils/server-sdk-etag-cache';
 import { EnvironmentRequest } from '../middleware/environment-resolver';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ServerStoreProductController');
 
 // Supported language codes for SDK API
 type SdkLanguage = 'ko' | 'en' | 'zh';

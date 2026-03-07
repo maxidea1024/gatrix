@@ -9,7 +9,7 @@ export class BannerClientController {
    * GET /api/v1/client/banners
    */
   static getBanners = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const banners = await BannerService.getPublishedBanners(environmentId);
 
     // Transform for client (remove internal fields)
@@ -39,7 +39,7 @@ export class BannerClientController {
    */
   static getBannerById = asyncHandler(async (req: SDKRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     const banner = await BannerService.getPublishedBannerById(bannerId, environmentId);
 

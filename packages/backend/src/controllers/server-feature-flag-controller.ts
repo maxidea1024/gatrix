@@ -19,8 +19,8 @@ import db from '../config/knex';
 import { featureMetricsService } from '../services/feature-metrics-service';
 import { networkTrafficService } from '../services/network-traffic-service';
 import { ErrorCodes, sendInternalError } from '../utils/api-response';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ServerFeatureFlagController');
 
 // Type for minimal flag data needed for runtime evaluation

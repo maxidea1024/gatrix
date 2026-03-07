@@ -17,7 +17,7 @@ export const getJobs = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { jobTypeId, isEnabled, search, limit = 20, offset = 0, page } = req.query;
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const filters: any = { environmentId };
     if (jobTypeId) filters.jobTypeId = parseInt(jobTypeId as string);
     if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
@@ -63,7 +63,7 @@ export const getJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const job = await JobModel.findById(jobId, environmentId);
 
     if (!job) {
@@ -94,7 +94,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job type', { field: 'jobTypeId' });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Job 이름 중복 Validation
     const existingJob = await JobModel.findByName(name, environmentId);
@@ -139,7 +139,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Job 존재 여부 Confirm
     const existingJob = await JobModel.findById(jobId, environmentId);
@@ -190,7 +190,7 @@ export const deleteJob = async (req: AuthenticatedRequest, res: Response) => {
       return sendBadRequest(res, 'Invalid job ID', { field: 'id' });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Job 존재 여부 Confirm
     const existingJob = await JobModel.findById(jobId, environmentId);

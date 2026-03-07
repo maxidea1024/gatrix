@@ -7,9 +7,6 @@ import { GameWorldService } from '../services/game-world-service';
 import { cacheService } from '../services/cache-service';
 import { pubSubService } from '../services/pub-sub-service';
 import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cache-keys';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ClientController');
 import { asyncHandler } from '../utils/async-handler';
 import VarsModel from '../models/vars';
 import { VarsService } from '../services/vars-service';
@@ -27,6 +24,9 @@ import {
   EvaluationUtils,
 } from '@gatrix/evaluator';
 import db from '../config/knex';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ClientController');
 
 export class ClientController {
   /**
@@ -73,7 +73,7 @@ export class ClientController {
     }
 
     // Environment is resolved by clientSDKAuth middleware
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Validate status parameter if provided
     const validStatuses = Object.values(ClientStatus);
@@ -308,7 +308,7 @@ export class ClientController {
    * GET /api/v1/client/game-worlds
    */
   static getGameWorlds = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const cacheKey = environmentId
       ? withEnvironment(environmentId, GAME_WORLDS.PUBLIC)
       : GAME_WORLDS.PUBLIC;
@@ -386,7 +386,7 @@ export class ClientController {
    * POST /api/v1/client/invalidate-cache
    */
   static invalidateCache = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     await GameWorldService.invalidateCache(environmentId);
 
     res.json({

@@ -10,7 +10,9 @@ import {
   MenuItem,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import moment from 'moment-timezone';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import dayjsTimezone from 'dayjs/plugin/timezone';
 import {
   getStoredTimezone,
   getStoredDateTimeFormat,
@@ -22,6 +24,9 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
+
+dayjs.extend(utc);
+dayjs.extend(dayjsTimezone);
 
 const formatPresets = [
   'YYYY-MM-DD HH:mm:ss',
@@ -40,19 +45,19 @@ const SettingsPage: React.FC = () => {
   const { user, refreshAuth } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
-  const tzOptions = useMemo(() => moment.tz.names(), []);
+  const tzOptions = useMemo(() => Intl.supportedValuesOf('timeZone'), []);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [dtFormat, setDtFormat] = useState<string>(getStoredDateTimeFormat());
   const [preview, setPreview] = useState<string>('');
 
   useEffect(() => {
     const now = new Date();
-    setPreview(moment(now).tz(timezone).format(dtFormat));
+    setPreview(dayjs(now).tz(timezone).format(dtFormat));
   }, [timezone, dtFormat]);
 
   // Format timezone with UTC offset
   const formatTimezone = (tz: string) => {
-    const offset = moment.tz(tz).format('Z');
+    const offset = dayjs().tz(tz).format('Z');
     return `${tz} (UTC${offset})`;
   };
 
@@ -66,7 +71,7 @@ const SettingsPage: React.FC = () => {
 
   // Update preview
   useEffect(() => {
-    const now = moment().tz(timezone);
+    const now = dayjs().tz(timezone);
     setPreview(now.format(dtFormat));
   }, [timezone, dtFormat]);
 
@@ -140,7 +145,7 @@ const SettingsPage: React.FC = () => {
                   <Box>
                     <Typography variant="body2">{option}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      UTC{moment.tz(option).format('Z')}
+                      UTC{dayjs().tz(option).format('Z')}
                     </Typography>
                   </Box>
                 </li>

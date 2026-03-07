@@ -1,9 +1,6 @@
 import { Response } from 'express';
 import { SDKRequest } from '../middleware/api-token-auth';
 import knex from '../config/knex';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('InternalApiTokens');
 import apiTokenUsageService from '../services/api-token-usage-service';
 import {
   sendForbidden,
@@ -12,6 +9,9 @@ import {
   sendSuccessResponse,
   ErrorCodes,
 } from '../utils/api-response';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('InternalApiTokens');
 
 /**
  * Internal API controller for Edge server to fetch API tokens

@@ -25,7 +25,7 @@ export class PlatformDefaultsController {
    * GET /api/v1/admin/platform-defaults
    */
   static getAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const defaults = await PlatformDefaultsService.getAllDefaults(environmentId);
 
     res.json({
@@ -40,7 +40,7 @@ export class PlatformDefaultsController {
    */
   static getPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platform } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     if (!platform) {
       throw new GatrixError('Platform parameter is required', 400);
@@ -63,7 +63,7 @@ export class PlatformDefaultsController {
    */
   static setPlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platform } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     if (!platform) {
       throw new GatrixError('Platform parameter is required', 400);
@@ -99,7 +99,7 @@ export class PlatformDefaultsController {
    * PUT /api/v1/admin/platform-defaults
    */
   static setAllDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Validate request body
     const { error, value } = allDefaultsSchema.validate(req.body);
@@ -128,7 +128,7 @@ export class PlatformDefaultsController {
    */
   static deletePlatformDefaults = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { platform } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     if (!platform) {
       throw new GatrixError('Platform parameter is required', 400);
