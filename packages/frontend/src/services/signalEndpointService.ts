@@ -1,6 +1,5 @@
 import api from './api';
 
-// Types
 export interface SignalEndpoint {
   id: number;
   name: string;

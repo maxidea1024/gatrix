@@ -62,7 +62,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
 
     const date = new Date(dateString);
 
-    // 유효한 날짜인지 확인
+    // Check if the date is valid
     if (isNaN(date.getTime())) {
       return t('invitations.invalidDate');
     }
@@ -80,7 +80,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
     const now = new Date();
     const expiresAt = new Date(invitation.expiresAt);
 
-    // 유효한 날짜인지 확인
+    // Check if the date is valid
     if (isNaN(expiresAt.getTime())) {
       return t('invitations.invalidDate');
     }

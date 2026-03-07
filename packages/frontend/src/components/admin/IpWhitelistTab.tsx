@@ -77,7 +77,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [search, setSearch] = useState('');
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // Debounced search (500ms delay)
   const debouncedSearch = useDebounce(search, 500);
 
   // Menu state
@@ -92,7 +92,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
     open: false,
     title: '',
     message: '',
-    action: () => {},
+    action: () => { },
   });
 
   // Form data
@@ -169,7 +169,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
     setSelectedIpWhitelist(null);
   };
 
-  // 복사 기능
+  // Copy functionality
   const handleCopyToClipboard = (text: string, type: string) => {
     copyToClipboardWithNotification(
       text,
@@ -189,7 +189,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
     setFormErrors({});
     setAddDialog(true);
 
-    // IP Address 필드에 포커스
+    // IP Address field focus
     setTimeout(() => {
       ipAddressFieldRef.current?.focus();
     }, 100);
@@ -207,7 +207,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
       setFormErrors({});
       setEditDialog(true);
 
-      // IP Address 필드에 포커스
+      // IP Address field focus
       setTimeout(() => {
         ipAddressFieldRef.current?.focus();
       }, 100);

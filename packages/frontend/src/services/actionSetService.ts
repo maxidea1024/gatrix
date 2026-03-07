@@ -1,6 +1,5 @@
 import api from './api';
 
-// Types
 export interface ActionSet {
   id: number;
   name: string;

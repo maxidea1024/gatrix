@@ -437,7 +437,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               error={customPayloadError}
               helperText={
                 t('gameWorlds.form.customPayloadHelp') ||
-                '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'
+                'Game world related additional data(JSON). If left empty, it will be saved as {}.'
               }
             />
           </Box>

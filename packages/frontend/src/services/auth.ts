@@ -202,9 +202,6 @@ export class AuthService {
     return user?.role === role;
   }
 
-
-
-
   static isActive(): boolean {
     const user = this.getStoredUser();
     return user?.status === 'active';
