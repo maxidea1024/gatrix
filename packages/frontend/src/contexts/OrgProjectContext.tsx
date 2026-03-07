@@ -25,7 +25,6 @@ import { useAuth } from './AuthContext';
 import { orgProjectService, Organisation, Project } from '../services/orgProjectService';
 import { devLogger } from '../utils/logger';
 
-
 const STORAGE_KEY_ORG = 'gatrix_selected_org';
 const STORAGE_KEY_PROJECT = 'gatrix_selected_project';
 

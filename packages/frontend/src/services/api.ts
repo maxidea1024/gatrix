@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import i18next from 'i18next';
 import { ApiResponse } from '@/types';
 
 class ApiService {
@@ -232,13 +233,13 @@ class ApiService {
 
         // Enhance error message for better user experience
         if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
-          error.message = '서버 응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
+          error.message = i18next.t('errors.timeout');
         } else if (error.code === 'ERR_NETWORK' || !error.response) {
-          error.message = '서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.';
+          error.message = i18next.t('errors.networkError');
         } else if (error.response?.status === 500) {
-          error.message = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+          error.message = i18next.t('errors.serverError');
         } else if (error.response?.status === 404) {
-          error.message = '요청한 리소스를 찾을 수 없습니다.';
+          error.message = i18next.t('errors.notFound');
         }
 
         return Promise.reject(error);
