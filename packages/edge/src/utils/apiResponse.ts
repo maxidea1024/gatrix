@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import { ErrorCodes, ErrorCode } from '@gatrix/shared';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ApiResponse');
 
 // Re-export for convenient use in route files
 export { ErrorCodes } from '@gatrix/shared';

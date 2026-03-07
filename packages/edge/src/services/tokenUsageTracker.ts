@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { config } from '../config/env';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('TokenUsageTracker');
 
 interface TokenUsageStats {
   usageCount: number;
@@ -29,11 +31,11 @@ class TokenUsageTracker {
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
-      logger.warn('[TokenUsageTracker] Already initialized');
+      logger.warn('Already initialized');
       return;
     }
 
-    logger.info('[TokenUsageTracker] Initializing token usage tracker...', {
+    logger.info('Initializing token usage tracker...', {
       reportIntervalMs: this.reportIntervalMs,
       edgeInstanceId: this.edgeInstanceId,
     });
@@ -41,12 +43,12 @@ class TokenUsageTracker {
     // Start periodic reporting
     this.reportTimer = setInterval(() => {
       this.reportUsageToBackend().catch((err) => {
-        logger.error('[TokenUsageTracker] Failed to report usage:', err.message);
+        logger.error('Failed to report usage:', err.message);
       });
     }, this.reportIntervalMs);
 
     this.initialized = true;
-    logger.info('[TokenUsageTracker] Initialized');
+    logger.info('Initialized');
   }
 
   /**
@@ -64,13 +66,13 @@ class TokenUsageTracker {
       try {
         await this.reportUsageToBackend();
       } catch (error) {
-        logger.error('[TokenUsageTracker] Failed to report usage during shutdown:', error);
+        logger.error('Failed to report usage during shutdown:', error);
       }
     }
 
     this.usageMap.clear();
     this.initialized = false;
-    logger.info('[TokenUsageTracker] Shutdown complete');
+    logger.info('Shutdown complete');
   }
 
   /**
@@ -139,7 +141,7 @@ class TokenUsageTracker {
       );
 
       if (response.data?.success) {
-        logger.info('[TokenUsageTracker] Usage reported successfully', {
+        logger.info('Usage reported successfully', {
           tokenCount: usageData.length,
           totalUsage: usageData.reduce((sum, d) => sum + d.usageCount, 0),
         });

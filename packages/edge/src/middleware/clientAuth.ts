@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientAuth');
 import { tokenMirrorService } from '../services/tokenMirrorService';
 import { tokenUsageTracker } from '../services/tokenUsageTracker';
 

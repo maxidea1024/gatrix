@@ -1,6 +1,8 @@
 import { config, validateConfig } from './config/env';
 import { createServer } from 'http';
-import logger from './config/logger';
+import { createLogger } from './config/logger';
+
+const logger = createLogger('EdgeServer');
 import app from './app';
 import internalApp from './internalApp';
 import { sdkManager } from './services/sdkManager';

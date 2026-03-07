@@ -1,7 +1,9 @@
 import axios from 'axios';
 import Redis from 'ioredis';
 import { config } from '../config/env';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('TokenMirror');
 
 /**
  * Token structure mirrored from backend
@@ -46,11 +48,11 @@ class TokenMirrorService {
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
-      logger.warn('[TokenMirror] Already initialized');
+      logger.warn('Already initialized');
       return;
     }
 
-    logger.info('[TokenMirror] Initializing token mirror service...');
+    logger.info('Initializing token mirror service...');
 
     // Fetch initial tokens
     await this.fetchAllTokens();
@@ -59,7 +61,7 @@ class TokenMirrorService {
     await this.subscribeToEvents();
 
     this.initialized = true;
-    logger.info(`[TokenMirror] Initialized with ${this.tokens.size} tokens`);
+    logger.info(`Initialized with ${this.tokens.size} tokens`);
   }
 
   /**
@@ -72,13 +74,13 @@ class TokenMirrorService {
         await this.subscriber.quit();
         this.subscriber = null;
       } catch (error) {
-        logger.error('[TokenMirror] Error during shutdown:', error);
+        logger.error('Error during shutdown:', error);
       }
     }
     this.tokens.clear();
     this.tokenById.clear();
     this.initialized = false;
-    logger.info('[TokenMirror] Shutdown complete');
+    logger.info('Shutdown complete');
   }
 
   /**
@@ -107,12 +109,12 @@ class TokenMirrorService {
           this.tokenById.set(token.id, token);
         }
 
-        logger.info(`[TokenMirror] Fetched ${tokens.length} tokens from backend`);
+        logger.info(`Fetched ${tokens.length} tokens from backend`);
       } else {
-        logger.error('[TokenMirror] Invalid response from backend:', response.data);
+        logger.error('Invalid response from backend:', response.data);
       }
     } catch (error: any) {
-      logger.error('[TokenMirror] Failed to fetch tokens:', error.message);
+      logger.error('Failed to fetch tokens:', error.message);
       throw error;
     }
   }
@@ -140,9 +142,9 @@ class TokenMirrorService {
 
       await this.subscriber.subscribe(this.CHANNEL_NAME);
 
-      logger.info(`[TokenMirror] Subscribed to Redis channel: ${this.CHANNEL_NAME}`);
+      logger.info(`Subscribed to Redis channel: ${this.CHANNEL_NAME}`);
     } catch (error: any) {
-      logger.error('[TokenMirror] Failed to subscribe to events:', error.message);
+      logger.error('Failed to subscribe to events:', error.message);
       // Continue without real-time updates - will rely on manual refresh
     }
   }
@@ -158,17 +160,17 @@ class TokenMirrorService {
         return; // Not a token event
       }
 
-      logger.info(`[TokenMirror] Received event: ${event.type}`, {
+      logger.info(`Received event: ${event.type}`, {
         id: event.data?.id,
       });
 
       // For any token change, refetch all tokens
       // This is simpler and more reliable than incremental updates
       this.fetchAllTokens().catch((err) => {
-        logger.error('[TokenMirror] Failed to refetch tokens after event:', err.message);
+        logger.error('Failed to refetch tokens after event:', err.message);
       });
     } catch (error: any) {
-      logger.error('[TokenMirror] Failed to parse event:', error.message);
+      logger.error('Failed to parse event:', error.message);
     }
   }
 

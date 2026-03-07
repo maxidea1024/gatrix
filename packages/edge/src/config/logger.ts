@@ -206,4 +206,92 @@ if (nodeEnv === 'production' || process.env.LOG_DIR) {
   );
 }
 
+// Category-based logger factory
+const loggers = new Map<string, winston.Logger>();
+
+const createLogger = (category: string): winston.Logger => {
+  if (loggers.has(category)) {
+    return loggers.get(category)!;
+  }
+
+  // Pretty format for category-based logging
+  const categoryPrettyFormat = winston.format.combine(
+    serviceFormat(),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.printf(({ timestamp, level, message, ...meta }) => {
+      let metaStr = '';
+      const { service, hostname: _h, internalIp: _ip, ...displayMeta } = meta;
+      if (Object.keys(displayMeta).length > 0) {
+        try {
+          metaStr = '\n' + JSON.stringify(displayMeta, null, 2);
+        } catch (error) {
+          metaStr = '\n[Object could not be serialized]';
+        }
+      }
+      // Apply yellow color to category name only
+      const coloredCategory = `[\x1b[33m${category}\x1b[0m]`;
+      const result = `${timestamp} [${level}] ${coloredCategory}: ${message}${metaStr}`;
+      return result;
+    })
+  );
+
+  // JSON format for category-based logging
+  const categoryJsonFormat = winston.format.combine(
+    serviceFormat(),
+    winston.format((info) => {
+      if (!info.category) {
+        info.category = category;
+      }
+      return info;
+    })(),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  );
+
+  const categoryLogger = winston.createLogger({
+    level: logLevel,
+    defaultMeta: {
+      service: serviceName,
+      category,
+    },
+    transports: [
+      // Console transport with category format
+      new winston.transports.Console({
+        level: logLevel,
+        format: useJsonConsoleFormat ? categoryJsonFormat : categoryPrettyFormat,
+      }),
+      // Add file transports in production
+      ...(nodeEnv === 'production' || process.env.LOG_DIR
+        ? [
+            new DailyRotateFile({
+              dirname: path.join(process.cwd(), logDir),
+              filename: 'edge-%DATE%.log',
+              datePattern: 'YYYY-MM-DD',
+              format: fileFormat,
+              maxSize: '20m',
+              maxFiles: '14d',
+              zippedArchive: true,
+            }),
+            new DailyRotateFile({
+              dirname: path.join(process.cwd(), logDir),
+              filename: 'edge-error-%DATE%.log',
+              datePattern: 'YYYY-MM-DD',
+              level: 'error',
+              format: fileFormat,
+              maxSize: '20m',
+              maxFiles: '30d',
+              zippedArchive: true,
+            }),
+          ]
+        : []),
+    ],
+  });
+
+  loggers.set(category, categoryLogger);
+  return categoryLogger;
+};
+
+// Export both default logger and factory function
 export default logger;
+export { createLogger };

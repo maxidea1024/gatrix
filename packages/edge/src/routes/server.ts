@@ -8,7 +8,9 @@ import {
   sendBadRequest,
   sendInternalError,
 } from '../utils/apiResponse';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerRoute');
 
 const router = Router();
 

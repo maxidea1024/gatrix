@@ -17,7 +17,9 @@ import { Response } from 'express';
 import { createClient, RedisClientType } from 'redis';
 import WebSocket, { WebSocketServer } from 'ws';
 import { config } from '../config/env';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('FlagStreaming');
 import { sdkManager } from './sdkManager';
 
 interface StreamingClient {
@@ -78,11 +80,11 @@ class FlagStreamingService {
     try {
       this.redisClient = createClient(redisOptions);
       this.redisClient.on('error', (err) => {
-        logger.error('Edge FlagStreamingService Redis client error:', err);
+        logger.error('Redis client error:', err);
       });
       await this.redisClient.connect();
     } catch (err) {
-      logger.error('Edge FlagStreamingService: Failed to connect Redis client:', err);
+      logger.error('Failed to connect Redis client:', err);
     }
 
     // Subscribe to Redis PubSub for SDK events
@@ -90,7 +92,7 @@ class FlagStreamingService {
       this.subscriber = createClient(redisOptions);
 
       this.subscriber.on('error', (err) => {
-        logger.error('Edge FlagStreamingService Redis subscriber error:', err);
+        logger.error('Redis subscriber error:', err);
       });
 
       await this.subscriber.connect();
@@ -108,13 +110,13 @@ class FlagStreamingService {
             }
           }
         } catch (err) {
-          logger.error('Edge FlagStreamingService: Failed to parse SDK event:', err);
+          logger.error('Failed to parse SDK event:', err);
         }
       });
 
-      logger.info(`Edge FlagStreamingService: Subscribed to Redis channel: ${SDK_EVENTS_CHANNEL}`);
+      logger.info(`Subscribed to Redis channel: ${SDK_EVENTS_CHANNEL}`);
     } catch (err) {
-      logger.error('Edge FlagStreamingService: Failed to subscribe to Redis PubSub:', err);
+      logger.error('Failed to subscribe to Redis PubSub:', err);
     }
 
     // Heartbeat every 30 seconds
@@ -130,7 +132,7 @@ class FlagStreamingService {
     // Create WebSocket server (noServer mode — upgrade handled externally)
     this.wss = new WebSocketServer({ noServer: true });
 
-    logger.info('Edge FlagStreamingService started (SSE + WebSocket)');
+    logger.info('started (SSE + WebSocket)');
   }
 
   /**
@@ -191,7 +193,7 @@ class FlagStreamingService {
     }
 
     this.started = false;
-    logger.info('Edge FlagStreamingService stopped');
+    logger.info('stopped');
   }
 
   /**
@@ -225,7 +227,7 @@ class FlagStreamingService {
       this.removeClient(clientId);
     });
 
-    logger.debug(`Edge streaming SSE client connected: ${clientId} for env: ${environment}`);
+    logger.debug(`SSE client connected: ${clientId} for env: ${environment}`);
   }
 
   /**
@@ -244,7 +246,7 @@ class FlagStreamingService {
     }
 
     this.sseClients.delete(clientId);
-    logger.debug(`Edge streaming SSE client disconnected: ${clientId}`);
+    logger.debug(`SSE client disconnected: ${clientId}`);
   }
 
   /**
@@ -285,11 +287,11 @@ class FlagStreamingService {
     });
 
     ws.on('error', (err) => {
-      logger.warn(`Edge WebSocket client error ${clientId}:`, err);
+      logger.warn(`client error ${clientId}:`, err);
       this.removeWebSocketClient(clientId);
     });
 
-    logger.debug(`Edge WebSocket client connected: ${clientId} for env: ${environment}`);
+    logger.debug(`client connected: ${clientId} for env: ${environment}`);
   }
 
   /**
@@ -311,7 +313,7 @@ class FlagStreamingService {
     }
 
     this.wsClients.delete(clientId);
-    logger.debug(`Edge WebSocket client disconnected: ${clientId}`);
+    logger.debug(`client disconnected: ${clientId}`);
   }
 
   /**
@@ -328,7 +330,7 @@ class FlagStreamingService {
         );
       }
     } catch (err) {
-      logger.error('Edge FlagStreamingService: Failed to refresh cache before notify:', err);
+      logger.error('Failed to refresh cache before notify:', err);
       // Still notify clients even if cache refresh fails
     }
 
@@ -469,7 +471,7 @@ class FlagStreamingService {
       const val = await this.redisClient.get(`${REVISION_KEY_PREFIX}${environment}`);
       return val ? parseInt(val, 10) : 0;
     } catch (err) {
-      logger.warn('Edge FlagStreamingService: Failed to get revision from Redis:', err);
+      logger.warn('Failed to get revision from Redis:', err);
       return 0;
     }
   }
@@ -483,7 +485,7 @@ class FlagStreamingService {
     try {
       return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environment}`);
     } catch (err) {
-      logger.warn('Edge FlagStreamingService: Failed to increment revision in Redis:', err);
+      logger.warn('Failed to increment revision in Redis:', err);
       return 0;
     }
   }

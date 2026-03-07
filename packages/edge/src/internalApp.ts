@@ -1,7 +1,9 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import healthRoutes from './routes/health';
 import internalRoutes from './routes/internal';
-import logger from './config/logger';
+import { createLogger } from './config/logger';
+
+const logger = createLogger('InternalApp');
 import { sdkManager } from './services/sdkManager';
 
 // Create Express application for internal endpoints

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EvaluationHelper');
 import { sdkManager } from '../services/sdkManager';
 import { EvaluationUtils } from '@gatrix/shared';
 

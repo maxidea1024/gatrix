@@ -1,6 +1,8 @@
 import { GatrixServerSDK, GatrixSDKConfig } from '@gatrix/server-sdk';
 import { config } from '../config/env';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('SDKManager');
 
 /**
  * SDK Manager - Singleton for managing GatrixServerSDK instance

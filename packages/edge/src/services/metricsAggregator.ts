@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { config } from '../config/env';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MetricsAggregator');
 
 interface ClientMetricBucket {
   start: Date;
@@ -38,7 +40,7 @@ class MetricsAggregator {
   private serverUnknownBuffers: Map<string, ServerUnknownBuffer> = new Map();
 
   private flushTimer: NodeJS.Timeout | null = null;
-  private readonly FLUSH_INTERVAL_MS = 30000; // 30 seconds
+  private readonly FLUSH_INTERVAL_MS = 30_000; // 30 seconds
 
   constructor() {
     this.startFlushTimer();
@@ -218,7 +220,7 @@ class MetricsAggregator {
               'x-application-name': config.applicationName,
               ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
             },
-            timeout: 10000,
+            timeout: 10_000,
           }
         );
       } catch (error: any) {
@@ -269,7 +271,7 @@ class MetricsAggregator {
                 'x-application-name': appName,
                 ...(buffer.sdkVersion && { 'x-sdk-version': buffer.sdkVersion }),
               },
-              timeout: 10000,
+              timeout: 10_000,
             }
           );
         } catch (error: any) {
