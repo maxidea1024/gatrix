@@ -9,10 +9,10 @@ import ClientVersionService, {
 import { ClientStatus } from '../models/client-version';
 import { ClientVersionModel } from '../models/client-version';
 import { GatrixError } from '../middleware/error-handler';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('ClientVersionController');
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ClientVersionController');
 
 /**
  * Convert ISO 8601 datetime string to MySQL DATETIME format
@@ -302,7 +302,7 @@ export class ClientVersionController {
   // Used 가능한 버전 Get list (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const versions = await ClientVersionService.getAvailableVersions(environmentId);
       res.json({
         success: true,
@@ -363,7 +363,7 @@ export class ClientVersionController {
       }
     });
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const result = await ClientVersionService.getAllClientVersions(
       environmentId,
       filters,
@@ -386,7 +386,7 @@ export class ClientVersionController {
       });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const clientVersion = await ClientVersionService.getClientVersionById(id, environmentId);
     if (!clientVersion) {
       return res.status(404).json({
@@ -428,7 +428,7 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
@@ -477,7 +477,7 @@ export class ClientVersionController {
       });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const bulkCreateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
@@ -590,7 +590,7 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
@@ -644,7 +644,7 @@ export class ClientVersionController {
       });
     }
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = (req as any).user?.userId;
     if (!userId) {
       return res.status(401).json({
@@ -707,7 +707,7 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     // Check if CR is required
     const requiresApproval = await UnifiedChangeGateway.requiresApproval(environmentId);
@@ -760,7 +760,7 @@ export class ClientVersionController {
 
   // 채널 Get list
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const platforms = await ClientVersionService.getPlatforms(environmentId);
 
     res.json({
@@ -827,7 +827,7 @@ export class ClientVersionController {
     }
 
     try {
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       // 모든 데이터를 가져오기 위해 매우 큰 limit Used
       const result = await ClientVersionService.getAllClientVersions(environmentId, value, {
         page: 1,

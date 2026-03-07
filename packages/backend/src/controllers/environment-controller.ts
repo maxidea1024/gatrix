@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import { Environment } from '../models/environment';
 import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('EnvironmentController');
 import { EnvironmentCopyService, CopyOptions } from '../services/environment-copy-service';
 import { initializeSystemKV } from '../utils/system-kv';
 import { pubSubService } from '../services/pub-sub-service';
 import { ErrorCodes } from '../utils/api-response';
 import { permissionService } from '../services/permission-service';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('EnvironmentController');
 
 export class EnvironmentController {
   /**

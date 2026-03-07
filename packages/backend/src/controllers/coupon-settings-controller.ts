@@ -4,8 +4,8 @@ import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../types/auth';
 import { CouponSettingsService } from '../services/coupon-settings-service';
 import { UnifiedChangeGateway } from '../services/unified-change-gateway';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('CouponSettingsController');
 
 // Validation schemas

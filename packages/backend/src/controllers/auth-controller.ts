@@ -3,10 +3,10 @@ import { AuthService } from '../services/auth-service';
 import passwordResetService from '../services/password-reset-service';
 import { asyncHandler, GatrixError } from '../middleware/error-handler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('AuthController');
 import Joi from 'joi';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('AuthController');
 
 // Validation schemas
 const loginSchema = Joi.object({

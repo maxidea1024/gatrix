@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DataManagementService } from '../services/data-management-service';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('DataManagementController');
 
 export const exportData = async (req: Request, res: Response, next: NextFunction) => {

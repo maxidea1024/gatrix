@@ -12,7 +12,7 @@ export class BannerController {
   static getBanners = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, status, sortBy, sortOrder } = req.query;
 
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const result = await BannerService.getBanners({
       environmentId,
       page: page ? parseInt(page as string) : undefined,
@@ -36,7 +36,7 @@ export class BannerController {
    */
   static getBannerById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
 
     const banner = await BannerService.getBannerById(bannerId, environmentId);
 
@@ -53,7 +53,7 @@ export class BannerController {
    */
   static createBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
@@ -113,7 +113,7 @@ export class BannerController {
   static updateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
@@ -162,7 +162,7 @@ export class BannerController {
    */
   static deleteBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
@@ -199,7 +199,7 @@ export class BannerController {
    */
   static publishBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
@@ -239,7 +239,7 @@ export class BannerController {
    */
   static archiveBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
@@ -279,7 +279,7 @@ export class BannerController {
    */
   static duplicateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environmentId = req.environmentId || 'development';
+    const environmentId = req.environmentId!;
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support (Creation)

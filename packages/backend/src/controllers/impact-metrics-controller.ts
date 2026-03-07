@@ -10,8 +10,8 @@
 import { Request, Response } from 'express';
 import { impactMetricsService } from '../services/impact-metrics-service';
 import { ImpactMetricConfigModel } from '../models/impact-metric-config';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ImpactMetricsController');
 
 class ImpactMetricsController {

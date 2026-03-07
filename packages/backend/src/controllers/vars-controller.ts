@@ -14,7 +14,7 @@ export class VarsController {
   static async getVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const value = await VarsModel.get(key, environmentId);
       res.json({ success: true, data: { key, value } });
     } catch (e) {
@@ -25,7 +25,7 @@ export class VarsController {
   static async setVar(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const incoming = req.body?.value ?? null;
       let toStore: string | null = null;
       if (incoming === null || incoming === undefined) {
@@ -96,7 +96,7 @@ export class VarsController {
    */
   static async getAllKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const items = await VarsService.getAllKV(environmentId);
       res.json({ success: true, data: items });
     } catch (e) {
@@ -110,7 +110,7 @@ export class VarsController {
    */
   static async getServerVars(req: SDKRequest, res: Response, next: NextFunction) {
     try {
-      const environmentId = req.params.env || req.environmentId || 'development';
+      const environmentId = req.params.env || req.environmentId!;
 
       await respondWithEtagCache(res, {
         cacheKey: `${SERVER_SDK_ETAG.VARS}:${environmentId}`,
@@ -133,7 +133,7 @@ export class VarsController {
   static async getKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const item = await VarsModel.getKV(fullKey, environmentId);
 
@@ -160,7 +160,7 @@ export class VarsController {
   static async createKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { varKey, varValue, valueType, description } = req.body;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
 
       if (!varKey || !valueType) {
         return res.status(400).json({
@@ -213,7 +213,7 @@ export class VarsController {
   static async updateKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const { varValue, valueType, description } = req.body;
 
@@ -317,7 +317,7 @@ export class VarsController {
   static async deleteKV(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const environmentId = req.environmentId || 'development';
+      const environmentId = req.environmentId!;
       const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
       await VarsModel.deleteKV(fullKey, environmentId);

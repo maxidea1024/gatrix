@@ -6,8 +6,8 @@ import { ChangeRequest } from '../models/change-request';
 import { ChangeItem } from '../models/change-item';
 import { ActionGroup } from '../models/action-group';
 import { Approval } from '../models/approval';
-import { createLogger } from '../config/logger';
 
+import { createLogger } from '../config/logger';
 const logger = createLogger('ChangeRequestController');
 
 // Helper to get environment from request
