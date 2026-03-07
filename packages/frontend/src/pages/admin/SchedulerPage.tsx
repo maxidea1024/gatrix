@@ -52,8 +52,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 
-import moment from 'moment';
-import 'moment/locale/ko';
+import dayjs from 'dayjs';
 
 // FullCalendar imports
 import FullCalendar from '@fullcalendar/react';
@@ -336,7 +335,7 @@ const SchedulerPage: React.FC = () => {
 
   // 현재 언어에 따른 Locale Settings
   const currentLanguage = i18n.language;
-  moment.locale(currentLanguage);
+
 
   // FullCalendar Locale 선택
   const getCalendarLocale = () => {
@@ -472,7 +471,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="Start Date/Time"
-                  value={formData.start ? (moment(formData.start) as any) : null}
+                  value={formData.start ? (dayjs(formData.start) as any) : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,
@@ -491,7 +490,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="End Date/Time"
-                  value={formData.end ? (moment(formData.end) as any) : null}
+                  value={formData.end ? (dayjs(formData.end) as any) : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,

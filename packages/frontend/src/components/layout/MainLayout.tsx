@@ -100,7 +100,7 @@ import {
   getMaintenanceStatusDisplay,
   MaintenanceStatusType,
 } from '@/utils/maintenanceStatusUtils';
-import moment from 'moment';
+
 import {
   getMenuCategories,
   getPathMatchMap,

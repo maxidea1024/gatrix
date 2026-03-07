@@ -7,7 +7,12 @@ import {
   SentimentSatisfiedAlt as AddReactionIcon,
 } from '@mui/icons-material';
 // React Chat Elements는 더 이상 Used하지 않음 (슬랙 스타일로 직접 구현)
-import moment from 'moment-timezone';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import dayjsTimezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(dayjsTimezone);
 import { getStoredTimezone } from '../../utils/dateFormat';
 import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
 import LinkPreviewCard from './LinkPreviewCard';
@@ -734,8 +739,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   // 상대적 시간 표시 (타임존 + 언어 지원)
   const formatRelativeTime = (timestamp: string) => {
     const userTimezone = getStoredTimezone();
-    const now = moment().tz(userTimezone);
-    const messageTime = moment(timestamp).tz(userTimezone);
+    const now = dayjs().tz(userTimezone);
+    const messageTime = dayjs(timestamp).tz(userTimezone);
     const diffInSeconds = now.diff(messageTime, 'seconds');
 
     const currentLanguage = i18n.language || 'ko'; // Default values을 한국어로 Settings

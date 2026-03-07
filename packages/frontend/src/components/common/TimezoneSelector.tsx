@@ -14,13 +14,18 @@ import {
 } from '@mui/material';
 import { Settings as SettingsIcon, Public as PublicIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import moment from 'moment-timezone';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import {
   getStoredTimezone,
   setStoredTimezone,
   formatDateTimeDetailed,
   formatUptime,
 } from '../../utils/dateFormat';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import { timeService, ServerTimeData } from '../../services/timeService';
 
 const TimezoneSelector: React.FC = () => {
@@ -32,7 +37,7 @@ const TimezoneSelector: React.FC = () => {
   const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(null);
   const [currentUptime, setCurrentUptime] = useState<number>(0);
 
-  const timezoneOptions = moment.tz.names();
+  const timezoneOptions = Intl.supportedValuesOf('timeZone');
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -77,7 +82,7 @@ const TimezoneSelector: React.FC = () => {
   };
 
   const formatTimezone = (tz: string) => {
-    const offset = moment.tz(tz).format('Z');
+    const offset = dayjs().tz(tz).format('Z');
     return `${tz} (UTC${offset})`;
   };
 
@@ -212,7 +217,7 @@ const TimezoneSelector: React.FC = () => {
                     <Box>
                       <Typography variant="body2">{option}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        UTC{moment.tz(option).format('Z')}
+                        UTC{dayjs().tz(option).format('Z')}
                       </Typography>
                     </Box>
                   </li>
@@ -237,7 +242,7 @@ const TimezoneSelector: React.FC = () => {
                   {formatTimezone(timezone)}
                 </Typography>
                 <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                  {moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss')}
+                  {dayjs().tz(timezone).format('YYYY-MM-DD HH:mm:ss')}
                 </Typography>
               </Box>
             </Stack>
