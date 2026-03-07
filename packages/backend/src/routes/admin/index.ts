@@ -1,5 +1,10 @@
 import express from 'express';
-import { authenticate, requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
+import {
+  authenticate,
+  requireOrgPermission,
+  requireProjectPermission,
+  requireEnvPermission,
+} from '../../middleware/auth';
 import { environmentContextMiddleware } from '../../middleware/environment-middleware';
 import { orgProjectScope } from '../../middleware/org-project-scope';
 import { P } from '@gatrix/shared/permissions';
@@ -111,11 +116,7 @@ router.use(environmentContextMiddleware as any);
 router.use('/', adminRoutes);
 
 // User management - requires users.view or users.manage permission
-router.use(
-  '/users',
-  requireOrgPermission([P.USERS_READ, P.USERS_UPDATE]) as any,
-  userRoutes
-);
+router.use('/users', requireOrgPermission([P.USERS_READ, P.USERS_UPDATE]) as any, userRoutes);
 
 // Security routes - requires security.view or security.manage permission
 router.use(
@@ -295,11 +296,7 @@ projectRouter.use(
 );
 
 // Vars (KV)
-projectRouter.use(
-  '/vars',
-  requireEnvPermission([P.VARS_READ, P.VARS_UPDATE]) as any,
-  varsRoutes
-);
+projectRouter.use('/vars', requireEnvPermission([P.VARS_READ, P.VARS_UPDATE]) as any, varsRoutes);
 
 // Service Notices
 projectRouter.use(
@@ -389,11 +386,7 @@ router.use(
 );
 
 // Jobs and scheduler
-router.use(
-  '/jobs',
-  requireOrgPermission([P.SCHEDULER_READ, P.SCHEDULER_UPDATE]) as any,
-  jobRoutes
-);
+router.use('/jobs', requireOrgPermission([P.SCHEDULER_READ, P.SCHEDULER_UPDATE]) as any, jobRoutes);
 
 // Invitations
 router.use(
@@ -403,11 +396,7 @@ router.use(
 );
 
 // Crash events
-router.use(
-  '/crash-events',
-  requireOrgPermission(P.CRASH_EVENTS_READ) as any,
-  crashEventRoutes
-);
+router.use('/crash-events', requireOrgPermission(P.CRASH_EVENTS_READ) as any, crashEventRoutes);
 
 // Console
 router.use('/console', requireOrgPermission(P.CONSOLE_ACCESS) as any, consoleRoutes);

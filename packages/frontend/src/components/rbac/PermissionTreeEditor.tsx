@@ -1,11 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-  Chip,
-} from '@mui/material';
+import { Box, Typography, Checkbox, FormControlLabel, Chip } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -29,10 +23,7 @@ const permLabel = (t: any, perm: string): string => {
 
 // Extract resource display name using localization key
 // e.g. resource "users" -> t('rbac.resource.users', 'users')
-const getResourceLabel = (
-  t: any,
-  resource: string
-): string => {
+const getResourceLabel = (t: any, resource: string): string => {
   // Try dedicated resource label key first
   const key = `rbac.resource.${resource}`;
   const label = t(key, '');
@@ -258,90 +249,95 @@ const PermissionTreeEditor: React.FC<PermissionTreeEditorProps> = ({
                     ))}
                   </Box>
 
-                  {resourceGroups.map(({ resource, permissions: resPerms, actionMap, extraActions }) => {
-                    const allResChecked = resPerms.every((p) => permissions.includes(p));
-                    const someResChecked =
-                      resPerms.some((p) => permissions.includes(p)) && !allResChecked;
-                    const resourceLabel = getResourceLabel(t, resource);
+                  {resourceGroups.map(
+                    ({ resource, permissions: resPerms, actionMap, extraActions }) => {
+                      const allResChecked = resPerms.every((p) => permissions.includes(p));
+                      const someResChecked =
+                        resPerms.some((p) => permissions.includes(p)) && !allResChecked;
+                      const resourceLabel = getResourceLabel(t, resource);
 
-                    return (
-                      <Box
-                        key={resource}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          pl: 4,
-                          pr: 1,
-                          py: 0,
-                          '&:hover': { bgcolor: 'action.hover' },
-                        }}
-                      >
-                        {/* Resource checkbox + name */}
-                        <Checkbox
-                          checked={allResChecked}
-                          indeterminate={someResChecked}
-                          onChange={() => handleToggleGroup(resPerms)}
-                          size="small"
-                          sx={{ p: 0.25 }}
-                        />
-                        <Typography
-                          variant="body2"
+                      return (
+                        <Box
+                          key={resource}
                           sx={{
-                            fontWeight: 500,
-                            fontSize: '0.78rem',
-                            minWidth: 130,
-                            ml: 0.5,
+                            display: 'flex',
+                            alignItems: 'center',
+                            pl: 4,
+                            pr: 1,
+                            py: 0,
+                            '&:hover': { bgcolor: 'action.hover' },
                           }}
                         >
-                          {resourceLabel}
-                        </Typography>
+                          {/* Resource checkbox + name */}
+                          <Checkbox
+                            checked={allResChecked}
+                            indeterminate={someResChecked}
+                            onChange={() => handleToggleGroup(resPerms)}
+                            size="small"
+                            sx={{ p: 0.25 }}
+                          />
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 500,
+                              fontSize: '0.78rem',
+                              minWidth: 130,
+                              ml: 0.5,
+                            }}
+                          >
+                            {resourceLabel}
+                          </Typography>
 
-                        {/* Fixed CRUD columns */}
-                        {STANDARD_ACTIONS.map((action) => {
-                          const perm = actionMap[action];
-                          const available = !!perm;
-                          return (
-                            <Box key={action} sx={{ width: 44, display: 'flex', justifyContent: 'center' }}>
-                              <Checkbox
-                                checked={available && permissions.includes(perm)}
-                                onChange={() => available && handleTogglePerm(perm)}
-                                disabled={!available}
-                                size="small"
-                                sx={{
-                                  p: 0.25,
-                                  opacity: available ? 1 : 0.2,
-                                }}
-                              />
-                            </Box>
-                          );
-                        })}
-
-                        {/* Extra non-CRUD actions */}
-                        {extraActions.map((action) => {
-                          const perm = actionMap[action];
-                          return (
-                            <FormControlLabel
-                              key={perm}
-                              control={
+                          {/* Fixed CRUD columns */}
+                          {STANDARD_ACTIONS.map((action) => {
+                            const perm = actionMap[action];
+                            const available = !!perm;
+                            return (
+                              <Box
+                                key={action}
+                                sx={{ width: 44, display: 'flex', justifyContent: 'center' }}
+                              >
                                 <Checkbox
-                                  checked={permissions.includes(perm)}
-                                  onChange={() => handleTogglePerm(perm)}
+                                  checked={available && permissions.includes(perm)}
+                                  onChange={() => available && handleTogglePerm(perm)}
+                                  disabled={!available}
                                   size="small"
-                                  sx={{ p: 0.25 }}
+                                  sx={{
+                                    p: 0.25,
+                                    opacity: available ? 1 : 0.2,
+                                  }}
                                 />
-                              }
-                              label={
-                                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
-                                  {action}
-                                </Typography>
-                              }
-                              sx={{ m: 0, ml: 0.5 }}
-                            />
-                          );
-                        })}
-                      </Box>
-                    );
-                  })}
+                              </Box>
+                            );
+                          })}
+
+                          {/* Extra non-CRUD actions */}
+                          {extraActions.map((action) => {
+                            const perm = actionMap[action];
+                            return (
+                              <FormControlLabel
+                                key={perm}
+                                control={
+                                  <Checkbox
+                                    checked={permissions.includes(perm)}
+                                    onChange={() => handleTogglePerm(perm)}
+                                    size="small"
+                                    sx={{ p: 0.25 }}
+                                  />
+                                }
+                                label={
+                                  <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                                    {action}
+                                  </Typography>
+                                }
+                                sx={{ m: 0, ml: 0.5 }}
+                              />
+                            );
+                          })}
+                        </Box>
+                      );
+                    }
+                  )}
                 </Box>
               )}
             </Box>

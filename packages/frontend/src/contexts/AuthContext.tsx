@@ -161,8 +161,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   };
 
-
-
   const canAccess = (requiredRoles?: string[]): boolean => {
     if (!isAuthenticated || !user) {
       return false;

@@ -152,7 +152,15 @@ const LandingPage: React.FC = () => {
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <LanguageIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', color: 'text.secondary' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    letterSpacing: 0.5,
+                    textTransform: 'uppercase',
+                    color: 'text.secondary',
+                  }}
+                >
                   {t('landing.language')}
                 </Typography>
               </Box>
@@ -174,7 +182,15 @@ const LandingPage: React.FC = () => {
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <PaletteIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', color: 'text.secondary' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    letterSpacing: 0.5,
+                    textTransform: 'uppercase',
+                    color: 'text.secondary',
+                  }}
+                >
                   {t('theme')}
                 </Typography>
               </Box>
@@ -196,7 +212,15 @@ const LandingPage: React.FC = () => {
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <TimezoneIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', color: 'text.secondary' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    letterSpacing: 0.5,
+                    textTransform: 'uppercase',
+                    color: 'text.secondary',
+                  }}
+                >
                   {t('landing.timezone')}
                 </Typography>
               </Box>
@@ -208,11 +232,7 @@ const LandingPage: React.FC = () => {
                 options={timezoneOptions}
                 getOptionLabel={formatTimezone}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={t('common.searchTimezone')}
-                    size="small"
-                  />
+                  <TextField {...params} placeholder={t('common.searchTimezone')} size="small" />
                 )}
                 renderOption={(props, option) => (
                   <li {...props}>

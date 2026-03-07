@@ -104,10 +104,14 @@ interface AccountDialogProps {
 const getEnvTypeColor = (type: string, customColor?: string): string => {
   if (customColor) return customColor;
   switch (type) {
-    case 'production': return '#d32f2f';
-    case 'staging': return '#ed6c02';
-    case 'development': return '#2e7d32';
-    default: return '#757575';
+    case 'production':
+      return '#d32f2f';
+    case 'staging':
+      return '#ed6c02';
+    case 'development':
+      return '#2e7d32';
+    default:
+      return '#757575';
   }
 };
 
@@ -258,7 +262,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
         <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
           <ListItemText
             primary={t('common.loading')}
-            primaryTypographyProps={{ variant: 'caption', color: 'text.secondary', fontStyle: 'italic' }}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
           />
         </ListItemButton>
       );
@@ -269,7 +277,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
         <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
           <ListItemText
             primary={t('environments.noEnvironments')}
-            primaryTypographyProps={{ variant: 'caption', color: 'text.secondary', fontStyle: 'italic' }}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
           />
         </ListItemButton>
       );
@@ -288,13 +300,16 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
             pl: indent,
             py: 0.5,
             '&.Mui-selected': {
-              backgroundColor: (theme) => alpha(envColor, theme.palette.mode === 'dark' ? 0.2 : 0.1),
+              backgroundColor: (theme) =>
+                alpha(envColor, theme.palette.mode === 'dark' ? 0.2 : 0.1),
               '&:hover': {
-                backgroundColor: (theme) => alpha(envColor, theme.palette.mode === 'dark' ? 0.25 : 0.15),
+                backgroundColor: (theme) =>
+                  alpha(envColor, theme.palette.mode === 'dark' ? 0.25 : 0.15),
               },
             },
             '&:hover': {
-              backgroundColor: (theme) => alpha(envColor, theme.palette.mode === 'dark' ? 0.15 : 0.08),
+              backgroundColor: (theme) =>
+                alpha(envColor, theme.palette.mode === 'dark' ? 0.15 : 0.08),
             },
           }}
         >
@@ -359,7 +374,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
 
             {/* Environment picker trigger */}
             <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mb: 0.5, display: 'block' }}
+              >
                 {t('serviceAccounts.environment')} *
               </Typography>
               <ButtonBase
@@ -375,7 +394,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                   border: '1px solid',
                   borderColor: selectedEnvironmentId ? 'primary.main' : 'divider',
                   bgcolor: selectedEnvironmentId
-                    ? (theme) => alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.08 : 0.04)
+                    ? (theme) =>
+                        alpha(
+                          theme.palette.primary.main,
+                          theme.palette.mode === 'dark' ? 0.08 : 0.04
+                        )
                     : 'transparent',
                   transition: 'all 0.15s',
                   '&:hover': {
@@ -385,7 +408,12 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <PublicIcon sx={{ fontSize: 18, color: selectedEnvironmentId ? 'primary.main' : 'text.disabled' }} />
+                  <PublicIcon
+                    sx={{
+                      fontSize: 18,
+                      color: selectedEnvironmentId ? 'primary.main' : 'text.disabled',
+                    }}
+                  />
                   <Typography
                     variant="body2"
                     sx={{
@@ -429,11 +457,17 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                       <React.Fragment key={org.id}>
                         {/* Org header (multi-org only) */}
                         {isMultiOrg && (
-                          <ListItemButton onClick={() => handleToggleOrg(org.id)} dense sx={{ py: 0.5 }}>
+                          <ListItemButton
+                            onClick={() => handleToggleOrg(org.id)}
+                            dense
+                            sx={{ py: 0.5 }}
+                          >
                             <ListItemIcon sx={{ minWidth: 28 }}>
-                              {isOrgExpanded
-                                ? <ExpandMoreIcon sx={{ fontSize: 18 }} />
-                                : <ChevronRightIcon sx={{ fontSize: 18 }} />}
+                              {isOrgExpanded ? (
+                                <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                              ) : (
+                                <ChevronRightIcon sx={{ fontSize: 18 }} />
+                              )}
                             </ListItemIcon>
                             <ListItemIcon sx={{ minWidth: 24 }}>
                               <BusinessIcon sx={{ fontSize: 16, opacity: 0.7 }} />
@@ -460,9 +494,11 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
                                   sx={{ py: 0.5, pl: projIndent }}
                                 >
                                   <ListItemIcon sx={{ minWidth: 28 }}>
-                                    {isProjExpanded
-                                      ? <ExpandMoreIcon sx={{ fontSize: 18 }} />
-                                      : <ChevronRightIcon sx={{ fontSize: 18 }} />}
+                                    {isProjExpanded ? (
+                                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                                    ) : (
+                                      <ChevronRightIcon sx={{ fontSize: 18 }} />
+                                    )}
                                   </ListItemIcon>
                                   <ListItemIcon sx={{ minWidth: 24 }}>
                                     <FolderIcon sx={{ fontSize: 16, opacity: 0.7 }} />
@@ -861,7 +897,11 @@ const ServiceAccountsPage: React.FC = () => {
   };
 
   // Account CRUD
-  const handleSaveAccount = async (data: { name: string; roleIds: string[]; environmentId: string }) => {
+  const handleSaveAccount = async (data: {
+    name: string;
+    roleIds: string[];
+    environmentId: string;
+  }) => {
     try {
       if (editDialog.account) {
         // Update name
@@ -1023,7 +1063,9 @@ const ServiceAccountsPage: React.FC = () => {
                             sx={{ borderRadius: '8px' }}
                           />
                         ) : (
-                          <Typography variant="body2" color="text.secondary">—</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            —
+                          </Typography>
                         )}
                       </TableCell>
                       <TableCell align="center">
@@ -1094,39 +1136,39 @@ const ServiceAccountsPage: React.FC = () => {
         }}
       >
         {canUpdate && (
-        <MenuItem
-          onClick={() => {
-            if (menuTargetAccount) setEditDialog({ open: true, account: menuTargetAccount });
-            setMenuAnchorEl(null);
-            setMenuTargetAccount(null);
-          }}
-        >
-          <ListItemIcon>
-            <EditIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t('common.edit')}</ListItemText>
-        </MenuItem>
+          <MenuItem
+            onClick={() => {
+              if (menuTargetAccount) setEditDialog({ open: true, account: menuTargetAccount });
+              setMenuAnchorEl(null);
+              setMenuTargetAccount(null);
+            }}
+          >
+            <ListItemIcon>
+              <EditIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('common.edit')}</ListItemText>
+          </MenuItem>
         )}
         {canDelete && (
-        <MenuItem
-          onClick={() => {
-            if (menuTargetAccount) {
-              setDeleteDialog({
-                open: true,
-                type: 'account',
-                accountId: menuTargetAccount.id,
-                name: menuTargetAccount.name,
-              });
-            }
-            setMenuAnchorEl(null);
-            setMenuTargetAccount(null);
-          }}
-        >
-          <ListItemIcon>
-            <DeleteIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
-        </MenuItem>
+          <MenuItem
+            onClick={() => {
+              if (menuTargetAccount) {
+                setDeleteDialog({
+                  open: true,
+                  type: 'account',
+                  accountId: menuTargetAccount.id,
+                  name: menuTargetAccount.name,
+                });
+              }
+              setMenuAnchorEl(null);
+              setMenuTargetAccount(null);
+            }}
+          >
+            <ListItemIcon>
+              <DeleteIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>{t('common.delete')}</ListItemText>
+          </MenuItem>
         )}
       </Menu>
 

@@ -242,7 +242,8 @@ const GroupsPage: React.FC = () => {
       loadRoles();
       // Load group effective permissions
       setGroupEffectivePermsLoading(true);
-      rbacService.getGroupEffectivePermissions(group.id)
+      rbacService
+        .getGroupEffectivePermissions(group.id)
         .then((data) => setGroupEffectivePerms(data))
         .catch(() => setGroupEffectivePerms(null))
         .finally(() => setGroupEffectivePermsLoading(false));
@@ -878,8 +879,15 @@ const GroupsPage: React.FC = () => {
                   <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
                     {t('rbac.roles.effectivePermissions')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.8rem' }}>
-                    {t('rbac.groups.effectivePermissionsDesc', 'Permissions that members of this group will receive from assigned roles.')}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1, fontSize: '0.8rem' }}
+                  >
+                    {t(
+                      'rbac.groups.effectivePermissionsDesc',
+                      'Permissions that members of this group will receive from assigned roles.'
+                    )}
                   </Typography>
                   <EffectivePermissionsViewer
                     data={groupEffectivePerms}

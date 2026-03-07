@@ -492,14 +492,30 @@ export class UserModel {
   /**
    * Search users by name or email
    */
-  static async searchUsers(query: string, limit: number = 20, orgId?: string): Promise<UserWithoutPassword[]> {
+  static async searchUsers(
+    query: string,
+    limit: number = 20,
+    orgId?: string
+  ): Promise<UserWithoutPassword[]> {
     try {
       const q = db('g_users')
-        .select('g_users.id', 'g_users.name', 'g_users.email', 'g_users.status', 'g_users.avatarUrl', 'g_users.createdAt', 'g_users.updatedAt')
+        .select(
+          'g_users.id',
+          'g_users.name',
+          'g_users.email',
+          'g_users.status',
+          'g_users.avatarUrl',
+          'g_users.createdAt',
+          'g_users.updatedAt'
+        )
         .where('g_users.status', 'active')
         .whereNot('g_users.authType', 'service-account')
         .andWhere(function () {
-          this.where('g_users.name', 'like', `%${query}%`).orWhere('g_users.email', 'like', `%${query}%`);
+          this.where('g_users.name', 'like', `%${query}%`).orWhere(
+            'g_users.email',
+            'like',
+            `%${query}%`
+          );
         })
         .orderBy('g_users.name', 'asc')
         .limit(limit);
@@ -507,8 +523,7 @@ export class UserModel {
       // Scope to organisation members if orgId is provided
       if (orgId) {
         q.join('g_organisation_members as om', function () {
-          this.on('om.userId', '=', 'g_users.id')
-            .andOn('om.orgId', '=', db.raw('?', [orgId]));
+          this.on('om.userId', '=', 'g_users.id').andOn('om.orgId', '=', db.raw('?', [orgId]));
         });
       }
 
@@ -559,9 +574,7 @@ export class UserModel {
   static async getPermissions(userId: string): Promise<string[]> {
     try {
       // Get all role IDs from direct bindings
-      const directBindings = await db('g_role_bindings')
-        .where('userId', userId)
-        .select('roleId');
+      const directBindings = await db('g_role_bindings').where('userId', userId).select('roleId');
 
       // Get all role IDs from group bindings
       const groupBindings = await db('g_role_bindings as rb')

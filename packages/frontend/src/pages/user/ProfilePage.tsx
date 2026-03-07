@@ -165,9 +165,7 @@ const ProfilePage: React.FC = () => {
         setAccessTree(tree);
         // Auto-expand all orgs and projects
         setExpandedOrgs(new Set(tree.map((o) => o.orgId)));
-        setExpandedProjects(
-          new Set(tree.flatMap((o) => o.projects.map((p) => p.projectId)))
-        );
+        setExpandedProjects(new Set(tree.flatMap((o) => o.projects.map((p) => p.projectId))));
       } catch {
         // Silently ignore
       } finally {
@@ -644,10 +642,7 @@ const ProfilePage: React.FC = () => {
                     </Typography>
                   </Box>
                 ) : (
-                  <EffectivePermissionsViewer
-                    data={effectivePermsData}
-                    maxHeight={350}
-                  />
+                  <EffectivePermissionsViewer data={effectivePermsData} maxHeight={350} />
                 )}
               </CardContent>
             </Card>
@@ -702,9 +697,15 @@ const ProfilePage: React.FC = () => {
                         }}
                       >
                         {expandedOrgs.has(org.orgId) ? (
-                          <ExpandMoreIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                          <ExpandMoreIcon
+                            fontSize="small"
+                            sx={{ mr: 0.5, color: 'text.secondary' }}
+                          />
                         ) : (
-                          <ChevronRightIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                          <ChevronRightIcon
+                            fontSize="small"
+                            sx={{ mr: 0.5, color: 'text.secondary' }}
+                          />
                         )}
                         <OrgIcon fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -741,9 +742,15 @@ const ProfilePage: React.FC = () => {
                             >
                               {proj.environments.length > 0 ? (
                                 expandedProjects.has(proj.projectId) ? (
-                                  <ExpandMoreIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                  <ExpandMoreIcon
+                                    fontSize="small"
+                                    sx={{ mr: 0.5, color: 'text.secondary' }}
+                                  />
                                 ) : (
-                                  <ChevronRightIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                  <ChevronRightIcon
+                                    fontSize="small"
+                                    sx={{ mr: 0.5, color: 'text.secondary' }}
+                                  />
                                 )
                               ) : (
                                 <Box sx={{ width: 24, mr: 0.5 }} />

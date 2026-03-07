@@ -1139,7 +1139,9 @@ const FeatureContextFieldsPage: React.FC = () => {
         title={
           !canManage && editingField?.id
             ? t('featureFlags.viewContextField')
-            : editingField?.id ? t('featureFlags.editContextField') : t('featureFlags.addContextField')
+            : editingField?.id
+              ? t('featureFlags.editContextField')
+              : t('featureFlags.addContextField')
         }
         subtitle={t('featureFlags.contextFieldsDescription')}
         storageKey="featureContextFieldDrawerWidth"

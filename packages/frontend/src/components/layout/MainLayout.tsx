@@ -1011,63 +1011,63 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   return (
                     <React.Fragment key={childIndex}>
                       {child.divider && <Divider sx={{ mx: 2, my: 0.5 }} />}
-                    <ListItemButton
-                      onClick={() => openOrNavigate(child.path)}
-                      sx={{
-                        pl: 2,
-                        pr: 2,
-                        borderRadius: 1,
-                        py: 0.75,
-                        my: 0.5,
-                        ml: 2,
-                        color: isChildActive
-                          ? theme.palette.text.primary
-                          : theme.palette.text.secondary,
-                        backgroundColor: isChildActive
-                          ? `${theme.palette.primary.main}20`
-                          : 'transparent',
-                        '&:hover': {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255,255,255,0.1)'
-                              : 'rgba(0,0,0,0.08)',
-                        },
-                      }}
-                    >
-                      <ListItemIcon
+                      <ListItemButton
+                        onClick={() => openOrNavigate(child.path)}
                         sx={{
-                          color: 'inherit',
-                          minWidth: 40,
-                          justifyContent: 'center',
+                          pl: 2,
+                          pr: 2,
+                          borderRadius: 1,
+                          py: 0.75,
+                          my: 0.5,
+                          ml: 2,
+                          color: isChildActive
+                            ? theme.palette.text.primary
+                            : theme.palette.text.secondary,
+                          backgroundColor: isChildActive
+                            ? `${theme.palette.primary.main}20`
+                            : 'transparent',
+                          '&:hover': {
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255,255,255,0.1)'
+                                : 'rgba(0,0,0,0.08)',
+                          },
                         }}
                       >
-                        {sidebarCollapsed ? (
-                          <Badge badgeContent={child.badge} color="primary">
-                            {child.icon}
-                          </Badge>
-                        ) : (
-                          child.icon
-                        )}
-                      </ListItemIcon>
-                      {!sidebarCollapsed && (
-                        <>
-                          <ListItemText
-                            primary={t(child.text)}
-                            primaryTypographyProps={{ fontSize: '0.875rem' }}
-                          />
-                          {child.badge && (
-                            <Badge
-                              badgeContent={child.badge}
-                              color="primary"
-                              sx={{
-                                ml: 1,
-                                '& .MuiBadge-badge': { fontSize: '0.625rem' },
-                              }}
-                            />
+                        <ListItemIcon
+                          sx={{
+                            color: 'inherit',
+                            minWidth: 40,
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {sidebarCollapsed ? (
+                            <Badge badgeContent={child.badge} color="primary">
+                              {child.icon}
+                            </Badge>
+                          ) : (
+                            child.icon
                           )}
-                        </>
-                      )}
-                    </ListItemButton>
+                        </ListItemIcon>
+                        {!sidebarCollapsed && (
+                          <>
+                            <ListItemText
+                              primary={t(child.text)}
+                              primaryTypographyProps={{ fontSize: '0.875rem' }}
+                            />
+                            {child.badge && (
+                              <Badge
+                                badgeContent={child.badge}
+                                color="primary"
+                                sx={{
+                                  ml: 1,
+                                  '& .MuiBadge-badge': { fontSize: '0.625rem' },
+                                }}
+                              />
+                            )}
+                          </>
+                        )}
+                      </ListItemButton>
                     </React.Fragment>
                   );
                 })}
@@ -1555,64 +1555,64 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {/* 사이드바 - 전체 높이 차지 (admin only) */}
       {showSidebar && (
-      <Box
-        component="nav"
-        sx={{
-          width: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
-          flexShrink: 0,
-          zIndex: (theme) => theme.zIndex.drawer,
-        }}
-      >
-        {/* 모바일 드로어 */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
+        <Box
+          component="nav"
           sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: 280,
-              backgroundColor: theme.palette.background.paper,
-              color: theme.palette.text.primary,
-              border: 'none',
-              borderRight: 'none',
-            },
+            width: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+            flexShrink: 0,
+            zIndex: (theme) => theme.zIndex.drawer,
           }}
         >
-          {drawerContent}
-        </Drawer>
+          {/* 모바일 드로어 */}
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            sx={{
+              display: { xs: 'block', md: 'none' },
+              '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                width: 280,
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+                border: 'none',
+                borderRight: 'none',
+              },
+            }}
+          >
+            {drawerContent}
+          </Drawer>
 
-        {/* 데스크톱 드로어 - 전체 높이 */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: sidebarCollapsed ? 64 : sidebarWidth,
-              transition: 'width 0.3s ease',
-              backgroundColor: theme.palette.background.paper,
-              color: theme.palette.text.primary,
-              position: 'fixed',
-              height: '100vh',
-              top: 0,
-              left: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              border: 'none',
-              borderRight: 'none',
-            },
-          }}
-          open
-        >
-          {drawerContent}
-        </Drawer>
-      </Box>
+          {/* 데스크톱 드로어 - 전체 높이 */}
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: { xs: 'none', md: 'block' },
+              '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                width: sidebarCollapsed ? 64 : sidebarWidth,
+                transition: 'width 0.3s ease',
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+                position: 'fixed',
+                height: '100vh',
+                top: 0,
+                left: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                border: 'none',
+                borderRight: 'none',
+              },
+            }}
+            open
+          >
+            {drawerContent}
+          </Drawer>
+        </Box>
       )}
 
       {/* 오른쪽 영역: AppBar + 메인 컨텐츠 */}
@@ -1642,8 +1642,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {showSidebar && (
-                isMobile ? (
+              {showSidebar &&
+                (isMobile ? (
                   <IconButton
                     color="inherit"
                     aria-label="open drawer"
@@ -1663,8 +1663,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   >
                     <MenuOpenIcon />
                   </IconButton>
-                )
-              )}
+                ))}
             </Box>
 
             {/* 점검 배너 - AppBar 내부 */}

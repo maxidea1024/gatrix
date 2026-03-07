@@ -7,13 +7,7 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, Button, CircularProgress, useTheme } from '@mui/material';
 import {
   Logout as LogoutIcon,
   CheckCircleOutline as CheckIcon,
@@ -235,7 +229,11 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
                 {step.icon}
               </Box>
               <Box>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.25, color: 'text.primary' }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  sx={{ mb: 0.25, color: 'text.primary' }}
+                >
                   {step.title}
                 </Typography>
                 <Typography variant="body2" sx={{ lineHeight: 1.5, color: 'text.secondary' }}>
@@ -258,9 +256,7 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
           }}
         >
           <CircularProgress size={12} thickness={5} sx={{ color: 'text.disabled' }} />
-          <Typography variant="caption">
-            {t('onboarding.autoChecking')}
-          </Typography>
+          <Typography variant="caption">{t('onboarding.autoChecking')}</Typography>
         </Box>
       </Box>
 
@@ -269,7 +265,10 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
         variant="text"
         size="small"
         startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
-        onClick={async () => { await logout(); window.location.href = '/login'; }}
+        onClick={async () => {
+          await logout();
+          window.location.href = '/login';
+        }}
         sx={{
           mt: 3,
           color: 'text.disabled',

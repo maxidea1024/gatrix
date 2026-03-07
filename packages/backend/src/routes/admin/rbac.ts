@@ -117,9 +117,7 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
 
     // Auto-bind Manager role (with *:*) at org scope so creator has full access
     try {
-      const managerRole = await db('g_roles')
-        .where('roleName', 'Manager')
-        .first();
+      const managerRole = await db('g_roles').where('roleName', 'Manager').first();
       if (managerRole) {
         await db('g_role_bindings').insert({
           id: generateULID(),
@@ -244,8 +242,6 @@ router.delete(
   }
 );
 
-
-
 // ==================== My Access (RBAC-filtered tree) ====================
 
 // GET /api/admin/rbac/my-access
@@ -366,9 +362,30 @@ router.post(
 
       // Create default environments (same as seed)
       const defaultEnvironments = [
-        { displayName: 'Development', type: 'development', color: '#4CAF50', order: 0, isDefault: true, requiresApproval: false },
-        { displayName: 'Staging', type: 'staging', color: '#FF9800', order: 1, isDefault: false, requiresApproval: false },
-        { displayName: 'Production', type: 'production', color: '#F44336', order: 2, isDefault: false, requiresApproval: true },
+        {
+          displayName: 'Development',
+          type: 'development',
+          color: '#4CAF50',
+          order: 0,
+          isDefault: true,
+          requiresApproval: false,
+        },
+        {
+          displayName: 'Staging',
+          type: 'staging',
+          color: '#FF9800',
+          order: 1,
+          isDefault: false,
+          requiresApproval: false,
+        },
+        {
+          displayName: 'Production',
+          type: 'production',
+          color: '#F44336',
+          order: 2,
+          isDefault: false,
+          requiresApproval: true,
+        },
       ];
 
       for (const env of defaultEnvironments) {
@@ -446,7 +463,15 @@ router.get('/projects/:id/members', async (req: any, res) => {
     const members = await db('g_project_members as pm')
       .join('g_users as u', 'pm.userId', 'u.id')
       .where('pm.projectId', req.params.id)
-      .select('pm.id', 'pm.projectId', 'pm.userId', 'pm.projectRole', 'pm.joinedAt', 'u.name', 'u.email');
+      .select(
+        'pm.id',
+        'pm.projectId',
+        'pm.userId',
+        'pm.projectRole',
+        'pm.joinedAt',
+        'u.name',
+        'u.email'
+      );
     res.json({ success: true, data: members });
   } catch (error) {
     logger.error('Error getting project members:', error);
@@ -497,7 +522,11 @@ router.post(
         action: 'project_member_add',
         resourceType: 'project',
         resourceId: req.params.id,
-        newValues: { targetUserId: userId, projectId: req.params.id, projectRole: projectRole || 'member' },
+        newValues: {
+          targetUserId: userId,
+          projectId: req.params.id,
+          projectRole: projectRole || 'member',
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });
@@ -602,39 +631,41 @@ router.delete(
 // ==================== Roles ====================
 
 // GET /api/admin/rbac/roles
-router.get(
-  '/roles',
-  requireOrgPermission(P.ROLES_READ) as any,
-  async (req: any, res) => {
-    try {
-      const query = db('g_roles')
-        .select(
-          'g_roles.*',
-          db.raw(
-            '(SELECT COUNT(*) FROM g_role_permissions WHERE roleId = g_roles.id) as permissionCount'
-          ),
-          db.raw('(SELECT COUNT(DISTINCT userId) FROM g_role_bindings WHERE roleId = g_roles.id AND userId IS NOT NULL) as userCount'),
-          db.raw('(SELECT COUNT(DISTINCT groupId) FROM g_role_bindings WHERE roleId = g_roles.id AND groupId IS NOT NULL) as groupCount')
+router.get('/roles', requireOrgPermission(P.ROLES_READ) as any, async (req: any, res) => {
+  try {
+    const query = db('g_roles')
+      .select(
+        'g_roles.*',
+        db.raw(
+          '(SELECT COUNT(*) FROM g_role_permissions WHERE roleId = g_roles.id) as permissionCount'
+        ),
+        db.raw(
+          '(SELECT COUNT(DISTINCT userId) FROM g_role_bindings WHERE roleId = g_roles.id AND userId IS NOT NULL) as userCount'
+        ),
+        db.raw(
+          '(SELECT COUNT(DISTINCT groupId) FROM g_role_bindings WHERE roleId = g_roles.id AND groupId IS NOT NULL) as groupCount'
         )
-        .where('g_roles.orgId', req.user.orgId)
-        .orderBy('g_roles.roleName', 'asc');
+      )
+      .where('g_roles.orgId', req.user.orgId)
+      .orderBy('g_roles.roleName', 'asc');
 
-      // Filter roles by actor's scope level (hierarchy-based)
-      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
-      query.where('g_roles.scopeType', 'in',
-        Object.entries(require('../../utils/scope-hierarchy').SCOPE_LEVELS)
-          .filter(([, level]) => (level as number) >= actorScopeLevel)
-          .map(([key]) => key)
-      );
+    // Filter roles by actor's scope level (hierarchy-based)
+    const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+    query.where(
+      'g_roles.scopeType',
+      'in',
+      Object.entries(require('../../utils/scope-hierarchy').SCOPE_LEVELS)
+        .filter(([, level]) => (level as number) >= actorScopeLevel)
+        .map(([key]) => key)
+    );
 
-      const roles = await query;
-      res.json({ success: true, data: roles });
-    } catch (error) {
-      logger.error('Error listing roles:', error);
-      res.status(500).json({ success: false, message: 'Failed to list roles' });
-    }
+    const roles = await query;
+    res.json({ success: true, data: roles });
+  } catch (error) {
+    logger.error('Error listing roles:', error);
+    res.status(500).json({ success: false, message: 'Failed to list roles' });
   }
-);
+});
 
 // GET /api/admin/rbac/roles/:id/effective-permissions
 // Returns the role's own + inherited (from parent roles) permissions
@@ -646,13 +677,15 @@ router.get(
       const roleId = req.params.id;
 
       // Get own permissions
-      const ownPerms = await db('g_role_permissions')
-        .where('roleId', roleId)
-        .select('permission');
+      const ownPerms = await db('g_role_permissions').where('roleId', roleId).select('permission');
       const ownPermSet = new Set(ownPerms.map((p: any) => p.permission));
 
       // Get inherited permissions via parent roles (recursively)
-      const inheritedPerms: Array<{ permission: string; fromRoleId: string; fromRoleName: string }> = [];
+      const inheritedPerms: Array<{
+        permission: string;
+        fromRoleId: string;
+        fromRoleName: string;
+      }> = [];
 
       // Recursive parent resolution
       const resolveParents = async (rIds: string[], depth: number = 0): Promise<void> => {
@@ -668,7 +701,10 @@ router.get(
             .where('roleId', parent.parentRoleId)
             .select('permission');
           for (const pp of parentPerms) {
-            if (!ownPermSet.has(pp.permission) && !inheritedPerms.some((ip) => ip.permission === pp.permission)) {
+            if (
+              !ownPermSet.has(pp.permission) &&
+              !inheritedPerms.some((ip) => ip.permission === pp.permission)
+            ) {
               inheritedPerms.push({
                 permission: pp.permission,
                 fromRoleId: parent.parentRoleId,
@@ -735,10 +771,16 @@ router.post(
       }
 
       // Prevent creating roles with permissions above actor's scope level
-      if (permissions && Array.isArray(permissions) && permissions.some((p: any) => p.permission === '*:*' || p === '*:*')) {
+      if (
+        permissions &&
+        Array.isArray(permissions) &&
+        permissions.some((p: any) => p.permission === '*:*' || p === '*:*')
+      ) {
         const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
         if (actorScopeLevel > getScopeLevel('system')) {
-          return res.status(403).json({ success: false, message: 'Cannot create roles with wildcard permissions' });
+          return res
+            .status(403)
+            .json({ success: false, message: 'Cannot create roles with wildcard permissions' });
         }
       }
 
@@ -783,13 +825,21 @@ router.put(
       }
       const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
       if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
-        return res.status(403).json({ success: false, message: 'Insufficient scope level to modify this role' });
+        return res
+          .status(403)
+          .json({ success: false, message: 'Insufficient scope level to modify this role' });
       }
 
       // Block wildcard permissions for actors below system scope
-      if (permissions && Array.isArray(permissions) && permissions.some((p: any) => p.permission === '*:*' || p === '*:*')) {
+      if (
+        permissions &&
+        Array.isArray(permissions) &&
+        permissions.some((p: any) => p.permission === '*:*' || p === '*:*')
+      ) {
         if (actorScopeLevel > getScopeLevel('system')) {
-          return res.status(403).json({ success: false, message: 'Cannot set wildcard permissions' });
+          return res
+            .status(403)
+            .json({ success: false, message: 'Cannot set wildcard permissions' });
         }
       }
 
@@ -813,7 +863,9 @@ router.put(
         .where('rb.roleId', req.params.id)
         .whereNotNull('rb.groupId')
         .select('gm.userId');
-      const affectedUserIds = [...new Set([...boundUsers, ...boundGroupUsers].map((u: any) => u.userId))];
+      const affectedUserIds = [
+        ...new Set([...boundUsers, ...boundGroupUsers].map((u: any) => u.userId)),
+      ];
 
       if (affectedUserIds.length > 0) {
         await pubSubService.publishNotification({
@@ -858,7 +910,9 @@ router.delete(
       }
       const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
       if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
-        return res.status(403).json({ success: false, message: 'Insufficient scope level to delete this role' });
+        return res
+          .status(403)
+          .json({ success: false, message: 'Insufficient scope level to delete this role' });
       }
 
       const deleted = await RoleModel.delete(req.params.id);
@@ -1078,7 +1132,9 @@ router.post(
       if (targetRole) {
         const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
         if (getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
-          return res.status(403).json({ success: false, message: 'Cannot assign roles above your scope level' });
+          return res
+            .status(403)
+            .json({ success: false, message: 'Cannot assign roles above your scope level' });
         }
       }
 
@@ -1243,7 +1299,12 @@ router.get(
   async (req: any, res) => {
     try {
       const userBindings = await db('g_role_bindings')
-        .select(['g_role_bindings.*', 'r.roleName', 'r.description as roleDescription', 'r.scopeType as roleScopeType'])
+        .select([
+          'g_role_bindings.*',
+          'r.roleName',
+          'r.description as roleDescription',
+          'r.scopeType as roleScopeType',
+        ])
         .join('g_roles as r', 'g_role_bindings.roleId', 'r.id')
         .where('g_role_bindings.userId', req.params.id)
         .orderBy('r.roleName', 'asc');
@@ -1339,13 +1400,20 @@ router.delete(
       const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
       const targetRole = await db('g_roles').where('id', req.params.roleId).first();
       if (targetRole && getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
-        return res.status(403).json({ success: false, message: 'Cannot remove roles above your scope level' });
+        return res
+          .status(403)
+          .json({ success: false, message: 'Cannot remove roles above your scope level' });
       }
 
       // Prevent managing users with higher scope level
       const targetUserScopeLevel = await permissionService.getUserMaxScopeLevel(req.params.id);
       if (targetUserScopeLevel < actorScopeLevel) {
-        return res.status(403).json({ success: false, message: 'Cannot modify roles of users with higher scope level' });
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: 'Cannot modify roles of users with higher scope level',
+          });
       }
 
       const result = await db('g_role_bindings')
@@ -1371,7 +1439,11 @@ router.delete(
         action: 'user_role_remove',
         resourceType: 'user',
         resourceId: req.params.id,
-        newValues: { targetUserId: req.params.id, roleId: req.params.roleId, roleName: targetRole?.roleName },
+        newValues: {
+          targetUserId: req.params.id,
+          roleId: req.params.roleId,
+          roleName: targetRole?.roleName,
+        },
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),
       });

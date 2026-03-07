@@ -37,8 +37,18 @@ router.get('/users/:id', usersView, AdminController.getUserById as any);
 
 router.put('/users/:id', usersManage, auditUserUpdate as any, AdminController.updateUser as any);
 router.delete('/users/:id', usersManage, auditUserDelete as any, AdminController.deleteUser as any);
-router.post('/users/:id/activate', usersManage, auditUserUnsuspend as any, AdminController.activateUser as any);
-router.post('/users/:id/suspend', usersManage, auditUserSuspend as any, AdminController.suspendUser as any);
+router.post(
+  '/users/:id/activate',
+  usersManage,
+  auditUserUnsuspend as any,
+  AdminController.activateUser as any
+);
+router.post(
+  '/users/:id/suspend',
+  usersManage,
+  auditUserSuspend as any,
+  AdminController.suspendUser as any
+);
 
 router.post('/users/:id/verify-email', usersManage, AdminController.verifyUserEmail as any);
 
@@ -48,7 +58,11 @@ router.get('/users/:id/permissions', usersView, AdminController.getUserPermissio
 
 // Bulk user operations
 router.post('/users/bulk/status', usersManage, AdminController.bulkUpdateUserStatus as any);
-router.post('/users/bulk/email-verified', usersManage, AdminController.bulkUpdateUserEmailVerified as any);
+router.post(
+  '/users/bulk/email-verified',
+  usersManage,
+  AdminController.bulkUpdateUserEmailVerified as any
+);
 router.post('/users/bulk/tags', usersManage, AdminController.bulkUpdateUserTags as any);
 router.post('/users/bulk/delete', usersManage, AdminController.bulkDeleteUsers as any);
 
@@ -62,8 +76,18 @@ router.post('/audit-logs/cleanup', systemManage, AdminController.cleanupAuditLog
 
 // Pending user approvals
 router.get('/pending-users', usersView, AdminController.getPendingUsers as any);
-router.post('/users/:id/approve', usersManage, auditUserApprove as any, AdminController.approveUser as any);
-router.post('/users/:id/reject', usersManage, auditUserReject as any, AdminController.rejectUser as any);
+router.post(
+  '/users/:id/approve',
+  usersManage,
+  auditUserApprove as any,
+  AdminController.approveUser as any
+);
+router.post(
+  '/users/:id/reject',
+  usersManage,
+  auditUserReject as any,
+  AdminController.rejectUser as any
+);
 
 // API Token management
 router.use('/api-tokens', apiTokenRoutes);

@@ -311,7 +311,10 @@ export const rbacService = {
 
   // ─── User Search ─────────────────────────
 
-  async searchUsers(query: string, orgId?: string): Promise<{ id: string; name: string; email: string }[]> {
+  async searchUsers(
+    query: string,
+    orgId?: string
+  ): Promise<{ id: string; name: string; email: string }[]> {
     const params: Record<string, any> = { search: query, limit: 20 };
     if (orgId) params.orgId = orgId;
     const res = await api.get('/admin/users', { params });

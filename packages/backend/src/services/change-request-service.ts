@@ -402,10 +402,7 @@ export class ChangeRequestService {
           await ChangeItem.query().findById(item.id).patch({ entityVersion: currentData.version });
         }
       } catch (err) {
-        logger.warn(
-          `Failed to capture version for ${item.targetTable}:${item.targetId}`,
-          err
-        );
+        logger.warn(`Failed to capture version for ${item.targetTable}:${item.targetId}`, err);
       }
     }
 
@@ -782,9 +779,7 @@ export class ChangeRequestService {
             });
           } else {
             // Warn but continue (dev/test environments)
-            logger.warn(
-              `Conflict detected but continuing (non-strict): ${conflictReason}`
-            );
+            logger.warn(`Conflict detected but continuing (non-strict): ${conflictReason}`);
           }
         }
 
@@ -943,9 +938,7 @@ export class ChangeRequestService {
                   .patch({
                     targetId: String(realId),
                   });
-                logger.info(
-                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
-                );
+                logger.info(`Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
               }
             } else {
               // Optimistic locking: increment version and add to WHERE clause
@@ -1022,9 +1015,7 @@ export class ChangeRequestService {
                   .patch({
                     targetId: String(realId),
                   });
-                logger.info(
-                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
-                );
+                logger.info(`Updated ChangeItem targetId: ${item.targetId} -> ${realId}`);
               }
             } else {
               // Optimistic locking: increment version and add to WHERE clause
@@ -1048,9 +1039,7 @@ export class ChangeRequestService {
                 await trx(item.targetTable).where('id', item.targetId).update(dbData);
               }
             }
-            logger.warn(
-              `No service handler for ${item.targetTable}, events not published`
-            );
+            logger.warn(`No service handler for ${item.targetTable}, events not published`);
           }
         }
       }
@@ -1266,10 +1255,7 @@ export class ChangeRequestService {
               currentVersion = currentLiveData.version;
             }
           } catch (err) {
-            logger.warn(
-              `Could not fetch live data for ${item.targetTable}:${item.targetId}`,
-              err
-            );
+            logger.warn(`Could not fetch live data for ${item.targetTable}:${item.targetId}`, err);
           }
         }
 

@@ -163,9 +163,7 @@ export class LockService {
       expiresAt,
     });
 
-    logger.info(
-      `Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
-    );
+    logger.info(`Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`);
     return lock;
   }
 

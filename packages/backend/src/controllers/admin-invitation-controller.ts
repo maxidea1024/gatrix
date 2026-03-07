@@ -250,8 +250,5 @@ export const createInvitationValidation = [
     .isInt({ min: 1, max: 8760 }) // 최소 1시간, 최대 1년(365*24)
     .withMessage('Expiration hours must be between 1 and 8760 (1 year)'),
 
-  body('autoJoinConfig')
-    .optional()
-    .isObject()
-    .withMessage('autoJoinConfig must be a valid object'),
+  body('autoJoinConfig').optional().isObject().withMessage('autoJoinConfig must be a valid object'),
 ];

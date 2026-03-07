@@ -677,9 +677,7 @@ export class CouponSettingsService {
     const used = Number(row.usedCount || 0);
     const unused = issued - used;
 
-    logger.debug(
-      `settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`
-    );
+    logger.debug(`settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`);
 
     return { issued, used, unused };
   }

@@ -83,7 +83,13 @@ export class UserController {
       }
     }
 
-    const filters = { status, search, orgId, excludeSystemAdmins: excludeHigherScopeUsers, actorScopeLevel };
+    const filters = {
+      status,
+      search,
+      orgId,
+      excludeSystemAdmins: excludeHigherScopeUsers,
+      actorScopeLevel,
+    };
     const pagination = { page, limit };
 
     const result = await UserService.getAllUsers(filters, pagination);

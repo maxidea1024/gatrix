@@ -145,7 +145,12 @@ export class GroupModel {
 
   // ─── Roles ─────────────────────────
 
-  static async addRole(groupId: string, roleId: string, orgId: string, assignedBy?: string): Promise<void> {
+  static async addRole(
+    groupId: string,
+    roleId: string,
+    orgId: string,
+    assignedBy?: string
+  ): Promise<void> {
     // Check for duplicate binding
     const existing = await db(this.BINDINGS_TABLE)
       .where('groupId', groupId)
@@ -197,8 +202,8 @@ export class GroupModel {
         `${this.BINDINGS_TABLE}.roleId`,
         db.raw('MIN(`g_role_bindings`.`assignedBy`) as assignedBy'),
         db.raw('MIN(`g_role_bindings`.`assignedAt`) as assignedAt'),
-        db.raw("MIN(`g_role_bindings`.`scopeType`) as scopeType"),
-        db.raw("MIN(`g_role_bindings`.`scopeId`) as scopeId"),
+        db.raw('MIN(`g_role_bindings`.`scopeType`) as scopeType'),
+        db.raw('MIN(`g_role_bindings`.`scopeId`) as scopeId'),
         'r.roleName',
         'r.description as roleDescription',
       ])

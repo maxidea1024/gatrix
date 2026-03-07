@@ -1,7 +1,12 @@
 import express from 'express';
 import { body } from 'express-validator';
 import ApiTokensController from '../../controllers/api-tokens-controller';
-import { authenticate, requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
+import {
+  authenticate,
+  requireOrgPermission,
+  requireProjectPermission,
+  requireEnvPermission,
+} from '../../middleware/auth';
 import { auditLog } from '../../middleware/audit-log';
 import { P } from '@gatrix/shared/permissions';
 

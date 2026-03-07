@@ -15,10 +15,7 @@ router.use((req, res, next) => {
 router.get('/meta/platforms' as any, ClientVersionController.getPlatforms as any);
 
 // ?�용 가?�한 버전 Get list (관리자�?
-router.get(
-  '/meta/versions' as any,
-  ClientVersionController.getAvailableVersions as any
-);
+router.get('/meta/versions' as any, ClientVersionController.getAvailableVersions as any);
 
 // ?�라?�언??버전 Get list (관리자�?
 router.get('/' as any, ClientVersionController.getClientVersions as any);
@@ -91,9 +88,6 @@ router.get('/:id/tags' as any, ClientVersionController.getTags as any);
 router.put('/:id/tags' as any, ClientVersionController.setTags as any);
 
 // Reset all client versions and cache (for testing)
-router.delete(
-  '/reset/all' as any,
-  ClientVersionController.resetAllClientVersions as any
-);
+router.delete('/reset/all' as any, ClientVersionController.resetAllClientVersions as any);
 
 export default router;

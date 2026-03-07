@@ -26,7 +26,16 @@ export class PublicInvitationController {
     try {
       // 초대 정보 조회
       const invitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'autoJoinConfig'])
+        .select([
+          'id',
+          'token',
+          'email',
+          'role',
+          'expiresAt',
+          'createdAt',
+          'isActive',
+          'autoJoinConfig',
+        ])
         .where('token', token)
         .where('isActive', true)
         .first();
@@ -60,9 +69,10 @@ export class PublicInvitationController {
       // Resolve autoJoinConfig to display names for invitee
       let autoJoinInfo = null;
       if (invitation.autoJoinConfig) {
-        const config = typeof invitation.autoJoinConfig === 'string'
-          ? JSON.parse(invitation.autoJoinConfig)
-          : invitation.autoJoinConfig;
+        const config =
+          typeof invitation.autoJoinConfig === 'string'
+            ? JSON.parse(invitation.autoJoinConfig)
+            : invitation.autoJoinConfig;
         autoJoinInfo = await UserOnboardingService.resolveAutoJoinConfigNames(config);
       }
 
@@ -114,7 +124,17 @@ export class PublicInvitationController {
     try {
       // 초대 정보 조회 및 Validation
       const invitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'usedAt', 'autoJoinConfig'])
+        .select([
+          'id',
+          'token',
+          'email',
+          'role',
+          'expiresAt',
+          'createdAt',
+          'isActive',
+          'usedAt',
+          'autoJoinConfig',
+        ])
         .where('token', token)
         .where('isActive', true)
         .first();
@@ -200,9 +220,10 @@ export class PublicInvitationController {
 
         // Apply auto-join config if present
         if (invitation.autoJoinConfig) {
-          const config = typeof invitation.autoJoinConfig === 'string'
-            ? JSON.parse(invitation.autoJoinConfig)
-            : invitation.autoJoinConfig;
+          const config =
+            typeof invitation.autoJoinConfig === 'string'
+              ? JSON.parse(invitation.autoJoinConfig)
+              : invitation.autoJoinConfig;
           await UserOnboardingService.applyAutoJoinConfig(
             userId,
             config,

@@ -358,10 +358,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         tags:
           selectedTags && selectedTags.length > 0
             ? selectedTags.map((tag) => ({
-              id: tag.id,
-              name: tag.name,
-              color: tag.color,
-            }))
+                id: tag.id,
+                name: tag.name,
+                color: tag.color,
+              }))
             : [],
       };
 

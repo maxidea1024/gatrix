@@ -58,8 +58,7 @@ const ProjectsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { refreshProjects, currentOrg, currentProjectId, organisations } =
-    useOrgProject();
+  const { refreshProjects, currentOrg, currentProjectId, organisations } = useOrgProject();
 
   // Resolve the parent org from URL param or current context
   const urlOrgId = searchParams.get('orgId');
@@ -119,7 +118,9 @@ const ProjectsPage: React.FC = () => {
     roleChanges: Record<string, 'admin' | 'member'>;
   }>({ add: [], remove: [], roleChanges: {} });
   const [userSearchInput, setUserSearchInput] = useState('');
-  const [userSearchResults, setUserSearchResults] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [userSearchResults, setUserSearchResults] = useState<
+    { id: string; name: string; email: string }[]
+  >([]);
   const [userSearchLoading, setUserSearchLoading] = useState(false);
   const debouncedUserSearch = useDebounce(userSearchInput, 300);
   const [memberApplying, setMemberApplying] = useState(false);
@@ -142,7 +143,9 @@ const ProjectsPage: React.FC = () => {
         if (!cancelled) setUserSearchLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [debouncedUserSearch, effectiveOrg?.id]);
 
   const handleOpenMemberDrawer = async (proj: Project) => {
@@ -194,27 +197,30 @@ const ProjectsPage: React.FC = () => {
     Object.keys(pendingChanges.roleChanges).length > 0;
 
   // Load projects and filter by effective org
-  const loadProjects = useCallback(async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      const projectData = await orgProjectService.getProjects();
-      // Filter by the effective org (URL param or current context)
-      const orgId = effectiveOrg?.id;
-      setProjects(orgId ? projectData.filter((p) => p.orgId === orgId) : projectData);
-
-      // Load access tree (non-blocking)
+  const loadProjects = useCallback(
+    async (silent = false) => {
       try {
-        const access = await orgProjectService.getMyAccess();
-        setAccessTree(access);
+        if (!silent) setLoading(true);
+        const projectData = await orgProjectService.getProjects();
+        // Filter by the effective org (URL param or current context)
+        const orgId = effectiveOrg?.id;
+        setProjects(orgId ? projectData.filter((p) => p.orgId === orgId) : projectData);
+
+        // Load access tree (non-blocking)
+        try {
+          const access = await orgProjectService.getMyAccess();
+          setAccessTree(access);
+        } catch {
+          console.warn('Failed to load access tree');
+        }
       } catch {
-        console.warn('Failed to load access tree');
+        enqueueSnackbar(t('rbac.projects.loadFailed'), { variant: 'error' });
+      } finally {
+        if (!silent) setLoading(false);
       }
-    } catch {
-      enqueueSnackbar(t('rbac.projects.loadFailed'), { variant: 'error' });
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  }, [enqueueSnackbar, t, effectiveOrg?.id]);
+    },
+    [enqueueSnackbar, t, effectiveOrg?.id]
+  );
 
   // Toggle project expansion and load environments
   const handleToggleProjectExpand = useCallback(
@@ -806,7 +812,15 @@ const ProjectsPage: React.FC = () => {
                     if (alreadyMember || alreadyPending) return;
                     setPendingChanges((prev) => ({
                       ...prev,
-                      add: [...prev.add, { userId: value.id, name: value.name, email: value.email, projectRole: 'member' }],
+                      add: [
+                        ...prev.add,
+                        {
+                          userId: value.id,
+                          name: value.name,
+                          email: value.email,
+                          projectRole: 'member',
+                        },
+                      ],
                       remove: prev.remove.filter((id) => id !== value.id),
                     }));
                   }}
@@ -821,7 +835,7 @@ const ProjectsPage: React.FC = () => {
               </Box>
 
               {/* Member list */}
-              {(pendingChanges.add.length > 0 || members.length > 0) ? (
+              {pendingChanges.add.length > 0 || members.length > 0 ? (
                 <Box
                   sx={{
                     border: 1,
@@ -844,8 +858,12 @@ const ProjectsPage: React.FC = () => {
                       }}
                     >
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
-                        <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
+                        <Typography variant="body2" fontWeight={500} noWrap>
+                          {m.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          {m.email}
+                        </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <IconButton
@@ -884,10 +902,14 @@ const ProjectsPage: React.FC = () => {
                         }}
                       >
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
-                          <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
+                          <Typography variant="body2" fontWeight={500} noWrap>
+                            {m.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            {m.email}
+                          </Typography>
                         </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <IconButton
                             size="small"
                             onClick={() => {
@@ -924,8 +946,12 @@ const ProjectsPage: React.FC = () => {
                         }}
                       >
                         <Box sx={{ flex: 1, minWidth: 0, textDecoration: 'line-through' }}>
-                          <Typography variant="body2" fontWeight={500} noWrap>{m.name}</Typography>
-                          <Typography variant="caption" color="text.secondary" noWrap>{m.email}</Typography>
+                          <Typography variant="body2" fontWeight={500} noWrap>
+                            {m.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            {m.email}
+                          </Typography>
                         </Box>
                         <Button
                           size="small"
@@ -942,7 +968,11 @@ const ProjectsPage: React.FC = () => {
                     ))}
                 </Box>
               ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: 'center', py: 4 }}
+                >
                   {t('rbac.projects.noMembers')}
                 </Typography>
               )}
@@ -961,9 +991,7 @@ const ProjectsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setMemberDrawerOpen(false)}>
-            {t('common.cancel')}
-          </Button>
+          <Button onClick={() => setMemberDrawerOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handleApplyMembers}

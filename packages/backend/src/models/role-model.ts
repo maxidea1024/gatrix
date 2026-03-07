@@ -93,9 +93,7 @@ export class RoleModel {
    * Get permissions for a role (pure permission strings, no scope)
    */
   static async getPermissions(roleId: string): Promise<string[]> {
-    const rows = await db(this.PERMISSIONS_TABLE)
-      .where('roleId', roleId)
-      .select('permission');
+    const rows = await db(this.PERMISSIONS_TABLE).where('roleId', roleId).select('permission');
     return rows.map((r: any) => r.permission);
   }
 

@@ -20,7 +20,6 @@ import {
   Select,
   MenuItem,
   Menu,
-
 } from '@mui/material';
 import {
   Business as BusinessIcon,
@@ -263,7 +262,9 @@ const WorkspacePage: React.FC = () => {
       // Update local state for immediate UI feedback
       setOrganisations((prev) =>
         prev.map((o) =>
-          o.id === editOrgId ? { ...o, displayName: editData.displayName, description: editData.description } : o
+          o.id === editOrgId
+            ? { ...o, displayName: editData.displayName, description: editData.description }
+            : o
         )
       );
       // Also refresh org context so environment selector shows updated name
@@ -360,9 +361,7 @@ const WorkspacePage: React.FC = () => {
       setInitialMembers(JSON.parse(JSON.stringify(members)));
       // Update member count locally for immediate UI feedback
       setOrganisations((prev) =>
-        prev.map((o) =>
-          o.id === selectedOrg.id ? { ...o, memberCount: members.length } : o
-        )
+        prev.map((o) => (o.id === selectedOrg.id ? { ...o, memberCount: members.length } : o))
       );
     } catch (error: any) {
       const msg = error?.response?.data?.message || t('rbac.orgs.memberUpdateFailed');
@@ -374,7 +373,9 @@ const WorkspacePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+      <Box
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}
+      >
         <Box>
           <Typography variant="h5" fontWeight={600} gutterBottom>
             {t('workspace.title')}
@@ -461,123 +462,131 @@ const WorkspacePage: React.FC = () => {
                     sx={{ p: 3, cursor: 'pointer' }}
                     onClick={() => navigate(`/admin/projects?orgId=${org.id}`)}
                   >
-                      {/* Header */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          justifyContent: 'space-between',
-                          mb: 2,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            minWidth: 0,
-                            flex: 1,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: 40,
-                              height: 40,
-                              borderRadius: 2,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              bgcolor: 'primary.main',
-                              color: 'primary.contrastText',
-                              flexShrink: 0,
-                            }}
-                          >
-                            <BusinessIcon fontSize="small" />
-                          </Box>
-                          <Box sx={{ minWidth: 0 }}>
-                            <Typography
-                              variant="subtitle1"
-                              fontWeight={600}
-                              noWrap
-                              title={org.displayName}
-                            >
-                              {org.displayName}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              noWrap
-                              sx={{ display: 'block' }}
-                              title={org.orgName}
-                            >
-                              {org.orgName}
-                            </Typography>
-                          </Box>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0, ml: 1 }}>
-                          <Chip
-                            label={org.isActive ? t('common.active') : t('common.inactive')}
-                            size="small"
-                            color={org.isActive ? 'success' : 'default'}
-                            variant="outlined"
-                          />
-                          {(canManageOrgs || canInvite) && (
-                            <IconButton
-                              size="small"
-                              onClick={(e) => handleMenuOpen(e, org)}
-                              sx={{ ml: 0.5 }}
-                            >
-                              <MoreVertIcon fontSize="small" />
-                            </IconButton>
-                          )}
-                        </Box>
-                      </Box>
-
-                      {/* Description */}
-                      {org.description && (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            mb: 2,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            lineHeight: 1.6,
-                          }}
-                        >
-                          {org.description}
-                        </Typography>
-                      )}
-
-                      {/* Footer info */}
+                    {/* Header */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        mb: 2,
+                      }}
+                    >
                       <Box
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 2,
-                          pt: 2,
-                          borderTop: '1px solid',
-                          borderColor: 'divider',
+                          gap: 1.5,
+                          minWidth: 0,
+                          flex: 1,
                         }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                          <Typography variant="caption" color="text.secondary">
-                            {org.memberCount} {t('workspace.members')}
+                        <Box
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            bgcolor: 'primary.main',
+                            color: 'primary.contrastText',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <BusinessIcon fontSize="small" />
+                        </Box>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={600}
+                            noWrap
+                            title={org.displayName}
+                          >
+                            {org.displayName}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            noWrap
+                            sx={{ display: 'block' }}
+                            title={org.orgName}
+                          >
+                            {org.orgName}
                           </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                          <Tooltip title={formatDateTimeDetailed(org.createdAt)} arrow>
-                            <Typography variant="caption" color="text.secondary">
-                              {formatRelativeTime(org.createdAt)}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
                       </Box>
-                    </CardContent>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          flexShrink: 0,
+                          ml: 1,
+                        }}
+                      >
+                        <Chip
+                          label={org.isActive ? t('common.active') : t('common.inactive')}
+                          size="small"
+                          color={org.isActive ? 'success' : 'default'}
+                          variant="outlined"
+                        />
+                        {(canManageOrgs || canInvite) && (
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleMenuOpen(e, org)}
+                            sx={{ ml: 0.5 }}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* Description */}
+                    {org.description && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 2,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {org.description}
+                      </Typography>
+                    )}
+
+                    {/* Footer info */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        pt: 2,
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="caption" color="text.secondary">
+                          {org.memberCount} {t('workspace.members')}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Tooltip title={formatDateTimeDetailed(org.createdAt)} arrow>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatRelativeTime(org.createdAt)}
+                          </Typography>
+                        </Tooltip>
+                      </Box>
+                    </Box>
+                  </CardContent>
 
                   {/* Expandable project list */}
                   {accessibleProjects.length > 0 && (
@@ -817,108 +826,105 @@ const WorkspacePage: React.FC = () => {
             <>
               {/* Add member section */}
               <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                    <Autocomplete
-                      size="small"
-                      sx={{ flex: 1 }}
-                      options={searchedUsers.filter(
-                        (u) => !pendingMembers.some((m) => m.userId === u.id)
-                      )}
-                      getOptionLabel={(opt) => `${opt.name} (${opt.email})`}
-                      value={selectedUser}
-                      onChange={(_, val) => setSelectedUser(val)}
-                      inputValue={memberSearchTerm}
-                      onInputChange={(_, val) => setMemberSearchTerm(val)}
-                      loading={searchingUsers}
-                      noOptionsText={
-                        memberSearchTerm.length < 2
-                          ? t('rbac.orgs.searchMinChars')
-                          : t('common.noResults')
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={t('rbac.orgs.searchMemberPlaceholder')}
-                        />
-                      )}
-                      renderOption={(props, option) => {
-                        const { key, ...otherProps } = props;
-                        return (
-                          <Box component="li" key={key} {...otherProps}>
-                            <Box>
-                              <Typography variant="body2">{option.name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {option.email}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        );
-                      }}
-                    />
-                    <Button
-                      variant="contained"
-                      size="small"
-                      disabled={!selectedUser}
-                      onClick={handleAddMember}
-                    >
-                      {t('rbac.orgs.addMember')}
-                    </Button>
-                  </Box>
-
-                  {/* Members list */}
-                  {pendingMembers.length === 0 ? (
-                    <Alert severity="info">{t('rbac.orgs.noMembers')}</Alert>
-                  ) : (
-                    <Box
-                      sx={{
-                        border: 1,
-                        borderColor: 'divider',
-                        borderRadius: 1,
-                      }}
-                    >
-                      {pendingMembers.map((member: OrgMember, index: number) => (
-                        <Box
-                          key={member.userId}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            px: 2,
-                            py: 1,
-                            borderBottom: index < pendingMembers.length - 1 ? 1 : 0,
-                            borderColor: 'divider',
-                          }}
-                        >
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography variant="body2" fontWeight={500}>
-                              {member.name || member.userId}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {member.email || ''}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Tooltip
-                              title={
-                                String(member.userId) === String(currentUser?.id)
-                                  ? t('rbac.orgs.cannotModifySelf')
-                                  : t('rbac.orgs.removeMember')
-                              }
-                            >
-                              <span>
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  onClick={() => handleRemoveMember(member.userId)}
-                                  disabled={String(member.userId) === String(currentUser?.id)}
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </span>
-                            </Tooltip>
-                          </Box>
+                <Autocomplete
+                  size="small"
+                  sx={{ flex: 1 }}
+                  options={searchedUsers.filter(
+                    (u) => !pendingMembers.some((m) => m.userId === u.id)
+                  )}
+                  getOptionLabel={(opt) => `${opt.name} (${opt.email})`}
+                  value={selectedUser}
+                  onChange={(_, val) => setSelectedUser(val)}
+                  inputValue={memberSearchTerm}
+                  onInputChange={(_, val) => setMemberSearchTerm(val)}
+                  loading={searchingUsers}
+                  noOptionsText={
+                    memberSearchTerm.length < 2
+                      ? t('rbac.orgs.searchMinChars')
+                      : t('common.noResults')
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder={t('rbac.orgs.searchMemberPlaceholder')} />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <Box component="li" key={key} {...otherProps}>
+                        <Box>
+                          <Typography variant="body2">{option.name}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {option.email}
+                          </Typography>
                         </Box>
-                      ))}
+                      </Box>
+                    );
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={!selectedUser}
+                  onClick={handleAddMember}
+                >
+                  {t('rbac.orgs.addMember')}
+                </Button>
+              </Box>
+
+              {/* Members list */}
+              {pendingMembers.length === 0 ? (
+                <Alert severity="info">{t('rbac.orgs.noMembers')}</Alert>
+              ) : (
+                <Box
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                  }}
+                >
+                  {pendingMembers.map((member: OrgMember, index: number) => (
+                    <Box
+                      key={member.userId}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        px: 2,
+                        py: 1,
+                        borderBottom: index < pendingMembers.length - 1 ? 1 : 0,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" fontWeight={500}>
+                          {member.name || member.userId}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {member.email || ''}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Tooltip
+                          title={
+                            String(member.userId) === String(currentUser?.id)
+                              ? t('rbac.orgs.cannotModifySelf')
+                              : t('rbac.orgs.removeMember')
+                          }
+                        >
+                          <span>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleRemoveMember(member.userId)}
+                              disabled={String(member.userId) === String(currentUser?.id)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Box>
                     </Box>
+                  ))}
+                </Box>
               )}
             </>
           ) : null}

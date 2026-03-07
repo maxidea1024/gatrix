@@ -876,7 +876,13 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={readonly ? t('releaseFlow.viewTemplate') : (initialData ? t('releaseFlow.editTemplate') : t('releaseFlow.createTemplate'))}
+      title={
+        readonly
+          ? t('releaseFlow.viewTemplate')
+          : initialData
+            ? t('releaseFlow.editTemplate')
+            : t('releaseFlow.createTemplate')
+      }
       subtitle={t('releaseFlow.templatesSubtitle')}
       storageKey="releaseFlowTemplateDrawerWidth"
       defaultWidth={800}

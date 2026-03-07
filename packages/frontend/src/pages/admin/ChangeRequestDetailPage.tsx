@@ -871,49 +871,48 @@ const ChangeRequestDetailPage: React.FC = () => {
               )}
 
               {/* Status Banners */}
-              {cr.status === 'rejected' &&
-                (cr.requesterId === user?.id || hasAnyPermissions) && (
-                  <Paper
+              {cr.status === 'rejected' && (cr.requesterId === user?.id || hasAnyPermissions) && (
+                <Paper
+                  sx={{
+                    p: 2,
+                    bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
+                    border: 1,
+                    borderColor: 'error.main',
+                  }}
+                >
+                  <Box
                     sx={{
-                      p: 2,
-                      bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
-                      border: 1,
-                      borderColor: 'error.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="body2" fontWeight={500} color="error.main">
-                          {t('changeRequest.status.rejected')}
+                    <Box>
+                      <Typography variant="body2" fontWeight={500} color="error.main">
+                        {t('changeRequest.status.rejected')}
+                      </Typography>
+                      {cr.rejectionReason && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block', mt: 0.5 }}
+                        >
+                          {cr.rejectionReason}
                         </Typography>
-                        {cr.rejectionReason && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ display: 'block', mt: 0.5 }}
-                          >
-                            {cr.rejectionReason}
-                          </Typography>
-                        )}
-                      </Box>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<DeleteIcon />}
-                        onClick={handleDelete}
-                        disabled={actionLoading}
-                      >
-                        {t('common.delete')}
-                      </Button>
+                      )}
                     </Box>
-                  </Paper>
-                )}
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      startIcon={<DeleteIcon />}
+                      onClick={handleDelete}
+                      disabled={actionLoading}
+                    >
+                      {t('common.delete')}
+                    </Button>
+                  </Box>
+                </Paper>
+              )}
 
               {cr.status === 'approved' && (
                 <Paper

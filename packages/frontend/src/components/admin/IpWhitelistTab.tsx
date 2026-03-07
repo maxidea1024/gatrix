@@ -92,7 +92,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => 
     open: false,
     title: '',
     message: '',
-    action: () => { },
+    action: () => {},
   });
 
   // Form data

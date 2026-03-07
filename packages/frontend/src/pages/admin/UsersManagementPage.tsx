@@ -390,7 +390,9 @@ const UsersManagementPage: React.FC = () => {
   const [newUserPermissions, setNewUserPermissions] = useState<Permission[]>([]);
 
   // RBAC roles for new user
-  const [newUserRbacRoles, setNewUserRbacRoles] = useState<{ roleId: string; roleName: string; description?: string }[]>([]);
+  const [newUserRbacRoles, setNewUserRbacRoles] = useState<
+    { roleId: string; roleName: string; description?: string }[]
+  >([]);
   const [newUserSelectedRbacRoleId, setNewUserSelectedRbacRoleId] = useState<string | null>(null);
 
   // Delete confirmation state
@@ -1194,12 +1196,18 @@ const UsersManagementPage: React.FC = () => {
           const newRoleIds = new Set(editUserRbacRoles.map((r) => r.roleId));
 
           // Deduplicate by roleId to prevent redundant API calls
-          const uniqueRolesToAdd = [...new Set(
-            editUserRbacRoles.filter((r) => !origRoleIds.has(r.roleId)).map((r) => r.roleId)
-          )];
-          const uniqueRolesToRemove = [...new Set(
-            originalUserData.rbacRoles.filter((r) => !newRoleIds.has(r.roleId)).map((r) => r.roleId)
-          )];
+          const uniqueRolesToAdd = [
+            ...new Set(
+              editUserRbacRoles.filter((r) => !origRoleIds.has(r.roleId)).map((r) => r.roleId)
+            ),
+          ];
+          const uniqueRolesToRemove = [
+            ...new Set(
+              originalUserData.rbacRoles
+                .filter((r) => !newRoleIds.has(r.roleId))
+                .map((r) => r.roleId)
+            ),
+          ];
 
           const userId = String(editUserDialog.user.id);
 
@@ -1917,13 +1925,13 @@ const UsersManagementPage: React.FC = () => {
                         </TableCell>
                         <TableCell align="center">
                           {(isCurrentUser(user) || canModifyUser(user)) && (
-                          <IconButton
-                            onClick={(event) => handleMenuOpen(event, user)}
-                            size="small"
-                            title={t('common.actions')}
-                          >
-                            <MoreVertIcon />
-                          </IconButton>
+                            <IconButton
+                              onClick={(event) => handleMenuOpen(event, user)}
+                              size="small"
+                              title={t('common.actions')}
+                            >
+                              <MoreVertIcon />
+                            </IconButton>
                           )}
                         </TableCell>
                       </TableRow>
@@ -2136,7 +2144,6 @@ const UsersManagementPage: React.FC = () => {
                 }}
               />
             </Box>
-
 
             {/* Tags Selection */}
             <Box>
@@ -2969,66 +2976,66 @@ const UsersManagementPage: React.FC = () => {
                 </Typography>
                 {/* Hide role selector if target user has system-scope roles */}
                 {!editUserRbacRoles.some((r) => r.roleScopeType === 'system') && (
-                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                  <Autocomplete
-                    size="small"
-                    sx={{ flex: 1 }}
-                    options={allRbacRoles.filter(
-                      (r) => !editUserRbacRoles.some((ur) => ur.roleId === r.id)
-                    )}
-                    getOptionLabel={(opt) => opt.roleName}
-                    value={allRbacRoles.find((r) => r.id === selectedRbacRoleId) || null}
-                    onChange={(_, val) => setSelectedRbacRoleId(val?.id || null)}
-                    slotProps={{
-                      popper: { style: { zIndex: 9999 } },
-                    }}
-                    renderInput={(params) => (
-                      <TextField {...params} placeholder={t('rbac.userRoles.selectRole')} />
-                    )}
-                    renderOption={(props, option) => {
-                      const { key, ...otherProps } = props;
-                      return (
-                        <Box component="li" key={key} {...otherProps}>
-                          <Box>
-                            <Typography variant="body2">{option.roleName}</Typography>
-                            {option.description && (
-                              <Typography variant="caption" color="text.secondary">
-                                {option.description}
-                              </Typography>
-                            )}
+                  <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                    <Autocomplete
+                      size="small"
+                      sx={{ flex: 1 }}
+                      options={allRbacRoles.filter(
+                        (r) => !editUserRbacRoles.some((ur) => ur.roleId === r.id)
+                      )}
+                      getOptionLabel={(opt) => opt.roleName}
+                      value={allRbacRoles.find((r) => r.id === selectedRbacRoleId) || null}
+                      onChange={(_, val) => setSelectedRbacRoleId(val?.id || null)}
+                      slotProps={{
+                        popper: { style: { zIndex: 9999 } },
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} placeholder={t('rbac.userRoles.selectRole')} />
+                      )}
+                      renderOption={(props, option) => {
+                        const { key, ...otherProps } = props;
+                        return (
+                          <Box component="li" key={key} {...otherProps}>
+                            <Box>
+                              <Typography variant="body2">{option.roleName}</Typography>
+                              {option.description && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {option.description}
+                                </Typography>
+                              )}
+                            </Box>
                           </Box>
-                        </Box>
-                      );
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    size="small"
-                    disabled={!selectedRbacRoleId}
-                    onClick={() => {
-                      if (!selectedRbacRoleId) return;
-                      const roleToAdd = allRbacRoles.find((r) => r.id === selectedRbacRoleId);
-                      if (!roleToAdd) return;
-                      // Add to local state only
-                      setEditUserRbacRoles((prev) => [
-                        ...prev,
-                        {
-                          id: `pending-${roleToAdd.id}`,
-                          userId: editUserDialog.user ? String(editUserDialog.user.id) : '',
-                          roleId: roleToAdd.id,
-                          scopeType: 'org',
-                          scopeId: '',
-                          assignedBy: null,
-                          roleName: roleToAdd.roleName,
-                          roleDescription: roleToAdd.description,
-                        },
-                      ]);
-                      setSelectedRbacRoleId(null);
-                    }}
-                  >
-                    {t('rbac.userRoles.addRole')}
-                  </Button>
-                </Box>
+                        );
+                      }}
+                    />
+                    <Button
+                      variant="contained"
+                      size="small"
+                      disabled={!selectedRbacRoleId}
+                      onClick={() => {
+                        if (!selectedRbacRoleId) return;
+                        const roleToAdd = allRbacRoles.find((r) => r.id === selectedRbacRoleId);
+                        if (!roleToAdd) return;
+                        // Add to local state only
+                        setEditUserRbacRoles((prev) => [
+                          ...prev,
+                          {
+                            id: `pending-${roleToAdd.id}`,
+                            userId: editUserDialog.user ? String(editUserDialog.user.id) : '',
+                            roleId: roleToAdd.id,
+                            scopeType: 'org',
+                            scopeId: '',
+                            assignedBy: null,
+                            roleName: roleToAdd.roleName,
+                            roleDescription: roleToAdd.description,
+                          },
+                        ]);
+                        setSelectedRbacRoleId(null);
+                      }}
+                    >
+                      {t('rbac.userRoles.addRole')}
+                    </Button>
+                  </Box>
                 )}
                 {editUserRbacRolesLoading ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
@@ -3073,10 +3080,7 @@ const UsersManagementPage: React.FC = () => {
                         {role.roleScopeType === 'system' ? (
                           <Tooltip title={t('rbac.userRoles.systemRoleCannotBeRemoved')}>
                             <span>
-                              <IconButton
-                                size="small"
-                                disabled
-                              >
+                              <IconButton size="small" disabled>
                                 <DeleteIcon fontSize="small" />
                               </IconButton>
                             </span>

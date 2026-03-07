@@ -630,7 +630,9 @@ const ActionSetsPage: React.FC = () => {
         {actionSets.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('actionSets.noActionSets')}
-            onAddClick={canManage ? () => setEditDialog({ open: true, actionSet: null }) : undefined}
+            onAddClick={
+              canManage ? () => setEditDialog({ open: true, actionSet: null }) : undefined
+            }
             addButtonLabel={t('actionSets.createActionSet')}
           />
         ) : (

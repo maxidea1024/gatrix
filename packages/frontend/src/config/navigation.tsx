@@ -622,7 +622,7 @@ function convertCategory(
   badges?: Record<string, string | number>
 ): MenuCategory {
   // A category is admin-only if any of its children require permissions
-  const hasPermissionChild = config.children.some(c => !!c.requiredPermission);
+  const hasPermissionChild = config.children.some((c) => !!c.requiredPermission);
   return {
     id: config.id,
     text: config.text,
@@ -650,7 +650,7 @@ export const getMenuCategories = (
   // Filter and convert categories
   const categories = MENU_CONFIG.filter((config) => {
     // Check if category has permission-gated children (admin-only)
-    const hasPermissionChild = config.children.some(c => !!c.requiredPermission);
+    const hasPermissionChild = config.children.some((c) => !!c.requiredPermission);
     if (hasPermissionChild && !isAdmin) return false;
     // Check condition
     if (config.condition && !config.condition(mergedOptions)) return false;

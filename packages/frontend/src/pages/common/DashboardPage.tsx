@@ -287,7 +287,11 @@ const DashboardPage: React.FC = () => {
   const theme = useTheme();
   const { user, hasPermission, permissions, permissionsLoading } = useAuth();
   const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
-  const { data: statsData, isLoading: statsLoading, mutate: refreshStats } = useConditionalApi<{
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    mutate: refreshStats,
+  } = useConditionalApi<{
     totalUsers: number;
     activeUsers: number;
     pendingUsers: number;
@@ -1560,7 +1564,11 @@ const DashboardPage: React.FC = () => {
                   <Typography variant="h6" fontWeight={600} gutterBottom>
                     {t('dashboard.welcomeHub.statusTitle')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8, mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.8, mb: 2 }}
+                  >
                     {t('dashboard.welcomeHub.statusDescription')}
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -1719,7 +1727,9 @@ const DashboardPage: React.FC = () => {
               </Typography>
               <Divider sx={{ mb: 2 }} />
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <Typography variant="body2" color="text.secondary">
                     {t('users.name')}
                   </Typography>
@@ -1727,7 +1737,9 @@ const DashboardPage: React.FC = () => {
                     {user?.name || '-'}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <Typography variant="body2" color="text.secondary">
                     {t('users.email')}
                   </Typography>
@@ -1735,7 +1747,9 @@ const DashboardPage: React.FC = () => {
                     {user?.email || '-'}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <Typography variant="body2" color="text.secondary">
                     {t('users.status')}
                   </Typography>
@@ -1754,340 +1768,185 @@ const DashboardPage: React.FC = () => {
 
       {/* Admin Quick Actions & Recent Activity */}
       {hasAnyPermissions && (
-      <Grid container spacing={3}>
-        {/* Quick Actions */}
-        <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                {t('dashboard.quickActionsTitle')}
-              </Typography>
-              <Grid container spacing={2}>
-                {quickActions.map((action) => (
-                  <Grid key={action.key} size={{ xs: 12, sm: 6, md: 4 }}>
-                    <QuickActionCard
-                      title={action.title}
-                      description={action.description}
-                      icon={action.icon}
-                      onClick={() => navigate(action.path)}
-                      badge={action.badge}
-                      color={action.color}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-              {quickActions.length === 0 && (
-                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
-                  <Typography variant="body2">{t('dashboard.noQuickActions')}</Typography>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Recent Activity */}
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 2,
-                }}
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  {t('dashboard.recentActivity')}
+        <Grid container spacing={3}>
+          {/* Quick Actions */}
+          <Grid size={{ xs: 12, lg: 8 }}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+                  {t('dashboard.quickActionsTitle')}
                 </Typography>
-                {hasPermission(P.AUDIT_LOGS_READ) && (
-                  <Tooltip title={t('dashboard.viewAll')}>
-                    <IconButton size="small" onClick={() => navigate('/admin/audit-logs')}>
-                      <OpenInNewIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Box>
-
-              {activitiesLoading ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {[1, 2, 3].map((i) => (
-                    <Box key={i} sx={{ display: 'flex', gap: 2 }}>
-                      <Skeleton variant="circular" width={40} height={40} />
-                      <Box sx={{ flex: 1 }}>
-                        <Skeleton width="60%" />
-                        <Skeleton width="40%" />
-                      </Box>
-                    </Box>
+                <Grid container spacing={2}>
+                  {quickActions.map((action) => (
+                    <Grid key={action.key} size={{ xs: 12, sm: 6, md: 4 }}>
+                      <QuickActionCard
+                        title={action.title}
+                        description={action.description}
+                        icon={action.icon}
+                        onClick={() => navigate(action.path)}
+                        badge={action.badge}
+                        color={action.color}
+                      />
+                    </Grid>
                   ))}
+                </Grid>
+                {quickActions.length === 0 && (
+                  <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                    <Typography variant="body2">{t('dashboard.noQuickActions')}</Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Recent Activity */}
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="h6" fontWeight={600}>
+                    {t('dashboard.recentActivity')}
+                  </Typography>
+                  {hasPermission(P.AUDIT_LOGS_READ) && (
+                    <Tooltip title={t('dashboard.viewAll')}>
+                      <IconButton size="small" onClick={() => navigate('/admin/audit-logs')}>
+                        <OpenInNewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Box>
-              ) : recentActivities.length > 0 ? (
-                <List disablePadding>
-                  {recentActivities.map((activity, index) => (
-                    <React.Fragment key={activity.id}>
-                      <ListItem disablePadding sx={{ py: 1.5 }}>
-                        <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Avatar
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              color: 'primary.main',
-                            }}
-                          >
-                            <EventNoteIcon sx={{ fontSize: 18 }} />
-                          </Avatar>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2" fontWeight={500} noWrap>
-                              {t(`auditLogs.actions.${activity.action}`, {
-                                defaultValue: activity.action,
-                              })}
-                            </Typography>
-                          }
-                          secondary={
-                            <Box
+
+                {activitiesLoading ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {[1, 2, 3].map((i) => (
+                      <Box key={i} sx={{ display: 'flex', gap: 2 }}>
+                        <Skeleton variant="circular" width={40} height={40} />
+                        <Box sx={{ flex: 1 }}>
+                          <Skeleton width="60%" />
+                          <Skeleton width="40%" />
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : recentActivities.length > 0 ? (
+                  <List disablePadding>
+                    {recentActivities.map((activity, index) => (
+                      <React.Fragment key={activity.id}>
+                        <ListItem disablePadding sx={{ py: 1.5 }}>
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            <Avatar
                               sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                                mt: 0.5,
+                                width: 32,
+                                height: 32,
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                color: 'primary.main',
                               }}
                             >
-                              <Typography variant="caption" color="text.secondary">
-                                {activity.userName}
+                              <EventNoteIcon sx={{ fontSize: 18 }} />
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2" fontWeight={500} noWrap>
+                                {t(`auditLogs.actions.${activity.action}`, {
+                                  defaultValue: activity.action,
+                                })}
                               </Typography>
-                              <Typography variant="caption" color="text.disabled">
-                                •
-                              </Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {formatRelativeTime(activity.timestamp, undefined, i18n.language)}
-                              </Typography>
-                            </Box>
-                          }
-                          secondaryTypographyProps={{ component: 'div' }}
-                        />
-                      </ListItem>
-                      {index < recentActivities.length - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </List>
-              ) : (
-                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
-                  <HistoryIcon sx={{ fontSize: 48, mb: 1, opacity: 0.5 }} />
-                  <Typography variant="body2">{t('dashboard.noRecentActivity')}</Typography>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
+                            }
+                            secondary={
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                  mt: 0.5,
+                                }}
+                              >
+                                <Typography variant="caption" color="text.secondary">
+                                  {activity.userName}
+                                </Typography>
+                                <Typography variant="caption" color="text.disabled">
+                                  •
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {formatRelativeTime(activity.timestamp, undefined, i18n.language)}
+                                </Typography>
+                              </Box>
+                            }
+                            secondaryTypographyProps={{ component: 'div' }}
+                          />
+                        </ListItem>
+                        {index < recentActivities.length - 1 && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </List>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                    <HistoryIcon sx={{ fontSize: 48, mb: 1, opacity: 0.5 }} />
+                    <Typography variant="body2">{t('dashboard.noRecentActivity')}</Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
       )}
 
       {/* Recent Crash Events & Server Lifecycle Events */}
-      {hasAnyPermissions && (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
-        <Grid container spacing={3} sx={{ mt: 4 }}>
-          {/* Recent Crash Events */}
-          {hasPermission(P.CRASH_EVENTS_READ) && (
-            <Grid size={{ xs: 12, lg: 6 }}>
-              <Card sx={{ height: '100%' }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 2,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="h6" fontWeight={600}>
-                        {t('dashboard.recentCrashEvents')}
-                      </Typography>
-                      {recentCrashEvents.length > 0 && (
-                        <Chip label={recentCrashEvents.length} size="small" color="error" />
-                      )}
-                    </Box>
-                    <Tooltip title={t('dashboard.viewAll')}>
-                      <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
-                        <OpenInNewIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-
-                  {crashEventsLoading ? (
+      {hasAnyPermissions &&
+        (hasPermission(P.CRASH_EVENTS_READ) || hasPermission(P.SERVERS_READ)) && (
+          <Grid container spacing={3} sx={{ mt: 4 }}>
+            {/* Recent Crash Events */}
+            {hasPermission(P.CRASH_EVENTS_READ) && (
+              <Grid size={{ xs: 12, lg: 6 }}>
+                <Card sx={{ height: '100%' }}>
+                  <CardContent>
                     <Box
                       sx={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: 1,
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2,
                       }}
                     >
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <Skeleton key={i} height={48} />
-                      ))}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" fontWeight={600}>
+                          {t('dashboard.recentCrashEvents')}
+                        </Typography>
+                        {recentCrashEvents.length > 0 && (
+                          <Chip label={recentCrashEvents.length} size="small" color="error" />
+                        )}
+                      </Box>
+                      <Tooltip title={t('dashboard.viewAll')}>
+                        <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
+                          <OpenInNewIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
-                  ) : recentCrashEvents.length > 0 ? (
-                    <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
-                      <List disablePadding dense>
-                        {recentCrashEvents.slice(0, 10).map((event, index) => (
-                          <React.Fragment key={event.id}>
-                            <ListItem
-                              disablePadding
-                              sx={{
-                                py: 1,
-                                cursor: 'pointer',
-                                '&:hover': { bgcolor: 'action.hover' },
-                              }}
-                              onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
-                            >
-                              <ListItemIcon sx={{ minWidth: 36 }}>
-                                <Avatar
-                                  sx={{
-                                    width: 28,
-                                    height: 28,
-                                    bgcolor: alpha(theme.palette.error.main, 0.1),
-                                    color: 'error.main',
-                                    fontSize: 12,
-                                  }}
-                                >
-                                  <BugReportIcon sx={{ fontSize: 16 }} />
-                                </Avatar>
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                                    {(event as any).firstLine || event.crashId}
-                                  </Typography>
-                                }
-                                secondary={
-                                  <Box
-                                    sx={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 1,
-                                      mt: 0.5,
-                                      flexWrap: 'wrap',
-                                    }}
-                                  >
-                                    <Chip
-                                      label={event.platform}
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ height: 18, fontSize: 10 }}
-                                    />
-                                    <Chip
-                                      label={event.branch}
-                                      size="small"
-                                      variant="outlined"
-                                      sx={{ height: 18, fontSize: 10 }}
-                                    />
-                                    <Typography variant="caption" color="text.secondary">
-                                      {formatRelativeTime(
-                                        event.createdAt,
-                                        undefined,
-                                        i18n.language
-                                      )}
-                                    </Typography>
-                                  </Box>
-                                }
-                                secondaryTypographyProps={{
-                                  component: 'div',
-                                }}
-                              />
-                            </ListItem>
-                            {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
-                          </React.Fragment>
+
+                    {crashEventsLoading ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1,
+                        }}
+                      >
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <Skeleton key={i} height={48} />
                         ))}
-                      </List>
-                    </Box>
-                  ) : (
-                    <Box
-                      sx={{
-                        textAlign: 'center',
-                        py: 8,
-                        color: 'text.secondary',
-                      }}
-                    >
-                      <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          )}
-
-          {/* Recent Server Lifecycle Events */}
-          {hasPermission(P.SERVERS_READ) && (
-            <Grid size={{ xs: 12, lg: 6 }}>
-              <Card sx={{ height: '100%' }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 2,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="h6" fontWeight={600}>
-                        {t('serverLifecycle.title')}
-                      </Typography>
-                      {recentLifecycleEvents.length > 0 && (
-                        <Chip label={recentLifecycleEvents.length} size="small" color="primary" />
-                      )}
-                    </Box>
-                    <Tooltip title={t('dashboard.viewAll')}>
-                      <IconButton size="small" onClick={() => navigate('/admin/server-lifecycle')}>
-                        <OpenInNewIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-
-                  {lifecycleEventsLoading ? (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 1,
-                      }}
-                    >
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <Skeleton key={i} height={48} />
-                      ))}
-                    </Box>
-                  ) : recentLifecycleEvents.length > 0 ? (
-                    <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
-                      <List disablePadding dense>
-                        {recentLifecycleEvents.map((event, index) => {
-                          const getEventColor = (type: string) => {
-                            switch (type) {
-                              case 'REGISTER':
-                                return 'success';
-                              case 'READY':
-                                return 'success';
-                              case 'INITIALIZING':
-                                return 'info';
-                              case 'UNREGISTER':
-                                return 'default';
-                              case 'SHUTTING_DOWN':
-                                return 'warning';
-                              case 'TERMINATED':
-                                return 'default';
-                              case 'TIMEOUT':
-                                return 'warning';
-                              case 'NO_RESPONSE':
-                                return 'warning';
-                              case 'ERROR':
-                                return 'error';
-                              default:
-                                return 'primary';
-                            }
-                          };
-
-                          return (
+                      </Box>
+                    ) : recentCrashEvents.length > 0 ? (
+                      <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
+                        <List disablePadding dense>
+                          {recentCrashEvents.slice(0, 10).map((event, index) => (
                             <React.Fragment key={event.id}>
                               <ListItem
                                 disablePadding
@@ -2096,43 +1955,26 @@ const DashboardPage: React.FC = () => {
                                   cursor: 'pointer',
                                   '&:hover': { bgcolor: 'action.hover' },
                                 }}
-                                onClick={() =>
-                                  navigate(
-                                    `/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`
-                                  )
-                                }
+                                onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
                               >
+                                <ListItemIcon sx={{ minWidth: 36 }}>
+                                  <Avatar
+                                    sx={{
+                                      width: 28,
+                                      height: 28,
+                                      bgcolor: alpha(theme.palette.error.main, 0.1),
+                                      color: 'error.main',
+                                      fontSize: 12,
+                                    }}
+                                  >
+                                    <BugReportIcon sx={{ fontSize: 16 }} />
+                                  </Avatar>
+                                </ListItemIcon>
                                 <ListItemText
                                   primary={
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        flexWrap: 'wrap',
-                                      }}
-                                    >
-                                      <Chip
-                                        label={t(`serverLifecycle.eventTypes.${event.eventType}`, {
-                                          defaultValue: event.eventType,
-                                        })}
-                                        size="small"
-                                        color={getEventColor(event.eventType) as any}
-                                        sx={{
-                                          height: 22,
-                                          fontSize: '0.7rem',
-                                          fontWeight: 600,
-                                        }}
-                                      />
-                                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                        {event.serviceType}
-                                      </Typography>
-                                      {event.serviceGroup && (
-                                        <Typography variant="caption" color="text.secondary">
-                                          ({event.serviceGroup})
-                                        </Typography>
-                                      )}
-                                    </Box>
+                                    <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                                      {(event as any).firstLine || event.crashId}
+                                    </Typography>
                                   }
                                   secondary={
                                     <Box
@@ -2144,25 +1986,18 @@ const DashboardPage: React.FC = () => {
                                         flexWrap: 'wrap',
                                       }}
                                     >
-                                      {event.hostname && (
-                                        <Typography
-                                          variant="caption"
-                                          color="text.secondary"
-                                          sx={{ fontWeight: 500 }}
-                                        >
-                                          {event.hostname}
-                                        </Typography>
-                                      )}
-                                      <Typography
-                                        variant="caption"
-                                        color="text.disabled"
-                                        sx={{
-                                          fontFamily: 'monospace',
-                                          fontSize: '0.65rem',
-                                        }}
-                                      >
-                                        {event.instanceId}
-                                      </Typography>
+                                      <Chip
+                                        label={event.platform}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 18, fontSize: 10 }}
+                                      />
+                                      <Chip
+                                        label={event.branch}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 18, fontSize: 10 }}
+                                      />
                                       <Typography variant="caption" color="text.secondary">
                                         {formatRelativeTime(
                                           event.createdAt,
@@ -2170,19 +2005,6 @@ const DashboardPage: React.FC = () => {
                                           i18n.language
                                         )}
                                       </Typography>
-                                      {event.cloudRegion && (
-                                        <Typography
-                                          variant="caption"
-                                          sx={{
-                                            bgcolor: 'action.selected',
-                                            px: 0.5,
-                                            borderRadius: 0,
-                                            fontSize: '0.65rem',
-                                          }}
-                                        >
-                                          {event.cloudRegion}
-                                        </Typography>
-                                      )}
                                     </Box>
                                   }
                                   secondaryTypographyProps={{
@@ -2190,29 +2012,228 @@ const DashboardPage: React.FC = () => {
                                   }}
                                 />
                               </ListItem>
-                              {index < recentLifecycleEvents.length - 1 && <Divider />}
+                              {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
                             </React.Fragment>
-                          );
-                        })}
-                      </List>
-                    </Box>
-                  ) : (
+                          ))}
+                        </List>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          textAlign: 'center',
+                          py: 8,
+                          color: 'text.secondary',
+                        }}
+                      >
+                        <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
+
+            {/* Recent Server Lifecycle Events */}
+            {hasPermission(P.SERVERS_READ) && (
+              <Grid size={{ xs: 12, lg: 6 }}>
+                <Card sx={{ height: '100%' }}>
+                  <CardContent>
                     <Box
                       sx={{
-                        textAlign: 'center',
-                        py: 8,
-                        color: 'text.secondary',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2,
                       }}
                     >
-                      <Typography variant="body2">{t('serverLifecycle.noEvents')}</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" fontWeight={600}>
+                          {t('serverLifecycle.title')}
+                        </Typography>
+                        {recentLifecycleEvents.length > 0 && (
+                          <Chip label={recentLifecycleEvents.length} size="small" color="primary" />
+                        )}
+                      </Box>
+                      <Tooltip title={t('dashboard.viewAll')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate('/admin/server-lifecycle')}
+                        >
+                          <OpenInNewIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          )}
-        </Grid>
-      )}
+
+                    {lifecycleEventsLoading ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1,
+                        }}
+                      >
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <Skeleton key={i} height={48} />
+                        ))}
+                      </Box>
+                    ) : recentLifecycleEvents.length > 0 ? (
+                      <Box sx={{ maxHeight: 350, overflow: 'auto' }}>
+                        <List disablePadding dense>
+                          {recentLifecycleEvents.map((event, index) => {
+                            const getEventColor = (type: string) => {
+                              switch (type) {
+                                case 'REGISTER':
+                                  return 'success';
+                                case 'READY':
+                                  return 'success';
+                                case 'INITIALIZING':
+                                  return 'info';
+                                case 'UNREGISTER':
+                                  return 'default';
+                                case 'SHUTTING_DOWN':
+                                  return 'warning';
+                                case 'TERMINATED':
+                                  return 'default';
+                                case 'TIMEOUT':
+                                  return 'warning';
+                                case 'NO_RESPONSE':
+                                  return 'warning';
+                                case 'ERROR':
+                                  return 'error';
+                                default:
+                                  return 'primary';
+                              }
+                            };
+
+                            return (
+                              <React.Fragment key={event.id}>
+                                <ListItem
+                                  disablePadding
+                                  sx={{
+                                    py: 1,
+                                    cursor: 'pointer',
+                                    '&:hover': { bgcolor: 'action.hover' },
+                                  }}
+                                  onClick={() =>
+                                    navigate(
+                                      `/admin/server-lifecycle?instanceId=${encodeURIComponent(event.instanceId)}`
+                                    )
+                                  }
+                                >
+                                  <ListItemText
+                                    primary={
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                          flexWrap: 'wrap',
+                                        }}
+                                      >
+                                        <Chip
+                                          label={t(
+                                            `serverLifecycle.eventTypes.${event.eventType}`,
+                                            {
+                                              defaultValue: event.eventType,
+                                            }
+                                          )}
+                                          size="small"
+                                          color={getEventColor(event.eventType) as any}
+                                          sx={{
+                                            height: 22,
+                                            fontSize: '0.7rem',
+                                            fontWeight: 600,
+                                          }}
+                                        />
+                                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                          {event.serviceType}
+                                        </Typography>
+                                        {event.serviceGroup && (
+                                          <Typography variant="caption" color="text.secondary">
+                                            ({event.serviceGroup})
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    }
+                                    secondary={
+                                      <Box
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 1,
+                                          mt: 0.5,
+                                          flexWrap: 'wrap',
+                                        }}
+                                      >
+                                        {event.hostname && (
+                                          <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{ fontWeight: 500 }}
+                                          >
+                                            {event.hostname}
+                                          </Typography>
+                                        )}
+                                        <Typography
+                                          variant="caption"
+                                          color="text.disabled"
+                                          sx={{
+                                            fontFamily: 'monospace',
+                                            fontSize: '0.65rem',
+                                          }}
+                                        >
+                                          {event.instanceId}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                          {formatRelativeTime(
+                                            event.createdAt,
+                                            undefined,
+                                            i18n.language
+                                          )}
+                                        </Typography>
+                                        {event.cloudRegion && (
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              bgcolor: 'action.selected',
+                                              px: 0.5,
+                                              borderRadius: 0,
+                                              fontSize: '0.65rem',
+                                            }}
+                                          >
+                                            {event.cloudRegion}
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    }
+                                    secondaryTypographyProps={{
+                                      component: 'div',
+                                    }}
+                                  />
+                                </ListItem>
+                                {index < recentLifecycleEvents.length - 1 && <Divider />}
+                              </React.Fragment>
+                            );
+                          })}
+                        </List>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          textAlign: 'center',
+                          py: 8,
+                          color: 'text.secondary',
+                        }}
+                      >
+                        <Typography variant="body2">{t('serverLifecycle.noEvents')}</Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
+          </Grid>
+        )}
     </Box>
   );
 };

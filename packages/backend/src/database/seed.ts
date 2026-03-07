@@ -399,10 +399,7 @@ async function createSampleReleaseFlows(createdBy: string) {
 // ==================== Default RBAC Roles ====================
 
 async function createDefaultRoles(orgId: string, adminUserId: string) {
-  const existing = await database.query(
-    'SELECT id FROM g_roles WHERE orgId = ? LIMIT 1',
-    [orgId]
-  );
+  const existing = await database.query('SELECT id FROM g_roles WHERE orgId = ? LIMIT 1', [orgId]);
   if (existing.length > 0) {
     logger.info('Default roles already exist, skipping creation');
     return;
@@ -410,23 +407,64 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
 
   // All org-level resources
   const orgResources = [
-    'users', 'groups', 'roles', 'invitations', 'projects',
-    'admin_tokens', 'ip_whitelist', 'account_whitelist', 'integrations',
-    'audit_logs', 'monitoring', 'realtime_events', 'open_api', 'console', 'chat',
-    'scheduler', 'event_lens', 'system_settings', 'translation',
+    'users',
+    'groups',
+    'roles',
+    'invitations',
+    'projects',
+    'admin_tokens',
+    'ip_whitelist',
+    'account_whitelist',
+    'integrations',
+    'audit_logs',
+    'monitoring',
+    'realtime_events',
+    'open_api',
+    'console',
+    'chat',
+    'scheduler',
+    'event_lens',
+    'system_settings',
+    'translation',
   ];
   // All project-level resources
   const projectResources = [
-    'features', 'segments', 'context_fields', 'release_flows', 'unknown_flags', 'crash_events',
-    'tags', 'impact_metrics', 'service_accounts', 'signal_endpoints', 'actions', 'data',
+    'features',
+    'segments',
+    'context_fields',
+    'release_flows',
+    'unknown_flags',
+    'crash_events',
+    'tags',
+    'impact_metrics',
+    'service_accounts',
+    'signal_endpoints',
+    'actions',
+    'data',
   ];
   // All env-level resources
   const envResources = [
-    'environments', 'env_features', 'env_keys', 'change_requests',
-    'client_versions', 'game_worlds', 'maintenance', 'maintenance_templates',
-    'service_notices', 'banners', 'servers', 'message_templates', 'vars', 'planning_data',
-    'coupons', 'coupon_settings', 'surveys', 'store_products',
-    'reward_templates', 'ingame_popups', 'operation_events',
+    'environments',
+    'env_features',
+    'env_keys',
+    'change_requests',
+    'client_versions',
+    'game_worlds',
+    'maintenance',
+    'maintenance_templates',
+    'service_notices',
+    'banners',
+    'servers',
+    'message_templates',
+    'vars',
+    'planning_data',
+    'coupons',
+    'coupon_settings',
+    'surveys',
+    'store_products',
+    'reward_templates',
+    'ingame_popups',
+    'operation_events',
   ];
   const allResources = [...orgResources, ...projectResources, ...envResources];
   const crudActions = ['create', 'read', 'update', 'delete'];
@@ -508,21 +546,42 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
     },
     {
       name: 'Operations Manager',
-      description: 'Full CRUD access to live operations: coupons, notices, banners, servers, and events',
+      description:
+        'Full CRUD access to live operations: coupons, notices, banners, servers, and events',
       resources: [
-        'coupons', 'coupon_settings', 'service_notices', 'banners', 'servers',
-        'message_templates', 'maintenance', 'maintenance_templates',
-        'ingame_popups', 'operation_events', 'surveys', 'store_products',
-        'reward_templates', 'vars', 'planning_data',
+        'coupons',
+        'coupon_settings',
+        'service_notices',
+        'banners',
+        'servers',
+        'message_templates',
+        'maintenance',
+        'maintenance_templates',
+        'ingame_popups',
+        'operation_events',
+        'surveys',
+        'store_products',
+        'reward_templates',
+        'vars',
+        'planning_data',
       ],
       actions: crudActions,
     },
     {
       name: 'Feature Manager',
-      description: 'Full CRUD access to feature flags, segments, release flows, and related resources',
+      description:
+        'Full CRUD access to feature flags, segments, release flows, and related resources',
       resources: [
-        'features', 'segments', 'context_fields', 'release_flows', 'unknown_flags',
-        'tags', 'impact_metrics', 'env_features', 'env_keys', 'change_requests',
+        'features',
+        'segments',
+        'context_fields',
+        'release_flows',
+        'unknown_flags',
+        'tags',
+        'impact_metrics',
+        'env_features',
+        'env_keys',
+        'change_requests',
         'environments',
       ],
       actions: crudActions,
@@ -531,8 +590,15 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
       name: 'Security Admin',
       description: 'Full CRUD access to roles, groups, users, tokens, and access control',
       resources: [
-        'users', 'groups', 'roles', 'invitations', 'admin_tokens',
-        'ip_whitelist', 'account_whitelist', 'service_accounts', 'audit_logs',
+        'users',
+        'groups',
+        'roles',
+        'invitations',
+        'admin_tokens',
+        'ip_whitelist',
+        'account_whitelist',
+        'service_accounts',
+        'audit_logs',
       ],
       actions: crudActions,
     },
@@ -564,7 +630,6 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
   }
   logger.info('Default roles created');
 }
-
 
 // ==================== Main Seed / Clear Functions ====================
 

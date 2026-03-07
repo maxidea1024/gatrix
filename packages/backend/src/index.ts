@@ -316,7 +316,8 @@ const startServer = async () => {
     // Initialize Service Discovery watch (for Redis keyspace notifications)
     try {
       const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
-      const serviceDiscoveryService = (await import('./services/service-discovery-service')).default;
+      const serviceDiscoveryService = (await import('./services/service-discovery-service'))
+        .default;
 
       if (serviceDiscoveryMode === 'redis') {
         // Start watching for Redis keyspace notifications (TTL expiration)

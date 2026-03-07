@@ -122,11 +122,7 @@ export class RoleBindingModel {
     scopeId?: string
   ): Promise<RoleBindingRecord[]> {
     const query = db(this.TABLE)
-      .select([
-        `${this.TABLE}.*`,
-        'r.roleName',
-        'r.description as roleDescription',
-      ])
+      .select([`${this.TABLE}.*`, 'r.roleName', 'r.description as roleDescription'])
       .leftJoin('g_roles as r', `${this.TABLE}.roleId`, 'r.id')
       .where(`${this.TABLE}.userId`, userId);
 
@@ -145,11 +141,7 @@ export class RoleBindingModel {
     scopeId?: string
   ): Promise<RoleBindingRecord[]> {
     const query = db(this.TABLE)
-      .select([
-        `${this.TABLE}.*`,
-        'r.roleName',
-        'r.description as roleDescription',
-      ])
+      .select([`${this.TABLE}.*`, 'r.roleName', 'r.description as roleDescription'])
       .leftJoin('g_roles as r', `${this.TABLE}.roleId`, 'r.id')
       .where(`${this.TABLE}.groupId`, groupId);
 
@@ -162,10 +154,7 @@ export class RoleBindingModel {
   /**
    * Get all bindings for a specific scope (e.g., all bindings for a project)
    */
-  static async getByScope(
-    scopeType: ScopeType,
-    scopeId: string
-  ): Promise<RoleBindingRecord[]> {
+  static async getByScope(scopeType: ScopeType, scopeId: string): Promise<RoleBindingRecord[]> {
     return db(this.TABLE)
       .select([
         `${this.TABLE}.*`,

@@ -215,7 +215,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       setDisplayIsCopy(!!isCopyMode);
 
       if (clientVersion) {
-
         (async () => {
           let source: any = clientVersion;
           try {
@@ -522,7 +521,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         }
         enqueueSnackbar(
           <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
-            Client version {' '}
+            Client version{' '}
             <Chip
               size="small"
               color="primary"
@@ -584,8 +583,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(onSubmit as any, () => {
-        })}
+        onSubmit={handleSubmit(onSubmit as any, () => {})}
         style={{
           display: 'flex',
           flexDirection: 'column',

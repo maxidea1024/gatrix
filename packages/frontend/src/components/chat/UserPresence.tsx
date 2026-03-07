@@ -171,8 +171,6 @@ const UserPresence: React.FC<UserPresenceProps> = ({
         <Typography variant={size === 'small' ? 'body2' : 'body1'} sx={{ fontWeight: 500 }} noWrap>
           {user.name || user.username}
         </Typography>
-
-
       </Box>
 
       {user.name && (

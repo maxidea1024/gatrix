@@ -524,11 +524,7 @@ const RegisterPage: React.FC = () => {
 
         {/* Auto-Join Info */}
         {autoJoinInfo && autoJoinInfo.memberships.length > 0 && (
-          <Alert
-            severity="info"
-            sx={{ mb: 3 }}
-            icon={<OrgIcon fontSize="small" />}
-          >
+          <Alert severity="info" sx={{ mb: 3 }} icon={<OrgIcon fontSize="small" />}>
             <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
               {t('autoJoin.acceptInfo')}
             </Typography>
@@ -538,7 +534,10 @@ const RegisterPage: React.FC = () => {
                   • {m.orgDisplayName || m.orgName}
                 </Typography>
                 {m.projects.map((p) => (
-                  <Box key={p.projectId} sx={{ display: 'flex', alignItems: 'center', ml: 2, mt: 0.25 }}>
+                  <Box
+                    key={p.projectId}
+                    sx={{ display: 'flex', alignItems: 'center', ml: 2, mt: 0.25 }}
+                  >
                     <ProjectIcon sx={{ fontSize: 14, mr: 0.5, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">
                       {p.projectDisplayName || p.projectName}
@@ -758,8 +757,8 @@ const RegisterPage: React.FC = () => {
                   // Mask characters when using type=text on WebKit browsers
                   ...(isWebkit && !showPassword
                     ? {
-                      WebkitTextSecurity: 'disc',
-                    }
+                        WebkitTextSecurity: 'disc',
+                      }
                     : {}),
                   '&:-webkit-autofill': {
                     WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -876,8 +875,8 @@ const RegisterPage: React.FC = () => {
                     // Mask characters when using type=text on WebKit browsers
                     ...(isWebkit && !showConfirmPassword
                       ? {
-                        WebkitTextSecurity: 'disc',
-                      }
+                          WebkitTextSecurity: 'disc',
+                        }
                       : {}),
                     '&:-webkit-autofill': {
                       WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',

@@ -1,5 +1,12 @@
 import crypto from 'crypto';
-import { EvaluationContext, FeatureFlag, FeatureSegment, EvaluationResult, Variant, VALUE_SOURCE } from '@gatrix/shared';
+import {
+  EvaluationContext,
+  FeatureFlag,
+  FeatureSegment,
+  EvaluationResult,
+  Variant,
+  VALUE_SOURCE,
+} from '@gatrix/shared';
 
 /**
  * Truncate an ISO 8601 time string to minute precision.

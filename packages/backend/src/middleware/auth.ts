@@ -139,7 +139,9 @@ export const requireOrgPermission = (permissions: string | string[]) => {
       }
     }
 
-    logger.warn(`[requireOrgPermission] DENIED: userId=${req.user.id}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
+    logger.warn(
+      `[requireOrgPermission] DENIED: userId=${req.user.id}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`
+    );
     next(new GatrixError('Insufficient permissions', 403));
   };
 };
@@ -164,13 +166,17 @@ export const requireProjectPermission = (permissions: string | string[]) => {
 
     const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
     for (const perm of requiredPermissions) {
-      if (await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)) {
+      if (
+        await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)
+      ) {
         next();
         return;
       }
     }
 
-    logger.warn(`[requireProjectPermission] DENIED: userId=${req.user.id}, projectId=${projectId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
+    logger.warn(
+      `[requireProjectPermission] DENIED: userId=${req.user.id}, projectId=${projectId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`
+    );
     next(new GatrixError('Insufficient permissions', 403));
   };
 };
@@ -194,14 +200,24 @@ export const requireEnvPermission = (permissions: string | string[]) => {
     for (const perm of requiredPermissions) {
       // If environment context is available, check env-level permission
       if (environmentId && projectId) {
-        if (await permissionService.hasEnvPermission(req.user.id, req.user.orgId, projectId, environmentId, perm)) {
+        if (
+          await permissionService.hasEnvPermission(
+            req.user.id,
+            req.user.orgId,
+            projectId,
+            environmentId,
+            perm
+          )
+        ) {
           next();
           return;
         }
       }
       // Fallback to project-level check when no environment context
       else if (projectId) {
-        if (await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)) {
+        if (
+          await permissionService.hasProjectPermission(req.user.id, req.user.orgId, projectId, perm)
+        ) {
           next();
           return;
         }
@@ -215,7 +231,9 @@ export const requireEnvPermission = (permissions: string | string[]) => {
       }
     }
 
-    logger.warn(`[requireEnvPermission] DENIED: userId=${req.user.id}, projectId=${projectId}, envId=${environmentId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`);
+    logger.warn(
+      `[requireEnvPermission] DENIED: userId=${req.user.id}, projectId=${projectId}, envId=${environmentId}, path=${req.path}, required=${JSON.stringify(requiredPermissions)}`
+    );
     next(new GatrixError('Insufficient permissions', 403));
   };
 };

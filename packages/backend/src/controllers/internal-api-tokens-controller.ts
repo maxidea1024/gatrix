@@ -56,8 +56,8 @@ class InternalApiTokensController {
       const environmentAssignments =
         tokenIds.length > 0
           ? await knex('g_api_access_token_environments')
-            .whereIn('tokenId', tokenIds)
-            .select('tokenId', 'environmentId')
+              .whereIn('tokenId', tokenIds)
+              .select('tokenId', 'environmentId')
           : [];
 
       // Group environment names by token

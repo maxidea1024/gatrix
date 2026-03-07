@@ -70,4 +70,3 @@ export const InvitationDurationLabels = {
   [InvitationDuration.WEEK]: '1주일',
   [InvitationDuration.MONTH]: '1개월',
 };
-

@@ -17,7 +17,12 @@ import redis from '../config/redis';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('PermissionService');
-import { matchSingle, MAX_INHERITANCE_DEPTH, RESOURCE_SCOPES, SCOPES } from '@gatrix/shared/permissions';
+import {
+  matchSingle,
+  MAX_INHERITANCE_DEPTH,
+  RESOURCE_SCOPES,
+  SCOPES,
+} from '@gatrix/shared/permissions';
 
 /**
  * Scope hierarchy for permission validation.
@@ -38,7 +43,10 @@ const PERM_SCOPE_MAP: Record<string, string[]> = {
  * Returns true if valid, false + logs warning if mismatch.
  * Wildcards (*:*) are always valid.
  */
-function isPermissionScopeValid(perm: string, expectedScope: 'system' | 'org' | 'project' | 'env'): boolean {
+function isPermissionScopeValid(
+  perm: string,
+  expectedScope: 'system' | 'org' | 'project' | 'env'
+): boolean {
   if (perm === '*:*' || perm.includes('*')) return true;
   const resource = perm.split(':')[0];
   const resourceScope = (RESOURCE_SCOPES as Record<string, string>)[resource];
@@ -51,7 +59,7 @@ function isPermissionScopeValid(perm: string, expectedScope: 'system' | 'org' | 
     const stack = new Error().stack;
     logger.error(
       `Permission scope mismatch: perm="${perm}" (resource scope=${resourceScope}) ` +
-      `checked in ${expectedScope} context. This is a bug.\n${stack}`
+        `checked in ${expectedScope} context. This is a bug.\n${stack}`
     );
     return false;
   }
@@ -221,10 +229,7 @@ class PermissionService {
   /**
    * Get user's org membership info
    */
-  async getOrgMembership(
-    userId: string,
-    orgId?: string
-  ): Promise<{ orgId: string } | null> {
+  async getOrgMembership(userId: string, orgId?: string): Promise<{ orgId: string } | null> {
     const query = db('g_organisation_members').where('userId', userId).select('orgId');
 
     if (orgId) {
@@ -242,9 +247,7 @@ class PermissionService {
   /**
    * Get all organisation memberships for a user
    */
-  async getUserOrganisations(
-    userId: string
-  ): Promise<Array<{ orgId: string }>> {
+  async getUserOrganisations(userId: string): Promise<Array<{ orgId: string }>> {
     const memberships = await db('g_organisation_members')
       .where('userId', userId)
       .join('g_organisations', 'g_organisation_members.orgId', 'g_organisations.id')
@@ -366,9 +369,7 @@ class PermissionService {
     }
 
     // Project member → all environments
-    const isProjectMember = await db('g_project_members')
-      .where({ projectId, userId })
-      .first();
+    const isProjectMember = await db('g_project_members').where({ projectId, userId }).first();
     if (isProjectMember) {
       const allEnvs = await db('g_environments').where({ projectId }).select('id');
       return allEnvs.map((e: any) => e.id);
@@ -623,9 +624,7 @@ class PermissionService {
       // Cache miss
     }
 
-    const rows = await db('g_role_permissions')
-      .where('roleId', roleId)
-      .select('permission');
+    const rows = await db('g_role_permissions').where('roleId', roleId).select('permission');
     const perms = rows.map((r: any) => r.permission);
 
     try {
@@ -707,9 +706,7 @@ class PermissionService {
     }
 
     // Direct bindings
-    const directRoles = await db('g_role_bindings')
-      .where('userId', userId)
-      .select('roleId');
+    const directRoles = await db('g_role_bindings').where('userId', userId).select('roleId');
 
     // Group bindings
     const groupRoles = await db('g_role_bindings as rb')

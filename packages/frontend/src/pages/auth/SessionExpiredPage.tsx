@@ -160,7 +160,11 @@ const SessionExpiredPage: React.FC = () => {
                 {step.icon}
               </Box>
               <Box>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.25, color: 'text.primary' }}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={600}
+                  sx={{ mb: 0.25, color: 'text.primary' }}
+                >
                   {step.title}
                 </Typography>
                 <Typography variant="body2" sx={{ lineHeight: 1.5, color: 'text.secondary' }}>

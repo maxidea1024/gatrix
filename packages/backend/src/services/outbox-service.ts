@@ -38,9 +38,7 @@ export class OutboxService {
       retryCount: 0,
     });
 
-    logger.debug(
-      `Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`
-    );
+    logger.debug(`Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`);
     return event;
   }
 
@@ -114,9 +112,7 @@ export class OutboxService {
         const hasChange =
           JSON.stringify(entity.originalBefore) !== JSON.stringify(entity.finalAfter);
         if (!hasChange) {
-          logger.debug(
-            `Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`
-          );
+          logger.debug(`Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`);
           continue;
         }
       }
@@ -193,19 +189,14 @@ export class OutboxService {
             retryCount: newRetryCount,
             errorMessage: error.message,
           });
-          logger.error(
-            `Event ${event.id} failed after ${maxRetries} retries:`,
-            error
-          );
+          logger.error(`Event ${event.id} failed after ${maxRetries} retries:`, error);
         } else {
           await event.$query().patch({
             status: 'pending', // Back to pending for retry
             retryCount: newRetryCount,
             errorMessage: error.message,
           });
-          logger.warn(
-            `Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`
-          );
+          logger.warn(`Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`);
         }
       }
     }

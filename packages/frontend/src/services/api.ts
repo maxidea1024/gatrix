@@ -224,9 +224,11 @@ class ApiService {
             const lastForbidden = (window as any).__lastForbiddenAt || 0;
             if (now - lastForbidden > 3000) {
               (window as any).__lastForbiddenAt = now;
-              window.dispatchEvent(new CustomEvent('gatrix:forbidden', {
-                detail: { url: error.config?.url, message: error.message },
-              }));
+              window.dispatchEvent(
+                new CustomEvent('gatrix:forbidden', {
+                  detail: { url: error.config?.url, message: error.message },
+                })
+              );
             }
           }
         }

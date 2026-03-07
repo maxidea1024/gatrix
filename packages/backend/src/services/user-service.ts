@@ -413,7 +413,11 @@ export class UserService {
   /**
    * Search users by name or email (for chat system)
    */
-  static async searchUsers(query: string, limit: number = 20, orgId?: string): Promise<UserWithoutPassword[]> {
+  static async searchUsers(
+    query: string,
+    limit: number = 20,
+    orgId?: string
+  ): Promise<UserWithoutPassword[]> {
     try {
       const users = await UserModel.searchUsers(query, limit, orgId);
       return users;

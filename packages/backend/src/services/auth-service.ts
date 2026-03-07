@@ -76,10 +76,7 @@ export class AuthService {
       }
 
       const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId);
-      const refreshToken = JwtUtils.generateRefreshToken(
-        userWithoutPassword as any,
-        orgId
-      );
+      const refreshToken = JwtUtils.generateRefreshToken(userWithoutPassword as any, orgId);
 
       logger.info('User logged in successfully:', {
         userId: user.id,

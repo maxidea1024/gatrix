@@ -1,6 +1,10 @@
 import express from 'express';
 import { ReleaseFlowController } from '../../controllers/release-flow-controller';
-import { requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
+import {
+  requireOrgPermission,
+  requireProjectPermission,
+  requireEnvPermission,
+} from '../../middleware/auth';
 import { P } from '@gatrix/shared/permissions';
 
 const router = express.Router();

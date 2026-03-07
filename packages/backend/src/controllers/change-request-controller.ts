@@ -352,10 +352,7 @@ export class ChangeRequestController {
             });
           }
         } catch (updateError) {
-          logger.error(
-            'Failed to update CR status after execution failure',
-            updateError
-          );
+          logger.error('Failed to update CR status after execution failure', updateError);
         }
 
         // Throw a safe error message for conflict/duplicate cases

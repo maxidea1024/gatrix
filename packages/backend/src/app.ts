@@ -206,11 +206,7 @@ app.use('/api/v1', routes);
 // Bull Board (Admin only)
 const bullBoardAdapter = BullBoardConfig.initialize();
 app.use('/bull-board', bullBoardAdapter.getRouter());
-app.use(
-  '/api/v1/bull-board',
-  authenticate as any as any,
-  bullBoardAdapter.getRouter()
-);
+app.use('/api/v1/bull-board', authenticate as any as any, bullBoardAdapter.getRouter());
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 

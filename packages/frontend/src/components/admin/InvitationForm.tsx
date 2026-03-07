@@ -111,10 +111,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
           <Divider />
 
           {/* Auto-Join Configuration */}
-          <OrgProjectTreeSelector
-            value={autoJoinMemberships}
-            onChange={setAutoJoinMemberships}
-          />
+          <OrgProjectTreeSelector value={autoJoinMemberships} onChange={setAutoJoinMemberships} />
         </Box>
 
         {/* Footer */}
@@ -196,10 +193,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       <Divider />
 
       {/* Auto-Join Configuration */}
-      <OrgProjectTreeSelector
-        value={autoJoinMemberships}
-        onChange={setAutoJoinMemberships}
-      />
+      <OrgProjectTreeSelector value={autoJoinMemberships} onChange={setAutoJoinMemberships} />
 
       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
         <Button onClick={onCancel} startIcon={<CancelIcon />} variant="outlined" disabled={loading}>

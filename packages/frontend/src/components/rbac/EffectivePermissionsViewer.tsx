@@ -1,11 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Tooltip,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Typography, Chip, Tooltip, CircularProgress } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { EffectivePermissions } from '@/services/rbacService';
 
@@ -24,10 +18,7 @@ const permLabel = (t: any, perm: string): string => {
 };
 
 // Extract resource display name using localization key
-const getResourceLabel = (
-  t: any,
-  resource: string
-): string => {
+const getResourceLabel = (t: any, resource: string): string => {
   const key = `rbac.resource.${resource}`;
   const label = t(key, '');
   if (label) return label;
@@ -35,10 +26,7 @@ const getResourceLabel = (
 };
 
 // Get action display label — just extract the action part and localize it
-const getActionLabel = (
-  t: any,
-  perm: string
-): string => {
+const getActionLabel = (t: any, perm: string): string => {
   const { action } = parsePerm(perm);
   if (!action) return perm;
   const key = `rbac.action.${action}`;

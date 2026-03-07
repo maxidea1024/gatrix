@@ -1,5 +1,10 @@
 import { apiService } from './api';
-import { Invitation, CreateInvitationRequest, InvitationResponse, AutoJoinInfo } from '../types/invitation';
+import {
+  Invitation,
+  CreateInvitationRequest,
+  InvitationResponse,
+  AutoJoinInfo,
+} from '../types/invitation';
 
 class InvitationService {
   private readonly ADMIN_BASE_URL = '/admin/invitations';

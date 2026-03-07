@@ -173,9 +173,7 @@ export class UserOnboardingService {
   /**
    * Resolve autoJoinConfig IDs to display names for the invitation acceptance page.
    */
-  static async resolveAutoJoinConfigNames(
-    config: AutoJoinConfig
-  ): Promise<{
+  static async resolveAutoJoinConfigNames(config: AutoJoinConfig): Promise<{
     memberships: Array<{
       orgId: string;
       orgName: string;

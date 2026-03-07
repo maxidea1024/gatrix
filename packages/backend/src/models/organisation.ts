@@ -86,11 +86,7 @@ export class Organisation {
 
   // ─── Members ─────────────────────────
 
-  static async addMember(
-    orgId: string,
-    userId: string,
-    invitedBy?: string
-  ): Promise<void> {
+  static async addMember(orgId: string, userId: string, invitedBy?: string): Promise<void> {
     const id = generateULID();
     await db(this.MEMBERS_TABLE).insert({
       id,

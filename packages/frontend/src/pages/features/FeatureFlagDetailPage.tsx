@@ -3107,84 +3107,86 @@ const FeatureFlagDetailPage: React.FC = () => {
               </Stack>
 
               {/* Action Buttons - only show for users with edit permission */}
-              {canManage && <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    if (originalFlag) {
-                      setFlag((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              enabledValue: originalFlag.enabledValue,
-                              disabledValue: originalFlag.disabledValue,
-                              validationRules: originalFlag.validationRules,
-                            }
-                          : prev
-                      );
+              {canManage && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      if (originalFlag) {
+                        setFlag((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                enabledValue: originalFlag.enabledValue,
+                                disabledValue: originalFlag.disabledValue,
+                                validationRules: originalFlag.validationRules,
+                              }
+                            : prev
+                        );
+                      }
+                    }}
+                    disabled={
+                      saving ||
+                      (JSON.stringify(flag.enabledValue) ===
+                        JSON.stringify(originalFlag?.enabledValue) &&
+                        JSON.stringify(flag.disabledValue) ===
+                          JSON.stringify(originalFlag?.disabledValue) &&
+                        JSON.stringify(flag.validationRules) ===
+                          JSON.stringify(originalFlag?.validationRules))
                     }
-                  }}
-                  disabled={
-                    saving ||
-                    (JSON.stringify(flag.enabledValue) ===
-                      JSON.stringify(originalFlag?.enabledValue) &&
-                      JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
-                      JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
-                  }
-                >
-                  {t('common.cancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={async () => {
-                    if (!flag) return;
-                    try {
-                      setSaving(true);
-                      await api.put(`${projectApiPath}/features/${flag.flagName}`, {
-                        enabledValue: flag.enabledValue,
-                        disabledValue: flag.disabledValue,
-                        validationRules: flag.validationRules ?? null,
-                        isGlobal: true,
-                      });
-                      setOriginalFlag((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              enabledValue: flag.enabledValue,
-                              disabledValue: flag.disabledValue,
-                              validationRules: flag.validationRules,
-                            }
-                          : prev
-                      );
-                      enqueueSnackbar(t('common.saveSuccess'), {
-                        variant: 'success',
-                      });
-                    } catch (error: any) {
-                      enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
-                        variant: 'error',
-                      });
-                    } finally {
-                      setSaving(false);
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={async () => {
+                      if (!flag) return;
+                      try {
+                        setSaving(true);
+                        await api.put(`${projectApiPath}/features/${flag.flagName}`, {
+                          enabledValue: flag.enabledValue,
+                          disabledValue: flag.disabledValue,
+                          validationRules: flag.validationRules ?? null,
+                          isGlobal: true,
+                        });
+                        setOriginalFlag((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                enabledValue: flag.enabledValue,
+                                disabledValue: flag.disabledValue,
+                                validationRules: flag.validationRules,
+                              }
+                            : prev
+                        );
+                        enqueueSnackbar(t('common.saveSuccess'), {
+                          variant: 'success',
+                        });
+                      } catch (error: any) {
+                        enqueueSnackbar(parseApiErrorMessage(error, 'common.saveFailed'), {
+                          variant: 'error',
+                        });
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    disabled={
+                      saving ||
+                      !!valueJsonErrors.enabledValue ||
+                      !!valueJsonErrors.disabledValue ||
+                      // Disable if nothing changed
+                      (JSON.stringify(flag.enabledValue) ===
+                        JSON.stringify(originalFlag?.enabledValue) &&
+                        JSON.stringify(flag.disabledValue) ===
+                          JSON.stringify(originalFlag?.disabledValue) &&
+                        JSON.stringify(flag.validationRules) ===
+                          JSON.stringify(originalFlag?.validationRules))
                     }
-                  }}
-                  disabled={
-                    saving ||
-                    !!valueJsonErrors.enabledValue ||
-                    !!valueJsonErrors.disabledValue ||
-                    // Disable if nothing changed
-                    (JSON.stringify(flag.enabledValue) ===
-                      JSON.stringify(originalFlag?.enabledValue) &&
-                      JSON.stringify(flag.disabledValue) ===
-                        JSON.stringify(originalFlag?.disabledValue) &&
-                      JSON.stringify(flag.validationRules) ===
-                        JSON.stringify(originalFlag?.validationRules))
-                  }
-                >
-                  {saving ? <CircularProgress size={20} /> : t('common.save')}
-                </Button>
-              </Box>}
+                  >
+                    {saving ? <CircularProgress size={20} /> : t('common.save')}
+                  </Button>
+                </Box>
+              )}
             </Stack>
           </Paper>
         </Box>

@@ -31,7 +31,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-
   Shield as ShieldIcon,
   People as PeopleIcon,
   Group as GroupIcon,
@@ -50,7 +49,6 @@ import rbacService, {
   type EffectivePermissions,
 } from '@/services/rbacService';
 
-
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
@@ -63,7 +61,6 @@ import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsVi
 const RolesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-
 
   // Data state
   const [roles, setRoles] = useState<Role[]>([]);
@@ -96,8 +93,6 @@ const RolesPage: React.FC = () => {
   });
   const [formPermissions, setFormPermissions] = useState<string[]>([]);
   const [initialPermissions, setInitialPermissions] = useState<string[]>([]);
-
-
 
   const [parentRoles, setParentRoles] = useState<RoleInheritance[]>([]);
   const [initialParentRoleIds, setInitialParentRoleIds] = useState<string[]>([]);
@@ -166,15 +161,13 @@ const RolesPage: React.FC = () => {
     loadPermissions();
   }, [loadRoles, loadPermissions]);
 
-
-
   // Filtered roles
   const filteredRoles = debouncedSearchTerm
     ? roles.filter(
-      (r) =>
-        r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    )
+        (r) =>
+          r.roleName.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          (r.description || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      )
     : roles;
 
   // Dialog handlers
@@ -271,7 +264,9 @@ const RolesPage: React.FC = () => {
           for (const parentId of pendingInheritanceAdds) {
             try {
               await rbacService.addRoleInheritance(newRoleId, parentId);
-            } catch { /* ignore inheritance errors on create */ }
+            } catch {
+              /* ignore inheritance errors on create */
+            }
           }
         }
         enqueueSnackbar(t('rbac.roles.createSuccess'), { variant: 'success' });
@@ -285,7 +280,9 @@ const RolesPage: React.FC = () => {
         for (const parentId of pendingInheritanceAdds) {
           try {
             await rbacService.addRoleInheritance(selectedRole.id, parentId);
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
         }
         for (const parentId of pendingInheritanceRemoves) {
           try {
@@ -294,7 +291,9 @@ const RolesPage: React.FC = () => {
             if (record) {
               await rbacService.removeRoleInheritance(selectedRole.id, record.id);
             }
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
         }
         enqueueSnackbar(t('rbac.roles.updateSuccess'), { variant: 'success' });
       }
@@ -502,7 +501,11 @@ const RolesPage: React.FC = () => {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         title={dialogMode === 'create' ? t('rbac.roles.createTitle') : t('rbac.roles.editTitle')}
-        subtitle={dialogMode === 'create' ? t('rbac.roles.createDescription') : t('rbac.roles.editDescription')}
+        subtitle={
+          dialogMode === 'create'
+            ? t('rbac.roles.createDescription')
+            : t('rbac.roles.editDescription')
+        }
         storageKey="rolesDrawerWidth"
         defaultWidth={600}
         minWidth={450}
@@ -510,7 +513,6 @@ const RolesPage: React.FC = () => {
         <Box
           sx={{ flex: 1, p: 3, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-
           <TextField
             label={t('rbac.roles.name')}
             value={formData.roleName}
@@ -552,7 +554,10 @@ const RolesPage: React.FC = () => {
                 </Typography>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontSize: '0.8rem' }}>
-                {t('rbac.roles.wildcardPermissionDesc', 'This role has unrestricted access to all resources and actions.')}
+                {t(
+                  'rbac.roles.wildcardPermissionDesc',
+                  'This role has unrestricted access to all resources and actions.'
+                )}
               </Typography>
             </Box>
           ) : (
@@ -613,7 +618,9 @@ const RolesPage: React.FC = () => {
                       // Buffer locally — do not call server
                       if (pendingInheritanceRemoves.includes(selectedParentRoleId)) {
                         // Cancel pending remove
-                        setPendingInheritanceRemoves((prev) => prev.filter((id) => id !== selectedParentRoleId));
+                        setPendingInheritanceRemoves((prev) =>
+                          prev.filter((id) => id !== selectedParentRoleId)
+                        );
                       } else {
                         setPendingInheritanceAdds((prev) => [...prev, selectedParentRoleId]);
                       }
@@ -629,7 +636,11 @@ const RolesPage: React.FC = () => {
                   const effectiveParents = [
                     ...parentRoles
                       .filter((pr) => !pendingInheritanceRemoves.includes(pr.parentRoleId))
-                      .map((pr) => ({ id: pr.parentRoleId, name: pr.parentRoleName, isPending: false })),
+                      .map((pr) => ({
+                        id: pr.parentRoleId,
+                        name: pr.parentRoleName,
+                        isPending: false,
+                      })),
                     ...pendingInheritanceAdds.map((id) => {
                       const r = roles.find((r) => r.id === id);
                       return { id, name: r?.roleName || id, isPending: true };
@@ -655,7 +666,9 @@ const RolesPage: React.FC = () => {
                           onDelete={() => {
                             if (pr.isPending) {
                               // Remove from pending adds
-                              setPendingInheritanceAdds((prev) => prev.filter((id) => id !== pr.id));
+                              setPendingInheritanceAdds((prev) =>
+                                prev.filter((id) => id !== pr.id)
+                              );
                             } else {
                               // Add to pending removes
                               setPendingInheritanceRemoves((prev) => [...prev, pr.id]);
@@ -677,7 +690,11 @@ const RolesPage: React.FC = () => {
                 <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
                   {t('rbac.roles.effectivePermissions')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.8rem' }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1, fontSize: '0.8rem' }}
+                >
                   {t('rbac.roles.effectivePermissionsDesc')}
                 </Typography>
                 <EffectivePermissionsViewer
