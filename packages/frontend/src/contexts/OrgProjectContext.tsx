@@ -3,12 +3,25 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useRef,
   ReactNode,
   useCallback,
 } from 'react';
-import { Box, Typography, Button, Paper } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  useTheme,
+  alpha,
+} from '@mui/material';
+import {
+  Logout as LogoutIcon,
+  CheckCircleOutline as CheckIcon,
+  HourglassTop as WaitIcon,
+  SupportAgent as SupportIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { Business as BusinessIcon, Logout as LogoutIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import { useAuth } from './AuthContext';
 import { orgProjectService, Organisation, Project } from '../services/orgProjectService';
 import { devLogger } from '../utils/logger';
@@ -59,6 +72,214 @@ const getStoredProjectId = (): string | null =>
 
 const storeOrgId = (orgId: string) => localStorage.setItem(STORAGE_KEY_ORG, orgId);
 const storeProjectId = (projectId: string) => localStorage.setItem(STORAGE_KEY_PROJECT, projectId);
+
+// Polling interval for checking org access (15 seconds)
+const POLL_INTERVAL_MS = 15000;
+
+// ==================== No-Org-Access Onboarding Page ====================
+
+const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  const steps = [
+    {
+      icon: <WaitIcon sx={{ fontSize: 22 }} />,
+      title: t('onboarding.step1Title'),
+      desc: t('onboarding.step1Desc'),
+    },
+    {
+      icon: <CheckIcon sx={{ fontSize: 22 }} />,
+      title: t('onboarding.step2Title'),
+      desc: t('onboarding.step2Desc'),
+    },
+    {
+      icon: <SupportIcon sx={{ fontSize: 22 }} />,
+      title: t('onboarding.step3Title'),
+      desc: t('onboarding.step3Desc'),
+    },
+  ];
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        overflow: 'hidden',
+        background: isDark
+          ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.15)} 0%, ${theme.palette.background.default} 50%, ${alpha(theme.palette.secondary.dark, 0.1)} 100%)`
+          : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.08)} 0%, #f8f9fc 50%, ${alpha(theme.palette.secondary.light, 0.06)} 100%)`,
+      }}
+    >
+      {/* Main card */}
+      <Box
+        sx={{
+          maxWidth: 520,
+          width: '100%',
+          mx: 2,
+          p: { xs: 4, sm: 5 },
+          borderRadius: 4,
+          bgcolor: isDark ? alpha(theme.palette.background.paper, 0.7) : 'rgba(255,255,255,0.85)',
+          backdropFilter: 'blur(20px)',
+          border: `1px solid ${isDark ? alpha('#fff', 0.08) : alpha('#000', 0.06)}`,
+          boxShadow: isDark
+            ? `0 8px 32px ${alpha('#000', 0.4)}`
+            : '0 8px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
+          textAlign: 'center',
+        }}
+      >
+        {/* Animated processing indicator */}
+        <Box sx={{ position: 'relative', display: 'inline-flex', mb: 3 }}>
+          <CircularProgress
+            size={72}
+            thickness={2}
+            sx={{
+              color: theme.palette.primary.main,
+              opacity: 0.3,
+            }}
+          />
+          <CircularProgress
+            size={72}
+            thickness={2}
+            variant="indeterminate"
+            sx={{
+              color: theme.palette.primary.main,
+              position: 'absolute',
+              left: 0,
+              animationDuration: '2.5s',
+            }}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: 28,
+                fontWeight: 800,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: -1,
+              }}
+            >
+              G
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Title */}
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          sx={{ mb: 1, color: 'text.primary', letterSpacing: -0.3 }}
+        >
+          {t('onboarding.title')}
+        </Typography>
+
+        {/* Subtitle */}
+        <Typography
+          variant="body1"
+          sx={{
+            mb: 4,
+            color: 'text.secondary',
+            lineHeight: 1.7,
+            maxWidth: 400,
+            mx: 'auto',
+          }}
+        >
+          {t('onboarding.subtitle')}
+        </Typography>
+
+        {/* Steps */}
+        <Box sx={{ textAlign: 'left', mb: 3 }}>
+          {steps.map((step, idx) => (
+            <Box
+              key={idx}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 1.5,
+                py: 1.5,
+                px: 2,
+                borderRadius: 2,
+                mb: 1,
+                bgcolor: isDark ? alpha(theme.palette.primary.main, 0.06) : alpha(theme.palette.primary.main, 0.03),
+                border: `1px solid ${isDark ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.primary.main, 0.06)}`,
+              }}
+            >
+              <Box
+                sx={{
+                  mt: 0.25,
+                  color: theme.palette.primary.main,
+                  opacity: 0.8,
+                  flexShrink: 0,
+                }}
+              >
+                {step.icon}
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.25 }}>
+                  {step.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                  {step.desc}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Auto-check indicator */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+            py: 1,
+            color: 'text.disabled',
+          }}
+        >
+          <CircularProgress size={12} thickness={5} sx={{ color: 'text.disabled' }} />
+          <Typography variant="caption">
+            {t('onboarding.autoChecking')}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Logout link */}
+      <Button
+        variant="text"
+        size="small"
+        startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
+        onClick={() => { window.location.href = '/logout'; }}
+        sx={{
+          mt: 3,
+          color: 'text.disabled',
+          textTransform: 'none',
+          fontSize: '0.8rem',
+          '&:hover': { color: 'text.secondary' },
+        }}
+      >
+        {t('onboarding.logoutLink')}
+      </Button>
+    </Box>
+  );
+};
+
+// ==================== Provider ====================
 
 export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -150,6 +371,24 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     }
   }, [currentOrgId, loadProjects]);
 
+  // Auto-poll when noOrgAccess — check every 15s if access has been granted
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (noOrgAccess && isAuthenticated) {
+      pollTimerRef.current = setInterval(() => {
+        loadOrgs();
+      }, POLL_INTERVAL_MS);
+      return () => {
+        if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+      };
+    }
+    // Clean up timer when access is granted
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+  }, [noOrgAccess, isAuthenticated, loadOrgs]);
+
   // Notify other components when project changes
   useEffect(() => {
     if (currentProjectId && currentProject) {
@@ -176,8 +415,6 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
   }, []);
 
   // Atomically switch both org and project at once.
-  // Unlike calling switchOrg + switchProject sequentially,
-  // this does NOT reset projectId to null in between.
   const switchContext = useCallback((orgId: string, projectId: string) => {
     setCurrentOrgId(orgId);
     storeOrgId(orgId);
@@ -208,59 +445,11 @@ export const OrgProjectProvider: React.FC<OrgProjectProviderProps> = ({ children
     getProjectApiPath,
   };
 
-  // Show full-screen notice when user has no org access
+  // Show full-screen pending access page
   if (noOrgAccess) {
     return (
       <OrgProjectContext.Provider value={value}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '100vh',
-            bgcolor: 'background.default',
-            p: 3,
-          }}
-        >
-          <Paper
-            elevation={3}
-            sx={{
-              p: 5,
-              maxWidth: 480,
-              textAlign: 'center',
-              borderRadius: 3,
-            }}
-          >
-            <BusinessIcon sx={{ fontSize: 64, color: 'warning.main', mb: 2 }} />
-            <Typography variant="h5" fontWeight={600} gutterBottom>
-              {t('rbac.noOrgAccess.title')}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.8 }}>
-              {t('rbac.noOrgAccess.description')}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-              <Button
-                variant="outlined"
-                startIcon={isLoading ? <RefreshIcon sx={{ animation: 'spin 1s linear infinite', '@keyframes spin': { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } } }} /> : <RefreshIcon />}
-                disabled={isLoading}
-                onClick={() => {
-                  setIsLoading(true);
-                  loadOrgs().finally(() => setIsLoading(false));
-                }}
-              >
-                {t('common.refresh')}
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<LogoutIcon />}
-                onClick={() => { window.location.href = '/logout'; }}
-              >
-                {t('common.logout')}
-              </Button>
-            </Box>
-          </Paper>
-        </Box>
+        <NoOrgAccessPage t={t} />
       </OrgProjectContext.Provider>
     );
   }
