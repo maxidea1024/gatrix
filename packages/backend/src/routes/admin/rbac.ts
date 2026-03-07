@@ -1408,12 +1408,10 @@ router.delete(
       // Prevent managing users with higher scope level
       const targetUserScopeLevel = await permissionService.getUserMaxScopeLevel(req.params.id);
       if (targetUserScopeLevel < actorScopeLevel) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: 'Cannot modify roles of users with higher scope level',
-          });
+        return res.status(403).json({
+          success: false,
+          message: 'Cannot modify roles of users with higher scope level',
+        });
       }
 
       const result = await db('g_role_bindings')
