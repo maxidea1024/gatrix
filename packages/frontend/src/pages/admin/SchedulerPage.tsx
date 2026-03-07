@@ -336,7 +336,6 @@ const SchedulerPage: React.FC = () => {
   // 현재 언어에 따른 Locale Settings
   const currentLanguage = i18n.language;
 
-
   // FullCalendar Locale 선택
   const getCalendarLocale = () => {
     switch (currentLanguage) {

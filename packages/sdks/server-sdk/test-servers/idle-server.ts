@@ -30,7 +30,6 @@ async function main() {
     service: 'idle', // Required: service name for identification
     group: process.env.SERVICE_GROUP || 'development', // Required: service group
 
-
     // Redis for events
     redis: {
       host: process.env.REDIS_HOST || 'localhost',

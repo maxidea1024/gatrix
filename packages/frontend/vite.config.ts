@@ -227,11 +227,7 @@ export default defineConfig({
             '@emotion/styled',
           ],
           // MUI data components
-          'vendor-mui-x': [
-            '@mui/x-data-grid',
-            '@mui/x-date-pickers',
-            '@mui/x-date-pickers-pro',
-          ],
+          'vendor-mui-x': ['@mui/x-data-grid', '@mui/x-date-pickers', '@mui/x-date-pickers-pro'],
           // Monaco editor - very large, used only in specific pages
           'vendor-monaco': ['monaco-editor', '@monaco-editor/react'],
           // Chart libraries

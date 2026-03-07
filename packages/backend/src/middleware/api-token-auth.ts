@@ -254,9 +254,7 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
     // Token determines environment — strict, no fallback
-    const environmentId =
-      req.apiToken?.environmentId ||
-      req.environmentId; // Already set by unsecured token handler
+    const environmentId = req.apiToken?.environmentId || req.environmentId; // Already set by unsecured token handler
 
     if (!environmentId) {
       logger.warn('Auth: Environment not determined from token', {

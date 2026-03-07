@@ -127,7 +127,11 @@ export class EnvironmentController {
 
     // Generate name from displayName if not provided
     const envName =
-      name || displayName?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9_-]/g, '');
+      name ||
+      displayName
+        ?.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9_-]/g, '');
 
     if (!envName || !Environment.isValidEnvironmentName(envName)) {
       throw new GatrixError(

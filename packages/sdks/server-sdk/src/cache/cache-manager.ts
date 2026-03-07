@@ -1694,7 +1694,11 @@ export class CacheManager {
    * @param environment Environment name (required)
    * @param status Optional status
    */
-  async updateSingleBanner(bannerId: string, environmentId: string, status?: string): Promise<void> {
+  async updateSingleBanner(
+    bannerId: string,
+    environmentId: string,
+    status?: string
+  ): Promise<void> {
     await this.bannerService?.updateSingleBanner(bannerId, environmentId, status);
   }
 

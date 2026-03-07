@@ -79,7 +79,11 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param environment Environment name (required)
    * @param status Optional status
    */
-  async updateSingleBanner(bannerId: string, environmentId: string, status?: string): Promise<void> {
+  async updateSingleBanner(
+    bannerId: string,
+    environmentId: string,
+    status?: string
+  ): Promise<void> {
     try {
       this.logger.debug('Updating single banner in cache', {
         bannerId,

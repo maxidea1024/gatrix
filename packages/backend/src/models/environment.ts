@@ -155,14 +155,8 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Get environment by name within a project
    */
-  static async getByName(
-    projectId: string,
-    name: string
-  ): Promise<Environment | undefined> {
-    return await this.query()
-      .where('projectId', projectId)
-      .where('name', name)
-      .first();
+  static async getByName(projectId: string, name: string): Promise<Environment | undefined> {
+    return await this.query().where('projectId', projectId).where('name', name).first();
   }
 
   /**

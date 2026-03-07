@@ -320,7 +320,10 @@ class FlagStreamingService {
    * Refresh the Edge's feature flag cache, then notify all clients.
    * This ensures clients that immediately re-fetch after notification receive fresh data.
    */
-  private async refreshCacheThenNotify(environmentId: string, changedKeys: string[]): Promise<void> {
+  private async refreshCacheThenNotify(
+    environmentId: string,
+    changedKeys: string[]
+  ): Promise<void> {
     try {
       const sdk = sdkManager.getSDK();
       if (sdk) {

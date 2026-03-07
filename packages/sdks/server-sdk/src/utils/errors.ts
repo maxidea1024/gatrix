@@ -117,7 +117,12 @@ export class FeatureFlagError extends Error {
   public readonly flagName: string;
   public readonly environmentId?: string;
 
-  constructor(code: FeatureFlagErrorCode, message: string, flagName: string, environmentId?: string) {
+  constructor(
+    code: FeatureFlagErrorCode,
+    message: string,
+    flagName: string,
+    environmentId?: string
+  ) {
     super(message);
     this.name = 'FeatureFlagError';
     this.code = code;

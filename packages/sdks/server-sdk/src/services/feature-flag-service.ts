@@ -210,7 +210,9 @@ export class FeatureFlagService {
         for (const segment of segments) {
           this.cachedSegments.set(segment.name, segment);
         }
-        this.logger.debug(`Loaded ${segments.length} segments from local storage`, { environmentId });
+        this.logger.debug(`Loaded ${segments.length} segments from local storage`, {
+          environmentId,
+        });
       }
     } catch (error: any) {
       this.logger.warn('Failed to load feature flags from local storage', {
@@ -867,7 +869,11 @@ export class FeatureFlagService {
    * @param context Evaluation context (merged with static context)
    * @param environment Environment name
    */
-  evaluate(flagName: string, context?: EvaluationContext, environmentId?: string): EvaluationResult {
+  evaluate(
+    flagName: string,
+    context?: EvaluationContext,
+    environmentId?: string
+  ): EvaluationResult {
     // Resolve environment using the configured resolver
     const resolvedEnv = environmentId || this.envResolver.resolve(environmentId, 'evaluate');
 

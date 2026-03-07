@@ -21,7 +21,6 @@ async function main() {
     service: 'test',
     group: 'development',
 
-
     cache: {
       enabled: true,
       ttl: 300,
@@ -105,7 +104,12 @@ async function main() {
     const testContext = { userId: 'test-user' };
 
     // Boolean variation (flagName, context, environment, defaultValue)
-    const boolResult = sdk.featureFlag.boolVariation(testFlagName, testContext, environmentId, false);
+    const boolResult = sdk.featureFlag.boolVariation(
+      testFlagName,
+      testContext,
+      environmentId,
+      false
+    );
     console.log(`    boolVariation('${testFlagName}'): ${boolResult}`);
 
     // Boolean variation detail
@@ -129,7 +133,12 @@ async function main() {
     console.log(`    stringVariation: ${stringResult}`);
 
     // Number variation
-    const numberResult = sdk.featureFlag.numberVariation(testFlagName, testContext, environmentId, 0);
+    const numberResult = sdk.featureFlag.numberVariation(
+      testFlagName,
+      testContext,
+      environmentId,
+      0
+    );
     console.log(`    numberVariation: ${numberResult}`);
 
     // JSON variation

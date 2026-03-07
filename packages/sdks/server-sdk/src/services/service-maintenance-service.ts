@@ -47,7 +47,9 @@ export class ServiceMaintenanceService {
       const cachedJson = await this.storage.get(`ServiceMaintenance_${environmentId}`);
       if (cachedJson) {
         this.cachedStatusByEnv.set(environmentId, JSON.parse(cachedJson));
-        this.logger.debug('Loaded service maintenance status from local storage', { environmentId });
+        this.logger.debug('Loaded service maintenance status from local storage', {
+          environmentId,
+        });
       }
     } catch (error: any) {
       this.logger.warn('Failed to load service maintenance status from local storage', {
