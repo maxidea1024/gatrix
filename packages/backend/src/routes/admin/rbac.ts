@@ -26,6 +26,8 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('rbac');
 import db from '../../config/knex';
+import { pubSubService } from '../../services/PubSubService';
+import { AuditLogModel } from '../../models/AuditLog';
 import { getScopeLevel } from '../../utils/scopeHierarchy';
 
 const router = express.Router();
@@ -148,6 +150,26 @@ router.post('/organisations/:id/members', requireOrgAdmin as any, async (req: an
     }
 
     await Organisation.addMember(req.params.id, userId, req.user.id);
+
+    // SSE notification to the added user
+    await pubSubService.publishNotification({
+      type: 'user_role_changed',
+      data: { userId },
+      targetUsers: [userId],
+      excludeUsers: [req.user.id],
+    });
+
+    // Audit log
+    await AuditLogModel.create({
+      userId: req.user.id,
+      action: 'org_member_add',
+      resourceType: 'organisation',
+      resourceId: req.params.id,
+      newValues: { targetUserId: userId, orgId: req.params.id },
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+
     res.status(201).json({ success: true, message: 'Member added successfully' });
   } catch (error) {
     logger.error('Error adding organisation member:', error);
@@ -171,6 +193,26 @@ router.delete(
       if (!result) {
         return res.status(404).json({ success: false, message: 'Member not found' });
       }
+
+      // SSE notification to the removed user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId: req.params.userId },
+        targetUsers: [req.params.userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'org_member_remove',
+        resourceType: 'organisation',
+        resourceId: req.params.id,
+        newValues: { targetUserId: req.params.userId, orgId: req.params.id },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.json({ success: true, message: 'Member removed successfully' });
     } catch (error) {
       logger.error('Error removing organisation member:', error);
@@ -417,6 +459,26 @@ router.post(
         invitedBy: req.user.id,
       });
       await permissionService.invalidateUserCache(userId);
+
+      // SSE notification to the added user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId },
+        targetUsers: [userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'project_member_add',
+        resourceType: 'project',
+        resourceId: req.params.id,
+        newValues: { targetUserId: userId, projectId: req.params.id, projectRole: projectRole || 'member' },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.status(201).json({ success: true, message: 'Member added successfully' });
     } catch (error) {
       logger.error('Error adding project member:', error);
@@ -445,6 +507,26 @@ router.put(
         return res.status(404).json({ success: false, message: 'Member not found' });
       }
       await permissionService.invalidateUserCache(req.params.userId);
+
+      // SSE notification to the updated user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId: req.params.userId },
+        targetUsers: [req.params.userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'project_member_update',
+        resourceType: 'project',
+        resourceId: req.params.id,
+        newValues: { targetUserId: req.params.userId, projectId: req.params.id, projectRole },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.json({ success: true, message: 'Member role updated successfully' });
     } catch (error) {
       logger.error('Error updating project member role:', error);
@@ -466,6 +548,26 @@ router.delete(
         return res.status(404).json({ success: false, message: 'Member not found' });
       }
       await permissionService.invalidateUserCache(req.params.userId);
+
+      // SSE notification to the removed user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId: req.params.userId },
+        targetUsers: [req.params.userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'project_member_remove',
+        resourceType: 'project',
+        resourceId: req.params.id,
+        newValues: { targetUserId: req.params.userId, projectId: req.params.id },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.json({ success: true, message: 'Member removed successfully' });
     } catch (error) {
       logger.error('Error removing project member:', error);
@@ -678,6 +780,39 @@ router.put(
         await RoleModel.setPermissions(req.params.id, permissions);
       }
 
+      // Notify all users bound to this role
+      const boundUsers = await db('g_role_bindings')
+        .where('roleId', req.params.id)
+        .whereNotNull('userId')
+        .select('userId');
+      const boundGroupUsers = await db('g_role_bindings as rb')
+        .join('g_group_members as gm', 'rb.groupId', 'gm.groupId')
+        .where('rb.roleId', req.params.id)
+        .whereNotNull('rb.groupId')
+        .select('gm.userId');
+      const affectedUserIds = [...new Set([...boundUsers, ...boundGroupUsers].map((u: any) => u.userId))];
+
+      if (affectedUserIds.length > 0) {
+        await pubSubService.publishNotification({
+          type: 'user_role_changed',
+          data: { roleId: req.params.id },
+          targetUsers: affectedUserIds,
+          excludeUsers: [req.user.id],
+        });
+      }
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'role_update',
+        resourceType: 'role',
+        resourceId: req.params.id,
+        oldValues: { roleName: existingRole.roleName, description: existingRole.description },
+        newValues: { roleName, description, permissions },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       const result = await RoleModel.getWithDetails(req.params.id);
       res.json({ success: true, data: result });
     } catch (error) {
@@ -835,6 +970,26 @@ router.post(
         return res.status(400).json({ success: false, message: 'userId is required' });
       }
       await GroupModel.addMember(req.params.id, userId, isGroupAdmin, req.user.id);
+
+      // SSE notification to the added user (group roles now apply to them)
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId },
+        targetUsers: [userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'group_member_add',
+        resourceType: 'group',
+        resourceId: req.params.id,
+        newValues: { targetUserId: userId, groupId: req.params.id, isGroupAdmin },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.status(201).json({ success: true, message: 'Member added' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -856,6 +1011,26 @@ router.delete(
       if (!removed) {
         return res.status(404).json({ success: false, message: 'Member not found' });
       }
+
+      // SSE notification to the removed user (group roles no longer apply)
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId: req.params.userId },
+        targetUsers: [req.params.userId],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'group_member_remove',
+        resourceType: 'group',
+        resourceId: req.params.id,
+        newValues: { targetUserId: req.params.userId, groupId: req.params.id },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.json({ success: true, message: 'Member removed' });
     } catch (error) {
       logger.error('Error removing group member:', error);
@@ -885,6 +1060,30 @@ router.post(
       }
 
       await GroupModel.addRole(req.params.id, roleId, req.user.orgId, req.user.id);
+
+      // SSE notification to all group members
+      const groupMembers = await GroupModel.getMembers(req.params.id);
+      const memberUserIds = groupMembers.map((m: any) => m.userId).filter(Boolean);
+      if (memberUserIds.length > 0) {
+        await pubSubService.publishNotification({
+          type: 'user_role_changed',
+          data: { groupId: req.params.id, roleId },
+          targetUsers: memberUserIds,
+          excludeUsers: [req.user.id],
+        });
+      }
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'group_role_assign',
+        resourceType: 'group',
+        resourceId: req.params.id,
+        newValues: { groupId: req.params.id, roleId, roleName: targetRole?.roleName },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.status(201).json({ success: true, message: 'Role assigned to group' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -902,10 +1101,36 @@ router.delete(
   requireOrgPermission(ORG_PERMISSIONS.GROUPS_WRITE) as any,
   async (req: any, res) => {
     try {
+      // Get group members before removing role (for SSE notification)
+      const groupMembersForNotify = await GroupModel.getMembers(req.params.id);
+
       const removed = await GroupModel.removeRole(req.params.id, req.params.roleId);
       if (!removed) {
         return res.status(404).json({ success: false, message: 'Role not assigned to this group' });
       }
+
+      // SSE notification to all group members
+      const memberIds = groupMembersForNotify.map((m: any) => m.userId).filter(Boolean);
+      if (memberIds.length > 0) {
+        await pubSubService.publishNotification({
+          type: 'user_role_changed',
+          data: { groupId: req.params.id, roleId: req.params.roleId },
+          targetUsers: memberIds,
+          excludeUsers: [req.user.id],
+        });
+      }
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'group_role_remove',
+        resourceType: 'group',
+        resourceId: req.params.id,
+        newValues: { groupId: req.params.id, roleId: req.params.roleId },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.json({ success: true, message: 'Role removed from group' });
     } catch (error) {
       logger.error('Error removing group role:', error);
@@ -1045,6 +1270,26 @@ router.post(
         assignedBy: req.user.id,
       });
       await permissionService.invalidateUserCache(req.params.id);
+
+      // SSE notification to the target user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId: req.params.id },
+        targetUsers: [req.params.id],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'user_role_assign',
+        resourceType: 'user',
+        resourceId: req.params.id,
+        newValues: { targetUserId: req.params.id, roleId, roleName: targetRole?.roleName },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.status(201).json({ success: true, message: 'Role assigned to user' });
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -1088,6 +1333,26 @@ router.delete(
         return res.status(404).json({ success: false, message: 'Role not assigned to this user' });
       }
       await permissionService.invalidateUserCache(req.params.id);
+
+      // SSE notification to the target user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: { userId: req.params.id },
+        targetUsers: [req.params.id],
+        excludeUsers: [req.user.id],
+      });
+
+      // Audit log
+      await AuditLogModel.create({
+        userId: req.user.id,
+        action: 'user_role_remove',
+        resourceType: 'user',
+        resourceId: req.params.id,
+        newValues: { targetUserId: req.params.id, roleId: req.params.roleId, roleName: targetRole?.roleName },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+      });
+
       res.json({ success: true, message: 'Role removed from user' });
     } catch (error) {
       logger.error('Error removing user role:', error);
