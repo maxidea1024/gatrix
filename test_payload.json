@@ -1,8 +1,0 @@
-{
-  "context": {
-    "userId": "user-12345",
-    "sessionId": "session-abcde",
-    "store": "appstore",
-    "vipTier": 10
-  }
-}

@@ -364,10 +364,10 @@ projectRouter.use(
   serverLifecycleRoutes
 );
 
-// Platform Defaults
+// Platform Defaults (same permission scope as client versions)
 projectRouter.use(
   '/platform-defaults',
-  requireEnvPermission([P.FEATURES_READ, P.FEATURES_UPDATE]) as any,
+  requireEnvPermission([P.CLIENT_VERSIONS_READ, P.CLIENT_VERSIONS_UPDATE]) as any,
   platformDefaultsRoutes
 );
 

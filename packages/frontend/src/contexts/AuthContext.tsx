@@ -248,15 +248,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const MIN_LOADING_TIME = 1500; // Minimum 1.5 seconds for better UX
 
       try {
-        devLogger.info('🔄 AuthContext: Starting initialization...');
+        devLogger.info('AuthContext: Starting initialization...');
         setIsLoading(true);
 
         // Check if we have stored auth data
         const storedToken = AuthService.getStoredToken();
         const storedUser = AuthService.getStoredUser();
 
-        devLogger.debug('🔍 AuthContext: Stored token exists:', !!storedToken);
-        devLogger.debug('🔍 AuthContext: Stored user exists:', !!storedUser);
+        devLogger.debug('AuthContext: Stored token exists:', !!storedToken);
+        devLogger.debug('AuthContext: Stored user exists:', !!storedUser);
 
         if (storedToken && storedUser) {
           // Initialize API service with stored token (checks expiry)
@@ -264,23 +264,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (isValid) {
             // Use stored user data without API call to prevent infinite loop
             setUser(storedUser);
-            devLogger.info('✅ AuthContext: User authenticated from storage');
+            devLogger.info('AuthContext: User authenticated from storage');
           } else {
             // Token was expired and cleared
             setUser(null);
-            devLogger.info('❌ AuthContext: Stored token expired, user logged out');
+            devLogger.info('AuthContext: Stored token expired, user logged out');
           }
         } else if (storedToken && !storedUser) {
           // Token exists but no user data - fetch profile (OAuth callback scenario)
-          devLogger.info('🔄 AuthContext: Token exists but no user data, fetching profile...');
+          devLogger.info('AuthContext: Token exists but no user data, fetching profile...');
           const isValid = AuthService.initializeAuth();
           if (isValid) {
             try {
               const user = await AuthService.getProfile();
               setUser(user);
-              devLogger.info('✅ AuthContext: User profile fetched successfully');
+              devLogger.info('AuthContext: User profile fetched successfully');
             } catch (error: any) {
-              devLogger.error('❌ AuthContext: Failed to fetch user profile:', error);
+              devLogger.error('AuthContext: Failed to fetch user profile:', error);
 
               // Check if this is a "user not found" error
               if (
@@ -291,7 +291,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               ) {
                 // User was deleted - redirect to session expired page
                 // The API interceptor will handle the redirect, just clear data here
-                devLogger.warn('⚠️ AuthContext: User not found - account may have been deleted');
+                devLogger.warn('️ AuthContext: User not found - account may have been deleted');
               }
 
               AuthService.clearAuthData();
@@ -300,15 +300,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // Token was expired
             setUser(null);
-            devLogger.info('❌ AuthContext: Stored token expired, user logged out');
+            devLogger.info('AuthContext: Stored token expired, user logged out');
           }
         } else {
           // No stored auth data
           setUser(null);
-          devLogger.info('❌ AuthContext: No stored auth data, user not authenticated');
+          devLogger.info('AuthContext: No stored auth data, user not authenticated');
         }
       } catch (error) {
-        devLogger.error('❌ AuthContext: Auth initialization error:', error);
+        devLogger.error('AuthContext: Auth initialization error:', error);
         AuthService.clearAuthData();
         setUser(null);
       } finally {
@@ -320,11 +320,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           devLogger.debug(`⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`);
           setTimeout(() => {
             setIsLoading(false);
-            devLogger.info('✅ AuthContext: Initialization complete, isLoading = false');
+            devLogger.info('AuthContext: Initialization complete, isLoading = false');
           }, remainingTime);
         } else {
           setIsLoading(false);
-          devLogger.info('✅ AuthContext: Initialization complete, isLoading = false');
+          devLogger.info('AuthContext: Initialization complete, isLoading = false');
         }
       }
     };

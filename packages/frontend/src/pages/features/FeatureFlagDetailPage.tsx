@@ -1527,6 +1527,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           onChange={(e) => {
             setFlag((prev) => (prev ? { ...prev, [field]: e.target.checked } : prev));
           }}
+          disabled={!canManage}
         />
       );
     }
@@ -1542,6 +1543,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             const val = e.target.value === '' ? 0 : Number(e.target.value);
             setFlag((prev) => (prev ? { ...prev, [field]: val } : prev));
           }}
+          disabled={!canManage}
         />
       );
     }
@@ -1583,6 +1585,7 @@ const FeatureFlagDetailPage: React.FC = () => {
             : t('featureFlags.disabledValue')
         }
         onValidationError={type === 'json' ? (err) => setJsonError(field, err) : undefined}
+        disabled={!canManage}
       />
     );
   };
@@ -3035,7 +3038,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 onChange={(rules) =>
                   setFlag((prev) => (prev ? { ...prev, validationRules: rules } : prev))
                 }
-                disabled={saving}
+                disabled={saving || !canManage}
               />
 
               {/* Flag Values */}
@@ -3103,8 +3106,8 @@ const FeatureFlagDetailPage: React.FC = () => {
                 </Box>
               </Stack>
 
-              {/* Action Buttons */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
+              {/* Action Buttons - only show for users with edit permission */}
+              {canManage && <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 2 }}>
                 <Button
                   variant="outlined"
                   onClick={() => {
@@ -3181,7 +3184,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                 >
                   {saving ? <CircularProgress size={20} /> : t('common.save')}
                 </Button>
-              </Box>
+              </Box>}
             </Stack>
           </Paper>
         </Box>

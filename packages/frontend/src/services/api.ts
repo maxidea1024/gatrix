@@ -13,13 +13,6 @@ class ApiService {
     // In production: API calls go to the same origin, so '/api/v1' is safest
     let baseURL = (import.meta as any).env?.VITE_API_URL || '/api/v1';
 
-    // Debugging: exact source of baseURL
-    console.log('[ApiService] Initial baseURL evaluation:', {
-      envValue: (import.meta as any).env?.VITE_API_URL,
-      fallback: '/api/v1',
-      evaluated: baseURL,
-    });
-
     // Only use runtime config in production (when explicitly set)
     if (import.meta.env.PROD) {
       const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as
@@ -27,7 +20,6 @@ class ApiService {
         | undefined;
       if (runtimeEnv && runtimeEnv.trim()) {
         baseURL = runtimeEnv.trim();
-        console.log('[ApiService] PROD: Using runtime config baseURL:', baseURL);
       }
     }
 
@@ -44,8 +36,6 @@ class ApiService {
       baseURL = '/api/v1';
     }
 
-    console.log('[ApiService] Final baseURL:', baseURL, 'PROD:', import.meta.env.PROD);
-
     this.api = axios.create({
       baseURL,
       timeout: 60000,
@@ -54,8 +44,6 @@ class ApiService {
         'Content-Type': 'application/json',
       },
     });
-
-    console.log('[ApiService] After axios.create - baseURL:', this.api.defaults.baseURL);
 
     this.setupInterceptors();
   }

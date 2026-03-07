@@ -82,12 +82,8 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     try {
       setIsLoading(true);
       setError(null);
-      console.log('[EnvironmentContext] Calling environmentService.getEnvironments()...');
-
       // Load all environments for the current project
       const envList = await environmentService.getEnvironments(projectApiPath);
-      console.log('[EnvironmentContext] Got environments:', envList);
-
       // Store all environments for admin UI
       setAllEnvironments(envList);
 
@@ -97,8 +93,6 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         const accessResponse = await apiService.get<UserEnvironmentAccess>(
           '/admin/users/me/environments'
         );
-        console.log('[EnvironmentContext] Got user access:', accessResponse.data);
-
         // Filter environments based on user access
         const userAccess = accessResponse.data;
 
@@ -117,8 +111,6 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         // If we can't load access permissions, allow all environments
         accessibleEnvs = envList;
       }
-
-      console.log('[EnvironmentContext] Accessible environments:', accessibleEnvs);
       setEnvironments(accessibleEnvs);
 
       // Get the currently stored environment
@@ -129,17 +121,12 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
         // Prefer the first environment or the one marked as default
         const defaultEnv = accessibleEnvs.find((e) => e.isDefault) || accessibleEnvs[0];
         if (defaultEnv) {
-          console.log(
-            '[EnvironmentContext] Auto-selecting default environment:',
-            defaultEnv.environmentId
-          );
           setCurrentEnvironmentId(defaultEnv.environmentId);
           storeEnvironment(defaultEnv.environmentId, defaultEnv.displayName);
         }
       } else if (storedEnv && !accessibleEnvs.find((e) => e.environmentId === storedEnv)) {
         // If the stored environment doesn't exist anymore or not accessible, reset to first
         if (accessibleEnvs.length > 0) {
-          console.log('[EnvironmentContext] Stored environment not found, resetting to first');
           setCurrentEnvironmentId(accessibleEnvs[0].environmentId);
           storeEnvironment(accessibleEnvs[0].environmentId, accessibleEnvs[0].displayName);
         } else {
@@ -161,7 +148,6 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
   // Reload environments when project changes
   useEffect(() => {
     if (isAuthenticated && hasAnyPermissions && currentProjectId) {
-      console.log('[EnvironmentContext] Project changed, reloading environments...');
       loadEnvironments();
     } else if (!isAuthenticated) {
       // Reset when unauthenticated
