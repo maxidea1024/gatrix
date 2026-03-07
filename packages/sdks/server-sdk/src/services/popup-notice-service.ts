@@ -31,7 +31,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environment: string): string {
+  protected getEndpoint(environmentId: string): string {
     return `/api/v1/server/ingame-popup-notices`;
   }
 
@@ -55,8 +55,8 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param id Popup notice ID
    * @param environment Environment name (required)
    */
-  async getById(id: number, environment: string): Promise<PopupNotice> {
-    this.logger.debug('Fetching popup notice by ID', { id, environment });
+  async getById(id: number, environmentId: string): Promise<PopupNotice> {
+    this.logger.debug('Fetching popup notice by ID', { id, environmentId });
 
     const response = await this.apiClient.get<{ notice: PopupNotice }>(
       `/api/v1/server/ingame-popup-notices/${id}`
@@ -82,13 +82,13 @@ export class PopupNoticeService extends BaseEnvironmentService<
    */
   async updateSingleNotice(
     id: number,
-    environment: string,
+    environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
     try {
       this.logger.debug('Updating single popup notice in cache', {
         id,
-        environment,
+        environmentId,
         isVisible,
       });
 
@@ -96,9 +96,9 @@ export class PopupNoticeService extends BaseEnvironmentService<
       if (isVisible === false || isVisible === 0) {
         this.logger.info('Popup notice isVisible=false, removing from cache', {
           id,
-          environment,
+          environmentId,
         });
-        this.removeFromCache(id, environment);
+        this.removeFromCache(id, environmentId);
         return;
       }
 
@@ -109,26 +109,26 @@ export class PopupNoticeService extends BaseEnvironmentService<
       // Fetch the single notice from backend using getById
       let updatedNotice: PopupNotice;
       try {
-        updatedNotice = await this.getById(id, environment);
+        updatedNotice = await this.getById(id, environmentId);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
         this.logger.debug('Popup notice not found or not active, removing from cache', {
           id,
-          environment,
+          environmentId,
         });
-        this.removeFromCache(id, environment);
+        this.removeFromCache(id, environmentId);
         return;
       }
 
-      this.updateItemInCache(updatedNotice, environment);
+      this.updateItemInCache(updatedNotice, environmentId);
     } catch (error: any) {
       this.logger.error('Failed to update single popup notice in cache', {
         id,
-        environment,
+        environmentId,
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refreshByEnvironment(environment);
+      await this.refreshByEnvironment(environmentId);
     }
   }
 
@@ -137,8 +137,8 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * @param worldId World ID
    * @param environment Environment name (required)
    */
-  getNoticesForWorld(worldId: string, environment: string): PopupNotice[] {
-    const notices = this.getCached(environment);
+  getNoticesForWorld(worldId: string, environmentId: string): PopupNotice[] {
+    const notices = this.getCached(environmentId);
     return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {
         return true; // No targeting = show to all
@@ -160,11 +160,11 @@ export class PopupNoticeService extends BaseEnvironmentService<
     subChannel?: string;
     worldId?: string;
     userId?: string;
-    environment: string;
+    environmentId: string;
   }): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId, environment } = options;
-    const notices = this.getCached(environment);
+    const { platform, channel, subChannel, worldId, userId, environmentId } = options;
+    const notices = this.getCached(environmentId);
     const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate
       if (notice.startDate) {

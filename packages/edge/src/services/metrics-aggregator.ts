@@ -49,8 +49,8 @@ class MetricsAggregator {
   /**
    * Add Client SDK metrics to buffer
    */
-  addClientMetrics(environment: string, appName: string, bucket: any, sdkVersion?: string): void {
-    const key = `${environment}:${appName}`;
+  addClientMetrics(environmentId: string, appName: string, bucket: any, sdkVersion?: string): void {
+    const key = `${environmentId}:${appName}`;
     let buffer = this.clientBuffers.get(key);
 
     if (!buffer) {
@@ -108,12 +108,12 @@ class MetricsAggregator {
    * Add Server SDK metrics to buffer
    */
   addServerMetrics(
-    environment: string,
+    environmentId: string,
     appName: string,
     metrics: ServerMetric[],
     sdkVersion?: string
   ): void {
-    const key = `${environment}:${appName}`;
+    const key = `${environmentId}:${appName}`;
     let buffer = this.serverBuffers.get(key);
 
     if (!buffer) {
@@ -144,13 +144,13 @@ class MetricsAggregator {
    * Add Server SDK unknown flag report to buffer
    */
   addServerUnknownReport(
-    environment: string,
+    environmentId: string,
     appName: string,
     flagName: string,
     count: number = 1,
     sdkVersion?: string
   ): void {
-    const key = `${environment}:${appName}`;
+    const key = `${environmentId}:${appName}`;
     let buffer = this.serverUnknownBuffers.get(key);
 
     if (!buffer) {
@@ -200,10 +200,10 @@ class MetricsAggregator {
 
     // Process Client Metrics
     const clientPromises = clientJobs.map(async ([key, buffer]) => {
-      const [environment, appName] = key.split(':');
+      const [environmentId, appName] = key.split(':');
       try {
         await axios.post(
-          `${config.gatrixUrl}/api/v1/client/features/${environment}/metrics`,
+          `${config.gatrixUrl}/api/v1/client/features/${environmentId}/metrics`,
           {
             appName,
             sdkVersion: buffer.sdkVersion,
@@ -230,11 +230,11 @@ class MetricsAggregator {
 
     // Process Server Metrics
     const serverPromises = serverJobs.map(async ([key, buffer]) => {
-      const [environment, appName] = key.split(':');
+      const [environmentId, appName] = key.split(':');
       const metrics = Array.from(buffer.metrics.values());
       try {
         await axios.post(
-          `${config.gatrixUrl}/api/v1/server/${environment}/features/metrics`,
+          `${config.gatrixUrl}/api/v1/server/${environmentId}/features/metrics`,
           {
             metrics,
             bucket: {
@@ -259,11 +259,11 @@ class MetricsAggregator {
 
     // Process Server Unknown Reports
     const unknownPromises = unknownJobs.flatMap(([key, buffer]) => {
-      const [environment, appName] = key.split(':');
+      const [environmentId, appName] = key.split(':');
       return Array.from(buffer.flags.entries()).map(async ([flagName, count]) => {
         try {
           await axios.post(
-            `${config.gatrixUrl}/api/v1/server/${environment}/features/unknown`,
+            `${config.gatrixUrl}/api/v1/server/${environmentId}/features/unknown`,
             { flagName, count, sdkVersion: buffer.sdkVersion },
             {
               headers: {

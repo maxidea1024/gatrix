@@ -24,7 +24,7 @@ import { sdkManager } from './sdk-manager';
 
 interface StreamingClient {
   id: string;
-  environment: string;
+  environmentId: string;
   response: Response;
   connectedAt: Date;
   lastEventTime: Date;
@@ -32,7 +32,7 @@ interface StreamingClient {
 
 interface WebSocketClient {
   id: string;
-  environment: string;
+  environmentId: string;
   ws: WebSocket;
   connectedAt: Date;
   lastEventTime: Date;
@@ -101,12 +101,12 @@ class FlagStreamingService {
         try {
           const event = JSON.parse(payload) as { type: string; data: Record<string, any> };
           if (event.type === 'feature_flag.changed') {
-            const environment = event.data.environment as string;
+            const environmentId = event.data.environment as string;
             const changedKeys = (event.data.changedKeys as string[]) ?? [];
-            if (environment) {
+            if (environmentId) {
               // Refresh Edge's own cache BEFORE notifying clients
               // so that clients re-fetching immediately get fresh data
-              this.refreshCacheThenNotify(environment, changedKeys);
+              this.refreshCacheThenNotify(environmentId, changedKeys);
             }
           }
         } catch (err) {
@@ -199,7 +199,7 @@ class FlagStreamingService {
   /**
    * Add a new SSE client connection
    */
-  async addClient(clientId: string, environment: string, res: Response): Promise<void> {
+  async addClient(clientId: string, environmentId: string, res: Response): Promise<void> {
     // Set SSE headers
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -210,7 +210,7 @@ class FlagStreamingService {
 
     const client: StreamingClient = {
       id: clientId,
-      environment,
+      environmentId,
       response: res,
       connectedAt: new Date(),
       lastEventTime: new Date(),
@@ -219,7 +219,7 @@ class FlagStreamingService {
     this.sseClients.set(clientId, client);
 
     // Send initial 'connected' event with current global revision from Redis
-    const globalRevision = await this.getGlobalRevision(environment);
+    const globalRevision = await this.getGlobalRevision(environmentId);
     this.sendSseEvent(clientId, 'connected', { globalRevision });
 
     // Handle connection close
@@ -227,7 +227,7 @@ class FlagStreamingService {
       this.removeClient(clientId);
     });
 
-    logger.debug(`SSE client connected: ${clientId} for env: ${environment}`);
+    logger.debug(`SSE client connected: ${clientId} for env: ${environmentId}`);
   }
 
   /**
@@ -253,10 +253,10 @@ class FlagStreamingService {
    * Add a new WebSocket client connection.
    * Called after HTTP upgrade is handled externally.
    */
-  async addWebSocketClient(clientId: string, environment: string, ws: WebSocket): Promise<void> {
+  async addWebSocketClient(clientId: string, environmentId: string, ws: WebSocket): Promise<void> {
     const client: WebSocketClient = {
       id: clientId,
-      environment,
+      environmentId,
       ws,
       connectedAt: new Date(),
       lastEventTime: new Date(),
@@ -266,7 +266,7 @@ class FlagStreamingService {
     this.wsClients.set(clientId, client);
 
     // Send initial 'connected' event with current global revision from Redis
-    const globalRevision = await this.getGlobalRevision(environment);
+    const globalRevision = await this.getGlobalRevision(environmentId);
     this.sendWebSocketEvent(clientId, 'connected', { globalRevision });
 
     // Handle WebSocket messages (ping/pong, etc.)
@@ -291,7 +291,7 @@ class FlagStreamingService {
       this.removeWebSocketClient(clientId);
     });
 
-    logger.debug(`client connected: ${clientId} for env: ${environment}`);
+    logger.debug(`client connected: ${clientId} for env: ${environmentId}`);
   }
 
   /**
@@ -320,13 +320,13 @@ class FlagStreamingService {
    * Refresh the Edge's feature flag cache, then notify all clients.
    * This ensures clients that immediately re-fetch after notification receive fresh data.
    */
-  private async refreshCacheThenNotify(environment: string, changedKeys: string[]): Promise<void> {
+  private async refreshCacheThenNotify(environmentId: string, changedKeys: string[]): Promise<void> {
     try {
       const sdk = sdkManager.getSDK();
       if (sdk) {
-        await sdk.featureFlag.refreshByEnvironment(environment);
+        await sdk.featureFlag.refreshByEnvironment(environmentId);
         logger.debug(
-          `Edge FlagStreamingService: Cache refreshed for env=${environment} before notify`
+          `Edge FlagStreamingService: Cache refreshed for env=${environmentId} before notify`
         );
       }
     } catch (err) {
@@ -334,11 +334,11 @@ class FlagStreamingService {
       // Still notify clients even if cache refresh fails
     }
 
-    await this.notifyClients(environment, changedKeys);
+    await this.notifyClients(environmentId, changedKeys);
   }
 
-  private async notifyClients(environment: string, changedKeys: string[]): Promise<void> {
-    const newRevision = await this.incrementGlobalRevision(environment);
+  private async notifyClients(environmentId: string, changedKeys: string[]): Promise<void> {
+    const newRevision = await this.incrementGlobalRevision(environmentId);
     const payload = {
       globalRevision: newRevision,
       changedKeys,
@@ -349,7 +349,7 @@ class FlagStreamingService {
 
     // Notify SSE clients
     for (const [clientId, client] of this.sseClients) {
-      if (client.environment === environment) {
+      if (client.environmentId === environmentId) {
         this.sendSseEvent(clientId, 'flags_changed', payload);
         notifiedCount++;
       }
@@ -357,7 +357,7 @@ class FlagStreamingService {
 
     // Notify WebSocket clients
     for (const [clientId, client] of this.wsClients) {
-      if (client.environment === environment) {
+      if (client.environmentId === environmentId) {
         this.sendWebSocketEvent(clientId, 'flags_changed', payload);
         notifiedCount++;
       }
@@ -365,7 +365,7 @@ class FlagStreamingService {
 
     if (notifiedCount > 0) {
       logger.debug(
-        `Edge FlagStreamingService: Notified ${notifiedCount} clients for env=${environment}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
+        `Edge FlagStreamingService: Notified ${notifiedCount} clients for env=${environmentId}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
       );
     }
   }
@@ -465,10 +465,10 @@ class FlagStreamingService {
    * Get current global revision for an environment from Redis.
    * Falls back to 0 if Redis is unavailable.
    */
-  private async getGlobalRevision(environment: string): Promise<number> {
+  private async getGlobalRevision(environmentId: string): Promise<number> {
     if (!this.redisClient) return 0;
     try {
-      const val = await this.redisClient.get(`${REVISION_KEY_PREFIX}${environment}`);
+      const val = await this.redisClient.get(`${REVISION_KEY_PREFIX}${environmentId}`);
       return val ? parseInt(val, 10) : 0;
     } catch (err) {
       logger.warn('Failed to get revision from Redis:', err);
@@ -480,10 +480,10 @@ class FlagStreamingService {
    * Atomically increment and return new global revision for an environment via Redis INCR.
    * This ensures consistency across multiple Edge instances.
    */
-  private async incrementGlobalRevision(environment: string): Promise<number> {
+  private async incrementGlobalRevision(environmentId: string): Promise<number> {
     if (!this.redisClient) return 0;
     try {
-      return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environment}`);
+      return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environmentId}`);
     } catch (err) {
       logger.warn('Failed to increment revision in Redis:', err);
       return 0;
@@ -501,12 +501,12 @@ class FlagStreamingService {
   } {
     const clientsByEnvironment: Record<string, number> = {};
     for (const [, client] of this.sseClients) {
-      clientsByEnvironment[client.environment] =
-        (clientsByEnvironment[client.environment] || 0) + 1;
+      clientsByEnvironment[client.environmentId] =
+        (clientsByEnvironment[client.environmentId] || 0) + 1;
     }
     for (const [, client] of this.wsClients) {
-      clientsByEnvironment[client.environment] =
-        (clientsByEnvironment[client.environment] || 0) + 1;
+      clientsByEnvironment[client.environmentId] =
+        (clientsByEnvironment[client.environmentId] || 0) + 1;
     }
 
     return {

@@ -4,12 +4,12 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IVarsService
 {
-    Task InitializeAsync(string environment, CancellationToken ct = default);
-    Task<List<VarItem>> FetchAsync(string environment, CancellationToken ct = default);
-    Task<List<VarItem>> FetchByEnvironmentAsync(string environment, CancellationToken ct = default);
-    List<VarItem> GetCached(string environment);
-    string? GetValue(string key, string environment);
-    T? GetParsedValue<T>(string key, string environment, System.Text.Json.JsonSerializerOptions? options = null);
-    void UpdateCache(List<VarItem> items, string environment);
+    Task InitializeAsync(string environmentId, CancellationToken ct = default);
+    Task<List<VarItem>> FetchAsync(string environmentId, CancellationToken ct = default);
+    Task<List<VarItem>> FetchByEnvironmentAsync(string environmentId, CancellationToken ct = default);
+    List<VarItem> GetCached(string environmentId);
+    string? GetValue(string key, string environmentId);
+    T? GetParsedValue<T>(string key, string environmentId, System.Text.Json.JsonSerializerOptions? options = null);
+    void UpdateCache(List<VarItem> items, string environmentId);
     void ClearCache();
 }

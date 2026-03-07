@@ -7,13 +7,13 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IGameWorldService
 {
-    Task InitializeAsync(string environment, CancellationToken ct = default);
-    Task<List<GameWorld>> FetchAsync(string environment, CancellationToken ct = default);
-    List<GameWorld> GetCached(string environment);
-    List<GameWorld> GetAll(string environment);
-    GameWorld? GetByWorldId(string worldId, string environment);
-    bool IsWorldMaintenanceActive(string worldId, string environment);
-    string? GetWorldMaintenanceMessage(string worldId, string environment, string lang = "en");
+    Task InitializeAsync(string environmentId, CancellationToken ct = default);
+    Task<List<GameWorld>> FetchAsync(string environmentId, CancellationToken ct = default);
+    List<GameWorld> GetCached(string environmentId);
+    List<GameWorld> GetAll(string environmentId);
+    GameWorld? GetByWorldId(string worldId, string environmentId);
+    bool IsWorldMaintenanceActive(string worldId, string environmentId);
+    string? GetWorldMaintenanceMessage(string worldId, string environmentId, string lang = "en");
 
     /// <summary>
     /// Update a single game world in cache.
@@ -21,10 +21,10 @@ public interface IGameWorldService
     /// If isVisible=true, fetches single item from API and upserts.
     /// Falls back to full refresh on failure.
     /// </summary>
-    Task UpdateSingleWorldAsync(int id, string environment, bool? isVisible = null, CancellationToken ct = default);
+    Task UpdateSingleWorldAsync(int id, string environmentId, bool? isVisible = null, CancellationToken ct = default);
 
     /// <summary>Remove a game world from cache by id.</summary>
-    void RemoveWorld(int id, string environment);
+    void RemoveWorld(int id, string environmentId);
 }
 
 public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListResponse>, IGameWorldService
@@ -33,24 +33,24 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
         : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "GameWorld";
-    protected override string GetEndpoint(string environment) =>
+    protected override string GetEndpoint(string environmentId) =>
         $"/api/v1/server/game-worlds";
     protected override List<GameWorld> ExtractItems(GameWorldListResponse response) =>
         response.Worlds.OrderBy(w => w.DisplayOrder).ToList();
     protected override object GetItemId(GameWorld item) => item.Id;
 
-    public Task<List<GameWorld>> FetchAsync(string environment, CancellationToken ct = default) =>
-        FetchByEnvironmentAsync(environment, ct);
+    public Task<List<GameWorld>> FetchAsync(string environmentId, CancellationToken ct = default) =>
+        FetchByEnvironmentAsync(environmentId, ct);
 
-    public List<GameWorld> GetAll(string environment) => GetCached(environment);
+    public List<GameWorld> GetAll(string environmentId) => GetCached(environmentId);
 
-    public GameWorld? GetByWorldId(string worldId, string environment) =>
-        GetCached(environment).FirstOrDefault(w =>
+    public GameWorld? GetByWorldId(string worldId, string environmentId) =>
+        GetCached(environmentId).FirstOrDefault(w =>
             string.Equals(w.WorldId, worldId, StringComparison.OrdinalIgnoreCase));
 
     // ── Single-item cache operations (event-driven) ─────────────
 
-    public async Task UpdateSingleWorldAsync(int id, string environment, bool? isVisible = null, CancellationToken ct = default)
+    public async Task UpdateSingleWorldAsync(int id, string environmentId, bool? isVisible = null, CancellationToken ct = default)
     {
         try
         {
@@ -58,7 +58,7 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
             if (isVisible == false)
             {
                 Logger.LogInformation("GameWorld isVisible=false, removing from cache (id={Id})", id);
-                RemoveFromCache(id, environment);
+                RemoveFromCache(id, environmentId);
                 return;
             }
 
@@ -72,31 +72,31 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
             if (!response.Success || response.Data is null)
             {
                 Logger.LogDebug("GameWorld not found (id={Id}), removing from cache", id);
-                RemoveFromCache(id, environment);
+                RemoveFromCache(id, environmentId);
                 return;
             }
 
-            UpsertItemInCache(response.Data, environment);
+            UpsertItemInCache(response.Data, environmentId);
             Logger.LogDebug("Single GameWorld upserted in cache (id={Id})", id);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update single GameWorld (id={Id}), falling back to full refresh", id);
-            await FetchByEnvironmentAsync(environment, ct);
+            await FetchByEnvironmentAsync(environmentId, ct);
         }
     }
 
-    public void RemoveWorld(int id, string environment)
+    public void RemoveWorld(int id, string environmentId)
     {
-        RemoveFromCache(id, environment);
+        RemoveFromCache(id, environmentId);
         Logger.LogInformation("GameWorld removed from cache (id={Id})", id);
     }
 
     // ── Maintenance helpers ─────────────────────────────────────
 
-    public bool IsWorldMaintenanceActive(string worldId, string environment)
+    public bool IsWorldMaintenanceActive(string worldId, string environmentId)
     {
-        var world = GetByWorldId(worldId, environment);
+        var world = GetByWorldId(worldId, environmentId);
         if (world is null || !world.IsMaintenance) return false;
 
         var now = DateTime.UtcNow;
@@ -110,9 +110,9 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
         return true;
     }
 
-    public string? GetWorldMaintenanceMessage(string worldId, string environment, string lang = "en")
+    public string? GetWorldMaintenanceMessage(string worldId, string environmentId, string lang = "en")
     {
-        var world = GetByWorldId(worldId, environment);
+        var world = GetByWorldId(worldId, environmentId);
         if (world is null) return null;
 
         if (world.SupportsMultiLanguage == true && world.MaintenanceLocales is { Count: > 0 })

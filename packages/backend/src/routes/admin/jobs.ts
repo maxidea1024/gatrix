@@ -23,6 +23,7 @@ const router = express.Router();
 
 // 모든 Route에 Authentication 및 Admin permission required
 router.use(authenticate as any);
+
 // Job Types Route
 router.get('/job-types', getJobTypes as any);
 router.get('/job-types/:id', getJobType as any);

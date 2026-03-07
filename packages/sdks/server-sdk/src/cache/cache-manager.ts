@@ -1215,10 +1215,10 @@ export class CacheManager {
    * Also checks and emits maintenance state change events
    * @param environment Environment name (required)
    */
-  async refreshGameWorlds(environment: string): Promise<void> {
+  async refreshGameWorlds(environmentId: string): Promise<void> {
     if (!this.gameWorldService) return;
     const start = process.hrtime.bigint();
-    await this.gameWorldService.refreshByEnvironment(environment);
+    await this.gameWorldService.refreshByEnvironment(environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('gameworlds');
@@ -1233,10 +1233,10 @@ export class CacheManager {
    * Refresh popup notices cache
    * @param environment Environment name (required)
    */
-  async refreshPopupNotices(environment: string): Promise<void> {
+  async refreshPopupNotices(environmentId: string): Promise<void> {
     if (!this.popupNoticeService) return;
     const start = process.hrtime.bigint();
-    await this.popupNoticeService.refreshByEnvironment(environment);
+    await this.popupNoticeService.refreshByEnvironment(environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('popups');
@@ -1249,10 +1249,10 @@ export class CacheManager {
    * Refresh surveys cache
    * @param environment Environment name (required)
    */
-  async refreshSurveys(environment: string): Promise<void> {
+  async refreshSurveys(environmentId: string): Promise<void> {
     if (!this.surveyService) return;
     const start = process.hrtime.bigint();
-    await this.surveyService.refreshByEnvironment(environment, {
+    await this.surveyService.refreshByEnvironment(environmentId, {
       isActive: true,
     });
     try {
@@ -1267,8 +1267,8 @@ export class CacheManager {
    * Refresh survey settings only
    * @param environment Environment name (required)
    */
-  async refreshSurveySettings(environment: string): Promise<void> {
-    await this.surveyService?.refreshSettings(environment);
+  async refreshSurveySettings(environmentId: string): Promise<void> {
+    await this.surveyService?.refreshSettings(environmentId);
   }
 
   /**
@@ -1280,10 +1280,10 @@ export class CacheManager {
    */
   async updateSingleGameWorld(
     id: number,
-    environment: string,
+    environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
-    await this.gameWorldService?.updateSingleWorld(id, environment, isVisible);
+    await this.gameWorldService?.updateSingleWorld(id, environmentId, isVisible);
     // Check maintenance state changes after update
     this.checkMaintenanceStateChanges();
   }
@@ -1339,8 +1339,8 @@ export class CacheManager {
    * Get cached game worlds
    * @param environment Environment name (required)
    */
-  getGameWorlds(environment: string): any[] {
-    return this.gameWorldService?.getCached(environment) || [];
+  getGameWorlds(environmentId: string): any[] {
+    return this.gameWorldService?.getCached(environmentId) || [];
   }
 
   /**
@@ -1348,8 +1348,8 @@ export class CacheManager {
    * @param id Game world ID
    * @param environment Environment name (required)
    */
-  removeGameWorld(id: number, environment: string): void {
-    this.gameWorldService?.removeFromCache(id, environment);
+  removeGameWorld(id: number, environmentId: string): void {
+    this.gameWorldService?.removeFromCache(id, environmentId);
   }
 
   /**
@@ -1360,10 +1360,10 @@ export class CacheManager {
    */
   async updateSinglePopupNotice(
     id: number,
-    environment: string,
+    environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
-    await this.popupNoticeService?.updateSingleNotice(id, environment, isVisible);
+    await this.popupNoticeService?.updateSingleNotice(id, environmentId, isVisible);
   }
 
   /**
@@ -1371,8 +1371,8 @@ export class CacheManager {
    * @param id Popup notice ID
    * @param environment Environment name (required)
    */
-  removePopupNotice(id: number, environment: string): void {
-    this.popupNoticeService?.removeFromCache(id, environment);
+  removePopupNotice(id: number, environmentId: string): void {
+    this.popupNoticeService?.removeFromCache(id, environmentId);
   }
 
   /**
@@ -1383,10 +1383,10 @@ export class CacheManager {
    */
   async updateSingleSurvey(
     id: string,
-    environment: string,
+    environmentId: string,
     isActive?: boolean | number
   ): Promise<void> {
-    await this.surveyService?.updateSingleSurvey(id, environment, isActive);
+    await this.surveyService?.updateSingleSurvey(id, environmentId, isActive);
   }
 
   /**
@@ -1394,19 +1394,19 @@ export class CacheManager {
    * @param id Survey ID
    * @param environment Environment name (required)
    */
-  removeSurvey(id: string, environment: string): void {
-    this.surveyService?.removeSurvey(id, environment);
+  removeSurvey(id: string, environmentId: string): void {
+    this.surveyService?.removeSurvey(id, environmentId);
   }
 
   /**
    * Refresh whitelist cache only
    * @param environment Environment name (required)
    */
-  async refreshWhitelists(environment: string): Promise<void> {
+  async refreshWhitelists(environmentId: string): Promise<void> {
     if (!this.whitelistService) return;
     this.logger.info('Refreshing whitelist cache...');
     const start = process.hrtime.bigint();
-    await this.whitelistService.refreshByEnvironment(environment);
+    await this.whitelistService.refreshByEnvironment(environmentId);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('whitelists');
@@ -1419,8 +1419,8 @@ export class CacheManager {
    * Get cached whitelists
    * @param environment Environment name (required)
    */
-  getWhitelists(environment: string) {
-    return this.whitelistService?.getCached(environment);
+  getWhitelists(environmentId: string) {
+    return this.whitelistService?.getCached(environmentId);
   }
 
   /**
@@ -1428,12 +1428,12 @@ export class CacheManager {
    * Used by refreshAll() to avoid duplicate state checks
    * @param environment Environment name (required)
    */
-  private async refreshServiceMaintenanceInternal(environment: string): Promise<void> {
+  private async refreshServiceMaintenanceInternal(environmentId: string): Promise<void> {
     if (!this.serviceMaintenanceService) return;
     this.logger.info('Refreshing service maintenance cache...');
     const start = process.hrtime.bigint();
     try {
-      const status = await this.serviceMaintenanceService.refreshByEnvironment(environment, true); // suppressWarnings=true for refreshAll
+      const status = await this.serviceMaintenanceService.refreshByEnvironment(environmentId, true); // suppressWarnings=true for refreshAll
       this.emitRefreshEvent('serviceMaintenance', status);
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       try {
@@ -1453,10 +1453,10 @@ export class CacheManager {
    * Also checks and emits maintenance state change events
    * @param environment Environment name (required)
    */
-  async refreshServiceMaintenance(environment: string): Promise<void> {
-    await this.refreshServiceMaintenanceInternal(environment);
+  async refreshServiceMaintenance(environmentId: string): Promise<void> {
+    await this.refreshServiceMaintenanceInternal(environmentId);
     // Check maintenance state changes after refresh
-    this.checkMaintenanceStateChanges(environment);
+    this.checkMaintenanceStateChanges(environmentId);
   }
 
   /**
@@ -1464,12 +1464,12 @@ export class CacheManager {
    * Compares current state with previous state and emits events if changed
    * @param environment Optional environment name. If not provided, checks all cached environments.
    */
-  private checkMaintenanceStateChanges(environment?: string): void {
+  private checkMaintenanceStateChanges(environmentId?: string): void {
     try {
-      if (environment) {
+      if (environmentId) {
         // Check specific environment
-        const serviceStatus = this.serviceMaintenanceService?.getCached(environment) || null;
-        const gameWorlds = this.gameWorldService?.getCached(environment) || [];
+        const serviceStatus = this.serviceMaintenanceService?.getCached(environmentId) || null;
+        const gameWorlds = this.gameWorldService?.getCached(environmentId) || [];
         this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
       } else {
         // Check all cached environments (for multi-env mode or when environment is not specified)
@@ -1496,8 +1496,8 @@ export class CacheManager {
    * Get cached service maintenance status
    * @param environment Environment name (required)
    */
-  getServiceMaintenanceStatus(environment: string): MaintenanceStatus | null {
-    return this.serviceMaintenanceService?.getCached(environment) || null;
+  getServiceMaintenanceStatus(environmentId: string): MaintenanceStatus | null {
+    return this.serviceMaintenanceService?.getCached(environmentId) || null;
   }
 
   /**
@@ -1524,8 +1524,8 @@ export class CacheManager {
    * Get cached client versions
    * @param environment Environment name (required)
    */
-  getClientVersions(environment: string): ClientVersion[] {
-    return this.clientVersionService?.getCached(environment) || [];
+  getClientVersions(environmentId: string): ClientVersion[] {
+    return this.clientVersionService?.getCached(environmentId) || [];
   }
 
   /**
@@ -1533,16 +1533,16 @@ export class CacheManager {
    * @param item Client version to update
    * @param environment Environment name (required)
    */
-  async updateSingleClientVersion(item: any, environment: string): Promise<void> {
-    this.clientVersionService?.updateSingleClientVersion(item, environment);
+  async updateSingleClientVersion(item: any, environmentId: string): Promise<void> {
+    this.clientVersionService?.updateSingleClientVersion(item, environmentId);
   }
 
   /**
    * Get cached service notices
    * @param environment Environment name (required)
    */
-  getServiceNotices(environment: string): ServiceNotice[] {
-    return this.serviceNoticeService?.getCached(environment) || [];
+  getServiceNotices(environmentId: string): ServiceNotice[] {
+    return this.serviceNoticeService?.getCached(environmentId) || [];
   }
 
   /**
@@ -1550,16 +1550,16 @@ export class CacheManager {
    * @param notice Service notice to update
    * @param environment Environment name (required)
    */
-  async updateSingleServiceNotice(notice: any, environment: string): Promise<void> {
-    this.serviceNoticeService?.updateSingleServiceNotice(notice, environment);
+  async updateSingleServiceNotice(notice: any, environmentId: string): Promise<void> {
+    this.serviceNoticeService?.updateSingleServiceNotice(notice, environmentId);
   }
 
   /**
    * Get cached banners
    * @param environment Environment name (required)
    */
-  getBanners(environment: string): Banner[] {
-    return this.bannerService?.getCached(environment) || [];
+  getBanners(environmentId: string): Banner[] {
+    return this.bannerService?.getCached(environmentId) || [];
   }
 
   // ==================== SERVICE GETTERS ====================
@@ -1624,8 +1624,8 @@ export class CacheManager {
    * Get cached store products
    * @param environment Environment name (required)
    */
-  getStoreProducts(environment: string): StoreProduct[] {
-    return this.storeProductService?.getCached(environment) || [];
+  getStoreProducts(environmentId: string): StoreProduct[] {
+    return this.storeProductService?.getCached(environmentId) || [];
   }
 
   /**
@@ -1653,8 +1653,8 @@ export class CacheManager {
    * Get cached vars
    * @param environment Environment name (required)
    */
-  getVars(environment: string): any[] {
-    return this.varsService?.getCached(environment) || [];
+  getVars(environmentId: string): any[] {
+    return this.varsService?.getCached(environmentId) || [];
   }
 
   /**
@@ -1665,10 +1665,10 @@ export class CacheManager {
    */
   async updateSingleStoreProduct(
     id: string,
-    environment: string,
+    environmentId: string,
     isActive?: boolean | number
   ): Promise<void> {
-    await this.storeProductService?.updateSingleProduct(id, environment, isActive);
+    await this.storeProductService?.updateSingleProduct(id, environmentId, isActive);
   }
 
   /**
@@ -1676,16 +1676,16 @@ export class CacheManager {
    * @param id Store product ID
    * @param environment Environment name (required)
    */
-  removeStoreProduct(id: string, environment: string): void {
-    this.storeProductService?.removeFromCache(id, environment);
+  removeStoreProduct(id: string, environmentId: string): void {
+    this.storeProductService?.removeFromCache(id, environmentId);
   }
 
   /**
    * Refresh store products cache for an environment
    * @param environment Environment name (required)
    */
-  async refreshStoreProducts(environment: string): Promise<void> {
-    await this.storeProductService?.refreshByEnvironment(environment);
+  async refreshStoreProducts(environmentId: string): Promise<void> {
+    await this.storeProductService?.refreshByEnvironment(environmentId);
   }
 
   /**
@@ -1694,8 +1694,8 @@ export class CacheManager {
    * @param environment Environment name (required)
    * @param status Optional status
    */
-  async updateSingleBanner(bannerId: string, environment: string, status?: string): Promise<void> {
-    await this.bannerService?.updateSingleBanner(bannerId, environment, status);
+  async updateSingleBanner(bannerId: string, environmentId: string, status?: string): Promise<void> {
+    await this.bannerService?.updateSingleBanner(bannerId, environmentId, status);
   }
 
   /**
@@ -1703,8 +1703,8 @@ export class CacheManager {
    * @param bannerId Banner ID
    * @param environment Environment name (required)
    */
-  removeBanner(bannerId: string, environment: string): void {
-    this.bannerService?.removeFromCache(bannerId, environment);
+  removeBanner(bannerId: string, environmentId: string): void {
+    this.bannerService?.removeFromCache(bannerId, environmentId);
   }
 
   /**

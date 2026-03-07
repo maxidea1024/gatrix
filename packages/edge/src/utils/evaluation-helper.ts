@@ -38,7 +38,7 @@ export async function performEvaluation(
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environment, applicationName } = clientContext;
+    const { environmentId, applicationName } = clientContext;
 
     // 1. Extract context and flag names from request
     const { context, flagNames } = EvaluationUtils.extractFromRequest(req);
@@ -47,7 +47,7 @@ export async function performEvaluation(
     if (!context.appName) {
       context.appName = applicationName;
     }
-    context.environment = environment;
+    context.environment = environmentId;
 
     // 2. Evaluate flags
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,14 +57,14 @@ export async function performEvaluation(
     let keysToEvaluate =
       flagNames.length > 0
         ? flagNames
-        : sdk.featureFlag.getCached(environment).map((f: any) => f.name);
+        : sdk.featureFlag.getCached(environmentId).map((f: any) => f.name);
 
     // Sort keys to ensure consistent iteration order
     keysToEvaluate = [...keysToEvaluate].sort();
 
     for (const key of keysToEvaluate) {
-      const result = sdk.featureFlag.evaluate(key, context, environment);
-      const flagDef = sdk.featureFlag.getFlagByName(environment, key);
+      const result = sdk.featureFlag.evaluate(key, context, environmentId);
+      const flagDef = sdk.featureFlag.getFlagByName(environmentId, key);
 
       // Format result using common utility
       results[key] = EvaluationUtils.formatResult(
@@ -79,7 +79,7 @@ export async function performEvaluation(
           enabledValue: result.enabled ? (result.variant?.value ?? undefined) : undefined,
           disabledValue: !result.enabled ? (result.variant?.value ?? undefined) : undefined,
         },
-        environment
+        environmentId
       );
     }
 
@@ -91,7 +91,7 @@ export async function performEvaluation(
         flags: flagsArray,
       },
       meta: {
-        environment,
+        environmentId,
         evaluatedAt: new Date().toISOString(),
       },
     };

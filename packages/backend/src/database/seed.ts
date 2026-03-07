@@ -88,10 +88,11 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
 
   for (const e of environments) {
     await database.query(
-      `INSERT INTO g_environments (id, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
-       VALUES (?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      `INSERT INTO g_environments (id, name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, requiresApproval, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, TRUE, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
       [
         ulid(),
+        e.env,
         e.displayName,
         e.type,
         e.order,

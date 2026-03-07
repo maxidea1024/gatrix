@@ -19,14 +19,14 @@ const router = Router();
  */
 function serverAuth(req: Request, res: Response, next: NextFunction): void {
   const apiToken = req.headers['x-api-token'] as string;
-  const environment = req.params.env;
+  const environmentId = req.params.env;
 
   if (!apiToken) {
     sendUnauthorized(res, 'x-api-token header is required', ErrorCodes.AUTH_TOKEN_REQUIRED);
     return;
   }
 
-  const validation = tokenMirrorService.validateToken(apiToken, 'server', environment);
+  const validation = tokenMirrorService.validateToken(apiToken, 'server', environmentId);
   if (!validation.valid) {
     sendUnauthorized(
       res,

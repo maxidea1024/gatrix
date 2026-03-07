@@ -101,8 +101,6 @@ internal class GatrixSdkOptionsValidator : IValidateOptions<GatrixSdkOptions>
             return ValidateOptionsResult.Fail("Gatrix:Service is required");
         if (string.IsNullOrWhiteSpace(options.Group))
             return ValidateOptionsResult.Fail("Gatrix:Group is required");
-        if (string.IsNullOrWhiteSpace(options.Environment))
-            return ValidateOptionsResult.Fail("Gatrix:Environment is required");
 
         return ValidateOptionsResult.Success;
     }

@@ -18,7 +18,7 @@ export interface ClientRequest extends Request {
      * Environment identifier (environmentName value).
      * This is the standard external identifier for environments.
      */
-    environment: string;
+    environmentId: string;
     clientVersion?: string;
     platform?: string;
     tokenName?: string;
@@ -54,7 +54,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     (req.query.applicationName as string);
 
   // Get environment from URL path parameter instead of header
-  const environment = req.params.environment as string;
+  const environmentId = req.params.environment as string;
   const clientVersion = req.headers['x-client-version'] as string | undefined;
   const platform = req.headers['x-platform'] as string | undefined;
 
@@ -92,17 +92,17 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     req.clientContext = {
       apiToken,
       applicationName,
-      environment,
+      environmentId,
       clientVersion,
       platform,
       tokenName: 'Unsecured Testing Token',
     };
-    logger.debug('Authenticated with unsecured token', { token: apiToken, environment });
+    logger.debug('Authenticated with unsecured token', { token: apiToken, environmentId });
     return next();
   }
 
   // Validate environment from path parameter
-  if (!environment) {
+  if (!environmentId) {
     res.status(400).json({
       success: false,
       error: {
@@ -114,7 +114,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
   }
 
   // Validate API token using mirrored tokens
-  const validation = tokenMirrorService.validateToken(apiToken, 'client', environment);
+  const validation = tokenMirrorService.validateToken(apiToken, 'client', environmentId);
 
   if (!validation.valid) {
     const errorMessages: Record<string, { code: string; message: string }> = {
@@ -134,7 +134,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
 
     logger.warn('Client authentication failed', {
       reason: validation.reason,
-      environment,
+      environmentId,
       applicationName,
     });
 
@@ -154,7 +154,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
   req.clientContext = {
     apiToken,
     applicationName,
-    environment,
+    environmentId,
     clientVersion,
     platform,
     tokenName: validation.token?.tokenName,
@@ -162,7 +162,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
 
   logger.debug('Client authenticated', {
     applicationName,
-    environment,
+    environmentId,
     clientVersion,
     platform,
     tokenName: validation.token?.tokenName,

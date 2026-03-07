@@ -7,7 +7,7 @@
 
 import { GatrixServerSDK } from '../src/index';
 
-const environment = process.env.ENVIRONMENT || 'development';
+const environmentId = process.env.ENVIRONMENT || 'development';
 
 async function main() {
   console.log('='.repeat(60));
@@ -20,7 +20,7 @@ async function main() {
     applicationName: 'feature-flag-test',
     service: 'test',
     group: 'development',
-    environment,
+
 
     cache: {
       enabled: true,
@@ -51,7 +51,7 @@ async function main() {
 
     // Test 1: Get all cached flags
     console.log('\n[2] Testing getCached()...');
-    const allFlags = sdk.featureFlag.getCached(environment);
+    const allFlags = sdk.featureFlag.getCached(environmentId);
     console.log(`    ✓ Retrieved ${allFlags.length} flags`);
     allFlags.forEach((flag) => {
       console.log(
@@ -68,7 +68,7 @@ async function main() {
     // Test 2: Get specific flag by name
     console.log('\n[3] Testing getFlagByName()...');
     const testFlagName = allFlags[0].name;
-    const flag = sdk.featureFlag.getFlagByName(environment, testFlagName);
+    const flag = sdk.featureFlag.getFlagByName(environmentId, testFlagName);
     if (flag) {
       console.log(`    ✓ Found flag: ${flag.name}`);
       console.log(`      - isEnabled: ${flag.isEnabled}`);
@@ -92,7 +92,7 @@ async function main() {
       // Test up to 3 flags
       console.log(`\n    Flag: ${testFlag.name}`);
       for (const context of testContexts) {
-        const result = sdk.featureFlag.evaluate(testFlag.name, context, environment);
+        const result = sdk.featureFlag.evaluate(testFlag.name, context, environmentId);
         const variantInfo = result.variant ? `, variant=${result.variant.name}` : '';
         console.log(
           `      userId=${context.userId} → enabled=${result.enabled}, reason=${result.reason}${variantInfo}`
@@ -105,14 +105,14 @@ async function main() {
     const testContext = { userId: 'test-user' };
 
     // Boolean variation (flagName, context, environment, defaultValue)
-    const boolResult = sdk.featureFlag.boolVariation(testFlagName, testContext, environment, false);
+    const boolResult = sdk.featureFlag.boolVariation(testFlagName, testContext, environmentId, false);
     console.log(`    boolVariation('${testFlagName}'): ${boolResult}`);
 
     // Boolean variation detail
     const boolDetailResult = sdk.featureFlag.boolVariationDetail(
       testFlagName,
       testContext,
-      environment,
+      environmentId,
       false
     );
     console.log(
@@ -123,17 +123,17 @@ async function main() {
     const stringResult = sdk.featureFlag.stringVariation(
       testFlagName,
       testContext,
-      environment,
+      environmentId,
       'default'
     );
     console.log(`    stringVariation: ${stringResult}`);
 
     // Number variation
-    const numberResult = sdk.featureFlag.numberVariation(testFlagName, testContext, environment, 0);
+    const numberResult = sdk.featureFlag.numberVariation(testFlagName, testContext, environmentId, 0);
     console.log(`    numberVariation: ${numberResult}`);
 
     // JSON variation
-    const jsonResult = sdk.featureFlag.jsonVariation(testFlagName, testContext, environment, {});
+    const jsonResult = sdk.featureFlag.jsonVariation(testFlagName, testContext, environmentId, {});
     console.log(`    jsonVariation: ${JSON.stringify(jsonResult)}`);
 
     // Test 5: Test rollout consistency (stickiness)
@@ -144,7 +144,7 @@ async function main() {
     const consistentContext = { userId: 'sticky-user-123' };
     const results: boolean[] = [];
     for (let i = 0; i < 10; i++) {
-      const result = sdk.featureFlag.evaluate(testFlagName, consistentContext, environment);
+      const result = sdk.featureFlag.evaluate(testFlagName, consistentContext, environmentId);
       results.push(result.enabled);
     }
     const allSame = results.every((r) => r === results[0]);

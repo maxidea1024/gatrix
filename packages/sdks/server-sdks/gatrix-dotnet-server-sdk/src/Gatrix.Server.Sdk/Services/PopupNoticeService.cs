@@ -8,15 +8,15 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IPopupNoticeService
 {
-    Task InitializeAsync(string environment, CancellationToken ct = default);
-    Task<List<PopupNotice>> FetchAsync(string environment, CancellationToken ct = default);
-    List<PopupNotice> GetCached(string environment);
-    List<PopupNotice> GetAll(string environment);
-    List<PopupNotice> GetForWorld(string worldId, string environment);
-    List<PopupNotice> GetActive(string environment, string? platform = null,
+    Task InitializeAsync(string environmentId, CancellationToken ct = default);
+    Task<List<PopupNotice>> FetchAsync(string environmentId, CancellationToken ct = default);
+    List<PopupNotice> GetCached(string environmentId);
+    List<PopupNotice> GetAll(string environmentId);
+    List<PopupNotice> GetForWorld(string worldId, string environmentId);
+    List<PopupNotice> GetActive(string environmentId, string? platform = null,
         string? channel = null, string? worldId = null, string? userId = null);
-    Task UpdateSingleNoticeAsync(int id, string environment, bool? isVisible = null, CancellationToken ct = default);
-    void RemoveNotice(int id, string environment);
+    Task UpdateSingleNoticeAsync(int id, string environmentId, bool? isVisible = null, CancellationToken ct = default);
+    void RemoveNotice(int id, string environmentId);
 }
 
 internal class PopupNoticeByIdResponse
@@ -30,25 +30,25 @@ public class PopupNoticeService : BaseEnvironmentService<PopupNotice, List<Popup
         : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "PopupNotice";
-    protected override string GetEndpoint(string environment) =>
+    protected override string GetEndpoint(string environmentId) =>
         $"/api/v1/server/ingame-popup-notices";
     protected override List<PopupNotice> ExtractItems(List<PopupNotice> response) => response;
     protected override object GetItemId(PopupNotice item) => item.Id;
 
-    public Task<List<PopupNotice>> FetchAsync(string environment, CancellationToken ct = default) =>
-        FetchByEnvironmentAsync(environment, ct);
-    public List<PopupNotice> GetAll(string environment) => GetCached(environment);
+    public Task<List<PopupNotice>> FetchAsync(string environmentId, CancellationToken ct = default) =>
+        FetchByEnvironmentAsync(environmentId, ct);
+    public List<PopupNotice> GetAll(string environmentId) => GetCached(environmentId);
 
     // ── Single-item cache operations (event-driven) ─────────────
 
-    public async Task UpdateSingleNoticeAsync(int id, string environment, bool? isVisible = null, CancellationToken ct = default)
+    public async Task UpdateSingleNoticeAsync(int id, string environmentId, bool? isVisible = null, CancellationToken ct = default)
     {
         try
         {
             if (isVisible == false)
             {
                 Logger.LogInformation("PopupNotice isVisible=false, removing from cache (id={Id})", id);
-                RemoveFromCache(id, environment);
+                RemoveFromCache(id, environmentId);
                 return;
             }
 
@@ -60,36 +60,36 @@ public class PopupNoticeService : BaseEnvironmentService<PopupNotice, List<Popup
             if (!response.Success || response.Data?.Notice is null)
             {
                 Logger.LogDebug("PopupNotice not found (id={Id}), removing from cache", id);
-                RemoveFromCache(id, environment);
+                RemoveFromCache(id, environmentId);
                 return;
             }
 
-            UpsertItemInCache(response.Data.Notice, environment);
+            UpsertItemInCache(response.Data.Notice, environmentId);
             Logger.LogDebug("Single PopupNotice upserted in cache (id={Id})", id);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update single PopupNotice (id={Id}), falling back to full refresh", id);
-            await FetchByEnvironmentAsync(environment, ct);
+            await FetchByEnvironmentAsync(environmentId, ct);
         }
     }
 
-    public void RemoveNotice(int id, string environment)
+    public void RemoveNotice(int id, string environmentId)
     {
-        RemoveFromCache(id, environment);
+        RemoveFromCache(id, environmentId);
         Logger.LogInformation("PopupNotice removed from cache (id={Id})", id);
     }
 
     // ── Targeting ───────────────────────────────────────────────
 
-    public List<PopupNotice> GetForWorld(string worldId, string environment) =>
-        GetCached(environment).Where(n => MatchesTarget(n.TargetWorlds, n.TargetWorldsInverted, worldId)).ToList();
+    public List<PopupNotice> GetForWorld(string worldId, string environmentId) =>
+        GetCached(environmentId).Where(n => MatchesTarget(n.TargetWorlds, n.TargetWorldsInverted, worldId)).ToList();
 
-    public List<PopupNotice> GetActive(string environment, string? platform = null,
+    public List<PopupNotice> GetActive(string environmentId, string? platform = null,
         string? channel = null, string? worldId = null, string? userId = null)
     {
         var now = DateTime.UtcNow;
-        return GetCached(environment)
+        return GetCached(environmentId)
             .Where(n =>
             {
                 if (n.StartDate is not null && DateTime.Parse(n.StartDate) > now) return false;

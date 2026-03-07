@@ -7,12 +7,12 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IServiceNoticeService
 {
-    Task InitializeAsync(string environment, CancellationToken ct = default);
-    Task<List<ServiceNotice>> FetchAsync(string environment, CancellationToken ct = default);
-    List<ServiceNotice> GetCached(string environment);
-    List<ServiceNotice> GetAll(string environment);
-    void UpsertSingle(ServiceNotice item, string environment);
-    void Remove(int id, string environment);
+    Task InitializeAsync(string environmentId, CancellationToken ct = default);
+    Task<List<ServiceNotice>> FetchAsync(string environmentId, CancellationToken ct = default);
+    List<ServiceNotice> GetCached(string environmentId);
+    List<ServiceNotice> GetAll(string environmentId);
+    void UpsertSingle(ServiceNotice item, string environmentId);
+    void Remove(int id, string environmentId);
 }
 
 public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<ServiceNotice>>, IServiceNoticeService
@@ -21,15 +21,15 @@ public class ServiceNoticeService : BaseEnvironmentService<ServiceNotice, List<S
         : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "ServiceNotice";
-    protected override string GetEndpoint(string environment) =>
+    protected override string GetEndpoint(string environmentId) =>
         $"/api/v1/server/service-notices";
     protected override List<ServiceNotice> ExtractItems(List<ServiceNotice> response) => response;
     protected override object GetItemId(ServiceNotice item) => item.Id;
 
-    public Task<List<ServiceNotice>> FetchAsync(string environment, CancellationToken ct = default) =>
-        FetchByEnvironmentAsync(environment, ct);
+    public Task<List<ServiceNotice>> FetchAsync(string environmentId, CancellationToken ct = default) =>
+        FetchByEnvironmentAsync(environmentId, ct);
 
-    public List<ServiceNotice> GetAll(string environment) => GetCached(environment);
-    public void UpsertSingle(ServiceNotice item, string environment) => UpsertItemInCache(item, environment);
-    public void Remove(int id, string environment) => RemoveFromCache(id, environment);
+    public List<ServiceNotice> GetAll(string environmentId) => GetCached(environmentId);
+    public void UpsertSingle(ServiceNotice item, string environmentId) => UpsertItemInCache(item, environmentId);
+    public void Remove(int id, string environmentId) => RemoveFromCache(id, environmentId);
 }

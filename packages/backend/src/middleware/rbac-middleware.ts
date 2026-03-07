@@ -102,8 +102,8 @@ export const requireProjectPermission = (perm: string) => {
 
 /**
  * Require an environment-level permission.
- * Resolves environment from: req.params.environmentId ??req.environmentId ??X-Environment-Id header
- * Auto-resolves the full chain: environment ??project ??organisation
+ * Resolves environment from: req.params.environmentId -> req.environmentId -> X-Environment-Id header
+ * Auto-resolves the full chain: environment -> project -> organisation
  */
 export const requireEnvPermission = (perm: string) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -124,7 +124,7 @@ export const requireEnvPermission = (perm: string) => {
         return;
       }
 
-      // Resolve full chain: environment ??project ??org
+      // Resolve full chain: environment -> project -> org
       const chain = await permissionService.resolveEnvironmentChain(environmentId);
       if (!chain) {
         next(new GatrixError('Environment not found', 404));
@@ -190,8 +190,8 @@ export const requireOrgAdmin = async (
       return;
     }
 
-    const isAdmin = await permissionService.isOrgAdmin(userId, orgId);
-    if (!isAdmin) {
+    const isOrgAdmin = await permissionService.isOrgAdmin(userId, orgId);
+    if (!isOrgAdmin) {
       logger.warn('Org admin access denied', { userId, orgId, path: req.path });
       next(new GatrixError('Admin access required', 403));
       return;

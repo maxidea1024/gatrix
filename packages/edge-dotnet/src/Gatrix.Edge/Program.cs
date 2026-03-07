@@ -61,10 +61,6 @@ builder.Services.AddGatrixServerSdk(options =>
     options.ApplicationName = edgeOptions.ApplicationName;
     options.Service = edgeOptions.Service;
     options.Group = edgeOptions.Group;
-    options.Environment = edgeOptions.Environment;
-
-    // Multi-environment mode
-    options.Environments = edgeOptions.Environments;
 
     options.Redis = new Gatrix.Server.Sdk.Options.RedisOptions
     {
@@ -107,7 +103,6 @@ builder.Services.AddHttpClient("GatrixBackend", client =>
     // Add default headers for authentication and environment
     client.DefaultRequestHeaders.Add("X-API-Token", edgeOptions.ApiToken);
     client.DefaultRequestHeaders.Add("X-Application-Name", edgeOptions.ApplicationName);
-    client.DefaultRequestHeaders.Add("X-Environment", edgeOptions.Environment);
 });
 
 // Add Edge-specific Services

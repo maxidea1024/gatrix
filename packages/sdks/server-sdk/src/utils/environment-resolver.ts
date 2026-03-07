@@ -49,9 +49,9 @@ export class EnvironmentResolver {
    * @returns Resolved environment name
    * @throws Error if environment is not provided in multi-environment mode
    */
-  resolve(environment?: string, context: string = 'method'): string {
-    if (environment) {
-      return environment;
+  resolve(environmentId?: string, context: string = 'method'): string {
+    if (environmentId) {
+      return environmentId;
     }
 
     if (this.multiEnvironmentMode) {
@@ -69,9 +69,9 @@ export class EnvironmentResolver {
    * @param environment Optional environment parameter
    * @returns Resolved environment name or undefined
    */
-  resolveOrUndefined(environment?: string): string | undefined {
-    if (environment) {
-      return environment;
+  resolveOrUndefined(environmentId?: string): string | undefined {
+    if (environmentId) {
+      return environmentId;
     }
 
     if (this.multiEnvironmentMode) {

@@ -4,10 +4,10 @@ import { UserModel } from '../models/user';
 import { GatrixError } from './error-handler';
 import { createLogger } from '../config/logger';
 import db from '../config/knex';
-
-const logger = createLogger('auth');
 import { permissionService } from '../services/permission-service';
 import { AppUser, AuthenticatedRequest } from '../types/auth';
+
+const logger = createLogger('auth');
 
 export type { AuthenticatedRequest };
 

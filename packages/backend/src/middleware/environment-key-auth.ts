@@ -127,21 +127,9 @@ export const authenticateEnvironmentKey = async (
       req.isEdgeBypassToken = special.isEdgeBypass || false;
       req.keyType = special.keyType === 'all' ? 'server' : special.keyType;
 
-      // For unsecured, resolve environment from header
-      const envName =
-        (req.headers[HEADERS.X_ENVIRONMENT] as string) ||
-        (req.params.env as string) ||
-        (req.params.environmentId as string) ||
-        (req.query.environmentId as string);
-
-      if (envName) {
-        req.environmentId = envName;
-        const envModel = await Environment.getById(envName);
-        if (envModel) {
-          req.environmentModel = envModel;
-          req.projectId = (envModel as any).projectId;
-        }
-      }
+      // Unsecured tokens with legacy format do not carry environment info.
+      // Use the new format (unsecured-{org}:{project}:{env}-{type}-api-token)
+      // via api-token-auth.ts instead.
 
       return next();
     }

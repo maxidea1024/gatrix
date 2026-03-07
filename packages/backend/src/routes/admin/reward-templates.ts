@@ -6,6 +6,7 @@ const router = Router();
 
 // All reward template routes require authentication and admin role
 router.use(authenticate as any);
+
 // Reward template CRUD routes
 router.get('/', RewardTemplateController.getRewardTemplates);
 router.get('/:id/references', RewardTemplateController.checkReferences);

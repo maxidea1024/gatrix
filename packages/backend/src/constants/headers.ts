@@ -58,11 +58,6 @@ export const API_HEADERS = {
   X_APPLICATION_NAME: 'x-application-name',
 
   /**
-   * 환경 이름 Headers (SDK용)
-   */
-  X_ENVIRONMENT: 'x-environment-id',
-
-  /**
    * Used자 ID Headers (Chat Server용)
    */
   X_USER_ID: 'x-user-id',
@@ -231,11 +226,8 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.AUTHORIZATION,
   HEADERS.X_REQUESTED_WITH,
   HEADERS.X_API_TOKEN,
-  HEADERS.X_USER_ID,
   HEADERS.X_APPLICATION_NAME,
   HEADERS.X_REQUEST_ID,
-  HEADERS.X_ENVIRONMENT,
-  HEADERS.X_CONNECTION_ID,
   HEADERS.X_SESSION_ID,
   HEADERS.IF_NONE_MATCH,
   HEADERS.X_SDK_VERSION,

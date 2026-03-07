@@ -1,3 +1,4 @@
+using Gatrix.Edge.Middleware;
 using Gatrix.Server.Sdk.Cache;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,13 +7,15 @@ namespace Gatrix.Edge.Controllers;
 public partial class PublicController : ControllerBase
 {
     /// <summary>
-    /// GET /public/{environment}/service-notices
+    /// GET /public/service-notices
+    /// Environment resolved from token.
     /// </summary>
-    [HttpGet("{environment}/service-notices")]
-    public IActionResult GetServiceNotices(string environment,
-        [FromQuery] string? platform, [FromQuery] string? fields)
+    [HttpGet("service-notices")]
+    public IActionResult GetServiceNotices([FromQuery] string? platform, [FromQuery] string? fields)
     {
-        var envNotices = _cacheManager.GetServiceNotices(environment);
+        var ctx = HttpContext.GetClientContext()!;
+        var environmentId = ctx.Environment;
+        var envNotices = _cacheManager.GetServiceNotices(environmentId);
 
         // Filter by platform
         var filtered = platform != null
@@ -35,7 +38,7 @@ public partial class PublicController : ControllerBase
         }
 
         _logger.LogDebug("Public service notices retrieved: env={Environment}, platform={Platform}, count={Count}",
-            environment, platform, filtered.Count);
+            environmentId, platform, filtered.Count);
 
         // Disable HTTP caching
         Response.Headers.CacheControl = "no-store, no-cache, must-revalidate, proxy-revalidate";
@@ -51,12 +54,14 @@ public partial class PublicController : ControllerBase
     }
 
     /// <summary>
-    /// GET /public/{environment}/service-notices/{noticeId}
+    /// GET /public/service-notices/{noticeId}
     /// </summary>
-    [HttpGet("{environment}/service-notices/{noticeId:int}")]
-    public IActionResult GetServiceNotice(string environment, int noticeId)
+    [HttpGet("service-notices/{noticeId:int}")]
+    public IActionResult GetServiceNotice(int noticeId)
     {
-        var envNotices = _cacheManager.GetServiceNotices(environment);
+        var ctx = HttpContext.GetClientContext()!;
+        var environmentId = ctx.Environment;
+        var envNotices = _cacheManager.GetServiceNotices(environmentId);
         var notice = envNotices.FirstOrDefault(n => n.Id == noticeId);
 
         if (notice == null)

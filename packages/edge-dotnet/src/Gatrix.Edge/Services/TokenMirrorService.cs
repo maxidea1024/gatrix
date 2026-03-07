@@ -222,7 +222,7 @@ public class TokenMirrorService : IHostedService, IDisposable
     /// <summary>
     /// Validate a token locally.
     /// </summary>
-    public TokenValidationResult ValidateToken(string tokenValue, string requiredType, string? environment = null)
+    public TokenValidationResult ValidateToken(string tokenValue, string requiredType, string? environmentId = null)
     {
         // Check unsecured client token
         if (tokenValue == _options.UnsecuredClientToken)
@@ -266,9 +266,9 @@ public class TokenMirrorService : IHostedService, IDisposable
         }
 
         // Check environment access
-        if (environment != null && !token.AllowAllEnvironments)
+        if (environmentId != null && !token.AllowAllEnvironments)
         {
-            if (!token.Environments.Contains(environment) && !token.Environments.Contains("*"))
+            if (!token.Environments.Contains(environmentId) && !token.Environments.Contains("*"))
             {
                 return new TokenValidationResult { Valid = false, Token = token, Reason = "invalid_environment" };
             }

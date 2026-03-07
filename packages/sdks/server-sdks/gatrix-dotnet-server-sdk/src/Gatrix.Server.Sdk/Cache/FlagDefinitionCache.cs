@@ -18,11 +18,11 @@ public class FlagDefinitionCache
     private Dictionary<string, FeatureSegment> _segments = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Get a flag definition by name for a specific environment.</summary>
-    public FeatureFlag? GetFlag(string flagName, string environment)
+    public FeatureFlag? GetFlag(string flagName, string environmentId)
     {
         lock (_lock)
         {
-            if (_flagsByEnv.TryGetValue(environment, out var flags))
+            if (_flagsByEnv.TryGetValue(environmentId, out var flags))
                 return flags.GetValueOrDefault(flagName);
 
             return null;
@@ -30,11 +30,11 @@ public class FlagDefinitionCache
     }
 
     /// <summary>Get all cached flags for a specific environment (readonly snapshot).</summary>
-    public List<FeatureFlag> GetCached(string environment)
+    public List<FeatureFlag> GetCached(string environmentId)
     {
         lock (_lock)
         {
-            if (_flagsByEnv.TryGetValue(environment, out var flags))
+            if (_flagsByEnv.TryGetValue(environmentId, out var flags))
                 return flags.Values.ToList();
 
             return [];
@@ -51,7 +51,7 @@ public class FlagDefinitionCache
     }
 
     /// <summary>Replace entire cache atomically with new definitions and segments for a specific environment.</summary>
-    public void Update(IEnumerable<FeatureFlag> flags, IEnumerable<FeatureSegment> segments, string environment)
+    public void Update(IEnumerable<FeatureFlag> flags, IEnumerable<FeatureSegment> segments, string environmentId)
     {
         var newFlags = new Dictionary<string, FeatureFlag>(StringComparer.OrdinalIgnoreCase);
         foreach (var flag in flags)
@@ -63,7 +63,7 @@ public class FlagDefinitionCache
 
         lock (_lock)
         {
-            _flagsByEnv[environment] = newFlags;
+            _flagsByEnv[environmentId] = newFlags;
             // Segments are merged globally (all environments share segments)
             foreach (var kvp in newSegments)
                 _segments[kvp.Key] = kvp.Value;
@@ -71,25 +71,25 @@ public class FlagDefinitionCache
     }
 
     /// <summary>Upsert a single flag in a specific environment.</summary>
-    public void UpsertFlag(FeatureFlag flag, string environment)
+    public void UpsertFlag(FeatureFlag flag, string environmentId)
     {
         lock (_lock)
         {
-            if (!_flagsByEnv.TryGetValue(environment, out var flags))
+            if (!_flagsByEnv.TryGetValue(environmentId, out var flags))
             {
                 flags = new Dictionary<string, FeatureFlag>(StringComparer.OrdinalIgnoreCase);
-                _flagsByEnv[environment] = flags;
+                _flagsByEnv[environmentId] = flags;
             }
             flags[flag.Name] = flag;
         }
     }
 
     /// <summary>Remove a single flag by name from a specific environment.</summary>
-    public void RemoveFlag(string flagName, string environment)
+    public void RemoveFlag(string flagName, string environmentId)
     {
         lock (_lock)
         {
-            if (_flagsByEnv.TryGetValue(environment, out var flags))
+            if (_flagsByEnv.TryGetValue(environmentId, out var flags))
                 flags.Remove(flagName);
         }
     }

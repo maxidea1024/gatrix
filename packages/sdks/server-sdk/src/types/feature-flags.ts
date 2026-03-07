@@ -45,7 +45,7 @@ export interface FeatureFlagResponse {
 // ==================== Metrics ====================
 
 export interface FlagMetric {
-  environment: string;
+  environmentId: string;
   flagName: string;
   enabled: boolean;
   variantName?: string;

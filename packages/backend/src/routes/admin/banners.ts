@@ -6,6 +6,7 @@ const router = Router();
 
 // All banner routes require authentication and admin role
 router.use(authenticate as any);
+
 // Banner CRUD routes
 router.get('/', BannerController.getBanners);
 router.get('/:bannerId', BannerController.getBannerById);

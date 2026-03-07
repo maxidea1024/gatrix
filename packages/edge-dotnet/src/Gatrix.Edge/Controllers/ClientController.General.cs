@@ -11,14 +11,16 @@ public partial class ClientController : GatrixControllerBase
     // =============================
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/client-version
+    /// GET /api/v1/client/{environmentId}/client-version
     /// </summary>
-    [HttpGet("{environment}/client-version")]
-    public IActionResult GetClientVersion(string environment,
-        [FromQuery] string? platform, [FromQuery] string? version,
+    [HttpGet("client-version")]
+    public IActionResult GetClientVersion([FromQuery] string? platform, [FromQuery] string? version,
         [FromQuery] string? status, [FromQuery] string? lang,
         [FromQuery] string? channel, [FromQuery] string? subChannel)
     {
+        var ctx = HttpContext.GetClientContext()!;
+        var environmentId = ctx.Environment;
+
         if (string.IsNullOrEmpty(platform))
             return BadRequest(new { success = false, message = "platform is a required query parameter" });
 
@@ -40,7 +42,7 @@ public partial class ClientController : GatrixControllerBase
         }
 
         // Get from cache
-        var envVersions = _cacheManager.GetClientVersions(environment);
+        var envVersions = _cacheManager.GetClientVersions(environmentId);
         var platformVersions = envVersions
             .Where(v => v.Platform == platform || v.Platform == "all")
             .ToList();
@@ -87,7 +89,7 @@ public partial class ClientController : GatrixControllerBase
         {
             try
             {
-                var channels = _cacheManager.GetVarParsedValue<List<JsonElement>>("$channels", environment);
+                var channels = _cacheManager.GetVarParsedValue<List<JsonElement>>("$channels", environmentId);
                 if (channels != null)
                 {
                     var channelData = channels.FirstOrDefault(c => 
@@ -148,12 +150,14 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/game-worlds
+    /// GET /api/v1/client/{environmentId}/game-worlds
     /// </summary>
-    [HttpGet("{environment}/game-worlds")]
-    public IActionResult GetGameWorlds(string environment)
+    [HttpGet("game-worlds")]
+    public IActionResult GetGameWorlds()
     {
-        var envWorlds = _cacheManager.GetGameWorlds(environment);
+        var ctx = HttpContext.GetClientContext()!;
+        var environmentId = ctx.Environment;
+        var envWorlds = _cacheManager.GetGameWorlds(environmentId);
         var visibleWorlds = envWorlds.Where(w => !w.IsMaintenance).ToList();
 
         var clientData = new
@@ -195,11 +199,11 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/test
+    /// GET /api/v1/client/{environmentId}/test
     /// </summary>
-    [HttpGet("{environment}/test")]
+    [HttpGet("test")]
     [ServiceFilter(typeof(ClientAuthMiddleware), IsReusable = false)]
-    public IActionResult TestAuth(string environment)
+    public IActionResult TestAuth()
     {
         var ctx = HttpContext.GetClientContext()!;
         return Ok(new
@@ -218,13 +222,13 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/banners
+    /// GET /api/v1/client/{environmentId}/banners
     /// </summary>
-    [HttpGet("{environment}/banners")]
-    public IActionResult GetBanners(string environment)
+    [HttpGet("banners")]
+    public IActionResult GetBanners()
     {
         var ctx = HttpContext.GetClientContext();
-        var env = ctx?.Environment ?? environment;
+        var env = ctx!.Environment;
 
         var envBanners = _cacheManager.GetBanners(env);
         var clientBanners = envBanners.Select(b => new
@@ -251,13 +255,13 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/banners/{bannerId}
+    /// GET /api/v1/client/{environmentId}/banners/{bannerId}
     /// </summary>
-    [HttpGet("{environment}/banners/{bannerId}")]
-    public IActionResult GetBanner(string environment, string bannerId)
+    [HttpGet("banners/{bannerId}")]
+    public IActionResult GetBanner(string bannerId)
     {
         var ctx = HttpContext.GetClientContext();
-        var env = ctx?.Environment ?? environment;
+        var env = ctx!.Environment;
 
         var envBanners = _cacheManager.GetBanners(env);
         var banner = envBanners.FirstOrDefault(b => b.BannerId == bannerId);
@@ -287,13 +291,13 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/client-versions
+    /// GET /api/v1/client/{environmentId}/client-versions
     /// </summary>
-    [HttpGet("{environment}/client-versions")]
-    public IActionResult GetClientVersions(string environment)
+    [HttpGet("client-versions")]
+    public IActionResult GetClientVersions()
     {
         var ctx = HttpContext.GetClientContext();
-        var env = ctx?.Environment ?? environment;
+        var env = ctx!.Environment;
 
         var envVersions = _cacheManager.GetClientVersions(env);
 
@@ -311,13 +315,13 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// GET /api/v1/client/{environment}/service-notices
+    /// GET /api/v1/client/{environmentId}/service-notices
     /// </summary>
-    [HttpGet("{environment}/service-notices")]
-    public IActionResult GetServiceNotices(string environment)
+    [HttpGet("service-notices")]
+    public IActionResult GetServiceNotices()
     {
         var ctx = HttpContext.GetClientContext();
-        var env = ctx?.Environment ?? environment;
+        var env = ctx!.Environment;
 
         var envNotices = _cacheManager.GetServiceNotices(env);
 

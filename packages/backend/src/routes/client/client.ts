@@ -70,7 +70,6 @@ router.post(
   clientSDKAuth,
   body('platform').isString().notEmpty(),
   body('branch').isString().notEmpty(),
-  body('environmentId').isString().notEmpty(),
   body('stack').isString().notEmpty(),
   body('marketType').optional({ nullable: true }).isString(),
   body('isEditor').optional({ nullable: true }).isBoolean(),

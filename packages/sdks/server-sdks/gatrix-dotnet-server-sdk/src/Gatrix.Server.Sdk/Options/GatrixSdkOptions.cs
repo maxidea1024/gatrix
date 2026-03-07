@@ -15,15 +15,6 @@ public class GatrixSdkOptions
     public string ApplicationName { get; set; } = string.Empty;
     public string Service { get; set; } = string.Empty;
     public string Group { get; set; } = string.Empty;
-    public string Environment { get; set; } = "development";
-
-    /// <summary>
-    /// Multi-environment mode (for Edge server).
-    /// - null or empty: single-environment mode (uses Environment property)
-    /// - ["*"]: wildcard mode — dynamically fetch all active environments from backend
-    /// - ["env1", "env2", ...]: explicit list of environments to cache
-    /// </summary>
-    public List<string>? Environments { get; set; }
 
     // ── Optional ──────────────────────────────────────────────────────
     public string? WorldId { get; set; }
@@ -37,16 +28,6 @@ public class GatrixSdkOptions
     public RetryOptions Retry { get; set; } = new();
     public FeaturesOptions Features { get; set; } = new();
     public FeatureFlagOptions FeatureFlags { get; set; } = new();
-
-    // ── Multi-environment helpers ────────────────────────────────────
-
-    /// <summary>True when Environments is set to ["*"] or a non-empty list.</summary>
-    public bool IsMultiEnvironmentMode =>
-        Environments is { Count: > 0 };
-
-    /// <summary>True when Environments contains "*" (wildcard mode).</summary>
-    public bool IsWildcardMode =>
-        Environments is { Count: > 0 } && Environments.Contains("*");
 }
 
 /// <summary>

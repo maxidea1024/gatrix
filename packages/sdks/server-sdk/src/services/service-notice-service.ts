@@ -48,18 +48,18 @@ export class ServiceNoticeService {
   /**
    * Initialize service and load data from local storage
    */
-  async initializeAsync(environment: string): Promise<void> {
+  async initializeAsync(environmentId: string): Promise<void> {
     if (!this.storage) return;
 
     try {
-      const cachedJson = await this.storage.get(`ServiceNotices_${environment}`);
+      const cachedJson = await this.storage.get(`ServiceNotices_${environmentId}`);
       if (cachedJson) {
-        this.cachedNoticesByEnv.set(environment, JSON.parse(cachedJson));
-        this.logger.debug('Loaded service notices from local storage', { environment });
+        this.cachedNoticesByEnv.set(environmentId, JSON.parse(cachedJson));
+        this.logger.debug('Loaded service notices from local storage', { environmentId });
       }
     } catch (error: any) {
       this.logger.warn('Failed to load service notices from local storage', {
-        environment,
+        environmentId,
         error: error.message,
       });
     }
@@ -84,10 +84,10 @@ export class ServiceNoticeService {
    * Get service notices for a specific environment
    * GET /api/v1/server/service-notices -> { notices: [...] }
    */
-  async listByEnvironment(environment: string): Promise<ServiceNotice[]> {
+  async listByEnvironment(environmentId: string): Promise<ServiceNotice[]> {
     const endpoint = `/api/v1/server/service-notices`;
 
-    this.logger.debug('Fetching service notices', { environment });
+    this.logger.debug('Fetching service notices', { environmentId });
 
     const response = await this.apiClient.get<ServiceNoticeListResponse>(endpoint);
 
@@ -96,16 +96,16 @@ export class ServiceNoticeService {
     }
 
     const notices = response.data.notices;
-    this.cachedNoticesByEnv.set(environment, notices);
+    this.cachedNoticesByEnv.set(environmentId, notices);
 
     // Save to local storage if available
     if (this.storage) {
-      await this.storage.save(`ServiceNotices_${environment}`, JSON.stringify(notices));
+      await this.storage.save(`ServiceNotices_${environmentId}`, JSON.stringify(notices));
     }
 
     this.logger.info('Service notices fetched', {
       count: notices.length,
-      environment,
+      environmentId,
     });
 
     return notices;
@@ -143,8 +143,8 @@ export class ServiceNoticeService {
    * Get cached service notices
    * @param environment Environment name (required)
    */
-  getCached(environment: string): ServiceNotice[] {
-    return this.cachedNoticesByEnv.get(environment) || [];
+  getCached(environmentId: string): ServiceNotice[] {
+    return this.cachedNoticesByEnv.get(environmentId) || [];
   }
 
   /**
@@ -172,10 +172,10 @@ export class ServiceNoticeService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environment: string): void {
-    this.cachedNoticesByEnv.delete(environment);
+  clearCacheForEnvironment(environmentId: string): void {
+    this.cachedNoticesByEnv.delete(environmentId);
     this.logger.debug('Service notices cache cleared for environment', {
-      environment,
+      environmentId,
     });
   }
 
@@ -185,17 +185,17 @@ export class ServiceNoticeService {
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
-    environment: string,
+    environmentId: string,
     suppressWarnings?: boolean
   ): Promise<ServiceNotice[]> {
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn(
         'ServiceNoticeService.refreshByEnvironment() called but feature is disabled',
-        { environment }
+        { environmentId }
       );
     }
-    this.logger.info('Refreshing service notices cache', { environment });
-    return await this.listByEnvironment(environment);
+    this.logger.info('Refreshing service notices cache', { environmentId });
+    return await this.listByEnvironment(environmentId);
   }
 
   /**
@@ -203,10 +203,10 @@ export class ServiceNoticeService {
    * @param notices Service notices to cache
    * @param environment Environment name (required)
    */
-  updateCache(notices: ServiceNotice[], environment: string): void {
-    this.cachedNoticesByEnv.set(environment, notices);
+  updateCache(notices: ServiceNotice[], environmentId: string): void {
+    this.cachedNoticesByEnv.set(environmentId, notices);
     this.logger.debug('Service notices cache updated', {
-      environment,
+      environmentId,
       count: notices.length,
     });
   }
@@ -216,15 +216,15 @@ export class ServiceNoticeService {
    * @param notice Service notice to update
    * @param environment Environment name (required)
    */
-  updateSingleServiceNotice(notice: ServiceNotice, environment: string): void {
+  updateSingleServiceNotice(notice: ServiceNotice, environmentId: string): void {
     const shouldBeCached = notice.isActive && this.isWithinTimeWindow(notice, new Date());
 
     if (!shouldBeCached) {
-      this.removeFromCache(notice.id, environment);
+      this.removeFromCache(notice.id, environmentId);
       return;
     }
 
-    const currentItems = this.cachedNoticesByEnv.get(environment) || [];
+    const currentItems = this.cachedNoticesByEnv.get(environmentId) || [];
     const itemId = notice.id;
 
     const existsInCache = currentItems.some((i) => i.id === itemId);
@@ -235,17 +235,17 @@ export class ServiceNoticeService {
       newItems = currentItems.map((i) => (i.id === itemId ? notice : i));
       this.logger.debug('Single service notice updated in cache', {
         id: itemId,
-        environment,
+        environmentId,
       });
     } else {
       newItems = [...currentItems, notice];
       this.logger.debug('Single service notice added to cache', {
         id: itemId,
-        environment,
+        environmentId,
       });
     }
 
-    this.cachedNoticesByEnv.set(environment, this.sortNotices(newItems));
+    this.cachedNoticesByEnv.set(environmentId, this.sortNotices(newItems));
   }
 
   /**
@@ -269,19 +269,19 @@ export class ServiceNoticeService {
    * @param id Service notice ID
    * @param environment Environment name (required)
    */
-  removeFromCache(id: number, environment: string): void {
-    const currentItems = this.cachedNoticesByEnv.get(environment) || [];
+  removeFromCache(id: number, environmentId: string): void {
+    const currentItems = this.cachedNoticesByEnv.get(environmentId) || [];
     const newItems = currentItems.filter((item) => item.id !== id);
-    this.cachedNoticesByEnv.set(environment, newItems);
-    this.logger.debug('Service notice removed from cache', { id, environment });
+    this.cachedNoticesByEnv.set(environmentId, newItems);
+    this.logger.debug('Service notice removed from cache', { id, environmentId });
   }
 
   /**
    * Get service notice by ID
    * @param environment Environment name (required)
    */
-  getById(id: number, environment: string): ServiceNotice | null {
-    const notices = this.getCached(environment);
+  getById(id: number, environmentId: string): ServiceNotice | null {
+    const notices = this.getCached(environmentId);
     return notices.find((n) => n.id === id) || null;
   }
 
@@ -289,8 +289,8 @@ export class ServiceNoticeService {
    * Get active service notices with optional filters
    * @param environment Environment name (required)
    */
-  getActive(environment: string, filters?: ServiceNoticeFilters): ServiceNotice[] {
-    const notices = this.getCached(environment);
+  getActive(environmentId: string, filters?: ServiceNoticeFilters): ServiceNotice[] {
+    const notices = this.getCached(environmentId);
     const now = new Date();
 
     return notices.filter((notice) => {
@@ -338,8 +338,8 @@ export class ServiceNoticeService {
    * @param category Notice category
    * @param environment Environment name (required)
    */
-  getByCategory(category: ServiceNoticeCategory, environment: string): ServiceNotice[] {
-    return this.getActive(environment, { category });
+  getByCategory(category: ServiceNoticeCategory, environmentId: string): ServiceNotice[] {
+    return this.getActive(environmentId, { category });
   }
 
   /**

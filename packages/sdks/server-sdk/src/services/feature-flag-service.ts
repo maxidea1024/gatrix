@@ -183,11 +183,11 @@ export class FeatureFlagService {
   /**
    * Initialize the service by loading definitions from local storage
    */
-  async initializeAsync(environment: string): Promise<void> {
+  async initializeAsync(environmentId: string): Promise<void> {
     if (!this.storage) return;
 
-    const flagsKey = `FeatureFlags_${environment}_flags`;
-    const segmentsKey = `FeatureFlags_${environment}_segments`;
+    const flagsKey = `FeatureFlags_${environmentId}_flags`;
+    const segmentsKey = `FeatureFlags_${environmentId}_segments`;
 
     try {
       const [flagsJson, segmentsJson] = await Promise.all([
@@ -201,8 +201,8 @@ export class FeatureFlagService {
         for (const flag of flags) {
           flagMap.set(flag.name, flag);
         }
-        this.cachedFlagsByEnv.set(environment, flagMap);
-        this.logger.debug(`Loaded ${flags.length} flags from local storage`, { environment });
+        this.cachedFlagsByEnv.set(environmentId, flagMap);
+        this.logger.debug(`Loaded ${flags.length} flags from local storage`, { environmentId });
       }
 
       if (segmentsJson) {
@@ -210,11 +210,11 @@ export class FeatureFlagService {
         for (const segment of segments) {
           this.cachedSegments.set(segment.name, segment);
         }
-        this.logger.debug(`Loaded ${segments.length} segments from local storage`, { environment });
+        this.logger.debug(`Loaded ${segments.length} segments from local storage`, { environmentId });
       }
     } catch (error: any) {
       this.logger.warn('Failed to load feature flags from local storage', {
-        environment,
+        environmentId,
         error: error.message,
       });
     }
@@ -227,7 +227,7 @@ export class FeatureFlagService {
    * GET /api/v1/server/features
    * Also caches referenced segments returned by the backend
    */
-  async listByEnvironment(environment: string): Promise<FeatureFlag[]> {
+  async listByEnvironment(environmentId: string): Promise<FeatureFlag[]> {
     let endpoint = `/api/v1/server/features`;
 
     // Append compact query param when enabled
@@ -235,7 +235,7 @@ export class FeatureFlagService {
       endpoint += '?compact=true';
     }
 
-    this.logger.debug('Fetching feature flags', { environment, compact: this.compactFlags });
+    this.logger.debug('Fetching feature flags', { environmentId, compact: this.compactFlags });
 
     const response = await this.apiClient.get<{
       flags: FeatureFlag[];
@@ -253,7 +253,7 @@ export class FeatureFlagService {
     for (const flag of flags) {
       flagMap.set(flag.name, flag);
     }
-    this.cachedFlagsByEnv.set(environment, flagMap);
+    this.cachedFlagsByEnv.set(environmentId, flagMap);
 
     // Cache segments (global, not per-environment)
     if (segments && segments.length > 0) {
@@ -266,14 +266,14 @@ export class FeatureFlagService {
     // Save to local storage if available
     if (this.storage) {
       await Promise.all([
-        this.storage.save(`FeatureFlags_${environment}_flags`, JSON.stringify(flags)),
-        this.storage.save(`FeatureFlags_${environment}_segments`, JSON.stringify(segments || [])),
+        this.storage.save(`FeatureFlags_${environmentId}_flags`, JSON.stringify(flags)),
+        this.storage.save(`FeatureFlags_${environmentId}_segments`, JSON.stringify(segments || [])),
       ]);
     }
 
     this.logger.info('Feature flags fetched', {
       count: flags.length,
-      environment,
+      environmentId,
     });
 
     return flags;
@@ -282,14 +282,14 @@ export class FeatureFlagService {
   /**
    * Refresh cached flags for a specific environment
    */
-  async refreshByEnvironment(environment: string): Promise<FeatureFlag[]> {
+  async refreshByEnvironment(environmentId: string): Promise<FeatureFlag[]> {
     if (!this.featureEnabled) {
       this.logger.warn('FeatureFlagService.refreshByEnvironment() called but feature is disabled', {
-        environment,
+        environmentId,
       });
     }
-    this.logger.info('Refreshing feature flags cache', { environment });
-    return await this.listByEnvironment(environment);
+    this.logger.info('Refreshing feature flags cache', { environmentId });
+    return await this.listByEnvironment(environmentId);
   }
 
   /**
@@ -338,13 +338,13 @@ export class FeatureFlagService {
   async listByEnvironments(environments: string[]): Promise<FeatureFlag[]> {
     const allFlags: FeatureFlag[] = [];
 
-    for (const environment of environments) {
+    for (const environmentId of environments) {
       try {
-        const flags = await this.listByEnvironment(environment);
+        const flags = await this.listByEnvironment(environmentId);
         allFlags.push(...flags);
       } catch (error: any) {
         this.logger.warn('Failed to load feature flags for environment', {
-          environment,
+          environmentId,
           error: error.message,
         });
       }
@@ -361,8 +361,8 @@ export class FeatureFlagService {
   /**
    * Get a single flag by name from cache (O(1) lookup)
    */
-  getFlagByName(environment: string, flagName: string): FeatureFlag | undefined {
-    const envCache = this.cachedFlagsByEnv.get(environment);
+  getFlagByName(environmentId: string, flagName: string): FeatureFlag | undefined {
+    const envCache = this.cachedFlagsByEnv.get(environmentId);
     return envCache?.get(flagName);
   }
 
@@ -370,16 +370,16 @@ export class FeatureFlagService {
    * Get all cached flags as array
    * @param environment Environment name (required)
    */
-  getCached(environment: string): FeatureFlag[] {
-    const envCache = this.cachedFlagsByEnv.get(environment);
+  getCached(environmentId: string): FeatureFlag[] {
+    const envCache = this.cachedFlagsByEnv.get(environmentId);
     return envCache ? Array.from(envCache.values()) : [];
   }
 
   /**
    * Get cached flag count for environment
    */
-  getCachedCount(environment: string): number {
-    return this.cachedFlagsByEnv.get(environment)?.size ?? 0;
+  getCachedCount(environmentId: string): number {
+    return this.cachedFlagsByEnv.get(environmentId)?.size ?? 0;
   }
 
   /**
@@ -400,10 +400,10 @@ export class FeatureFlagService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environment: string): void {
-    this.cachedFlagsByEnv.delete(environment);
+  clearCacheForEnvironment(environmentId: string): void {
+    this.cachedFlagsByEnv.delete(environmentId);
     this.logger.debug('Feature flags cache cleared for environment', {
-      environment,
+      environmentId,
     });
   }
 
@@ -498,8 +498,8 @@ export class FeatureFlagService {
    * @param environment Environment name
    * @returns true if the flag is defined, false otherwise
    */
-  hasFlag(flagName: string, environment: string): boolean {
-    const flagMap = this.cachedFlagsByEnv.get(environment);
+  hasFlag(flagName: string, environmentId: string): boolean {
+    const flagMap = this.cachedFlagsByEnv.get(environmentId);
     if (!flagMap) return false;
     return flagMap.has(flagName);
   }
@@ -517,9 +517,9 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: boolean,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): boolean {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     if (result.reason === 'not_found') {
       return fallbackValue;
     }
@@ -536,9 +536,9 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: boolean,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): boolean {
-    return this.isEnabled(flagName, fallbackValue, context, environment);
+    return this.isEnabled(flagName, fallbackValue, context, environmentId);
   }
 
   /**
@@ -548,9 +548,9 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: boolean,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): { value: boolean; reason: EvaluationResult['reason']; flagName: string } {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     return {
       value: result.reason === 'not_found' ? fallbackValue : result.enabled,
       reason: result.reason,
@@ -565,9 +565,9 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: string,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): string {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     if (result.reason === 'not_found' || result.variant?.value == null) {
       return fallbackValue;
     }
@@ -581,14 +581,14 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: string,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): {
     value: string;
     reason: EvaluationResult['reason'];
     flagName: string;
     variantName?: string;
   } {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     const value =
       result.reason === 'not_found' || result.variant?.value == null
         ? fallbackValue
@@ -608,9 +608,9 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: number,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): number {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     if (result.reason === 'not_found' || result.variant?.value == null) {
       return fallbackValue;
     }
@@ -625,14 +625,14 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: number,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): {
     value: number;
     reason: EvaluationResult['reason'];
     flagName: string;
     variantName?: string;
   } {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     let value = fallbackValue;
     if (result.reason !== 'not_found' && result.variant?.value != null) {
       const num = Number(result.variant.value);
@@ -653,9 +653,9 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: T,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): T {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     if (result.reason === 'not_found' || result.variant?.value == null) {
       return fallbackValue;
     }
@@ -680,14 +680,14 @@ export class FeatureFlagService {
     flagName: string,
     fallbackValue: T,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): {
     value: T;
     reason: EvaluationResult['reason'];
     flagName: string;
     variantName?: string;
   } {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     let value = fallbackValue;
     if (result.reason !== 'not_found' && result.variant?.value != null) {
       const rawValue = result.variant.value;
@@ -718,16 +718,16 @@ export class FeatureFlagService {
   stringVariationOrThrow(
     flagName: string,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): string {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
 
     if (result.reason === 'not_found') {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.FLAG_NOT_FOUND,
-        `Feature flag '${flagName}' not found in environment '${environment}'`,
+        `Feature flag '${flagName}' not found in environment '${environmentId}'`,
         flagName,
-        environment
+        environmentId
       );
     }
 
@@ -736,7 +736,7 @@ export class FeatureFlagService {
         FeatureFlagErrorCode.NO_VALUE,
         `Feature flag '${flagName}' has no variant value`,
         flagName,
-        environment
+        environmentId
       );
     }
 
@@ -750,16 +750,16 @@ export class FeatureFlagService {
   numberVariationOrThrow(
     flagName: string,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): number {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
 
     if (result.reason === 'not_found') {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.FLAG_NOT_FOUND,
-        `Feature flag '${flagName}' not found in environment '${environment}'`,
+        `Feature flag '${flagName}' not found in environment '${environmentId}'`,
         flagName,
-        environment
+        environmentId
       );
     }
 
@@ -768,7 +768,7 @@ export class FeatureFlagService {
         FeatureFlagErrorCode.NO_VALUE,
         `Feature flag '${flagName}' has no variant value`,
         flagName,
-        environment
+        environmentId
       );
     }
 
@@ -778,7 +778,7 @@ export class FeatureFlagService {
         FeatureFlagErrorCode.INVALID_VALUE_TYPE,
         `Feature flag '${flagName}' variant value is not a valid number`,
         flagName,
-        environment
+        environmentId
       );
     }
     return num;
@@ -791,16 +791,16 @@ export class FeatureFlagService {
   jsonVariationOrThrow<T = any>(
     flagName: string,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): T {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
 
     if (result.reason === 'not_found') {
       throw new FeatureFlagError(
         FeatureFlagErrorCode.FLAG_NOT_FOUND,
-        `Feature flag '${flagName}' not found in environment '${environment}'`,
+        `Feature flag '${flagName}' not found in environment '${environmentId}'`,
         flagName,
-        environment
+        environmentId
       );
     }
 
@@ -809,7 +809,7 @@ export class FeatureFlagService {
         FeatureFlagErrorCode.NO_VALUE,
         `Feature flag '${flagName}' has no variant value`,
         flagName,
-        environment
+        environmentId
       );
     }
 
@@ -825,7 +825,7 @@ export class FeatureFlagService {
           FeatureFlagErrorCode.INVALID_VALUE_TYPE,
           `Feature flag '${flagName}' variant value is not valid JSON`,
           flagName,
-          environment
+          environmentId
         );
       }
     }
@@ -833,7 +833,7 @@ export class FeatureFlagService {
       FeatureFlagErrorCode.INVALID_VALUE_TYPE,
       `Feature flag '${flagName}' variant value type is not supported`,
       flagName,
-      environment
+      environmentId
     );
   }
 
@@ -851,9 +851,9 @@ export class FeatureFlagService {
     flagName: string,
     defaultVariant?: Variant,
     context?: EvaluationContext,
-    environment?: string
+    environmentId?: string
   ): Variant | undefined {
-    const result = this.evaluate(flagName, context, environment);
+    const result = this.evaluate(flagName, context, environmentId);
     if (result.reason === 'not_found' || !result.variant) {
       return defaultVariant;
     }
@@ -867,9 +867,9 @@ export class FeatureFlagService {
    * @param context Evaluation context (merged with static context)
    * @param environment Environment name
    */
-  evaluate(flagName: string, context?: EvaluationContext, environment?: string): EvaluationResult {
+  evaluate(flagName: string, context?: EvaluationContext, environmentId?: string): EvaluationResult {
     // Resolve environment using the configured resolver
-    const resolvedEnv = environment || this.envResolver.resolve(environment, 'evaluate');
+    const resolvedEnv = environmentId || this.envResolver.resolve(environmentId, 'evaluate');
 
     // Merge static context with per-evaluation context
     const mergedContext = this.mergeContext(context || {});
@@ -907,13 +907,13 @@ export class FeatureFlagService {
    * Record a flag evaluation metric
    */
   private recordMetric(
-    environment: string,
+    environmentId: string,
     flagName: string,
     enabled: boolean,
     variantName?: string
   ): void {
     this.metricsBuffer.push({
-      environment,
+      environmentId,
       flagName,
       enabled,
       variantName,
@@ -942,13 +942,13 @@ export class FeatureFlagService {
       // Group metrics by environment first
       const byEnvironment = new Map<string, typeof metricsToSend>();
       for (const metric of metricsToSend) {
-        const envMetrics = byEnvironment.get(metric.environment) || [];
+        const envMetrics = byEnvironment.get(metric.environmentId) || [];
         envMetrics.push(metric);
-        byEnvironment.set(metric.environment, envMetrics);
+        byEnvironment.set(metric.environmentId, envMetrics);
       }
 
       // Process each environment separately
-      for (const [environment, envMetrics] of byEnvironment) {
+      for (const [environmentId, envMetrics] of byEnvironment) {
         // Aggregate metrics by flagName + enabled + variantName
         const aggregated = new Map<
           string,
@@ -978,7 +978,7 @@ export class FeatureFlagService {
         const aggregatedMetrics = Array.from(aggregated.values());
 
         this.logger.debug('Flushing feature flag metrics', {
-          environment,
+          environmentId,
           rawCount: envMetrics.length,
           aggregatedCount: aggregatedMetrics.length,
         });
@@ -1028,19 +1028,19 @@ export class FeatureFlagService {
    */
   async updateSingleFlag(
     flagName: string,
-    environment: string,
+    environmentId: string,
     isEnabled?: boolean
   ): Promise<void> {
     try {
       this.logger.debug('Updating single flag in cache', {
         flagName,
-        environment,
+        environmentId,
         isEnabled,
       });
 
       // If explicitly disabled or archived, remove from cache
       if (isEnabled === false) {
-        this.removeFlag(flagName, environment);
+        this.removeFlag(flagName, environmentId);
         return;
       }
 
@@ -1052,49 +1052,49 @@ export class FeatureFlagService {
       if (!response.success || !response.data) {
         this.logger.debug('Flag not found or not active, removing from cache', {
           flagName,
-          environment,
+          environmentId,
         });
-        this.removeFlag(flagName, environment);
+        this.removeFlag(flagName, environmentId);
         return;
       }
 
       const updatedFlag = response.data.flag;
 
       // Get or create environment cache Map
-      let envCache = this.cachedFlagsByEnv.get(environment);
+      let envCache = this.cachedFlagsByEnv.get(environmentId);
       if (!envCache) {
         envCache = new Map<string, FeatureFlag>();
-        this.cachedFlagsByEnv.set(environment, envCache);
+        this.cachedFlagsByEnv.set(environmentId, envCache);
       }
 
       // Add or update flag in cache (O(1))
       envCache.set(flagName, updatedFlag);
       this.logger.debug('Single flag updated in cache', {
         flagName,
-        environment,
+        environmentId,
       });
     } catch (error: any) {
       this.logger.error('Failed to update single flag in cache', {
         flagName,
-        environment,
+        environmentId,
         error: error.message,
       });
       // Fall back to full refresh
-      await this.refreshByEnvironment(environment);
+      await this.refreshByEnvironment(environmentId);
     }
   }
 
   /**
    * Remove a flag from cache (O(1))
    */
-  removeFlag(flagName: string, environment: string): void {
-    this.logger.debug('Removing flag from cache', { flagName, environment });
+  removeFlag(flagName: string, environmentId: string): void {
+    this.logger.debug('Removing flag from cache', { flagName, environmentId });
 
-    const envCache = this.cachedFlagsByEnv.get(environment);
+    const envCache = this.cachedFlagsByEnv.get(environmentId);
     if (envCache) {
       envCache.delete(flagName);
     }
 
-    this.logger.debug('Flag removed from cache', { flagName, environment });
+    this.logger.debug('Flag removed from cache', { flagName, environmentId });
   }
 }

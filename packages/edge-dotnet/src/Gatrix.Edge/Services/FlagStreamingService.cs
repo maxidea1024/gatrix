@@ -113,7 +113,7 @@ public class FlagStreamingService : IHostedService, IDisposable
     /// <summary>
     /// Add a new SSE client.
     /// </summary>
-    public async Task AddSseClientAsync(string clientId, string environment, HttpResponse response)
+    public async Task AddSseClientAsync(string clientId, string environmentId, HttpResponse response)
     {
         response.ContentType = "text/event-stream";
         response.Headers.CacheControl = "no-cache";
@@ -123,7 +123,7 @@ public class FlagStreamingService : IHostedService, IDisposable
         var client = new SseClient
         {
             Id = clientId,
-            Environment = environment,
+            Environment = environmentId,
             Response = response,
             ConnectedAt = DateTime.UtcNow,
             LastEventTime = DateTime.UtcNow,
@@ -132,21 +132,21 @@ public class FlagStreamingService : IHostedService, IDisposable
         _sseClients[clientId] = client;
 
         // Send connected event
-        var revision = await GetGlobalRevisionAsync(environment);
+        var revision = await GetGlobalRevisionAsync(environmentId);
         await WriteSseEventAsync(clientId, "connected", new { globalRevision = revision });
 
-        _logger.LogDebug("SSE client connected: {ClientId} for env: {Environment}", clientId, environment);
+        _logger.LogDebug("SSE client connected: {ClientId} for env: {Environment}", clientId, environmentId);
     }
 
     /// <summary>
     /// Add a new WebSocket client.
     /// </summary>
-    public async Task AddWsClientAsync(string clientId, string environment, WebSocket ws)
+    public async Task AddWsClientAsync(string clientId, string environmentId, WebSocket ws)
     {
         var client = new WsClient
         {
             Id = clientId,
-            Environment = environment,
+            Environment = environmentId,
             Socket = ws,
             ConnectedAt = DateTime.UtcNow,
             LastEventTime = DateTime.UtcNow,
@@ -155,10 +155,10 @@ public class FlagStreamingService : IHostedService, IDisposable
         _wsClients[clientId] = client;
 
         // Send connected event
-        var revision = await GetGlobalRevisionAsync(environment);
+        var revision = await GetGlobalRevisionAsync(environmentId);
         await WriteWsEventAsync(clientId, "connected", new { globalRevision = revision });
 
-        _logger.LogDebug("WebSocket client connected: {ClientId} for env: {Environment}", clientId, environment);
+        _logger.LogDebug("WebSocket client connected: {ClientId} for env: {Environment}", clientId, environmentId);
 
         // Start reading messages (handle ping/pong)
         _ = ReadWsMessagesAsync(clientId, ws);
@@ -200,7 +200,7 @@ public class FlagStreamingService : IHostedService, IDisposable
                 !data.TryGetProperty("environment", out var envEl))
                 return;
 
-            var environment = envEl.GetString()!;
+            var environmentId = envEl.GetString()!;
             var changedKeys = new List<string>();
             if (data.TryGetProperty("changedKeys", out var keysEl) && keysEl.ValueKind == JsonValueKind.Array)
             {
@@ -212,7 +212,7 @@ public class FlagStreamingService : IHostedService, IDisposable
             }
 
             // Refresh cache then notify clients
-            _ = RefreshCacheThenNotifyAsync(environment, changedKeys);
+            _ = RefreshCacheThenNotifyAsync(environmentId, changedKeys);
         }
         catch (Exception ex)
         {
@@ -220,24 +220,24 @@ public class FlagStreamingService : IHostedService, IDisposable
         }
     }
 
-    private async Task RefreshCacheThenNotifyAsync(string environment, List<string> changedKeys)
+    private async Task RefreshCacheThenNotifyAsync(string environmentId, List<string> changedKeys)
     {
         try
         {
-            await _cacheManager.RefreshFeatureFlagsAsync(environment);
-            _logger.LogDebug("FlagStreamingService: Cache refreshed for env={Environment}", environment);
+            await _cacheManager.RefreshFeatureFlagsAsync(environmentId);
+            _logger.LogDebug("FlagStreamingService: Cache refreshed for env={Environment}", environmentId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "FlagStreamingService: Failed to refresh cache before notify");
         }
 
-        await NotifyClientsAsync(environment, changedKeys);
+        await NotifyClientsAsync(environmentId, changedKeys);
     }
 
-    private async Task NotifyClientsAsync(string environment, List<string> changedKeys)
+    private async Task NotifyClientsAsync(string environmentId, List<string> changedKeys)
     {
-        var newRevision = await IncrementGlobalRevisionAsync(environment);
+        var newRevision = await IncrementGlobalRevisionAsync(environmentId);
         var payload = new { globalRevision = newRevision, changedKeys, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() };
 
         var notified = 0;
@@ -245,7 +245,7 @@ public class FlagStreamingService : IHostedService, IDisposable
         // SSE clients
         foreach (var (id, client) in _sseClients)
         {
-            if (client.Environment == environment)
+            if (client.Environment == environmentId)
             {
                 await WriteSseEventAsync(id, "flags_changed", payload);
                 notified++;
@@ -255,7 +255,7 @@ public class FlagStreamingService : IHostedService, IDisposable
         // WS clients
         foreach (var (id, client) in _wsClients)
         {
-            if (client.Environment == environment)
+            if (client.Environment == environmentId)
             {
                 await WriteWsEventAsync(id, "flags_changed", payload);
                 notified++;
@@ -265,7 +265,7 @@ public class FlagStreamingService : IHostedService, IDisposable
         if (notified > 0)
         {
             _logger.LogDebug("FlagStreamingService: Notified {Count} clients for env={Environment}, rev={Revision}",
-                notified, environment, newRevision);
+                notified, environmentId, newRevision);
         }
     }
 
@@ -379,21 +379,21 @@ public class FlagStreamingService : IHostedService, IDisposable
         }
     }
 
-    private async Task<long> GetGlobalRevisionAsync(string environment)
+    private async Task<long> GetGlobalRevisionAsync(string environmentId)
     {
         if (_redisDb == null) return 0;
         try
         {
-            var val = await _redisDb.StringGetAsync($"{RevisionKeyPrefix}{environment}");
+            var val = await _redisDb.StringGetAsync($"{RevisionKeyPrefix}{environmentId}");
             return val.HasValue && long.TryParse(val, out var rev) ? rev : 0;
         }
         catch { return 0; }
     }
 
-    private async Task<long> IncrementGlobalRevisionAsync(string environment)
+    private async Task<long> IncrementGlobalRevisionAsync(string environmentId)
     {
         if (_redisDb == null) return 0;
-        try { return await _redisDb.StringIncrementAsync($"{RevisionKeyPrefix}{environment}"); }
+        try { return await _redisDb.StringIncrementAsync($"{RevisionKeyPrefix}{environmentId}"); }
         catch { return 0; }
     }
 

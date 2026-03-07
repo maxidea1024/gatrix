@@ -15,7 +15,7 @@ export interface MirroredToken {
   tokenValue: string;
   tokenType: 'client' | 'server' | 'edge' | 'all';
   allowAllEnvironments: boolean;
-  environments: string[]; // ['*'] for all, or list of environment names
+  environments: string[]; // ['*'] for all, or list of environmentId names
   expiresAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -180,7 +180,7 @@ class TokenMirrorService {
   validateToken(
     tokenValue: string,
     requiredType: 'client' | 'server' | 'all',
-    environment?: string
+    environmentId?: string
   ): TokenValidationResult {
     // Check for unsecured client token (for testing purposes, client -> edge)
     // Note: id=0 is used for unsecured tokens to skip usage tracking
@@ -221,8 +221,8 @@ class TokenMirrorService {
     }
 
     // Check environment access
-    if (environment && !token.allowAllEnvironments) {
-      if (!token.environments.includes(environment) && !token.environments.includes('*')) {
+    if (environmentId && !token.allowAllEnvironments) {
+      if (!token.environments.includes(environmentId) && !token.environments.includes('*')) {
         return { valid: false, token, reason: 'invalid_environment' };
       }
     }

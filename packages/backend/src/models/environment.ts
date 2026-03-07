@@ -6,6 +6,7 @@ import { ulid } from 'ulid';
 export type EnvironmentType = 'development' | 'staging' | 'production';
 
 export interface EnvironmentData {
+  name: string;
   displayName: string;
   description?: string;
   environmentType: EnvironmentType;
@@ -32,6 +33,7 @@ export class Environment extends Model implements EnvironmentData {
 
   id!: string;
 
+  name!: string;
   displayName!: string;
   description?: string;
   environmentType!: EnvironmentType;
@@ -59,9 +61,15 @@ export class Environment extends Model implements EnvironmentData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['displayName'],
+      required: ['name', 'displayName'],
 
       properties: {
+        name: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 100,
+          pattern: '^[a-z0-9_-]+$',
+        },
         displayName: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: ['string', 'null'], maxLength: 1000 },
         environmentType: {
@@ -145,6 +153,19 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
+   * Get environment by name within a project
+   */
+  static async getByName(
+    projectId: string,
+    name: string
+  ): Promise<Environment | undefined> {
+    return await this.query()
+      .where('projectId', projectId)
+      .where('name', name)
+      .first();
+  }
+
+  /**
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
@@ -199,12 +220,21 @@ export class Environment extends Model implements EnvironmentData {
   static async createEnvironment(
     data: Omit<EnvironmentData, 'createdAt' | 'updatedAt'>
   ): Promise<Environment> {
-    // Check if environment with same displayName already exists in same project
-    const existing = await this.query()
+    // Check if environment with same name already exists in same project
+    const existingName = await this.query()
+      .where('name', data.name)
+      .where('projectId', data.projectId)
+      .first();
+    if (existingName) {
+      throw new Error(`Environment with name '${data.name}' already exists`);
+    }
+
+    // Also check displayName uniqueness within project
+    const existingDisplay = await this.query()
       .where('displayName', data.displayName)
       .where('projectId', data.projectId)
       .first();
-    if (existing) {
+    if (existingDisplay) {
       throw new Error(`Environment '${data.displayName}' already exists`);
     }
 

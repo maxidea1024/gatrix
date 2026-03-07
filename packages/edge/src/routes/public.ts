@@ -52,12 +52,12 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const environment = req.params.environment;
+    const environmentId = req.params.environment;
     const platform = req.query.platform as string | undefined;
     const fields = req.query.fields as string | undefined;
 
     // Get service notices from cache for this environment
-    const envNotices = sdk.getServiceNotices(environment);
+    const envNotices = sdk.getServiceNotices(environmentId);
 
     // Optionally filter by platform
     let filteredNotices = envNotices;
@@ -86,7 +86,7 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
     }
 
     logger.debug('Public service notices retrieved', {
-      environment,
+      environmentId,
       platform,
       fields,
       count: responseNotices.length,
@@ -122,7 +122,7 @@ router.get('/:environment/service-notices/:noticeId', async (req: Request, res: 
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const environment = req.params.environment;
+    const environmentId = req.params.environment;
     const noticeId = parseInt(req.params.noticeId, 10);
 
     if (isNaN(noticeId)) {
@@ -137,7 +137,7 @@ router.get('/:environment/service-notices/:noticeId', async (req: Request, res: 
     }
 
     // Get service notices from cache for this environment
-    const envNotices = sdk.getServiceNotices(environment);
+    const envNotices = sdk.getServiceNotices(environmentId);
     const notice = envNotices.find((n: { id: number }) => n.id === noticeId);
 
     if (!notice) {
@@ -154,7 +154,7 @@ router.get('/:environment/service-notices/:noticeId', async (req: Request, res: 
     recordCacheHit('public_service_notice_detail');
 
     logger.debug('Public service notice detail retrieved', {
-      environment,
+      environmentId,
       noticeId,
     });
 

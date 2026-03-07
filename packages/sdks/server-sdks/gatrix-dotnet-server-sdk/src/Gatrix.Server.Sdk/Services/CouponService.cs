@@ -5,7 +5,7 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface ICouponService
 {
-    Task<RedeemCouponResponse> RedeemAsync(RedeemCouponRequest request, string environment, CancellationToken ct = default);
+    Task<RedeemCouponResponse> RedeemAsync(RedeemCouponRequest request, string environmentId, CancellationToken ct = default);
 }
 
 public class CouponService : ICouponService
@@ -14,7 +14,7 @@ public class CouponService : ICouponService
 
     public CouponService(GatrixApiClient apiClient) => _apiClient = apiClient;
 
-    public async Task<RedeemCouponResponse> RedeemAsync(RedeemCouponRequest request, string environment, CancellationToken ct = default)
+    public async Task<RedeemCouponResponse> RedeemAsync(RedeemCouponRequest request, string environmentId, CancellationToken ct = default)
     {
         var response = await _apiClient.PostAsync<RedeemCouponResponse>(
             $"/api/v1/server/coupons/redeem", request, ct);

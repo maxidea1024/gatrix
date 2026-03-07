@@ -48,7 +48,7 @@ export const auditLog = (options: AuditLogOptions) => {
           return;
         }
 
-        // Resource ID 결정 (?�청?�서 ?�는 ?�답?�서)
+        // Resource ID 결정
         let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
@@ -434,8 +434,6 @@ export const auditPasswordChange = auditLog({
   getDescription: (req: AuthenticatedRequest) => `User '${req.user?.email}' changed password`,
 });
 
-// 기본 auditLog ?�수�??��??�고 개별 미들?�어???�거
-// �??�우?�에??auditLog�?직접 ?�용?�도�?변�?
 export const auditProfileUpdate = auditLog({
   action: 'profile_update',
   resourceType: 'user',
