@@ -11,13 +11,13 @@ namespace Gatrix.Edge.Controllers;
 
 public partial class ServerController : GatrixControllerBase
 {
-    private IActionResult? ValidateServerAuth(string? environment = null)
+    private IActionResult? ValidateServerAuth(string? environmentId = null)
     {
         var apiToken = Request.Headers["x-api-token"].FirstOrDefault();
         if (string.IsNullOrEmpty(apiToken))
             return Unauthorized(new { success = false, error = "x-api-token header is required" });
 
-        var validation = _tokenMirror.ValidateToken(apiToken, "server", environment);
+        var validation = _tokenMirror.ValidateToken(apiToken, "server", environmentId);
         if (!validation.Valid)
             return Unauthorized(new { success = false, error = "Invalid or unauthorized server API token" });
 

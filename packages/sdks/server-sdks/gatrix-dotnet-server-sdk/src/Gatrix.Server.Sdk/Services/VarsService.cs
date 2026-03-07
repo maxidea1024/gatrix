@@ -16,7 +16,7 @@ public class VarsService : BaseEnvironmentService<VarItem, List<VarItem>>, IVars
     {
     }
 
-    protected override string GetEndpoint(string environment) => 
+    protected override string GetEndpoint(string environmentId) => 
         $"/api/v1/server/vars";
 
     protected override List<VarItem> ExtractItems(List<VarItem> response) => 
@@ -26,29 +26,29 @@ public class VarsService : BaseEnvironmentService<VarItem, List<VarItem>>, IVars
 
     protected override object GetItemId(VarItem item) => item.VarKey;
 
-    public Task<List<VarItem>> FetchAsync(string environment, CancellationToken ct = default) =>
-        FetchByEnvironmentAsync(environment, ct);
+    public Task<List<VarItem>> FetchAsync(string environmentId, CancellationToken ct = default) =>
+        FetchByEnvironmentAsync(environmentId, ct);
 
     /// <summary>
     /// Get a variable value by key from cache.
     /// </summary>
-    public string? GetValue(string key, string environment)
+    public string? GetValue(string key, string environmentId)
     {
-        var items = GetCached(environment);
+        var items = GetCached(environmentId);
         return items.Find(i => i.VarKey == key)?.VarValue;
     }
 
     /// <summary>
     /// Get a variable value parsed as JSON.
     /// </summary>
-    public T? GetParsedValue<T>(string key, string environment, JsonSerializerOptions? options = null)
+    public T? GetParsedValue<T>(string key, string environmentId, JsonSerializerOptions? options = null)
     {
-        var value = GetValue(key, environment);
+        var value = GetValue(key, environmentId);
         if (string.IsNullOrEmpty(value)) return default;
 
         try
         {
-            var item = GetCached(environment).Find(i => i.VarKey == key);
+            var item = GetCached(environmentId).Find(i => i.VarKey == key);
             if (item != null && (item.ValueType == "object" || item.ValueType == "array"))
             {
                 return JsonSerializer.Deserialize<T>(value, options);
@@ -60,7 +60,7 @@ public class VarsService : BaseEnvironmentService<VarItem, List<VarItem>>, IVars
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "Failed to parse KV value for key: {Key} in {Environment}", key, environment);
+            Logger.LogWarning(ex, "Failed to parse KV value for key: {Key} in {Environment}", key, environmentId);
             return default;
         }
     }

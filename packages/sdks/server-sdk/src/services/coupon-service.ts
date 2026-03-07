@@ -40,11 +40,11 @@ export class CouponService {
    * @param request Coupon redemption request
    * @param environment Environment name (required)
    */
-  async redeem(request: RedeemCouponRequest, environment: string): Promise<RedeemCouponResponse> {
+  async redeem(request: RedeemCouponRequest, environmentId: string): Promise<RedeemCouponResponse> {
     this.logger.info('Redeeming coupon', {
       code: request.code,
       userId: request.userId,
-      environment,
+      environmentId,
     });
 
     const { code, ...body } = request;
@@ -69,7 +69,7 @@ export class CouponService {
         code,
         userId: request.userId,
         sequence: response.data.sequence,
-        environment,
+        environmentId,
       });
 
       return response.data;

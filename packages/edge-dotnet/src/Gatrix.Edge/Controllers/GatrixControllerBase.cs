@@ -32,7 +32,7 @@ public abstract class GatrixControllerBase : ControllerBase
         _metricsAggregator = metricsAggregator;
     }
 
-    protected IActionResult PerformEvaluation(string environment, ClientContext clientContext, bool isPost)
+    protected IActionResult PerformEvaluation(string environmentId, ClientContext clientContext, bool isPost)
     {
         var context = new Dictionary<string, string>();
         var flagNames = new List<string>();
@@ -127,9 +127,9 @@ public abstract class GatrixControllerBase : ControllerBase
 
         if (!context.ContainsKey("appName"))
             context["appName"] = clientContext.ApplicationName;
-        context["environment"] = environment;
+        context["environment"] = environmentId;
 
-        var cachedFlags = _flagCache.GetCached(environment);
+        var cachedFlags = _flagCache.GetCached(environmentId);
         var segments = _flagCache.GetSegments();
 
         var contextHash = Request.Headers["x-gatrix-context-hash"].FirstOrDefault();
@@ -148,7 +148,7 @@ public abstract class GatrixControllerBase : ControllerBase
         var defsHash = Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(defsMaterial))).ToLowerInvariant();
 
         var cachePrefix = this is ClientController ? "c" : "s";
-        var evalCacheKey = $"{cachePrefix}_eval:{environment}:{contextHash}:{flagNamesHash}:{defsHash}";
+        var evalCacheKey = $"{cachePrefix}_eval:{environmentId}:{contextHash}:{flagNamesHash}:{defsHash}";
 
         if (_evalCache.TryGetValue(evalCacheKey, out (string ETag, object Response) cached))
         {
@@ -176,7 +176,7 @@ public abstract class GatrixControllerBase : ControllerBase
                 else evalCtx.Properties[kv.Key] = kv.Value;
             }
 
-            var result = _featureFlagService.Evaluate(key, evalCtx, environment);
+            var result = _featureFlagService.Evaluate(key, evalCtx, environmentId);
             var flagDef = cachedFlags.FirstOrDefault(f => f.Name == key);
 
             var variantName = result.Variant?.Name ?? (result.Enabled ? "$default" : "$disabled");
@@ -239,7 +239,7 @@ public abstract class GatrixControllerBase : ControllerBase
         {
             success = true,
             data = new { flags = results },
-            meta = new { environment, evaluatedAt = DateTime.UtcNow.ToString("o") },
+            meta = new { environment = environmentId, evaluatedAt = DateTime.UtcNow.ToString("o") },
         };
 
         _evalCache.Set(evalCacheKey, (etag, responseObj), TimeSpan.FromSeconds(30));

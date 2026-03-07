@@ -28,7 +28,7 @@ export class ClientVersionService extends BaseEnvironmentService<
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environment: string): string {
+  protected getEndpoint(environmentId: string): string {
     return `/api/v1/server/client-versions`;
   }
 
@@ -49,8 +49,8 @@ export class ClientVersionService extends BaseEnvironmentService<
    * @param item Client version to update
    * @param environment Environment name (required)
    */
-  updateSingleClientVersion(item: ClientVersion, environment: string): void {
-    this.updateItemInCache(item, environment);
+  updateSingleClientVersion(item: ClientVersion, environmentId: string): void {
+    this.updateItemInCache(item, environmentId);
   }
 
   // ==================== Domain-specific Methods ====================
@@ -64,9 +64,9 @@ export class ClientVersionService extends BaseEnvironmentService<
   getByPlatformAndVersion(
     platform: string,
     version: string,
-    environment: string
+    environmentId: string
   ): ClientVersion | null {
-    const versions = this.getCached(environment);
+    const versions = this.getCached(environmentId);
     return versions.find((v) => v.platform === platform && v.clientVersion === version) || null;
   }
 
@@ -79,10 +79,10 @@ export class ClientVersionService extends BaseEnvironmentService<
    */
   getLatestByPlatform(
     platform: string,
-    environment: string,
+    environmentId: string,
     status?: string
   ): ClientVersion | null {
-    const versions = this.getCached(environment);
+    const versions = this.getCached(environmentId);
     const filtered = versions.filter((v) => {
       if (v.platform !== platform) return false;
       if (status && v.clientStatus !== status) return false;
@@ -104,8 +104,8 @@ export class ClientVersionService extends BaseEnvironmentService<
    * @param platform Platform name
    * @param environment Environment name (required)
    */
-  getByPlatform(platform: string, environment: string): ClientVersion[] {
-    const versions = this.getCached(environment);
+  getByPlatform(platform: string, environmentId: string): ClientVersion[] {
+    const versions = this.getCached(environmentId);
     return versions.filter((v) => v.platform === platform);
   }
 

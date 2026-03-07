@@ -29,9 +29,7 @@ async function main() {
     applicationName: 'idle',
     service: 'idle', // Required: service name for identification
     group: process.env.SERVICE_GROUP || 'development', // Required: service group
-    environment: targetEnvironment, // Required: environment (for metrics/service discovery)
-    // Use multi-environment mode: '*' for all environments, or array for specific ones
-    environments: environments === '*' ? '*' : environments.split(','),
+
 
     // Redis for events
     redis: {

@@ -12,13 +12,13 @@ public partial class ClientController : GatrixControllerBase
     // =============================
 
     /// <summary>
-    /// POST /api/v1/client/{environment}/crashes/upload — Proxy to backend
+    /// POST /api/v1/client/{environmentId}/crashes/upload — Proxy to backend
     /// </summary>
-    [HttpPost("{environment}/crashes/upload")]
-    public async Task<IActionResult> UploadCrash(string environment)
+    [HttpPost("crashes/upload")]
+    public async Task<IActionResult> UploadCrash()
     {
         var ctx = HttpContext.GetClientContext();
-        var env = ctx?.Environment ?? environment;
+        var env = ctx!.Environment;
 
         var clientIp = Request.Headers["X-Forwarded-For"].FirstOrDefault()
                     ?? HttpContext.Connection.RemoteIpAddress?.ToString()
@@ -39,7 +39,6 @@ public partial class ClientController : GatrixControllerBase
             };
             request.Headers.Add("x-api-token", _options.ApiToken);
             request.Headers.Add("x-application-name", _options.ApplicationName);
-            request.Headers.Add("x-environment", env);
             request.Headers.Add("x-forwarded-for", clientIp);
             request.Headers.Add("user-agent", userAgent);
 

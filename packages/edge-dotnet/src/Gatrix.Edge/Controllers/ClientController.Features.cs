@@ -18,31 +18,31 @@ public partial class ClientController : GatrixControllerBase
     // ===================================
 
     /// <summary>
-    /// POST /api/v1/client/features/{environment}/eval
+    /// POST /api/v1/client/features/{environmentId}/eval
     /// </summary>
-    [HttpPost("features/{environment}/eval")]
-    public IActionResult EvalFlagsPost(string environment)
+    [HttpPost("features/eval")]
+    public IActionResult EvalFlagsPost()
     {
         var ctx = HttpContext.GetClientContext()!;
-        return PerformEvaluation(environment, ctx, isPost: true);
+        return PerformEvaluation(ctx.Environment, ctx, isPost: true);
     }
 
     /// <summary>
-    /// GET /api/v1/client/features/{environment}/eval
+    /// GET /api/v1/client/features/{environmentId}/eval
     /// </summary>
-    [HttpGet("features/{environment}/eval")]
-    public IActionResult EvalFlagsGet(string environment)
+    [HttpGet("features/eval")]
+    public IActionResult EvalFlagsGet()
     {
         var ctx = HttpContext.GetClientContext()!;
-        return PerformEvaluation(environment, ctx, isPost: false);
+        return PerformEvaluation(ctx.Environment, ctx, isPost: false);
     }
 
 
     /// <summary>
-    /// GET /api/v1/client/features/{environment}/stream/sse — SSE streaming
+    /// GET /api/v1/client/features/{environmentId}/stream/sse — SSE streaming
     /// </summary>
-    [HttpGet("features/{environment}/stream/sse")]
-    public async Task StreamFlags(string environment)
+    [HttpGet("features/stream/sse")]
+    public async Task StreamFlags()
     {
         var ctx = HttpContext.GetClientContext()!;
         var clientId = $"edge-flag-stream-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}-{Guid.NewGuid():N}"[..40];
@@ -60,10 +60,10 @@ public partial class ClientController : GatrixControllerBase
     }
 
     /// <summary>
-    /// POST /api/v1/client/features/{environment}/metrics — Buffered metrics
+    /// POST /api/v1/client/features/{environmentId}/metrics — Buffered metrics
     /// </summary>
-    [HttpPost("features/{environment}/metrics")]
-    public async Task<IActionResult> PostMetrics(string environment)
+    [HttpPost("features/metrics")]
+    public async Task<IActionResult> PostMetrics()
     {
         var ctx = HttpContext.GetClientContext()!;
 

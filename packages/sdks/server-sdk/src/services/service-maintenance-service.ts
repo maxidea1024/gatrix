@@ -40,18 +40,18 @@ export class ServiceMaintenanceService {
   /**
    * Initialize service and load data from local storage
    */
-  async initializeAsync(environment: string): Promise<void> {
+  async initializeAsync(environmentId: string): Promise<void> {
     if (!this.storage) return;
 
     try {
-      const cachedJson = await this.storage.get(`ServiceMaintenance_${environment}`);
+      const cachedJson = await this.storage.get(`ServiceMaintenance_${environmentId}`);
       if (cachedJson) {
-        this.cachedStatusByEnv.set(environment, JSON.parse(cachedJson));
-        this.logger.debug('Loaded service maintenance status from local storage', { environment });
+        this.cachedStatusByEnv.set(environmentId, JSON.parse(cachedJson));
+        this.logger.debug('Loaded service maintenance status from local storage', { environmentId });
       }
     } catch (error: any) {
       this.logger.warn('Failed to load service maintenance status from local storage', {
-        environment,
+        environmentId,
         error: error.message,
       });
     }
@@ -76,10 +76,10 @@ export class ServiceMaintenanceService {
    * Fetch service maintenance status for a specific environment
    * GET /api/v1/server/maintenance
    */
-  async getStatusByEnvironment(environment: string): Promise<MaintenanceStatus> {
+  async getStatusByEnvironment(environmentId: string): Promise<MaintenanceStatus> {
     const endpoint = `/api/v1/server/maintenance`;
 
-    this.logger.debug('Fetching service maintenance status', { environment });
+    this.logger.debug('Fetching service maintenance status', { environmentId });
 
     const response = await this.apiClient.get<MaintenanceStatus>(endpoint);
 
@@ -93,15 +93,15 @@ export class ServiceMaintenanceService {
       isMaintenanceActive: response.data.isMaintenanceActive ?? false,
     };
 
-    this.cachedStatusByEnv.set(environment, status);
+    this.cachedStatusByEnv.set(environmentId, status);
 
     // Save to local storage if available
     if (this.storage) {
-      await this.storage.save(`ServiceMaintenance_${environment}`, JSON.stringify(status));
+      await this.storage.save(`ServiceMaintenance_${environmentId}`, JSON.stringify(status));
     }
 
     this.logger.info('Service maintenance status fetched', {
-      environment,
+      environmentId,
       hasMaintenanceScheduled: status.hasMaintenanceScheduled,
       isMaintenanceActive: status.isMaintenanceActive,
     });
@@ -137,24 +137,24 @@ export class ServiceMaintenanceService {
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
-    environment: string,
+    environmentId: string,
     suppressWarnings?: boolean
   ): Promise<MaintenanceStatus> {
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn(
         'ServiceMaintenanceService.refreshByEnvironment() called but feature is disabled',
-        { environment }
+        { environmentId }
       );
     }
-    return await this.getStatusByEnvironment(environment);
+    return await this.getStatusByEnvironment(environmentId);
   }
 
   /**
    * Get cached service maintenance status
    * @param environment Environment name (required)
    */
-  getCached(environment: string): MaintenanceStatus | null {
-    return this.cachedStatusByEnv.get(environment) || null;
+  getCached(environmentId: string): MaintenanceStatus | null {
+    return this.cachedStatusByEnv.get(environmentId) || null;
   }
 
   /**
@@ -175,10 +175,10 @@ export class ServiceMaintenanceService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environment: string): void {
-    this.cachedStatusByEnv.delete(environment);
+  clearCacheForEnvironment(environmentId: string): void {
+    this.cachedStatusByEnv.delete(environmentId);
     this.logger.debug('Service maintenance cache cleared for environment', {
-      environment,
+      environmentId,
     });
   }
 
@@ -188,11 +188,11 @@ export class ServiceMaintenanceService {
    * @param status Maintenance status to cache
    * @param environment Environment name (required)
    */
-  updateCache(status: MaintenanceStatus | null, environment: string): void {
+  updateCache(status: MaintenanceStatus | null, environmentId: string): void {
     if (status) {
-      this.cachedStatusByEnv.set(environment, status);
+      this.cachedStatusByEnv.set(environmentId, status);
     } else {
-      this.cachedStatusByEnv.delete(environment);
+      this.cachedStatusByEnv.delete(environmentId);
     }
   }
 
@@ -200,8 +200,8 @@ export class ServiceMaintenanceService {
    * Check if service is currently in maintenance based on flag and time window
    * @param environment Environment name (required)
    */
-  isMaintenanceActive(environment: string): boolean {
-    const cachedStatus = this.cachedStatusByEnv.get(environment);
+  isMaintenanceActive(environmentId: string): boolean {
+    const cachedStatus = this.cachedStatusByEnv.get(environmentId);
     if (!cachedStatus) {
       return false;
     }
@@ -239,9 +239,9 @@ export class ServiceMaintenanceService {
    * @param lang Language code
    * @param environment Environment name (required)
    */
-  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environment: string): string | null {
-    const cachedStatus = this.cachedStatusByEnv.get(environment);
-    if (!this.isMaintenanceActive(environment) || !cachedStatus?.detail) {
+  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environmentId: string): string | null {
+    const cachedStatus = this.cachedStatusByEnv.get(environmentId);
+    if (!this.isMaintenanceActive(environmentId) || !cachedStatus?.detail) {
       return null;
     }
 

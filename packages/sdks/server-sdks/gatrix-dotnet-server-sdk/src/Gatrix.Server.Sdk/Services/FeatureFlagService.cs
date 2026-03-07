@@ -65,13 +65,13 @@ public class FeatureFlagService : IFeatureFlagService
     public void SetStaticContext(EvaluationContext context) => _staticContext = context;
 
     /// <summary>Initialize the service by loading definitions from local storage.</summary>
-    public async Task InitializeAsync(string environment, CancellationToken ct = default)
+    public async Task InitializeAsync(string environmentId, CancellationToken ct = default)
     {
         if (_storage == null) return;
 
-        var flagsKey = $"FeatureFlags_{environment}_flags";
-        var segmentsKey = $"FeatureFlags_{environment}_segments";
-        var etagKey = $"FeatureFlags_{environment}_etag";
+        var flagsKey = $"FeatureFlags_{environmentId}_flags";
+        var segmentsKey = $"FeatureFlags_{environmentId}_segments";
+        var etagKey = $"FeatureFlags_{environmentId}_etag";
 
         try
         {
@@ -87,30 +87,30 @@ public class FeatureFlagService : IFeatureFlagService
 
                 if (flags != null)
                 {
-                    _cache.Update(flags, segments ?? [], environment);
+                    _cache.Update(flags, segments ?? [], environmentId);
                     _logger.LogDebug("Loaded {FlagCount} flags from local storage for {Environment}",
-                        flags.Count, environment);
+                        flags.Count, environmentId);
                 }
             }
 
             var cachedEtag = await _storage.GetAsync(etagKey, ct);
             if (!string.IsNullOrEmpty(cachedEtag))
             {
-                _etagsByEnv[environment] = cachedEtag;
+                _etagsByEnv[environmentId] = cachedEtag;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to load feature flags from local storage for {Environment}", environment);
+            _logger.LogWarning(ex, "Failed to load feature flags from local storage for {Environment}", environmentId);
         }
     }
 
     /// <summary>Fetch flag and segment definitions from API and update local cache (remote + local).</summary>
-    public async Task FetchAsync(string environment, CancellationToken ct = default)
+    public async Task FetchAsync(string environmentId, CancellationToken ct = default)
     {
         try
         {
-            _etagsByEnv.TryGetValue(environment, out var etag);
+            _etagsByEnv.TryGetValue(environmentId, out var etag);
 
             var endpoint = $"/api/v1/server/features";
             if (_options.FeatureFlags.Compact)
@@ -123,52 +123,51 @@ public class FeatureFlagService : IFeatureFlagService
 
             if (!response.Success)
             {
-                _logger.LogWarning("Failed to fetch feature flags for {Environment}", environment);
+                _logger.LogWarning("Failed to fetch feature flags for {Environment}", environmentId);
                 return;
             }
 
             if (response.NotModified)
             {
-                _logger.LogDebug("Feature flags for {Environment} not modified (304)", environment);
+                _logger.LogDebug("Feature flags for {Environment} not modified (304)", environmentId);
                 return;
             }
 
             if (response.Data is not null)
             {
-                _cache.Update(response.Data.Flags, response.Data.Segments, environment);
+                _cache.Update(response.Data.Flags, response.Data.Segments, environmentId);
 
                 if (_storage != null)
                 {
-                    await _storage.SaveAsync($"FeatureFlags_{environment}_flags", JsonSerializer.Serialize(response.Data.Flags), ct);
-                    await _storage.SaveAsync($"FeatureFlags_{environment}_segments", JsonSerializer.Serialize(response.Data.Segments), ct);
+                    await _storage.SaveAsync($"FeatureFlags_{environmentId}_flags", JsonSerializer.Serialize(response.Data.Flags), ct);
+                    await _storage.SaveAsync($"FeatureFlags_{environmentId}_segments", JsonSerializer.Serialize(response.Data.Segments), ct);
                 }
 
                 if (response.Etag != null)
                 {
-                    _etagsByEnv[environment] = response.Etag;
+                    _etagsByEnv[environmentId] = response.Etag;
                     if (_storage != null)
                     {
-                        await _storage.SaveAsync($"FeatureFlags_{environment}_etag", response.Etag, ct);
+                        await _storage.SaveAsync($"FeatureFlags_{environmentId}_etag", response.Etag, ct);
                     }
                 }
 
                 _logger.LogInformation("Feature flags cached: {FlagCount} flags, {SegmentCount} segments for {Environment}",
-                    response.Data.Flags.Count, response.Data.Segments.Count, environment);
+                    response.Data.Flags.Count, response.Data.Segments.Count, environmentId);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to fetch feature flags for {Environment}", environment);
+            _logger.LogError(ex, "Failed to fetch feature flags for {Environment}", environmentId);
         }
     }
 
-    /// <summary>Resolve environment: use explicit value, or fall back to configured default.</summary>
-    private string? ResolveEnvironment(string? environment) =>
-        environment ?? (_options.IsMultiEnvironmentMode ? null : _options.Environment);
+    /// <summary>Resolve environment: use explicit value, or null if not provided.</summary>
+    private string? ResolveEnvironment(string? environmentId) => environmentId;
 
     /// <summary>Fetch a single flag by name from the API and update cache.
     /// Uses the single-flag endpoint which always returns full data (no compact mode).</summary>
-    public async Task FetchSingleFlagAsync(string flagName, string environment, CancellationToken ct = default)
+    public async Task FetchSingleFlagAsync(string flagName, string environmentId, CancellationToken ct = default)
     {
         try
         {
@@ -177,20 +176,20 @@ public class FeatureFlagService : IFeatureFlagService
 
             if (!response.Success || response.Data?.Flag is null)
             {
-                _logger.LogDebug("Flag {FlagName} not found in {Environment}, removing from cache", flagName, environment);
-                _cache.RemoveFlag(flagName, environment);
+                _logger.LogDebug("Flag {FlagName} not found in {Environment}, removing from cache", flagName, environmentId);
+                _cache.RemoveFlag(flagName, environmentId);
                 return;
             }
 
             var flag = response.Data.Flag;
-            _cache.UpsertFlag(flag, environment);
-            _logger.LogInformation("Single flag {FlagName} updated in {Environment}", flagName, environment);
+            _cache.UpsertFlag(flag, environmentId);
+            _logger.LogInformation("Single flag {FlagName} updated in {Environment}", flagName, environmentId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to fetch single flag {FlagName} for {Environment}, falling back to full refresh", flagName, environment);
+            _logger.LogError(ex, "Failed to fetch single flag {FlagName} for {Environment}, falling back to full refresh", flagName, environmentId);
             // Fall back to full environment refresh
-            await FetchAsync(environment, ct);
+            await FetchAsync(environmentId, ct);
         }
     }
 
@@ -200,9 +199,9 @@ public class FeatureFlagService : IFeatureFlagService
     // Core Evaluation
 
 
-    public EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environment = null)
+    public EvaluationResult Evaluate(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var env = ResolveEnvironment(environment);
+        var env = ResolveEnvironment(environmentId);
 
         // Multi-environment mode requires explicit environment
         if (env is null)
@@ -253,65 +252,65 @@ public class FeatureFlagService : IFeatureFlagService
 
     // IsEnabled
 
-    public bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null)
+    public bool IsEnabled(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         return result.Reason == EvaluationReasons.NotFound ? fallback : result.Enabled;
     }
 
     // Variant (name only)
 
-    public string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environment = null)
+    public string Variation(string flagName, string fallback = "", EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound) return fallback;
         return result.Variant.Name ?? fallback;
     }
 
     // Typed Variations
 
-    public string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environment = null)
+    public string StringVariation(string flagName, string fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "string")) return fallback;
         return ExtractString(result.Variant) ?? fallback;
     }
 
-    public int IntVariation(string flagName, int fallback, EvaluationContext? context = null, string? environment = null)
+    public int IntVariation(string flagName, int fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && int.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
 
-    public long LongVariation(string flagName, long fallback, EvaluationContext? context = null, string? environment = null)
+    public long LongVariation(string flagName, long fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && long.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
 
-    public float FloatVariation(string flagName, float fallback, EvaluationContext? context = null, string? environment = null)
+    public float FloatVariation(string flagName, float fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && float.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
 
-    public double DoubleVariation(string flagName, double fallback, EvaluationContext? context = null, string? environment = null)
+    public double DoubleVariation(string flagName, double fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "number")) return fallback;
         var str = ExtractString(result.Variant);
         return str is not null && double.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
     }
 
-    public bool BoolVariation(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null)
+    public bool BoolVariation(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "boolean")) return fallback;
         var str = ExtractString(result.Variant);
         if (str is null) return fallback;
@@ -322,9 +321,9 @@ public class FeatureFlagService : IFeatureFlagService
         return fallback;
     }
 
-    public T? JsonVariation<T>(string flagName, T? fallback = default, EvaluationContext? context = null, string? environment = null)
+    public T? JsonVariation<T>(string flagName, T? fallback = default, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound || IsTypeMismatch(result, "json") || result.Variant.Value is null)
             return fallback;
 
@@ -344,53 +343,53 @@ public class FeatureFlagService : IFeatureFlagService
 
     // Variation Details — value + evaluation metadata
 
-    public EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environment = null)
+    public EvaluationDetail<string> StringVariationDetails(string flagName, string fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (IsTypeMismatch(result, "string")) return MakeTypeMismatchDetail(result, fallback);
         var value = result.Reason == EvaluationReasons.NotFound ? fallback : ExtractString(result.Variant) ?? fallback;
         return MakeDetail(result, value);
     }
 
-    public EvaluationDetail<int> IntVariationDetails(string flagName, int fallback, EvaluationContext? context = null, string? environment = null)
+    public EvaluationDetail<int> IntVariationDetails(string flagName, int fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && int.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
     }
 
-    public EvaluationDetail<long> LongVariationDetails(string flagName, long fallback, EvaluationContext? context = null, string? environment = null)
+    public EvaluationDetail<long> LongVariationDetails(string flagName, long fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && long.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
     }
 
-    public EvaluationDetail<float> FloatVariationDetails(string flagName, float fallback, EvaluationContext? context = null, string? environment = null)
+    public EvaluationDetail<float> FloatVariationDetails(string flagName, float fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && float.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
     }
 
-    public EvaluationDetail<double> DoubleVariationDetails(string flagName, double fallback, EvaluationContext? context = null, string? environment = null)
+    public EvaluationDetail<double> DoubleVariationDetails(string flagName, double fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (IsTypeMismatch(result, "number")) return MakeTypeMismatchDetail(result, fallback);
         var str = result.Reason == EvaluationReasons.NotFound ? null : ExtractString(result.Variant);
         var value = str is not null && double.TryParse(str, CultureInfo.InvariantCulture, out var v) ? v : fallback;
         return MakeDetail(result, value);
     }
 
-    public EvaluationDetail<bool> BoolVariationDetails(string flagName, bool fallback, EvaluationContext? context = null, string? environment = null)
+    public EvaluationDetail<bool> BoolVariationDetails(string flagName, bool fallback, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound) return MakeDetail(result, fallback);
         if (IsTypeMismatch(result, "boolean")) return MakeTypeMismatchDetail(result, fallback);
         var str = ExtractString(result.Variant);
@@ -406,15 +405,15 @@ public class FeatureFlagService : IFeatureFlagService
 
     // OrThrow — throws FeatureFlagException on failure
 
-    public string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    public string StringVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         return ExtractStringOrThrow(result, flagName);
     }
 
-    public int IntVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    public int IntVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         var str = ExtractStringOrThrow(result, flagName);
         return int.TryParse(str, CultureInfo.InvariantCulture, out var v)
             ? v
@@ -422,9 +421,9 @@ public class FeatureFlagService : IFeatureFlagService
                 $"Flag '{flagName}' variant value is not a valid int", flagName);
     }
 
-    public long LongVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    public long LongVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         var str = ExtractStringOrThrow(result, flagName);
         return long.TryParse(str, CultureInfo.InvariantCulture, out var v)
             ? v
@@ -432,9 +431,9 @@ public class FeatureFlagService : IFeatureFlagService
                 $"Flag '{flagName}' variant value is not a valid long", flagName);
     }
 
-    public float FloatVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    public float FloatVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         var str = ExtractStringOrThrow(result, flagName);
         return float.TryParse(str, CultureInfo.InvariantCulture, out var v)
             ? v
@@ -442,9 +441,9 @@ public class FeatureFlagService : IFeatureFlagService
                 $"Flag '{flagName}' variant value is not a valid float", flagName);
     }
 
-    public double DoubleVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    public double DoubleVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         var str = ExtractStringOrThrow(result, flagName);
         return double.TryParse(str, CultureInfo.InvariantCulture, out var v)
             ? v
@@ -452,9 +451,9 @@ public class FeatureFlagService : IFeatureFlagService
                 $"Flag '{flagName}' variant value is not a valid double", flagName);
     }
 
-    public bool BoolVariationOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    public bool BoolVariationOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         var str = ExtractStringOrThrow(result, flagName);
         if (bool.TryParse(str, out var v)) return v;
         if (str == "1") return true;
@@ -463,9 +462,9 @@ public class FeatureFlagService : IFeatureFlagService
             $"Flag '{flagName}' variant value is not a valid bool", flagName);
     }
 
-    public T JsonVariationOrThrow<T>(string flagName, EvaluationContext? context = null, string? environment = null)
+    public T JsonVariationOrThrow<T>(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = EvaluateOrThrow(flagName, context, environment);
+        var result = EvaluateOrThrow(flagName, context, environmentId);
         if (result.Variant.Value is null)
             throw new FeatureFlagException(FeatureFlagErrorCode.NoValue,
                 $"Flag '{flagName}' has no variant value", flagName);
@@ -501,9 +500,9 @@ public class FeatureFlagService : IFeatureFlagService
         return variant.Value.ToString();
     }
 
-    private EvaluationResult EvaluateOrThrow(string flagName, EvaluationContext? context = null, string? environment = null)
+    private EvaluationResult EvaluateOrThrow(string flagName, EvaluationContext? context = null, string? environmentId = null)
     {
-        var result = Evaluate(flagName, context, environment);
+        var result = Evaluate(flagName, context, environmentId);
         if (result.Reason == EvaluationReasons.NotFound)
             throw new FeatureFlagException(FeatureFlagErrorCode.FlagNotFound,
                 $"Feature flag '{flagName}' not found", flagName);

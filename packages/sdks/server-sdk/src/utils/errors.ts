@@ -115,14 +115,14 @@ export class CouponRedeemError extends Error {
 export class FeatureFlagError extends Error {
   public readonly code: FeatureFlagErrorCode;
   public readonly flagName: string;
-  public readonly environment?: string;
+  public readonly environmentId?: string;
 
-  constructor(code: FeatureFlagErrorCode, message: string, flagName: string, environment?: string) {
+  constructor(code: FeatureFlagErrorCode, message: string, flagName: string, environmentId?: string) {
     super(message);
     this.name = 'FeatureFlagError';
     this.code = code;
     this.flagName = flagName;
-    this.environment = environment;
+    this.environmentId = environmentId;
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, FeatureFlagError);
@@ -135,7 +135,7 @@ export class FeatureFlagError extends Error {
       code: this.code,
       message: this.message,
       flagName: this.flagName,
-      environment: this.environment,
+      environmentId: this.environmentId,
     };
   }
 }

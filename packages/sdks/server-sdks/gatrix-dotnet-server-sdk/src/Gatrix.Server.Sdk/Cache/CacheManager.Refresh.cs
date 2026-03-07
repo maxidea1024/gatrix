@@ -111,9 +111,9 @@ public partial class CacheManager
     }
 
     /// <summary>Refresh ONLY feature flags (flags + segments) for a specific environment.</summary>
-    public async Task RefreshFeatureFlagsAsync(string? environment = null, CancellationToken ct = default)
+    public async Task RefreshFeatureFlagsAsync(string? environmentId = null, CancellationToken ct = default)
     {
-        var env = environment ?? _options.Environment;
+        var env = environmentId ?? throw new ArgumentNullException(nameof(environmentId), "environment is required");
         if (_options.Features.FeatureFlag)
         {
             await _featureFlag.FetchAsync(env, ct);
@@ -121,11 +121,11 @@ public partial class CacheManager
     }
 
     /// <summary>Refresh ONLY vars for a specific environment.</summary>
-    public async Task RefreshVarsAsync(string environment, CancellationToken ct = default)
+    public async Task RefreshVarsAsync(string environmentId, CancellationToken ct = default)
     {
         if (_options.Features.Vars)
         {
-            await _vars.FetchByEnvironmentAsync(environment, ct);
+            await _vars.FetchByEnvironmentAsync(environmentId, ct);
         }
     }
 
@@ -133,70 +133,57 @@ public partial class CacheManager
     private const string WildcardEnvironmentsCacheKey = "wildcard_environments_list";
 
     /// <summary>
-    /// Resolve target environments based on configuration.
+    /// Resolve target environments (always from backend via wildcard).
     /// </summary>
     private async Task<List<string>> GetTargetEnvironmentsAsync(CancellationToken ct)
     {
-        if (!_options.IsMultiEnvironmentMode)
+        // 1. Try to load from local storage first if memory is empty
+        if (_cachedWildcardEnvironments == null && _storage != null)
         {
-            return [_options.Environment];
-        }
-
-        if (_options.IsWildcardMode)
-        {
-            // 1. Try to load from local storage first if memory is empty
-            if (_cachedWildcardEnvironments == null && _storage != null)
-            {
-                try
-                {
-                    var cachedJson = await _storage.GetAsync(WildcardEnvironmentsCacheKey, ct);
-                    if (!string.IsNullOrEmpty(cachedJson))
-                    {
-                        _cachedWildcardEnvironments = JsonSerializer.Deserialize<List<string>>(cachedJson);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed to load wildcard environments from local storage");
-                }
-            }
-
-            // 2. Try to fetch fresh list from backend
             try
             {
-                var response = await _apiClient.GetAsync<EnvironmentListResponse>(
-                    "/api/v1/server/internal/environments", etag: null, ct: ct);
-
-                if (response.Success && response.Data?.Environments is { Count: > 0 })
+                var cachedJson = await _storage.GetAsync(WildcardEnvironmentsCacheKey, ct);
+                if (!string.IsNullOrEmpty(cachedJson))
                 {
-                    var envNames = response.Data.Environments
-                        .Select(e => e.Environment)
-                        .ToList();
-                    
-                    _cachedWildcardEnvironments = envNames;
-
-                    // Persist to local storage
-                    if (_storage != null)
-                    {
-                        var json = JsonSerializer.Serialize(envNames);
-                        await _storage.SaveAsync(WildcardEnvironmentsCacheKey, json, ct);
-                    }
-
-                    _logger.LogInformation("Wildcard mode: resolved {Count} environments from backend",
-                        envNames.Count);
-                    return envNames;
+                    _cachedWildcardEnvironments = JsonSerializer.Deserialize<List<string>>(cachedJson);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to fetch environment list from backend — using local cache if available");
+                _logger.LogWarning(ex, "Failed to load environments from local storage");
             }
-
-            return _cachedWildcardEnvironments ?? [];
         }
 
-        return _options.Environments!
-            .Where(e => e != "*")
-            .ToList();
+        // 2. Try to fetch fresh list from backend
+        try
+        {
+            var response = await _apiClient.GetAsync<EnvironmentListResponse>(
+                "/api/v1/server/internal/environments", etag: null, ct: ct);
+
+            if (response.Success && response.Data?.Environments is { Count: > 0 })
+            {
+                var envNames = response.Data.Environments
+                    .Select(e => e.Environment)
+                    .ToList();
+
+                _cachedWildcardEnvironments = envNames;
+
+                // Persist to local storage
+                if (_storage != null)
+                {
+                    var json = JsonSerializer.Serialize(envNames);
+                    await _storage.SaveAsync(WildcardEnvironmentsCacheKey, json, ct);
+                }
+
+                _logger.LogInformation("Resolved {Count} environments from backend", envNames.Count);
+                return envNames;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch environment list from backend — using local cache if available");
+        }
+
+        return _cachedWildcardEnvironments ?? [];
     }
 }

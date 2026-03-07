@@ -151,11 +151,11 @@ router.use(authenticate as any as any);
  */
 router.post('/cleanup', async (req: Request, res: Response) => {
   try {
-    logger.info('🗑️ Starting server cleanup...');
+    logger.info('Starting server cleanup...');
 
     // Get inactive services (terminated, error, no-response)
     const inactiveServices = await serviceDiscoveryService.getInactiveServices();
-    logger.info(`📊 Total inactive services: ${inactiveServices.length}`);
+    logger.info(`Total inactive services: ${inactiveServices.length}`);
 
     // Count by status
     const statusCounts = {
@@ -163,10 +163,10 @@ router.post('/cleanup', async (req: Request, res: Response) => {
       error: inactiveServices.filter((s) => s.status === 'error').length,
       noResponse: inactiveServices.filter((s) => s.status === 'no-response').length,
     };
-    logger.info(`🎯 Services to delete: ${inactiveServices.length}`, statusCounts);
+    logger.info(`Services to delete: ${inactiveServices.length}`, statusCounts);
 
     if (inactiveServices.length === 0) {
-      logger.info('✅ No services to clean up');
+      logger.info('No services to clean up');
       return res.json({
         success: true,
         data: {
@@ -189,7 +189,7 @@ router.post('/cleanup', async (req: Request, res: Response) => {
       message: `Cleanup completed: ${result.deletedCount} services deleted`,
     });
   } catch (error) {
-    logger.error('❌ Error during cleanup:', error);
+    logger.error('Error during cleanup:', error);
     res.status(500).json({
       success: false,
       error: { message: 'Failed to cleanup services' },

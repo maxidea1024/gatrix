@@ -86,6 +86,7 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
     });
   } catch (error: any) {
     logger.error('Failed to get whitelists:', error);
+
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to get whitelists',
@@ -243,6 +244,7 @@ router.post('/unregister', serverSDKAuth, async (req: any, res: any) => {
     });
   } catch (error: any) {
     logger.error('Failed to unregister service:', error);
+
     res.status(500).json({
       success: false,
       error: { message: error.message || 'Failed to unregister service' },
@@ -325,6 +327,7 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
     });
   } catch (error: any) {
     logger.error('Failed to update service status:', error);
+
     res.status(500).json({
       success: false,
       error: { message: error.message || 'Failed to update service status' },
@@ -384,6 +387,7 @@ router.get('/', serverSDKAuth, async (req: any, res: any) => {
     });
   } catch (error: any) {
     logger.error('Failed to get services:', error);
+
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to get services',
@@ -415,6 +419,7 @@ router.get('/:serviceType/:instanceId', serverSDKAuth, async (req: any, res: any
     });
   } catch (error: any) {
     logger.error('Failed to get service:', error);
+
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to get service',

@@ -52,9 +52,9 @@ public class MetricsAggregator : IHostedService, IDisposable
     /// <summary>
     /// Add client SDK metrics to buffer.
     /// </summary>
-    public void AddClientMetrics(string environment, string appName, JsonElement bucket, string? sdkVersion)
+    public void AddClientMetrics(string environmentId, string appName, JsonElement bucket, string? sdkVersion)
     {
-        var key = $"{environment}:{appName}";
+        var key = $"{environmentId}:{appName}";
         _clientBuffers.AddOrUpdate(key,
             _ => CreateClientBucket(bucket, sdkVersion),
             (_, existing) =>
@@ -67,9 +67,9 @@ public class MetricsAggregator : IHostedService, IDisposable
     /// <summary>
     /// Add server SDK metrics to buffer.
     /// </summary>
-    public void AddServerMetrics(string environment, string appName, JsonElement metrics, string? sdkVersion)
+    public void AddServerMetrics(string environmentId, string appName, JsonElement metrics, string? sdkVersion)
     {
-        var key = $"{environment}:{appName}";
+        var key = $"{environmentId}:{appName}";
         _serverBuffers.AddOrUpdate(key,
             _ =>
             {
@@ -88,9 +88,9 @@ public class MetricsAggregator : IHostedService, IDisposable
     /// <summary>
     /// Add server SDK unknown flag report to buffer.
     /// </summary>
-    public void AddServerUnknownReport(string environment, string appName, string flagName, int count, string? sdkVersion)
+    public void AddServerUnknownReport(string environmentId, string appName, string flagName, int count, string? sdkVersion)
     {
-        var key = $"{environment}:{appName}";
+        var key = $"{environmentId}:{appName}";
         _serverUnknownBuffers.AddOrUpdate(key,
             _ => new ServerUnknownBuffer
             {
@@ -170,13 +170,13 @@ public class MetricsAggregator : IHostedService, IDisposable
         await Task.WhenAll(tasks);
     }
 
-    private async Task FlushClientMetrics(string environment, string appName, ClientMetricBucket buffer)
+    private async Task FlushClientMetrics(string environmentId, string appName, ClientMetricBucket buffer)
     {
         try
         {
             var client = _httpClientFactory.CreateClient("GatrixBackend");
             var request = new HttpRequestMessage(HttpMethod.Post,
-                $"/api/v1/client/features/{Uri.EscapeDataString(environment)}/metrics")
+                $"/api/v1/client/features/{Uri.EscapeDataString(environmentId)}/metrics")
             {
                 Content = JsonContent.Create(new
                 {
@@ -201,18 +201,18 @@ public class MetricsAggregator : IHostedService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to flush client metrics for {Key}", $"{environment}:{appName}");
+            _logger.LogError(ex, "Failed to flush client metrics for {Key}", $"{environmentId}:{appName}");
         }
     }
 
-    private async Task FlushServerMetrics(string environment, string appName, ServerMetricBuffer buffer)
+    private async Task FlushServerMetrics(string environmentId, string appName, ServerMetricBuffer buffer)
     {
         try
         {
             var metrics = buffer.Metrics.Values.ToList();
             var client = _httpClientFactory.CreateClient("GatrixBackend");
             var request = new HttpRequestMessage(HttpMethod.Post,
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/features/metrics")
+                $"/api/v1/server/{Uri.EscapeDataString(environmentId)}/features/metrics")
             {
                 Content = JsonContent.Create(new
                 {
@@ -239,17 +239,17 @@ public class MetricsAggregator : IHostedService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to flush server metrics for {Key}", $"{environment}:{appName}");
+            _logger.LogError(ex, "Failed to flush server metrics for {Key}", $"{environmentId}:{appName}");
         }
     }
 
-    private async Task FlushServerUnknown(string environment, string appName, string flagName, int count, string? sdkVersion)
+    private async Task FlushServerUnknown(string environmentId, string appName, string flagName, int count, string? sdkVersion)
     {
         try
         {
             var client = _httpClientFactory.CreateClient("GatrixBackend");
             var request = new HttpRequestMessage(HttpMethod.Post,
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/features/unknown")
+                $"/api/v1/server/{Uri.EscapeDataString(environmentId)}/features/unknown")
             {
                 Content = JsonContent.Create(new { flagName, count, sdkVersion })
             };
@@ -267,7 +267,7 @@ public class MetricsAggregator : IHostedService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to flush unknown report for {Flag} in {Key}", flagName, $"{environment}:{appName}");
+            _logger.LogError(ex, "Failed to flush unknown report for {Flag} in {Key}", flagName, $"{environmentId}:{appName}");
         }
     }
 

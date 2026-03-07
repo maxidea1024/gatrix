@@ -101,9 +101,8 @@ public class FlagMetricsService : IDisposable
             },
         };
 
-        var env = _options.Environment;
         await _apiClient.PostAsync<object>(
-            $"/api/v1/client/features/{Uri.EscapeDataString(env)}/metrics", payload, ct);
+            "/api/v1/client/features/metrics", payload, ct);
 
         _logger.LogDebug("Flag metrics flushed: {FlagCount} flags, {MissingCount} missing",
             flagsPayload.Count, missingPayload.Count);

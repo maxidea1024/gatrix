@@ -104,6 +104,7 @@ export class EnvironmentController {
    */
   static createEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const {
+      name,
       displayName,
       description,
       environmentType,
@@ -124,6 +125,19 @@ export class EnvironmentController {
       throw new GatrixError('Project ID is required', 400, true, ErrorCodes.BAD_REQUEST);
     }
 
+    // Generate name from displayName if not provided
+    const envName =
+      name || displayName?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9_-]/g, '');
+
+    if (!envName || !Environment.isValidEnvironmentName(envName)) {
+      throw new GatrixError(
+        'Invalid environment name. Use only lowercase letters, numbers, underscore, and hyphen.',
+        400,
+        true,
+        ErrorCodes.VALIDATION_ERROR
+      );
+    }
+
     // Validate base environment if provided
     if (baseEnvironment) {
       const baseEnv = await Environment.query().findById(baseEnvironment);
@@ -134,6 +148,7 @@ export class EnvironmentController {
 
     try {
       const newEnv = await Environment.createEnvironment({
+        name: envName,
         displayName,
         description,
         environmentType: environmentType || 'development',

@@ -59,7 +59,7 @@ async function main(): Promise<void> {
           return;
         }
 
-        const environment = wsPathMatch[1];
+        const environmentId = wsPathMatch[1];
 
         // Extract metadata from query parameters or headers
         // (browsers cannot send custom headers during WebSocket handshake)
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
         }
 
         // Validate token via tokenMirrorService
-        const result = tokenMirrorService.validateToken(apiToken, 'client', environment);
+        const result = tokenMirrorService.validateToken(apiToken, 'client', environmentId);
         const isUnsecured = apiToken === 'gatrix-unsecured-client-api-token';
         if (!result.valid && !isUnsecured) {
           socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
@@ -104,12 +104,12 @@ async function main(): Promise<void> {
           const clientId = `edge-flag-ws-${ulid()}`;
           logger.debug('WebSocket client upgrading', {
             clientId,
-            environment,
+            environmentId,
             appName,
             connectionId,
             sdkVersion,
           });
-          await flagStreamingService.addWebSocketClient(clientId, environment, ws);
+          await flagStreamingService.addWebSocketClient(clientId, environmentId, ws);
         });
       } catch (err) {
         logger.error('Edge WebSocket upgrade error:', err);

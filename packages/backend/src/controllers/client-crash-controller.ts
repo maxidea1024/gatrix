@@ -21,13 +21,15 @@ export class ClientCrashController {
   static uploadCrash = asyncHandler(async (req: Request, res: Response) => {
     const body: CrashUploadRequest = req.body;
 
-    // Validate required fields
-    if (!body.platform || !body.branch || !body.environmentId || !body.stack) {
+    // Validate required fields (environmentId comes from token, not body)
+    if (!body.platform || !body.branch || !body.stack) {
       throw new GatrixError(
-        'Bad request body: Missing required fields (platform, branch, environmentId, stack)',
+        'Bad request body: Missing required fields (platform, branch, stack)',
         400
       );
     }
+
+    const environmentId = (req as any).environmentId;
 
     try {
       // Generate crash hash from stack trace
@@ -77,7 +79,7 @@ export class ClientCrashController {
           id: newCrashId,
           chash,
           branch: body.branch,
-          environmentId: body.environmentId,
+          environmentId: environmentId,
           platform: body.platform,
           marketType: body.marketType,
           isEditor: body.isEditor || false,
@@ -130,7 +132,7 @@ export class ClientCrashController {
         platform: body.platform,
         marketType: body.marketType,
         branch: body.branch,
-        environmentId: body.environmentId,
+        environmentId: environmentId,
         isEditor: body.isEditor,
         appVersion: body.appVersion,
         resVersion: body.resVersion,

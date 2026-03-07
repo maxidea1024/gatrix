@@ -10,8 +10,8 @@ export class GatrixMaintenanceHelper {
   /**
    * Get current maintenance status for client delivery
    */
-  getCurrentMaintenanceStatus(environment?: string): CurrentMaintenanceStatus {
-    const env = (this.sdk as any).resolveEnvironment(environment, 'getCurrentMaintenanceStatus');
+  getCurrentMaintenanceStatus(environmentId?: string): CurrentMaintenanceStatus {
+    const env = (this.sdk as any).resolveEnvironment(environmentId, 'getCurrentMaintenanceStatus');
     const serviceMaintenance = (this.sdk as any).cacheManager?.getServiceMaintenanceService();
     const gameWorld = (this.sdk as any).cacheManager?.getGameWorldService();
 
@@ -66,8 +66,8 @@ export class GatrixMaintenanceHelper {
   /**
    * Check if maintenance is active
    */
-  isMaintenanceActive(worldId?: string, environment?: string): boolean {
-    const env = (this.sdk as any).resolveEnvironment(environment, 'isMaintenanceActive');
+  isMaintenanceActive(worldId?: string, environmentId?: string): boolean {
+    const env = (this.sdk as any).resolveEnvironment(environmentId, 'isMaintenanceActive');
     const serviceMaintenance = (this.sdk as any).cacheManager?.getServiceMaintenanceService();
     const gameWorld = (this.sdk as any).cacheManager?.getGameWorldService();
 
@@ -94,9 +94,9 @@ export class GatrixMaintenanceHelper {
   getMaintenanceInfo(
     worldId?: string,
     lang: 'ko' | 'en' | 'zh' = 'en',
-    environment?: string
+    environmentId?: string
   ): MaintenanceInfo {
-    const env = (this.sdk as any).resolveEnvironment(environment, 'getMaintenanceInfo');
+    const env = (this.sdk as any).resolveEnvironment(environmentId, 'getMaintenanceInfo');
     const serviceMaintenance = (this.sdk as any).cacheManager?.getServiceMaintenanceService();
     const gameWorld = (this.sdk as any).cacheManager?.getGameWorldService();
     const cacheManager = (this.sdk as any).cacheManager;

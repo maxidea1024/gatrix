@@ -19,13 +19,8 @@ public class EdgeOptions
     public string ApiToken { get; set; } = "gatrix-edge-internal-bypass-token";
     public string ApplicationName { get; set; } = "edge-server";
 
-    // SDK required fields for metrics labels and service discovery
     public string Service { get; set; } = "edge";
     public string Group { get; set; } = "gatrix";
-    public string Environment { get; set; } = "gatrix-env";
-
-    // Target environments (comma-separated in env var, or "*" for all)
-    public List<string> Environments { get; set; } = new();
 
     // Redis configuration
     public EdgeRedisOptions Redis { get; set; } = new();

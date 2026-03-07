@@ -18,12 +18,12 @@ public class FeatureFlagException : Exception
     public string? Environment { get; }
     public FeatureFlagErrorCode ErrorCode { get; }
 
-    public FeatureFlagException(FeatureFlagErrorCode errorCode, string message, string flagName, string? environment = null)
+    public FeatureFlagException(FeatureFlagErrorCode errorCode, string message, string flagName, string? environmentId = null)
         : base(message)
     {
         ErrorCode = errorCode;
         FlagName = flagName;
-        Environment = environment;
+        Environment = environmentId;
     }
 }
 

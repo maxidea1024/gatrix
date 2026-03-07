@@ -6,6 +6,7 @@ const router = express.Router();
 
 // All routes require authentication and admin role
 router.use(authenticate as any);
+
 /**
  * @route GET /api/v1/admin/change-requests
  * @desc Get list of change requests for current environment

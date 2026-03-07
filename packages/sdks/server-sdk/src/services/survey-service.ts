@@ -42,25 +42,25 @@ export class SurveyService {
   /**
    * Initialize service and load data from local storage
    */
-  async initializeAsync(environment: string): Promise<void> {
+  async initializeAsync(environmentId: string): Promise<void> {
     if (!this.storage) return;
 
     try {
       const [surveysJson, settingsJson] = await Promise.all([
-        this.storage.get(`Surveys_${environment}_data`),
-        this.storage.get(`Surveys_${environment}_settings`),
+        this.storage.get(`Surveys_${environmentId}_data`),
+        this.storage.get(`Surveys_${environmentId}_settings`),
       ]);
 
       if (surveysJson) {
-        this.cachedSurveysByEnv.set(environment, JSON.parse(surveysJson));
+        this.cachedSurveysByEnv.set(environmentId, JSON.parse(surveysJson));
       }
       if (settingsJson) {
-        this.cachedSettingsByEnv.set(environment, JSON.parse(settingsJson));
+        this.cachedSettingsByEnv.set(environmentId, JSON.parse(settingsJson));
       }
-      this.logger.debug('Loaded surveys from local storage', { environment });
+      this.logger.debug('Loaded surveys from local storage', { environmentId });
     } catch (error: any) {
       this.logger.warn('Failed to load surveys from local storage', {
-        environment,
+        environmentId,
         error: error.message,
       });
     }
@@ -86,12 +86,12 @@ export class SurveyService {
    * GET /api/v1/server/surveys
    */
   async listByEnvironment(
-    environment: string,
+    environmentId: string,
     params?: SurveyListParams
   ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     const endpoint = `/api/v1/server/surveys`;
 
-    this.logger.debug('Fetching surveys', { environment, params });
+    this.logger.debug('Fetching surveys', { environmentId, params });
 
     const response = await this.apiClient.get<{
       surveys: Survey[];
@@ -106,21 +106,21 @@ export class SurveyService {
 
     // response.data contains { surveys, settings }
     const { surveys, settings } = response.data;
-    this.cachedSurveysByEnv.set(environment, surveys);
-    this.cachedSettingsByEnv.set(environment, settings);
+    this.cachedSurveysByEnv.set(environmentId, surveys);
+    this.cachedSettingsByEnv.set(environmentId, settings);
 
     // Save to local storage if available
     if (this.storage) {
       await Promise.all([
-        this.storage.save(`Surveys_${environment}_data`, JSON.stringify(surveys)),
-        this.storage.save(`Surveys_${environment}_settings`, JSON.stringify(settings)),
+        this.storage.save(`Surveys_${environmentId}_data`, JSON.stringify(surveys)),
+        this.storage.save(`Surveys_${environmentId}_settings`, JSON.stringify(settings)),
       ]);
     }
 
     this.logger.info('Surveys fetched', {
       count: surveys.length,
       hasSettings: !!settings,
-      environment,
+      environmentId,
     });
 
     return { surveys, settings };
@@ -159,8 +159,8 @@ export class SurveyService {
    * Get cached surveys
    * @param environment Environment name (required)
    */
-  getCached(environment: string): Survey[] {
-    return this.cachedSurveysByEnv.get(environment) || [];
+  getCached(environmentId: string): Survey[] {
+    return this.cachedSurveysByEnv.get(environmentId) || [];
   }
 
   /**
@@ -181,8 +181,8 @@ export class SurveyService {
    * Get cached survey settings
    * @param environment Environment name (required)
    */
-  getCachedSettings(environment: string): SurveySettings | null {
-    return this.cachedSettingsByEnv.get(environment) || null;
+  getCachedSettings(environmentId: string): SurveySettings | null {
+    return this.cachedSettingsByEnv.get(environmentId) || null;
   }
 
   /**
@@ -197,10 +197,10 @@ export class SurveyService {
   /**
    * Clear cached data for a specific environment
    */
-  clearCacheForEnvironment(environment: string): void {
-    this.cachedSurveysByEnv.delete(environment);
-    this.cachedSettingsByEnv.delete(environment);
-    this.logger.debug('Surveys cache cleared for environment', { environment });
+  clearCacheForEnvironment(environmentId: string): void {
+    this.cachedSurveysByEnv.delete(environmentId);
+    this.cachedSettingsByEnv.delete(environmentId);
+    this.logger.debug('Surveys cache cleared for environment', { environmentId });
   }
 
   /**
@@ -210,17 +210,17 @@ export class SurveyService {
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
-    environment: string,
+    environmentId: string,
     params?: SurveyListParams,
     suppressWarnings?: boolean
   ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     if (!this.featureEnabled && !suppressWarnings) {
       this.logger.warn('SurveyService.refreshByEnvironment() called but feature is disabled', {
-        environment,
+        environmentId,
       });
     }
-    this.logger.info('Refreshing surveys cache', { environment });
-    return await this.listByEnvironment(environment, params);
+    this.logger.info('Refreshing surveys cache', { environmentId });
+    return await this.listByEnvironment(environmentId, params);
   }
 
   /**
@@ -229,8 +229,8 @@ export class SurveyService {
    * @param id Survey ID
    * @param environment Environment name (required)
    */
-  async getById(id: string, environment: string): Promise<Survey> {
-    this.logger.debug('Fetching survey by ID', { id, environment });
+  async getById(id: string, environmentId: string): Promise<Survey> {
+    this.logger.debug('Fetching survey by ID', { id, environmentId });
 
     const response = await this.apiClient.get<{ survey: Survey }>(`/api/v1/server/surveys/${id}`);
 
@@ -248,8 +248,8 @@ export class SurveyService {
    * GET /api/v1/server/surveys/settings
    * @param environment Environment name (required)
    */
-  async refreshSettings(environment: string): Promise<SurveySettings> {
-    this.logger.info('Refreshing survey settings', { environment });
+  async refreshSettings(environmentId: string): Promise<SurveySettings> {
+    this.logger.info('Refreshing survey settings', { environmentId });
 
     const response = await this.apiClient.get<{ settings: SurveySettings }>(
       `/api/v1/server/surveys/settings`
@@ -260,11 +260,11 @@ export class SurveyService {
     }
 
     const { settings } = response.data;
-    const oldSettings = this.cachedSettingsByEnv.get(environment);
-    this.cachedSettingsByEnv.set(environment, settings);
+    const oldSettings = this.cachedSettingsByEnv.get(environmentId);
+    this.cachedSettingsByEnv.set(environmentId, settings);
 
     this.logger.info('Survey settings refreshed', {
-      environment,
+      environmentId,
       oldSettings,
       newSettings: settings,
       changed: !this.areSettingsEqual(oldSettings || null, settings),
@@ -278,10 +278,10 @@ export class SurveyService {
    * @param surveys Surveys to cache
    * @param environment Environment name (required)
    */
-  updateCache(surveys: Survey[], environment: string): void {
-    this.cachedSurveysByEnv.set(environment, surveys);
+  updateCache(surveys: Survey[], environmentId: string): void {
+    this.cachedSurveysByEnv.set(environmentId, surveys);
     this.logger.debug('Surveys cache updated', {
-      environment,
+      environmentId,
       count: surveys.length,
     });
   }
@@ -297,13 +297,13 @@ export class SurveyService {
    */
   async updateSingleSurvey(
     id: string,
-    environment: string,
+    environmentId: string,
     isActive?: boolean | number
   ): Promise<void> {
     try {
       this.logger.debug('Updating single survey in cache', {
         id,
-        environment,
+        environmentId,
         isActive,
       });
 
@@ -311,9 +311,9 @@ export class SurveyService {
       if (isActive === false || isActive === 0) {
         this.logger.info('Survey isActive=false, removing from cache', {
           id,
-          environment,
+          environmentId,
         });
-        this.removeSurvey(id, environment);
+        this.removeSurvey(id, environmentId);
         return;
       }
 
@@ -324,19 +324,19 @@ export class SurveyService {
       // Fetch the single survey from backend using getById (instead of list)
       let updatedSurvey: Survey;
       try {
-        updatedSurvey = await this.getById(id, environment);
+        updatedSurvey = await this.getById(id, environmentId);
       } catch (_error: any) {
         // If survey not found (404), it's no longer active
         this.logger.debug('Survey not found or not active, removing from cache', {
           id,
-          environment,
+          environmentId,
         });
-        this.removeSurvey(id, environment);
+        this.removeSurvey(id, environmentId);
         return;
       }
 
       // Get current surveys for this environment
-      const currentSurveys = this.cachedSurveysByEnv.get(environment) || [];
+      const currentSurveys = this.cachedSurveysByEnv.get(environmentId) || [];
 
       // Check if survey already exists in cache
       const existsInCache = currentSurveys.some((survey) => survey.id === id);
@@ -346,29 +346,29 @@ export class SurveyService {
         const newSurveys = currentSurveys.map((survey) =>
           survey.id === id ? updatedSurvey : survey
         );
-        this.cachedSurveysByEnv.set(environment, newSurveys);
+        this.cachedSurveysByEnv.set(environmentId, newSurveys);
         this.logger.debug('Single survey updated in cache', {
           id,
-          environment,
+          environmentId,
         });
       } else {
         // Survey not in cache but found in backend (e.g., isActive changed from false to true)
         // Add it to cache
         const newSurveys = [...currentSurveys, updatedSurvey];
-        this.cachedSurveysByEnv.set(environment, newSurveys);
+        this.cachedSurveysByEnv.set(environmentId, newSurveys);
         this.logger.debug('Single survey added to cache (was previously removed)', {
           id,
-          environment,
+          environmentId,
         });
       }
     } catch (error: any) {
       this.logger.error('Failed to update single survey in cache', {
         id,
-        environment,
+        environmentId,
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refreshByEnvironment(environment);
+      await this.refreshByEnvironment(environmentId);
     }
   }
 
@@ -377,16 +377,16 @@ export class SurveyService {
    * @param id Survey ID
    * @param environment Environment name (required)
    */
-  removeSurvey(id: string, environment: string): void {
-    this.logger.debug('Removing survey from cache', { id, environment });
+  removeSurvey(id: string, environmentId: string): void {
+    this.logger.debug('Removing survey from cache', { id, environmentId });
 
-    const currentSurveys = this.cachedSurveysByEnv.get(environment) || [];
+    const currentSurveys = this.cachedSurveysByEnv.get(environmentId) || [];
 
     // Immutable update: create new array without the deleted survey
     const newSurveys = currentSurveys.filter((survey) => survey.id !== id);
-    this.cachedSurveysByEnv.set(environment, newSurveys);
+    this.cachedSurveysByEnv.set(environmentId, newSurveys);
 
-    this.logger.debug('Survey removed from cache', { id, environment });
+    this.logger.debug('Survey removed from cache', { id, environmentId });
   }
 
   /**
@@ -394,8 +394,8 @@ export class SurveyService {
    * @param worldId World ID
    * @param environment Environment name (required)
    */
-  getSurveysForWorld(worldId: string, environment: string): Survey[] {
-    const surveys = this.getCached(environment);
+  getSurveysForWorld(worldId: string, environmentId: string): Survey[] {
+    const surveys = this.getCached(environmentId);
     return surveys.filter((survey) => {
       if (!survey.targetWorlds || survey.targetWorlds.length === 0) {
         return !survey.targetWorldsInverted; // No targeting = show to all (if not inverted)
@@ -412,16 +412,16 @@ export class SurveyService {
    * @param newSettings New settings to cache
    * @param environment Environment name (required)
    */
-  updateSettings(newSettings: SurveySettings, environment: string): void {
-    const oldSettings = this.cachedSettingsByEnv.get(environment);
-    this.cachedSettingsByEnv.set(environment, newSettings);
+  updateSettings(newSettings: SurveySettings, environmentId: string): void {
+    const oldSettings = this.cachedSettingsByEnv.get(environmentId);
+    this.cachedSettingsByEnv.set(environmentId, newSettings);
 
     // Check if settings actually changed
     const settingsChanged = !this.areSettingsEqual(oldSettings || null, newSettings);
 
     if (settingsChanged) {
       this.logger.info('Survey settings updated', {
-        environment,
+        environmentId,
         oldSettings,
         newSettings,
       });
@@ -467,9 +467,9 @@ export class SurveyService {
     worldId: string,
     userLevel: number,
     joinDays: number,
-    environment: string
+    environmentId: string
   ): Survey[] {
-    const surveys = this.getCached(environment);
+    const surveys = this.getCached(environmentId);
     return surveys.filter((survey) => {
       // Check platform targeting
       if (survey.targetPlatforms && survey.targetPlatforms.length > 0) {

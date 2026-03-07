@@ -5,6 +5,7 @@ import { VarsController } from '../../controllers/vars-controller';
 const router = Router();
 
 router.use(authenticate as any);
+
 // KV management routes (must come before /:key to avoid conflicts)
 router.get('/kv', VarsController.getAllKV as any);
 router.post('/kv', VarsController.createKV as any);

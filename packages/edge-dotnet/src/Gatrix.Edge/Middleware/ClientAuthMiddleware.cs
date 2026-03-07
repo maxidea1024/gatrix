@@ -5,7 +5,7 @@ namespace Gatrix.Edge.Middleware;
 
 /// <summary>
 /// Client authentication middleware.
-/// Validates API token and sets ClientContext in HttpContext.Items.
+/// Validates API token and resolves environment from token.
 /// Applied via UseWhen() on routes that require client auth.
 /// </summary>
 public class ClientAuthMiddleware
@@ -44,9 +44,6 @@ public class ClientAuthMiddleware
                            ?? context.Request.Query["appName"].FirstOrDefault()
                            ?? context.Request.Query["applicationName"].FirstOrDefault();
 
-        // Environment from route
-        var environment = context.Request.RouteValues["environment"]?.ToString();
-
         var clientVersion = context.Request.Headers["x-client-version"].FirstOrDefault();
         var platform = context.Request.Headers["x-platform"].FirstOrDefault();
 
@@ -75,37 +72,25 @@ public class ClientAuthMiddleware
             return;
         }
 
-        // Handle unsecured tokens
+        // Handle unsecured tokens — use 'development' as default environment
         if (apiToken == UnsecuredClientToken || apiToken == UnsecuredServerToken || apiToken == UnsecuredEdgeToken)
         {
             context.Items["ClientContext"] = new ClientContext
             {
                 ApiToken = apiToken,
                 ApplicationName = applicationName,
-                Environment = environment ?? "",
+                Environment = "development",
                 ClientVersion = clientVersion,
                 Platform = platform,
                 TokenName = "Unsecured Testing Token",
             };
-            _logger.LogDebug("Authenticated with unsecured token: {Token}, env={Environment}", apiToken, environment);
+            _logger.LogDebug("Authenticated with unsecured token: {Token}", apiToken);
             await _next(context);
             return;
         }
 
-        // Validate environment
-        if (string.IsNullOrEmpty(environment))
-        {
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                success = false,
-                error = new { code = "MISSING_ENVIRONMENT", message = "Environment is required in URL path" }
-            });
-            return;
-        }
-
-        // Validate API token
-        var validation = tokenMirror.ValidateToken(apiToken, "client", environment);
+        // Validate API token — environment is resolved from token, not URL
+        var validation = tokenMirror.ValidateToken(apiToken, "client");
 
         if (!validation.Valid)
         {
@@ -120,8 +105,8 @@ public class ClientAuthMiddleware
             var (code, message) = errorMap.GetValueOrDefault(validation.Reason ?? "not_found",
                 ("INVALID_TOKEN", "Invalid API token"));
 
-            _logger.LogWarning("Client auth failed: reason={Reason}, env={Environment}, app={App}",
-                validation.Reason, environment, applicationName);
+            _logger.LogWarning("Client auth failed: reason={Reason}, app={App}",
+                validation.Reason, applicationName);
 
             context.Response.StatusCode = 401;
             await context.Response.WriteAsJsonAsync(new
@@ -132,23 +117,56 @@ public class ClientAuthMiddleware
             return;
         }
 
-        // Record token usage
-        if (validation.Token?.Id > 0)
+        // Resolve environment from token
+        var token = validation.Token!;
+        string environmentId;
+
+        if (token.AllowAllEnvironments || (token.Environments.Count == 1 && token.Environments[0] == "*"))
         {
-            usageTracker.RecordUsage(validation.Token.Id);
+            // Token has access to all environments — cannot determine which one
+            _logger.LogWarning("Token has access to all environments, cannot resolve: {TokenName}", token.TokenName);
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                success = false,
+                error = new { code = "AMBIGUOUS_ENVIRONMENT", message = "Token has access to all environments. Use an environment-specific token." }
+            });
+            return;
+        }
+        else if (token.Environments.Count == 1)
+        {
+            environmentId = token.Environments[0];
+        }
+        else
+        {
+            // Multi-environment token
+            _logger.LogWarning("Token has access to multiple environments: {TokenName}", token.TokenName);
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                success = false,
+                error = new { code = "AMBIGUOUS_ENVIRONMENT", message = "Token has access to multiple environments. Use an environment-specific token." }
+            });
+            return;
+        }
+
+        // Record token usage
+        if (token.Id > 0)
+        {
+            usageTracker.RecordUsage(token.Id);
         }
 
         context.Items["ClientContext"] = new ClientContext
         {
             ApiToken = apiToken,
             ApplicationName = applicationName,
-            Environment = environment,
+            Environment = environmentId,
             ClientVersion = clientVersion,
             Platform = platform,
-            TokenName = validation.Token?.TokenName,
+            TokenName = token.TokenName,
         };
 
-        _logger.LogDebug("Client authenticated: app={App}, env={Environment}", applicationName, environment);
+        _logger.LogDebug("Client authenticated: app={App}, env={Environment}", applicationName, environmentId);
 
         await _next(context);
     }

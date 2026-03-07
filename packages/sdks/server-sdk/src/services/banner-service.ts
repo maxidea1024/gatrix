@@ -24,7 +24,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environment: string): string {
+  protected getEndpoint(environmentId: string): string {
     return `/api/v1/server/banners`;
   }
 
@@ -45,11 +45,11 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   /**
    * Refresh cached banners for a specific environment
    */
-  async refreshByEnvironment(environment: string): Promise<Banner[]> {
-    this.logger.info('Refreshing banners cache', { environment });
+  async refreshByEnvironment(environmentId: string): Promise<Banner[]> {
+    this.logger.info('Refreshing banners cache', { environmentId });
     // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache(this.getEndpoint(environment));
-    return await this.listByEnvironment(environment);
+    this.apiClient.invalidateEtagCache(this.getEndpoint(environmentId));
+    return await this.listByEnvironment(environmentId);
   }
 
   // ==================== Domain-specific Methods ====================
@@ -60,7 +60,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param bannerId Banner ID
    * @param environment Environment name (required)
    */
-  async fetchById(bannerId: string, environment: string): Promise<Banner> {
+  async fetchById(bannerId: string, environmentId: string): Promise<Banner> {
     const response = await this.apiClient.get<{ banner: Banner }>(
       `/api/v1/server/banners/${bannerId}`
     );
@@ -79,11 +79,11 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param environment Environment name (required)
    * @param status Optional status
    */
-  async updateSingleBanner(bannerId: string, environment: string, status?: string): Promise<void> {
+  async updateSingleBanner(bannerId: string, environmentId: string, status?: string): Promise<void> {
     try {
       this.logger.debug('Updating single banner in cache', {
         bannerId,
-        environment,
+        environmentId,
         status,
       });
 
@@ -91,10 +91,10 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
       if (status && status !== 'published') {
         this.logger.info('Banner is not published, removing from cache', {
           bannerId,
-          environment,
+          environmentId,
           status,
         });
-        this.removeFromCache(bannerId, environment);
+        this.removeFromCache(bannerId, environmentId);
         return;
       }
 
@@ -106,16 +106,16 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
       this.apiClient.invalidateEtagCache(`/banners/${bannerId}`);
 
       // Fetch the updated banner from backend
-      const updatedBanner = await this.fetchById(bannerId, environment);
-      this.updateItemInCache(updatedBanner, environment);
+      const updatedBanner = await this.fetchById(bannerId, environmentId);
+      this.updateItemInCache(updatedBanner, environmentId);
     } catch (error: any) {
       this.logger.error('Failed to update single banner in cache', {
         bannerId,
-        environment,
+        environmentId,
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refreshByEnvironment(environment);
+      await this.refreshByEnvironment(environmentId);
     }
   }
 
@@ -124,8 +124,8 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param bannerId Banner ID
    * @param environment Environment name (required)
    */
-  getById(bannerId: string, environment: string): Banner | null {
-    const banners = this.getCached(environment);
+  getById(bannerId: string, environmentId: string): Banner | null {
+    const banners = this.getCached(environmentId);
     return banners.find((b) => b.bannerId === bannerId) || null;
   }
 
@@ -134,8 +134,8 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param name Banner name
    * @param environment Environment name (required)
    */
-  getByName(name: string, environment: string): Banner | null {
-    const banners = this.getCached(environment);
+  getByName(name: string, environmentId: string): Banner | null {
+    const banners = this.getCached(environmentId);
     return banners.find((b) => b.name === name) || null;
   }
 
@@ -143,8 +143,8 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * Get published banners only
    * @param environment Environment name (required)
    */
-  getPublished(environment: string): Banner[] {
-    const banners = this.getCached(environment);
+  getPublished(environmentId: string): Banner[] {
+    const banners = this.getCached(environmentId);
     return banners.filter((b) => b.status === 'published');
   }
 
@@ -153,8 +153,8 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * @param status Banner status
    * @param environment Environment name (required)
    */
-  getByStatus(status: 'draft' | 'published' | 'archived', environment: string): Banner[] {
-    const banners = this.getCached(environment);
+  getByStatus(status: 'draft' | 'published' | 'archived', environmentId: string): Banner[] {
+    const banners = this.getCached(environmentId);
     return banners.filter((b) => b.status === status);
   }
 }

@@ -14,13 +14,13 @@ public class SurveyListResponse
 
 public interface ISurveyService
 {
-    Task InitializeAsync(string environment, CancellationToken ct = default);
-    Task<SurveyListResponse> FetchAsync(string environment, CancellationToken ct = default);
-    List<Survey> GetCached(string environment);
-    List<Survey> GetAll(string environment);
-    SurveySettings? GetSettings(string environment);
-    Task UpdateSingleSurveyAsync(string id, string environment, bool? isActive = null, CancellationToken ct = default);
-    void RemoveSurvey(string id, string environment);
+    Task InitializeAsync(string environmentId, CancellationToken ct = default);
+    Task<SurveyListResponse> FetchAsync(string environmentId, CancellationToken ct = default);
+    List<Survey> GetCached(string environmentId);
+    List<Survey> GetAll(string environmentId);
+    SurveySettings? GetSettings(string environmentId);
+    Task UpdateSingleSurveyAsync(string id, string environmentId, bool? isActive = null, CancellationToken ct = default);
+    void RemoveSurvey(string id, string environmentId);
 }
 
 public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>, ISurveyService
@@ -31,38 +31,38 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
         : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "Survey";
-    protected override string GetEndpoint(string environment) =>
+    protected override string GetEndpoint(string environmentId) =>
         $"/api/v1/server/surveys";
     protected override List<Survey> ExtractItems(SurveyListResponse response) => response.Surveys;
     protected override object GetItemId(Survey item) => item.Id;
 
-    public async Task<SurveyListResponse> FetchAsync(string environment, CancellationToken ct = default)
+    public async Task<SurveyListResponse> FetchAsync(string environmentId, CancellationToken ct = default)
     {
-        var endpoint = GetEndpoint(environment);
+        var endpoint = GetEndpoint(environmentId);
         var response = await ApiClient.GetAsync<SurveyListResponse>(endpoint, ct: ct);
         if (response.Success && response.Data is not null)
         {
-            UpdateCache(response.Data.Surveys, environment);
-            _settingsByEnv[environment] = response.Data.Settings;
+            UpdateCache(response.Data.Surveys, environmentId);
+            _settingsByEnv[environmentId] = response.Data.Settings;
             return response.Data;
         }
-        return new SurveyListResponse { Surveys = GetCached(environment), Settings = GetSettings(environment) };
+        return new SurveyListResponse { Surveys = GetCached(environmentId), Settings = GetSettings(environmentId) };
     }
 
-    public List<Survey> GetAll(string environment) => GetCached(environment);
-    public SurveySettings? GetSettings(string environment) =>
-        _settingsByEnv.GetValueOrDefault(environment);
+    public List<Survey> GetAll(string environmentId) => GetCached(environmentId);
+    public SurveySettings? GetSettings(string environmentId) =>
+        _settingsByEnv.GetValueOrDefault(environmentId);
 
     // ── Single-item cache operations (event-driven) ─────────────
 
-    public async Task UpdateSingleSurveyAsync(string id, string environment, bool? isActive = null, CancellationToken ct = default)
+    public async Task UpdateSingleSurveyAsync(string id, string environmentId, bool? isActive = null, CancellationToken ct = default)
     {
         try
         {
             if (isActive == false)
             {
                 Logger.LogInformation("Survey isActive=false, removing from cache (id={Id})", id);
-                RemoveFromCache(id, environment);
+                RemoveFromCache(id, environmentId);
                 return;
             }
 
@@ -74,23 +74,23 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
             if (!response.Success || response.Data is null)
             {
                 Logger.LogDebug("Survey not found (id={Id}), removing from cache", id);
-                RemoveFromCache(id, environment);
+                RemoveFromCache(id, environmentId);
                 return;
             }
 
-            UpsertItemInCache(response.Data, environment);
+            UpsertItemInCache(response.Data, environmentId);
             Logger.LogDebug("Single Survey upserted in cache (id={Id})", id);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update single Survey (id={Id}), falling back to full refresh", id);
-            await FetchAsync(environment, ct);
+            await FetchAsync(environmentId, ct);
         }
     }
 
-    public void RemoveSurvey(string id, string environment)
+    public void RemoveSurvey(string id, string environmentId)
     {
-        RemoveFromCache(id, environment);
+        RemoveFromCache(id, environmentId);
         Logger.LogInformation("Survey removed from cache (id={Id})", id);
     }
 }

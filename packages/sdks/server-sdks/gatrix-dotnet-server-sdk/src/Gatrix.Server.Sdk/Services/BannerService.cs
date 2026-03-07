@@ -7,12 +7,12 @@ namespace Gatrix.Server.Sdk.Services;
 
 public interface IBannerService
 {
-    Task InitializeAsync(string environment, CancellationToken ct = default);
-    Task<List<Banner>> FetchAsync(string environment, CancellationToken ct = default);
-    List<Banner> GetCached(string environment);
-    List<Banner> GetAll(string environment);
-    void UpsertSingle(Banner item, string environment);
-    void Remove(int id, string environment);
+    Task InitializeAsync(string environmentId, CancellationToken ct = default);
+    Task<List<Banner>> FetchAsync(string environmentId, CancellationToken ct = default);
+    List<Banner> GetCached(string environmentId);
+    List<Banner> GetAll(string environmentId);
+    void UpsertSingle(Banner item, string environmentId);
+    void Remove(int id, string environmentId);
 }
 
 public class BannerService : BaseEnvironmentService<Banner, List<Banner>>, IBannerService
@@ -21,15 +21,15 @@ public class BannerService : BaseEnvironmentService<Banner, List<Banner>>, IBann
         : base(apiClient, logger, storage) { }
 
     protected override string ServiceName => "Banner";
-    protected override string GetEndpoint(string environment) =>
+    protected override string GetEndpoint(string environmentId) =>
         $"/api/v1/server/banners";
     protected override List<Banner> ExtractItems(List<Banner> response) => response;
     protected override object GetItemId(Banner item) => item.BannerId;
 
-    public Task<List<Banner>> FetchAsync(string environment, CancellationToken ct = default) =>
-        FetchByEnvironmentAsync(environment, ct);
+    public Task<List<Banner>> FetchAsync(string environmentId, CancellationToken ct = default) =>
+        FetchByEnvironmentAsync(environmentId, ct);
 
-    public List<Banner> GetAll(string environment) => GetCached(environment);
-    public void UpsertSingle(Banner item, string environment) => UpsertItemInCache(item, environment);
-    public void Remove(int id, string environment) => RemoveFromCache(id, environment);
+    public List<Banner> GetAll(string environmentId) => GetCached(environmentId);
+    public void UpsertSingle(Banner item, string environmentId) => UpsertItemInCache(item, environmentId);
+    public void Remove(int id, string environmentId) => RemoveFromCache(id, environmentId);
 }

@@ -125,7 +125,7 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const environment = req.params.environment;
+    const environmentId = req.params.environment;
     const { platform, version, status, lang, channel, subChannel } = req.query as {
       platform?: string;
       version?: string;
@@ -176,7 +176,7 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     }
 
     // Get client versions from cache for this environment
-    const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
+    const envVersions = sdk.getClientVersions(environmentId) as ClientVersion[];
 
     // Filter by platform
     const platformVersions = envVersions.filter(
@@ -246,7 +246,7 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
       (record.clientStatus === 'FORCED_UPDATE' || record.clientStatus === 'RECOMMENDED_UPDATE')
     ) {
       try {
-        const channels = sdk.getVarParsedValue<any[]>('$channels', environment);
+        const channels = sdk.getVarParsedValue<any[]>('$channels', environmentId);
         if (Array.isArray(channels)) {
           const channelData = channels.find((c) => c.value === channel);
           if (channelData) {
@@ -282,14 +282,14 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
           }
         } else {
           logger.warn('$channels KV not found or not an array', {
-            environment,
+            environmentId,
             found: !!channels,
           });
         }
       } catch (e) {
         logger.warn('Failed to process $channel KV for appUpdateUrl', {
           error: e,
-          environment,
+          environmentId,
           channel,
           subChannel,
         });
@@ -314,7 +314,7 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     }
 
     logger.debug('Client version retrieved', {
-      environment,
+      environmentId,
       platform,
       version: record.clientVersion,
     });
@@ -341,10 +341,10 @@ router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const environment = req.params.environment;
+    const environmentId = req.params.environment;
 
     // Get game worlds from cache for this environment
-    const envWorlds = sdk.getGameWorlds(environment) as GameWorld[];
+    const envWorlds = sdk.getGameWorlds(environmentId) as GameWorld[];
 
     // Record cache hit/miss
     if (envWorlds.length > 0) {
@@ -374,7 +374,7 @@ router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
     };
 
     logger.debug('Game worlds retrieved', {
-      environment,
+      environmentId,
       count: visibleWorlds.length,
     });
 
@@ -433,7 +433,7 @@ router.get('/cache-stats', async (_req: Request, res: Response) => {
 // ============================================================================
 
 router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response) => {
-  const { applicationName, environment } = req.clientContext!;
+  const { applicationName, environmentId } = req.clientContext!;
 
   res.json({
     success: true,
@@ -442,7 +442,7 @@ router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response)
       tokenId: 'edge-token', // Edge doesn't have token ID
       tokenName: applicationName,
       tokenType: 'client',
-      environment,
+      environmentId,
       timestamp: new Date().toISOString(),
     },
   });
@@ -453,10 +453,10 @@ router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: 
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environment } = req.clientContext!;
+    const { environmentId } = req.clientContext!;
 
     // Get banners from cache for this environment
-    const envBanners = sdk.getBanners(environment) as Banner[];
+    const envBanners = sdk.getBanners(environmentId) as Banner[];
 
     // Record cache hit/miss
     if (envBanners.length > 0) {
@@ -478,7 +478,7 @@ router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: 
     }));
 
     logger.debug('Banners retrieved', {
-      environment,
+      environmentId,
       count: clientBanners.length,
     });
 
@@ -510,10 +510,10 @@ router.get(
       if (!sdk) return;
 
       const { bannerId } = req.params;
-      const { environment } = req.clientContext!;
+      const { environmentId } = req.clientContext!;
 
       // Get banners from cache for this environment
-      const envBanners = sdk.getBanners(environment) as Banner[];
+      const envBanners = sdk.getBanners(environmentId) as Banner[];
 
       // Find the specific banner
       const banner = envBanners.find((b) => b.bannerId === bannerId);
@@ -541,7 +541,7 @@ router.get(
       };
 
       logger.debug('Banner retrieved', {
-        environment,
+        environmentId,
         bannerId,
       });
 
@@ -577,10 +577,10 @@ router.get(
       const sdk = getSDKOrError(res);
       if (!sdk) return;
 
-      const { environment, platform } = req.clientContext!;
+      const { environmentId, platform } = req.clientContext!;
 
       // Get client versions from cache for this environment
-      const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
+      const envVersions = sdk.getClientVersions(environmentId) as ClientVersion[];
 
       // Optionally filter by platform
       let filteredVersions = envVersions;
@@ -598,7 +598,7 @@ router.get(
       }
 
       logger.debug('Client versions retrieved', {
-        environment,
+        environmentId,
         platform,
         count: filteredVersions.length,
       });
@@ -631,10 +631,10 @@ router.get(
       const sdk = getSDKOrError(res);
       if (!sdk) return;
 
-      const { environment, platform } = req.clientContext!;
+      const { environmentId, platform } = req.clientContext!;
 
       // Get service notices from cache for this environment
-      const envNotices = sdk.getServiceNotices(environment);
+      const envNotices = sdk.getServiceNotices(environmentId);
 
       // Optionally filter by platform
       let filteredNotices = envNotices;
@@ -653,7 +653,7 @@ router.get(
       }
 
       logger.debug('Service notices retrieved', {
-        environment,
+        environmentId,
         platform,
         count: filteredNotices.length,
       });
@@ -687,7 +687,7 @@ router.post(
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
-      const { environment } = req.clientContext!;
+      const { environmentId } = req.clientContext!;
 
       // Get client IP and user agent to forward to backend
       const clientIp =
@@ -695,7 +695,7 @@ router.post(
       const userAgent = req.headers['user-agent'] || 'unknown';
 
       logger.debug('Proxying crash upload to backend', {
-        environment,
+        environmentId,
         platform: req.body.platform,
         branch: req.body.branch,
         clientIp,
@@ -709,7 +709,7 @@ router.post(
           'Content-Type': 'application/json',
           'x-api-token': config.apiToken,
           'x-application-name': config.applicationName,
-          'x-environment': environment,
+          'x-environment': environmentId,
           'x-forwarded-for': clientIp,
           'user-agent': userAgent,
         },
@@ -717,7 +717,7 @@ router.post(
       });
 
       logger.info('Crash upload proxied successfully', {
-        environment,
+        environmentId,
         platform: req.body.platform,
         branch: req.body.branch,
         crashId: response.data?.data?.crashId,
@@ -785,7 +785,7 @@ router.get(
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
-      const { environment } = req.clientContext!;
+      const { environmentId } = req.clientContext!;
 
       // Lazy-import to avoid import-time side effects
       const { flagStreamingService } = await import('../services/flag-streaming-service');
@@ -794,7 +794,7 @@ router.get(
       const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
       // Register SSE client (sets headers, sends 'connected' event, handles cleanup on close)
-      await flagStreamingService.addClient(clientId, environment, res);
+      await flagStreamingService.addClient(clientId, environmentId, res);
     } catch (error) {
       logger.error('Error establishing flag streaming connection:', error);
       if (!res.headersSent) {
@@ -815,7 +815,7 @@ router.post(
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
-      const { environment, applicationName } = req.clientContext!;
+      const { environmentId, applicationName } = req.clientContext!;
       const { bucket } = req.body;
       const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
@@ -824,7 +824,7 @@ router.post(
       }
 
       // Add to aggregator for buffering
-      metricsAggregator.addClientMetrics(environment, applicationName, bucket, sdkVersion);
+      metricsAggregator.addClientMetrics(environmentId, applicationName, bucket, sdkVersion);
 
       // Return success immediately (fire and forget from client perspective)
       res.json({ success: true, buffered: true });
