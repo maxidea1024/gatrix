@@ -62,6 +62,8 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useAuth } from '@/hooks/useAuth';
+import { P } from '@/types/permissions';
 
 // ==================== Tab Panel ====================
 
@@ -422,6 +424,10 @@ const ServiceAccountsPage: React.FC = () => {
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission(P.SERVICE_ACCOUNTS_CREATE);
+  const canUpdate = hasPermission(P.SERVICE_ACCOUNTS_UPDATE);
+  const canDelete = hasPermission(P.SERVICE_ACCOUNTS_DELETE);
   const [accounts, setAccounts] = useState<ServiceAccount[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -632,7 +638,7 @@ const ServiceAccountsPage: React.FC = () => {
           <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchAccounts}>
             {t('common.refresh')}
           </Button>
-          {accounts.length > 0 && (
+          {accounts.length > 0 && canCreate && (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -649,8 +655,8 @@ const ServiceAccountsPage: React.FC = () => {
         {accounts.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('serviceAccounts.noAccounts')}
-            onAddClick={() => setEditDialog({ open: true, account: null })}
-            addButtonLabel={t('serviceAccounts.createAccount')}
+            onAddClick={canCreate ? () => setEditDialog({ open: true, account: null }) : undefined}
+            addButtonLabel={canCreate ? t('serviceAccounts.createAccount') : undefined}
           />
         ) : (
           <TableContainer component={Paper} variant="outlined">
@@ -753,6 +759,7 @@ const ServiceAccountsPage: React.FC = () => {
           setMenuTargetAccount(null);
         }}
       >
+        {canUpdate && (
         <MenuItem
           onClick={() => {
             if (menuTargetAccount) setEditDialog({ open: true, account: menuTargetAccount });
@@ -765,6 +772,8 @@ const ServiceAccountsPage: React.FC = () => {
           </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
         </MenuItem>
+        )}
+        {canDelete && (
         <MenuItem
           onClick={() => {
             if (menuTargetAccount) {
@@ -784,6 +793,7 @@ const ServiceAccountsPage: React.FC = () => {
           </ListItemIcon>
           <ListItemText>{t('common.delete')}</ListItemText>
         </MenuItem>
+        )}
       </Menu>
 
       {/* Detail Drawer */}

@@ -175,7 +175,7 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         text: 'sidebar.serviceAccounts',
         icon: 'ManageAccounts',
         path: '/admin/service-accounts',
-        requiredPermission: P.SERVICE_ACCOUNTS_READ,
+        requiredPermission: P.SERVICE_ACCOUNTS_UPDATE,
       },
     ],
   },
