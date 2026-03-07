@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { UserController } from '../controllers/UserController';
+import { UserController } from '../controllers/user-controller';
 import { authenticate } from '../middleware/auth';
-import { generalLimiter } from '../middleware/rateLimiter';
+import { generalLimiter } from '../middleware/rate-limiter';
 
 const router = Router();
 /**
@@ -84,7 +84,7 @@ const router = Router();
  *                   type: object
  *                   properties:
  *                     user:
- *                       $ref: '#/components/schemas/User'
+ *                       $ref: '#/components/schemas/user'
  *             examples:
  *               default:
  *                 value:
@@ -144,7 +144,7 @@ const router = Router();
  *                   type: object
  *                   properties:
  *                     user:
- *                       $ref: '#/components/schemas/User'
+ *                       $ref: '#/components/schemas/user'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
  *       401:

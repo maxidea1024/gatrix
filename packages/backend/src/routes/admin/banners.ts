@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
-import { BannerController } from '../../controllers/BannerController';
+import { BannerController } from '../../controllers/banner-controller';
 
 const router = Router();
 

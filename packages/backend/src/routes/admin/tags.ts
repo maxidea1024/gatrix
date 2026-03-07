@@ -1,7 +1,7 @@
 ﻿import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
-import { auditLog } from '../../middleware/auditLog';
-import { TagController } from '../../controllers/TagController';
+import { auditLog } from '../../middleware/audit-log';
+import { TagController } from '../../controllers/tag-controller';
 
 const router = Router();
 

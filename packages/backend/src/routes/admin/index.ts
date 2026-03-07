@@ -1,55 +1,55 @@
 import express from 'express';
 import { authenticate, requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
-import { environmentContextMiddleware } from '../../middleware/environmentMiddleware';
-import { orgProjectScope } from '../../middleware/orgProjectScope';
+import { environmentContextMiddleware } from '../../middleware/environment-middleware';
+import { orgProjectScope } from '../../middleware/org-project-scope';
 import { P } from '@gatrix/shared/permissions';
 
 // Import all admin-related route modules
 import adminRoutes from './admin';
 import userRoutes from './users';
 import whitelistRoutes from './whitelist';
-import ipWhitelistRoutes from './ipWhitelist';
-import clientVersionRoutes from './clientVersionRoutes';
-import auditLogRoutes from './auditLogs';
+import ipWhitelistRoutes from './ip-whitelist';
+import clientVersionRoutes from './client-version-routes';
+import auditLogRoutes from './audit-logs';
 import tagRoutes from './tags';
-import messageTemplateRoutes from './messageTemplates';
+import messageTemplateRoutes from './message-templates';
 import translationRoutes from './translation';
 import varsRoutes from './vars';
-import gameWorldRoutes from './gameWorlds';
-import apiTokenRoutes from './apiTokens';
+import gameWorldRoutes from './game-worlds';
+import apiTokenRoutes from './api-tokens';
 import notificationRoutes from './notifications';
 
 import environmentRoutes from './environments';
 import jobRoutes from './jobs';
 import maintenanceRoutes from './maintenance';
 import invitationRoutes from './invitations';
-import crashEventRoutes from './crashEvents';
+import crashEventRoutes from './crash-events';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
-import rewardTemplateRoutes from './rewardTemplates';
-import storeProductRoutes from './storeProducts';
-import serviceNoticeRoutes from './serviceNotices';
-import ingamePopupNoticeRoutes from './ingamePopupNotices';
-import planningDataRoutes from './planningData';
-import couponSettingsRoutes from './couponSettings';
-import serviceDiscoveryRoutes from './serviceDiscovery';
-import monitoringAlertRoutes from './monitoringAlerts';
-import dataManagementRoutes from './dataManagement';
+import rewardTemplateRoutes from './reward-templates';
+import storeProductRoutes from './store-products';
+import serviceNoticeRoutes from './service-notices';
+import ingamePopupNoticeRoutes from './ingame-popup-notices';
+import planningDataRoutes from './planning-data';
+import couponSettingsRoutes from './coupon-settings';
+import serviceDiscoveryRoutes from './service-discovery';
+import monitoringAlertRoutes from './monitoring-alerts';
+import dataManagementRoutes from './data-management';
 import bannerRoutes from './banners';
-import cmsCashShopRoutes from './cmsCashShop';
-import serverLifecycleRoutes from './serverLifecycle';
-import changeRequestRoutes from './changeRequests';
+import cmsCashShopRoutes from './cms-cash-shop';
+import serverLifecycleRoutes from './server-lifecycle';
+import changeRequestRoutes from './change-requests';
 import featureRoutes from './features';
-import platformDefaultsRoutes from './platformDefaults';
-import unknownFlagsRoutes from './unknownFlags';
+import platformDefaultsRoutes from './platform-defaults';
+import unknownFlagsRoutes from './unknown-flags';
 import integrationRoutes from './integrations';
-import releaseFlowRoutes from './releaseFlows';
-import serviceAccountRoutes from './serviceAccounts';
-import signalEndpointRoutes from './signalEndpoints';
-import actionSetRoutes from './actionSets';
-import queueMonitorRoutes from './queueMonitor';
+import releaseFlowRoutes from './release-flows';
+import serviceAccountRoutes from './service-accounts';
+import signalEndpointRoutes from './signal-endpoints';
+import actionSetRoutes from './action-sets';
+import queueMonitorRoutes from './queue-monitor';
 import rbacRoutes from './rbac';
-import ImpactMetricsController from '../../controllers/ImpactMetricsController';
+import ImpactMetricsController from '../../controllers/impact-metrics-controller';
 
 const router = express.Router();
 
@@ -60,7 +60,7 @@ router.use('/services', serviceDiscoveryRoutes);
 
 // Self-service routes for authenticated users (not requiring admin role)
 
-import { permissionService } from '../../services/PermissionService';
+import { permissionService } from '../../services/permission-service';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('index');
@@ -95,7 +95,7 @@ router.get('/users/me/environments', authenticate as any, async (req: any, res: 
 });
 
 // Self-service: Get current user's RBAC permissions (no requirePermission needed)
-import { UserController } from '../../controllers/UserController';
+import { UserController } from '../../controllers/user-controller';
 router.get('/users/me/permissions', authenticate as any, UserController.getMyPermissions);
 
 router.use('/rbac', rbacRoutes);

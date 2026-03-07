@@ -1,15 +1,15 @@
 import express, { Response } from 'express';
-import { mailService } from '../services/MailService';
+import { mailService } from '../services/mail-service';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth';
-import { MailType, MailPriority } from '../models/Mail';
-import { pubSubService } from '../services/PubSubService';
+import { MailType, MailPriority } from '../models/mail';
+import { pubSubService } from '../services/pub-sub-service';
 import {
   sendBadRequest,
   sendNotFound,
   sendInternalError,
   sendSuccessResponse,
   ErrorCodes,
-} from '../utils/apiResponse';
+} from '../utils/api-response';
 
 const router = express.Router();
 

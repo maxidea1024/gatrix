@@ -1,0 +1,358 @@
+// import bcrypt from 'bcryptjs'; // Removed as it's not used directly here
+import { UserModel } from '../models/user';
+import { JwtUtils } from '../utils/jwt';
+import { GatrixError } from '../middleware/error-handler';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuthService');
+import { CreateUserData, UserWithoutPassword } from '../types/user';
+import db from '../config/knex';
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface AuthResponse {
+  user: UserWithoutPassword;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export class AuthService {
+  static async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    try {
+      const { email, password } = credentials;
+
+      // Find user by email
+      const user = await UserModel.findByEmail(email);
+      if (!user) {
+        throw new GatrixError('USER_NOT_FOUND', 404);
+      }
+
+      // Check if user is active
+      if (user.status !== 'active') {
+        if (user.status === 'pending') {
+          throw new GatrixError('ACCOUNT_PENDING', 403);
+        } else if (user.status === 'suspended') {
+          throw new GatrixError('ACCOUNT_SUSPENDED', 403);
+        } else {
+          throw new GatrixError('Account is not active. Please contact an administrator.', 403);
+        }
+      }
+
+      // Verify password
+      const isValidPassword = await UserModel.verifyPassword(user, password);
+      if (!isValidPassword) {
+        throw new GatrixError('Invalid email or password', 401);
+      }
+
+      // Update last login
+      await UserModel.updateLastLogin(user.id);
+
+      // Remove password hash from user object
+      const userWithoutPassword = { ...user };
+      delete (userWithoutPassword as any).passwordHash;
+
+      // Generate tokens
+      // Look up org membership to include correct orgId in JWT
+      let orgId = '';
+      try {
+        const membership = await db('g_organisation_members')
+          .where('userId', user.id)
+          .orderBy('joinedAt', 'asc')
+          .first();
+        if (membership) {
+          orgId = membership.orgId;
+        }
+      } catch (err) {
+        logger.warn('Failed to lookup org membership during login:', err);
+      }
+
+      const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId);
+      const refreshToken = JwtUtils.generateRefreshToken(
+        userWithoutPassword as any,
+        orgId
+      );
+
+      logger.info('User logged in successfully:', {
+        userId: user.id,
+        email: user.email,
+      });
+
+      return {
+        user: userWithoutPassword as any,
+        accessToken,
+        refreshToken,
+      };
+    } catch (error) {
+      if (error instanceof GatrixError) {
+        throw error;
+      }
+      logger.error('Login error:', error);
+      throw new GatrixError('Login failed', 500);
+    }
+  }
+
+  static async register(registerData: RegisterData): Promise<UserWithoutPassword> {
+    try {
+      const { email, password, name } = registerData;
+
+      // Check if user already exists
+      const existingUser = await UserModel.findByEmail(email);
+      if (existingUser) {
+        throw new GatrixError('EMAIL_ALREADY_EXISTS', 409);
+      }
+
+      // Create user data
+      const userData: CreateUserData = {
+        email,
+        password,
+        name,
+        status: 'pending', // New users need admin approval
+        emailVerified: false,
+      };
+
+      // Create user
+      const user = await UserModel.create(userData);
+
+      logger.info('User registered successfully:', {
+        userId: user.id,
+        email: user.email,
+      });
+
+      return user;
+    } catch (error) {
+      if (error instanceof GatrixError) {
+        throw error;
+      }
+      logger.error('Registration error:', error);
+      throw new GatrixError('REGISTRATION_FAILED', 500);
+    }
+  }
+
+  static async refreshToken(
+    refreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    try {
+      // Verify refresh token
+      const payload = JwtUtils.verifyRefreshToken(refreshToken);
+      if (!payload) {
+        logger.warn('Refresh token verification failed: invalid or expired token');
+        throw new GatrixError('Invalid or expired refresh token', 401);
+      }
+
+      logger.debug('Refresh token verified, looking up user:', {
+        userId: payload.userId,
+      });
+
+      // Get user details
+      const user = await UserModel.findById(payload.userId);
+      if (!user) {
+        logger.warn('User not found during token refresh:', {
+          userId: payload.userId,
+        });
+        throw new GatrixError('User not found', 401);
+      }
+
+      if (user.status !== 'active') {
+        logger.warn('User account is not active during token refresh:', {
+          userId: payload.userId,
+          status: user.status,
+        });
+        throw new GatrixError('User account is not active', 401);
+      }
+
+      // Generate new tokens
+      const newAccessToken = JwtUtils.generateToken(user, payload.orgId);
+      const newRefreshToken = JwtUtils.generateRefreshToken(user, payload.orgId);
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch (error) {
+      if (error instanceof GatrixError) {
+        throw error;
+      }
+      logger.error('Token refresh error:', error);
+      throw new GatrixError('Token refresh failed', 500);
+    }
+  }
+
+  static async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    try {
+      // Get user with password hash
+      const user = await UserModel.findByEmail((await UserModel.findById(userId))!.email);
+      if (!user) {
+        throw new GatrixError('User not found', 404);
+      }
+
+      // OAuth Used자들은 비밀번호 변경 불가
+      if (user.authType !== 'local') {
+        throw new GatrixError('Password change is not available for OAuth users', 400);
+      }
+
+      // Verify current password
+      if (user.passwordHash) {
+        const isValidPassword = await UserModel.verifyPassword(user, currentPassword);
+        if (!isValidPassword) {
+          throw new GatrixError('Current password is incorrect', 400);
+        }
+      } else {
+        // local Used자인데 passwordHash가 없는 경우 (데이터 불일치)
+        throw new GatrixError('Password not set for this account', 400);
+      }
+
+      // Update password
+      await UserModel.updatePassword(userId, newPassword);
+
+      logger.info('Password changed successfully:', {
+        userId,
+      });
+    } catch (error) {
+      if (error instanceof GatrixError) {
+        throw error;
+      }
+      logger.error('Change password error:', error);
+      throw new GatrixError('Password change failed', 500);
+    }
+  }
+
+  static async resetPassword(email: string): Promise<void> {
+    try {
+      const user = await UserModel.findByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists or not
+        logger.info('Password reset requested for non-existent email:', {
+          email,
+        });
+        return;
+      }
+
+      // 1. 보안 리셋 토큰 Create
+      const crypto = require('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 Expired
+
+      // 2. 데이터베이스에 Save token
+      await db('g_password_reset_tokens').insert({
+        userId: user.id,
+        token: resetToken,
+        expiresAt,
+        createdAt: new Date(),
+      });
+
+      // 3. 이메일 발송
+      const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+
+      // QueueService를 통해 이메일 발송 (비동기)
+      const QueueService = require('./queue-service').default;
+      await QueueService.addEmailJob({
+        to: user.email,
+        subject: 'Password Reset Request',
+        html: `
+          <h2>Password Reset Request</h2>
+          <p>You requested a password reset. Click the link below to reset your password:</p>
+          <a href="${resetUrl}">Reset Password</a>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+        `,
+        text: `Password reset requested. Visit: ${resetUrl} (expires in 1 hour)`,
+      });
+
+      logger.info('Password reset email sent:', {
+        userId: user.id,
+        email: user.email,
+      });
+    } catch (error) {
+      logger.error('Password reset error:', error);
+      throw new GatrixError('Password reset failed', 500);
+    }
+  }
+
+  static async verifyEmail(userId: string): Promise<void> {
+    try {
+      await UserModel.update(userId, {
+        emailVerified: true,
+      });
+
+      logger.info('Email verified successfully:', {
+        userId,
+      });
+    } catch (error) {
+      logger.error('Email verification error:', error);
+      throw new GatrixError('Email verification failed', 500);
+    }
+  }
+
+  static async getProfile(userId: string): Promise<UserWithoutPassword> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new GatrixError('User not found', 404);
+      }
+
+      return user;
+    } catch (error) {
+      if (error instanceof GatrixError) {
+        throw error;
+      }
+      logger.error('Get profile error:', error);
+      throw new GatrixError('Failed to get user profile', 500);
+    }
+  }
+
+  static async updateProfile(
+    userId: string,
+    updateData: {
+      name?: string;
+      avatarUrl?: string;
+      preferredLanguage?: string;
+    }
+  ): Promise<UserWithoutPassword> {
+    try {
+      // Only allow specific fields for profile updates
+      const allowedFields = ['name', 'avatarUrl', 'preferredLanguage'];
+      const filteredData: any = {};
+
+      for (const [key, value] of Object.entries(updateData)) {
+        if (allowedFields.includes(key) && value !== undefined) {
+          filteredData[key] = value;
+        }
+      }
+
+      if (Object.keys(filteredData).length === 0) {
+        throw new GatrixError('No valid fields to update', 400);
+      }
+
+      const user = await UserModel.update(userId, filteredData);
+      if (!user) {
+        throw new GatrixError('User not found', 404);
+      }
+
+      logger.info('Profile updated successfully:', {
+        userId,
+        updates: Object.keys(filteredData),
+      });
+
+      return user;
+    } catch (error) {
+      if (error instanceof GatrixError) {
+        throw error;
+      }
+      logger.error('Update profile error:', error);
+      throw new GatrixError('Profile update failed', 500);
+    }
+  }
+}

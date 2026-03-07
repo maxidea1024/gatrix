@@ -4,23 +4,23 @@
  * Registry for all available addon providers.
  */
 
-import { Addon } from './Addon';
-import { SlackAddon } from './SlackAddon';
-import { SlackAppAddon } from './SlackAppAddon';
-import { WebhookAddon } from './WebhookAddon';
-import { TeamsAddon } from './TeamsAddon';
-import { LarkAddon } from './LarkAddon';
-import { NewRelicAddon } from './NewRelicAddon';
-import { DiscordAddon } from './DiscordAddon';
-import { PagerDutyAddon } from './PagerDutyAddon';
-import { TelegramAddon } from './TelegramAddon';
-import { WhatsAppAddon } from './WhatsAppAddon';
-import { LineAddon } from './LineAddon';
-import { KakaoAddon } from './KakaoAddon';
-import { GoogleChatAddon } from './GoogleChatAddon';
-import { WeComAddon } from './WeComAddon';
-import { DingTalkAddon } from './DingTalkAddon';
-import { DebugAddon } from './DebugAddon';
+import { Addon } from './addon';
+import { SlackAddon } from './slack-addon';
+import { SlackAppAddon } from './slack-app-addon';
+import { WebhookAddon } from './webhook-addon';
+import { TeamsAddon } from './teams-addon';
+import { LarkAddon } from './lark-addon';
+import { NewRelicAddon } from './new-relic-addon';
+import { DiscordAddon } from './discord-addon';
+import { PagerDutyAddon } from './pager-duty-addon';
+import { TelegramAddon } from './telegram-addon';
+import { WhatsAppAddon } from './whats-app-addon';
+import { LineAddon } from './line-addon';
+import { KakaoAddon } from './kakao-addon';
+import { GoogleChatAddon } from './google-chat-addon';
+import { WeComAddon } from './we-com-addon';
+import { DingTalkAddon } from './ding-talk-addon';
+import { DebugAddon } from './debug-addon';
 import { getAllAddonDefinitions, getAddonDefinition, ADDON_DEFINITIONS } from './definitions';
 import type { AddonDefinition } from './definitions';
 

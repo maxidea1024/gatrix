@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate, requireOrgPermission } from '../../middleware/auth';
-import { AdminController } from '../../controllers/AdminController';
-import apiTokenRoutes from './apiTokens';
+import { AdminController } from '../../controllers/admin-controller';
+import apiTokenRoutes from './api-tokens';
 import {
   auditUserUpdate,
   auditUserDelete,
@@ -9,7 +9,7 @@ import {
   auditUserReject,
   auditUserSuspend,
   auditUserUnsuspend,
-} from '../../middleware/auditLog';
+} from '../../middleware/audit-log';
 import { P } from '@gatrix/shared/permissions';
 
 const router = Router();

@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { ClientController } from '../../controllers/ClientController';
-import { ClientCrashController } from '../../controllers/ClientCrashController';
-import { BannerClientController } from '../../controllers/BannerClientController';
-import { requestLogger } from '../../middleware/requestLogger';
-import { clientSDKAuth } from '../../middleware/apiTokenAuth';
+import { ClientController } from '../../controllers/client-controller';
+import { ClientCrashController } from '../../controllers/client-crash-controller';
+import { BannerClientController } from '../../controllers/banner-client-controller';
+import { requestLogger } from '../../middleware/request-logger';
+import { clientSDKAuth } from '../../middleware/api-token-auth';
 import { body, param, validationResult } from 'express-validator';
-import { GatrixError } from '../../middleware/errorHandler';
+import { GatrixError } from '../../middleware/error-handler';
 
 const router = Router();
 

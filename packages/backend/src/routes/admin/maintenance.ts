@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { MaintenanceController } from '../../controllers/MaintenanceController';
+import { MaintenanceController } from '../../controllers/maintenance-controller';
 
 const router = Router();
 

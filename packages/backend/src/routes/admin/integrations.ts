@@ -5,7 +5,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { IntegrationService } from '../../services/IntegrationService';
+import { IntegrationService } from '../../services/integration-service';
 import { getAddonDefinition } from '../../addons/definitions';
 import { createLogger } from '../../config/logger';
 

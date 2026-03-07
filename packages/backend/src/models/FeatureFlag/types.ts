@@ -3,7 +3,7 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('types');
 import { ulid } from 'ulid';
-import { parseJsonField } from '../../utils/dbUtils';
+import { parseJsonField } from '../../utils/db-utils';
 
 // Re-export shared types for backward compatibility
 // All consumers that import from this file still work unchanged

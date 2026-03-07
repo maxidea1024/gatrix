@@ -6,7 +6,7 @@
  * These should be translated on the frontend using i18n.
  */
 
-import { IntegrationEventType, ALL_INTEGRATION_EVENTS } from '../types/integrationEvents';
+import { IntegrationEventType, ALL_INTEGRATION_EVENTS } from '../types/integration-events';
 
 /**
  * Parameter type for addon configuration

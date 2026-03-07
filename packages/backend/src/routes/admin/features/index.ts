@@ -4,13 +4,13 @@
  */
 
 import { Router } from 'express';
-import networkTrafficRouter from './networkTraffic';
-import flagTypesRouter from './flagTypes';
+import networkTrafficRouter from './network-traffic';
+import flagTypesRouter from './flag-types';
 import segmentsRouter from './segments';
-import contextFieldsRouter from './contextFields';
-import codeReferencesRouter from './codeReferences';
+import contextFieldsRouter from './context-fields';
+import codeReferencesRouter from './code-references';
 import playgroundRouter from './playground';
-import importExportRouter from './importExport';
+import importExportRouter from './import-export';
 import flagsRouter from './flags';
 
 const router = Router();

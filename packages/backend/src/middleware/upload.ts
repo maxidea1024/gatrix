@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import { Express } from 'express-serve-static-core';
-import { GatrixError } from './errorHandler';
+import { GatrixError } from './error-handler';
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(process.cwd(), 'uploads');

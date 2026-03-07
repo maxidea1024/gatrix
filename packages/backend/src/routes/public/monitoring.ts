@@ -1,5 +1,5 @@
 import express from 'express';
-import serviceDiscoveryService from '../../services/serviceDiscoveryService';
+import serviceDiscoveryService from '../../services/service-discovery-service';
 
 const router = express.Router();
 

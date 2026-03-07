@@ -1,5 +1,5 @@
 import db from '../config/knex';
-import { PasswordResetService } from '../services/PasswordResetService';
+import { PasswordResetService } from '../services/password-reset-service';
 import logger from '../config/logger';
 
 /**

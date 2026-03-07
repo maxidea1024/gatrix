@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
-import { WhitelistController } from '../../controllers/WhitelistController';
-import { auditLog } from '../../middleware/auditLog';
+import { WhitelistController } from '../../controllers/whitelist-controller';
+import { auditLog } from '../../middleware/audit-log';
 
 const router = Router();
 

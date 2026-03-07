@@ -1,5 +1,5 @@
-import EmailService from '../services/EmailService';
-import { UserModel } from '../models/User';
+import EmailService from '../services/email-service';
+import { UserModel } from '../models/user';
 import logger from '../config/logger';
 
 /**

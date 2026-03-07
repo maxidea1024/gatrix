@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserController } from '../../controllers/UserController';
+import { UserController } from '../../controllers/user-controller';
 import { authenticate } from '../../middleware/auth';
 
 const router = Router();
@@ -28,7 +28,7 @@ const router = Router();
  *                   type: object
  *                   properties:
  *                     user:
- *                       $ref: '#/components/schemas/User'
+ *                       $ref: '#/components/schemas/user'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
@@ -74,7 +74,7 @@ const router = Router();
  *                   type: object
  *                   properties:
  *                     user:
- *                       $ref: '#/components/schemas/User'
+ *                       $ref: '#/components/schemas/user'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
  *       401:

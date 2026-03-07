@@ -4,7 +4,7 @@
 
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../../middleware/auth';
-import { RequestContext } from '../../../services/FeatureFlagService';
+import { RequestContext } from '../../../services/feature-flag-service';
 
 /**
  * Validate environment is set in request

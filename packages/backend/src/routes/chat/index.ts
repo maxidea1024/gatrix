@@ -2,12 +2,12 @@ import express from 'express';
 import multer from 'multer';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
-import { ChatSyncController } from '../../controllers/ChatSyncController';
+import { ChatSyncController } from '../../controllers/chat-sync-controller';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('ChatRoutes');
 import { HEADERS } from '../../constants/headers';
-import { UserModel } from '../../models/User';
+import { UserModel } from '../../models/user';
 
 const router = express.Router();
 
@@ -46,7 +46,7 @@ router.use((req, res, next) => {
 router.get('/test-connection', async (req, res) => {
   try {
     const chatServerService =
-      require('../../services/ChatServerService').ChatServerService.getInstance();
+      require('../../services/chat-server-service').ChatServerService.getInstance();
     const response = await chatServerService.axiosInstance.get('/health');
     res.json({
       success: true,
@@ -156,7 +156,7 @@ const proxyOptions = {
       });
 
       const chatServerService =
-        require('../../services/ChatServerService').ChatServerService.getInstance();
+        require('../../services/chat-server-service').ChatServerService.getInstance();
       chatServerService
         .ensureUserSynced({
           id: user.id,

@@ -2,8 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { authenticate, AuthenticatedRequest } from '../../middleware/auth';
-import SSENotificationService from '../../services/sseNotificationService';
-import { pubSubService } from '../../services/PubSubService';
+import SSENotificationService from '../../services/sse-notification-service';
+import { pubSubService } from '../../services/pub-sub-service';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('notifications');

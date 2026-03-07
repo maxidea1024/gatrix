@@ -6,7 +6,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { SignalEndpointModel } from '../../models/SignalEndpoint';
+import { SignalEndpointModel } from '../../models/signal-endpoint';
 import { createLogger } from '../../config/logger';
 import crypto from 'crypto';
 

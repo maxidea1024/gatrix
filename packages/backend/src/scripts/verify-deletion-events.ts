@@ -1,4 +1,4 @@
-import { pubSubService } from '../services/PubSubService';
+import { pubSubService } from '../services/pub-sub-service';
 import { Redis } from 'ioredis';
 import { config } from '../config';
 

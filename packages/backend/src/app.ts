@@ -11,10 +11,10 @@ import { config } from './config';
 import passport from './config/passport';
 import swaggerSpec from './config/swagger';
 // import logger from './config/logger';
-import { requestLogger } from './middleware/requestLogger';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import { generalLimiter, apiLimiter } from './middleware/rateLimiter';
-import { appInstance } from './utils/AppInstance';
+import { requestLogger } from './middleware/request-logger';
+import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { generalLimiter, apiLimiter } from './middleware/rate-limiter';
+import { appInstance } from './utils/app-instance';
 import { ALLOWED_HEADERS } from './constants/headers';
 
 // Import main routes module
@@ -143,7 +143,7 @@ app.use(passport.initialize() as any);
 // app.use(passport.session() as any);
 
 // Metrics endpoint
-import { impactMetricsService } from './services/ImpactMetricsService';
+import { impactMetricsService } from './services/impact-metrics-service';
 
 app.get('/metrics', async (req, res) => {
   try {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { auth, requireProjectPermission } from '../../middleware/auth';
-import EnvironmentController from '../../controllers/EnvironmentController';
+import EnvironmentController from '../../controllers/environment-controller';
 import { P } from '@gatrix/shared/permissions';
 
 const router = express.Router({ mergeParams: true });

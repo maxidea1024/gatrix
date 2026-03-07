@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   PublicInvitationController,
   acceptInvitationValidation,
-} from '../../controllers/PublicInvitationController';
+} from '../../controllers/public-invitation-controller';
 
 const router = Router();
 

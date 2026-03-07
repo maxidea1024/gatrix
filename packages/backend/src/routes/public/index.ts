@@ -1,7 +1,7 @@
 import express from 'express';
 import uploadRoutes from './upload';
 import invitationRoutes from './invitations';
-import serviceNoticeRoutes from './serviceNotices';
+import serviceNoticeRoutes from './service-notices';
 import monitoringRoutes from './monitoring';
 import signalRoutes from './signals';
 

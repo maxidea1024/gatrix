@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import { config } from '../config';
 import logger from '../config/logger';
 import database from '../config/database';
-import { initializeSystemKV } from '../utils/systemKV';
+import { initializeSystemKV } from '../utils/system-kv';
 
 const { ulid } = require('ulid');
 

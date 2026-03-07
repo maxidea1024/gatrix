@@ -41,10 +41,10 @@ async function runTest() {
       hasPass: !!configModule.config.database.password,
     });
 
-    const { UnifiedChangeGateway } = require('../services/UnifiedChangeGateway');
-    const { ChangeRequestService } = require('../services/ChangeRequestService');
-    const { ChangeRequest } = require('../models/ChangeRequest');
-    const { Environment } = require('../models/Environment');
+    const { UnifiedChangeGateway } = require('../services/unified-change-gateway');
+    const { ChangeRequestService } = require('../services/change-request-service');
+    const { ChangeRequest } = require('../models/change-request');
+    const { Environment } = require('../models/environment');
 
     // Setup: Ensure Test Env exists
     const existingEnv = await Environment.query().findById(TEST_ENV);

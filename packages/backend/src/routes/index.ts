@@ -1,19 +1,19 @@
 import express from 'express';
-import { authLimiter } from '../middleware/rateLimiter';
+import { authLimiter } from '../middleware/rate-limiter';
 
 // Import organized route modules
 import clientRoutes from './client';
 import serverRoutes from './server';
 import adminRoutes from './admin';
-import { MonitoringAlertController } from '../controllers/MonitoringAlertController';
+import { MonitoringAlertController } from '../controllers/monitoring-alert-controller';
 import authRoutes from './auth';
 import publicRoutes from './public';
 // chatRoutes are handled directly in app.ts before body parsing
 import userRoutes from './users';
-import linkPreviewRoutes from './linkPreview';
+import linkPreviewRoutes from './link-preview';
 import mailRoutes from './mails';
 import couponRoutes from './coupons';
-import entityLockRoutes from '../controllers/EntityLockController';
+import entityLockRoutes from '../controllers/entity-lock-controller';
 import signalIngestionRoutes from './public/signals';
 
 const router = express.Router();

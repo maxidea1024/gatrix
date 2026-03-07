@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import logger from '../config/logger';
-import migration from './Migration';
+import migration from './migration';
 
 async function runMigrations() {
   try {

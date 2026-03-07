@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../../middleware/auth';
-import { auditLog } from '../../middleware/auditLog';
+import { auditLog } from '../../middleware/audit-log';
 import {
   getJobs,
   getJob,
@@ -11,13 +11,13 @@ import {
   getJobExecutions,
   setJobTags,
   getJobTags,
-} from '../../controllers/jobController';
-import { getJobTypes, getJobType } from '../../controllers/jobTypeController';
+} from '../../controllers/job-controller';
+import { getJobTypes, getJobType } from '../../controllers/job-type-controller';
 import {
   getJobExecutions as getAllJobExecutions,
   getJobExecution,
   getJobExecutionStatistics,
-} from '../../controllers/jobExecutionController';
+} from '../../controllers/job-execution-controller';
 
 const router = express.Router();
 

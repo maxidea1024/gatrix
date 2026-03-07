@@ -8,27 +8,27 @@
 
 import express from 'express';
 import { authenticate } from '../../middleware/auth';
-import { requireOrgPermission, requireOrgAdmin } from '../../middleware/rbacMiddleware';
+import { requireOrgPermission, requireOrgAdmin } from '../../middleware/rbac-middleware';
 import { ORG_PERMISSIONS } from '../../types/permissions';
 import { P } from '@gatrix/shared/permissions';
 import { AuthenticatedRequest } from '../../types/auth';
-import { Organisation } from '../../models/Organisation';
-import { ProjectModel } from '../../models/ProjectModel';
-import { RoleModel } from '../../models/RoleModel';
-import { GroupModel } from '../../models/GroupModel';
-import { AdminApiToken } from '../../models/AdminApiToken';
-import { EnvironmentKey } from '../../models/EnvironmentKey';
-import { permissionService } from '../../services/PermissionService';
+import { Organisation } from '../../models/organisation';
+import { ProjectModel } from '../../models/project-model';
+import { RoleModel } from '../../models/role-model';
+import { GroupModel } from '../../models/group-model';
+import { AdminApiToken } from '../../models/admin-api-token';
+import { EnvironmentKey } from '../../models/environment-key';
+import { permissionService } from '../../services/permission-service';
 import { generateULID } from '../../utils/ulid';
-import { GatrixError } from '../../middleware/errorHandler';
-import { initializeSystemKV } from '../../utils/systemKV';
+import { GatrixError } from '../../middleware/error-handler';
+import { initializeSystemKV } from '../../utils/system-kv';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('rbac');
 import db from '../../config/knex';
-import { pubSubService } from '../../services/PubSubService';
-import { AuditLogModel } from '../../models/AuditLog';
-import { getScopeLevel } from '../../utils/scopeHierarchy';
+import { pubSubService } from '../../services/pub-sub-service';
+import { AuditLogModel } from '../../models/audit-log';
+import { getScopeLevel } from '../../utils/scope-hierarchy';
 
 const router = express.Router();
 
@@ -622,7 +622,7 @@ router.get(
       // Filter roles by actor's scope level (hierarchy-based)
       const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
       query.where('g_roles.scopeType', 'in',
-        Object.entries(require('../../utils/scopeHierarchy').SCOPE_LEVELS)
+        Object.entries(require('../../utils/scope-hierarchy').SCOPE_LEVELS)
           .filter(([, level]) => (level as number) >= actorScopeLevel)
           .map(([key]) => key)
       );

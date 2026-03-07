@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UploadController } from '../../controllers/UploadController';
+import { UploadController } from '../../controllers/upload-controller';
 import { authenticate } from '../../middleware/auth';
 import { uploadAvatar } from '../../middleware/upload';
 

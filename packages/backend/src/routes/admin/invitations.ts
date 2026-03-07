@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
-import { requireOrgPermission } from '../../middleware/rbacMiddleware';
+import { requireOrgPermission } from '../../middleware/rbac-middleware';
 import { ORG_PERMISSIONS } from '../../types/permissions';
 import {
   AdminInvitationController,
   createInvitationValidation,
-} from '../../controllers/AdminInvitationController';
-import { enhancedAuditLog, fetchInvitationById } from '../../utils/enhancedAuditLog';
+} from '../../controllers/admin-invitation-controller';
+import { enhancedAuditLog, fetchInvitationById } from '../../utils/enhanced-audit-log';
 
 const router = Router();
 

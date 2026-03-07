@@ -5,10 +5,10 @@
 
 import { Router, Response } from 'express';
 import { AuthenticatedRequest } from '../../../middleware/auth';
-import { asyncHandler } from '../../../middleware/errorHandler';
-import { featureFlagService } from '../../../services/FeatureFlagService';
+import { asyncHandler } from '../../../middleware/error-handler';
+import { featureFlagService } from '../../../services/feature-flag-service';
 import { requireEnvironment, getRequestContext } from './_helpers';
-import { flagCodeReferencesRouter } from './codeReferences';
+import { flagCodeReferencesRouter } from './code-references';
 
 const router = Router();
 

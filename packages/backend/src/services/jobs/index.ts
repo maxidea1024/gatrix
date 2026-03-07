@@ -1,8 +1,8 @@
-import { JobFactory } from './JobFactory';
-import { MailSendJob } from './MailSendJob';
-import { HttpRequestJob } from './HttpRequestJob';
-import { SshCommandJob } from './SshCommandJob';
-import { LogMessageJob } from './LogMessageJob';
+import { JobFactory } from './job-factory';
+import { MailSendJob } from './mail-send-job';
+import { HttpRequestJob } from './http-request-job';
+import { SshCommandJob } from './ssh-command-job';
+import { LogMessageJob } from './log-message-job';
 import { createLogger } from '../../config/logger';
 
 const logger = createLogger('index');
@@ -22,8 +22,8 @@ export function initializeJobTypes(): void {
   }
 }
 
-export * from './JobFactory';
-export * from './MailSendJob';
-export * from './HttpRequestJob';
-export * from './SshCommandJob';
-export * from './LogMessageJob';
+export * from './job-factory';
+export * from './mail-send-job';
+export * from './http-request-job';
+export * from './ssh-command-job';
+export * from './log-message-job';

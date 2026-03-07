@@ -145,7 +145,7 @@ const options: swaggerJSDoc.Options = {
               type: 'string',
             },
             user: {
-              $ref: '#/components/schemas/User',
+              $ref: '#/components/schemas/user',
             },
             accessToken: {
               type: 'string',
@@ -291,7 +291,7 @@ const options: swaggerJSDoc.Options = {
             tags: {
               type: 'array',
               description: 'Associated tags',
-              items: { $ref: '#/components/schemas/Tag' },
+              items: { $ref: '#/components/schemas/tag' },
             },
           },
         },

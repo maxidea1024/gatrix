@@ -6,7 +6,7 @@ import { Strategy as GitHubStrategy } from 'passport-github2';
 import { Strategy as QQStrategy } from 'passport-qq';
 // import { Strategy as WeChatStrategy } from 'passport-wechat';
 // import { Strategy as BaiduStrategy } from 'passport-baidu';
-import { UserModel } from '../models/User';
+import { UserModel } from '../models/user';
 import { config } from './index';
 import logger from './logger';
 import { JwtPayload } from '../utils/jwt';

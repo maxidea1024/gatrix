@@ -1,27 +1,27 @@
 import express from 'express';
 import multer from 'multer';
-import { serverAuthBase, serverSDKAuth } from '../../middleware/apiTokenAuth';
-import { resolveEnvironment } from '../../middleware/environmentResolver';
-import ServerAuthController from '../../controllers/ServerAuthController';
-import ServerUserController from '../../controllers/ServerUserController';
-import ServerNotificationController from '../../controllers/ServerNotificationController';
-import ServerFileController from '../../controllers/ServerFileController';
-import ServerChatController from '../../controllers/ServerChatController';
-import { CouponRedeemController } from '../../controllers/CouponRedeemController';
-import ServerGameWorldController from '../../controllers/ServerGameWorldController';
-import IngamePopupNoticeController from '../../controllers/IngamePopupNoticeController';
-import { SurveyController } from '../../controllers/SurveyController';
-import { MaintenanceController } from '../../controllers/MaintenanceController';
-import serviceDiscoveryRoutes, { getWhitelistsHandler } from './serviceDiscovery';
-import ServerClientVersionController from '../../controllers/ServerClientVersionController';
-import ServerServiceNoticeController from '../../controllers/ServerServiceNoticeController';
-import ServerBannerController from '../../controllers/ServerBannerController';
-import ServerStoreProductController from '../../controllers/ServerStoreProductController';
-import ServerEnvironmentController from '../../controllers/ServerEnvironmentController';
-import InternalApiTokensController from '../../controllers/InternalApiTokensController';
-import { PlanningDataController } from '../../controllers/PlanningDataController';
-import ServerFeatureFlagController from '../../controllers/ServerFeatureFlagController';
-import { VarsController } from '../../controllers/VarsController';
+import { serverAuthBase, serverSDKAuth } from '../../middleware/api-token-auth';
+import { resolveEnvironment } from '../../middleware/environment-resolver';
+import ServerAuthController from '../../controllers/server-auth-controller';
+import ServerUserController from '../../controllers/server-user-controller';
+import ServerNotificationController from '../../controllers/server-notification-controller';
+import ServerFileController from '../../controllers/server-file-controller';
+import ServerChatController from '../../controllers/server-chat-controller';
+import { CouponRedeemController } from '../../controllers/coupon-redeem-controller';
+import ServerGameWorldController from '../../controllers/server-game-world-controller';
+import IngamePopupNoticeController from '../../controllers/ingame-popup-notice-controller';
+import { SurveyController } from '../../controllers/survey-controller';
+import { MaintenanceController } from '../../controllers/maintenance-controller';
+import serviceDiscoveryRoutes, { getWhitelistsHandler } from './service-discovery';
+import ServerClientVersionController from '../../controllers/server-client-version-controller';
+import ServerServiceNoticeController from '../../controllers/server-service-notice-controller';
+import ServerBannerController from '../../controllers/server-banner-controller';
+import ServerStoreProductController from '../../controllers/server-store-product-controller';
+import ServerEnvironmentController from '../../controllers/server-environment-controller';
+import InternalApiTokensController from '../../controllers/internal-api-tokens-controller';
+import { PlanningDataController } from '../../controllers/planning-data-controller';
+import ServerFeatureFlagController from '../../controllers/server-feature-flag-controller';
+import { VarsController } from '../../controllers/vars-controller';
 
 const router = express.Router();
 
@@ -210,7 +210,7 @@ router.post(
 router.get('/segments', serverSDKAuth as any, ServerFeatureFlagController.getSegments as any);
 
 // Impact metrics routes (SDK → backend)
-import ImpactMetricsController from '../../controllers/ImpactMetricsController';
+import ImpactMetricsController from '../../controllers/impact-metrics-controller';
 router.post('/impact-metrics', serverAuthBase, ImpactMetricsController.receiveMetrics as any);
 
 export default router;

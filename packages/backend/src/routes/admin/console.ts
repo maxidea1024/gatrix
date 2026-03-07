@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
-import { SystemConsoleController } from '../../controllers/SystemConsoleController';
+import { SystemConsoleController } from '../../controllers/system-console-controller';
 
 const router = Router();
 

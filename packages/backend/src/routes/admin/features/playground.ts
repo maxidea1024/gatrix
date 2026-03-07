@@ -6,10 +6,10 @@
 
 import { Router, Response } from 'express';
 import { AuthenticatedRequest } from '../../../middleware/auth';
-import { asyncHandler } from '../../../middleware/errorHandler';
-import { featureFlagService } from '../../../services/FeatureFlagService';
+import { asyncHandler } from '../../../middleware/error-handler';
+import { featureFlagService } from '../../../services/feature-flag-service';
 import { ValidationRules } from '../../../models/FeatureFlag';
-import { validateFlagValue } from '../../../utils/validateFlagValue';
+import { validateFlagValue } from '../../../utils/validate-flag-value';
 import {
   VALUE_SOURCE,
   evaluateStrategyWithDetails,

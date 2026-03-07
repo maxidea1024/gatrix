@@ -1,6 +1,6 @@
 import { config } from './config';
 import { createServer } from 'http';
-import type { SSENotificationBusMessage } from './services/PubSubService';
+import type { SSENotificationBusMessage } from './services/pub-sub-service';
 import type { GatrixServerSDK } from '@gatrix/server-sdk';
 
 // Lazy imports to avoid initialization at import time
@@ -175,22 +175,22 @@ const startServer = async () => {
     database = (await import('./config/database')).default;
     redisClient = (await import('./config/redis')).default;
 
-    const pubSubModule = await import('./services/PubSubService');
+    const pubSubModule = await import('./services/pub-sub-service');
     pubSubService = pubSubModule.pubSubService;
 
-    const queueModule = await import('./services/QueueService');
+    const queueModule = await import('./services/queue-service');
     queueService = queueModule.queueService;
 
-    apiTokenUsageService = (await import('./services/ApiTokenUsageService')).default;
+    apiTokenUsageService = (await import('./services/api-token-usage-service')).default;
     app = (await import('./app')).default;
 
-    const dbTimezoneModule = await import('./utils/dbTimezoneCheck');
+    const dbTimezoneModule = await import('./utils/db-timezone-check');
     setDatabaseTimezoneToUTC = dbTimezoneModule.setDatabaseTimezoneToUTC;
 
-    const appInstanceModule = await import('./utils/AppInstance');
+    const appInstanceModule = await import('./utils/app-instance');
     appInstance = appInstanceModule.appInstance;
 
-    SSENotificationService = (await import('./services/sseNotificationService')).default;
+    SSENotificationService = (await import('./services/sse-notification-service')).default;
 
     logger.info('Starting Gatrix Backend Server...');
 
@@ -260,7 +260,7 @@ const startServer = async () => {
 
     // Initialize Flag Streaming Service (SSE for SDK clients)
     try {
-      const { flagStreamingService } = await import('./services/FlagStreamingService');
+      const { flagStreamingService } = await import('./services/flag-streaming-service');
       await flagStreamingService.start();
       logger.info('Flag Streaming Service initialized');
     } catch (error) {
@@ -288,7 +288,7 @@ const startServer = async () => {
 
     // Initialize Impact Metrics Service
     try {
-      const { impactMetricsService } = await import('./services/ImpactMetricsService');
+      const { impactMetricsService } = await import('./services/impact-metrics-service');
       impactMetricsService.initialize();
       logger.info('Impact Metrics Service initialized');
     } catch (error) {
@@ -297,7 +297,7 @@ const startServer = async () => {
 
     // Initialize system-defined KV items for all environments
     try {
-      const { initializeAllSystemKV } = await import('./utils/systemKV');
+      const { initializeAllSystemKV } = await import('./utils/system-kv');
       await initializeAllSystemKV();
       logger.info('System KV items initialized for all environments');
     } catch (error) {
@@ -306,7 +306,7 @@ const startServer = async () => {
 
     // Initialize Planning Data (reward lookup)
     try {
-      const { PlanningDataService } = await import('./services/PlanningDataService');
+      const { PlanningDataService } = await import('./services/planning-data-service');
       await PlanningDataService.initialize();
       logger.info('Planning data initialized successfully');
     } catch (error) {
@@ -316,7 +316,7 @@ const startServer = async () => {
     // Initialize Service Discovery watch (for Redis keyspace notifications)
     try {
       const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
-      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+      const serviceDiscoveryService = (await import('./services/service-discovery-service')).default;
 
       if (serviceDiscoveryMode === 'redis') {
         // Start watching for Redis keyspace notifications (TTL expiration)
@@ -347,7 +347,7 @@ const startServer = async () => {
 
     // Register lifecycle event cleanup job (BullMQ-based)
     try {
-      lifecycleCleanupScheduler = await import('./services/lifecycleCleanupScheduler');
+      lifecycleCleanupScheduler = await import('./services/lifecycle-cleanup-scheduler');
       await lifecycleCleanupScheduler.initializeLifecycleCleanupJob();
       logger.info('Lifecycle event cleanup job registered');
     } catch (error) {
@@ -384,7 +384,7 @@ const startServer = async () => {
         }
 
         // Validate token
-        const { ApiAccessToken } = await import('./models/ApiAccessToken');
+        const { ApiAccessToken } = await import('./models/api-access-token');
         const tokenData = await ApiAccessToken.validateAndUse(apiToken);
         if (!tokenData) {
           // Check special tokens
@@ -396,7 +396,7 @@ const startServer = async () => {
           }
         }
 
-        const { flagStreamingService } = await import('./services/FlagStreamingService');
+        const { flagStreamingService } = await import('./services/flag-streaming-service');
         const wss = flagStreamingService.getWebSocketServer();
         if (!wss) {
           socket.destroy();

@@ -5,8 +5,8 @@
 
 import { Router, Response } from 'express';
 import { AuthenticatedRequest } from '../../../middleware/auth';
-import { asyncHandler } from '../../../middleware/errorHandler';
-import { featureFlagService } from '../../../services/FeatureFlagService';
+import { asyncHandler } from '../../../middleware/error-handler';
+import { featureFlagService } from '../../../services/feature-flag-service';
 
 const router = Router();
 
