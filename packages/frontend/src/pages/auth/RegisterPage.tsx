@@ -335,10 +335,7 @@ const RegisterPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0f0f0f 0%, #050505 100%)'
-              : 'linear-gradient(135deg, #9e9e9e 0%, #757575 100%)',
+          bgcolor: 'background.default',
           p: 2,
         }}
       >

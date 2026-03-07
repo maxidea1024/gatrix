@@ -13,7 +13,6 @@ import {
   Button,
   CircularProgress,
   useTheme,
-  alpha,
 } from '@mui/material';
 import {
   Logout as LogoutIcon,
@@ -25,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from './AuthContext';
 import { orgProjectService, Organisation, Project } from '../services/orgProjectService';
 import { devLogger } from '../utils/logger';
+
 
 const STORAGE_KEY_ORG = 'gatrix_selected_org';
 const STORAGE_KEY_PROJECT = 'gatrix_selected_project';
@@ -117,9 +117,7 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
         alignItems: 'center',
         height: '100vh',
         overflow: 'hidden',
-        background: isDark
-          ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.15)} 0%, ${theme.palette.background.default} 50%, ${alpha(theme.palette.secondary.dark, 0.1)} 100%)`
-          : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.08)} 0%, #f8f9fc 50%, ${alpha(theme.palette.secondary.light, 0.06)} 100%)`,
+        bgcolor: 'background.default',
       }}
     >
       {/* Main card */}
@@ -130,11 +128,11 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
           mx: 2,
           p: { xs: 4, sm: 5 },
           borderRadius: 4,
-          bgcolor: isDark ? alpha(theme.palette.background.paper, 0.7) : 'rgba(255,255,255,0.85)',
-          backdropFilter: 'blur(20px)',
-          border: `1px solid ${isDark ? alpha('#fff', 0.08) : alpha('#000', 0.06)}`,
+          bgcolor: 'background.paper',
+          border: `1px solid`,
+          borderColor: 'divider',
           boxShadow: isDark
-            ? `0 8px 32px ${alpha('#000', 0.4)}`
+            ? '0 8px 32px rgba(0,0,0,0.3)'
             : '0 8px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
           textAlign: 'center',
         }}
@@ -223,25 +221,25 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
                 px: 2,
                 borderRadius: 2,
                 mb: 1,
-                bgcolor: isDark ? alpha(theme.palette.primary.main, 0.06) : alpha(theme.palette.primary.main, 0.03),
-                border: `1px solid ${isDark ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.primary.main, 0.06)}`,
+                bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             >
               <Box
                 sx={{
                   mt: 0.25,
-                  color: theme.palette.primary.main,
-                  opacity: 0.8,
+                  color: 'primary.main',
                   flexShrink: 0,
                 }}
               >
                 {step.icon}
               </Box>
               <Box>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.25 }}>
+                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.25, color: 'text.primary' }}>
                   {step.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                <Typography variant="body2" sx={{ lineHeight: 1.5, color: 'text.secondary' }}>
                   {step.desc}
                 </Typography>
               </Box>
