@@ -35,7 +35,7 @@ async function dropAllTables() {
     // Re-enable foreign key checks
     await database.query('SET FOREIGN_KEY_CHECKS = 1');
 
-    console.log('✓ All tables dropped successfully');
+    console.log('All tables dropped successfully');
   } catch (error) {
     console.error('Error dropping tables:', error);
     throw error;
@@ -50,7 +50,7 @@ async function runMigrations() {
     const { runMigrations: runMigrationsFunc } = await import('./migrate');
     await runMigrationsFunc();
 
-    console.log('✓ Migrations completed successfully');
+    console.log('Migrations completed successfully');
   } catch (error) {
     console.error('Error running migrations:', error);
     throw error;
@@ -62,7 +62,7 @@ async function resetDatabase() {
     await dropAllTables();
     await runMigrations();
 
-    console.log('🎉 Database reset completed successfully!');
+    console.log('Database reset completed successfully!');
     process.exit(0);
   } catch (error) {
     console.error('Database reset failed:', error);
