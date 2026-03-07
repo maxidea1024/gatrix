@@ -204,7 +204,7 @@ export class UserModel {
 
       // Build base query — scope to org if orgId filter is present
       const baseQuery = () => {
-        const q = db('g_users');
+        const q = db('g_users').whereNot('g_users.authType', 'service-account');
         if (filters.orgId) {
           q.join('g_organisation_members as om', function () {
             this.on('om.userId', '=', 'g_users.id').andOn(
@@ -497,6 +497,7 @@ export class UserModel {
       const q = db('g_users')
         .select('g_users.id', 'g_users.name', 'g_users.email', 'g_users.status', 'g_users.avatarUrl', 'g_users.createdAt', 'g_users.updatedAt')
         .where('g_users.status', 'active')
+        .whereNot('g_users.authType', 'service-account')
         .andWhere(function () {
           this.where('g_users.name', 'like', `%${query}%`).orWhere('g_users.email', 'like', `%${query}%`);
         })
@@ -537,6 +538,7 @@ export class UserModel {
           'updatedAt',
         ])
         .where('status', 'active') // 활성 사용자만 동기화
+        .whereNot('authType', 'service-account')
         .andWhere(function () {
           this.where('updatedAt', '>=', since).orWhere('createdAt', '>=', since);
         })

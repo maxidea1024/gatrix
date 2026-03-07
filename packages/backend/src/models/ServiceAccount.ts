@@ -5,6 +5,8 @@ import crypto from 'crypto';
 
 const logger = createLogger('ServiceAccountModel');
 
+const SA_ENV_TABLE = 'g_service_account_environments';
+
 /**
  * g_service_account_tokens schema (after migration 013):
  *   id CHAR(26) PK
@@ -27,6 +29,8 @@ export interface ServiceAccount {
   email: string;
   status: string;
   authType: 'service-account';
+  environmentId: string | null;
+  environmentName: string | null;
   createdBy: string | null;
   createdByName?: string;
   createdAt: Date;
@@ -49,11 +53,13 @@ export interface ServiceAccountToken {
 export interface CreateServiceAccountData {
   name: string;
   createdBy: string;
+  environmentId: string;
 }
 
 export interface UpdateServiceAccountData {
   name?: string;
   updatedBy: string;
+  environmentId?: string | null;
 }
 
 export class ServiceAccountModel {
@@ -71,14 +77,22 @@ export class ServiceAccountModel {
 
       const id = generateULID();
 
-      await db(this.TABLE).insert({
-        id,
-        name: data.name,
-        email,
-        status: 'active',
-        authType: 'service-account',
-        emailVerified: true,
-        createdBy: data.createdBy,
+      await db.transaction(async (trx) => {
+        await trx(this.TABLE).insert({
+          id,
+          name: data.name,
+          email,
+          status: 'active',
+          authType: 'service-account',
+          emailVerified: true,
+          createdBy: data.createdBy,
+        });
+
+        // Create environment assignment
+        await trx(SA_ENV_TABLE).insert({
+          serviceAccountId: id,
+          environmentId: data.environmentId,
+        });
       });
 
       const account = await this.findById(id);
@@ -109,8 +123,12 @@ export class ServiceAccountModel {
           `${this.TABLE}.createdAt`,
           `${this.TABLE}.updatedAt`,
           'creator.name as createdByName',
+          `${SA_ENV_TABLE}.environmentId`,
+          'g_environments.displayName as environmentName',
         ])
         .leftJoin(`${this.TABLE} as creator`, `${this.TABLE}.createdBy`, 'creator.id')
+        .leftJoin(SA_ENV_TABLE, `${this.TABLE}.id`, `${SA_ENV_TABLE}.serviceAccountId`)
+        .leftJoin('g_environments', `${SA_ENV_TABLE}.environmentId`, 'g_environments.id')
         .where(`${this.TABLE}.id`, id)
         .where(`${this.TABLE}.authType`, 'service-account')
         .first();
@@ -140,8 +158,12 @@ export class ServiceAccountModel {
           `${this.TABLE}.createdAt`,
           `${this.TABLE}.updatedAt`,
           'creator.name as createdByName',
+          `${SA_ENV_TABLE}.environmentId`,
+          'g_environments.displayName as environmentName',
         ])
         .leftJoin(`${this.TABLE} as creator`, `${this.TABLE}.createdBy`, 'creator.id')
+        .leftJoin(SA_ENV_TABLE, `${this.TABLE}.id`, `${SA_ENV_TABLE}.serviceAccountId`)
+        .leftJoin('g_environments', `${SA_ENV_TABLE}.environmentId`, 'g_environments.id')
         .where(`${this.TABLE}.authType`, 'service-account')
         .orderBy(`${this.TABLE}.name`, 'asc');
 
@@ -157,17 +179,41 @@ export class ServiceAccountModel {
    */
   static async update(id: string, data: UpdateServiceAccountData): Promise<ServiceAccount | null> {
     try {
-      const updateData: any = {};
-      if (data.name !== undefined) updateData.name = data.name;
-      updateData.updatedBy = data.updatedBy;
-      updateData.updatedAt = db.fn.now();
+      await db.transaction(async (trx) => {
+        const updateData: any = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        updateData.updatedBy = data.updatedBy;
+        updateData.updatedAt = db.fn.now();
 
-      if (Object.keys(updateData).length > 1) {
-        await db(this.TABLE)
-          .where('id', id)
-          .where('authType', 'service-account')
-          .update(updateData);
-      }
+        if (Object.keys(updateData).length > 1) {
+          await trx(this.TABLE)
+            .where('id', id)
+            .where('authType', 'service-account')
+            .update(updateData);
+        }
+
+        // Update environment assignment
+        if (data.environmentId !== undefined) {
+          if (data.environmentId === null) {
+            // Remove assignment
+            await trx(SA_ENV_TABLE).where('serviceAccountId', id).del();
+          } else {
+            // Upsert assignment
+            const existing = await trx(SA_ENV_TABLE).where('serviceAccountId', id).first();
+            if (existing) {
+              await trx(SA_ENV_TABLE).where('serviceAccountId', id).update({
+                environmentId: data.environmentId,
+                updatedAt: db.fn.now(),
+              });
+            } else {
+              await trx(SA_ENV_TABLE).insert({
+                serviceAccountId: id,
+                environmentId: data.environmentId,
+              });
+            }
+          }
+        }
+      });
 
       return this.findById(id);
     } catch (error) {
@@ -320,6 +366,8 @@ export class ServiceAccountModel {
     return {
       ...row,
       authType: 'service-account' as const,
+      environmentId: row.environmentId || null,
+      environmentName: row.environmentName || null,
       tokens,
     };
   }

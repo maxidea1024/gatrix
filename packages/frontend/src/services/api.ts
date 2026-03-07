@@ -105,8 +105,10 @@ class ApiService {
 
         // Check for "user not found" error - this happens when user is deleted but token is still valid
         // Redirect to session expired page to prevent infinite loop
+        // BUT skip for login requests - login USER_NOT_FOUND should show error on login page
         if (
           error.response?.status === 404 &&
+          !originalRequest.url?.includes('/auth/login') &&
           (error.response?.data?.message === 'USER_NOT_FOUND' ||
             error.response?.data?.error?.message === 'USER_NOT_FOUND' ||
             error.response?.data?.message?.includes('User not found'))

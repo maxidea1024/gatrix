@@ -7,6 +7,8 @@ export interface ServiceAccount {
   email: string;
   authType: string;
   status: string;
+  environmentId: string | null;
+  environmentName: string | null;
   createdAt: string;
   updatedAt: string;
   tokens?: ServiceAccountToken[];
@@ -39,6 +41,7 @@ class ServiceAccountService {
     projectApiPath: string,
     data: {
       name: string;
+      environmentId: string;
     }
   ): Promise<ServiceAccount> {
     const response = await api.post(`${projectApiPath}/service-accounts`, data);
@@ -50,6 +53,7 @@ class ServiceAccountService {
     id: number,
     data: {
       name?: string;
+      environmentId?: string | null;
     }
   ): Promise<ServiceAccount> {
     const response = await api.put(`${projectApiPath}/service-accounts/${id}`, data);

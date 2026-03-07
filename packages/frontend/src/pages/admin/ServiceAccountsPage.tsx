@@ -4,7 +4,7 @@
  * Allows administrators to manage service accounts and their tokens.
  * Uses RBAC system for role assignment.
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -36,6 +36,11 @@ import {
   Autocomplete,
   Menu,
   MenuItem,
+  ButtonBase,
+  Popover,
+  alpha,
+  Collapse,
+  ListItemButton,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -48,6 +53,13 @@ import {
   Save as SaveIcon,
   Shield as ShieldIcon,
   MoreVert as MoreVertIcon,
+  Public as PublicIcon,
+  Business as BusinessIcon,
+  Folder as FolderIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -64,6 +76,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
+import environmentService from '@/services/environmentService';
 
 // ==================== Tab Panel ====================
 
@@ -84,27 +97,89 @@ interface AccountDialogProps {
   open: boolean;
   account: ServiceAccount | null;
   onClose: () => void;
-  onSave: (data: { name: string; roleIds: string[] }) => void;
+  onSave: (data: { name: string; roleIds: string[]; environmentId: string }) => void;
+}
+
+// Environment type to color mapping (same as EnvironmentSelector)
+const getEnvTypeColor = (type: string, customColor?: string): string => {
+  if (customColor) return customColor;
+  switch (type) {
+    case 'production': return '#d32f2f';
+    case 'staging': return '#ed6c02';
+    case 'development': return '#2e7d32';
+    default: return '#757575';
+  }
+};
+
+interface CachedEnv {
+  environmentId: string;
+  displayName: string;
+  environmentType: string;
+  color?: string;
 }
 
 const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, onSave }) => {
   const { t } = useTranslation();
+  const { organisations, projects } = useOrgProject();
   const [name, setName] = useState('');
+  const [selectedEnvironmentId, setSelectedEnvironmentId] = useState<string>('');
+  const [selectedEnvLabel, setSelectedEnvLabel] = useState<string>('');
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
   const [rolesLoading, setRolesLoading] = useState(false);
 
+  // Environment tree picker state
+  const [envPickerAnchor, setEnvPickerAnchor] = useState<HTMLElement | null>(null);
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [projectEnvCache, setProjectEnvCache] = useState<Record<string, CachedEnv[]>>({});
+  const [loadingProjectIds, setLoadingProjectIds] = useState<Set<string>>(new Set());
+  const loadedRef = useRef<Set<string>>(new Set());
+
+  // Lazy-load environments for a project on expand
+  const loadProjectEnvs = useCallback(async (projectId: string, orgId: string) => {
+    if (loadedRef.current.has(projectId)) return;
+    loadedRef.current.add(projectId);
+    setLoadingProjectIds((prev) => new Set(prev).add(projectId));
+    try {
+      const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
+      const envs = await environmentService.getEnvironments(apiPath, true);
+      setProjectEnvCache((prev) => ({
+        ...prev,
+        [projectId]: envs.map((e) => ({
+          environmentId: e.environmentId,
+          displayName: e.displayName,
+          environmentType: e.environmentType,
+          color: e.color,
+        })),
+      }));
+    } catch {
+      loadedRef.current.delete(projectId);
+    } finally {
+      setLoadingProjectIds((prev) => {
+        const next = new Set(prev);
+        next.delete(projectId);
+        return next;
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (open) {
       setName(account?.name || '');
+      setSelectedEnvironmentId(account?.environmentId || '');
+      setSelectedEnvLabel(account?.environmentName || '');
       setSelectedRoleIds([]);
       setRolesLoading(true);
+      loadedRef.current = new Set();
+      setProjectEnvCache({});
+      setExpandedOrgs(new Set());
+      setExpandedProjects(new Set());
 
       const loadData = async () => {
         try {
           const roles = await rbacService.getRoles();
           setAllRoles(roles);
-
           if (account) {
             const userRoles = await rbacService.getUserRoles(String(account.id));
             setSelectedRoleIds(userRoles.map((ur) => ur.roleId));
@@ -126,8 +201,122 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
   };
 
   const handleSave = () => {
-    if (!name.trim()) return;
-    onSave({ name: name.trim(), roleIds: selectedRoleIds });
+    if (!name.trim() || !selectedEnvironmentId) return;
+    onSave({ name: name.trim(), roleIds: selectedRoleIds, environmentId: selectedEnvironmentId });
+  };
+
+  // Environment tree handlers
+  const handleOpenEnvPicker = (e: React.MouseEvent<HTMLElement>) => {
+    setEnvPickerAnchor(e.currentTarget);
+    // Auto-expand single org and its projects
+    if (organisations.length === 1) {
+      const orgId = organisations[0].id;
+      setExpandedOrgs(new Set([orgId]));
+      const orgProjects = projects.filter((p) => p.orgId === orgId);
+      setExpandedProjects(new Set(orgProjects.map((p) => p.id)));
+      orgProjects.forEach((p) => loadProjectEnvs(p.id, orgId));
+    }
+  };
+
+  const handleToggleOrg = (orgId: string) => {
+    setExpandedOrgs((prev) => {
+      const next = new Set(prev);
+      if (next.has(orgId)) next.delete(orgId);
+      else next.add(orgId);
+      return next;
+    });
+  };
+
+  const handleToggleProject = (projectId: string, orgId: string) => {
+    setExpandedProjects((prev) => {
+      const next = new Set(prev);
+      if (next.has(projectId)) {
+        next.delete(projectId);
+      } else {
+        next.add(projectId);
+        loadProjectEnvs(projectId, orgId);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectEnv = (envId: string, envLabel: string) => {
+    setSelectedEnvironmentId(envId);
+    setSelectedEnvLabel(envLabel);
+    setEnvPickerAnchor(null);
+  };
+
+  const isMultiOrg = organisations.length > 1;
+
+  // Render environment items for a project
+  const renderProjectEnvs = (projectId: string, indent: number) => {
+    const envs = projectEnvCache[projectId] || [];
+    const isLoadingEnvs = loadingProjectIds.has(projectId);
+
+    if (isLoadingEnvs && envs.length === 0) {
+      return (
+        <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
+          <ListItemText
+            primary={t('common.loading')}
+            primaryTypographyProps={{ variant: 'caption', color: 'text.secondary', fontStyle: 'italic' }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    if (envs.length === 0) {
+      return (
+        <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
+          <ListItemText
+            primary={t('environments.noEnvironments')}
+            primaryTypographyProps={{ variant: 'caption', color: 'text.secondary', fontStyle: 'italic' }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    return envs.map((env) => {
+      const envColor = getEnvTypeColor(env.environmentType, env.color);
+      const isSelected = env.environmentId === selectedEnvironmentId;
+      return (
+        <ListItemButton
+          key={env.environmentId}
+          onClick={() => handleSelectEnv(env.environmentId, env.displayName)}
+          dense
+          selected={isSelected}
+          sx={{
+            pl: indent,
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: (theme) => alpha(envColor, theme.palette.mode === 'dark' ? 0.2 : 0.1),
+              '&:hover': {
+                backgroundColor: (theme) => alpha(envColor, theme.palette.mode === 'dark' ? 0.25 : 0.15),
+              },
+            },
+            '&:hover': {
+              backgroundColor: (theme) => alpha(envColor, theme.palette.mode === 'dark' ? 0.15 : 0.08),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: 0.5,
+                backgroundColor: envColor,
+                boxShadow: isSelected ? `0 0 6px ${alpha(envColor, 0.6)}` : 'none',
+              }}
+            />
+          </ListItemIcon>
+          <ListItemText
+            primary={env.displayName}
+            primaryTypographyProps={{ variant: 'body2', fontWeight: isSelected ? 600 : 400 }}
+          />
+          {isSelected && <CheckIcon sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }} />}
+        </ListItemButton>
+      );
+    });
   };
 
   return (
@@ -167,6 +356,136 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+
+            {/* Environment picker trigger */}
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+                {t('serviceAccounts.environment')} *
+              </Typography>
+              <ButtonBase
+                onClick={handleOpenEnvPicker}
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  px: 1.5,
+                  py: 1,
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: selectedEnvironmentId ? 'primary.main' : 'divider',
+                  bgcolor: selectedEnvironmentId
+                    ? (theme) => alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.08 : 0.04)
+                    : 'transparent',
+                  transition: 'all 0.15s',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <PublicIcon sx={{ fontSize: 18, color: selectedEnvironmentId ? 'primary.main' : 'text.disabled' }} />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: selectedEnvironmentId ? 600 : 400,
+                      color: selectedEnvironmentId ? 'text.primary' : 'text.secondary',
+                    }}
+                  >
+                    {selectedEnvLabel || t('serviceAccounts.selectEnvironment')}
+                  </Typography>
+                </Box>
+                <ArrowDropDownIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+              </ButtonBase>
+
+              {/* Environment tree popover */}
+              <Popover
+                open={Boolean(envPickerAnchor)}
+                anchorEl={envPickerAnchor}
+                onClose={() => setEnvPickerAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      mt: 0.5,
+                      minWidth: 320,
+                      maxWidth: 420,
+                      maxHeight: 360,
+                      borderRadius: 2,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                      overflow: 'auto',
+                    },
+                  },
+                }}
+              >
+                <Box sx={{ py: 0.5 }}>
+                  {organisations.map((org) => {
+                    const isOrgExpanded = expandedOrgs.has(org.id) || !isMultiOrg;
+                    const orgProjects = projects.filter((p) => p.orgId === org.id);
+
+                    return (
+                      <React.Fragment key={org.id}>
+                        {/* Org header (multi-org only) */}
+                        {isMultiOrg && (
+                          <ListItemButton onClick={() => handleToggleOrg(org.id)} dense sx={{ py: 0.5 }}>
+                            <ListItemIcon sx={{ minWidth: 28 }}>
+                              {isOrgExpanded
+                                ? <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                                : <ChevronRightIcon sx={{ fontSize: 18 }} />}
+                            </ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 24 }}>
+                              <BusinessIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={org.displayName || org.orgName}
+                              primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }}
+                            />
+                          </ListItemButton>
+                        )}
+
+                        {/* Projects */}
+                        <Collapse in={isOrgExpanded} timeout="auto">
+                          {orgProjects.map((proj) => {
+                            const isProjExpanded = expandedProjects.has(proj.id);
+                            const projIndent = isMultiOrg ? 4 : 1.5;
+                            const envIndent = projIndent + 3.5;
+
+                            return (
+                              <React.Fragment key={proj.id}>
+                                <ListItemButton
+                                  onClick={() => handleToggleProject(proj.id, org.id)}
+                                  dense
+                                  sx={{ py: 0.5, pl: projIndent }}
+                                >
+                                  <ListItemIcon sx={{ minWidth: 28 }}>
+                                    {isProjExpanded
+                                      ? <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                                      : <ChevronRightIcon sx={{ fontSize: 18 }} />}
+                                  </ListItemIcon>
+                                  <ListItemIcon sx={{ minWidth: 24 }}>
+                                    <FolderIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={proj.displayName || proj.projectName}
+                                    primaryTypographyProps={{ variant: 'body2', fontWeight: 400 }}
+                                  />
+                                </ListItemButton>
+
+                                <Collapse in={isProjExpanded} timeout="auto">
+                                  {renderProjectEnvs(proj.id, envIndent)}
+                                </Collapse>
+                              </React.Fragment>
+                            );
+                          })}
+                        </Collapse>
+                      </React.Fragment>
+                    );
+                  })}
+                </Box>
+              </Popover>
+            </Box>
           </Box>
         </Paper>
 
@@ -257,7 +576,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ open, account, onClose, o
           onClick={handleSave}
           variant="contained"
           startIcon={<SaveIcon />}
-          disabled={!name.trim()}
+          disabled={!name.trim() || !selectedEnvironmentId}
         >
           {account ? t('common.save') : t('common.create')}
         </Button>
@@ -542,12 +861,13 @@ const ServiceAccountsPage: React.FC = () => {
   };
 
   // Account CRUD
-  const handleSaveAccount = async (data: { name: string; roleIds: string[] }) => {
+  const handleSaveAccount = async (data: { name: string; roleIds: string[]; environmentId: string }) => {
     try {
       if (editDialog.account) {
         // Update name
         await serviceAccountService.update(projectApiPath, editDialog.account.id, {
           name: data.name,
+          environmentId: data.environmentId,
         });
 
         // Sync roles: get current roles, compute adds/removes
@@ -570,6 +890,7 @@ const ServiceAccountsPage: React.FC = () => {
         // Create account then assign roles
         const created = await serviceAccountService.create(projectApiPath, {
           name: data.name,
+          environmentId: data.environmentId,
         });
 
         if (data.roleIds.length > 0) {
@@ -664,6 +985,7 @@ const ServiceAccountsPage: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>{t('serviceAccounts.accountName')}</TableCell>
+                  <TableCell>{t('serviceAccounts.environment')}</TableCell>
                   <TableCell align="center">{t('rbac.roles.title')}</TableCell>
                   <TableCell>{t('serviceAccounts.status')}</TableCell>
                   <TableCell align="center">{t('serviceAccounts.tokens')}</TableCell>
@@ -674,7 +996,7 @@ const ServiceAccountsPage: React.FC = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                       <Typography color="text.secondary">{t('common.loading')}</Typography>
                     </TableCell>
                   </TableRow>
@@ -691,6 +1013,18 @@ const ServiceAccountsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           {account.email}
                         </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {account.environmentName ? (
+                          <Chip
+                            label={account.environmentName}
+                            size="small"
+                            variant="outlined"
+                            sx={{ borderRadius: '8px' }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">—</Typography>
+                        )}
                       </TableCell>
                       <TableCell align="center">
                         <Chip

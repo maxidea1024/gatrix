@@ -51,16 +51,21 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, environmentId } = req.body;
     const user = req.user as { id: string; name: string };
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Name is required' });
     }
 
+    if (!environmentId) {
+      return res.status(400).json({ error: 'Environment is required' });
+    }
+
     const account = await ServiceAccountModel.create({
       name: name.trim(),
       createdBy: user.id,
+      environmentId: environmentId || undefined,
     });
 
     res.status(201).json({ data: account });
@@ -78,12 +83,13 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const { name } = req.body;
+    const { name, environmentId } = req.body;
     const user = req.user as { id: string; name: string };
 
     const account = await ServiceAccountModel.update(id, {
       name,
       updatedBy: user.id,
+      environmentId: environmentId !== undefined ? environmentId : undefined,
     });
 
     if (!account) {
