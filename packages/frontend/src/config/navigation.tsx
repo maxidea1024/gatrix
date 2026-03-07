@@ -157,6 +157,7 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         icon: 'Shield',
         path: '/admin/roles',
         requiredPermission: P.ROLES_UPDATE,
+        divider: true,
       },
       {
         text: 'sidebar.groups',

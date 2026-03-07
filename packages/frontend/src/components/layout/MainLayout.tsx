@@ -1009,8 +1009,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   const isChildActive = isActivePath(child.path);
 
                   return (
+                    <React.Fragment key={childIndex}>
+                      {child.divider && <Divider sx={{ mx: 2, my: 0.5 }} />}
                     <ListItemButton
-                      key={childIndex}
                       onClick={() => openOrNavigate(child.path)}
                       sx={{
                         pl: 2,
@@ -1067,6 +1068,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         </>
                       )}
                     </ListItemButton>
+                    </React.Fragment>
                   );
                 })}
               </List>
