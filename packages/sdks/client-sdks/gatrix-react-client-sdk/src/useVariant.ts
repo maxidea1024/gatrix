@@ -23,7 +23,7 @@ import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 import { VALUE_SOURCE, type Variant } from '@gatrix/gatrix-js-client-sdk';
 
-export function useVariant(flagName: string, forceRealtime = false): Variant {
+export function useVariant(flagName: string, forceRealtime = true): Variant {
   const { features } = useGatrixContext();
   const [variant, setVariant] = useState<Variant>(
     () =>

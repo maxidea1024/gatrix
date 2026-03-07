@@ -24,65 +24,65 @@ class GATRIXCLIENTSDK_API IGatrixVariationProvider {
   GENERATED_BODY()
 
 public:
-  virtual bool IsEnabledInternal(const FString& FlagName, bool bForceRealtime = false) = 0;
+  virtual bool IsEnabledInternal(const FString& FlagName, bool bForceRealtime = true) = 0;
   virtual FGatrixVariant GetVariantInternal(const FString& FlagName,
-                                            bool bForceRealtime = false) = 0;
+                                            bool bForceRealtime = true) = 0;
 
   // Metadata access (no metrics tracking)
-  virtual bool HasFlagInternal(const FString& FlagName, bool bForceRealtime = false) const = 0;
+  virtual bool HasFlagInternal(const FString& FlagName, bool bForceRealtime = true) const = 0;
   virtual EGatrixValueType GetValueTypeInternal(const FString& FlagName,
-                                                bool bForceRealtime = false) const = 0;
-  virtual int32 GetVersionInternal(const FString& FlagName, bool bForceRealtime = false) const = 0;
-  virtual FString GetReasonInternal(const FString& FlagName, bool bForceRealtime = false) const = 0;
+                                                bool bForceRealtime = true) const = 0;
+  virtual int32 GetVersionInternal(const FString& FlagName, bool bForceRealtime = true) const = 0;
+  virtual FString GetReasonInternal(const FString& FlagName, bool bForceRealtime = true) const = 0;
   virtual bool GetImpressionDataInternal(const FString& FlagName,
-                                         bool bForceRealtime = false) const = 0;
+                                         bool bForceRealtime = true) const = 0;
   virtual FGatrixEvaluatedFlag GetRawFlagInternal(const FString& FlagName,
-                                                  bool bForceRealtime = false) const = 0;
+                                                  bool bForceRealtime = true) const = 0;
 
   virtual FString VariationInternal(const FString& FlagName, const FString& FallbackValue,
-                                    bool bForceRealtime = false) = 0;
+                                    bool bForceRealtime = true) = 0;
   virtual bool BoolVariationInternal(const FString& FlagName, bool FallbackValue,
-                                     bool bForceRealtime = false) = 0;
+                                     bool bForceRealtime = true) = 0;
   virtual FString StringVariationInternal(const FString& FlagName, const FString& FallbackValue,
-                                          bool bForceRealtime = false) = 0;
+                                          bool bForceRealtime = true) = 0;
   virtual float FloatVariationInternal(const FString& FlagName, float FallbackValue,
-                                       bool bForceRealtime = false) = 0;
+                                       bool bForceRealtime = true) = 0;
   virtual int32 IntVariationInternal(const FString& FlagName, int32 FallbackValue,
-                                     bool bForceRealtime = false) = 0;
+                                     bool bForceRealtime = true) = 0;
   virtual double DoubleVariationInternal(const FString& FlagName, double FallbackValue,
-                                         bool bForceRealtime = false) = 0;
+                                         bool bForceRealtime = true) = 0;
   virtual FString JsonVariationInternal(const FString& FlagName, const FString& FallbackValue,
-                                        bool bForceRealtime = false) = 0;
+                                        bool bForceRealtime = true) = 0;
 
   virtual FGatrixVariationResult BoolVariationDetailsInternal(const FString& FlagName,
                                                               bool FallbackValue,
-                                                              bool bForceRealtime = false) = 0;
+                                                              bool bForceRealtime = true) = 0;
   virtual FGatrixVariationResult StringVariationDetailsInternal(const FString& FlagName,
                                                                 const FString& FallbackValue,
-                                                                bool bForceRealtime = false) = 0;
+                                                                bool bForceRealtime = true) = 0;
   virtual FGatrixVariationResult FloatVariationDetailsInternal(const FString& FlagName,
                                                                float FallbackValue,
-                                                               bool bForceRealtime = false) = 0;
+                                                               bool bForceRealtime = true) = 0;
   virtual FGatrixVariationResult IntVariationDetailsInternal(const FString& FlagName,
                                                              int32 FallbackValue,
-                                                             bool bForceRealtime = false) = 0;
+                                                             bool bForceRealtime = true) = 0;
   virtual FGatrixVariationResult DoubleVariationDetailsInternal(const FString& FlagName,
                                                                 double FallbackValue,
-                                                                bool bForceRealtime = false) = 0;
+                                                                bool bForceRealtime = true) = 0;
   virtual FGatrixVariationResult JsonVariationDetailsInternal(const FString& FlagName,
                                                               const FString& FallbackValue,
-                                                              bool bForceRealtime = false) = 0;
+                                                              bool bForceRealtime = true) = 0;
 
   virtual bool BoolVariationOrThrowInternal(const FString& FlagName,
-                                            bool bForceRealtime = false) = 0;
+                                            bool bForceRealtime = true) = 0;
   virtual FString StringVariationOrThrowInternal(const FString& FlagName,
-                                                 bool bForceRealtime = false) = 0;
+                                                 bool bForceRealtime = true) = 0;
   virtual float FloatVariationOrThrowInternal(const FString& FlagName,
-                                              bool bForceRealtime = false) = 0;
+                                              bool bForceRealtime = true) = 0;
   virtual int32 IntVariationOrThrowInternal(const FString& FlagName,
-                                            bool bForceRealtime = false) = 0;
+                                            bool bForceRealtime = true) = 0;
   virtual double DoubleVariationOrThrowInternal(const FString& FlagName,
-                                                bool bForceRealtime = false) = 0;
+                                                bool bForceRealtime = true) = 0;
   virtual FString JsonVariationOrThrowInternal(const FString& FlagName,
-                                               bool bForceRealtime = false) = 0;
+                                               bool bForceRealtime = true) = 0;
 };

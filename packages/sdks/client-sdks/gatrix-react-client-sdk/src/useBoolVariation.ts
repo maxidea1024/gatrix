@@ -22,7 +22,7 @@ import { useGatrixContext } from './useGatrixContext';
 export function useBoolVariation(
   flagName: string,
   fallbackValue: boolean,
-  forceRealtime = false
+  forceRealtime = true
 ): boolean {
   const { features } = useGatrixContext();
   const [value, setValue] = useState(() =>

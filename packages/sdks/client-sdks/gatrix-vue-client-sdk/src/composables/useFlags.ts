@@ -2,7 +2,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
 import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
 
-export function useFlags(forceRealtime = false) {
+export function useFlags(forceRealtime = true) {
   const client = useGatrixClient();
   const flags = ref<EvaluatedFlag[]>(client.features.getAllFlags(forceRealtime));
 

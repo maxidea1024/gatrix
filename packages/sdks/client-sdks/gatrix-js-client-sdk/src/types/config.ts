@@ -103,9 +103,6 @@ export interface GatrixClientConfig {
   /** Application name */
   appName: string;
 
-  /** Environment name (optional metadata, token determines actual environment) */
-  environment?: string;
-
   /** Custom HTTP headers */
   customHeaders?: Record<string, string>;
 

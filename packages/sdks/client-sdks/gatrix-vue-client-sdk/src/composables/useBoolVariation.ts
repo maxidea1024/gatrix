@@ -1,7 +1,7 @@
 import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
 
-export function useBoolVariation(flagName: string, fallbackValue: boolean, forceRealtime = false) {
+export function useBoolVariation(flagName: string, fallbackValue: boolean, forceRealtime = true) {
   const client = useGatrixClient();
   const value = ref(client.features.boolVariation(flagName, fallbackValue, forceRealtime));
 

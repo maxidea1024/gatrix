@@ -14,7 +14,6 @@ export function validateConfig(config: GatrixClientConfig): void {
   validateRequiredString(config.apiUrl, 'apiUrl');
   validateRequiredString(config.apiToken, 'apiToken');
   validateRequiredString(config.appName, 'appName');
-  validateRequiredString(config.environment, 'environment');
 
   // apiUrl format
   if (config.apiUrl && !isValidUrl(config.apiUrl)) {

@@ -1,4 +1,4 @@
-﻿﻿# Gatrix Lua SDK for Unreal Engine
+# Gatrix Lua SDK for Unreal Engine
 
 > **Feature flags, A/B testing, and remote configuration — official Gatrix Lua binding for Unreal Engine.**
 
@@ -347,34 +347,34 @@ gatrix.Features.FetchFlags()
 ```lua
 --- Check if a flag is enabled
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return boolean
 local Enabled = gatrix.Features.IsEnabled("my_flag")
 local Enabled = gatrix.Features.IsEnabled("my_flag", true)  -- forceRealtime
 
 --- Get raw flag data as EvaluatedFlag table
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return EvaluatedFlag
 local Flag = gatrix.Features.GetFlag("my_flag")
 local Flag = gatrix.Features.GetFlag("my_flag", true)
 
 --- Get variant for a flag (never nil; returns $missing variant if not found)
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return Variant
 local Variant = gatrix.Features.GetVariant("my_flag")
 local Variant = gatrix.Features.GetVariant("my_flag", true)
 
 --- Get all evaluated flags
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return EvaluatedFlag[]
 local Flags = gatrix.Features.GetAllFlags()
 local Flags = gatrix.Features.GetAllFlags(true)
 
 --- Check if a flag exists in the cache
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return boolean
 local Exists = gatrix.Features.HasFlag("my_flag")
 local Exists = gatrix.Features.HasFlag("my_flag", true)
@@ -382,7 +382,7 @@ local Exists = gatrix.Features.HasFlag("my_flag", true)
 
 ### Typed Variations (`gatrix.Features`)
 
-> `forceRealtime` (optional, default `false`) — if `true`, reads directly from the **realtime** flag
+> `forceRealtime` (optional, default `true`) — if `true`, reads directly from the **realtime** flag
 > cache, bypassing `ExplicitSyncMode`. Useful in monitoring, debug overlays, or admin UIs that
 > always need the latest server-fetched value regardless of sync state.
 
@@ -390,7 +390,7 @@ local Exists = gatrix.Features.HasFlag("my_flag", true)
 --- Get variant name (string)
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue string   Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return string
 local VariantName = gatrix.Features.Variation("my_flag", "default")
 local VariantName = gatrix.Features.Variation("my_flag", "default", true)
@@ -398,7 +398,7 @@ local VariantName = gatrix.Features.Variation("my_flag", "default", true)
 --- Get boolean variation (returns flag.enabled state)
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue boolean  Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return boolean
 local BoolVal = gatrix.Features.BoolVariation("flag", false)
 local BoolVal = gatrix.Features.BoolVariation("flag", false, true)
@@ -406,7 +406,7 @@ local BoolVal = gatrix.Features.BoolVariation("flag", false, true)
 --- Get string variation from variant payload
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue string   Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return string
 local StrVal = gatrix.Features.StringVariation("flag", "default")
 local StrVal = gatrix.Features.StringVariation("flag", "default", true)
@@ -414,7 +414,7 @@ local StrVal = gatrix.Features.StringVariation("flag", "default", true)
 --- Get integer variation from variant payload
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue integer  Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return integer
 local IntVal = gatrix.Features.IntVariation("flag", 0)
 local IntVal = gatrix.Features.IntVariation("flag", 0, true)
@@ -422,7 +422,7 @@ local IntVal = gatrix.Features.IntVariation("flag", 0, true)
 --- Get float variation from variant payload
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue number   Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return number
 local FloatVal = gatrix.Features.FloatVariation("flag", 0.0)
 local FloatVal = gatrix.Features.FloatVariation("flag", 0.0, true)
@@ -436,7 +436,7 @@ Returns a `VariationResult` table with the value **plus** evaluation metadata.
 --- Get boolean variation with evaluation details
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue boolean  Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return VariationResult {Value: boolean, Reason: string, FlagExists: boolean, Enabled: boolean}
 local Result = gatrix.Features.BoolVariationDetails("flag", false)
 local Result = gatrix.Features.BoolVariationDetails("flag", false, true)
@@ -444,7 +444,7 @@ local Result = gatrix.Features.BoolVariationDetails("flag", false, true)
 --- Get string variation with evaluation details
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue string   Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return VariationResult {Value: string, Reason: string, FlagExists: boolean, Enabled: boolean}
 local Result = gatrix.Features.StringVariationDetails("flag", "")
 local Result = gatrix.Features.StringVariationDetails("flag", "", true)
@@ -452,7 +452,7 @@ local Result = gatrix.Features.StringVariationDetails("flag", "", true)
 --- Get integer variation with evaluation details
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue integer  Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return VariationResult {Value: integer, Reason: string, FlagExists: boolean, Enabled: boolean}
 local Result = gatrix.Features.IntVariationDetails("flag", 0)
 local Result = gatrix.Features.IntVariationDetails("flag", 0, true)
@@ -460,7 +460,7 @@ local Result = gatrix.Features.IntVariationDetails("flag", 0, true)
 --- Get float variation with evaluation details
 --- @param FlagName      string   Feature flag key
 --- @param FallbackValue number   Value to return if flag not found or type mismatch
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return VariationResult {Value: number, Reason: string, FlagExists: boolean, Enabled: boolean}
 local Result = gatrix.Features.FloatVariationDetails("flag", 0.0)
 local Result = gatrix.Features.FloatVariationDetails("flag", 0.0, true)
@@ -474,28 +474,28 @@ Use these where a missing flag is a programming error, not a runtime condition.
 ```lua
 --- Get boolean variation, raises Lua error if flag not found or type mismatch
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return boolean
 local Val = gatrix.Features.BoolVariationOrThrow("flag")
 local Val = gatrix.Features.BoolVariationOrThrow("flag", true)
 
 --- Get string variation, raises Lua error if flag not found or type mismatch
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return string
 local Val = gatrix.Features.StringVariationOrThrow("flag")
 local Val = gatrix.Features.StringVariationOrThrow("flag", true)
 
 --- Get integer variation, raises Lua error if flag not found or type mismatch
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return integer
 local Val = gatrix.Features.IntVariationOrThrow("flag")
 local Val = gatrix.Features.IntVariationOrThrow("flag", true)
 
 --- Get float variation, raises Lua error if flag not found or type mismatch
 --- @param FlagName      string   Feature flag key
---- @param forceRealtime boolean? Read from realtimeFlags (default: false)
+--- @param forceRealtime boolean? Read from realtimeFlags (default: true)
 --- @return number
 local Val = gatrix.Features.FloatVariationOrThrow("flag")
 local Val = gatrix.Features.FloatVariationOrThrow("flag", true)

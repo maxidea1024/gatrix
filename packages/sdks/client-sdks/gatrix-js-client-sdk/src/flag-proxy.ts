@@ -1,4 +1,4 @@
-﻿/**
+/**
  * FlagProxy - Thin shell that delegates ALL logic to VariationProvider.
  *
  * Architecture per CLIENT_SDK_SPEC:
@@ -16,7 +16,7 @@ export class FlagProxy {
   private _forceRealtime: boolean;
   private client: VariationProvider;
 
-  constructor(client: VariationProvider, flagName: string, forceRealtime: boolean = false) {
+  constructor(client: VariationProvider, flagName: string, forceRealtime: boolean = true) {
     this._flagName = flagName ?? '';
     this._forceRealtime = forceRealtime;
     this.client = client;

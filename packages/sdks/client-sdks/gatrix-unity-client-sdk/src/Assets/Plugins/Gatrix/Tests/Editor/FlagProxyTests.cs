@@ -50,29 +50,29 @@ namespace Gatrix.Unity.SDK.Tests
         }
 
         // IVariationProvider implementation
-        public bool IsEnabledInternal(string flagName, bool forceRealtime = false) { Record("IsEnabledInternal", flagName); return IsEnabledResult; }
-        public Variant GetVariantInternal(string flagName, bool forceRealtime = false) { Record("GetVariantInternal", flagName); return GetVariantResult; }
-        public string VariationInternal(string flagName, string fallbackValue, bool forceRealtime = false) { Record("VariationInternal", flagName); return VariationResult ?? fallbackValue; }
-        public bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = false) { Record("BoolVariationInternal", flagName); return BoolVariationResult; }
-        public string StringVariationInternal(string flagName, string fallbackValue, bool forceRealtime = false) { Record("StringVariationInternal", flagName); return StringVariationResult ?? fallbackValue; }
-        public int IntVariationInternal(string flagName, int fallbackValue, bool forceRealtime = false) { Record("IntVariationInternal", flagName); return IntVariationResult; }
-        public float FloatVariationInternal(string flagName, float fallbackValue, bool forceRealtime = false) { Record("FloatVariationInternal", flagName); return FloatVariationResult; }
-        public double DoubleVariationInternal(string flagName, double fallbackValue, bool forceRealtime = false) { Record("DoubleVariationInternal", flagName); return DoubleVariationResult; }
-        public Dictionary<string, object> JsonVariationInternal(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false) { Record("JsonVariationInternal", flagName); return JsonVariationResult ?? fallbackValue; }
+        public bool IsEnabledInternal(string flagName, bool forceRealtime = true) { Record("IsEnabledInternal", flagName); return IsEnabledResult; }
+        public Variant GetVariantInternal(string flagName, bool forceRealtime = true) { Record("GetVariantInternal", flagName); return GetVariantResult; }
+        public string VariationInternal(string flagName, string fallbackValue, bool forceRealtime = true) { Record("VariationInternal", flagName); return VariationResult ?? fallbackValue; }
+        public bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = true) { Record("BoolVariationInternal", flagName); return BoolVariationResult; }
+        public string StringVariationInternal(string flagName, string fallbackValue, bool forceRealtime = true) { Record("StringVariationInternal", flagName); return StringVariationResult ?? fallbackValue; }
+        public int IntVariationInternal(string flagName, int fallbackValue, bool forceRealtime = true) { Record("IntVariationInternal", flagName); return IntVariationResult; }
+        public float FloatVariationInternal(string flagName, float fallbackValue, bool forceRealtime = true) { Record("FloatVariationInternal", flagName); return FloatVariationResult; }
+        public double DoubleVariationInternal(string flagName, double fallbackValue, bool forceRealtime = true) { Record("DoubleVariationInternal", flagName); return DoubleVariationResult; }
+        public Dictionary<string, object> JsonVariationInternal(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true) { Record("JsonVariationInternal", flagName); return JsonVariationResult ?? fallbackValue; }
 
-        public bool BoolVariationOrThrowInternal(string flagName, bool forceRealtime = false) { Record("BoolVariationOrThrowInternal", flagName); return BoolOrThrowResult; }
-        public string StringVariationOrThrowInternal(string flagName, bool forceRealtime = false) { Record("StringVariationOrThrowInternal", flagName); return StringOrThrowResult; }
-        public int IntVariationOrThrowInternal(string flagName, bool forceRealtime = false) { Record("IntVariationOrThrowInternal", flagName); return IntOrThrowResult; }
-        public float FloatVariationOrThrowInternal(string flagName, bool forceRealtime = false) { Record("FloatVariationOrThrowInternal", flagName); return FloatOrThrowResult; }
-        public double DoubleVariationOrThrowInternal(string flagName, bool forceRealtime = false) { Record("DoubleVariationOrThrowInternal", flagName); return DoubleOrThrowResult; }
-        public Dictionary<string, object> JsonVariationOrThrowInternal(string flagName, bool forceRealtime = false) { Record("JsonVariationOrThrowInternal", flagName); return JsonOrThrowResult; }
+        public bool BoolVariationOrThrowInternal(string flagName, bool forceRealtime = true) { Record("BoolVariationOrThrowInternal", flagName); return BoolOrThrowResult; }
+        public string StringVariationOrThrowInternal(string flagName, bool forceRealtime = true) { Record("StringVariationOrThrowInternal", flagName); return StringOrThrowResult; }
+        public int IntVariationOrThrowInternal(string flagName, bool forceRealtime = true) { Record("IntVariationOrThrowInternal", flagName); return IntOrThrowResult; }
+        public float FloatVariationOrThrowInternal(string flagName, bool forceRealtime = true) { Record("FloatVariationOrThrowInternal", flagName); return FloatOrThrowResult; }
+        public double DoubleVariationOrThrowInternal(string flagName, bool forceRealtime = true) { Record("DoubleVariationOrThrowInternal", flagName); return DoubleOrThrowResult; }
+        public Dictionary<string, object> JsonVariationOrThrowInternal(string flagName, bool forceRealtime = true) { Record("JsonVariationOrThrowInternal", flagName); return JsonOrThrowResult; }
 
-        public VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool fallbackValue, bool forceRealtime = false) { Record("BoolVariationDetailsInternal", flagName); return BoolDetailsResult; }
-        public VariationResult<string> StringVariationDetailsInternal(string flagName, string fallbackValue, bool forceRealtime = false) { Record("StringVariationDetailsInternal", flagName); return StringDetailsResult; }
-        public VariationResult<int> IntVariationDetailsInternal(string flagName, int fallbackValue, bool forceRealtime = false) { Record("IntVariationDetailsInternal", flagName); return IntDetailsResult; }
-        public VariationResult<float> FloatVariationDetailsInternal(string flagName, float fallbackValue, bool forceRealtime = false) { Record("FloatVariationDetailsInternal", flagName); return FloatDetailsResult; }
-        public VariationResult<double> DoubleVariationDetailsInternal(string flagName, double fallbackValue, bool forceRealtime = false) { Record("DoubleVariationDetailsInternal", flagName); return DoubleDetailsResult; }
-        public VariationResult<Dictionary<string, object>> JsonVariationDetailsInternal(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false) { Record("JsonVariationDetailsInternal", flagName); return JsonDetailsResult; }
+        public VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool fallbackValue, bool forceRealtime = true) { Record("BoolVariationDetailsInternal", flagName); return BoolDetailsResult; }
+        public VariationResult<string> StringVariationDetailsInternal(string flagName, string fallbackValue, bool forceRealtime = true) { Record("StringVariationDetailsInternal", flagName); return StringDetailsResult; }
+        public VariationResult<int> IntVariationDetailsInternal(string flagName, int fallbackValue, bool forceRealtime = true) { Record("IntVariationDetailsInternal", flagName); return IntDetailsResult; }
+        public VariationResult<float> FloatVariationDetailsInternal(string flagName, float fallbackValue, bool forceRealtime = true) { Record("FloatVariationDetailsInternal", flagName); return FloatDetailsResult; }
+        public VariationResult<double> DoubleVariationDetailsInternal(string flagName, double fallbackValue, bool forceRealtime = true) { Record("DoubleVariationDetailsInternal", flagName); return DoubleDetailsResult; }
+        public VariationResult<Dictionary<string, object>> JsonVariationDetailsInternal(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true) { Record("JsonVariationDetailsInternal", flagName); return JsonDetailsResult; }
     }
 
     [TestFixture]

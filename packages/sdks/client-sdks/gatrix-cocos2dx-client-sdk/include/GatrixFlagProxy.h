@@ -21,7 +21,7 @@ namespace gatrix {
  */
 class FlagProxy {
 public:
-  FlagProxy(IVariationProvider* provider, const std::string& flagName, bool forceRealtime = false)
+  FlagProxy(IVariationProvider* provider, const std::string& flagName, bool forceRealtime = true)
       : _provider(provider), _flagName(flagName), _forceRealtime(forceRealtime) {
     assert(_provider != nullptr);
   }

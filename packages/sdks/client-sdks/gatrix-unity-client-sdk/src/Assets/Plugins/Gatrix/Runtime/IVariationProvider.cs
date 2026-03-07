@@ -19,58 +19,58 @@ namespace Gatrix.Unity.SDK
         // ==================== Core Access ====================
 
         /// <summary>Check if flag is enabled (with metrics tracking)</summary>
-        bool IsEnabledInternal(string flagName, bool forceRealtime = false);
+        bool IsEnabledInternal(string flagName, bool forceRealtime = true);
 
         /// <summary>Get variant object (with metrics tracking)</summary>
-        Variant GetVariantInternal(string flagName, bool forceRealtime = false);
+        Variant GetVariantInternal(string flagName, bool forceRealtime = true);
 
         // ==================== Metadata Access ====================
 
         /// <summary>Check if flag exists in cache</summary>
-        bool HasFlagInternal(string flagName, bool forceRealtime = false);
+        bool HasFlagInternal(string flagName, bool forceRealtime = true);
 
         /// <summary>Get value type of flag</summary>
-        ValueType GetValueTypeInternal(string flagName, bool forceRealtime = false);
+        ValueType GetValueTypeInternal(string flagName, bool forceRealtime = true);
 
         /// <summary>Get version of flag</summary>
-        int GetVersionInternal(string flagName, bool forceRealtime = false);
+        int GetVersionInternal(string flagName, bool forceRealtime = true);
 
         /// <summary>Get evaluation reason of flag</summary>
-        string GetReasonInternal(string flagName, bool forceRealtime = false);
+        string GetReasonInternal(string flagName, bool forceRealtime = true);
 
         /// <summary>Get whether impression data is enabled</summary>
-        bool GetImpressionDataInternal(string flagName, bool forceRealtime = false);
+        bool GetImpressionDataInternal(string flagName, bool forceRealtime = true);
 
         /// <summary>Get raw evaluated flag (or null if not found)</summary>
-        EvaluatedFlag GetRawFlagInternal(string flagName, bool forceRealtime = false);
+        EvaluatedFlag GetRawFlagInternal(string flagName, bool forceRealtime = true);
 
         // ==================== Variations ====================
 
-        string VariationInternal(string flagName, string fallbackValue, bool forceRealtime = false);
-        bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = false);
-        string StringVariationInternal(string flagName, string fallbackValue, bool forceRealtime = false);
-        int IntVariationInternal(string flagName, int fallbackValue, bool forceRealtime = false);
-        float FloatVariationInternal(string flagName, float fallbackValue, bool forceRealtime = false);
-        double DoubleVariationInternal(string flagName, double fallbackValue, bool forceRealtime = false);
-        Dictionary<string, object> JsonVariationInternal(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false);
+        string VariationInternal(string flagName, string fallbackValue, bool forceRealtime = true);
+        bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = true);
+        string StringVariationInternal(string flagName, string fallbackValue, bool forceRealtime = true);
+        int IntVariationInternal(string flagName, int fallbackValue, bool forceRealtime = true);
+        float FloatVariationInternal(string flagName, float fallbackValue, bool forceRealtime = true);
+        double DoubleVariationInternal(string flagName, double fallbackValue, bool forceRealtime = true);
+        Dictionary<string, object> JsonVariationInternal(string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true);
 
         // ==================== Variation Details ====================
 
-        VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool fallbackValue, bool forceRealtime = false);
-        VariationResult<string> StringVariationDetailsInternal(string flagName, string fallbackValue, bool forceRealtime = false);
-        VariationResult<int> IntVariationDetailsInternal(string flagName, int fallbackValue, bool forceRealtime = false);
-        VariationResult<float> FloatVariationDetailsInternal(string flagName, float fallbackValue, bool forceRealtime = false);
-        VariationResult<double> DoubleVariationDetailsInternal(string flagName, double fallbackValue, bool forceRealtime = false);
+        VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool fallbackValue, bool forceRealtime = true);
+        VariationResult<string> StringVariationDetailsInternal(string flagName, string fallbackValue, bool forceRealtime = true);
+        VariationResult<int> IntVariationDetailsInternal(string flagName, int fallbackValue, bool forceRealtime = true);
+        VariationResult<float> FloatVariationDetailsInternal(string flagName, float fallbackValue, bool forceRealtime = true);
+        VariationResult<double> DoubleVariationDetailsInternal(string flagName, double fallbackValue, bool forceRealtime = true);
         VariationResult<Dictionary<string, object>> JsonVariationDetailsInternal(
-            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false);
+            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true);
 
         // ==================== OrThrow ====================
 
-        bool BoolVariationOrThrowInternal(string flagName, bool forceRealtime = false);
-        string StringVariationOrThrowInternal(string flagName, bool forceRealtime = false);
-        int IntVariationOrThrowInternal(string flagName, bool forceRealtime = false);
-        float FloatVariationOrThrowInternal(string flagName, bool forceRealtime = false);
-        double DoubleVariationOrThrowInternal(string flagName, bool forceRealtime = false);
-        Dictionary<string, object> JsonVariationOrThrowInternal(string flagName, bool forceRealtime = false);
+        bool BoolVariationOrThrowInternal(string flagName, bool forceRealtime = true);
+        string StringVariationOrThrowInternal(string flagName, bool forceRealtime = true);
+        int IntVariationOrThrowInternal(string flagName, bool forceRealtime = true);
+        float FloatVariationOrThrowInternal(string flagName, bool forceRealtime = true);
+        double DoubleVariationOrThrowInternal(string flagName, bool forceRealtime = true);
+        Dictionary<string, object> JsonVariationOrThrowInternal(string flagName, bool forceRealtime = true);
     }
 }

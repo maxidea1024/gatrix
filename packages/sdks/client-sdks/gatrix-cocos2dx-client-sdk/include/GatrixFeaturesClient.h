@@ -41,114 +41,114 @@ public:
                      std::function<void(bool, const std::string&)> onComplete);
 
   // ==================== Flag Access - Basic ====================
-  bool isEnabled(const std::string& flagName, bool forceRealtime = false);
-  const EvaluatedFlag* getFlag(const std::string& flagName, bool forceRealtime = false);
-  Variant getVariant(const std::string& flagName, bool forceRealtime = false);
+  bool isEnabled(const std::string& flagName, bool forceRealtime = true);
+  const EvaluatedFlag* getFlag(const std::string& flagName, bool forceRealtime = true);
+  Variant getVariant(const std::string& flagName, bool forceRealtime = true);
   std::vector<EvaluatedFlag> getAllFlags() const;
 
   // ==================== Flag Access - Typed Variations (fallbackValue
   // REQUIRED)
   // ====================
   std::string variation(const std::string& flagName, const std::string& fallbackValue,
-                        bool forceRealtime = false);
-  bool boolVariation(const std::string& flagName, bool fallbackValue, bool forceRealtime = false);
+                        bool forceRealtime = true);
+  bool boolVariation(const std::string& flagName, bool fallbackValue, bool forceRealtime = true);
   std::string stringVariation(const std::string& flagName, const std::string& fallbackValue,
-                              bool forceRealtime = false);
-  int intVariation(const std::string& flagName, int fallbackValue, bool forceRealtime = false);
+                              bool forceRealtime = true);
+  int intVariation(const std::string& flagName, int fallbackValue, bool forceRealtime = true);
   float floatVariation(const std::string& flagName, float fallbackValue,
-                       bool forceRealtime = false);
+                       bool forceRealtime = true);
   double doubleVariation(const std::string& flagName, double fallbackValue,
-                         bool forceRealtime = false);
+                         bool forceRealtime = true);
   std::string jsonVariation(const std::string& flagName, const std::string& fallbackValue,
-                            bool forceRealtime = false);
+                            bool forceRealtime = true);
 
   // ==================== Variation Details (fallbackValue REQUIRED)
   // ====================
   VariationResult<bool> boolVariationDetails(const std::string& flagName, bool fallbackValue,
-                                             bool forceRealtime = false);
+                                             bool forceRealtime = true);
   VariationResult<std::string> stringVariationDetails(const std::string& flagName,
                                                       const std::string& fallbackValue,
-                                                      bool forceRealtime = false);
+                                                      bool forceRealtime = true);
   VariationResult<int> intVariationDetails(const std::string& flagName, int fallbackValue,
-                                           bool forceRealtime = false);
+                                           bool forceRealtime = true);
   VariationResult<float> floatVariationDetails(const std::string& flagName, float fallbackValue,
-                                               bool forceRealtime = false);
+                                               bool forceRealtime = true);
   VariationResult<double> doubleVariationDetails(const std::string& flagName, double fallbackValue,
-                                                 bool forceRealtime = false);
+                                                 bool forceRealtime = true);
   VariationResult<std::string> jsonVariationDetails(const std::string& flagName,
                                                     const std::string& fallbackValue,
-                                                    bool forceRealtime = false);
+                                                    bool forceRealtime = true);
 
   // ==================== Strict Variations (Throw on missing)
   // ====================
-  bool boolVariationOrThrow(const std::string& flagName, bool forceRealtime = false);
-  std::string stringVariationOrThrow(const std::string& flagName, bool forceRealtime = false);
-  float floatVariationOrThrow(const std::string& flagName, bool forceRealtime = false);
-  int intVariationOrThrow(const std::string& flagName, bool forceRealtime = false);
-  double doubleVariationOrThrow(const std::string& flagName, bool forceRealtime = false);
-  std::string jsonVariationOrThrow(const std::string& flagName, bool forceRealtime = false);
+  bool boolVariationOrThrow(const std::string& flagName, bool forceRealtime = true);
+  std::string stringVariationOrThrow(const std::string& flagName, bool forceRealtime = true);
+  float floatVariationOrThrow(const std::string& flagName, bool forceRealtime = true);
+  int intVariationOrThrow(const std::string& flagName, bool forceRealtime = true);
+  double doubleVariationOrThrow(const std::string& flagName, bool forceRealtime = true);
+  std::string jsonVariationOrThrow(const std::string& flagName, bool forceRealtime = true);
 
   // ==================== IVariationProvider Metadata Implementation
   // ====================
-  bool hasFlagInternal(const std::string& flagName, bool forceRealtime = false) const override;
+  bool hasFlagInternal(const std::string& flagName, bool forceRealtime = true) const override;
   ValueType getValueTypeInternal(const std::string& flagName,
-                                 bool forceRealtime = false) const override;
-  int getVersionInternal(const std::string& flagName, bool forceRealtime = false) const override;
+                                 bool forceRealtime = true) const override;
+  int getVersionInternal(const std::string& flagName, bool forceRealtime = true) const override;
   std::string getReasonInternal(const std::string& flagName,
-                                bool forceRealtime = false) const override;
+                                bool forceRealtime = true) const override;
   bool getImpressionDataInternal(const std::string& flagName,
-                                 bool forceRealtime = false) const override;
+                                 bool forceRealtime = true) const override;
   const EvaluatedFlag* getRawFlagInternal(const std::string& flagName,
-                                          bool forceRealtime = false) const override;
+                                          bool forceRealtime = true) const override;
 
   // ==================== IVariationProvider Implementation ====================
-  bool isEnabledInternal(const std::string& flagName, bool forceRealtime = false) override;
-  Variant getVariantInternal(const std::string& flagName, bool forceRealtime = false) override;
+  bool isEnabledInternal(const std::string& flagName, bool forceRealtime = true) override;
+  Variant getVariantInternal(const std::string& flagName, bool forceRealtime = true) override;
 
   std::string variationInternal(const std::string& flagName, const std::string& fallbackValue,
-                                bool forceRealtime = false) override;
+                                bool forceRealtime = true) override;
   bool boolVariationInternal(const std::string& flagName, bool fallbackValue,
-                             bool forceRealtime = false) override;
+                             bool forceRealtime = true) override;
   std::string stringVariationInternal(const std::string& flagName, const std::string& fallbackValue,
-                                      bool forceRealtime = false) override;
+                                      bool forceRealtime = true) override;
   float floatVariationInternal(const std::string& flagName, float fallbackValue,
-                               bool forceRealtime = false) override;
+                               bool forceRealtime = true) override;
   int intVariationInternal(const std::string& flagName, int fallbackValue,
-                           bool forceRealtime = false) override;
+                           bool forceRealtime = true) override;
   double doubleVariationInternal(const std::string& flagName, double fallbackValue,
-                                 bool forceRealtime = false) override;
+                                 bool forceRealtime = true) override;
   std::string jsonVariationInternal(const std::string& flagName, const std::string& fallbackValue,
-                                    bool forceRealtime = false) override;
+                                    bool forceRealtime = true) override;
 
   VariationResult<bool> boolVariationDetailsInternal(const std::string& flagName,
                                                      bool fallbackValue,
-                                                     bool forceRealtime = false) override;
+                                                     bool forceRealtime = true) override;
   VariationResult<std::string> stringVariationDetailsInternal(const std::string& flagName,
                                                               const std::string& fallbackValue,
-                                                              bool forceRealtime = false) override;
+                                                              bool forceRealtime = true) override;
   VariationResult<float> floatVariationDetailsInternal(const std::string& flagName,
                                                        float fallbackValue,
-                                                       bool forceRealtime = false) override;
+                                                       bool forceRealtime = true) override;
   VariationResult<int> intVariationDetailsInternal(const std::string& flagName, int fallbackValue,
-                                                   bool forceRealtime = false) override;
+                                                   bool forceRealtime = true) override;
   VariationResult<double> doubleVariationDetailsInternal(const std::string& flagName,
                                                          double fallbackValue,
-                                                         bool forceRealtime = false) override;
+                                                         bool forceRealtime = true) override;
   VariationResult<std::string> jsonVariationDetailsInternal(const std::string& flagName,
                                                             const std::string& fallbackValue,
-                                                            bool forceRealtime = false) override;
+                                                            bool forceRealtime = true) override;
 
   bool boolVariationOrThrowInternal(const std::string& flagName,
-                                    bool forceRealtime = false) override;
+                                    bool forceRealtime = true) override;
   std::string stringVariationOrThrowInternal(const std::string& flagName,
-                                             bool forceRealtime = false) override;
+                                             bool forceRealtime = true) override;
   float floatVariationOrThrowInternal(const std::string& flagName,
-                                      bool forceRealtime = false) override;
-  int intVariationOrThrowInternal(const std::string& flagName, bool forceRealtime = false) override;
+                                      bool forceRealtime = true) override;
+  int intVariationOrThrowInternal(const std::string& flagName, bool forceRealtime = true) override;
   double doubleVariationOrThrowInternal(const std::string& flagName,
-                                        bool forceRealtime = false) override;
+                                        bool forceRealtime = true) override;
   std::string jsonVariationOrThrowInternal(const std::string& flagName,
-                                           bool forceRealtime = false) override;
+                                           bool forceRealtime = true) override;
 
   // ==================== FlagProxy Access ====================
   bool hasFlag(const std::string& flagName) const;
@@ -247,11 +247,11 @@ private:
   std::map<std::string, std::vector<WatchCallback>> _syncedWatchCallbacks;
 
   // Active flags getter
-  const std::map<std::string, EvaluatedFlag>& selectFlags(bool forceRealtime = false) const;
+  const std::map<std::string, EvaluatedFlag>& selectFlags(bool forceRealtime = true) const;
 
   // Shared flag lookup with full metrics tracking (missing, access, impression)
   const EvaluatedFlag* lookupFlag(const std::string& flagName, const std::string& eventType,
-                                  bool forceRealtime = false);
+                                  bool forceRealtime = true);
 
   // Internal
   FlagProxy createProxyForWatch(const std::string& flagName, bool forceRealtime = true);

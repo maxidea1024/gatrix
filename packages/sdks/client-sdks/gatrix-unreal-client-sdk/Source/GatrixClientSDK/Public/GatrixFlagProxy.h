@@ -141,6 +141,6 @@ public:
 
 private:
   FString FlagName;
-  bool bForceRealtime = false;
+  bool bForceRealtime = true;
   IGatrixVariationProvider* Provider = nullptr;
 };

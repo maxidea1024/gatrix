@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VariationProvider - Interface for centralized variation logic.
  *
  * This interface defines the internal methods that handle all variation logic:
@@ -8,7 +8,7 @@
  * FlagProxy holds a reference to this interface (not FeaturesClient directly)
  * to avoid circular dependencies and keep a clean separation.
  *
- * All methods accept an optional `forceRealtime` parameter (default: false).
+ * All methods accept an optional `forceRealtime` parameter (default: true).
  * When true, the method reads from realtimeFlags directly, bypassing
  * explicitSyncMode's synchronizedFlags.
  */
