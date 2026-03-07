@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
-import { createLogger } from '../config/logger';
-
-const logger = createLogger('EvaluationHelper');
-import { sdkManager } from '../services/sdkManager';
+import { sdkManager } from '../services/sdk-manager';
 import { EvaluationUtils } from '@gatrix/evaluator';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('EvaluationHelper');
 
 /**
  * Get SDK instance or return 503 error

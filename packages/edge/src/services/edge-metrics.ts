@@ -1,4 +1,4 @@
-import { sdkManager } from './sdkManager';
+import { sdkManager } from './sdk-manager';
 
 /**
  * Edge Server Custom Metrics

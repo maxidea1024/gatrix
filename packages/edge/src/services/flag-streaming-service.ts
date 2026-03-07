@@ -20,7 +20,7 @@ import { config } from '../config/env';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('FlagStreaming');
-import { sdkManager } from './sdkManager';
+import { sdkManager } from './sdk-manager';
 
 interface StreamingClient {
   id: string;

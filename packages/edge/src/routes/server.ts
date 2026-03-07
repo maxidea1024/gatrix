@@ -1,13 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { tokenMirrorService } from '../services/tokenMirrorService';
-import { metricsAggregator } from '../services/metricsAggregator';
-import { performEvaluation } from '../utils/evaluationHelper';
+import { tokenMirrorService } from '../services/token-mirror-service';
+import { metricsAggregator } from '../services/metrics-aggregator';
+import { performEvaluation } from '../utils/evaluation-helper';
 import {
   ErrorCodes,
   sendUnauthorized,
   sendBadRequest,
   sendInternalError,
-} from '../utils/apiResponse';
+} from '../utils/api-response';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('ServerRoute');
@@ -45,7 +45,7 @@ function serverAuth(req: Request, res: Response, next: NextFunction): void {
  */
 router.get('/:env/features', serverAuth, async (req: Request, res: Response) => {
   try {
-    const { getSDKOrError } = await import('../utils/evaluationHelper');
+    const { getSDKOrError } = await import('../utils/evaluation-helper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
@@ -123,7 +123,7 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
  */
 router.get('/segments', serverAuth, async (req: Request, res: Response) => {
   try {
-    const { getSDKOrError } = await import('../utils/evaluationHelper');
+    const { getSDKOrError } = await import('../utils/evaluation-helper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 

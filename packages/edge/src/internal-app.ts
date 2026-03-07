@@ -4,7 +4,7 @@ import internalRoutes from './routes/internal';
 import { createLogger } from './config/logger';
 
 const logger = createLogger('InternalApp');
-import { sdkManager } from './services/sdkManager';
+import { sdkManager } from './services/sdk-manager';
 
 // Create Express application for internal endpoints
 const internalApp: Application = express();

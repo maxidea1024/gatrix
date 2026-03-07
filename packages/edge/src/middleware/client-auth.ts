@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('ClientAuth');
-import { tokenMirrorService } from '../services/tokenMirrorService';
-import { tokenUsageTracker } from '../services/tokenUsageTracker';
+import { tokenMirrorService } from '../services/token-mirror-service';
+import { tokenUsageTracker } from '../services/token-usage-tracker';
 
 // Unsecured tokens for testing purposes
 const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';

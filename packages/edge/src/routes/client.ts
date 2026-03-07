@@ -1,14 +1,14 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import crypto from 'crypto';
-import { clientAuth, ClientRequest } from '../middleware/clientAuth';
-import { sdkManager } from '../services/sdkManager';
+import { clientAuth, ClientRequest } from '../middleware/client-auth';
+import { sdkManager } from '../services/sdk-manager';
 import { config } from '../config/env';
 import logger from '../config/logger';
 import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
-import { metricsAggregator } from '../services/metricsAggregator';
-import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/edgeMetrics';
-import { performEvaluation, getSDKOrError } from '../utils/evaluationHelper';
+import { metricsAggregator } from '../services/metrics-aggregator';
+import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/edge-metrics';
+import { performEvaluation, getSDKOrError } from '../utils/evaluation-helper';
 
 const router = Router();
 
@@ -788,7 +788,7 @@ router.get(
       const { environment } = req.clientContext!;
 
       // Lazy-import to avoid import-time side effects
-      const { flagStreamingService } = await import('../services/FlagStreamingService');
+      const { flagStreamingService } = await import('../services/flag-streaming-service');
 
       // Generate unique client ID
       const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;

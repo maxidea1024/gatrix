@@ -4,12 +4,12 @@ import { createLogger } from './config/logger';
 
 const logger = createLogger('EdgeServer');
 import app from './app';
-import internalApp from './internalApp';
-import { sdkManager } from './services/sdkManager';
-import { initEdgeMetrics, sdkInitialized } from './services/edgeMetrics';
-import { tokenMirrorService } from './services/tokenMirrorService';
-import { tokenUsageTracker } from './services/tokenUsageTracker';
-import { metricsAggregator } from './services/metricsAggregator';
+import internalApp from './internal-app';
+import { sdkManager } from './services/sdk-manager';
+import { initEdgeMetrics, sdkInitialized } from './services/edge-metrics';
+import { tokenMirrorService } from './services/token-mirror-service';
+import { tokenUsageTracker } from './services/token-usage-tracker';
+import { metricsAggregator } from './services/metrics-aggregator';
 
 /**
  * Main entry point for Edge server
@@ -39,7 +39,7 @@ async function main(): Promise<void> {
     await tokenUsageTracker.initialize();
 
     // Initialize Flag Streaming Service (SSE for SDK clients)
-    const { flagStreamingService } = await import('./services/FlagStreamingService');
+    const { flagStreamingService } = await import('./services/flag-streaming-service');
     await flagStreamingService.start();
     logger.info('Flag Streaming Service initialized');
 

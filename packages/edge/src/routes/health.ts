@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { sdkManager } from '../services/sdkManager';
-import { tokenMirrorService } from '../services/tokenMirrorService';
+import { sdkManager } from '../services/sdk-manager';
+import { tokenMirrorService } from '../services/token-mirror-service';
 
 const router = Router();
 

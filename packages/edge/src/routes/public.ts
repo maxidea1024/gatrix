@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { sdkManager } from '../services/sdkManager';
+import { sdkManager } from '../services/sdk-manager';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('PublicRoute');
-import { cacheHitsTotal, cacheMissesTotal } from '../services/edgeMetrics';
+import { cacheHitsTotal, cacheMissesTotal } from '../services/edge-metrics';
 
 const router = Router();
 
