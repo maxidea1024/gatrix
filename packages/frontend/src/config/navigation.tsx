@@ -156,19 +156,19 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         text: 'sidebar.roles',
         icon: 'Shield',
         path: '/admin/roles',
-        requiredPermission: P.ROLES_READ,
+        requiredPermission: P.ROLES_UPDATE,
       },
       {
         text: 'sidebar.groups',
         icon: 'Group',
         path: '/admin/groups',
-        requiredPermission: P.GROUPS_READ,
+        requiredPermission: P.GROUPS_UPDATE,
       },
       {
         text: 'sidebar.userManagement',
         icon: 'People',
         path: '/admin/users',
-        requiredPermission: P.USERS_READ,
+        requiredPermission: P.USERS_UPDATE,
       },
       {
         text: 'sidebar.serviceAccounts',

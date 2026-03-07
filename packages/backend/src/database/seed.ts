@@ -497,6 +497,71 @@ async function createDefaultRoles(orgId: string, adminUserId: string) {
 
     logger.info(`  Role created: ${role.name} (${perms.length} permissions)`);
   }
+
+  // 3. Create specialized roles (targeted resource access)
+  const specializedRoles = [
+    {
+      name: 'System Monitoring',
+      description: 'Read-only access to server infrastructure, monitoring, and real-time events',
+      resources: ['servers', 'monitoring', 'realtime_events', 'event_lens', 'scheduler'],
+      actions: ['read'],
+    },
+    {
+      name: 'Operations Manager',
+      description: 'Full CRUD access to live operations: coupons, notices, banners, servers, and events',
+      resources: [
+        'coupons', 'coupon_settings', 'service_notices', 'banners', 'servers',
+        'message_templates', 'maintenance', 'maintenance_templates',
+        'ingame_popups', 'operation_events', 'surveys', 'store_products',
+        'reward_templates', 'vars', 'planning_data',
+      ],
+      actions: crudActions,
+    },
+    {
+      name: 'Feature Manager',
+      description: 'Full CRUD access to feature flags, segments, release flows, and related resources',
+      resources: [
+        'features', 'segments', 'context_fields', 'release_flows', 'unknown_flags',
+        'tags', 'impact_metrics', 'env_features', 'env_keys', 'change_requests',
+        'environments',
+      ],
+      actions: crudActions,
+    },
+    {
+      name: 'Security Admin',
+      description: 'Full CRUD access to roles, groups, users, tokens, and access control',
+      resources: [
+        'users', 'groups', 'roles', 'invitations', 'admin_tokens',
+        'ip_whitelist', 'account_whitelist', 'service_accounts', 'audit_logs',
+      ],
+      actions: crudActions,
+    },
+  ];
+
+  for (const role of specializedRoles) {
+    const roleId = ulid();
+    await database.query(
+      `INSERT INTO g_roles (id, orgId, roleName, description, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [roleId, orgId, role.name, role.description]
+    );
+
+    const perms: string[] = [];
+    for (const resource of role.resources) {
+      for (const action of role.actions) {
+        perms.push(`${resource}:${action}`);
+      }
+    }
+
+    if (perms.length > 0) {
+      const values = perms.map((p) => `('${ulid()}', '${roleId}', '${p}')`).join(',');
+      await database.query(
+        `INSERT INTO g_role_permissions (id, roleId, permission) VALUES ${values}`
+      );
+    }
+
+    logger.info(`  Role created: ${role.name} (${perms.length} permissions)`);
+  }
   logger.info('Default roles created');
 }
 
