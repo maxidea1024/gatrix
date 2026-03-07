@@ -94,6 +94,7 @@ export interface UserRole {
   assignedBy: string | null;
   roleName: string;
   roleDescription: string | null;
+  roleScopeType?: string;
 }
 
 export interface PermissionReference {

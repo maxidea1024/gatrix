@@ -25,6 +25,7 @@ import { createLogger } from '../../config/logger';
 
 const logger = createLogger('rbac');
 import db from '../../config/knex';
+import { getScopeLevel } from '../../utils/scopeHierarchy';
 
 const router = express.Router();
 
@@ -480,7 +481,7 @@ router.get(
   requireOrgPermission(ORG_PERMISSIONS.ROLES_WRITE) as any,
   async (req: any, res) => {
     try {
-      const roles = await db('g_roles')
+      const query = db('g_roles')
         .select(
           'g_roles.*',
           db.raw(
@@ -491,6 +492,16 @@ router.get(
         )
         .where('g_roles.orgId', req.user.orgId)
         .orderBy('g_roles.roleName', 'asc');
+
+      // Filter roles by actor's scope level (hierarchy-based)
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      query.where('g_roles.scopeType', 'in',
+        Object.entries(require('../../utils/scopeHierarchy').SCOPE_LEVELS)
+          .filter(([, level]) => (level as number) >= actorScopeLevel)
+          .map(([key]) => key)
+      );
+
+      const roles = await query;
       res.json({ success: true, data: roles });
     } catch (error) {
       logger.error('Error listing roles:', error);
@@ -570,6 +581,14 @@ router.get(
       if (!role) {
         return res.status(404).json({ success: false, message: 'Role not found' });
       }
+      // Verify actor can view roles at this scope level
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      if (role.orgId !== req.user.orgId) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
+      if (getScopeLevel(role.scopeType) < actorScopeLevel) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
       res.json({ success: true, data: role });
     } catch (error) {
       logger.error('Error getting role:', error);
@@ -587,6 +606,14 @@ router.post(
       const { roleName, description, permissions } = req.body;
       if (!roleName) {
         return res.status(400).json({ success: false, message: 'roleName is required' });
+      }
+
+      // Prevent creating roles with permissions above actor's scope level
+      if (permissions && Array.isArray(permissions) && permissions.some((p: any) => p.permission === '*:*' || p === '*:*')) {
+        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+        if (actorScopeLevel > getScopeLevel('system')) {
+          return res.status(403).json({ success: false, message: 'Cannot create roles with wildcard permissions' });
+        }
       }
 
       const existing = await RoleModel.findByName(req.user.orgId, roleName);
@@ -623,6 +650,23 @@ router.put(
     try {
       const { roleName, description, permissions } = req.body;
 
+      // IDOR prevention + scope hierarchy protection
+      const existingRole = await db('g_roles').where('id', req.params.id).first();
+      if (!existingRole || existingRole.orgId !== req.user.orgId) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
+        return res.status(403).json({ success: false, message: 'Insufficient scope level to modify this role' });
+      }
+
+      // Block wildcard permissions for actors below system scope
+      if (permissions && Array.isArray(permissions) && permissions.some((p: any) => p.permission === '*:*' || p === '*:*')) {
+        if (actorScopeLevel > getScopeLevel('system')) {
+          return res.status(403).json({ success: false, message: 'Cannot set wildcard permissions' });
+        }
+      }
+
       await RoleModel.update(req.params.id, {
         roleName,
         description,
@@ -648,6 +692,16 @@ router.delete(
   requireOrgPermission(ORG_PERMISSIONS.ROLES_WRITE) as any,
   async (req: any, res) => {
     try {
+      // IDOR prevention + scope hierarchy protection
+      const existingRole = await db('g_roles').where('id', req.params.id).first();
+      if (!existingRole || existingRole.orgId !== req.user.orgId) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      if (getScopeLevel(existingRole.scopeType) < actorScopeLevel) {
+        return res.status(403).json({ success: false, message: 'Insufficient scope level to delete this role' });
+      }
+
       const deleted = await RoleModel.delete(req.params.id);
       if (!deleted) {
         return res.status(404).json({ success: false, message: 'Role not found' });
@@ -819,6 +873,16 @@ router.post(
       if (!roleId) {
         return res.status(400).json({ success: false, message: 'roleId is required' });
       }
+
+      // Prevent assigning roles above actor's scope level (privilege escalation)
+      const targetRole = await db('g_roles').where('id', roleId).first();
+      if (targetRole) {
+        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+        if (getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
+          return res.status(403).json({ success: false, message: 'Cannot assign roles above your scope level' });
+        }
+      }
+
       await GroupModel.addRole(req.params.id, roleId, req.user.orgId, req.user.id);
       res.status(201).json({ success: true, message: 'Role assigned to group' });
     } catch (error: any) {
@@ -930,7 +994,7 @@ router.get(
   async (req: any, res) => {
     try {
       const userBindings = await db('g_role_bindings')
-        .select(['g_role_bindings.*', 'r.roleName', 'r.description as roleDescription'])
+        .select(['g_role_bindings.*', 'r.roleName', 'r.description as roleDescription', 'r.scopeType as roleScopeType'])
         .join('g_roles as r', 'g_role_bindings.roleId', 'r.id')
         .where('g_role_bindings.userId', req.params.id)
         .orderBy('r.roleName', 'asc');
@@ -956,6 +1020,19 @@ router.post(
       if (!roleId) {
         return res.status(400).json({ success: false, message: 'roleId is required' });
       }
+
+      // Prevent assigning roles above actor's scope level (privilege escalation)
+      const targetRole = await db('g_roles').where('id', roleId).first();
+      if (targetRole) {
+        const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+        if (getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
+          return res.status(403).json({
+            success: false,
+            message: 'Cannot assign roles above your scope level',
+          });
+        }
+      }
+
       const id = generateULID();
       await db('g_role_bindings').insert({
         id,
@@ -988,6 +1065,20 @@ router.delete(
       if (String(req.user.id) === String(req.params.id)) {
         return res.status(403).json({ success: false, message: 'Cannot modify your own roles' });
       }
+
+      // Prevent removing roles above actor's scope level
+      const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      const targetRole = await db('g_roles').where('id', req.params.roleId).first();
+      if (targetRole && getScopeLevel(targetRole.scopeType) < actorScopeLevel) {
+        return res.status(403).json({ success: false, message: 'Cannot remove roles above your scope level' });
+      }
+
+      // Prevent managing users with higher scope level
+      const targetUserScopeLevel = await permissionService.getUserMaxScopeLevel(req.params.id);
+      if (targetUserScopeLevel < actorScopeLevel) {
+        return res.status(403).json({ success: false, message: 'Cannot modify roles of users with higher scope level' });
+      }
+
       const result = await db('g_role_bindings')
         .where('userId', req.params.id)
         .where('roleId', req.params.roleId)

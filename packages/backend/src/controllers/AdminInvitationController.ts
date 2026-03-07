@@ -24,7 +24,7 @@ export class AdminInvitationController {
       });
     }
 
-    const { email, expirationHours = 168 } = req.body; // 기본값: 168시간(7일)
+    const { email, expirationHours = 168, autoJoinConfig } = req.body; // 기본값: 168시간(7일)
     const userId = req.user?.id;
 
     if (!userId) {
@@ -78,6 +78,7 @@ export class AdminInvitationController {
       createdAt: new Date(),
       expiresAt,
       isActive: true,
+      autoJoinConfig: autoJoinConfig ? JSON.stringify(autoJoinConfig) : null,
     });
 
     const invitationData = {
@@ -88,6 +89,7 @@ export class AdminInvitationController {
       createdAt: new Date().toISOString(),
       createdBy: userId.toString(),
       isActive: true,
+      autoJoinConfig: autoJoinConfig || null,
     };
 
     // PubSub을 통해 모든 인스턴스가 수신 후 각자 SSE로 전파 (자신 제외)
@@ -247,4 +249,9 @@ export const createInvitationValidation = [
     .optional()
     .isInt({ min: 1, max: 8760 }) // 최소 1시간, 최대 1년(365*24)
     .withMessage('Expiration hours must be between 1 and 8760 (1 year)'),
+
+  body('autoJoinConfig')
+    .optional()
+    .isObject()
+    .withMessage('autoJoinConfig must be a valid object'),
 ];

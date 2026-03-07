@@ -187,6 +187,8 @@ export class UserModel {
       tags?: string[];
       tags_operator?: 'any_of' | 'include_all';
       orgId?: string;
+      excludeSystemAdmins?: boolean;
+      actorScopeLevel?: number;
     } = {}
   ): Promise<{
     users: UserWithoutPassword[];
@@ -211,6 +213,22 @@ export class UserModel {
               db.raw('?', [filters.orgId])
             );
           });
+        }
+        // Exclude users with roles above actor's scope level (hierarchy-based)
+        if (filters.excludeSystemAdmins && filters.actorScopeLevel != null) {
+          const { SCOPE_LEVELS } = require('../utils/scopeHierarchy');
+          const higherScopes = Object.entries(SCOPE_LEVELS)
+            .filter(([, level]) => (level as number) < filters.actorScopeLevel!)
+            .map(([key]) => key);
+          if (higherScopes.length > 0) {
+            q.whereNotExists(function (this: any) {
+              this.select('*')
+                .from('g_role_bindings as rb')
+                .join('g_roles as r', 'rb.roleId', 'r.id')
+                .whereRaw('rb.userId = g_users.id')
+                .whereIn('r.scopeType', higherScopes);
+            });
+          }
         }
         return q;
       };
@@ -272,7 +290,7 @@ export class UserModel {
 
       // Get users with camelCase field names
       const usersQuery = applyFilters(
-        db('g_users').leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+        baseQuery().leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
       )
         .select([
           'g_users.id',

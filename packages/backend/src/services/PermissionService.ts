@@ -17,7 +17,46 @@ import redis from '../config/redis';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('PermissionService');
-import { matchSingle, MAX_INHERITANCE_DEPTH } from '@gatrix/shared/permissions';
+import { matchSingle, MAX_INHERITANCE_DEPTH, RESOURCE_SCOPES, SCOPES } from '@gatrix/shared/permissions';
+
+/**
+ * Scope hierarchy for permission validation.
+ * org scope includes org resources (checked via hasOrgPermission).
+ * project scope includes project resources (checked via hasProjectPermission).
+ * env scope includes env resources (checked via hasEnvPermission).
+ * system resources are not directly checked — they go through system admin check.
+ */
+const PERM_SCOPE_MAP: Record<string, string[]> = {
+  system: [SCOPES.SYSTEM, SCOPES.ORG, SCOPES.PROJECT, SCOPES.ENV],
+  org: [SCOPES.ORG, SCOPES.SYSTEM, SCOPES.PROJECT, SCOPES.ENV],
+  project: [SCOPES.PROJECT, SCOPES.ENV],
+  env: [SCOPES.ENV],
+};
+
+/**
+ * Validate that a permission belongs to the expected scope.
+ * Returns true if valid, false + logs warning if mismatch.
+ * Wildcards (*:*) are always valid.
+ */
+function isPermissionScopeValid(perm: string, expectedScope: 'system' | 'org' | 'project' | 'env'): boolean {
+  if (perm === '*:*' || perm.includes('*')) return true;
+  const resource = perm.split(':')[0];
+  const resourceScope = (RESOURCE_SCOPES as Record<string, string>)[resource];
+  if (!resourceScope) {
+    logger.warn(`Unknown resource in permission: ${perm}`);
+    return true; // Allow unknown resources to avoid blocking
+  }
+  const allowedScopes = PERM_SCOPE_MAP[expectedScope];
+  if (!allowedScopes || !allowedScopes.includes(resourceScope)) {
+    const stack = new Error().stack;
+    logger.error(
+      `Permission scope mismatch: perm="${perm}" (resource scope=${resourceScope}) ` +
+      `checked in ${expectedScope} context. This is a bug.\n${stack}`
+    );
+    return false;
+  }
+  return true;
+}
 
 // Cache TTL constants (in seconds)
 const CACHE_TTL = {
@@ -37,9 +76,26 @@ class PermissionService {
   // ==================== Public API ====================
 
   /**
+   * Check if user has a system-level permission
+   */
+  async hasSystemPermission(userId: string, perm: string): Promise<boolean> {
+    // Sanity check: perm must be a system-scope permission
+    if (!isPermissionScopeValid(perm, 'system')) return false;
+
+    // Get role IDs at system scope
+    const roleIds = await this.getBindingRoleIds(userId, 'system', 'SYSTEM');
+    if (roleIds.length === 0) return false;
+
+    return this.checkPermissionInRoles(roleIds, perm);
+  }
+
+  /**
    * Check if user has an organisation-level permission
    */
   async hasOrgPermission(userId: string, orgId: string, perm: string): Promise<boolean> {
+    // Sanity check: perm must be an org-scope permission
+    if (!isPermissionScopeValid(perm, 'org')) return false;
+
     // 1. Org Admin → all permissions
     if (await this.isOrgAdmin(userId, orgId)) return true;
 
@@ -60,14 +116,14 @@ class PermissionService {
     projectId: string,
     perm: string
   ): Promise<boolean> {
-    // 1. Org Admin → all permissions
-    if (await this.isOrgAdmin(userId, orgId)) return true;
+    // Sanity check: perm must be a project-scope permission
+    if (!isPermissionScopeValid(perm, 'project')) return false;
 
-    // 2. Get effective role IDs at project scope (with override chain)
+    // Get effective role IDs at project scope (with override chain)
     const roleIds = await this.getEffectiveRoleIds(userId, 'project', projectId);
     if (roleIds.length === 0) return false;
 
-    // 3. Check permissions
+    // Check permissions
     return this.checkPermissionInRoles(roleIds, perm);
   }
 
@@ -81,14 +137,14 @@ class PermissionService {
     environmentId: string,
     perm: string
   ): Promise<boolean> {
-    // 1. Org Admin → all permissions
-    if (await this.isOrgAdmin(userId, orgId)) return true;
+    // Sanity check: perm must be an env-scope permission
+    if (!isPermissionScopeValid(perm, 'env')) return false;
 
-    // 2. Get effective role IDs at environment scope (with override chain)
+    // Get effective role IDs at environment scope (with override chain)
     const roleIds = await this.getEffectiveRoleIds(userId, 'environment', environmentId);
     if (roleIds.length === 0) return false;
 
-    // 3. Check permissions
+    // Check permissions
     return this.checkPermissionInRoles(roleIds, perm);
   }
 
@@ -119,6 +175,30 @@ class PermissionService {
     }
 
     return isAdmin;
+  }
+
+  /**
+   * Check if user has wildcard (*:*) permission at system scope.
+   * Only true super-admins have this — they can see all users across all orgs.
+   */
+  async isSystemAdmin(userId: string): Promise<boolean> {
+    const roleIds = await this.getBindingRoleIds(userId, 'system', 'SYSTEM');
+    if (roleIds.length === 0) return false;
+    return this.checkPermissionInRoles(roleIds, '*:*');
+  }
+
+  /**
+   * Get the highest scope level (lowest number = highest privilege) among the user's assigned roles.
+   * Uses hierarchy: system(0) > org(1) > project(2) > env(3)
+   */
+  async getUserMaxScopeLevel(userId: string): Promise<number> {
+    const { getHighestScopeLevel, SCOPE_LEVELS } = await import('../utils/scopeHierarchy');
+    const roles = await db('g_role_bindings')
+      .join('g_roles', 'g_role_bindings.roleId', 'g_roles.id')
+      .where('g_role_bindings.userId', userId)
+      .select('g_roles.scopeType');
+    if (roles.length === 0) return SCOPE_LEVELS.project;
+    return getHighestScopeLevel(roles.map((r: any) => r.scopeType));
   }
 
   /**

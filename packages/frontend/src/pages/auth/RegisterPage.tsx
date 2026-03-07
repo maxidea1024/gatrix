@@ -29,7 +29,8 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { useSnackbar } from 'notistack';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { invitationService } from '../../services/invitationService';
-import { Invitation } from '../../types/invitation';
+import { Invitation, AutoJoinInfo } from '../../types/invitation';
+import { Business as OrgIcon, Folder as ProjectIcon } from '@mui/icons-material';
 
 // Validation schema - will be created inside component to access t function
 
@@ -66,6 +67,7 @@ const RegisterPage: React.FC = () => {
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [invitationLoading, setInvitationLoading] = useState(false);
   const [invitationError, setInvitationError] = useState<string | null>(null);
+  const [autoJoinInfo, setAutoJoinInfo] = useState<AutoJoinInfo | null>(null);
 
   // Validation schema with translations
   const registerSchema = useMemo(
@@ -155,7 +157,11 @@ const RegisterPage: React.FC = () => {
       const result = await invitationService.validateInvitation(token);
       if (result.valid && result.invitation) {
         setInvitation(result.invitation);
-        // 초대받은 경우 이메일 필드를 미리 채움 (있는 경우)
+        // Store auto-join info for display
+        if (result.autoJoinInfo) {
+          setAutoJoinInfo(result.autoJoinInfo);
+        }
+        // Pre-fill email if provided
         if (result.invitation.email) {
           setValue('email', result.invitation.email);
         }
@@ -516,6 +522,34 @@ const RegisterPage: React.FC = () => {
               {t('auth.invitation.receivedTitle')}
             </Typography>
             <Typography variant="body2">{t('auth.invitation.receivedDesc')}</Typography>
+          </Alert>
+        )}
+
+        {/* Auto-Join Info */}
+        {autoJoinInfo && autoJoinInfo.memberships.length > 0 && (
+          <Alert
+            severity="info"
+            sx={{ mb: 3 }}
+            icon={<OrgIcon fontSize="small" />}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              {t('autoJoin.acceptInfo')}
+            </Typography>
+            {autoJoinInfo.memberships.map((m) => (
+              <Box key={m.orgId} sx={{ ml: 1, mt: 0.5 }}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  • {m.orgDisplayName || m.orgName}
+                </Typography>
+                {m.projects.map((p) => (
+                  <Box key={p.projectId} sx={{ display: 'flex', alignItems: 'center', ml: 2, mt: 0.25 }}>
+                    <ProjectIcon sx={{ fontSize: 14, mr: 0.5, color: 'text.secondary' }} />
+                    <Typography variant="body2" color="text.secondary">
+                      {p.projectDisplayName || p.projectName}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            ))}
           </Alert>
         )}
 

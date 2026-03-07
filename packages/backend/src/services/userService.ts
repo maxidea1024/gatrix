@@ -11,6 +11,8 @@ export interface UserFilters {
   search?: string;
   tags?: string[];
   orgId?: string;
+  excludeSystemAdmins?: boolean;
+  actorScopeLevel?: number;
 }
 
 export interface PaginationOptions {

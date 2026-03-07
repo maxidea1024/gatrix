@@ -33,6 +33,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
+  PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +72,7 @@ const WorkspacePage: React.FC = () => {
   const navigate = useNavigate();
   const { currentOrgId, refreshOrgs } = useOrgProject();
   const canManageOrgs = hasPermission([P.ALL]);
+  const canInvite = hasPermission([P.INVITATIONS_CREATE]);
   const [organisations, setOrganisations] = useState<OrgWithMemberCount[]>([]);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -518,7 +520,7 @@ const WorkspacePage: React.FC = () => {
                             color={org.isActive ? 'success' : 'default'}
                             variant="outlined"
                           />
-                          {canManageOrgs && (
+                          {(canManageOrgs || canInvite) && (
                             <IconButton
                               size="small"
                               onClick={(e) => handleMenuOpen(e, org)}
@@ -640,28 +642,45 @@ const WorkspacePage: React.FC = () => {
 
       {/* Context Menu */}
       <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
-        <MenuItem
-          onClick={() => {
-            if (menuTarget) handleEdit(menuTarget);
-            handleMenuClose();
-          }}
-        >
-          <ListItemIcon>
-            <EditIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t('common.edit')}</ListItemText>
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (menuTarget) handleViewDetails(menuTarget);
-            handleMenuClose();
-          }}
-        >
-          <ListItemIcon>
-            <PeopleIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t('rbac.orgs.memberManageTitle')}</ListItemText>
-        </MenuItem>
+        {canManageOrgs && (
+          <MenuItem
+            onClick={() => {
+              if (menuTarget) handleEdit(menuTarget);
+              handleMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <EditIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('common.edit')}</ListItemText>
+          </MenuItem>
+        )}
+        {canManageOrgs && (
+          <MenuItem
+            onClick={() => {
+              if (menuTarget) handleViewDetails(menuTarget);
+              handleMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <PeopleIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('rbac.orgs.memberManageTitle')}</ListItemText>
+          </MenuItem>
+        )}
+        {(canManageOrgs || canInvite) && (
+          <MenuItem
+            onClick={() => {
+              handleMenuClose();
+              navigate('/admin/users?openInvite=true');
+            }}
+          >
+            <ListItemIcon>
+              <PersonAddIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('invitations.drawerTitle')}</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
 
       {/* Create Organisation Drawer */}

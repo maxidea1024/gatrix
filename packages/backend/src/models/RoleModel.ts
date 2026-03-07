@@ -12,6 +12,7 @@ export interface RoleRecord {
   orgId: string;
   roleName: string;
   description: string | null;
+  scopeType: string;
   createdBy: string | null;
   updatedBy: string | null;
   createdAt: Date;

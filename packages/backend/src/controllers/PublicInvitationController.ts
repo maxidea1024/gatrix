@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Knex } from 'knex';
 import { createLogger } from '../config/logger';
+import { UserOnboardingService } from '../services/UserOnboardingService';
 
 const logger = createLogger('PublicInvitationController');
 
@@ -25,7 +26,7 @@ export class PublicInvitationController {
     try {
       // 초대 정보 조회
       const invitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive'])
+        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'autoJoinConfig'])
         .where('token', token)
         .where('isActive', true)
         .first();
@@ -56,6 +57,15 @@ export class PublicInvitationController {
         });
       }
 
+      // Resolve autoJoinConfig to display names for invitee
+      let autoJoinInfo = null;
+      if (invitation.autoJoinConfig) {
+        const config = typeof invitation.autoJoinConfig === 'string'
+          ? JSON.parse(invitation.autoJoinConfig)
+          : invitation.autoJoinConfig;
+        autoJoinInfo = await UserOnboardingService.resolveAutoJoinConfigNames(config);
+      }
+
       res.json({
         success: true,
         data: {
@@ -67,6 +77,7 @@ export class PublicInvitationController {
             createdAt: invitation.createdAt,
             expiresAt: invitation.expiresAt,
           },
+          autoJoinInfo,
         },
       });
     } catch (error) {
@@ -103,7 +114,7 @@ export class PublicInvitationController {
     try {
       // 초대 정보 조회 및 검증
       const invitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'usedAt'])
+        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'usedAt', 'autoJoinConfig'])
         .where('token', token)
         .where('isActive', true)
         .first();
@@ -163,9 +174,9 @@ export class PublicInvitationController {
       // 비밀번호 해시화
       const hashedPassword = await bcrypt.hash(password, 12);
 
-      // 트랜잭션으로 사용자 생성 및 초대 사용 처리
+      // Transaction: create user, mark invitation used, apply auto-join
       await db.transaction(async (trx: Knex.Transaction) => {
-        // 사용자 생성
+        // Create user
         const userId = uuidv4();
         await trx('g_users').insert({
           id: userId,
@@ -180,12 +191,24 @@ export class PublicInvitationController {
           updatedAt: now,
         });
 
-        // 초대 사용 처리
+        // Mark invitation as used
         await trx('g_invitations').where('id', invitation.id).update({
           usedAt: now,
           usedBy: userId,
           updatedAt: now,
         });
+
+        // Apply auto-join config if present
+        if (invitation.autoJoinConfig) {
+          const config = typeof invitation.autoJoinConfig === 'string'
+            ? JSON.parse(invitation.autoJoinConfig)
+            : invitation.autoJoinConfig;
+          await UserOnboardingService.applyAutoJoinConfig(
+            userId,
+            config,
+            invitation.createdBy || userId
+          );
+        }
       });
 
       res.status(201).json({

@@ -7,6 +7,8 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { UserModel } from '../models/User';
 import Joi from 'joi';
 import { createLogger } from '../config/logger';
+import { UserOnboardingService } from '../services/UserOnboardingService';
+import { permissionService } from '../services/PermissionService';
 
 const logger = createLogger('UserController');
 
@@ -55,6 +57,7 @@ const createUserSchema = Joi.object({
     .default('active'),
   emailVerified: Joi.boolean().optional().default(true),
   tagIds: Joi.array().items(Joi.string()).optional().default([]),
+  autoJoinConfig: Joi.object().optional(),
 });
 
 export class UserController {
@@ -67,7 +70,20 @@ export class UserController {
 
     const { page, limit, status, search } = value;
 
-    const filters = { status, search };
+    // Scope filtering by hierarchy: filter users visible based on actor's scope level
+    let orgId: string | undefined;
+    let excludeHigherScopeUsers = false;
+    let actorScopeLevel = 1;
+    if (req.user?.orgId) {
+      actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      const { SCOPE_LEVELS } = require('../utils/scopeHierarchy');
+      if (actorScopeLevel > SCOPE_LEVELS.system) {
+        orgId = req.user.orgId;
+        excludeHigherScopeUsers = true;
+      }
+    }
+
+    const filters = { status, search, orgId, excludeSystemAdmins: excludeHigherScopeUsers, actorScopeLevel };
     const pagination = { page, limit };
 
     const result = await UserService.getAllUsers(filters, pagination);
@@ -84,16 +100,16 @@ export class UserController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const { tagIds, ...userData } = value;
+    const { tagIds, autoJoinConfig, ...userData } = value;
     const createdBy = req.user?.userId;
 
-    // 사용자 생성
+    // Create user
     let user = await UserService.createUser({
       ...userData,
       createdBy,
     });
 
-    // 태그 설정
+    // Set tags
     if (tagIds && tagIds.length > 0) {
       logger.debug('Setting user tags for new user:', {
         userId: user.id,
@@ -103,8 +119,23 @@ export class UserController {
       await UserTagService.setUserTags(user.id, tagIds, createdBy!);
       logger.debug('User tags set successfully for new user');
 
-      // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+      // Reload user to include latest tag info
       user = await UserService.getUserById(user.id);
+    }
+
+    // Apply auto-join config if provided
+    if (autoJoinConfig) {
+      try {
+        await UserOnboardingService.applyAutoJoinConfig(
+          user.id,
+          autoJoinConfig,
+          createdBy || user.id
+        );
+        logger.info('Auto-join config applied for new user', { userId: user.id });
+      } catch (error) {
+        logger.error('Failed to apply auto-join config for new user:', error);
+        // User is already created, log the error but don't fail the request
+      }
     }
 
     res.status(201).json({
@@ -148,6 +179,13 @@ export class UserController {
     const { tagIds, ...userData } = value;
     const updatedBy = req.user?.userId;
 
+    // Prevent managing users with higher scope level
+    const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user!.id);
+    const targetScopeLevel = await permissionService.getUserMaxScopeLevel(userId);
+    if (targetScopeLevel < actorScopeLevel) {
+      throw new GatrixError('Cannot modify users with higher scope level', 403);
+    }
+
     logger.debug('Update user request:', {
       userId,
       tagIds,
@@ -186,6 +224,13 @@ export class UserController {
     // Prevent users from deleting themselves
     if (req.user?.userId === userId) {
       throw new GatrixError('You cannot delete your own account', 403);
+    }
+
+    // Prevent managing users with higher scope level
+    const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user!.id);
+    const targetScopeLevel = await permissionService.getUserMaxScopeLevel(userId);
+    if (targetScopeLevel < actorScopeLevel) {
+      throw new GatrixError('Cannot delete users with higher scope level', 403);
     }
 
     await UserService.deleteUser(userId);

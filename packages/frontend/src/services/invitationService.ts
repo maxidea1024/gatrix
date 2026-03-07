@@ -1,5 +1,5 @@
 import { apiService } from './api';
-import { Invitation, CreateInvitationRequest, InvitationResponse } from '../types/invitation';
+import { Invitation, CreateInvitationRequest, InvitationResponse, AutoJoinInfo } from '../types/invitation';
 
 class InvitationService {
   private readonly ADMIN_BASE_URL = '/admin/invitations';
@@ -31,7 +31,11 @@ class InvitationService {
   }
 
   // Public: validate invitation token
-  async validateInvitation(token: string): Promise<{ valid: boolean; invitation?: Invitation }> {
+  async validateInvitation(token: string): Promise<{
+    valid: boolean;
+    invitation?: Invitation;
+    autoJoinInfo?: AutoJoinInfo | null;
+  }> {
     const response = await apiService.get(`${this.PUBLIC_BASE_URL}/validate/${token}`);
     return response.data;
   }

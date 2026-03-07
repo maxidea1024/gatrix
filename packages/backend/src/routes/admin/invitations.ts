@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
+import { requireOrgPermission } from '../../middleware/rbacMiddleware';
+import { ORG_PERMISSIONS } from '../../types/permissions';
 import {
   AdminInvitationController,
   createInvitationValidation,
@@ -9,9 +11,11 @@ import { enhancedAuditLog, fetchInvitationById } from '../../utils/enhancedAudit
 const router = Router();
 
 router.use(authenticate as any);
-// POST /api/v1/admin/invitations - 사용자 초대 생성
+
+// POST /api/v1/admin/invitations - Create invitation
 router.post(
   '/',
+  requireOrgPermission(ORG_PERMISSIONS.INVITATIONS_WRITE) as any,
   createInvitationValidation,
   enhancedAuditLog({
     action: 'invitation_create',
@@ -35,12 +39,17 @@ router.post(
 // GET /api/v1/admin/invitations/current
 router.get('/current', AdminInvitationController.getCurrent as any);
 
-// GET /api/v1/admin/invitations - 초대 목록 조회
-router.get('/', AdminInvitationController.getInvitations as any);
+// GET /api/v1/admin/invitations - List invitations
+router.get(
+  '/',
+  requireOrgPermission(ORG_PERMISSIONS.INVITATIONS_READ) as any,
+  AdminInvitationController.getInvitations as any
+);
 
-// DELETE /api/v1/admin/invitations/:id - 초대 삭제
+// DELETE /api/v1/admin/invitations/:id - Delete invitation
 router.delete(
   '/:id',
+  requireOrgPermission(ORG_PERMISSIONS.INVITATIONS_WRITE) as any,
   enhancedAuditLog({
     action: 'invitation_delete',
     resourceType: 'invitation',
@@ -70,3 +79,4 @@ router.delete(
 );
 
 export default router;
+

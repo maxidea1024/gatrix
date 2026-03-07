@@ -114,6 +114,7 @@ import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import SearchTextField from '@/components/common/SearchTextField';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useLocation } from 'react-router-dom';
 import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -228,6 +229,17 @@ const UsersManagementPage: React.FC = () => {
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const { environments } = useEnvironments();
+  const location = useLocation();
+
+  // Auto-open invitation drawer when navigated with ?openInvite=true
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('openInvite') === 'true') {
+      setInvitationDialogOpen(true);
+      // Clean up the URL param
+      window.history.replaceState({}, '', location.pathname);
+    }
+  }, [location.search]);
   const canManage = hasPermission([P.USERS_UPDATE]);
 
   // Helper function to check if user is current user
@@ -1902,6 +1914,7 @@ const UsersManagementPage: React.FC = () => {
                           )}
                         </TableCell>
                         <TableCell align="center">
+                          {(isCurrentUser(user) || canModifyUser(user)) && (
                           <IconButton
                             onClick={(event) => handleMenuOpen(event, user)}
                             size="small"
@@ -1909,6 +1922,7 @@ const UsersManagementPage: React.FC = () => {
                           >
                             <MoreVertIcon />
                           </IconButton>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -2951,6 +2965,8 @@ const UsersManagementPage: React.FC = () => {
                 <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
                   {t('rbac.userRoles.title')}
                 </Typography>
+                {/* Hide role selector if target user has system-scope roles */}
+                {!editUserRbacRoles.some((r) => r.roleScopeType === 'system') && (
                 <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
                   <Autocomplete
                     size="small"
@@ -3011,6 +3027,7 @@ const UsersManagementPage: React.FC = () => {
                     {t('rbac.userRoles.addRole')}
                   </Button>
                 </Box>
+                )}
                 {editUserRbacRolesLoading ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
                     <CircularProgress size={24} />
@@ -3051,20 +3068,33 @@ const UsersManagementPage: React.FC = () => {
                             </Typography>
                           )}
                         </Box>
-                        <Tooltip title={t('rbac.userRoles.removeRole')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => {
-                              // Remove from local state only
-                              setEditUserRbacRoles((prev) =>
-                                prev.filter((r) => r.roleId !== role.roleId)
-                              );
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        {role.roleScopeType === 'system' ? (
+                          <Tooltip title={t('rbac.userRoles.systemRoleCannotBeRemoved')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                disabled
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title={t('rbac.userRoles.removeRole')}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => {
+                                // Remove from local state only
+                                setEditUserRbacRoles((prev) =>
+                                  prev.filter((r) => r.roleId !== role.roleId)
+                                );
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       </Box>
                     ))}
                   </Box>
@@ -3671,78 +3701,20 @@ const UsersManagementPage: React.FC = () => {
       </Drawer>
 
       {/* Invitation Form Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={invitationDialogOpen}
         onClose={() => setInvitationDialogOpen(false)}
-        sx={{
-          zIndex: 1300,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 400 },
-            maxWidth: '100vw',
-            height: '100vh', // 전체 화면 높이 사용
-            top: 0, // 상단에 붙임
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
+        title={t('invitations.drawerTitle')}
+        storageKey="invitation-drawer-width"
+        defaultWidth={520}
+        minWidth={400}
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('invitations.drawerTitle')}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              onClick={loadCurrentInvitation}
-              size="small"
-              sx={{
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-              title={t('common.refresh')}
-            >
-              <RefreshIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => setInvitationDialogOpen(false)}
-              size="small"
-              sx={{
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </Box>
-
-        {/* Content - 스크롤 가능 */}
-        <Box
-          sx={{
-            flex: 1,
-            overflow: 'auto',
-          }}
-        >
-          <InvitationForm
-            onSubmit={handleCreateInvitation}
-            onCancel={() => setInvitationDialogOpen(false)}
-            isDrawer={true}
-          />
-        </Box>
-      </Drawer>
+        <InvitationForm
+          onSubmit={handleCreateInvitation}
+          onCancel={() => setInvitationDialogOpen(false)}
+          isDrawer={true}
+        />
+      </ResizableDrawer>
 
       {/* Column Settings Popover */}
       <Popover
