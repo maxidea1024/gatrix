@@ -83,6 +83,13 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
   const isDark = theme.palette.mode === 'dark';
   const { logout } = useAuth();
 
+  // Replace URL to /onboarding so the browser shows the correct path
+  useEffect(() => {
+    if (window.location.pathname !== '/onboarding') {
+      window.history.replaceState(null, '', '/onboarding');
+    }
+  }, []);
+
   const steps = [
     {
       icon: <WaitIcon sx={{ fontSize: 22 }} />,
@@ -265,7 +272,7 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
         variant="text"
         size="small"
         startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
-        onClick={() => { logout(); }}
+        onClick={async () => { await logout(); window.location.href = '/login'; }}
         sx={{
           mt: 3,
           color: 'text.disabled',
