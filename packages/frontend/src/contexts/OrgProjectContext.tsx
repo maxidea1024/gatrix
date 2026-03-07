@@ -81,6 +81,7 @@ const POLL_INTERVAL_MS = 15000;
 const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { logout } = useAuth();
 
   const steps = [
     {
@@ -264,7 +265,7 @@ const NoOrgAccessPage: React.FC<{ t: (key: string) => string }> = ({ t }) => {
         variant="text"
         size="small"
         startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
-        onClick={() => { window.location.href = '/logout'; }}
+        onClick={() => { logout(); }}
         sx={{
           mt: 3,
           color: 'text.disabled',
