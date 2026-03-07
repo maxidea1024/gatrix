@@ -523,6 +523,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Load pending CR count and my draft count
   const loadPendingCRCount = useCallback(async () => {
+    // Skip if user doesn't have change request permission
+    if (!hasPermission([P.CHANGE_REQUESTS_CREATE])) return;
     try {
       const projectApiPath = getProjectApiPath();
       const response = await changeRequestService.getMyRequests(projectApiPath);
@@ -536,7 +538,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     } catch (error) {
       // Silently fail - don't spam errors for optional feature
     }
-  }, []);
+  }, [hasPermission]);
 
   // Load pending CR count on mount and environment change
   useEffect(() => {
