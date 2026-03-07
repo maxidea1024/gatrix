@@ -7,7 +7,9 @@ import { GameWorldService } from '../services/GameWorldService';
 import { cacheService } from '../services/CacheService';
 import { pubSubService } from '../services/PubSubService';
 import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cacheKeys';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientController');
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
 import { VarsService } from '../services/VarsService';
@@ -23,7 +25,7 @@ import {
   EvaluationContext,
   VALUE_SOURCE,
   EvaluationUtils,
-} from '@gatrix/shared';
+} from '@gatrix/evaluator';
 import db from '../config/knex';
 
 export class ClientController {
@@ -71,7 +73,7 @@ export class ClientController {
     }
 
     // Environment is resolved by clientSDKAuth middleware
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Validate status parameter if provided
     const validStatuses = Object.values(ClientStatus);
@@ -98,7 +100,7 @@ export class ClientController {
     const baseCacheKey = `client_version:${platform}:${versionKey}${statusKey}${channelKey}${subChannelKey}${lang ? `:${lang}` : ''}`;
 
     // Scoping cache by environment
-    const cacheKey = environment ? withEnvironment(environment, baseCacheKey) : baseCacheKey;
+    const cacheKey = environmentId ? withEnvironment(environmentId, baseCacheKey) : baseCacheKey;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -117,17 +119,21 @@ export class ClientController {
     let record;
     if (isLatestRequest) {
       // Get the latest version for the platform (with optional status filter and environment)
-      record = await ClientVersionService.findLatestByPlatform(platform, statusFilter, environment);
+      record = await ClientVersionService.findLatestByPlatform(
+        platform,
+        statusFilter,
+        environmentId
+      );
     } else {
       // Get exact version match
-      record = await ClientVersionService.findByExact(platform, version, environment);
+      record = await ClientVersionService.findByExact(platform, version, environmentId);
     }
 
     if (!record) {
       return res.status(404).json({
         success: false,
         message: isLatestRequest
-          ? `No client version found for platform: ${platform} in environment: ${environment}${statusFilter ? ` with status: ${statusFilter}` : ''}`
+          ? `No client version found for platform: ${platform} in environmentId: ${environmentId}${statusFilter ? ` with status: ${statusFilter}` : ''}`
           : 'Client version not found',
       });
     }
@@ -135,11 +141,11 @@ export class ClientController {
     // Get clientVersionPassiveData from KV settings for the specific environment and resolve by version
     let passiveData = {};
     try {
-      const passiveDataStr = await VarsService.get('$clientVersionPassiveData', environment);
+      const passiveDataStr = await VarsService.get('$clientVersionPassiveData', environmentId);
       passiveData = resolvePassiveData(passiveDataStr, record.clientVersion);
     } catch (error) {
       logger.warn(
-        `Failed to resolve clientVersionPassiveData for environment ${environment}:`,
+        `Failed to resolve clientVersionPassiveData for environmentId ${environmentId}:`,
         error
       );
     }
@@ -180,7 +186,7 @@ export class ClientController {
         record.clientStatus === ClientStatus.RECOMMENDED_UPDATE)
     ) {
       try {
-        const channelsStr = await VarsService.get('$channels', environment);
+        const channelsStr = await VarsService.get('$channels', environmentId);
         if (channelsStr) {
           const channels = JSON.parse(channelsStr);
           if (Array.isArray(channels)) {
@@ -212,15 +218,15 @@ export class ClientController {
               });
             }
           } else {
-            logger.debug('Backend: $channels KV is not an array', { environment });
+            logger.debug('Backend: $channels KV is not an array', { environmentId });
           }
         } else {
-          logger.debug('Backend: $channels KV not found', { environment });
+          logger.debug('Backend: $channels KV not found', { environmentId });
         }
       } catch (e) {
         logger.warn('Failed to process $channel KV for appUpdateUrl in backend', {
           error: e,
-          environment,
+          environmentId,
           channel,
           subChannel,
         });
@@ -233,7 +239,7 @@ export class ClientController {
     let patchAddress = record.patchAddress;
 
     if (clientIp) {
-      const isWhitelisted = await IpWhitelistService.isIpWhitelisted(clientIp, environment);
+      const isWhitelisted = await IpWhitelistService.isIpWhitelisted(clientIp, environmentId);
       if (isWhitelisted) {
         // Use whitelist addresses if available
         if (record.gameServerAddressForWhiteList) {
@@ -302,9 +308,9 @@ export class ClientController {
    * GET /api/v1/client/game-worlds
    */
   static getGameWorlds = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environment = req.environment || 'development';
-    const cacheKey = environment
-      ? withEnvironment(environment, GAME_WORLDS.PUBLIC)
+    const environmentId = req.environmentId || 'development';
+    const cacheKey = environmentId
+      ? withEnvironment(environmentId, GAME_WORLDS.PUBLIC)
       : GAME_WORLDS.PUBLIC;
 
     // Try to get from cache first
@@ -325,7 +331,7 @@ export class ClientController {
     const worlds = await GameWorldService.getAllGameWorlds({
       isVisible: true,
       isMaintenance: false,
-      environment: environment,
+      environmentId: environmentId,
     });
 
     // Transform data for client consumption (remove sensitive fields)
@@ -380,8 +386,8 @@ export class ClientController {
    * POST /api/v1/client/invalidate-cache
    */
   static invalidateCache = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environment = req.environment || 'development';
-    await GameWorldService.invalidateCache(environment);
+    const environmentId = req.environmentId || 'development';
+    await GameWorldService.invalidateCache(environmentId);
 
     res.json({
       success: true,
@@ -397,8 +403,8 @@ export class ClientController {
   static evaluateFlags = asyncHandler(async (req: SDKRequest, res: Response) => {
     try {
       // Environment from path parameter (preferred) or header (fallback)
-      const environment = req.params.environment || req.environment;
-      if (!environment) {
+      const environmentId = req.params.environmentId || req.environmentId;
+      if (!environmentId) {
         return res.status(400).json({ success: false, message: 'Environment is required' });
       }
 
@@ -415,14 +421,14 @@ export class ClientController {
 
       // 2. Fetch all flags and segments (with caching)
       // We cache the *definitions* for a short time (e.g. 60s) to avoid DB spam
-      const definitionsCacheKey = `feature_flags:definitions:${environment}`;
+      const definitionsCacheKey = `feature_flags:definitions:${environmentId}`;
       let definitions = await cacheService.get<any>(definitionsCacheKey);
 
       if (!definitions) {
         // Fetch from DB
         // We need ALL flags to evaluate, and ALL segments, and ALL variants
         const [flagsData, segmentsList] = await Promise.all([
-          FeatureFlagModel.findAll({ environment, limit: 10000 }),
+          FeatureFlagModel.findAll({ environmentId, limit: 10000 }),
           FeatureSegmentModel.findAll(),
         ]);
 
@@ -432,13 +438,15 @@ export class ClientController {
         let allStrategies: any[] = [];
         if (flagIds.length > 0) {
           [allVariants, allStrategies] = await Promise.all([
-            db('g_feature_variants').whereIn('flagId', flagIds).where('environment', environment),
+            db('g_feature_variants')
+              .whereIn('flagId', flagIds)
+              .where('environmentId', environmentId),
             db('g_feature_strategies as s')
               .leftJoin('g_feature_flag_segments as fs', 's.id', 'fs.strategyId')
               .leftJoin('g_feature_segments as seg', 'fs.segmentId', 'seg.id')
               .select('s.*', db.raw('GROUP_CONCAT(seg.segmentName) as strategySegmentNames'))
               .whereIn('s.flagId', flagIds)
-              .where('s.environment', environment)
+              .where('s.environmentId', environmentId)
               .groupBy('s.id')
               .orderBy('s.sortOrder', 'asc'),
           ]);
@@ -517,7 +525,7 @@ export class ClientController {
         .createHash('md5')
         .update(JSON.stringify(definitions))
         .digest('hex');
-      const evalCacheKey = `feature_flags:eval_cache:${environment}:${contextHash}:${flagNamesHash}:${definitionsHash}`;
+      const evalCacheKey = `feature_flags:eval_cache:${environmentId}:${contextHash}:${flagNamesHash}:${definitionsHash}`;
 
       const cachedResult = await cacheService.get<any>(evalCacheKey);
       if (cachedResult) {
@@ -583,7 +591,9 @@ export class ClientController {
 
       for (const dbFlag of evaluableFlags) {
         // Resolve enabled/disabled values using explicit override flags
-        const envSettings = dbFlag.environments?.find((e: any) => e.environment === environment);
+        const envSettings = dbFlag.environments?.find(
+          (e: any) => e.environmentId === environmentId
+        );
         const resolvedEnabledValue = envSettings?.overrideEnabledValue
           ? envSettings.enabledValue
           : dbFlag.enabledValue;
@@ -631,7 +641,7 @@ export class ClientController {
             disabledValue: resolvedDisabledValue,
             valueSource: envSettings ? 'environment' : 'flag',
           },
-          environment
+          environmentId
         );
       }
 
@@ -644,7 +654,7 @@ export class ClientController {
           flags: flagsArray,
         },
         meta: {
-          environment,
+          environmentId,
           evaluatedAt: new Date().toISOString(),
         },
       };
@@ -679,7 +689,7 @@ export class ClientController {
    * POST /api/v1/client/features/:environment/metrics
    */
   static submitMetrics = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environment = req.params.environment || req.environment;
+    const environmentId = req.params.environmentId || req.environmentId;
     const { bucket, appName } = req.body;
 
     if (!bucket || !bucket.flags) {
@@ -724,7 +734,7 @@ export class ClientController {
     const sdkVersion = (req.headers['x-sdk-version'] as string) || req.body.sdkVersion;
 
     await featureMetricsService.processAggregatedMetrics(
-      environment!,
+      environmentId!,
       aggregatedMetrics,
       bucket.stop,
       appName || req.body.appName,
@@ -740,7 +750,7 @@ export class ClientController {
       for (const [flagName, count] of Object.entries(bucket.missing as any)) {
         await unknownFlagService.reportUnknownFlag({
           flagName,
-          environment: environment!,
+          environmentId: environmentId!,
           appName: appName || req.body.appName,
           sdkVersion,
           count: (count as number) || 1,
@@ -759,8 +769,8 @@ export class ClientController {
    * Sends 'connected', 'flags_changed', and 'heartbeat' events.
    */
   static streamFlags = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environment = req.params.environment || req.environment;
-    if (!environment) {
+    const environmentId = req.params.environmentId || req.environmentId;
+    if (!environmentId) {
       return res.status(400).json({ success: false, message: 'Environment is required' });
     }
 
@@ -771,6 +781,6 @@ export class ClientController {
     const clientId = `flag-stream-${ulid()}`;
 
     // Register SSE client (sets headers, sends 'connected' event, handles cleanup)
-    await flagStreamingService.addClient(clientId, environment, res);
+    await flagStreamingService.addClient(clientId, environmentId, res);
   });
 }

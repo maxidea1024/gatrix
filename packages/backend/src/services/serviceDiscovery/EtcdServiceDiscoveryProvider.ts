@@ -5,7 +5,9 @@
  * Requires: npm install etcd3
  */
 
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('EtcdServiceDiscoveryProvider');
 import config from '../../config';
 import {
   IServiceDiscoveryProvider,

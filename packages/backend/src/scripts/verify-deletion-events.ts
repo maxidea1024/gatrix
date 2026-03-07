@@ -26,7 +26,7 @@ async function main() {
     type: 'service_notice.deleted',
     data: {
       id: 9999,
-      environment: 'development',
+      environmentId: 'development',
       timestamp: Date.now(),
     },
   });
@@ -38,7 +38,7 @@ async function main() {
     type: 'client_version.deleted',
     data: {
       id: 8888,
-      environment: 'development',
+      environmentId: 'development',
       timestamp: Date.now(),
     },
   });

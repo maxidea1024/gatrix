@@ -1,11 +1,13 @@
 import { Response } from 'express';
 import { EventEmitter } from 'events';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('sseNotificationService');
 import { pubSubService } from './PubSubService';
 
 export interface SSEClient {
   id: string;
-  userId?: number;
+  userId?: string;
   response: Response;
   lastPing: Date;
   subscriptions: Set<string>;
@@ -15,9 +17,9 @@ export interface NotificationEvent {
   type: string;
   data: any;
   timestamp: Date;
-  targetUsers?: number[];
+  targetUsers?: string[];
   targetChannels?: string[];
-  excludeUsers?: number[];
+  excludeUsers?: string[];
 }
 
 export class SSENotificationService extends EventEmitter {
@@ -42,7 +44,7 @@ export class SSENotificationService extends EventEmitter {
   /**
    * Add a new SSE client
    */
-  public addClient(clientId: string, response: Response, userId?: number): void {
+  public addClient(clientId: string, response: Response, userId?: string): void {
     // Set SSE headers
     response.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -164,7 +166,7 @@ export class SSENotificationService extends EventEmitter {
   /**
    * Send event to specific user
    */
-  public sendToUser(userId: number, event: NotificationEvent): number {
+  public sendToUser(userId: string, event: NotificationEvent): number {
     if (event.excludeUsers?.includes(userId)) {
       return 0;
     }
@@ -296,10 +298,10 @@ export class SSENotificationService extends EventEmitter {
    */
   public getStats(): {
     totalClients: number;
-    clientsByUser: Record<number, number>;
+    clientsByUser: Record<string, number>;
     subscriptionCounts: Record<string, number>;
   } {
-    const clientsByUser: Record<number, number> = {};
+    const clientsByUser: Record<string, number> = {};
     const subscriptionCounts: Record<string, number> = {};
 
     this.clients.forEach((client) => {
@@ -356,8 +358,8 @@ export class ChangeRequestNotifications {
   static async notifySubmitted(changeRequest: {
     id: string;
     title: string;
-    environment: string;
-    requesterId: number;
+    environmentId: string;
+    requesterId: string;
     requesterName?: string;
   }): Promise<void> {
     const event: NotificationEvent = {
@@ -365,7 +367,7 @@ export class ChangeRequestNotifications {
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         requesterId: changeRequest.requesterId,
         requesterName: changeRequest.requesterName,
       },
@@ -384,18 +386,18 @@ export class ChangeRequestNotifications {
     changeRequest: {
       id: string;
       title: string;
-      environment: string;
-      requesterId: number;
+      environmentId: string;
+      requesterId: string;
     },
     approverName?: string,
-    actorId?: number
+    actorId?: string
   ): Promise<void> {
     const event: NotificationEvent = {
       type: 'change_request_approved',
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         approverName,
       },
       timestamp: new Date(),
@@ -414,18 +416,18 @@ export class ChangeRequestNotifications {
     changeRequest: {
       id: string;
       title: string;
-      environment: string;
-      requesterId: number;
+      environmentId: string;
+      requesterId: string;
     },
     executorName?: string,
-    actorId?: number
+    actorId?: string
   ): Promise<void> {
     const event: NotificationEvent = {
       type: 'change_request_executed',
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         executorName,
       },
       timestamp: new Date(),
@@ -443,19 +445,19 @@ export class ChangeRequestNotifications {
     changeRequest: {
       id: string;
       title: string;
-      environment: string;
-      requesterId: number;
+      environmentId: string;
+      requesterId: string;
     },
     rejectorName?: string,
     comment?: string,
-    actorId?: number
+    actorId?: string
   ): Promise<void> {
     const event: NotificationEvent = {
       type: 'change_request_rejected',
       data: {
         id: changeRequest.id,
         title: changeRequest.title,
-        environment: changeRequest.environment,
+        environmentId: changeRequest.environmentId,
         rejectorName,
         comment,
       },

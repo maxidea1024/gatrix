@@ -60,6 +60,7 @@ import type {
   AvailableMetric,
 } from '../../services/releaseFlowService';
 import api from '../../services/api';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import ConfirmDialog from '../common/ConfirmDialog';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 
@@ -121,6 +122,8 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   hideHeader = false,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { enqueueSnackbar } = useSnackbar();
   const [safeguards, setSafeguards] = useState<Safeguard[]>([]);
   const [loading, setLoading] = useState(false);
@@ -152,7 +155,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   const fetchSafeguards = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await listSafeguards(milestoneId);
+      const data = await listSafeguards(milestoneId, projectApiPath);
       setSafeguards(data);
     } catch {
       // Silent catch - empty state will show
@@ -169,7 +172,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   const fetchAvailableMetrics = useCallback(async () => {
     setMetricsLoading(true);
     try {
-      const metrics = await getAvailableMetrics();
+      const metrics = await getAvailableMetrics(projectApiPath);
       setAvailableMetrics(metrics);
     } catch {
       // Silent - user can still type manually
@@ -188,7 +191,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
     const timer = setTimeout(async () => {
       setLabelsLoading(true);
       try {
-        const response = await api.get<string[]>('/admin/impact-metrics/labels', {
+        const response = await api.get<string[]>(`${projectApiPath}/impact-metrics/labels`, {
           params: { metric: metricName },
         });
         setAvailableLabels(response.data || []);
@@ -255,7 +258,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           timeRangeMinutes,
           labelFilters: Object.keys(labelFilters).length > 0 ? labelFilters : null,
         };
-        await updateSafeguard(selectedSafeguard.id, input);
+        await updateSafeguard(selectedSafeguard.id, input, projectApiPath);
         enqueueSnackbar(t('releaseFlow.safeguard.updateSuccess'), { variant: 'success' });
       } else {
         const input: CreateSafeguardInput = {
@@ -270,7 +273,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
           labelFilters: Object.keys(labelFilters).length > 0 ? labelFilters : undefined,
           action: 'pause',
         };
-        await createSafeguard(input);
+        await createSafeguard(input, projectApiPath);
         enqueueSnackbar(t('releaseFlow.safeguard.createSuccess'), { variant: 'success' });
       }
       setDialogOpen(false);
@@ -292,7 +295,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   const handleDeleteConfirm = async () => {
     if (!selectedSafeguard) return;
     try {
-      await deleteSafeguard(selectedSafeguard.id);
+      await deleteSafeguard(selectedSafeguard.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.safeguard.deleteSuccess'), { variant: 'success' });
       setDeleteConfirmOpen(false);
       setSelectedSafeguard(null);
@@ -305,7 +308,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
   const handleEvaluate = async () => {
     setEvaluating(true);
     try {
-      await evaluateSafeguards(milestoneId);
+      await evaluateSafeguards(milestoneId, projectApiPath);
       enqueueSnackbar(t('releaseFlow.safeguard.evaluateSuccess'), { variant: 'success' });
       fetchSafeguards();
     } catch {
@@ -317,7 +320,7 @@ const SafeguardPanel: React.FC<SafeguardPanelProps> = ({
 
   const handleReset = async (safeguardId: string) => {
     try {
-      await resetSafeguard(safeguardId);
+      await resetSafeguard(safeguardId, projectApiPath);
       enqueueSnackbar(t('releaseFlow.safeguard.resetSuccess'), { variant: 'success' });
       fetchSafeguards();
     } catch {

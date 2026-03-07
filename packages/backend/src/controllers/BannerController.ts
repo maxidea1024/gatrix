@@ -12,9 +12,9 @@ export class BannerController {
   static getBanners = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { page, limit, search, status, sortBy, sortOrder } = req.query;
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const result = await BannerService.getBanners({
-      environment,
+      environmentId,
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
       search: search as string,
@@ -36,9 +36,9 @@ export class BannerController {
    */
   static getBannerById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
-    const banner = await BannerService.getBannerById(bannerId, environment);
+    const banner = await BannerService.getBannerById(bannerId, environmentId);
 
     res.json({
       success: true,
@@ -53,13 +53,13 @@ export class BannerController {
    */
   static createBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       userId!,
-      environment,
+      environmentId,
       'g_banners',
       {
         name,
@@ -69,12 +69,12 @@ export class BannerController {
         metadata,
         playbackSpeed,
         sequences,
-        environment,
+        environmentId,
         createdBy: userId,
       },
       async () => {
         const banner = await BannerService.createBanner({
-          environment,
+          environmentId,
           name,
           description,
           width,
@@ -113,13 +113,13 @@ export class BannerController {
   static updateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
     const { name, description, width, height, metadata, playbackSpeed, sequences } = req.body;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId!,
-      environment,
+      environmentId,
       'g_banners',
       bannerId,
       {
@@ -133,7 +133,7 @@ export class BannerController {
         updatedBy: userId,
       },
       async () => {
-        const banner = await BannerService.getBannerById(bannerId, environment);
+        const banner = await BannerService.getBannerById(bannerId, environmentId);
         return { banner };
       }
     );
@@ -162,17 +162,17 @@ export class BannerController {
    */
   static deleteBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       userId!,
-      environment,
+      environmentId,
       'g_banners',
       bannerId,
       async () => {
-        await BannerService.deleteBanner(bannerId, environment);
+        await BannerService.deleteBanner(bannerId, environmentId);
       }
     );
 
@@ -199,18 +199,18 @@ export class BannerController {
    */
   static publishBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId!,
-      environment,
+      environmentId,
       'g_banners',
       bannerId,
       { status: 'published', updatedBy: userId },
       async () => {
-        const banner = await BannerService.getBannerById(bannerId, environment);
+        const banner = await BannerService.getBannerById(bannerId, environmentId);
         return { banner };
       }
     );
@@ -239,18 +239,18 @@ export class BannerController {
    */
   static archiveBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId!,
-      environment,
+      environmentId,
       'g_banners',
       bannerId,
       { status: 'archived', updatedBy: userId },
       async () => {
-        const banner = await BannerService.getBannerById(bannerId, environment);
+        const banner = await BannerService.getBannerById(bannerId, environmentId);
         return { banner };
       }
     );
@@ -279,17 +279,17 @@ export class BannerController {
    */
   static duplicateBanner = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = req.user?.userId;
 
     // Use UnifiedChangeGateway for CR support (Creation)
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       userId!,
-      environment,
+      environmentId,
       'g_banners',
-      { duplicateFrom: bannerId, environment, createdBy: userId },
+      { duplicateFrom: bannerId, environmentId, createdBy: userId },
       async () => {
-        const banner = await BannerService.duplicateBanner(bannerId, environment, userId);
+        const banner = await BannerService.duplicateBanner(bannerId, environmentId, userId);
         return banner;
       }
     );

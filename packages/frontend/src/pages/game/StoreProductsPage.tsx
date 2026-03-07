@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -51,7 +51,7 @@ import SyncPreviewDialog, {
 } from '../../components/game/SyncPreviewDialog';
 import BatchProcessDialog from '../../components/game/BatchProcessDialog';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -65,6 +65,8 @@ import DynamicFilterBar, {
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useNavigate } from 'react-router-dom';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 // Store display names
 const STORE_DISPLAY_NAMES: Record<string, string> = {
@@ -82,7 +84,9 @@ const StoreProductsPage: React.FC = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.STORE_PRODUCTS_MANAGE]);
+  const canManage = hasPermission([P.STORE_PRODUCTS_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [products, setProducts] = useState<StoreProduct[]>([]);
@@ -310,7 +314,7 @@ const StoreProductsPage: React.FC = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const result = await storeProductService.getStoreProducts({
+      const result = await storeProductService.getStoreProducts(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
@@ -357,7 +361,7 @@ const StoreProductsPage: React.FC = () => {
   // Load product statistics
   const loadStats = async () => {
     try {
-      const stats = await storeProductService.getStats();
+      const stats = await storeProductService.getStats(projectApiPath);
       setProductStats(stats);
     } catch (error) {
       console.error('Failed to load product stats:', error);
@@ -373,7 +377,7 @@ const StoreProductsPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAllRegistryTags(tags);
       } catch (error) {
         console.error('Failed to load registry tags:', error);
@@ -482,7 +486,7 @@ const StoreProductsPage: React.FC = () => {
   const handleSyncPreview = async () => {
     setSyncLoading(true);
     try {
-      const preview = await storeProductService.previewSync();
+      const preview = await storeProductService.previewSync(projectApiPath);
       setSyncPreview(preview);
       setSyncDialogOpen(true);
     } catch (error: any) {
@@ -498,7 +502,7 @@ const StoreProductsPage: React.FC = () => {
   const handleSyncApply = async (selected: SelectedSyncItems) => {
     setSyncLoading(true);
     try {
-      const result = await storeProductService.applySync(selected);
+      const result = await storeProductService.applySync(projectApiPath, selected);
       setSyncDialogOpen(false);
       setSyncPreview(null);
       enqueueSnackbar(
@@ -530,7 +534,7 @@ const StoreProductsPage: React.FC = () => {
     currentIsActive?: boolean;
     targetIsActive: boolean;
   }) => {
-    const result = await storeProductService.bulkUpdateActiveStatusByFilter(params);
+    const result = await storeProductService.bulkUpdateActiveStatusByFilter(projectApiPath, params);
     const actionLabel = params.targetIsActive
       ? t('storeProducts.bulkActivate')
       : t('storeProducts.bulkDeactivate');
@@ -545,7 +549,7 @@ const StoreProductsPage: React.FC = () => {
   };
 
   const handleBatchProcessGetCount = async (params: { search?: string; isActive?: boolean }) => {
-    return await storeProductService.getCountByFilter(params);
+    return await storeProductService.getCountByFilter(projectApiPath, params);
   };
 
   const handleDelete = (product: StoreProduct) => {
@@ -557,7 +561,7 @@ const StoreProductsPage: React.FC = () => {
     if (!deletingProduct) return;
 
     try {
-      await storeProductService.deleteStoreProduct(deletingProduct.id);
+      await storeProductService.deleteStoreProduct(projectApiPath, deletingProduct.id);
       enqueueSnackbar(t('storeProducts.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadProducts();
@@ -584,7 +588,7 @@ const StoreProductsPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await storeProductService.deleteStoreProducts(selectedIds);
+      await storeProductService.deleteStoreProducts(projectApiPath, selectedIds);
       enqueueSnackbar(t('storeProducts.bulkDeleteSuccess'), {
         variant: 'success',
       });
@@ -606,7 +610,11 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkActivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
+      const result = await storeProductService.bulkUpdateActiveStatus(
+        projectApiPath,
+        selectedIds,
+        true
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -625,7 +633,11 @@ const StoreProductsPage: React.FC = () => {
   const handleBulkDeactivate = async () => {
     if (selectedIds.length === 0) return;
     try {
-      const result = await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
+      const result = await storeProductService.bulkUpdateActiveStatus(
+        projectApiPath,
+        selectedIds,
+        false
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -644,7 +656,11 @@ const StoreProductsPage: React.FC = () => {
   // Toggle active status
   const handleToggleActive = async (product: StoreProduct) => {
     try {
-      const result = await storeProductService.toggleActive(product.id, !product.isActive);
+      const result = await storeProductService.toggleActive(
+        projectApiPath,
+        product.id,
+        !product.isActive
+      );
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -966,21 +982,17 @@ const StoreProductsPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading && isInitialLoad ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : products.length === 0 ? (
-            <EmptyState
-              message={t('storeProducts.noProductsFound')}
-              onAddClick={canManage ? handleSyncPreview : undefined}
-              addButtonLabel={t('storeProducts.syncWithPlanningData')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={loading && isInitialLoad}>
+        {products.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('storeProducts.noProductsFound')}
+            onAddClick={canManage ? handleSyncPreview : undefined}
+            addButtonLabel={t('storeProducts.syncWithPlanningData')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
                   <TableHead>
@@ -1360,10 +1372,10 @@ const StoreProductsPage: React.FC = () => {
                   setPage(0);
                 }}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
@@ -1424,7 +1436,7 @@ const StoreProductsPage: React.FC = () => {
               {products
                 .filter((p) => selectedIds.includes(p.id))
                 .map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product.id} hover>
                     <TableCell>{product.cmsProductId || '-'}</TableCell>
                     <TableCell>{product.productId}</TableCell>
                     <TableCell>{product.productName}</TableCell>

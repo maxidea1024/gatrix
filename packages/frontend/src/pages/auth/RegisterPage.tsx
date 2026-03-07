@@ -29,7 +29,8 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { useSnackbar } from 'notistack';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { invitationService } from '../../services/invitationService';
-import { Invitation } from '../../types/invitation';
+import { Invitation, AutoJoinInfo } from '../../types/invitation';
+import { Business as OrgIcon, Folder as ProjectIcon } from '@mui/icons-material';
 
 // Validation schema - will be created inside component to access t function
 
@@ -61,11 +62,12 @@ const RegisterPage: React.FC = () => {
     return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
   }, []);
 
-  // 초대 관련 상태
+  // 초대 관련 Status
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [invitationLoading, setInvitationLoading] = useState(false);
   const [invitationError, setInvitationError] = useState<string | null>(null);
+  const [autoJoinInfo, setAutoJoinInfo] = useState<AutoJoinInfo | null>(null);
 
   // Validation schema with translations
   const registerSchema = useMemo(
@@ -103,8 +105,8 @@ const RegisterPage: React.FC = () => {
     watch,
     setValue,
   } = useForm<RegisterData & { confirmPassword: string }>({
-    resolver,
-    mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
+    resolver: resolver as any,
+    mode: 'onChange', // 실시간 Validation을 위해 onChange로 변경
     defaultValues: {
       name: '',
       email: '',
@@ -136,7 +138,7 @@ const RegisterPage: React.FC = () => {
     }
   }, [watchedPassword, trigger]);
 
-  // 초대 토큰 확인
+  // 초대 토큰 Confirm
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get('invite');
@@ -155,7 +157,11 @@ const RegisterPage: React.FC = () => {
       const result = await invitationService.validateInvitation(token);
       if (result.valid && result.invitation) {
         setInvitation(result.invitation);
-        // 초대받은 경우 이메일 필드를 미리 채움 (있는 경우)
+        // Store auto-join info for display
+        if (result.autoJoinInfo) {
+          setAutoJoinInfo(result.autoJoinInfo);
+        }
+        // Pre-fill email if provided
         if (result.invitation.email) {
           setValue('email', result.invitation.email);
         }
@@ -240,14 +246,14 @@ const RegisterPage: React.FC = () => {
         });
       }
 
-      // 성공 시 최소 2초 대기
+      // Success 시 최소 2초 대기
       const elapsed = Date.now() - startTime;
       const remainingTime = Math.max(0, 2000 - elapsed);
       if (remainingTime > 0) {
         await new Promise((resolve) => setTimeout(resolve, remainingTime));
       }
 
-      // 성공 시에만 에러 메시지 지우기
+      // Success 시에만 Error message 지우기
       setRegisterError(null);
       setRegisteredEmail(data.email); // Save registered email
       setRegisterSuccess(true);
@@ -286,13 +292,13 @@ const RegisterPage: React.FC = () => {
     // 최소 2초 대기
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // 타임아웃 설정 (30초)
+    // 타임아웃 Settings (30초)
     const timeout = setTimeout(() => {
       setOauthLoading(null);
       setRegisterError(t('auth.errors.oauthTimeout'));
     }, 30000);
 
-    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
+    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 Save
     sessionStorage.setItem('oauthTimeout', timeout.toString());
     sessionStorage.setItem('oauthProvider', provider);
 
@@ -312,12 +318,12 @@ const RegisterPage: React.FC = () => {
   };
 
   const handleWeChatLogin = () => {
-    // 임시 비활성화
+    // 임시 비Active화
     console.log('WeChat login not available yet');
   };
 
   const handleBaiduLogin = () => {
-    // 임시 비활성화
+    // 임시 비Active화
     console.log('Baidu login not available yet');
   };
 
@@ -329,10 +335,7 @@ const RegisterPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'linear-gradient(135deg, #0f0f0f 0%, #050505 100%)'
-              : 'linear-gradient(135deg, #9e9e9e 0%, #757575 100%)',
+          bgcolor: 'background.default',
           p: 2,
         }}
       >
@@ -516,6 +519,34 @@ const RegisterPage: React.FC = () => {
               {t('auth.invitation.receivedTitle')}
             </Typography>
             <Typography variant="body2">{t('auth.invitation.receivedDesc')}</Typography>
+          </Alert>
+        )}
+
+        {/* Auto-Join Info */}
+        {autoJoinInfo && autoJoinInfo.memberships.length > 0 && (
+          <Alert
+            severity="info"
+            sx={{ mb: 3 }}
+            icon={<OrgIcon fontSize="small" />}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              {t('autoJoin.acceptInfo')}
+            </Typography>
+            {autoJoinInfo.memberships.map((m) => (
+              <Box key={m.orgId} sx={{ ml: 1, mt: 0.5 }}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  • {m.orgDisplayName || m.orgName}
+                </Typography>
+                {m.projects.map((p) => (
+                  <Box key={p.projectId} sx={{ display: 'flex', alignItems: 'center', ml: 2, mt: 0.25 }}>
+                    <ProjectIcon sx={{ fontSize: 14, mr: 0.5, color: 'text.secondary' }} />
+                    <Typography variant="body2" color="text.secondary">
+                      {p.projectDisplayName || p.projectName}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            ))}
           </Alert>
         )}
 
@@ -727,8 +758,8 @@ const RegisterPage: React.FC = () => {
                   // Mask characters when using type=text on WebKit browsers
                   ...(isWebkit && !showPassword
                     ? {
-                        WebkitTextSecurity: 'disc',
-                      }
+                      WebkitTextSecurity: 'disc',
+                    }
                     : {}),
                   '&:-webkit-autofill': {
                     WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -845,8 +876,8 @@ const RegisterPage: React.FC = () => {
                     // Mask characters when using type=text on WebKit browsers
                     ...(isWebkit && !showConfirmPassword
                       ? {
-                          WebkitTextSecurity: 'disc',
-                        }
+                        WebkitTextSecurity: 'disc',
+                      }
                       : {}),
                     '&:-webkit-autofill': {
                       WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -1075,7 +1106,7 @@ const RegisterPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // 임시 비Active화
                 sx={{
                   width: 56,
                   height: 56,
@@ -1104,7 +1135,7 @@ const RegisterPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // 임시 비Active화
                 sx={{
                   width: 56,
                   height: 56,

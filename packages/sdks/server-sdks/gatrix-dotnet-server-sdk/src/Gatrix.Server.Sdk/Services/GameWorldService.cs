@@ -34,7 +34,7 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
 
     protected override string ServiceName => "GameWorld";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/game-worlds";
+        $"/api/v1/server/game-worlds";
     protected override List<GameWorld> ExtractItems(GameWorldListResponse response) =>
         response.Worlds.OrderBy(w => w.DisplayOrder).ToList();
     protected override object GetItemId(GameWorld item) => item.Id;
@@ -67,7 +67,7 @@ public class GameWorldService : BaseEnvironmentService<GameWorld, GameWorldListR
 
             // Fetch single item from API
             var response = await ApiClient.GetAsync<GameWorld>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/game-worlds/{id}", ct: ct);
+                $"/api/v1/server/game-worlds/{id}", ct: ct);
 
             if (!response.Success || response.Data is null)
             {

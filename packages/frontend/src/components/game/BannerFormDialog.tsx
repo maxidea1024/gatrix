@@ -45,6 +45,7 @@ import SequenceEditor from './SequenceEditor';
 import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import BannerPreview from './BannerPreview';
 import { useEntityLock } from '../../hooks/useEntityLock';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface BannerFormDialogProps {
   open: boolean;
@@ -77,6 +78,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Form state
   const [name, setName] = useState('');
@@ -179,7 +182,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
         frames: (s.frames || []).map((f) => ({
           imageUrl: f.imageUrl,
           delay: f.delay,
-          link: f.link || '',
+          clickUrl: f.clickUrl || '',
         })),
       })),
     };
@@ -198,7 +201,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
         frames: (s.frames || []).map((f) => ({
           imageUrl: f.imageUrl,
           delay: f.delay,
-          link: f.link || '',
+          clickUrl: f.clickUrl || '',
         })),
       })),
     };
@@ -322,7 +325,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
     setSaving(true);
     try {
       if (banner) {
-        const result = await bannerService.updateBanner(banner.bannerId, {
+        const result = await bannerService.updateBanner(projectApiPath, banner.bannerId, {
           name,
           description,
           width,
@@ -337,7 +340,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({ open, onClose, onSa
           enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
         }
       } else {
-        const result = await bannerService.createBanner({
+        const result = await bannerService.createBanner(projectApiPath, {
           name,
           description,
           width,

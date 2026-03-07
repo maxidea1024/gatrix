@@ -38,7 +38,6 @@ import {
   Close as CloseIcon,
   Add as AddIcon,
   CheckCircle as CompletedIcon,
-  ArrowDownward as ArrowDownIcon,
   HelpOutline as HelpOutlineIcon,
   DeleteOutline as DeleteIcon,
   MoreVert as MoreVertIcon,
@@ -61,12 +60,13 @@ import SafeguardPanel from './SafeguardPanel';
 import StrategyListReadonly from './StrategyListReadonly';
 import { ContextFieldInfo } from './ConstraintDisplay';
 import { ReleaseFlowTemplate } from '../../services/releaseFlowService';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import ConfirmDialog from '../common/ConfirmDialog';
 
 interface ReleaseFlowTabProps {
   flagId: string;
   flagName: string;
-  environments: Array<{ environment: string; displayName: string }>;
+  environments: Array<{ environmentId: string; displayName: string }>;
   canManage: boolean;
   initialShowTemplates?: boolean;
   envEnabled?: boolean;
@@ -148,8 +148,10 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [selectedEnv, setSelectedEnv] = useState<string>(
-    environments.length > 0 ? environments[0].environment : ''
+    environments.length > 0 ? environments[0].environmentId : ''
   );
 
   const { data: templates, isLoading: loadingTemplates } = useReleaseFlowTemplates();
@@ -160,7 +162,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
   } = useReleaseFlowPlan(flagId, selectedEnv);
 
   const [applying, setApplying] = useState(false);
-  const [actionLoadingType, setActionLoadingType] = useState<'pause' | 'resume' | 'jump' | 'delete' | null>(null);
+  const [actionLoadingType, setActionLoadingType] = useState<
+    'pause' | 'resume' | 'jump' | 'delete' | null
+  >(null);
   const [autoControlling, setAutoControlling] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(initialShowTemplates);
 
@@ -201,7 +205,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         if (!envEnabled && plan.status === 'active') {
           // Environment disabled -> auto-pause
           try {
-            await pausePlan(plan.id);
+            await pausePlan(plan.id, projectApiPath);
             enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'info' });
             mutatePlan();
             if (onPlanChange) onPlanChange();
@@ -211,7 +215,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         } else if (envEnabled && plan.status === 'paused') {
           // Environment re-enabled -> auto-resume
           try {
-            await resumePlan(plan.id);
+            await resumePlan(plan.id, projectApiPath);
             enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'info' });
             mutatePlan();
             if (onPlanChange) onPlanChange();
@@ -221,7 +225,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
         } else if (envEnabled && plan.status === 'draft') {
           // Environment enabled with draft plan -> auto-start
           try {
-            await startPlan(plan.id);
+            await startPlan(plan.id, projectApiPath);
             enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
             mutatePlan();
             if (onPlanChange) onPlanChange();
@@ -242,7 +246,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     const handleReleaseFlowUpdate = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       // Only refresh if this event is for our current flag/environment
-      if (detail?.flagId === flagId && detail?.environment === selectedEnv) {
+      if (detail?.flagId === flagId && detail?.environmentId === selectedEnv) {
         mutatePlan();
         if (onPlanChange) onPlanChange();
       }
@@ -261,9 +265,12 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       setApplying(true);
       // If a plan already exists, archive it first before applying a new template
       if (plan) {
-        await deletePlan(plan.id);
+        await deletePlan(plan.id, projectApiPath);
       }
-      const newPlan = await applyTemplate({ flagId, environment: selectedEnv, templateId });
+      const newPlan = await applyTemplate(
+        { flagId, environmentId: selectedEnv, templateId },
+        projectApiPath
+      );
       enqueueSnackbar(t('releaseFlow.applySuccess'), { variant: 'success' });
 
       // Auto-start the plan if the environment is already enabled
@@ -271,7 +278,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       // when a new plan is applied while the environment is already active)
       if (envEnabled && newPlan?.id && canManage) {
         try {
-          await startPlan(newPlan.id);
+          await startPlan(newPlan.id, projectApiPath);
           enqueueSnackbar(t('releaseFlow.startedSuccess'), { variant: 'success' });
         } catch (startError) {
           // Plan was applied successfully but auto-start failed — not critical
@@ -293,7 +300,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan) return;
     try {
       setActionLoadingType('delete');
-      await deletePlan(plan.id);
+      await deletePlan(plan.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.planDeleteSuccess'), { variant: 'success' });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
@@ -315,11 +322,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan || !targetMilestoneId) return;
     try {
       setActionLoadingType('jump');
-      await startMilestone(plan.id, targetMilestoneId);
+      await startMilestone(plan.id, targetMilestoneId, projectApiPath);
 
       // If environment is disabled, immediately pause so it doesn't run
       if (!envEnabled) {
-        await pausePlan(plan.id);
+        await pausePlan(plan.id, projectApiPath);
       }
 
       enqueueSnackbar(t('releaseFlow.milestoneStartSuccess'), { variant: 'success' });
@@ -338,7 +345,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan) return;
     try {
       setActionLoadingType('pause');
-      await pausePlan(plan.id);
+      await pausePlan(plan.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.pausedSuccess'), { variant: 'success' });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
@@ -353,7 +360,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     if (!plan || !envEnabled) return;
     try {
       setActionLoadingType('resume');
-      await resumePlan(plan.id);
+      await resumePlan(plan.id, projectApiPath);
       enqueueSnackbar(t('releaseFlow.resumedSuccess'), { variant: 'success' });
       await mutatePlan();
       if (onPlanChange) onPlanChange();
@@ -386,7 +393,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     try {
       setTransitionSaving(true);
       const totalMinutes = toMinutes(transitionValue, transitionUnit);
-      await setTransitionCondition(editingTransitionId, totalMinutes);
+      await setTransitionCondition(editingTransitionId, totalMinutes, projectApiPath);
       await mutatePlan();
       if (onPlanChange) onPlanChange();
       setEditingTransitionId(null);
@@ -401,7 +408,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
     async (milestoneId: string) => {
       try {
         setTransitionSaving(true);
-        await removeTransitionCondition(milestoneId);
+        await removeTransitionCondition(milestoneId, projectApiPath);
         await mutatePlan();
         if (onPlanChange) onPlanChange();
         setEditingTransitionId(null);
@@ -545,11 +552,50 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             flexShrink: 0,
+            pl: '16px',
           }}
         >
-          <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 16 }} />
-          <ArrowDownIcon sx={{ fontSize: 16, color: lineColor, my: -0.25 }} />
-          <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 16 }} />
+          {hasTransition ? (
+            <Box
+              sx={{
+                width: isCurrentActive && !isPaused ? 10 : 2,
+                flexGrow: 1,
+                minHeight: 24,
+                position: 'relative',
+                overflow: 'hidden',
+                ...(isCurrentActive && !isPaused
+                  ? {
+                      // Center line behind chevrons
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        left: '50%',
+                        width: 2,
+                        transform: 'translateX(-50%)',
+                        bgcolor: 'primary.main',
+                        opacity: 0.3,
+                      },
+                      // Flowing chevron arrows via seamless background-position loop
+                      background: (theme: any) =>
+                        `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='12' viewBox='0 0 10 12'%3E%3Cpath d='M1 2 L5 6 L9 2' fill='none' stroke='${encodeURIComponent(theme.palette.primary.main)}' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-y center`,
+                      backgroundSize: '10px 12px',
+                      animation: 'chevronFlow 1.8s linear infinite',
+                      '@keyframes chevronFlow': {
+                        '0%': { backgroundPositionY: '0px' },
+                        '100%': { backgroundPositionY: '12px' },
+                      },
+                    }
+                  : {
+                      bgcolor: lineColor,
+                    }),
+              }}
+            />
+          ) : (
+            // No transition — just a simple short line, no arrow
+            <Box sx={{ width: 2, flexGrow: 1, bgcolor: lineColor, minHeight: 12 }} />
+          )}
         </Box>
 
         {/* Transition content */}
@@ -558,7 +604,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            py: 0.5,
+            py: hasTransition ? 0.5 : 0,
             pl: 1,
           }}
         >
@@ -655,12 +701,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
 
   // ==================== Loading ====================
 
+  // Skip rendering during initial plan check to avoid layout jitter.
+  // The brief loading period resolves quickly and showing a spinner
+  // causes the container to shift visually.
   if (loadingPlan && !plan) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-        <CircularProgress size={28} />
-      </Box>
-    );
+    return null;
   }
 
   // ==================== Render ====================
@@ -670,15 +715,15 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
       {/* Environment Selector */}
       {environments.length > 1 && (
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="subtitle2">{t('featureFlags.environment')}:</Typography>
+          <Typography variant="subtitle2">{t('common.environment')}:</Typography>
           <Stack direction="row" spacing={1}>
             {environments.map((env) => (
               <Chip
-                key={env.environment}
+                key={env.environmentId}
                 label={env.displayName}
-                onClick={() => setSelectedEnv(env.environment)}
-                color={selectedEnv === env.environment ? 'primary' : 'default'}
-                variant={selectedEnv === env.environment ? 'filled' : 'outlined'}
+                onClick={() => setSelectedEnv(env.environmentId)}
+                color={selectedEnv === env.environmentId ? 'primary' : 'default'}
+                variant={selectedEnv === env.environmentId ? 'filled' : 'outlined'}
                 size="small"
               />
             ))}
@@ -747,7 +792,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                     );
                   }
                   if (plan?.status === 'paused') {
-                    const activeMilestone = milestones.find((m: any) => m.id === plan.activeMilestoneId);
+                    const activeMilestone = milestones.find(
+                      (m: any) => m.id === plan.activeMilestoneId
+                    );
                     const pausedTime = activeMilestone?.pausedAt;
                     const pausedLabel = pausedTime
                       ? `${t('releaseFlow.statusPaused')}: ${formatRelativeTime(pausedTime)}`
@@ -765,13 +812,11 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       />
                     );
                   }
-                  const statusMap: Record<
-                    string,
-                    { label: string; color: 'default' | 'primary' }
-                  > = {
-                    draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
-                    active: { label: t('releaseFlow.statusActive'), color: 'primary' },
-                  };
+                  const statusMap: Record<string, { label: string; color: 'default' | 'primary' }> =
+                    {
+                      draft: { label: t('releaseFlow.statusDraft'), color: 'default' },
+                      active: { label: t('releaseFlow.statusActive'), color: 'primary' },
+                    };
                   const status = statusMap[plan?.status || 'draft'];
                   return status ? (
                     <Chip
@@ -973,9 +1018,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             bgcolor:
                               status === 'active' || status === 'paused'
                                 ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255,255,255,0.03)'
-                                    : 'rgba(0,0,0,0.015)'
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255,255,255,0.03)'
+                                      : 'rgba(0,0,0,0.015)'
                                 : 'transparent',
                             cursor: 'pointer',
                             '&:hover': {
@@ -1084,10 +1129,14 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                           </Box>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-
                             <Box
                               onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                              sx={{ flexShrink: 0, minHeight: 32, display: 'flex', alignItems: 'center' }}
+                              sx={{
+                                flexShrink: 0,
+                                minHeight: 32,
+                                display: 'flex',
+                                alignItems: 'center',
+                              }}
                             >
                               {renderMilestoneControls(milestone.id, index, isScheduled)}
                             </Box>
@@ -1109,7 +1158,7 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                             )}
 
                             {/* Strategies */}
-                            <Box sx={{ pl: 1.5, borderLeft: 2, borderColor: 'divider' }}>
+                            <Box>
                               <Typography
                                 variant="caption"
                                 fontWeight={600}
@@ -1223,9 +1272,9 @@ const ReleaseFlowTab: React.FC<ReleaseFlowTabProps> = ({
                       '&:hover':
                         !applying && !isCurrentTemplate
                           ? {
-                            borderColor: 'primary.main',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          }
+                              borderColor: 'primary.main',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            }
                           : {},
                     }}
                   >

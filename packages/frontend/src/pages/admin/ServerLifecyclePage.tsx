@@ -53,7 +53,7 @@ import { RelativeTime } from '../../components/common/RelativeTime';
 import serverLifecycleService, {
   ServerLifecycleEvent,
 } from '../../services/serverLifecycleService';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -61,6 +61,7 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
 import SearchTextField from '../../components/common/SearchTextField';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import {
   DndContext,
   closestCenter,
@@ -79,6 +80,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 // Column definition interface
 interface ColumnConfig {
@@ -264,7 +266,7 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
           </Box>
         );
       case 'environment':
-        return <Typography variant="body2">{event.environment || '-'}</Typography>;
+        return <Typography variant="body2">{event.environmentId || '-'}</Typography>;
       case 'instanceId':
         return (
           <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -436,14 +438,14 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   {/* Environment */}
                   <Box>
                     <Typography variant="caption" color="textSecondary" display="block">
-                      {t('serverLifecycle.environment')}
+                      {t('serverLifecycle.environmentId')}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2">{event.environment || '-'}</Typography>
-                      {event.environment && (
+                      <Typography variant="body2">{event.environmentId || '-'}</Typography>
+                      {event.environmentId && (
                         <IconButton
                           size="small"
-                          onClick={() => handleCopy(event.environment!)}
+                          onClick={() => handleCopy(event.environmentId!)}
                           sx={{ p: 0.25 }}
                         >
                           <ContentCopyIcon sx={{ fontSize: 14 }} />
@@ -717,6 +719,8 @@ const ServerLifecyclePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -763,7 +767,7 @@ const ServerLifecyclePage: React.FC = () => {
     { id: 'group', labelKey: 'serverLifecycle.group', visible: true },
     {
       id: 'environment',
-      labelKey: 'serverLifecycle.environment',
+      labelKey: 'serverLifecycle.environmentId',
       visible: true,
     },
     { id: 'instanceId', labelKey: 'serverLifecycle.instanceId', visible: true },
@@ -842,7 +846,7 @@ const ServerLifecyclePage: React.FC = () => {
     params.sortBy = sortBy;
     params.sortOrder = sortOrder;
 
-    return await serverLifecycleService.getEvents(params);
+    return await serverLifecycleService.getEvents(projectApiPath, params);
   }, [page, rowsPerPage, debouncedSearchQuery, debouncedActiveFilters, sortBy, sortOrder]);
 
   const { data, isLoading, mutate } = useSWR(
@@ -1219,68 +1223,66 @@ const ServerLifecyclePage: React.FC = () => {
       </Popover>
 
       {/* Table */}
-      <Paper elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-          </Box>
-        ) : !data?.data || data.data.length === 0 ? (
-          <EmptyState message={t('serverLifecycle.noEvents')} />
+      <PageContentLoader loading={isLoading}>
+        {!data?.data || data.data.length === 0 ? (
+          <EmptyPagePlaceholder message={t('serverLifecycle.noEvents')} />
         ) : (
-          <TableContainer>
-            <Table aria-label="server lifecycle table" size="small">
-              <TableHead sx={{ bgcolor: 'action.hover' }}>
-                <TableRow>
-                  <TableCell width="50" />
-                  {visibleColumns.map((colId) => {
-                    const col = columns.find((c) => c.id === colId);
-                    const sortField = columnToSortField[colId];
-                    const isSortable = !!sortField;
-                    const isActive = sortBy === sortField;
-                    return col ? (
-                      <TableCell key={colId} sx={{ fontWeight: 600 }}>
-                        {isSortable ? (
-                          <TableSortLabel
-                            active={isActive}
-                            direction={isActive ? sortOrder : 'desc'}
-                            onClick={() => handleSort(colId)}
-                          >
-                            {t(col.labelKey)}
-                          </TableSortLabel>
-                        ) : (
-                          t(col.labelKey)
-                        )}
-                      </TableCell>
-                    ) : null;
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.data.map((event: ServerLifecycleEvent, index: number) => (
-                  <EventRow
-                    key={event.id}
-                    event={event}
-                    visibleColumns={visibleColumns}
-                    index={index}
-                    enqueueSnackbar={enqueueSnackbar}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Paper elevation={2} sx={{ borderRadius: 2, position: 'relative' }}>
+            <TableContainer>
+              <Table aria-label="server lifecycle table" size="small">
+                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                  <TableRow>
+                    <TableCell width="50" />
+                    {visibleColumns.map((colId) => {
+                      const col = columns.find((c) => c.id === colId);
+                      const sortField = columnToSortField[colId];
+                      const isSortable = !!sortField;
+                      const isActive = sortBy === sortField;
+                      return col ? (
+                        <TableCell key={colId} sx={{ fontWeight: 600 }}>
+                          {isSortable ? (
+                            <TableSortLabel
+                              active={isActive}
+                              direction={isActive ? sortOrder : 'desc'}
+                              onClick={() => handleSort(colId)}
+                            >
+                              {t(col.labelKey)}
+                            </TableSortLabel>
+                          ) : (
+                            t(col.labelKey)
+                          )}
+                        </TableCell>
+                      ) : null;
+                    })}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.data.map((event: ServerLifecycleEvent, index: number) => (
+                    <EventRow
+                      key={event.id}
+                      event={event}
+                      visibleColumns={visibleColumns}
+                      index={index}
+                      enqueueSnackbar={enqueueSnackbar}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {data && data.data && data.data.length > 0 && (
+              <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+                <SimplePagination
+                  count={data.total}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </Box>
+            )}
+          </Paper>
         )}
-        {data && data.data && data.data.length > 0 && (
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-            <SimplePagination
-              count={data.total}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-          </Box>
-        )}
-      </Paper>
+      </PageContentLoader>
     </Box>
   );
 };

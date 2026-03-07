@@ -6,13 +6,15 @@
 import { ulid } from 'ulid';
 import { EntityLock, LockType } from '../models/EntityLock';
 import { User } from '../models/User';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('LockService');
 
 export interface LockCheckResult {
   isLocked: boolean;
   lockType?: LockType;
   lockedBy?: {
-    id: number;
+    id: string;
     name?: string;
     email?: string;
   };
@@ -24,8 +26,8 @@ export interface LockCheckResult {
 export interface AcquireLockOptions {
   entityType: string;
   entityId: string;
-  environment: string;
-  userId: number;
+  environmentId: string;
+  userId: string;
   lockType?: LockType;
   expiresInMinutes?: number;
 }
@@ -37,13 +39,13 @@ export class LockService {
   static async checkLock(
     entityType: string,
     entityId: string,
-    environment: string,
-    currentUserId?: number
+    environmentId: string,
+    currentUserId?: string
   ): Promise<LockCheckResult> {
     const lock = await EntityLock.query()
       .where('entityType', entityType)
       .where('entityId', entityId)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .withGraphFetched('user')
       .first();
 
@@ -110,7 +112,7 @@ export class LockService {
     const {
       entityType,
       entityId,
-      environment,
+      environmentId,
       userId,
       lockType = 'soft',
       expiresInMinutes = 30,
@@ -120,7 +122,7 @@ export class LockService {
     const existing = await EntityLock.query()
       .where('entityType', entityType)
       .where('entityId', entityId)
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .first();
 
     if (existing) {
@@ -155,14 +157,14 @@ export class LockService {
       id: ulid(),
       entityType,
       entityId,
-      environment,
+      environmentId,
       lockedBy: userId,
       lockType,
       expiresAt,
     });
 
     logger.info(
-      `[LockService] Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
+      `Lock acquired: ${entityType}:${entityId} by user ${userId} (${lockType})`
     );
     return lock;
   }
@@ -173,13 +175,13 @@ export class LockService {
   static async releaseLock(
     entityType: string,
     entityId: string,
-    environment: string,
-    userId?: number
+    environmentId: string,
+    userId?: string
   ): Promise<boolean> {
     let query = EntityLock.query()
       .where('entityType', entityType)
       .where('entityId', entityId)
-      .where('environment', environment);
+      .where('environmentId', environmentId);
 
     // If userId provided, only release own lock
     if (userId) {
@@ -188,7 +190,7 @@ export class LockService {
 
     const deleted = await query.delete();
     if (deleted > 0) {
-      logger.info(`[LockService] Lock released: ${entityType}:${entityId}`);
+      logger.info(`Lock released: ${entityType}:${entityId}`);
       return true;
     }
     return false;
@@ -205,7 +207,7 @@ export class LockService {
       .delete();
 
     if (deleted > 0) {
-      logger.info(`[LockService] Cleaned up ${deleted} expired locks`);
+      logger.info(`Cleaned up ${deleted} expired locks`);
     }
     return deleted;
   }
@@ -213,18 +215,18 @@ export class LockService {
   /**
    * Get all locks for a user
    */
-  static async getUserLocks(userId: number): Promise<EntityLock[]> {
+  static async getUserLocks(userId: string): Promise<EntityLock[]> {
     return await EntityLock.query().where('lockedBy', userId).orderBy('createdAt', 'desc');
   }
 
   /**
    * Release all locks for a user (e.g., on logout)
    */
-  static async releaseAllUserLocks(userId: number): Promise<number> {
+  static async releaseAllUserLocks(userId: string): Promise<number> {
     const deleted = await EntityLock.query().where('lockedBy', userId).delete();
 
     if (deleted > 0) {
-      logger.info(`[LockService] Released all locks for user ${userId}: ${deleted} locks`);
+      logger.info(`Released all locks for user ${userId}: ${deleted} locks`);
     }
     return deleted;
   }

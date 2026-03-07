@@ -1,10 +1,14 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import { GatrixError } from '../middleware/errorHandler';
 import TagAssignmentModel from './TagAssignment';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AccountWhitelist');
 
 export interface Whitelist {
-  id: number;
-  environment: string;
+  id: string;
+  environmentId: string;
   accountId: string;
   ipAddress?: string;
   startDate?: Date;
@@ -12,8 +16,8 @@ export interface Whitelist {
   purpose?: string;
   isEnabled: boolean;
   tags?: string[];
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
   createdByName?: string;
@@ -30,7 +34,7 @@ export interface CreateWhitelistData {
   purpose?: string;
   isEnabled?: boolean;
   tags?: string[];
-  createdBy: number;
+  createdBy: string;
 }
 
 export interface UpdateWhitelistData {
@@ -41,14 +45,14 @@ export interface UpdateWhitelistData {
   purpose?: string;
   tags?: string[];
   isEnabled?: boolean;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export interface WhitelistFilters {
-  environment: string;
+  environmentId: string;
   accountId?: string;
   ipAddress?: string;
-  createdBy?: number;
+  createdBy?: string;
   search?: string;
   tags?: string[];
   isEnabled?: boolean;
@@ -66,20 +70,20 @@ export class WhitelistModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    filters: WhitelistFilters = { environment: '' }
+    filters: WhitelistFilters = { environmentId: '' }
   ): Promise<WhitelistListResponse> {
     try {
       const offset = (page - 1) * limit;
-      const environment = filters.environment;
+      const environmentId = filters.environmentId;
 
       // Build base query with environment filter
       let query = db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
         .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
-        .where('w.environment', environment)
+        .where('w.environmentId', environmentId)
         .select([
           'w.id',
-          'w.environment',
+          'w.environmentId',
           'w.accountId',
           'w.ipAddress',
           'w.startDate',
@@ -150,19 +154,19 @@ export class WhitelistModel {
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      console.error('AccountWhitelist.findAll error:', error);
+      logger.error('findAll error:', error);
       throw new GatrixError('Failed to fetch whitelists', 500);
     }
   }
 
-  static async findById(id: number, environment: string): Promise<Whitelist | null> {
+  static async findById(id: string, environmentId: string): Promise<Whitelist | null> {
     try {
       const result = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
         .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
         .select([
           'w.id',
-          'w.environment',
+          'w.environmentId',
           'w.accountId',
           'w.ipAddress',
           'w.startDate',
@@ -180,7 +184,7 @@ export class WhitelistModel {
           'u.email as updatedByEmail',
         ])
         .where('w.id', id)
-        .where('w.environment', environment)
+        .where('w.environmentId', environmentId)
         .first();
 
       return result ? this.mapRowToWhitelist(result) : null;
@@ -189,10 +193,12 @@ export class WhitelistModel {
     }
   }
 
-  static async create(data: CreateWhitelistData, environment: string): Promise<Whitelist> {
+  static async create(data: CreateWhitelistData, environmentId: string): Promise<Whitelist> {
     try {
-      const [insertId] = await db('g_account_whitelist').insert({
-        environment: environment,
+      const id = generateULID();
+      await db('g_account_whitelist').insert({
+        id,
+        environmentId: environmentId,
         accountId: data.accountId,
         ipAddress: data.ipAddress || null,
         startDate: data.startDate || null,
@@ -203,7 +209,7 @@ export class WhitelistModel {
         createdBy: data.createdBy,
       });
 
-      const created = await this.findById(insertId, environment);
+      const created = await this.findById(id, environmentId);
       if (!created) {
         throw new GatrixError('Failed to create whitelist entry', 500);
       }
@@ -215,44 +221,21 @@ export class WhitelistModel {
   }
 
   static async update(
-    id: number,
+    id: string,
     data: UpdateWhitelistData,
-    environment: string
+    environmentId: string
   ): Promise<Whitelist | null> {
     try {
       const updateData: any = {};
 
-      if (data.accountId !== undefined) {
-        updateData.accountId = data.accountId;
-      }
-
-      if (data.ipAddress !== undefined) {
-        updateData.ipAddress = data.ipAddress || null;
-      }
-
-      if (data.isEnabled !== undefined) {
-        updateData.isEnabled = data.isEnabled;
-      }
-
-      if (data.startDate !== undefined) {
-        updateData.startDate = data.startDate || null;
-      }
-
-      if (data.endDate !== undefined) {
-        updateData.endDate = data.endDate || null;
-      }
-
-      if (data.purpose !== undefined) {
-        updateData.purpose = data.purpose || null;
-      }
-
-      if (data.tags !== undefined) {
-        updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
-      }
-
-      if (data.updatedBy !== undefined) {
-        updateData.updatedBy = data.updatedBy;
-      }
+      if (data.accountId !== undefined) updateData.accountId = data.accountId;
+      if (data.ipAddress !== undefined) updateData.ipAddress = data.ipAddress || null;
+      if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
+      if (data.startDate !== undefined) updateData.startDate = data.startDate || null;
+      if (data.endDate !== undefined) updateData.endDate = data.endDate || null;
+      if (data.purpose !== undefined) updateData.purpose = data.purpose || null;
+      if (data.tags !== undefined) updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
+      if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       if (Object.keys(updateData).length === 0) {
         throw new GatrixError('No fields to update', 400);
@@ -262,20 +245,20 @@ export class WhitelistModel {
 
       await db('g_account_whitelist')
         .where('id', id)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update(updateData);
 
-      return await this.findById(id, environment);
+      return await this.findById(id, environmentId);
     } catch (error) {
       throw new GatrixError('Failed to update whitelist entry', 500);
     }
   }
 
-  static async delete(id: number, environment: string): Promise<boolean> {
+  static async delete(id: string, environmentId: string): Promise<boolean> {
     try {
       const result = await db('g_account_whitelist')
         .where('id', id)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .del();
       return result > 0;
     } catch (error) {
@@ -283,14 +266,14 @@ export class WhitelistModel {
     }
   }
 
-  static async bulkCreate(entries: CreateWhitelistData[], environment: string): Promise<number> {
+  static async bulkCreate(entries: CreateWhitelistData[], environmentId: string): Promise<number> {
     try {
       if (entries.length === 0) {
         return 0;
       }
 
       const insertData = entries.map((entry) => ({
-        environment: environment,
+        environmentId: environmentId,
         accountId: entry.accountId,
         ipAddress: entry.ipAddress || null,
         startDate: entry.startDate || null,
@@ -316,8 +299,8 @@ export class WhitelistModel {
         try {
           tags = JSON.parse(row.tags);
         } catch (error) {
-          // JSON 파싱 실패 시 문자열을 배열로 변환
-          console.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
+          // JSON 파싱 Failed 시 문자열을 배열로 변환
+          logger.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
           // 쉼표로 구분된 문자열을 배열로 변환
           tags = row.tags
             .split(',')
@@ -331,7 +314,7 @@ export class WhitelistModel {
 
     return {
       id: row.id,
-      environment: row.environment,
+      environmentId: row.environmentId,
       accountId: row.accountId,
       ipAddress: row.ipAddress,
       startDate: row.startDate ? new Date(row.startDate) : undefined,
@@ -350,7 +333,7 @@ export class WhitelistModel {
     };
   }
 
-  static async findByAccountId(accountId: string, environment: string): Promise<Whitelist[]> {
+  static async findByAccountId(accountId: string, environmentId: string): Promise<Whitelist[]> {
     try {
       const rows = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
@@ -363,7 +346,7 @@ export class WhitelistModel {
           'u.email as updatedByEmail',
         ])
         .where('w.accountId', accountId)
-        .where('w.environment', environment)
+        .where('w.environmentId', environmentId)
         .orderBy('w.createdAt', 'desc');
 
       return rows.map(this.mapRowToWhitelist);
@@ -373,11 +356,11 @@ export class WhitelistModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(whitelistId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTags(whitelistId: string, tagIds: string[], createdBy?: string): Promise<void> {
     await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds, createdBy);
   }
 
-  static async getTags(whitelistId: number): Promise<any[]> {
+  static async getTags(whitelistId: string): Promise<any[]> {
     return await TagAssignmentModel.listTagsForEntity('whitelist', whitelistId);
   }
 }

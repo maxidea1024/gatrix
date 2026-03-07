@@ -1,7 +1,7 @@
 /**
  * Banner Service
  * Handles banner list and retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/banners
+ * Uses per-environment API pattern: GET /api/v1/server/banners
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
@@ -25,7 +25,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   // ==================== Abstract Method Implementations ====================
 
   protected getEndpoint(environment: string): string {
-    return `/api/v1/server/${encodeURIComponent(environment)}/banners`;
+    return `/api/v1/server/banners`;
   }
 
   protected extractItems(response: BannerListResponse): Banner[] {
@@ -62,7 +62,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    */
   async fetchById(bannerId: string, environment: string): Promise<Banner> {
     const response = await this.apiClient.get<{ banner: Banner }>(
-      `/api/v1/server/${encodeURIComponent(environment)}/banners/${bannerId}`
+      `/api/v1/server/banners/${bannerId}`
     );
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch banner');

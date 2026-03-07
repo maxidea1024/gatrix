@@ -1,12 +1,14 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BaseJob, JobExecutionResult } from './JobFactory';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('HttpRequestJob');
 import { HEADERS, HEADER_VALUES } from '../../constants/headers';
 
 export class HttpRequestJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
     try {
-      // 필수 필드 검증
+      // Validate required fields
       this.validateRequiredFields(['url', 'method']);
 
       const {
@@ -19,22 +21,22 @@ export class HttpRequestJob extends BaseJob {
         auth,
       } = this.context.jobDataMap;
 
-      // Axios 요청 설정
+      // Axios Request Settings
       const config: AxiosRequestConfig = {
         url,
         method: method.toUpperCase(),
         headers,
         timeout,
-        validateStatus: validateStatus || ((status) => status < 500), // 5xx 에러만 실패로 처리
+        validateStatus: validateStatus || ((status) => status < 500), // 5xx 에러만 Failed로 처리
       };
 
-      // 요청 본문 설정
+      // Request 본문 Settings
       if (body && ['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
         if (typeof body === 'string') {
           config.data = body;
         } else {
           config.data = body;
-          // JSON 요청인 경우 Content-Type 설정
+          // JSON Request인 경우 Content-Type Settings
           if (!headers[HEADERS.CONTENT_TYPE] && !headers['content-type']) {
             config.headers = {
               ...config.headers,
@@ -44,7 +46,7 @@ export class HttpRequestJob extends BaseJob {
         }
       }
 
-      // 인증 설정
+      // Authentication Settings
       if (auth) {
         if (auth.type === 'basic' && auth.username && auth.password) {
           config.auth = {
@@ -65,7 +67,7 @@ export class HttpRequestJob extends BaseJob {
         url: config.url,
       });
 
-      // HTTP 요청 실행
+      // HTTP Request 실행
       const response: AxiosResponse = await axios(config);
 
       logger.info(`HTTP request completed`, {
@@ -104,7 +106,7 @@ export class HttpRequestJob extends BaseJob {
           : undefined,
       });
 
-      // Axios 에러인 경우 응답 정보도 포함
+      // Axios 에러인 경우 Response 정보도 포함
       if ((error as any).response) {
         return {
           success: false,

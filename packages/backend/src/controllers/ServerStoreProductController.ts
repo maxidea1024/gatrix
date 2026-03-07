@@ -1,7 +1,9 @@
 import { Response } from 'express';
 import StoreProductService, { StoreProduct } from '../services/StoreProductService';
 import { TagService } from '../services/TagService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerStoreProductController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
@@ -52,7 +54,7 @@ function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLangua
     updatedBy: _updatedBy,
     createdAt: _createdAt,
     updatedAt: _updatedAt,
-    environment: _env,
+    environmentId: _env,
     // Remove multi-language fields
     nameKo: _nameKo,
     nameEn: _nameEn,
@@ -119,10 +121,10 @@ export class ServerStoreProductController {
    */
   static async getStoreProducts(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const lang = parseLanguage(req.query.language);
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -133,12 +135,12 @@ export class ServerStoreProductController {
       }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.STORE_PRODUCT_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const result = await StoreProductService.getStoreProducts({
-            environment: environment,
+            environmentId: environmentId,
             limit: 1000,
             page: 1,
             isActive: true,
@@ -153,7 +155,7 @@ export class ServerStoreProductController {
           );
 
           logger.info(
-            `Server SDK: Retrieved ${productsWithTags.length} store products for environment ${environment} (lang: ${lang})`
+            `Server SDK: Retrieved ${productsWithTags.length} store products for environmentId ${environmentId} (lang: ${lang})`
           );
 
           return {
@@ -185,10 +187,10 @@ export class ServerStoreProductController {
   static async getStoreProductById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
-      const environment = req.environment;
+      const environmentId = req.environmentId;
       const lang = parseLanguage(req.query.language);
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -237,7 +239,7 @@ export class ServerStoreProductController {
       const cleanProduct = stripInternalFields(product, tags, lang);
 
       logger.info(
-        `Server SDK: Retrieved store product ${id} (lang: ${lang}) for environment ${environment}`
+        `Server SDK: Retrieved store product ${id} (lang: ${lang}) for environmentId ${environmentId}`
       );
 
       res.json({

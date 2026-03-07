@@ -23,6 +23,7 @@ import JsonEditor from '@/components/common/JsonEditor';
 import ArrayEditor from '@/components/common/ArrayEditor';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface KeyValueFormDrawerProps {
   open: boolean;
@@ -50,6 +51,8 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { refresh: refreshPlatformConfig } = usePlatformConfig();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [submitting, setSubmitting] = useState(false);
   const [previousArrayElementType, setPreviousArrayElementType] = useState<
     VarValueType | undefined
@@ -165,10 +168,14 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
 
       // Check if item has id to determine edit mode (duplicated items won't have id)
       if (item?.id) {
-        await varsService.updateKV(item.varKey.replace('kv:', ''), data as UpdateVarData);
+        await varsService.updateKV(
+          projectApiPath,
+          item.varKey.replace('kv:', ''),
+          data as UpdateVarData
+        );
         enqueueSnackbar(t('settings.kv.updateSuccess'), { variant: 'success' });
       } else {
-        await varsService.createKV(data as CreateVarData);
+        await varsService.createKV(projectApiPath, data as CreateVarData);
         // Show different message for duplicate vs create
         const successMessage = isDuplicate
           ? t('settings.kv.duplicateSuccess')

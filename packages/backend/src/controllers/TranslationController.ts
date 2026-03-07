@@ -8,7 +8,7 @@ import { sleep } from '../utils/asyncUtils';
 // Ensure a minimum response time for UI update timing
 const MIN_RESPONSE_MS = 2_000;
 
-// 단일 번역 요청 스키마
+// 단일 Translation Request 스키마
 const translateSchema = Joi.object({
   text: Joi.string().required().max(5000).messages({
     'string.empty': 'Translation text is required',
@@ -20,7 +20,7 @@ const translateSchema = Joi.object({
   sourceLanguage: Joi.string().optional().default('auto'),
 });
 
-// 다중 번역 요청 스키마
+// 다중 Translation Request 스키마
 const translateMultipleSchema = Joi.object({
   text: Joi.string().required().max(5000).messages({
     'string.empty': 'Translation text is required',
@@ -38,7 +38,7 @@ const translateMultipleSchema = Joi.object({
   sourceLanguage: Joi.string().optional().default('auto'),
 });
 
-// 언어 감지 요청 스키마
+// Detect language Request 스키마
 const detectLanguageSchema = Joi.object({
   text: Joi.string().required().max(1000).messages({
     'string.empty': 'Text is required for language detection',
@@ -48,7 +48,7 @@ const detectLanguageSchema = Joi.object({
 
 export class TranslationController {
   /**
-   * 단일 언어 번역
+   * 단일 언어 Translation
    */
   static translateText = asyncHandler(async (req: Request, res: Response) => {
     const startedAt = Date.now();
@@ -72,7 +72,7 @@ export class TranslationController {
   });
 
   /**
-   * 다중 언어 번역
+   * 다중 언어 Translation
    */
   static translateToMultipleLanguages = asyncHandler(async (req: Request, res: Response) => {
     const startedAt = Date.now();
@@ -102,7 +102,7 @@ export class TranslationController {
   });
 
   /**
-   * 언어 감지
+   * Detect language
    */
   static detectLanguage = asyncHandler(async (req: Request, res: Response) => {
     const startedAt = Date.now();

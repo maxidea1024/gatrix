@@ -1,9 +1,12 @@
 import db from '../config/knex';
-import logger from '../config/logger';
+import { generateULID } from '../utils/ulid';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MessageTemplate');
 
 export interface MessageTemplateFilters {
-  environment: string;
-  createdBy?: number | number[];
+  environmentId: string;
+  createdBy?: string[];
   createdBy_operator?: 'any_of' | 'include_all';
   isEnabled?: boolean | boolean[];
   isEnabled_operator?: 'any_of' | 'include_all';
@@ -20,15 +23,15 @@ export interface MessageTemplateListResult {
 }
 
 export interface MessageTemplate {
-  id?: number;
-  environment: string;
+  id?: string;
+  environmentId: string;
   name: string;
   type: string;
   isEnabled: boolean;
   supportsMultiLanguage: boolean;
   defaultMessage: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -38,28 +41,28 @@ export class MessageTemplateModel {
     filters: MessageTemplateFilters
   ): Promise<MessageTemplateListResult> {
     try {
-      // 기본값 설정
+      // Set default values
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
-      const environment = filters.environment;
+      const environmentId = filters.environmentId;
 
       logger.debug('🔍 MessageTemplate query filters:', { filters });
 
-      // 테스트: 테이블에 데이터가 있는지 확인
+      // 테스트: 테이블에 데이터가 있는지 Confirm
       const testCount = await db('g_message_templates')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .count('* as count')
         .first();
       logger.debug('🔍 Total records in g_message_templates:', { testCount });
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_message_templates as mt')
           .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
-          .where('mt.environment', environment);
+          .where('mt.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
         // Handle createdBy filter (single or multiple)
         if (filters?.createdBy !== undefined) {
@@ -101,7 +104,7 @@ export class MessageTemplateModel {
           });
         }
 
-        // 태그 필터 처리
+        // 태그 Filter 처리
         if (filters?.tags && filters.tags.length > 0) {
           const operator = filters.tags_operator || 'include_all';
 
@@ -131,10 +134,10 @@ export class MessageTemplateModel {
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('mt.id as total').first();
 
-      // Data 쿼리
+      // Data Query
       const dataQuery = applyFilters(baseQuery())
         .select(['mt.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .orderBy('mt.createdAt', 'desc')
@@ -180,14 +183,14 @@ export class MessageTemplateModel {
     }
   }
 
-  static async findById(id: number, environment: string): Promise<any | null> {
+  static async findById(id: string, environmentId: string): Promise<any | null> {
     try {
       const template = await db('g_message_templates as mt')
         .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
         .select(['mt.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .where('mt.id', id)
-        .where('mt.environment', environment)
+        .where('mt.environmentId', environmentId)
         .first();
 
       if (!template) {
@@ -211,12 +214,14 @@ export class MessageTemplateModel {
     }
   }
 
-  static async create(data: any, environment: string): Promise<any> {
+  static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
-        // 메시지 템플릿 생성
-        const [insertId] = await trx('g_message_templates').insert({
-          environment: environment,
+        // 메시지 템플릿 Create
+        const id = generateULID();
+        await trx('g_message_templates').insert({
+          id,
+          environmentId: environmentId,
           name: data.name,
           type: data.type,
           defaultMessage: data.defaultMessage || data.default_message || data.content || '',
@@ -237,7 +242,7 @@ export class MessageTemplateModel {
         // 언어별 메시지 처리
         if (data.locales && data.locales.length > 0) {
           const localeInserts = data.locales.map((locale: any) => ({
-            templateId: insertId,
+            templateId: id,
             lang: locale.lang,
             message: locale.message,
             createdBy: data.createdBy || data.created_by,
@@ -249,12 +254,12 @@ export class MessageTemplateModel {
           await trx('g_message_template_locales').insert(localeInserts);
         }
 
-        const created = await this.findById(insertId, environment);
+        const created = await this.findById(id, environmentId);
 
         if (!created) {
           // 직접 ID와 기본 정보를 반환
           return {
-            id: insertId,
+            id: id,
             name: data.name,
             type: data.type,
             defaultMessage: data.defaultMessage || data.default_message || data.content || '',
@@ -276,13 +281,13 @@ export class MessageTemplateModel {
     }
   }
 
-  static async update(id: number, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 업데이트
         await trx('g_message_templates')
           .where('id', id)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .update({
             name: data.name,
             type: data.type,
@@ -294,10 +299,10 @@ export class MessageTemplateModel {
             updatedAt: new Date(),
           });
 
-        // 기존 언어별 메시지 삭제
+        // Existing 언어별 메시지 Delete
         await trx('g_message_template_locales').where('templateId', id).del();
 
-        // 새로운 언어별 메시지 추가
+        // New 언어별 메시지 추가
         if (data.locales && data.locales.length > 0) {
           const localeInserts = data.locales.map((locale: any) => ({
             templateId: id,
@@ -312,7 +317,7 @@ export class MessageTemplateModel {
           await trx('g_message_template_locales').insert(localeInserts);
         }
 
-        return await this.findById(id, environment);
+        return await this.findById(id, environmentId);
       });
     } catch (error) {
       logger.error('Error updating message template:', error);
@@ -320,9 +325,9 @@ export class MessageTemplateModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_message_templates').where('id', id).where('environment', environment).del();
+      await db('g_message_templates').where('id', id).where('environmentId', environmentId).del();
     } catch (error) {
       logger.error('Error deleting message template:', error);
       throw error;
@@ -330,7 +335,7 @@ export class MessageTemplateModel {
   }
 
   // 추가 메서드들
-  static async findByName(name: string, excludeId?: number): Promise<any | null> {
+  static async findByName(name: string, excludeId?: string): Promise<any | null> {
     try {
       let query = db('g_message_templates').where('name', name);
 
@@ -346,10 +351,10 @@ export class MessageTemplateModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(templateId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTags(templateId: string, tagIds: string[], createdBy?: string): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments')
           .where('entityType', 'message_template')
           .where('entityId', templateId)
@@ -361,7 +366,7 @@ export class MessageTemplateModel {
             entityType: 'message_template',
             entityId: templateId,
             tagId: tagId,
-            createdBy: createdBy || 1,
+            createdBy: createdBy || '',
             createdAt: new Date(),
           }));
           await trx('g_tag_assignments').insert(assignments);
@@ -373,7 +378,7 @@ export class MessageTemplateModel {
     }
   }
 
-  static async getTags(templateId: number): Promise<any[]> {
+  static async getTags(templateId: string): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')

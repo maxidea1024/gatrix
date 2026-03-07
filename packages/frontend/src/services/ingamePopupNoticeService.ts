@@ -22,6 +22,9 @@ export interface IngamePopupNotice {
   messageTemplateId: number | null;
   useTemplate: boolean;
   description: string | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
   createdAt: string;
   updatedAt: string;
   createdBy: number;
@@ -76,6 +79,7 @@ class IngamePopupNoticeService {
    * Get ingame popup notices with pagination and filters
    */
   async getIngamePopupNotices(
+    projectApiPath: string,
     page: number = 1,
     limit: number = 10,
     filters: IngamePopupNoticeFilters = {}
@@ -112,15 +116,15 @@ class IngamePopupNoticeService {
       params.search = filters.search;
     }
 
-    const response = await api.get('/admin/ingame-popup-notices', { params });
+    const response = await api.get(`${projectApiPath}/ingame-popup-notices`, { params });
     return response.data;
   }
 
   /**
    * Get ingame popup notice by ID
    */
-  async getIngamePopupNoticeById(id: number): Promise<IngamePopupNotice> {
-    const response = await api.get(`/admin/ingame-popup-notices/${id}`);
+  async getIngamePopupNoticeById(projectApiPath: string, id: number): Promise<IngamePopupNotice> {
+    const response = await api.get(`${projectApiPath}/ingame-popup-notices/${id}`);
     return response.data.notice;
   }
 
@@ -128,9 +132,10 @@ class IngamePopupNoticeService {
    * Create ingame popup notice
    */
   async createIngamePopupNotice(
+    projectApiPath: string,
     data: CreateIngamePopupNoticeData
   ): Promise<IngamePopupNoticeMutationResult> {
-    const response = await api.post('/admin/ingame-popup-notices', data);
+    const response = await api.post(`${projectApiPath}/ingame-popup-notices`, data);
     return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
   }
 
@@ -138,26 +143,30 @@ class IngamePopupNoticeService {
    * Update ingame popup notice
    */
   async updateIngamePopupNotice(
+    projectApiPath: string,
     id: number,
     data: UpdateIngamePopupNoticeData
   ): Promise<IngamePopupNoticeMutationResult> {
-    const response = await api.put(`/admin/ingame-popup-notices/${id}`, data);
+    const response = await api.put(`${projectApiPath}/ingame-popup-notices/${id}`, data);
     return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
   }
 
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(id: number): Promise<MutationResult<void>> {
-    const response = await api.delete(`/admin/ingame-popup-notices/${id}`);
+  async deleteIngamePopupNotice(projectApiPath: string, id: number): Promise<MutationResult<void>> {
+    const response = await api.delete(`${projectApiPath}/ingame-popup-notices/${id}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Delete multiple ingame popup notices
    */
-  async deleteMultipleIngamePopupNotices(ids: number[]): Promise<MutationResult<void>> {
-    const response = await api.post('/admin/ingame-popup-notices/bulk-delete', {
+  async deleteMultipleIngamePopupNotices(
+    projectApiPath: string,
+    ids: number[]
+  ): Promise<MutationResult<void>> {
+    const response = await api.post(`${projectApiPath}/ingame-popup-notices/bulk-delete`, {
       ids,
     });
     return parseChangeRequestResponse<void>(response, () => undefined);
@@ -166,8 +175,8 @@ class IngamePopupNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: number): Promise<IngamePopupNoticeMutationResult> {
-    const response = await api.patch(`/admin/ingame-popup-notices/${id}/toggle-active`);
+  async toggleActive(projectApiPath: string, id: number): Promise<IngamePopupNoticeMutationResult> {
+    const response = await api.patch(`${projectApiPath}/ingame-popup-notices/${id}/toggle-active`);
     return parseChangeRequestResponse<IngamePopupNotice>(response, (r) => r?.notice);
   }
 }

@@ -2,8 +2,8 @@ import { Model } from 'objection';
 import { convertToMySQLDateTime } from '../utils/dateUtils';
 
 export interface ServerLifecycleEventData {
-  id?: number;
-  environment: string;
+  id?: string;
+  environmentId: string;
   instanceId: string;
   serviceType: string;
   serviceGroup?: string;
@@ -31,8 +31,8 @@ export interface ServerLifecycleEventData {
 export class ServerLifecycleEvent extends Model implements ServerLifecycleEventData {
   static tableName = 'g_server_lifecycle_events';
 
-  id?: number;
-  environment!: string;
+  id?: string;
+  environmentId!: string;
   instanceId!: string;
   serviceType!: string;
   serviceGroup?: string;
@@ -59,10 +59,10 @@ export class ServerLifecycleEvent extends Model implements ServerLifecycleEventD
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environment', 'instanceId', 'serviceType', 'eventType', 'instanceStatus'],
+      required: ['environmentId', 'instanceId', 'serviceType', 'eventType', 'instanceStatus'],
       properties: {
         id: { type: 'integer' },
-        environment: { type: 'string', minLength: 1, maxLength: 127 },
+        environmentId: { type: 'string', minLength: 1, maxLength: 127 },
         instanceId: { type: 'string', minLength: 1, maxLength: 127 },
         serviceType: { type: 'string', minLength: 1, maxLength: 63 },
         serviceGroup: { type: 'string', maxLength: 63 },

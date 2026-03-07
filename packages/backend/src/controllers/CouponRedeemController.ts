@@ -23,13 +23,13 @@ export class CouponRedeemController {
    */
   static redeem = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const { code } = req.params;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!code) {
       throw new GatrixError('Coupon code is required', 400);
     }
 
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment is required', 400);
     }
 
@@ -40,7 +40,7 @@ export class CouponRedeemController {
     }
 
     // Redeem coupon
-    const result = await CouponRedeemService.redeemCoupon(code, value, environment);
+    const result = await CouponRedeemService.redeemCoupon(code, value, environmentId);
 
     res.json({
       success: true,

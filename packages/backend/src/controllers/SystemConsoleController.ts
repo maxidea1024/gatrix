@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { consoleService } from '../services/ConsoleService';
 import { pubSubService } from '../services/PubSubService';
 import { AuditLogModel } from '../models/AuditLog';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('SystemConsoleController');
 
 export class SystemConsoleController {
   static async listCommands(req: Request, res: Response) {
@@ -50,8 +52,7 @@ export class SystemConsoleController {
       });
     } catch (err) {
       // Non-fatal: logging only
-      // eslint-disable-next-line no-console
-      console.error('Failed to publish console_output notification:', err);
+      logger.error('Failed to publish console_output notification:', err);
     }
 
     return res.json({ success: true, output: result.output });

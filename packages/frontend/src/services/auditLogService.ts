@@ -57,17 +57,14 @@ export class AuditLogService {
       }
     });
 
-    const response = await apiService.get<{
-      success: boolean;
-      data: AuditLogListResponse;
-    }>(`${this.BASE_URL}?${params}`);
+    const response = await apiService.get<any>(`${this.BASE_URL}?${params}`);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
-    // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
+    // ApiService.request() already returns response.data
+    // response is the { success: true, data: {...} } structure sent from backend
     if (response?.success && response?.data) {
       return response.data;
     }
-    // 응답이 올바르지 않은 경우 기본값 반환
+    // Return default value if response is invalid
     return {
       logs: [],
       total: 0,
@@ -89,13 +86,10 @@ export class AuditLogService {
       params.append('end_date', endDate);
     }
 
-    const response = await apiService.get<{
-      success: boolean;
-      data: AuditLogStats[];
-    }>(`${this.BASE_URL}/stats?${params}`);
+    const response = await apiService.get<any>(`${this.BASE_URL}/stats?${params}`);
 
-    if (response.data?.success && response.data?.data) {
-      return response.data.data;
+    if (response?.success && response?.data) {
+      return response.data;
     }
 
     return [];

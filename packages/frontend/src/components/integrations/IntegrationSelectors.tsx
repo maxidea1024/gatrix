@@ -260,7 +260,7 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
 interface EnvironmentSelectorProps {
   selectedEnvironments: string[];
   onChange: (environments: string[]) => void;
-  environments: { environment: string; displayName?: string }[];
+  environments: { environmentId: string; displayName?: string }[];
 }
 
 /**
@@ -286,14 +286,14 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
       {/* Environment chips as tags */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
         {environments.map((env) => {
-          const isSelected = selectedEnvironments.includes(env.environment);
+          const isSelected = selectedEnvironments.includes(env.environmentId);
           return (
             <Chip
-              key={env.environment}
-              label={env.displayName || env.environment}
+              key={env.environmentId}
+              label={env.displayName || env.environmentId}
               color={isSelected ? 'primary' : 'default'}
               variant={isSelected ? 'filled' : 'outlined'}
-              onClick={() => handleToggle(env.environment)}
+              onClick={() => handleToggle(env.environmentId)}
               sx={{
                 cursor: 'pointer',
                 transition: 'all 0.2s',

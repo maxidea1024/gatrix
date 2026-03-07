@@ -1,7 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { sdkManager } from '../services/sdkManager';
-import logger from '../config/logger';
-import { cacheHitsTotal, cacheMissesTotal } from '../services/edgeMetrics';
+import { sdkManager } from '../services/sdk-manager';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PublicRoute');
+import { cacheHitsTotal, cacheMissesTotal } from '../services/edge-metrics';
 
 const router = Router();
 
@@ -45,44 +47,6 @@ function getSDKOrError(res: Response): ReturnType<typeof sdkManager.getSDK> | nu
 // Public Routes (No Authentication Required)
 // ============================================================================
 
-/**
- * @openapi
- * /public/{environment}/service-notices:
- *   get:
- *     tags: [EdgePublic]
- *     summary: Get public service notices
- *     description: Returns list of active service notices. No authentication required.
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *       - in: query
- *         name: platform
- *         schema: { type: string }
- *         description: Platform filter (e.g., 'android', 'ios')
- *       - in: query
- *         name: limit
- *         schema: { type: integer, default: 100 }
- *         description: Maximum number of notices to return
- *     responses:
- *       200:
- *         description: List of service notices
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   type: object
- *                   properties:
- *                     notices:
- *                       type: array
- *                       items: { $ref: '#/components/schemas/ServiceNotice' }
- *                     total: { type: integer, example: 3 }
- */
 router.get('/:environment/service-notices', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
@@ -153,30 +117,6 @@ router.get('/:environment/service-notices', async (req: Request, res: Response) 
   }
 });
 
-/**
- * @openapi
- * /public/{environment}/service-notices/{noticeId}:
- *   get:
- *     tags: [EdgePublic]
- *     summary: Get single service notice detail
- *     description: Returns full content of a specific service notice. No authentication required.
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *       - in: path
- *         name: noticeId
- *         required: true
- *         schema: { type: integer }
- *         description: Notice ID
- *     responses:
- *       200:
- *         description: Service notice detail
- *       404:
- *         description: Notice not found
- */
 router.get('/:environment/service-notices/:noticeId', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);

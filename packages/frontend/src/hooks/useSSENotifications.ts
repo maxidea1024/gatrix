@@ -17,7 +17,7 @@ export interface SSEOptions {
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
   onEvent?: (event: SSEEvent) => void;
-  skipInvitationNotifications?: boolean; // 초대링크 알림 스킵 옵션
+  skipInvitationNotifications?: boolean; // 초대링크 Notification 스킵 옵션
 }
 
 export const useSSENotifications = (options: SSEOptions = {}) => {
@@ -50,7 +50,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const onDisconnectRef = useRef<typeof onDisconnect>();
   const onErrorRef = useRef<typeof onError>();
   const onEventRef = useRef<typeof onEvent>();
-  const connectRef = useRef<() => void>(() => { });
+  const connectRef = useRef<() => void>(() => {});
   const isConnectingRef = useRef(false);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         setIsConnected(true);
         setConnectionStatus('connected');
         reconnectAttemptsRef.current = 0;
-        maxReconnectReachedRef.current = false; // 연결 성공 시 플래그 리셋
+        maxReconnectReachedRef.current = false; // 연결 Success 시 플래그 리셋
         isConnectingRef.current = false;
         onConnectRef.current?.();
       };
@@ -204,7 +204,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     reconnectAttemptsRef.current++;
 
     reconnectTimeoutRef.current = setTimeout(() => {
-      // 재연결 시도 전에 기존 연결 정리 (disconnect 함수 사용하지 않음 - 플래그 리셋 방지)
+      // 재연결 시도 전에 Existing 연결 Cleanup (disconnect 함수 Used하지 않음 - 플래그 리셋 방지)
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
         eventSourceRef.current = null;
@@ -311,9 +311,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         case 'release_flow.plan_resumed':
         case 'release_flow.plan_completed':
           // Dispatch custom event for release flow updates
-          window.dispatchEvent(
-            new CustomEvent('release-flow-updated', { detail: event.data })
-          );
+          window.dispatchEvent(new CustomEvent('release-flow-updated', { detail: event.data }));
           break;
 
         default:

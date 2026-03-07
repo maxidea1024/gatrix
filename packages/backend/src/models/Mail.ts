@@ -1,3 +1,4 @@
+import { generateULID } from '../utils/ulid';
 import { Model } from 'objection';
 
 export interface MailData {
@@ -9,10 +10,10 @@ export type MailPriority = 'low' | 'normal' | 'high' | 'urgent';
 export type ContentType = 'text' | 'html';
 
 export interface Mail {
-  id: number;
-  senderId: number | null;
+  id: string;
+  senderId: string | null;
   senderName: string | null;
-  recipientId: number;
+  recipientId: string;
   subject: string;
   content: string;
   contentType: ContentType;
@@ -30,10 +31,10 @@ export interface Mail {
 }
 
 export class MailModel extends Model {
-  id!: number;
-  senderId!: number | null;
+  id!: string;
+  senderId!: string | null;
   senderName!: string | null;
-  recipientId!: number;
+  recipientId!: string;
   subject!: string;
   content!: string;
   contentType!: ContentType;
@@ -58,10 +59,10 @@ export class MailModel extends Model {
       type: 'object',
       required: ['recipientId', 'subject', 'content'],
       properties: {
-        id: { type: 'integer' },
-        senderId: { type: ['integer', 'null'] },
+        id: { type: 'string' },
+        senderId: { type: ['string', 'null'] },
         senderName: { type: ['string', 'null'], maxLength: 255 },
-        recipientId: { type: 'integer' },
+        recipientId: { type: 'string' },
         subject: { type: 'string', maxLength: 500 },
         content: { type: 'string' },
         contentType: { type: 'string', enum: ['text', 'html'] },
@@ -79,7 +80,7 @@ export class MailModel extends Model {
   }
 
   // Get unread count for a user
-  static async getUnreadCount(userId: number): Promise<number> {
+  static async getUnreadCount(userId: string): Promise<number> {
     const result = await this.query()
       .where('recipientId', userId)
       .where('isRead', false)
@@ -92,7 +93,7 @@ export class MailModel extends Model {
 
   // Get sent mails for a user
   static async getSentMailsForUser(
-    userId: number,
+    userId: string,
     options: {
       page?: number;
       limit?: number;
@@ -124,7 +125,7 @@ export class MailModel extends Model {
 
   // Get mails for a user with filters
   static async getMailsForUser(
-    userId: number,
+    userId: string,
     options: {
       isRead?: boolean;
       isStarred?: boolean;
@@ -174,7 +175,7 @@ export class MailModel extends Model {
   }
 
   // Mark mail as read
-  static async markAsRead(mailId: number, userId: number): Promise<boolean> {
+  static async markAsRead(mailId: string, userId: string): Promise<boolean> {
     const now = new Date();
     const result = await this.query()
       .patch({
@@ -189,7 +190,7 @@ export class MailModel extends Model {
   }
 
   // Mark multiple mails as read
-  static async markMultipleAsRead(mailIds: number[], userId: number): Promise<number> {
+  static async markMultipleAsRead(mailIds: string[], userId: string): Promise<number> {
     const now = new Date();
     const result = await this.query()
       .patch({
@@ -204,7 +205,7 @@ export class MailModel extends Model {
   }
 
   // Mark all unread mails as read (with optional filters)
-  static async markAllAsRead(userId: number, filters: any = {}): Promise<number> {
+  static async markAllAsRead(userId: string, filters: any = {}): Promise<number> {
     const now = new Date();
     const query = this.query()
       .patch({
@@ -225,7 +226,7 @@ export class MailModel extends Model {
   }
 
   // Toggle starred status
-  static async toggleStarred(mailId: number, userId: number): Promise<boolean> {
+  static async toggleStarred(mailId: string, userId: string): Promise<boolean> {
     const mail = await this.query()
       .findById(mailId)
       .where('recipientId', userId)
@@ -241,7 +242,7 @@ export class MailModel extends Model {
   }
 
   // Soft delete mail
-  static async softDelete(mailId: number, userId: number): Promise<boolean> {
+  static async softDelete(mailId: string, userId: string): Promise<boolean> {
     const now = new Date();
     const result = await this.query()
       .patch({
@@ -255,7 +256,7 @@ export class MailModel extends Model {
   }
 
   // Delete multiple mails
-  static async deleteMultiple(mailIds: number[], userId: number): Promise<number> {
+  static async deleteMultiple(mailIds: string[], userId: string): Promise<number> {
     const now = new Date();
     const result = await this.query()
       .patch({
@@ -269,7 +270,7 @@ export class MailModel extends Model {
   }
 
   // Delete all mails (with optional filters)
-  static async deleteAllMails(userId: number, filters: any = {}): Promise<number> {
+  static async deleteAllMails(userId: string, filters: any = {}): Promise<number> {
     const now = new Date();
     const query = this.query()
       .patch({
@@ -293,9 +294,9 @@ export class MailModel extends Model {
 
   // Send mail (create new mail)
   static async sendMail(mailData: {
-    senderId?: number | null;
+    senderId?: string | null;
     senderName?: string | null;
-    recipientId: number;
+    recipientId: string;
     subject: string;
     content: string;
     contentType?: ContentType;
@@ -305,6 +306,7 @@ export class MailModel extends Model {
     mailData?: MailData | null;
   }): Promise<MailModel> {
     const mail = await this.query().insert({
+      id: generateULID(),
       senderId: mailData.senderId || null,
       senderName: mailData.senderName || null,
       recipientId: mailData.recipientId,
@@ -325,7 +327,7 @@ export class MailModel extends Model {
 
   // Send system mail (helper function)
   static async sendSystemMail(
-    recipientId: number,
+    recipientId: string,
     subject: string,
     content: string,
     options: {

@@ -17,6 +17,7 @@ import planningDataService, {
   RewardTypeInfo,
   RewardItem,
 } from '../../services/planningDataService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 export interface RewardSelection {
   rewardType: string;
@@ -43,6 +44,8 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [rewardTypes, setRewardTypes] = useState<RewardTypeInfo[]>([]);
@@ -54,7 +57,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   const loadRewardTypes = useCallback(async () => {
     try {
       setLoadingTypes(true);
-      const types = await planningDataService.getRewardTypeList();
+      const types = await planningDataService.getRewardTypeList(projectApiPath);
       setRewardTypes(types);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('planningData.errors.loadRewardTypesFailed'), {
@@ -81,7 +84,11 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           };
           const language = languageMap[i18n.language] || 'kr';
 
-          const itemList = await planningDataService.getRewardTypeItems(rewardType, language);
+          const itemList = await planningDataService.getRewardTypeItems(
+            projectApiPath,
+            rewardType,
+            language
+          );
           console.log(
             '[RewardItemSelector] Loaded items with language:',
             language,

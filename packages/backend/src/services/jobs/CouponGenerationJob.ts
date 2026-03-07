@@ -1,7 +1,9 @@
 import { Job } from 'bullmq';
 import { ulid } from 'ulid';
 import database from '../../config/database';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('CouponGenerationJob');
 import { RowDataPacket } from 'mysql2/promise';
 import { generateCouponCode, CodePattern } from '../../utils/couponCodeGenerator';
 
@@ -85,9 +87,9 @@ export class CouponGenerationJob {
         [settingId]
       );
       const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
-      const environment = settings[0]?.environment;
+      const environmentId = settings[0]?.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         throw new Error('Setting not found or missing environment');
       }
 
@@ -100,7 +102,7 @@ export class CouponGenerationJob {
         settingId,
         quantity,
         codePattern,
-        environment,
+        environmentId,
       });
 
       for (let i = 0; i < quantity; i += this.BATCH_SIZE) {
@@ -143,15 +145,15 @@ export class CouponGenerationJob {
           }
 
           localSet.add(code!);
-          batchCodes.push([ulid(), settingId, code!, environment]);
+          batchCodes.push([ulid(), settingId, code!, environmentId]);
         }
 
         // Insert batch immediately (streaming approach)
         if (batchCodes.length > 0) {
           const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
           await pool.execute(
-            `INSERT INTO g_coupons (id, settingId, code, environment) VALUES ${placeholders}`,
-            batchCodes.flat()
+            `INSERT INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
+            batchCodes.flat() as string[]
           );
 
           totalGenerated += batchCodes.length;
@@ -196,7 +198,7 @@ export class CouponGenerationJob {
       try {
         await pool.execute(
           'UPDATE g_coupon_settings SET generationStatus = ?, generationJobId = NULL WHERE id = ?',
-          ['FAILED', settingId]
+          ['FAILED', settingId ?? null]
         );
       } catch (updateError) {
         logger.error('Failed to update coupon status to FAILED', {

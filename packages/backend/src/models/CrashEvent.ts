@@ -7,7 +7,7 @@ import { generateULID } from '../utils/ulid';
  * Represents an individual crash occurrence
  */
 export class CrashEvent extends Model {
-  static tableName = 'crash_events';
+  static tableName = 'g_crash_events';
 
   id!: string; // ULID
   crashId!: string; // Reference to crashes.id
@@ -16,7 +16,7 @@ export class CrashEvent extends Model {
   platform!: string; // Platform
   marketType?: string; // Market type
   branch!: string; // Branch name
-  environment!: string; // Environment
+  environmentId!: string; // Environment
   isEditor!: boolean; // Whether crash occurred in editor
 
   appVersion?: string; // App version (semver format)
@@ -39,7 +39,7 @@ export class CrashEvent extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['id', 'crashId', 'platform', 'branch', 'environment'],
+      required: ['id', 'crashId', 'platform', 'branch', 'environmentId'],
       properties: {
         id: { type: 'string', maxLength: 26 }, // ULID
         crashId: { type: 'string', maxLength: 26 }, // ULID
@@ -47,7 +47,7 @@ export class CrashEvent extends Model {
         platform: { type: 'string', maxLength: 50 },
         marketType: { type: ['string', 'null'], maxLength: 50 },
         branch: { type: 'string', maxLength: 50 },
-        environment: { type: 'string', maxLength: 50 },
+        environmentId: { type: 'string', maxLength: 50 },
         isEditor: { type: 'boolean', default: false },
         appVersion: { type: ['string', 'null'], maxLength: 50 },
         resVersion: { type: ['string', 'null'], maxLength: 50 },
@@ -94,7 +94,7 @@ export class CrashEvent extends Model {
     platform: string;
     marketType?: string;
     branch: string;
-    environment: string;
+    environmentId: string;
     isEditor?: boolean;
     appVersion?: string;
     resVersion?: string;
@@ -166,9 +166,9 @@ export class CrashEvent extends Model {
   static async getEnvironmentStats(crashId: string) {
     return await this.query()
       .where('crashId', crashId)
-      .select('environment')
+      .select('environmentId')
       .count('* as count')
-      .groupBy('environment')
+      .groupBy('environmentId')
       .orderBy('count', 'desc');
   }
 

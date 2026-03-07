@@ -1,6 +1,5 @@
 import api from './api';
 
-// Types
 export interface SignalEndpoint {
   id: number;
   name: string;
@@ -33,61 +32,70 @@ export interface Signal {
 }
 
 class SignalEndpointService {
-  async getAll(): Promise<SignalEndpoint[]> {
-    const response = await api.get('/admin/signal-endpoints');
+  async getAll(projectApiPath: string): Promise<SignalEndpoint[]> {
+    const response = await api.get(`${projectApiPath}/signal-endpoints`);
     return response.data;
   }
 
-  async getById(id: number): Promise<SignalEndpoint> {
-    const response = await api.get(`/admin/signal-endpoints/${id}`);
+  async getById(projectApiPath: string, id: number): Promise<SignalEndpoint> {
+    const response = await api.get(`${projectApiPath}/signal-endpoints/${id}`);
     return response.data;
   }
 
-  async create(data: { name: string; description?: string }): Promise<SignalEndpoint> {
-    const response = await api.post('/admin/signal-endpoints', data);
+  async create(
+    projectApiPath: string,
+    data: { name: string; description?: string }
+  ): Promise<SignalEndpoint> {
+    const response = await api.post(`${projectApiPath}/signal-endpoints`, data);
     return response.data;
   }
 
   async update(
+    projectApiPath: string,
     id: number,
     data: { name?: string; description?: string; isEnabled?: boolean }
   ): Promise<SignalEndpoint> {
-    const response = await api.put(`/admin/signal-endpoints/${id}`, data);
+    const response = await api.put(`${projectApiPath}/signal-endpoints/${id}`, data);
     return response.data;
   }
 
-  async delete(id: number): Promise<void> {
-    await api.delete(`/admin/signal-endpoints/${id}`);
+  async delete(projectApiPath: string, id: number): Promise<void> {
+    await api.delete(`${projectApiPath}/signal-endpoints/${id}`);
   }
 
-  async toggle(id: number): Promise<SignalEndpoint> {
-    const response = await api.post(`/admin/signal-endpoints/${id}/toggle`);
+  async toggle(projectApiPath: string, id: number): Promise<SignalEndpoint> {
+    const response = await api.post(`${projectApiPath}/signal-endpoints/${id}/toggle`);
     return response.data;
   }
 
   async createToken(
+    projectApiPath: string,
     endpointId: number,
     data: { name: string }
   ): Promise<SignalEndpointToken & { secret: string }> {
-    const response = await api.post(`/admin/signal-endpoints/${endpointId}/tokens`, data);
+    const response = await api.post(
+      `${projectApiPath}/signal-endpoints/${endpointId}/tokens`,
+      data
+    );
     return response.data;
   }
 
-  async deleteToken(endpointId: number, tokenId: number): Promise<void> {
-    await api.delete(`/admin/signal-endpoints/${endpointId}/tokens/${tokenId}`);
+  async deleteToken(projectApiPath: string, endpointId: number, tokenId: number): Promise<void> {
+    await api.delete(`${projectApiPath}/signal-endpoints/${endpointId}/tokens/${tokenId}`);
   }
 
   async getSignals(
+    projectApiPath: string,
     endpointId: number,
     limit = 50,
     offset = 0
   ): Promise<{ data: Signal[]; pagination: { total: number; limit: number; offset: number } }> {
-    const response = await api.get(`/admin/signal-endpoints/${endpointId}/signals`, {
+    const response = await api.get(`${projectApiPath}/signal-endpoints/${endpointId}/signals`, {
       params: { limit, offset },
     });
     return {
       data: response.data,
-      pagination: (response as Record<string, unknown>).pagination as {
+      pagination: (response as any).pagination as {
         total: number;
         limit: number;
         offset: number;

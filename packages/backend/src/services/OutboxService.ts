@@ -8,7 +8,9 @@
 import { Transaction } from 'objection';
 import { ulid } from 'ulid';
 import { OutboxEvent, OutboxEventType, OUTBOX_EVENT_TYPES } from '../models/OutboxEvent';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('OutboxService');
 import { pubSubService } from './PubSubService';
 import knex from '../config/knex';
 
@@ -37,7 +39,7 @@ export class OutboxService {
     });
 
     logger.debug(
-      `[OutboxService] Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`
+      `Event recorded: ${data.entityType}:${data.entityId} (${data.eventType})`
     );
     return event;
   }
@@ -102,7 +104,7 @@ export class OutboxService {
       // Skip if created and then deleted (no net change)
       if (entity.wasCreated && entity.wasDeleted) {
         logger.debug(
-          `[OutboxService] Pruned event: ${entity.entityType}:${entity.entityId} (created then deleted)`
+          `Pruned event: ${entity.entityType}:${entity.entityId} (created then deleted)`
         );
         continue;
       }
@@ -113,7 +115,7 @@ export class OutboxService {
           JSON.stringify(entity.originalBefore) !== JSON.stringify(entity.finalAfter);
         if (!hasChange) {
           logger.debug(
-            `[OutboxService] Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`
+            `Pruned event: ${entity.entityType}:${entity.entityId} (no net change)`
           );
           continue;
         }
@@ -147,7 +149,7 @@ export class OutboxService {
     }
 
     logger.info(
-      `[OutboxService] Recorded ${events.length} events for CR ${changeRequestId} (pruned ${changes.length - events.length})`
+      `Recorded ${events.length} events for CR ${changeRequestId} (pruned ${changes.length - events.length})`
     );
     return events;
   }
@@ -179,7 +181,7 @@ export class OutboxService {
         });
 
         processed++;
-        logger.debug(`[OutboxService] Processed event ${event.id}`);
+        logger.debug(`Processed event ${event.id}`);
       } catch (error: any) {
         // Mark as failed with retry
         const newRetryCount = event.retryCount + 1;
@@ -192,7 +194,7 @@ export class OutboxService {
             errorMessage: error.message,
           });
           logger.error(
-            `[OutboxService] Event ${event.id} failed after ${maxRetries} retries:`,
+            `Event ${event.id} failed after ${maxRetries} retries:`,
             error
           );
         } else {
@@ -202,7 +204,7 @@ export class OutboxService {
             errorMessage: error.message,
           });
           logger.warn(
-            `[OutboxService] Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`
+            `Event ${event.id} failed, will retry (${newRetryCount}/${maxRetries})`
           );
         }
       }
@@ -242,7 +244,7 @@ export class OutboxService {
       },
     });
 
-    logger.debug(`[OutboxService] Published event: ${eventName}`);
+    logger.debug(`Published event: ${eventName}`);
   }
 
   /**
@@ -259,7 +261,7 @@ export class OutboxService {
       .delete();
 
     if (deleted > 0) {
-      logger.info(`[OutboxService] Cleaned up ${deleted} old events`);
+      logger.info(`Cleaned up ${deleted} old events`);
     }
     return deleted;
   }

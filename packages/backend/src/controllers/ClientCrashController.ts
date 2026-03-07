@@ -6,7 +6,9 @@ import { CrashUploadRequest, CrashState, CRASH_CONSTANTS } from '../types/crash'
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientCrashController');
 import { cacheService } from '../services/CacheService';
 import { isGreaterThan } from '../utils/semver';
 import { generateULID } from '../utils/ulid';
@@ -20,9 +22,9 @@ export class ClientCrashController {
     const body: CrashUploadRequest = req.body;
 
     // Validate required fields
-    if (!body.platform || !body.branch || !body.environment || !body.stack) {
+    if (!body.platform || !body.branch || !body.environmentId || !body.stack) {
       throw new GatrixError(
-        'Bad request body: Missing required fields (platform, branch, environment, stack)',
+        'Bad request body: Missing required fields (platform, branch, environmentId, stack)',
         400
       );
     }
@@ -75,7 +77,7 @@ export class ClientCrashController {
           id: newCrashId,
           chash,
           branch: body.branch,
-          environment: body.environment,
+          environmentId: body.environmentId,
           platform: body.platform,
           marketType: body.marketType,
           isEditor: body.isEditor || false,
@@ -128,7 +130,7 @@ export class ClientCrashController {
         platform: body.platform,
         marketType: body.marketType,
         branch: body.branch,
-        environment: body.environment,
+        environmentId: body.environmentId,
         isEditor: body.isEditor,
         appVersion: body.appVersion,
         resVersion: body.resVersion,

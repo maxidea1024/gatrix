@@ -2,6 +2,11 @@
 description: Run dev environment with auto-approval
 ---
 
+## Browser Access
+
+- URL: http://localhost:43000
+- Login: admin@gatrix.com / admin123
+
 // turbo-all
 
 ## Start Development Environment

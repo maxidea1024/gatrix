@@ -24,7 +24,7 @@ export interface EnhancedAuditLogOptions {
 
 /**
  * Enhanced audit log middleware that captures detailed before/after state
- * Follows 육하원칙 (5W1H): Who, What, When, Where, Why, How
+ * Follows 5W1H principle (5W1H): Who, What, When, Where, Why, How
  */
 export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -71,7 +71,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           return;
         }
 
-        // Resource ID 결정 (요청에서 또는 응답에서)
+        // Resource ID 결정 (Request에서 또는 Response에서)
         let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
         if (!resourceId && options.getResourceIdFromResponse && responseBody) {
           const id = options.getResourceIdFromResponse(responseBody);
@@ -97,7 +97,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           : context?.description;
 
         await AuditLogModel.create({
-          userId: req.user?.userId,
+          userId: req.user?.id,
           action: options.action,
           description,
           resourceType: options.resourceType,
@@ -106,7 +106,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
           newValues: finalNewValues,
           ipAddress: req.ip,
           userAgent: req.get('User-Agent'),
-          environment: req.environment,
+          environmentId: req.environmentId,
         });
 
         if (captureError) {
@@ -129,7 +129,7 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
 /**
  * Helper function to fetch game world details by ID
  */
-export async function fetchGameWorldById(id: number | string): Promise<any> {
+export async function fetchGameWorldById(id: string | string): Promise<any> {
   const world = await db('g_game_worlds').where('id', id).first();
 
   if (!world) {
@@ -153,9 +153,9 @@ export async function fetchGameWorldById(id: number | string): Promise<any> {
 /**
  * Helper function to fetch user details by ID
  */
-export async function fetchUserById(id: number | string): Promise<any> {
+export async function fetchUserById(id: string | string): Promise<any> {
   const user = await db('g_users')
-    .select('id', 'name', 'email', 'role', 'status', 'emailVerified')
+    .select('id', 'name', 'email', 'status', 'emailVerified')
     .where('id', id)
     .first();
 
@@ -188,7 +188,7 @@ export async function fetchInvitationById(id: string): Promise<any> {
 /**
  * Helper function to fetch API token details by ID
  */
-export async function fetchApiTokenById(id: number | string): Promise<any> {
+export async function fetchApiTokenById(id: string | string): Promise<any> {
   const token = await db('g_api_access_tokens').where('id', id).first();
 
   if (!token) {
@@ -230,10 +230,9 @@ export async function fetchRecordsByIds(
 export function createAuditContext(req: AuthenticatedRequest, additionalInfo?: any): any {
   return {
     timestamp: new Date().toISOString(),
-    userId: req.user?.userId,
+    userId: req.user?.id,
     userName: (req.user as any)?.name,
     userEmail: req.user?.email,
-    userRole: req.user?.role,
     ipAddress: req.ip,
     userAgent: req.get('User-Agent'),
     method: req.method,

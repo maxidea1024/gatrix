@@ -1,6 +1,8 @@
 import { ulid } from 'ulid';
 import os from 'os';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AppInstance');
 
 export interface AppInstanceInfo {
   instanceId: string;
@@ -9,14 +11,14 @@ export interface AppInstanceInfo {
   platform: string;
   nodeVersion: string;
   appVersion: string;
-  environment: string;
+  environmentId: string;
   startedAt: Date;
   uptime: number; // in seconds
 }
 
 /**
  * 앱 인스턴스 정보를 관리하는 싱글톤 클래스
- * 백엔드 시작 시 생성되어 시스템 전역에서 사용됩니다.
+ * 백엔드 시작 시 Create되어 시스템 전역에서 Used됩니다.
  */
 class AppInstance {
   private static instance: AppInstance;
@@ -32,7 +34,7 @@ class AppInstance {
       platform: `${os.platform()}-${os.arch()}`,
       nodeVersion: process.version,
       appVersion: packageJson.version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
+      environmentId: process.env.NODE_ENV || 'development',
       startedAt: new Date(),
       uptime: 0,
     };
@@ -42,7 +44,7 @@ class AppInstance {
       processId: this._instanceInfo.processId,
       hostname: this._instanceInfo.hostname,
       platform: this._instanceInfo.platform,
-      environment: this._instanceInfo.environment,
+      environmentId: this._instanceInfo.environmentId,
     });
   }
 
@@ -83,7 +85,7 @@ class AppInstance {
       processId: info.processId,
       hostname: info.hostname,
       platform: info.platform,
-      environment: info.environment,
+      environmentId: info.environmentId,
       uptime: `${info.uptime}s`,
     };
   }
@@ -105,7 +107,7 @@ class AppInstance {
       status: 'healthy',
       uptime: info.uptime,
       memory: process.memoryUsage(),
-      environment: info.environment,
+      environmentId: info.environmentId,
       nodeVersion: info.nodeVersion,
       appVersion: info.appVersion,
     };

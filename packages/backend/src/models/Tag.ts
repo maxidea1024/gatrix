@@ -1,15 +1,16 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 
 export interface TagAttributes {
-  id: number;
-  // Global tag, no environmentId
+  id: string;
+  projectId?: string | null;
   name: string;
   color: string;
   description?: string | null;
   createdAt: string;
   updatedAt: string;
-  createdBy?: number | null;
-  updatedBy?: number | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
   createdByName?: string | null;
   updatedByName?: string | null;
   createdByEmail?: string | null;
@@ -20,19 +21,20 @@ export interface CreateTagData {
   name: string;
   color?: string;
   description?: string | null;
-  createdBy?: number | null;
+  projectId?: string | null;
+  createdBy?: string | null;
 }
 
 export interface UpdateTagData {
   name?: string;
   color?: string;
   description?: string | null;
-  updatedBy?: number | null;
+  updatedBy?: string | null;
 }
 
 export default class TagModel {
-  static async list(): Promise<TagAttributes[]> {
-    return await db('g_tags as t')
+  static async list(projectId?: string): Promise<TagAttributes[]> {
+    const query = db('g_tags as t')
       .leftJoin('g_users as c', 'c.id', 't.createdBy')
       .leftJoin('g_users as u', 'u.id', 't.updatedBy')
       .select([
@@ -42,10 +44,16 @@ export default class TagModel {
         'u.name as updatedByName',
         'u.email as updatedByEmail',
       ])
-      .orderBy('t.createdAt', 'desc'); // Sort by most recent first
+      .orderBy('t.createdAt', 'desc');
+
+    if (projectId) {
+      query.where('t.projectId', projectId);
+    }
+
+    return await query;
   }
 
-  static async findById(id: number): Promise<TagAttributes | null> {
+  static async findById(id: string): Promise<TagAttributes | null> {
     const row = await db('g_tags').where('id', id).first();
     return row || null;
   }
@@ -68,27 +76,33 @@ export default class TagModel {
         });
       return (await this.findById(existing.id))!;
     }
-    const [id] = await db('g_tags').insert({
+    const newId = generateULID();
+    await db('g_tags').insert({
+      id: newId,
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     });
-    return (await this.findById(id))!;
+    return (await this.findById(newId))!;
   }
 
   static async create(data: CreateTagData): Promise<TagAttributes> {
-    const insertData = {
+    const insertData: any = {
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null,
     };
-    const [id] = await db('g_tags').insert(insertData);
-    return (await this.findById(id))!;
+    if (data.projectId) {
+      insertData.projectId = data.projectId;
+    }
+    const newId = generateULID();
+    await db('g_tags').insert({ id: newId, ...insertData });
+    return (await this.findById(newId))!;
   }
 
-  static async update(id: number, data: UpdateTagData): Promise<TagAttributes | null> {
+  static async update(id: string, data: UpdateTagData): Promise<TagAttributes | null> {
     const updateData: any = {};
     Object.entries(data).forEach(([k, v]) => {
       if (v !== undefined) {
@@ -107,7 +121,7 @@ export default class TagModel {
     return this.findById(id);
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(id: string): Promise<void> {
     await db('g_tags').where('id', id).del();
   }
 }

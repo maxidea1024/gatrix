@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -46,13 +46,18 @@ import planningDataService, { UploadRecord } from '../../services/planningDataSe
 import SimplePagination from '../../components/common/SimplePagination';
 import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 
 const PlanningDataHistoryPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canView = hasPermission([PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE]);
-  const canManage = hasPermission([PERMISSIONS.PLANNING_DATA_MANAGE]);
+  const canView = hasPermission([P.PLANNING_DATA_READ, P.PLANNING_DATA_UPDATE]);
+  const canManage = hasPermission([P.PLANNING_DATA_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [history, setHistory] = useState<UploadRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +80,7 @@ const PlanningDataHistoryPage: React.FC = () => {
   const loadHistory = async () => {
     try {
       setLoading(true);
-      const data = await planningDataService.getUploadHistory(100);
+      const data = await planningDataService.getUploadHistory(projectApiPath, 100);
       setHistory(data);
     } catch (error: any) {
       console.error('Error loading history:', error);
@@ -97,7 +102,7 @@ const PlanningDataHistoryPage: React.FC = () => {
 
   const handleReset = async () => {
     try {
-      const result = await planningDataService.resetUploadHistory();
+      const result = await planningDataService.resetUploadHistory(projectApiPath);
       enqueueSnackbar(t('planningData.history.resetSuccess', { count: result.deletedCount }), {
         variant: 'success',
       });
@@ -319,91 +324,68 @@ const PlanningDataHistoryPage: React.FC = () => {
       </Card>
 
       {/* Content */}
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : history.length === 0 ? (
-        <Card>
-          <CardContent>
-            <Typography color="text.secondary" align="center">
-              {t('planningData.history.noRecords')}
-            </Typography>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell width={40}></TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'uploadedAt'}
-                        direction={orderBy === 'uploadedAt' ? order : 'asc'}
-                        onClick={() => handleSort('uploadedAt')}
-                      >
-                        {t('planningData.history.uploadedAt')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'uploaderName'}
-                        direction={orderBy === 'uploaderName' ? order : 'asc'}
-                        onClick={() => handleSort('uploaderName')}
-                      >
-                        {t('planningData.history.uploader')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={orderBy === 'uploadSource'}
-                        direction={orderBy === 'uploadSource' ? order : 'asc'}
-                        onClick={() => handleSort('uploadSource')}
-                      >
-                        {t('planningData.history.source')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>{t('planningData.history.hash')}</TableCell>
-                    <TableCell align="center">
-                      <TableSortLabel
-                        active={orderBy === 'changedFilesCount'}
-                        direction={orderBy === 'changedFilesCount' ? order : 'asc'}
-                        onClick={() => handleSort('changedFilesCount')}
-                      >
-                        {t('planningData.history.changedFilesCount')}
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell align="center">{t('planningData.history.changes')}</TableCell>
-                    <TableCell>{t('planningData.history.comment')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedHistory.map((record, index) => (
-                    <React.Fragment key={record.id}>
-                      <TableRow
-                        hover
-                        sx={{
-                          cursor:
-                            record.fileDiffs && Object.keys(record.fileDiffs).length > 0
-                              ? 'pointer'
-                              : 'default',
-                          bgcolor:
-                            index % 2 === 1
-                              ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.04)'
-                                    : 'rgba(0, 0, 0, 0.025)'
-                              : 'transparent',
-                          '&:hover': {
-                            bgcolor: (theme) =>
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.08)'
-                                : 'rgba(0, 0, 0, 0.05)',
-                          },
-                          '&.MuiTableRow-root:nth-of-type(even)': {
+      <PageContentLoader loading={loading}>
+        {history.length === 0 ? (
+          <EmptyPagePlaceholder message={t('planningData.history.noRecords')} />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width={40}></TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={orderBy === 'uploadedAt'}
+                          direction={orderBy === 'uploadedAt' ? order : 'asc'}
+                          onClick={() => handleSort('uploadedAt')}
+                        >
+                          {t('planningData.history.uploadedAt')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={orderBy === 'uploaderName'}
+                          direction={orderBy === 'uploaderName' ? order : 'asc'}
+                          onClick={() => handleSort('uploaderName')}
+                        >
+                          {t('planningData.history.uploader')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={orderBy === 'uploadSource'}
+                          direction={orderBy === 'uploadSource' ? order : 'asc'}
+                          onClick={() => handleSort('uploadSource')}
+                        >
+                          {t('planningData.history.source')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>{t('planningData.history.hash')}</TableCell>
+                      <TableCell align="center">
+                        <TableSortLabel
+                          active={orderBy === 'changedFilesCount'}
+                          direction={orderBy === 'changedFilesCount' ? order : 'asc'}
+                          onClick={() => handleSort('changedFilesCount')}
+                        >
+                          {t('planningData.history.changedFilesCount')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell align="center">{t('planningData.history.changes')}</TableCell>
+                      <TableCell>{t('planningData.history.comment')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedHistory.map((record, index) => (
+                      <React.Fragment key={record.id}>
+                        <TableRow
+                          hover
+                          sx={{
+                            cursor:
+                              record.fileDiffs && Object.keys(record.fileDiffs).length > 0
+                                ? 'pointer'
+                                : 'default',
                             bgcolor:
                               index % 2 === 1
                                 ? (theme) =>
@@ -411,563 +393,583 @@ const PlanningDataHistoryPage: React.FC = () => {
                                       ? 'rgba(255, 255, 255, 0.04)'
                                       : 'rgba(0, 0, 0, 0.025)'
                                 : 'transparent',
-                          },
-                          ...(expandedRow === record.id && {
-                            bgcolor: 'action.selected',
-                            '&:hover': { bgcolor: 'action.selected' },
-                          }),
-                        }}
-                        onClick={() => {
-                          // Only toggle if there are diffs to show
-                          if (record.fileDiffs && Object.keys(record.fileDiffs).length > 0) {
-                            toggleExpand(record.id);
-                          }
-                        }}
-                      >
-                        <TableCell>
-                          {record.fileDiffs && Object.keys(record.fileDiffs).length > 0 ? (
-                            <IconButton size="small">
-                              {expandedRow === record.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                            </IconButton>
-                          ) : null}
-                        </TableCell>
-                        <TableCell>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                            }}
-                          >
-                            <Tooltip title={formatDateTimeDetailed(record.uploadedAt)}>
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  fontWeight: index === 0 ? 'bold' : 'normal',
-                                }}
-                              >
-                                {formatRelativeTime(record.uploadedAt)}
-                              </Typography>
-                            </Tooltip>
-                            {index === 0 && (
-                              <Chip
-                                size="small"
-                                label={t('planningData.history.latest')}
-                                color="primary"
-                                sx={{
-                                  height: 20,
-                                  fontSize: '0.625rem',
-                                  fontWeight: 'bold',
-                                }}
-                              />
-                            )}
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {record.uploaderName || 'Unknown'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            size="small"
-                            icon={record.uploadSource === 'cli' ? <CliIcon /> : <WebIcon />}
-                            label={record.uploadSource.toUpperCase()}
-                            color={record.uploadSource === 'cli' ? 'warning' : 'default'}
-                            variant="outlined"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={t('common.copyToClipboard')}>
-                            <Chip
-                              size="small"
-                              variant="outlined"
-                              label={record.uploadHash.substring(0, 8)}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyToClipboardWithNotification(
-                                  record.uploadHash,
-                                  () =>
-                                    enqueueSnackbar(t('common.copiedToClipboard'), {
-                                      variant: 'success',
-                                    }),
-                                  () =>
-                                    enqueueSnackbar(t('common.copyFailed'), {
-                                      variant: 'error',
-                                    })
-                                );
-                              }}
+                            '&:hover': {
+                              bgcolor: (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.08)'
+                                  : 'rgba(0, 0, 0, 0.05)',
+                            },
+                            '&.MuiTableRow-root:nth-of-type(even)': {
+                              bgcolor:
+                                index % 2 === 1
+                                  ? (theme) =>
+                                      theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.04)'
+                                        : 'rgba(0, 0, 0, 0.025)'
+                                  : 'transparent',
+                            },
+                            ...(expandedRow === record.id && {
+                              bgcolor: 'action.selected',
+                              '&:hover': { bgcolor: 'action.selected' },
+                            }),
+                          }}
+                          onClick={() => {
+                            // Only toggle if there are diffs to show
+                            if (record.fileDiffs && Object.keys(record.fileDiffs).length > 0) {
+                              toggleExpand(record.id);
+                            }
+                          }}
+                        >
+                          <TableCell>
+                            {record.fileDiffs && Object.keys(record.fileDiffs).length > 0 ? (
+                              <IconButton size="small">
+                                {expandedRow === record.id ? (
+                                  <ExpandLessIcon />
+                                ) : (
+                                  <ExpandMoreIcon />
+                                )}
+                              </IconButton>
+                            ) : null}
+                          </TableCell>
+                          <TableCell>
+                            <Box
                               sx={{
-                                cursor: 'pointer',
-                                fontFamily: 'monospace',
-                                borderRadius: 1,
-                                bgcolor: 'background.paper',
-                                '&:hover': { bgcolor: 'action.hover' },
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
                               }}
-                            />
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="center">{record.changedFiles?.length || 0}</TableCell>
-                        <TableCell align="center">
-                          {record.fileDiffs ? (
-                            (() => {
-                              // Calculate total changes from all file diffs
-                              let totalAdded = 0,
-                                totalRemoved = 0,
-                                totalModified = 0;
-                              Object.values(record.fileDiffs).forEach((diff: any) => {
-                                totalAdded += diff.added?.length || 0;
-                                totalRemoved += diff.removed?.length || 0;
-                                totalModified += diff.modified?.length || 0;
-                              });
-                              return (
-                                <Box
+                            >
+                              <Tooltip title={formatDateTimeDetailed(record.uploadedAt)}>
+                                <Typography
+                                  variant="body2"
                                   sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
+                                    fontWeight: index === 0 ? 'bold' : 'normal',
                                   }}
                                 >
-                                  <Chip
-                                    size="small"
-                                    label={`${t('planningData.history.added')}:${totalAdded}`}
-                                    color="success"
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                  <Chip
-                                    size="small"
-                                    label={`${t('planningData.history.modified')}:${totalModified}`}
-                                    color="warning"
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                  <Chip
-                                    size="small"
-                                    label={`${t('planningData.history.removed')}:${totalRemoved}`}
-                                    color="error"
-                                    sx={{ height: 20, fontSize: '0.7rem' }}
-                                  />
-                                </Box>
-                              );
-                            })()
-                          ) : (
-                            <Typography variant="caption" color="text.secondary">
-                              -
+                                  {formatRelativeTime(record.uploadedAt)}
+                                </Typography>
+                              </Tooltip>
+                              {index === 0 && (
+                                <Chip
+                                  size="small"
+                                  label={t('planningData.history.latest')}
+                                  color="primary"
+                                  sx={{
+                                    height: 20,
+                                    fontSize: '0.625rem',
+                                    fontWeight: 'bold',
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {record.uploaderName || 'Unknown'}
                             </Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                            {record.uploadComment || '-'}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow
-                        sx={{
-                          bgcolor:
-                            index % 2 === 1
-                              ? (theme) =>
-                                  theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.04)'
-                                    : 'rgba(0, 0, 0, 0.025)'
-                              : 'transparent',
-                          '&:hover': {
-                            bgcolor: (theme) =>
-                              theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.08)'
-                                : 'rgba(0, 0, 0, 0.05)',
-                          },
-                          '&.MuiTableRow-root:nth-of-type(even)': {
-                            bgcolor:
-                              index % 2 === 1
-                                ? (theme) =>
-                                    theme.palette.mode === 'dark'
-                                      ? 'rgba(255, 255, 255, 0.04)'
-                                      : 'rgba(0, 0, 0, 0.025)'
-                                : 'transparent',
-                          },
-                          ...(expandedRow === record.id && {
-                            bgcolor: 'action.selected',
-                          }),
-                        }}
-                      >
-                        <TableCell colSpan={8} sx={{ py: 0 }}>
-                          <Collapse in={expandedRow === record.id} timeout="auto" unmountOnExit>
-                            <Box sx={{ py: 2, px: 4 }}>
-                              {record.changedFiles && record.changedFiles.length > 0 ? (
-                                <>
-                                  <Typography variant="subtitle2" gutterBottom>
-                                    {t('planningData.history.changedFiles')} (
-                                    {record.changedFiles.length}):
-                                  </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              size="small"
+                              icon={record.uploadSource === 'cli' ? <CliIcon /> : <WebIcon />}
+                              label={record.uploadSource.toUpperCase()}
+                              color={record.uploadSource === 'cli' ? 'warning' : 'default'}
+                              variant="outlined"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Tooltip title={t('common.copyToClipboard')}>
+                              <Chip
+                                size="small"
+                                variant="outlined"
+                                label={record.uploadHash.substring(0, 8)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyToClipboardWithNotification(
+                                    record.uploadHash,
+                                    () =>
+                                      enqueueSnackbar(t('common.copiedToClipboard'), {
+                                        variant: 'success',
+                                      }),
+                                    () =>
+                                      enqueueSnackbar(t('common.copyFailed'), {
+                                        variant: 'error',
+                                      })
+                                  );
+                                }}
+                                sx={{
+                                  cursor: 'pointer',
+                                  fontFamily: 'monospace',
+                                  borderRadius: 1,
+                                  bgcolor: 'background.paper',
+                                  '&:hover': { bgcolor: 'action.hover' },
+                                }}
+                              />
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell align="center">{record.changedFiles?.length || 0}</TableCell>
+                          <TableCell align="center">
+                            {record.fileDiffs ? (
+                              (() => {
+                                // Calculate total changes from all file diffs
+                                let totalAdded = 0,
+                                  totalRemoved = 0,
+                                  totalModified = 0;
+                                Object.values(record.fileDiffs).forEach((diff: any) => {
+                                  totalAdded += diff.added?.length || 0;
+                                  totalRemoved += diff.removed?.length || 0;
+                                  totalModified += diff.modified?.length || 0;
+                                });
+                                return (
                                   <Box
                                     sx={{
                                       display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: 1,
+                                      gap: 0.5,
+                                      justifyContent: 'center',
                                     }}
                                   >
-                                    {record.changedFiles.map((file) => {
-                                      const fileDiff = record.fileDiffs?.[file];
-                                      return (
-                                        <Box
-                                          key={file}
-                                          sx={{
-                                            p: 1.5,
-                                            bgcolor: (theme) =>
-                                              theme.palette.mode === 'dark'
-                                                ? 'background.default'
-                                                : 'action.hover',
-                                            borderRadius: 1,
-                                          }}
-                                        >
-                                          <Chip
-                                            size="small"
-                                            label={file}
-                                            color="warning"
-                                            sx={{ mb: 1 }}
-                                          />
-                                          {fileDiff && (
-                                            <Box sx={{ mt: 1 }}>
-                                              {fileDiff.modified?.length > 0 && (
-                                                <Box sx={{ mb: 2 }}>
-                                                  <Typography
-                                                    variant="caption"
-                                                    color="warning.main"
-                                                    sx={{
-                                                      fontWeight: 'bold',
-                                                      display: 'block',
-                                                      mb: 0.5,
-                                                    }}
-                                                  >
-                                                    ~ {t('planningData.history.modified')}:{' '}
-                                                    {fileDiff.modified.length}
-                                                  </Typography>
-                                                  <Box
-                                                    component="table"
-                                                    sx={{
-                                                      width: '100%',
-                                                      borderCollapse: 'collapse',
-                                                      fontSize: '0.75rem',
-                                                      fontFamily: 'monospace',
-                                                      border: '1px dashed',
-                                                      borderColor: 'divider',
-                                                      '& th, & td': {
-                                                        borderBottom: '1px dashed',
-                                                        borderRight: '1px dashed',
-                                                        borderColor: 'divider',
-                                                        p: 0.5,
-                                                        textAlign: 'left',
-                                                      },
-                                                      '& th:last-child, & td:last-child': {
-                                                        borderRight: 'none',
-                                                      },
-                                                      '& th': {
-                                                        bgcolor: 'action.hover',
-                                                        fontWeight: 'bold',
-                                                      },
-                                                      '& tbody tr:nth-of-type(odd)': {
-                                                        bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                                      },
-                                                    }}
-                                                  >
-                                                    <thead>
-                                                      <tr>
-                                                        <Box component="th" sx={{ width: '35%' }}>
-                                                          {t('planningData.history.path')}
-                                                        </Box>
-                                                        <Box
-                                                          component="th"
-                                                          sx={{
-                                                            width: '32%',
-                                                            color: 'error.main',
-                                                          }}
-                                                        >
-                                                          {t('planningData.history.before')}
-                                                        </Box>
-                                                        <Box
-                                                          component="th"
-                                                          sx={{
-                                                            width: '32%',
-                                                            color: 'success.main',
-                                                          }}
-                                                        >
-                                                          {t('planningData.history.after')}
-                                                        </Box>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                      {fileDiff.modified
-                                                        .slice(0, 10)
-                                                        .map((item, idx) => (
-                                                          <tr key={idx}>
-                                                            <td>{item.path}</td>
-                                                            <Box
-                                                              component="td"
-                                                              sx={{
-                                                                color: 'error.main',
-                                                                textDecoration: 'line-through',
-                                                                wordBreak: 'break-all',
-                                                              }}
-                                                            >
-                                                              {typeof item.before === 'string'
-                                                                ? item.before
-                                                                : JSON.stringify(item.before)}
-                                                            </Box>
-                                                            <Box
-                                                              component="td"
-                                                              sx={{
-                                                                color: 'success.main',
-                                                                wordBreak: 'break-all',
-                                                              }}
-                                                            >
-                                                              {typeof item.after === 'string'
-                                                                ? item.after
-                                                                : JSON.stringify(item.after)}
-                                                            </Box>
-                                                          </tr>
-                                                        ))}
-                                                    </tbody>
-                                                  </Box>
-                                                  {fileDiff.modified.length > 10 && (
-                                                    <Typography
-                                                      variant="caption"
-                                                      color="text.secondary"
-                                                      sx={{
-                                                        mt: 0.5,
-                                                        display: 'block',
-                                                      }}
-                                                    >
-                                                      +{fileDiff.modified.length - 10} more...
-                                                    </Typography>
-                                                  )}
-                                                </Box>
-                                              )}
-                                              {fileDiff.added?.length > 0 && (
-                                                <Box sx={{ mb: 2 }}>
-                                                  <Typography
-                                                    variant="caption"
-                                                    color="success.main"
-                                                    sx={{
-                                                      fontWeight: 'bold',
-                                                      display: 'block',
-                                                      mb: 0.5,
-                                                    }}
-                                                  >
-                                                    + {t('planningData.history.added')}:{' '}
-                                                    {fileDiff.added.length}
-                                                  </Typography>
-                                                  <Box
-                                                    component="table"
-                                                    sx={{
-                                                      width: '100%',
-                                                      borderCollapse: 'collapse',
-                                                      fontSize: '0.75rem',
-                                                      fontFamily: 'monospace',
-                                                      border: '1px dashed',
-                                                      borderColor: 'divider',
-                                                      '& th, & td': {
-                                                        borderBottom: '1px dashed',
-                                                        borderRight: '1px dashed',
-                                                        borderColor: 'divider',
-                                                        p: 0.5,
-                                                        textAlign: 'left',
-                                                      },
-                                                      '& th:last-child, & td:last-child': {
-                                                        borderRight: 'none',
-                                                      },
-                                                      '& th': {
-                                                        bgcolor: 'action.hover',
-                                                        fontWeight: 'bold',
-                                                      },
-                                                      '& tbody tr:nth-of-type(odd)': {
-                                                        bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                                      },
-                                                    }}
-                                                  >
-                                                    <thead>
-                                                      <tr>
-                                                        <Box component="th" sx={{ width: '40%' }}>
-                                                          {t('planningData.history.path')}
-                                                        </Box>
-                                                        <Box
-                                                          component="th"
-                                                          sx={{
-                                                            color: 'success.main',
-                                                          }}
-                                                        >
-                                                          {t('planningData.history.value')}
-                                                        </Box>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                      {fileDiff.added
-                                                        .slice(0, 10)
-                                                        .map((item, idx) => (
-                                                          <tr key={idx}>
-                                                            <td>{item.path}</td>
-                                                            <Box
-                                                              component="td"
-                                                              sx={{
-                                                                color: 'success.main',
-                                                                wordBreak: 'break-all',
-                                                              }}
-                                                            >
-                                                              {typeof item.value === 'string'
-                                                                ? item.value
-                                                                : JSON.stringify(item.value)}
-                                                            </Box>
-                                                          </tr>
-                                                        ))}
-                                                    </tbody>
-                                                  </Box>
-                                                  {fileDiff.added.length > 10 && (
-                                                    <Typography
-                                                      variant="caption"
-                                                      color="text.secondary"
-                                                      sx={{
-                                                        mt: 0.5,
-                                                        display: 'block',
-                                                      }}
-                                                    >
-                                                      +{fileDiff.added.length - 10} more...
-                                                    </Typography>
-                                                  )}
-                                                </Box>
-                                              )}
-                                              {fileDiff.removed?.length > 0 && (
-                                                <Box sx={{ mb: 2 }}>
-                                                  <Typography
-                                                    variant="caption"
-                                                    color="error.main"
-                                                    sx={{
-                                                      fontWeight: 'bold',
-                                                      display: 'block',
-                                                      mb: 0.5,
-                                                    }}
-                                                  >
-                                                    − {t('planningData.history.removed')}:{' '}
-                                                    {fileDiff.removed.length}
-                                                  </Typography>
-                                                  <Box
-                                                    component="table"
-                                                    sx={{
-                                                      width: '100%',
-                                                      borderCollapse: 'collapse',
-                                                      fontSize: '0.75rem',
-                                                      fontFamily: 'monospace',
-                                                      border: '1px dashed',
-                                                      borderColor: 'divider',
-                                                      '& th, & td': {
-                                                        borderBottom: '1px dashed',
-                                                        borderRight: '1px dashed',
-                                                        borderColor: 'divider',
-                                                        p: 0.5,
-                                                        textAlign: 'left',
-                                                      },
-                                                      '& th:last-child, & td:last-child': {
-                                                        borderRight: 'none',
-                                                      },
-                                                      '& th': {
-                                                        bgcolor: 'action.hover',
-                                                        fontWeight: 'bold',
-                                                      },
-                                                      '& tbody tr:nth-of-type(odd)': {
-                                                        bgcolor: 'rgba(255, 255, 255, 0.02)',
-                                                      },
-                                                    }}
-                                                  >
-                                                    <thead>
-                                                      <tr>
-                                                        <Box component="th" sx={{ width: '40%' }}>
-                                                          {t('planningData.history.path')}
-                                                        </Box>
-                                                        <Box
-                                                          component="th"
-                                                          sx={{
-                                                            color: 'error.main',
-                                                          }}
-                                                        >
-                                                          {t('planningData.history.value')}
-                                                        </Box>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                      {fileDiff.removed
-                                                        .slice(0, 10)
-                                                        .map((item, idx) => (
-                                                          <tr key={idx}>
-                                                            <td>{item.path}</td>
-                                                            <Box
-                                                              component="td"
-                                                              sx={{
-                                                                color: 'error.main',
-                                                                textDecoration: 'line-through',
-                                                                wordBreak: 'break-all',
-                                                              }}
-                                                            >
-                                                              {typeof item.value === 'string'
-                                                                ? item.value
-                                                                : JSON.stringify(item.value)}
-                                                            </Box>
-                                                          </tr>
-                                                        ))}
-                                                    </tbody>
-                                                  </Box>
-                                                  {fileDiff.removed.length > 10 && (
-                                                    <Typography
-                                                      variant="caption"
-                                                      color="text.secondary"
-                                                      sx={{
-                                                        mt: 0.5,
-                                                        display: 'block',
-                                                      }}
-                                                    >
-                                                      +{fileDiff.removed.length - 10} more...
-                                                    </Typography>
-                                                  )}
-                                                </Box>
-                                              )}
-                                            </Box>
-                                          )}
-                                          {!fileDiff && (
-                                            <Typography variant="caption" color="text.secondary">
-                                              {t('planningData.history.noDiffAvailable')}
-                                            </Typography>
-                                          )}
-                                        </Box>
-                                      );
-                                    })}
+                                    <Chip
+                                      size="small"
+                                      label={`${t('planningData.history.added')}:${totalAdded}`}
+                                      color="success"
+                                      sx={{ height: 20, fontSize: '0.7rem' }}
+                                    />
+                                    <Chip
+                                      size="small"
+                                      label={`${t('planningData.history.modified')}:${totalModified}`}
+                                      color="warning"
+                                      sx={{ height: 20, fontSize: '0.7rem' }}
+                                    />
+                                    <Chip
+                                      size="small"
+                                      label={`${t('planningData.history.removed')}:${totalRemoved}`}
+                                      color="error"
+                                      sx={{ height: 20, fontSize: '0.7rem' }}
+                                    />
                                   </Box>
-                                </>
-                              ) : (
-                                <Typography variant="body2" color="text.secondary">
-                                  {t('planningData.history.noChanges')}
-                                </Typography>
-                              )}
-                            </Box>
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                                );
+                              })()
+                            ) : (
+                              <Typography variant="caption" color="text.secondary">
+                                -
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
+                              {record.uploadComment || '-'}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow
+                          hover
+                          sx={{
+                            bgcolor:
+                              index % 2 === 1
+                                ? (theme) =>
+                                    theme.palette.mode === 'dark'
+                                      ? 'rgba(255, 255, 255, 0.04)'
+                                      : 'rgba(0, 0, 0, 0.025)'
+                                : 'transparent',
+                            '&:hover': {
+                              bgcolor: (theme) =>
+                                theme.palette.mode === 'dark'
+                                  ? 'rgba(255, 255, 255, 0.08)'
+                                  : 'rgba(0, 0, 0, 0.05)',
+                            },
+                            '&.MuiTableRow-root:nth-of-type(even)': {
+                              bgcolor:
+                                index % 2 === 1
+                                  ? (theme) =>
+                                      theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.04)'
+                                        : 'rgba(0, 0, 0, 0.025)'
+                                  : 'transparent',
+                            },
+                            ...(expandedRow === record.id && {
+                              bgcolor: 'action.selected',
+                            }),
+                          }}
+                        >
+                          <TableCell colSpan={8} sx={{ py: 0 }}>
+                            <Collapse in={expandedRow === record.id} timeout="auto" unmountOnExit>
+                              <Box sx={{ py: 2, px: 4 }}>
+                                {record.changedFiles && record.changedFiles.length > 0 ? (
+                                  <>
+                                    <Typography variant="subtitle2" gutterBottom>
+                                      {t('planningData.history.changedFiles')} (
+                                      {record.changedFiles.length}):
+                                    </Typography>
+                                    <Box
+                                      sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 1,
+                                      }}
+                                    >
+                                      {record.changedFiles.map((file) => {
+                                        const fileDiff = record.fileDiffs?.[file];
+                                        return (
+                                          <Box
+                                            key={file}
+                                            sx={{
+                                              p: 1.5,
+                                              bgcolor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                  ? 'background.default'
+                                                  : 'action.hover',
+                                              borderRadius: 1,
+                                            }}
+                                          >
+                                            <Chip
+                                              size="small"
+                                              label={file}
+                                              color="warning"
+                                              sx={{ mb: 1 }}
+                                            />
+                                            {fileDiff && (
+                                              <Box sx={{ mt: 1 }}>
+                                                {fileDiff.modified?.length > 0 && (
+                                                  <Box sx={{ mb: 2 }}>
+                                                    <Typography
+                                                      variant="caption"
+                                                      color="warning.main"
+                                                      sx={{
+                                                        fontWeight: 'bold',
+                                                        display: 'block',
+                                                        mb: 0.5,
+                                                      }}
+                                                    >
+                                                      ~ {t('planningData.history.modified')}:{' '}
+                                                      {fileDiff.modified.length}
+                                                    </Typography>
+                                                    <Box
+                                                      component="table"
+                                                      sx={{
+                                                        width: '100%',
+                                                        borderCollapse: 'collapse',
+                                                        fontSize: '0.75rem',
+                                                        fontFamily: 'monospace',
+                                                        border: '1px dashed',
+                                                        borderColor: 'divider',
+                                                        '& th, & td': {
+                                                          borderBottom: '1px dashed',
+                                                          borderRight: '1px dashed',
+                                                          borderColor: 'divider',
+                                                          p: 0.5,
+                                                          textAlign: 'left',
+                                                        },
+                                                        '& th:last-child, & td:last-child': {
+                                                          borderRight: 'none',
+                                                        },
+                                                        '& th': {
+                                                          bgcolor: 'action.hover',
+                                                          fontWeight: 'bold',
+                                                        },
+                                                        '& tbody tr:nth-of-type(odd)': {
+                                                          bgcolor: 'rgba(255, 255, 255, 0.02)',
+                                                        },
+                                                      }}
+                                                    >
+                                                      <thead>
+                                                        <tr>
+                                                          <Box component="th" sx={{ width: '35%' }}>
+                                                            {t('planningData.history.path')}
+                                                          </Box>
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              width: '32%',
+                                                              color: 'error.main',
+                                                            }}
+                                                          >
+                                                            {t('planningData.history.before')}
+                                                          </Box>
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              width: '32%',
+                                                              color: 'success.main',
+                                                            }}
+                                                          >
+                                                            {t('planningData.history.after')}
+                                                          </Box>
+                                                        </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                        {fileDiff.modified
+                                                          .slice(0, 10)
+                                                          .map((item, idx) => (
+                                                            <tr key={idx}>
+                                                              <td>{item.path}</td>
+                                                              <Box
+                                                                component="td"
+                                                                sx={{
+                                                                  color: 'error.main',
+                                                                  textDecoration: 'line-through',
+                                                                  wordBreak: 'break-all',
+                                                                }}
+                                                              >
+                                                                {typeof item.before === 'string'
+                                                                  ? item.before
+                                                                  : JSON.stringify(item.before)}
+                                                              </Box>
+                                                              <Box
+                                                                component="td"
+                                                                sx={{
+                                                                  color: 'success.main',
+                                                                  wordBreak: 'break-all',
+                                                                }}
+                                                              >
+                                                                {typeof item.after === 'string'
+                                                                  ? item.after
+                                                                  : JSON.stringify(item.after)}
+                                                              </Box>
+                                                            </tr>
+                                                          ))}
+                                                      </tbody>
+                                                    </Box>
+                                                    {fileDiff.modified.length > 10 && (
+                                                      <Typography
+                                                        variant="caption"
+                                                        color="text.secondary"
+                                                        sx={{
+                                                          mt: 0.5,
+                                                          display: 'block',
+                                                        }}
+                                                      >
+                                                        +{fileDiff.modified.length - 10} more...
+                                                      </Typography>
+                                                    )}
+                                                  </Box>
+                                                )}
+                                                {fileDiff.added?.length > 0 && (
+                                                  <Box sx={{ mb: 2 }}>
+                                                    <Typography
+                                                      variant="caption"
+                                                      color="success.main"
+                                                      sx={{
+                                                        fontWeight: 'bold',
+                                                        display: 'block',
+                                                        mb: 0.5,
+                                                      }}
+                                                    >
+                                                      + {t('planningData.history.added')}:{' '}
+                                                      {fileDiff.added.length}
+                                                    </Typography>
+                                                    <Box
+                                                      component="table"
+                                                      sx={{
+                                                        width: '100%',
+                                                        borderCollapse: 'collapse',
+                                                        fontSize: '0.75rem',
+                                                        fontFamily: 'monospace',
+                                                        border: '1px dashed',
+                                                        borderColor: 'divider',
+                                                        '& th, & td': {
+                                                          borderBottom: '1px dashed',
+                                                          borderRight: '1px dashed',
+                                                          borderColor: 'divider',
+                                                          p: 0.5,
+                                                          textAlign: 'left',
+                                                        },
+                                                        '& th:last-child, & td:last-child': {
+                                                          borderRight: 'none',
+                                                        },
+                                                        '& th': {
+                                                          bgcolor: 'action.hover',
+                                                          fontWeight: 'bold',
+                                                        },
+                                                        '& tbody tr:nth-of-type(odd)': {
+                                                          bgcolor: 'rgba(255, 255, 255, 0.02)',
+                                                        },
+                                                      }}
+                                                    >
+                                                      <thead>
+                                                        <tr>
+                                                          <Box component="th" sx={{ width: '40%' }}>
+                                                            {t('planningData.history.path')}
+                                                          </Box>
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              color: 'success.main',
+                                                            }}
+                                                          >
+                                                            {t('planningData.history.value')}
+                                                          </Box>
+                                                        </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                        {fileDiff.added
+                                                          .slice(0, 10)
+                                                          .map((item, idx) => (
+                                                            <tr key={idx}>
+                                                              <td>{item.path}</td>
+                                                              <Box
+                                                                component="td"
+                                                                sx={{
+                                                                  color: 'success.main',
+                                                                  wordBreak: 'break-all',
+                                                                }}
+                                                              >
+                                                                {typeof item.value === 'string'
+                                                                  ? item.value
+                                                                  : JSON.stringify(item.value)}
+                                                              </Box>
+                                                            </tr>
+                                                          ))}
+                                                      </tbody>
+                                                    </Box>
+                                                    {fileDiff.added.length > 10 && (
+                                                      <Typography
+                                                        variant="caption"
+                                                        color="text.secondary"
+                                                        sx={{
+                                                          mt: 0.5,
+                                                          display: 'block',
+                                                        }}
+                                                      >
+                                                        +{fileDiff.added.length - 10} more...
+                                                      </Typography>
+                                                    )}
+                                                  </Box>
+                                                )}
+                                                {fileDiff.removed?.length > 0 && (
+                                                  <Box sx={{ mb: 2 }}>
+                                                    <Typography
+                                                      variant="caption"
+                                                      color="error.main"
+                                                      sx={{
+                                                        fontWeight: 'bold',
+                                                        display: 'block',
+                                                        mb: 0.5,
+                                                      }}
+                                                    >
+                                                      − {t('planningData.history.removed')}:{' '}
+                                                      {fileDiff.removed.length}
+                                                    </Typography>
+                                                    <Box
+                                                      component="table"
+                                                      sx={{
+                                                        width: '100%',
+                                                        borderCollapse: 'collapse',
+                                                        fontSize: '0.75rem',
+                                                        fontFamily: 'monospace',
+                                                        border: '1px dashed',
+                                                        borderColor: 'divider',
+                                                        '& th, & td': {
+                                                          borderBottom: '1px dashed',
+                                                          borderRight: '1px dashed',
+                                                          borderColor: 'divider',
+                                                          p: 0.5,
+                                                          textAlign: 'left',
+                                                        },
+                                                        '& th:last-child, & td:last-child': {
+                                                          borderRight: 'none',
+                                                        },
+                                                        '& th': {
+                                                          bgcolor: 'action.hover',
+                                                          fontWeight: 'bold',
+                                                        },
+                                                        '& tbody tr:nth-of-type(odd)': {
+                                                          bgcolor: 'rgba(255, 255, 255, 0.02)',
+                                                        },
+                                                      }}
+                                                    >
+                                                      <thead>
+                                                        <tr>
+                                                          <Box component="th" sx={{ width: '40%' }}>
+                                                            {t('planningData.history.path')}
+                                                          </Box>
+                                                          <Box
+                                                            component="th"
+                                                            sx={{
+                                                              color: 'error.main',
+                                                            }}
+                                                          >
+                                                            {t('planningData.history.value')}
+                                                          </Box>
+                                                        </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                        {fileDiff.removed
+                                                          .slice(0, 10)
+                                                          .map((item, idx) => (
+                                                            <tr key={idx}>
+                                                              <td>{item.path}</td>
+                                                              <Box
+                                                                component="td"
+                                                                sx={{
+                                                                  color: 'error.main',
+                                                                  textDecoration: 'line-through',
+                                                                  wordBreak: 'break-all',
+                                                                }}
+                                                              >
+                                                                {typeof item.value === 'string'
+                                                                  ? item.value
+                                                                  : JSON.stringify(item.value)}
+                                                              </Box>
+                                                            </tr>
+                                                          ))}
+                                                      </tbody>
+                                                    </Box>
+                                                    {fileDiff.removed.length > 10 && (
+                                                      <Typography
+                                                        variant="caption"
+                                                        color="text.secondary"
+                                                        sx={{
+                                                          mt: 0.5,
+                                                          display: 'block',
+                                                        }}
+                                                      >
+                                                        +{fileDiff.removed.length - 10} more...
+                                                      </Typography>
+                                                    )}
+                                                  </Box>
+                                                )}
+                                              </Box>
+                                            )}
+                                            {!fileDiff && (
+                                              <Typography variant="caption" color="text.secondary">
+                                                {t('planningData.history.noDiffAvailable')}
+                                              </Typography>
+                                            )}
+                                          </Box>
+                                        );
+                                      })}
+                                    </Box>
+                                  </>
+                                ) : (
+                                  <Typography variant="body2" color="text.secondary">
+                                    {t('planningData.history.noChanges')}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-            {/* Pagination */}
-            <SimplePagination
-              count={filteredHistory.length}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={(_, newPage) => setPage(newPage)}
-              onRowsPerPageChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setPage(0);
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
+              {/* Pagination */}
+              <SimplePagination
+                count={filteredHistory.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setPage(0);
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Reset Confirmation Dialog */}
       <Dialog

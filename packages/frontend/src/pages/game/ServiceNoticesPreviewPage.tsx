@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import serviceNoticeService, { ServiceNotice } from '../../services/serviceNoticeService';
 import { formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { Tooltip } from '@mui/material';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const PREVIEW_WIDTH = 1536;
 const PREVIEW_HEIGHT = 928;
@@ -140,6 +141,8 @@ const saveReadNotices = (readNotices: Set<number>) => {
 
 const ServiceNoticesPreviewPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [notices, setNotices] = useState<ServiceNotice[]>([]);
   const [selectedNotice, setSelectedNotice] = useState<ServiceNotice | null>(null);
   const [readNotices, setReadNotices] = useState<Set<number>>(getReadNotices());
@@ -185,7 +188,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
 
         // Get all active notices
         console.log('[ServiceNoticesPreview] Calling API...');
-        const result = await serviceNoticeService.getServiceNotices(1, 100, {
+        const result = await serviceNoticeService.getServiceNotices(projectApiPath, 1, 100, {
           isActive: true,
         });
         console.log('[ServiceNoticesPreview] API response:', result);

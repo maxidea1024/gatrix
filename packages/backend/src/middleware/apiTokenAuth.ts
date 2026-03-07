@@ -2,17 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiAccessToken } from '../models/ApiAccessToken';
 import { Environment } from '../models/Environment';
 import { CacheService } from '../services/CacheService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('apiTokenAuth');
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import { ErrorCodes } from '../utils/apiResponse';
 
 // ==================== Constants ====================
 
-const UNSECURED_TOKENS = {
-  CLIENT: 'gatrix-unsecured-client-api-token',
-  SERVER: 'gatrix-unsecured-server-api-token',
-  EDGE: 'gatrix-unsecured-edge-api-token',
-} as const;
+// Unsecured token format: unsecured-{org}:{project}:{env}-{server|client|edge}-api-token
+// Only allowed when ALLOW_UNSECURED_TOKENS=true is set in the environment
+const ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
+const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
 
 export const EDGE_BYPASS_TOKEN =
   process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
@@ -24,10 +25,13 @@ const CACHE_TTL = 300; // 5 minutes
 export interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
   environments?: Environment[];
-  environment?: string;
+  environmentId?: string;
   environmentModel?: Environment;
   isUnsecuredToken?: boolean;
   isEdgeBypassToken?: boolean;
+  unsecuredOrgId?: string;
+  unsecuredProjectId?: string;
+  unsecuredEnvironmentId?: string;
 }
 
 // ==================== Helpers ====================
@@ -50,34 +54,35 @@ function extractToken(req: Request): string | undefined {
 
 /**
  * Handles special internal/testing tokens
+ * Unsecured token format: unsecured-{org}:{project}:{env}-{server|client|edge}-api-token
  */
 function handleSpecialTokens(token: string): {
   apiToken: Partial<ApiAccessToken>;
   isUnsecured?: boolean;
   isEdgeBypass?: boolean;
+  unsecuredOrgId?: string;
+  unsecuredProjectId?: string;
+  unsecuredEnvironmentId?: string;
 } | null {
-  // Unsecured testing tokens
-  if (
-    token === UNSECURED_TOKENS.CLIENT ||
-    token === UNSECURED_TOKENS.SERVER ||
-    token === UNSECURED_TOKENS.EDGE
-  ) {
-    const typeMap: Record<string, 'client' | 'server' | 'edge' | 'all'> = {
-      [UNSECURED_TOKENS.CLIENT]: 'client',
-      [UNSECURED_TOKENS.SERVER]: 'server',
-      [UNSECURED_TOKENS.EDGE]: 'all',
-    };
-    const type = typeMap[token] || 'client';
-    return {
-      apiToken: {
-        id: `unsecured-${type}`,
-        tokenType: type as any,
-        tokenName: `Unsecured ${type.toUpperCase()} Token`,
-        allowAllEnvironments: true,
-        createdBy: 0, // Mock system user ID
-      },
-      isUnsecured: true,
-    };
+  // Unsecured tokens — only allowed when explicitly enabled
+  if (ALLOW_UNSECURED_TOKENS) {
+    const match = token.match(UNSECURED_TOKEN_REGEX);
+    if (match) {
+      const [, orgId, projectId, envId, tokenType] = match;
+      const type = tokenType as 'client' | 'server' | 'edge';
+      return {
+        apiToken: {
+          id: `unsecured-${tokenType}-${orgId}-${projectId}`,
+          projectId,
+          tokenType: type as any,
+          tokenName: `Unsecured ${tokenType.toUpperCase()} Token (${orgId}/${projectId}/${envId})`,
+        },
+        isUnsecured: true,
+        unsecuredOrgId: orgId,
+        unsecuredProjectId: projectId,
+        unsecuredEnvironmentId: envId,
+      };
+    }
   }
 
   // Edge internal bypass token
@@ -85,10 +90,9 @@ function handleSpecialTokens(token: string): {
     return {
       apiToken: {
         id: 'edge-bypass',
-        tokenType: 'all',
+        tokenType: 'server',
         tokenName: 'Edge Bypass Token (Internal)',
-        allowAllEnvironments: true,
-        createdBy: 0, // Mock system user ID
+        createdBy: '',
       },
       isEdgeBypass: true,
     };
@@ -98,25 +102,15 @@ function handleSpecialTokens(token: string): {
 }
 
 /**
- * Validates if token has access to specific environment
+ * Validates if token has access to specific environment.
+ * With single environmentId, this is a simple string comparison.
  */
-async function checkEnvironmentAccess(
-  apiToken: ApiAccessToken,
-  environmentName: string
-): Promise<boolean> {
-  if (apiToken.allowAllEnvironments) return true;
-
+function checkEnvironmentAccess(apiToken: ApiAccessToken, environmentId: string): boolean {
   if (typeof apiToken.hasEnvironmentAccess === 'function') {
-    return await apiToken.hasEnvironmentAccess(environmentName);
+    return apiToken.hasEnvironmentAccess(environmentId);
   }
-
   // Fallback for cached plain objects
-  const { default: knex } = await import('../config/knex');
-  const envAccess = await knex('g_api_access_token_environments')
-    .where('tokenId', apiToken.id)
-    .where('environment', environmentName)
-    .first();
-  return !!envAccess;
+  return apiToken.environmentId === environmentId;
 }
 
 // ==================== Middlewares ====================
@@ -140,6 +134,10 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       req.isUnsecuredToken = special.isUnsecured || false;
       req.isEdgeBypassToken = special.isEdgeBypass || false;
       req.apiToken = special.apiToken as ApiAccessToken;
+      // For unsecured tokens, auto-set environmentId from parsed token
+      if (special.unsecuredEnvironmentId) {
+        req.environmentId = special.unsecuredEnvironmentId;
+      }
       return next();
     }
 
@@ -199,7 +197,7 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
       });
     }
 
-    if (apiToken.tokenType === 'all' || apiToken.tokenType === (tokenType as any)) {
+    if (apiToken.tokenType === (tokenType as any)) {
       return next();
     }
 
@@ -232,7 +230,7 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
     logger.warn('Auth: Application name missing', { url: req.originalUrl });
     return res.status(400).json({
       success: false,
-      error: { code: ErrorCodes.BAD_REQUEST, message: 'X-Application-Name is required' },
+      error: { code: ErrorCodes.BAD_REQUEST, message: `${HEADERS.X_APPLICATION_NAME} is required` },
     });
   }
 
@@ -250,60 +248,72 @@ export const validateApplicationName = (req: SDKRequest, res: Response, next: Ne
 };
 
 /**
- * Resolves atmosphere and environment, validates access
+ * Resolves environment from token (token determines everything).
+ * Falls back to X-Environment-Id header or :env path param for backward compatibility.
  */
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
-    const environmentName =
-      (req.headers[HEADERS.X_ENVIRONMENT] as string) ||
+    // Token determines environment — no more X-Environment-Id header needed
+    const environmentId =
+      req.apiToken?.environmentId ||
+      req.environmentId || // Already set by unsecured token handler
+      (req.headers[HEADERS.X_ENVIRONMENT] as string) || // Legacy fallback
       (req.params.env as string) ||
-      (req.params.environment as string) ||
-      (req.query.environment as string);
+      (req.query.environmentId as string);
 
-    if (!environmentName) {
-      logger.warn('Auth: Environment missing in request', { url: req.originalUrl });
+    if (!environmentId) {
+      logger.warn('Auth: Environment not determined from token', {
+        url: req.originalUrl,
+        tokenId: req.apiToken?.id,
+      });
       return res.status(400).json({
         success: false,
-        error: { code: ErrorCodes.ENV_INVALID, message: 'Environment is required' },
+        error: {
+          code: ErrorCodes.ENV_INVALID,
+          message: 'Environment could not be determined from token',
+        },
       });
     }
 
     // Resolve and validate environment
-    const cacheKey = `sdk_env:${environmentName}`;
-    let environment = await CacheService.get<Environment>(cacheKey);
+    const cacheKey = `sdk_env:${environmentId}`;
+    let env = await CacheService.get<Environment>(cacheKey);
 
-    if (!environment) {
-      environment = (await Environment.getByName(environmentName)) || null;
-      if (!environment) {
-        logger.warn('Auth: Environment not found', { environmentName });
+    if (!env) {
+      env = (await Environment.getById(environmentId)) || null;
+      if (!env) {
+        logger.warn('Auth: Environment not found', { environmentId });
         return res.status(404).json({
           success: false,
           error: {
             code: ErrorCodes.ENV_NOT_FOUND,
-            message: `Environment not found: ${environmentName}`,
+            message: `Environment not found: ${environmentId}`,
           },
         });
       }
-      await CacheService.set(cacheKey, environment, CACHE_TTL);
+      await CacheService.set(cacheKey, env, CACHE_TTL);
     }
 
-    req.environment = environment.environment;
-    req.environmentModel = environment;
+    req.environmentId = env.id;
+    req.environmentModel = env;
 
-    // Access check
-    if (!req.isUnsecuredToken && req.apiToken) {
-      const hasAccess = await checkEnvironmentAccess(req.apiToken, req.environment);
+    // Access check (skip for unsecured/bypass tokens)
+    if (!req.isUnsecuredToken && !req.isEdgeBypassToken && req.apiToken) {
+      const hasAccess = checkEnvironmentAccess(req.apiToken, req.environmentId);
       if (!hasAccess) {
         logger.warn('Auth: Environment access denied', {
           tokenId: req.apiToken.id,
           tokenType: req.apiToken.tokenType,
-          env: req.environment,
+          tokenEnv: req.apiToken.environmentId,
+          requestedEnv: req.environmentId,
           url: req.originalUrl,
-          allowAll: req.apiToken.allowAllEnvironments,
         });
         return res.status(403).json({
           success: false,
-          error: { code: ErrorCodes.ENV_ACCESS_DENIED, message: 'No access to this environment' },
+          error: {
+            code: ErrorCodes.ENV_ACCESS_DENIED,
+            message: 'Token does not have access to this environment',
+          },
         });
       }
     }

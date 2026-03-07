@@ -2,27 +2,63 @@ import { Request, Response } from 'express';
 import { Environment } from '../models/Environment';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EnvironmentController');
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
 import { initializeSystemKV } from '../utils/systemKV';
 import { pubSubService } from '../services/PubSubService';
 import { ErrorCodes } from '../utils/apiResponse';
+import { permissionService } from '../services/PermissionService';
 
 export class EnvironmentController {
   /**
-   * Get all environments
+   * Get all environments for a specific project
    */
   static getEnvironments = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { projectId } = req.params;
     const includeHidden = req.query.includeHidden === 'true';
-    const environments = await Environment.getAll(includeHidden);
+    const userId = req.user?.userId;
 
-    // Get stats for each environment and add id field for frontend compatibility
+    if (!projectId) {
+      throw new GatrixError('Project ID is required', 400, true, ErrorCodes.VALIDATION_ERROR);
+    }
+
+    // Get environments scoped to this project
+    const query = Environment.query()
+      .where('projectId', projectId)
+      .orderBy('displayOrder', 'asc')
+      .orderBy('displayName');
+
+    if (!includeHidden) {
+      query.where('isHidden', false);
+    }
+
+    let environments = await query;
+
+    // Apply RBAC filtering: only return environments user has access to
+    if (userId) {
+      const { orgId } = req.params;
+      try {
+        const accessibleEnvIds = await permissionService.getAccessibleEnvironmentIds(
+          userId,
+          orgId,
+          projectId
+        );
+        // If accessibleEnvIds is empty array, user may be super admin (handled by permissionService)
+        if (accessibleEnvIds.length > 0) {
+          environments = environments.filter((env) => accessibleEnvIds.includes(env.id));
+        }
+      } catch (err) {
+        logger.warn('Failed to check user environment access', { userId, err });
+      }
+    }
+
+    // Get stats for each environment
     const environmentsWithStats = await Promise.all(
       environments.map(async (env) => {
         const stats = await env.getStats();
         return {
-          id: env.environment, // Map environment to id for frontend compatibility
-          environmentName: env.environment, // Also provide as environmentName
           ...env,
           stats,
         };
@@ -36,13 +72,13 @@ export class EnvironmentController {
   });
 
   /**
-   * Get environment by name
+   * Get environment by id
    */
   static getEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { environment } = req.params;
+    const { environmentId } = req.params;
 
     const env = await Environment.query()
-      .findById(environment)
+      .findById(environmentId)
       .withGraphFetched('[creator(basicInfo), updater(basicInfo)]')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email'),
@@ -68,21 +104,24 @@ export class EnvironmentController {
    */
   static createEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const {
-      environment,
       displayName,
       description,
       environmentType,
       color,
       displayOrder,
-      projectId,
       requiresApproval,
       requiredApprovers,
       baseEnvironment,
     } = req.body;
     const userId = (req.user as any)?.userId;
+    const projectId = req.params.projectId;
 
     if (!userId) {
       throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
+    }
+
+    if (!projectId) {
+      throw new GatrixError('Project ID is required', 400, true, ErrorCodes.BAD_REQUEST);
     }
 
     // Validate base environment if provided
@@ -95,7 +134,6 @@ export class EnvironmentController {
 
     try {
       const newEnv = await Environment.createEnvironment({
-        environment,
         displayName,
         description,
         environmentType: environmentType || 'development',
@@ -103,7 +141,7 @@ export class EnvironmentController {
         isHidden: false,
         displayOrder: displayOrder || 99,
         color: color || '#607D8B',
-        projectId: projectId || undefined,
+        projectId,
         isDefault: false,
         requiresApproval: requiresApproval || false,
         requiredApprovers: requiredApprovers || 1,
@@ -113,15 +151,16 @@ export class EnvironmentController {
       // Note: Segments will be created by new remote config system when implemented
       if (!baseEnvironment) {
         // Initialize system-defined KV items ($channels, $platforms, $clientVersionPassiveData)
-        await initializeSystemKV(newEnv.environment);
-        logger.info(`System KV items initialized for new environment: ${environment}`);
+        await initializeSystemKV(newEnv.id);
+
+        logger.info(`System KV items initialized for new environmentId: ${newEnv.id}`);
       }
 
       // Copy data from base environment if provided
       let copyResult = null;
       if (baseEnvironment) {
         logger.info(
-          `Copying data from base environment ${baseEnvironment} to new environment ${newEnv.environment}`
+          `Copying data from base environmentId ${baseEnvironment} to new environmentId ${newEnv.id}`
         );
 
         const copyOptions: CopyOptions = {
@@ -149,24 +188,24 @@ export class EnvironmentController {
 
         copyResult = await EnvironmentCopyService.copyEnvironmentData(
           baseEnvironment,
-          newEnv.environment,
+          newEnv.id,
           copyOptions,
           userId
         );
 
-        logger.info(`Data copied from base environment to ${environment}`, {
+        logger.info(`Data copied from base environmentId to ${newEnv.id}`, {
           copyResult,
         });
       }
 
-      logger.info(`Environment created: ${environment} by user ${userId}`);
+      logger.info(`Environment created: ${newEnv.id} by user ${userId}`);
 
       // Publish SDK event for dynamic environment detection
       try {
         await pubSubService.publishSDKEvent({
           type: 'environment.created',
           data: {
-            environment: newEnv.environment,
+            environmentId: newEnv.id,
             timestamp: Date.now(),
           },
         });
@@ -186,6 +225,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error creating environment:', error);
+
       res.status(400).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to create environment',
@@ -197,7 +237,7 @@ export class EnvironmentController {
    * Update environment
    */
   static updateEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { environment } = req.params;
+    const { environmentId } = req.params;
     const {
       displayName,
       description,
@@ -214,13 +254,13 @@ export class EnvironmentController {
       throw new GatrixError('User not authenticated', 401, true, ErrorCodes.UNAUTHORIZED);
     }
 
-    const env = await Environment.query().findById(environment);
+    const env = await Environment.query().findById(environmentId);
     if (!env) {
       throw new GatrixError('Environment not found', 404, true, ErrorCodes.ENV_NOT_FOUND);
     }
 
     // Prevent modifying hidden status for system environments like gatrix-env
-    if (isHidden !== undefined && env.environment === 'gatrix-env') {
+    if (isHidden !== undefined && env.displayName === 'gatrix-env') {
       return res.status(400).json({
         success: false,
         code: 'CANNOT_MODIFY_SYSTEM_ENVIRONMENT',
@@ -243,7 +283,7 @@ export class EnvironmentController {
         userId
       );
 
-      logger.info(`Environment updated: ${env.environment} by user ${userId}`);
+      logger.info(`Environment updated: ${env.id} by user ${userId}`);
 
       res.json({
         success: true,
@@ -252,6 +292,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error updating environment:', error);
+
       res.status(400).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to update environment',
@@ -263,7 +304,7 @@ export class EnvironmentController {
    * Get related data details for an environment (for delete confirmation)
    */
   static getEnvironmentRelatedData = asyncHandler(async (req: Request, res: Response) => {
-    const { environment: envParam } = req.params;
+    const { environmentId: envParam } = req.params;
 
     const env = await Environment.query().findById(envParam);
     if (!env) {
@@ -273,13 +314,27 @@ export class EnvironmentController {
       });
     }
 
-    const relatedData = await env.getRelatedDataDetails();
+    let relatedData;
+    try {
+      relatedData = await env.getRelatedDataDetails();
+    } catch (err) {
+      logger.error('getRelatedDataDetails failed:', {
+        environmentId: envParam,
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to load related data',
+      });
+    }
 
     res.json({
       success: true,
       data: {
-        environment: {
-          environment: env.environment,
+        environmentId: {
+          environmentId: env.id,
           displayName: env.displayName,
           isSystemDefined: env.isSystemDefined,
           isDefault: env.isDefault,
@@ -295,7 +350,7 @@ export class EnvironmentController {
    * Delete environment
    */
   static deleteEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { environment: envParam } = req.params;
+    const { environmentId: envParam } = req.params;
     const { force } = req.body || {};
     const userId = (req.user as any)?.userId;
 
@@ -315,12 +370,12 @@ export class EnvironmentController {
     }
 
     try {
-      const environmentName = env.environment;
+      const environmentName = env.id;
       await env.deleteEnvironment(force === true);
 
       logger.info(`Environment deleted: ${environmentName} by user ${userId}`, {
         force,
-        environment: envParam,
+        environmentId: envParam,
       });
 
       // Publish SDK event for dynamic environment detection
@@ -328,7 +383,7 @@ export class EnvironmentController {
         await pubSubService.publishSDKEvent({
           type: 'environment.deleted',
           data: {
-            environment: environmentName,
+            environmentId: environmentName,
             timestamp: Date.now(),
           },
         });
@@ -382,9 +437,9 @@ export class EnvironmentController {
    * Get environment segments - Placeholder for new remote config system
    */
   static getEnvironmentSegments = asyncHandler(async (req: Request, res: Response) => {
-    const { environment } = req.params;
+    const { environmentId } = req.params;
 
-    const env = await Environment.query().findById(environment);
+    const env = await Environment.query().findById(environmentId);
     if (!env) {
       return res.status(404).json({
         success: false,
@@ -403,7 +458,7 @@ export class EnvironmentController {
    * Create predefined segments for environment - Placeholder for new remote config system
    */
   static createPredefinedSegments = asyncHandler(async (req: Request, res: Response) => {
-    const { environment } = req.params;
+    const { environmentId } = req.params;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
@@ -413,7 +468,7 @@ export class EnvironmentController {
       });
     }
 
-    const env = await Environment.query().findById(environment);
+    const env = await Environment.query().findById(environmentId);
     if (!env) {
       return res.status(404).json({
         success: false,
@@ -433,9 +488,9 @@ export class EnvironmentController {
    * Get environment statistics
    */
   static getEnvironmentStats = asyncHandler(async (req: Request, res: Response) => {
-    const { environment } = req.params;
+    const { environmentId } = req.params;
 
-    const env = await Environment.query().findById(environment);
+    const env = await Environment.query().findById(environmentId);
     if (!env) {
       return res.status(404).json({
         success: false,
@@ -455,16 +510,16 @@ export class EnvironmentController {
    * Validate environment name
    */
   static validateEnvironmentName = asyncHandler(async (req: Request, res: Response) => {
-    const { environment } = req.body;
+    const { environmentId } = req.body;
 
-    if (!environment) {
+    if (!environmentId) {
       return res.status(400).json({
         success: false,
         message: 'Environment name is required',
       });
     }
 
-    const isValid = Environment.isValidEnvironmentName(environment);
+    const isValid = Environment.isValidEnvironmentName(environmentId);
     if (!isValid) {
       return res.status(400).json({
         success: false,
@@ -473,7 +528,7 @@ export class EnvironmentController {
       });
     }
 
-    const existing = await Environment.getByName(environment);
+    const existing = await Environment.query().where('displayName', req.body.name).first();
     if (existing) {
       return res.status(409).json({
         success: false,
@@ -536,7 +591,7 @@ export class EnvironmentController {
       );
 
       logger.info(
-        `Environment data copied from ${sourceEnv.environment} to ${targetEnv.environment} by user ${userId}`,
+        `Environment data copied from ${sourceEnv.displayName} to ${targetEnv.displayName} by user ${userId}`,
         {
           result,
         }
@@ -549,6 +604,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error copying environment data:', error);
+
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to copy environment data',
@@ -588,12 +644,12 @@ export class EnvironmentController {
 
       // Fill in environment info
       preview.source = {
-        environment: sourceEnv.environment,
-        name: sourceEnv.displayName,
+        environmentId: sourceEnv.id,
+        displayName: sourceEnv.displayName,
       };
       preview.target = {
-        environment: targetEnv.environment,
-        name: targetEnv.displayName,
+        environmentId: targetEnv.id,
+        displayName: targetEnv.displayName,
       };
 
       res.json({
@@ -602,6 +658,7 @@ export class EnvironmentController {
       });
     } catch (error) {
       logger.error('Error getting copy preview:', error);
+
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to get copy preview',

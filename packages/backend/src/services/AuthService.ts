@@ -2,7 +2,9 @@
 import { UserModel } from '../models/User';
 import { JwtUtils } from '../utils/jwt';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuthService');
 import { CreateUserData, UserWithoutPassword } from '../types/user';
 import db from '../config/knex';
 
@@ -59,8 +61,25 @@ export class AuthService {
       delete (userWithoutPassword as any).passwordHash;
 
       // Generate tokens
-      const accessToken = JwtUtils.generateToken(userWithoutPassword as any);
-      const refreshToken = JwtUtils.generateRefreshToken(userWithoutPassword as any);
+      // Look up org membership to include correct orgId in JWT
+      let orgId = '';
+      try {
+        const membership = await db('g_organisation_members')
+          .where('userId', user.id)
+          .orderBy('joinedAt', 'asc')
+          .first();
+        if (membership) {
+          orgId = membership.orgId;
+        }
+      } catch (err) {
+        logger.warn('Failed to lookup org membership during login:', err);
+      }
+
+      const accessToken = JwtUtils.generateToken(userWithoutPassword as any, orgId);
+      const refreshToken = JwtUtils.generateRefreshToken(
+        userWithoutPassword as any,
+        orgId
+      );
 
       logger.info('User logged in successfully:', {
         userId: user.id,
@@ -151,8 +170,8 @@ export class AuthService {
       }
 
       // Generate new tokens
-      const newAccessToken = JwtUtils.generateToken(user);
-      const newRefreshToken = JwtUtils.generateRefreshToken(user);
+      const newAccessToken = JwtUtils.generateToken(user, payload.orgId);
+      const newRefreshToken = JwtUtils.generateRefreshToken(user, payload.orgId);
 
       return {
         accessToken: newAccessToken,
@@ -168,7 +187,7 @@ export class AuthService {
   }
 
   static async changePassword(
-    userId: number,
+    userId: string,
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
@@ -179,7 +198,7 @@ export class AuthService {
         throw new GatrixError('User not found', 404);
       }
 
-      // OAuth 사용자들은 비밀번호 변경 불가
+      // OAuth Used자들은 비밀번호 변경 불가
       if (user.authType !== 'local') {
         throw new GatrixError('Password change is not available for OAuth users', 400);
       }
@@ -191,7 +210,7 @@ export class AuthService {
           throw new GatrixError('Current password is incorrect', 400);
         }
       } else {
-        // local 사용자인데 passwordHash가 없는 경우 (데이터 불일치)
+        // local Used자인데 passwordHash가 없는 경우 (데이터 불일치)
         throw new GatrixError('Password not set for this account', 400);
       }
 
@@ -221,12 +240,12 @@ export class AuthService {
         return;
       }
 
-      // 1. 보안 리셋 토큰 생성
+      // 1. 보안 리셋 토큰 Create
       const crypto = require('crypto');
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 만료
+      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 Expired
 
-      // 2. 데이터베이스에 토큰 저장
+      // 2. 데이터베이스에 Save token
       await db('g_password_reset_tokens').insert({
         userId: user.id,
         token: resetToken,
@@ -262,7 +281,7 @@ export class AuthService {
     }
   }
 
-  static async verifyEmail(userId: number): Promise<void> {
+  static async verifyEmail(userId: string): Promise<void> {
     try {
       await UserModel.update(userId, {
         emailVerified: true,
@@ -277,7 +296,7 @@ export class AuthService {
     }
   }
 
-  static async getProfile(userId: number): Promise<UserWithoutPassword> {
+  static async getProfile(userId: string): Promise<UserWithoutPassword> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -295,7 +314,7 @@ export class AuthService {
   }
 
   static async updateProfile(
-    userId: number,
+    userId: string,
     updateData: {
       name?: string;
       avatarUrl?: string;

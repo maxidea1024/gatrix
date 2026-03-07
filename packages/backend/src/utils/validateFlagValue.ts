@@ -130,7 +130,7 @@ function validateString(value: any, rules: ValidationRules, errors: string[]): a
 function validateNumber(value: any, rules: ValidationRules, errors: string[]): void {
   const numValue = typeof value === 'number' ? value : Number(value);
 
-  if (isNaN(numValue)) {
+  if (!numValue) {
     errors.push('INVALID_NUMBER');
     return;
   }

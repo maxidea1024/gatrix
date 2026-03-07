@@ -181,14 +181,14 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
             </Grid>
           )}
 
-          {execution.error_message && (
+          {execution.errorMessage && (
             <Grid size={{ xs: 12 }}>
               <Alert severity="error">
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.errorMessage')}
                 </Typography>
                 <Typography variant="body2" component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
-                  {execution.error_message}
+                  {execution.errorMessage}
                 </Typography>
               </Alert>
             </Grid>

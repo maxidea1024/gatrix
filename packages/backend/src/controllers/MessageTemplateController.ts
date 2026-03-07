@@ -9,12 +9,12 @@ export class MessageTemplateController {
 
       // Handle createdBy as single value or array
       const createdBy = req.query.createdBy;
-      let createdByValue: number | number[] | undefined;
+      let createdByValue: string[] | undefined;
       if (createdBy !== undefined) {
         if (Array.isArray(createdBy)) {
-          createdByValue = createdBy.map((v) => Number(v));
+          createdByValue = createdBy.map((v) => String(v));
         } else {
-          createdByValue = Number(createdBy);
+          createdByValue = [String(createdBy)];
         }
       }
       const createdByOperator = req.query.createdBy_operator as
@@ -41,18 +41,18 @@ export class MessageTemplateController {
         | 'include_all'
         | undefined;
 
-      // tags 파라미터 처리 (배열로 변환)
+      // tags Parameters 처리 (배열로 변환)
       let tagIds: string[] | undefined;
       if (tags) {
         tagIds = Array.isArray(tags) ? tags : [tags];
       }
       const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
 
-      // MessageTemplateModel 사용
+      // MessageTemplateModel Used
       const result = await MessageTemplateModel.findAllWithPagination({
-        environment,
+        environmentId,
         createdBy: createdByValue,
         createdBy_operator: createdByOperator,
         isEnabled: isEnabledValue,
@@ -72,9 +72,9 @@ export class MessageTemplateController {
 
   static async get(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
-      const environment = req.environment || 'development';
-      const data = await MessageTemplateModel.findById(id, environment);
+      const id = req.params.id;
+      const environmentId = req.environmentId || 'development';
+      const data = await MessageTemplateModel.findById(id, environmentId);
       if (!data) return res.status(404).json({ success: false, message: 'Not found' });
       res.json({ success: true, data });
     } catch (e) {
@@ -85,7 +85,7 @@ export class MessageTemplateController {
   static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const body = req.body as MessageTemplate;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
 
       // Check for duplicate name
       const existing = await MessageTemplateModel.findByName(body.name);
@@ -107,7 +107,7 @@ export class MessageTemplateController {
           created_by: (req as any)?.user?.userId,
           updated_by: (req as any)?.user?.userId,
         },
-        environment
+        environmentId
       );
       res.status(201).json({ success: true, data: created });
     } catch (e) {
@@ -117,9 +117,9 @@ export class MessageTemplateController {
 
   static async update(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id;
       const body = req.body as MessageTemplate;
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
 
       // Check for duplicate name (excluding current template)
       const existing = await MessageTemplateModel.findByName(body.name, id);
@@ -142,7 +142,7 @@ export class MessageTemplateController {
           created_by: (req as any)?.user?.userId,
           updated_by: (req as any)?.user?.userId,
         },
-        environment
+        environmentId
       );
       res.json({ success: true, data: updated });
     } catch (e) {
@@ -152,9 +152,9 @@ export class MessageTemplateController {
 
   static async remove(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
-      const environment = req.environment || 'development';
-      await MessageTemplateModel.delete(id, environment);
+      const id = req.params.id;
+      const environmentId = req.environmentId || 'development';
+      await MessageTemplateModel.delete(id, environmentId);
       res.json({ success: true });
     } catch (e) {
       next(e);
@@ -165,10 +165,10 @@ export class MessageTemplateController {
     try {
       const { ids } = req.body;
 
-      const environment = req.environment || 'development';
+      const environmentId = req.environmentId || 'development';
 
       // Delete all templates
-      await Promise.all(ids.map((id: any) => MessageTemplateModel.delete(Number(id), environment)));
+      await Promise.all(ids.map((id: any) => MessageTemplateModel.delete(id, environmentId)));
 
       res.json({
         success: true,
@@ -179,7 +179,7 @@ export class MessageTemplateController {
     }
   }
 
-  // 메시지 템플릿 태그 설정
+  // 메시지 템플릿 태그 Settings
   static async setTags(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
@@ -192,7 +192,7 @@ export class MessageTemplateController {
         });
       }
 
-      await MessageTemplateModel.setTags(parseInt(id), tagIds);
+      await MessageTemplateModel.setTags(id, tagIds);
 
       res.json({
         success: true,
@@ -207,7 +207,7 @@ export class MessageTemplateController {
   static async getTags(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const tags = await MessageTemplateModel.getTags(parseInt(id));
+      const tags = await MessageTemplateModel.getTags(id);
 
       res.json({
         success: true,

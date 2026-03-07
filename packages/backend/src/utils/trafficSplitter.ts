@@ -33,7 +33,7 @@ export class TrafficSplitter {
    * @param experimentId - Experiment identifier for consistent hashing
    * @returns Selected variant or null if user is not in any variant
    */
-  static selectVariant<T extends { id: number | string; trafficPercentage: number }>(
+  static selectVariant<T extends { id: string; trafficPercentage: number }>(
     userId: string,
     variants: T[],
     experimentId: string
@@ -97,7 +97,7 @@ export class TrafficSplitter {
    * @returns Object with group assignments
    */
   static multivariateAssignment<
-    T extends Record<string, { variants: Array<{ id: string | number; percentage: number }> }>,
+    T extends Record<string, { variants: Array<{ id: string; percentage: number }> }>,
   >(userId: string, groups: T, experimentId: string): Record<keyof T, string | number | null> {
     const result: Record<keyof T, string | number | null> = {} as any;
 
@@ -129,7 +129,7 @@ export class TrafficSplitter {
    * @param experimentId - Experiment identifier
    * @returns Distribution statistics
    */
-  static calculateDistribution<T extends { id: number | string; trafficPercentage: number }>(
+  static calculateDistribution<T extends { id: string; trafficPercentage: number }>(
     userIds: string[],
     variants: T[],
     experimentId: string
@@ -204,7 +204,7 @@ export class TrafficSplitter {
    * @param experimentId - Experiment identifier
    * @returns Selected variant or null
    */
-  static selectVariantFast<T extends { id: number | string; trafficPercentage: number }>(
+  static selectVariantFast<T extends { id: string; trafficPercentage: number }>(
     userId: string,
     variants: T[],
     experimentId: string
@@ -284,7 +284,7 @@ export class CampaignEvaluator {
    */
   static getActiveCampaign<
     T extends {
-      id: number | string;
+      id: string;
       priority: number;
       startDate: Date;
       endDate: Date;
@@ -413,7 +413,7 @@ export class TrafficSplitterUtils {
    * @param experimentId - Experiment identifier
    * @returns Accuracy metrics
    */
-  static validateVariantDistribution<T extends { id: string | number; trafficPercentage: number }>(
+  static validateVariantDistribution<T extends { id: string; trafficPercentage: number }>(
     variants: T[],
     sampleSize: number = 100000,
     experimentId: string = 'test'

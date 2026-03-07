@@ -1,21 +1,23 @@
 import { Request, Response } from 'express';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerChatController');
 
 export interface ServerChatRequest extends Request {
   apiToken?: any;
 }
 
-// 메모리에 채팅 서버 정보 저장 (실제로는 DB 사용)
+// 메모리에 채팅 서버 정보 Save (실제로는 DB Used)
 const chatServers = new Map<string, any>();
 const chatStats = new Map<string, any>();
 
 class ServerChatController {
-  // 채팅 서버 등록
+  // 채팅 서버 Register
   static async registerServer(req: ServerChatRequest, res: Response) {
     try {
       const { serverId, host, port, maxConnections, capabilities } = req.body;
 
-      // 필수 필드 검증
+      // Validate required fields
       if (!serverId || !host || !port) {
         return res.status(400).json({
           success: false,
@@ -23,7 +25,7 @@ class ServerChatController {
         });
       }
 
-      // 서버 정보 저장
+      // 서버 정보 Save
       const serverInfo = {
         serverId,
         host,
@@ -63,7 +65,7 @@ class ServerChatController {
     }
   }
 
-  // 채팅 서버 등록 해제
+  // 채팅 서버 Register Unregister
   static async unregisterServer(req: ServerChatRequest, res: Response) {
     try {
       const serverId = req.body.serverId || req.params.serverId;
@@ -84,7 +86,7 @@ class ServerChatController {
         });
       }
 
-      // 서버 정보 제거
+      // Remove server info
       chatServers.delete(serverId);
       chatStats.delete(serverId);
 
@@ -108,12 +110,12 @@ class ServerChatController {
     }
   }
 
-  // 채팅 통계 보고
+  // Report chat statistics
   static async reportStats(req: ServerChatRequest, res: Response) {
     try {
       const { serverId, connectedUsers, activeChannels, messagesPerSecond, timestamp } = req.body;
 
-      // 필수 필드 검증
+      // Validate required fields
       if (!serverId || connectedUsers === undefined || activeChannels === undefined) {
         return res.status(400).json({
           success: false,
@@ -121,7 +123,7 @@ class ServerChatController {
         });
       }
 
-      // 서버가 등록되어 있는지 확인
+      // Check if server is registered
       const serverInfo = chatServers.get(serverId);
       if (!serverInfo) {
         return res.status(404).json({
@@ -130,7 +132,7 @@ class ServerChatController {
         });
       }
 
-      // 통계 정보 저장
+      // Save statistics info
       const statsData = {
         serverId,
         connectedUsers,
@@ -142,7 +144,7 @@ class ServerChatController {
 
       chatStats.set(serverId, statsData);
 
-      // 서버 하트비트 업데이트
+      // Update server heartbeat
       serverInfo.lastHeartbeat = new Date();
       chatServers.set(serverId, serverInfo);
 
@@ -169,12 +171,12 @@ class ServerChatController {
     }
   }
 
-  // 채팅 활동 보고
+  // Report chat activity
   static async reportActivity(req: ServerChatRequest, res: Response) {
     try {
       const { userId, channelId, messageCount, lastActivityAt } = req.body;
 
-      // 필수 필드 검증
+      // Validate required fields
       if (!userId || !channelId || messageCount === undefined) {
         return res.status(400).json({
           success: false,
@@ -182,7 +184,7 @@ class ServerChatController {
         });
       }
 
-      // 활동 정보 로깅
+      // Log activity info
       logger.info(`Chat activity reported:`, {
         userId,
         channelId,
@@ -208,7 +210,7 @@ class ServerChatController {
     }
   }
 
-  // 등록된 채팅 서버 목록 조회 (관리용)
+  // Get registered chat server list (for admin)
   static async getRegisteredServers(req: ServerChatRequest, res: Response) {
     try {
       const servers = Array.from(chatServers.values());

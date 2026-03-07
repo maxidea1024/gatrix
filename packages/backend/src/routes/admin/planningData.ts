@@ -1,6 +1,6 @@
 import { Router, Request } from 'express';
 import multer from 'multer';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { PlanningDataController } from '../../controllers/PlanningDataController';
 
 const router = Router() as any;
@@ -16,8 +16,6 @@ const upload = multer({
 
 // All planning data routes require authentication and admin role
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // Planning data routes
 router.get('/reward-lookup', PlanningDataController.getRewardLookup);
 router.get('/reward-types', PlanningDataController.getRewardTypeList);

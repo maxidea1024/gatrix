@@ -184,14 +184,14 @@ const worldSDK = GatrixServerSDK.createInstance(baseConfig, {
 
 ### 필수 설정 필드
 
-| 필드 | 타입 | 설명 | 예시 |
-|------|------|------|------|
-| `gatrixUrl` | string | Gatrix 백엔드 URL | `https://api.gatrix.com` |
-| `apiToken` | string | 서버 API 토큰 | `your-server-api-token` |
-| `applicationName` | string | 애플리케이션 이름 | `my-game-server` |
-| `service` | string | 서비스 이름 | `auth`, `lobby`, `world`, `chat` |
-| `group` | string | 서비스 그룹 | `kr`, `us`, `production` |
-| `environment` | string 또는 `'*'` | 환경 식별자 또는 멀티 환경 모드 | `env_prod`, `env_staging`, `*` |
+| 필드              | 타입              | 설명                            | 예시                             |
+| ----------------- | ----------------- | ------------------------------- | -------------------------------- |
+| `gatrixUrl`       | string            | Gatrix 백엔드 URL               | `https://api.gatrix.com`         |
+| `apiToken`        | string            | 서버 API 토큰                   | `your-server-api-token`          |
+| `applicationName` | string            | 애플리케이션 이름               | `my-game-server`                 |
+| `service`         | string            | 서비스 이름                     | `auth`, `lobby`, `world`, `chat` |
+| `group`           | string            | 서비스 그룹                     | `kr`, `us`, `production`         |
+| `environment`     | string 또는 `'*'` | 환경 식별자 또는 멀티 환경 모드 | `env_prod`, `env_staging`, `*`   |
 
 ### 멀티 환경 모드
 
@@ -211,6 +211,94 @@ const prodWorlds = sdk.getCachedGameWorlds('production');
 ```
 
 ## API 레퍼런스
+
+### 피처 플래그 (Feature Flags)
+
+백엔드 라운드트립 없이 로컬에서 플래그를 평가합니다. 캐시된 플래그 정의를 사용하여 `FeatureFlagEvaluator`로 평가하며, 모든 플랫폼에서 일관된 퍼센트 버킷팅을 위해 **MurmurHash3**를 사용합니다.
+
+#### 기본 사용법
+
+```typescript
+// 플래그 활성화 여부 확인 (명시적 폴백값 필수)
+const enabled = sdk.featureFlag.isEnabled('new_battle_mode', false);
+
+// 타입별 변형 값 가져오기
+const config = sdk.featureFlag.stringVariation('battle_config', 'default');
+const maxPlayers = sdk.featureFlag.numberVariation('max_players', 100);
+const premium = sdk.featureFlag.boolVariation('premium_mode', false);
+const settings = sdk.featureFlag.jsonVariation<GameSettings>('game_settings', defaultSettings);
+```
+
+#### 컨텍스트를 사용한 평가
+
+```typescript
+const context = {
+  userId: 'user-123',
+  sessionId: 'session-456',
+  appVersion: '1.2.3',
+  properties: {
+    platform: 'pc',
+    country: 'KR',
+    level: 50,
+  },
+};
+
+const enabled = sdk.featureFlag.isEnabled('new_feature', false, context);
+```
+
+#### 평가 메서드
+
+| 메서드                                             | 반환 타입          | 설명               |
+| -------------------------------------------------- | ------------------ | ------------------ |
+| `isEnabled(flag, fallback, context?, env?)`        | `boolean`          | 플래그 활성화 여부 |
+| `boolVariation(flag, fallback, context?, env?)`    | `boolean`          | 불리언 변형 값     |
+| `stringVariation(flag, fallback, context?, env?)`  | `string`           | 문자열 변형 값     |
+| `numberVariation(flag, fallback, context?, env?)`  | `number`           | 숫자 변형 값       |
+| `jsonVariation<T>(flag, fallback, context?, env?)` | `T`                | JSON 변형 값       |
+| `evaluate(flag, context?, env?)`                   | `EvaluationResult` | 전체 평가 상세     |
+
+#### 상세 메서드 (Detail)
+
+값과 함께 평가 메타데이터(reason, flagName, variantName)를 반환합니다:
+
+```typescript
+const detail = sdk.featureFlag.stringVariationDetail('feature_config', 'default', context);
+console.log('값:', detail.value);
+console.log('이유:', detail.reason); // 'strategy_match', 'default', 'disabled', 'not_found'
+```
+
+#### OrThrow 메서드
+
+플래그를 찾을 수 없거나 값이 없으면 `FeatureFlagError`를 throw합니다:
+
+```typescript
+try {
+  const value = sdk.featureFlag.stringVariationOrThrow('required_config', context);
+} catch (error) {
+  if (error instanceof FeatureFlagError) {
+    console.error('플래그 에러:', error.code, error.message);
+  }
+}
+```
+
+#### 정적 컨텍스트
+
+모든 평가에 적용되는 기본 컨텍스트를 설정합니다. 평가별 컨텍스트가 우선합니다:
+
+```typescript
+sdk.featureFlag.setStaticContext({
+  appName: 'my-game',
+  properties: { platform: 'pc', region: 'kr' },
+});
+```
+
+#### 평가 알고리즘
+
+- **MurmurHash3** (32비트, seed 0) 사용하여 일관된 퍼센트 버킷팅
+- 수식: `(murmurhash3(groupId + ':' + stickinessValue, 0) % 10001) / 100.0`
+- 범위: `0.00` – `100.00`
+- TypeScript (server-sdk)와 C# (dotnet-server-sdk)에서 동일한 결과 보장
+- 끈적임(stickiness) 모드: `default`, `userId`, `sessionId`, `random`, 또는 커스텀 컨텍스트 속성
 
 ### 쿠폰
 
@@ -279,10 +367,10 @@ const message = sdk.getWorldMaintenanceMessage('world-1', 'ko');
 
 #### 이름 규칙
 
-| 속성/메서드 | 설명 |
-|-------------|------|
-| `hasMaintenanceScheduled` | 점검이 예약되어 있는지 (관리자에서 설정) |
-| `isMaintenanceActive` | 점검이 현재 활성 상태인지 (시간 기반 확인) |
+| 속성/메서드               | 설명                                       |
+| ------------------------- | ------------------------------------------ |
+| `hasMaintenanceScheduled` | 점검이 예약되어 있는지 (관리자에서 설정)   |
+| `isMaintenanceActive`     | 점검이 현재 활성 상태인지 (시간 기반 확인) |
 
 ```typescript
 // 글로벌 서비스 점검 확인
@@ -337,11 +425,11 @@ const worldSurveys = sdk.getSurveysForWorld('world-1');
 
 #### 캐시 갱신 방식
 
-| 방식 | TTL 사용 | Redis 필요 | 갱신 트리거 |
-|------|----------|------------|-------------|
-| `polling` | ✅ 예 | ❌ 아니오 | `ttl` 기반 주기적 갱신 |
-| `event` | ❌ 아니오 | ✅ 예 | Redis PubSub 이벤트 |
-| `manual` | ❌ 아니오 | ❌ 아니오 | 수동 `sdk.refreshCache()` 호출만 |
+| 방식      | TTL 사용 | Redis 필요 | 갱신 트리거                      |
+| --------- | -------- | ---------- | -------------------------------- |
+| `polling` | ✅ 예     | ❌ 아니오   | `ttl` 기반 주기적 갱신           |
+| `event`   | ❌ 아니오 | ✅ 예       | Redis PubSub 이벤트              |
+| `manual`  | ❌ 아니오 | ❌ 아니오   | 수동 `sdk.refreshCache()` 호출만 |
 
 ```typescript
 // 모든 캐시 갱신
@@ -357,13 +445,13 @@ await sdk.refreshSurveysCache();
 
 #### 표준 이벤트
 
-| 이벤트 타입 | 트리거 | 자동 갱신 |
-|-------------|--------|-----------|
-| `gameworld.created/updated/deleted` | 게임 월드 생성/수정/삭제 | ✅ 게임 월드 캐시 |
-| `popup.created/updated/deleted` | 팝업 공지 생성/수정/삭제 | ✅ 팝업 공지 캐시 |
-| `survey.created/updated/deleted` | 설문 생성/수정/삭제 | ✅ 설문 캐시 |
-| `maintenance.started/ended` | 점검 시작/종료 | ✅ 게임 월드 캐시 |
-| `whitelist.updated` | 화이트리스트 수정 | ✅ 화이트리스트 캐시 |
+| 이벤트 타입                         | 트리거                   | 자동 갱신           |
+| ----------------------------------- | ------------------------ | ------------------- |
+| `gameworld.created/updated/deleted` | 게임 월드 생성/수정/삭제 | ✅ 게임 월드 캐시    |
+| `popup.created/updated/deleted`     | 팝업 공지 생성/수정/삭제 | ✅ 팝업 공지 캐시    |
+| `survey.created/updated/deleted`    | 설문 생성/수정/삭제      | ✅ 설문 캐시         |
+| `maintenance.started/ended`         | 점검 시작/종료           | ✅ 게임 월드 캐시    |
+| `whitelist.updated`                 | 화이트리스트 수정        | ✅ 화이트리스트 캐시 |
 
 ```typescript
 sdk.on('gameworld.updated', async (event) => {

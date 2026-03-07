@@ -23,10 +23,10 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Permission } from '@/types';
-import { PERMISSION_CATEGORIES, ALL_PERMISSIONS } from '@/types/permissions';
+import { PERMISSION_CATEGORIES, RESOURCE_ACTIONS, type Resource } from '@gatrix/shared/permissions';
 
 export interface Environment {
-  environment: string;
+  environmentId: string;
   name: string;
   displayName?: string;
   environmentName?: string;
@@ -48,11 +48,21 @@ interface PermissionSelectorProps {
   showEnvironments?: boolean;
 }
 
-// Convert PERMISSION_CATEGORIES object to array for iteration
-const categoryEntries = Object.entries(PERMISSION_CATEGORIES).map(([id, category]) => ({
-  id,
-  ...category,
+// Build permission strings from shared RESOURCE_ACTIONS
+function getResourcePermissions(resource: Resource): string[] {
+  const actions = RESOURCE_ACTIONS[resource] || [];
+  return actions.map((action) => `${resource}:${action}`);
+}
+
+// Build category entries from shared PERMISSION_CATEGORIES
+const categoryEntries = PERMISSION_CATEGORIES.map((category, index) => ({
+  id: `cat-${index}`,
+  label: category.labelKey,
+  permissions: category.resources.flatMap((resource) => getResourcePermissions(resource)),
 }));
+
+// All permissions from all categories
+const ALL_PERMISSIONS = categoryEntries.flatMap((c) => c.permissions);
 
 /**
  * Reusable permission selector component
@@ -372,11 +382,12 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 }}
               >
                 {environments.map((env) => {
-                  const isSelected = allowAllEnvs || selectedEnvironments.includes(env.environment);
+                  const isSelected =
+                    allowAllEnvs || selectedEnvironments.includes(env.environmentId);
                   const displayName = env.displayName || env.environmentName || env.name;
                   return (
                     <Tooltip
-                      key={env.environment}
+                      key={env.environmentId}
                       title={t('users.environmentAccessDesc', {
                         name: displayName,
                       })}
@@ -387,12 +398,12 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                       <Box
                         onClick={() => {
                           if (allowAllEnvs) return;
-                          if (selectedEnvironments.includes(env.environment)) {
+                          if (selectedEnvironments.includes(env.environmentId)) {
                             onEnvironmentsChange?.(
-                              selectedEnvironments.filter((id) => id !== env.environment)
+                              selectedEnvironments.filter((id) => id !== env.environmentId)
                             );
                           } else {
-                            onEnvironmentsChange?.([...selectedEnvironments, env.environment]);
+                            onEnvironmentsChange?.([...selectedEnvironments, env.environmentId]);
                           }
                         }}
                         sx={{

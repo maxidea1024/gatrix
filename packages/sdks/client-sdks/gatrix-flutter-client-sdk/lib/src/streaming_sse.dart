@@ -95,7 +95,7 @@ class SseConnection {
 
   String _buildUrl() {
     final baseUrl = config.url ??
-        '$apiUrl/client/features/$environment/stream/sse';
+        '$apiUrl/client/features/stream/sse';
     final params = <String, String>{
       'x-api-token': apiToken,
       'appName': appName,
@@ -119,7 +119,6 @@ class SseConnection {
       request.headers.set('Cache-Control', 'no-cache');
       request.headers.set('X-API-Token', apiToken);
       request.headers.set('X-Application-Name', appName);
-      request.headers.set('X-Environment', environment);
       request.headers.set('X-Connection-Id', connectionId);
       request.headers.set('X-SDK-Version', sdkVersion);
       customHeaders?.forEach((key, value) {

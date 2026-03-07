@@ -1,14 +1,14 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import crypto from 'crypto';
-import { clientAuth, ClientRequest } from '../middleware/clientAuth';
-import { sdkManager } from '../services/sdkManager';
+import { clientAuth, ClientRequest } from '../middleware/client-auth';
+import { sdkManager } from '../services/sdk-manager';
 import { config } from '../config/env';
 import logger from '../config/logger';
 import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
-import { metricsAggregator } from '../services/metricsAggregator';
-import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/edgeMetrics';
-import { performEvaluation, getSDKOrError } from '../utils/evaluationHelper';
+import { metricsAggregator } from '../services/metrics-aggregator';
+import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/edge-metrics';
+import { performEvaluation, getSDKOrError } from '../utils/evaluation-helper';
 
 const router = Router();
 
@@ -120,77 +120,6 @@ setTimeout(() => {
 // Public Routes (No Authentication Required - Same as Backend)
 // ============================================================================
 
-/**
- * @openapi
- * /client/{environment}/client-version:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get client version information (Cached)
- *     description: Returns the latest client version info for the given platform. Filterable by status. Serves from edge cache.
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string, example: 'production' }
- *         description: Environment name (e.g., 'staging', 'production')
- *       - in: query
- *         name: platform
- *         required: true
- *         schema: { type: string, example: 'android' }
- *         description: Platform identifier (e.g., 'android', 'ios', 'windows')
- *       - in: query
- *         name: version
- *         schema: { type: string, example: 'latest' }
- *         description: Client version string. If omitted or 'latest', returns the latest version.
- *       - in: query
- *         name: status
- *         schema: { type: string, enum: [ONLINE, OFFLINE, MAINTENANCE, UPDATE_REQUIRED], example: 'ONLINE' }
- *         description: Filter by status
- *       - in: query
- *         name: channel
- *         schema: { type: string, example: 'pc' }
- *         description: Channel identifier
- *       - in: query
- *         name: subChannel
- *         schema: { type: string, example: 'pc' }
- *         description: Sub-channel identifier
- *       - in: query
- *         name: lang
- *         schema: { type: string, enum: [ko, en, zh], example: 'ko' }
- *         description: Language code for localized maintenance messages
- *       - in: header
- *         name: x-application-name
- *         required: true
- *         schema: { type: string, example: 'gatrix-app' }
- *       - in: header
- *         name: x-api-token
- *         required: true
- *         schema: { type: string, example: 'test-token-123' }
- *     responses:
- *       200:
- *         description: Client version information
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   $ref: '#/components/schemas/ClientVersion'
- *                 cached: { type: boolean, example: true }
- *       400:
- *         description: Bad Request (Missing parameters or invalid status)
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/ErrorResponse' }
- *             example: { success: false, message: "platform is a required query parameter", error: "VALIDATION_ERROR" }
- *       404:
- *         description: Not Found (No client version matches)
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/ErrorResponse' }
- *             example: { success: false, message: "Client version not found", error: "NOT_FOUND" }
- */
 router.get('/:environment/client-version', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
@@ -407,38 +336,6 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
   }
 });
 
-/**
- * @openapi
- * /client/{environment}/game-worlds:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get all game worlds (Cached)
- *     description: Returns list of visible game worlds served from edge cache.
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string, example: 'production' }
- *         description: Environment name (e.g., 'staging', 'production')
- *     responses:
- *       200:
- *         description: List of game worlds
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   type: object
- *                   properties:
- *                     worlds:
- *                       type: array
- *                       items: { $ref: '#/components/schemas/GameWorld' }
- *                     total: { type: integer, example: 1 }
- *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
- *                 cached: { type: boolean, example: true }
- */
 router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
@@ -498,29 +395,6 @@ router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @openapi
- * /client/cache-stats:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get cache statistics
- *     description: Returns metrics about the edge cache status.
- *     responses:
- *       200:
- *         description: Cache statistics
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   type: object
- *                   properties:
- *                     cache: { type: object, example: { initialized: true, type: 'edge-sdk-cache' } }
- *                     queue: { type: object, example: { pending: 0 } }
- *                     pubsub: { type: object, example: { connected: true, timestamp: '2025-12-12T12:00:00Z' } }
- */
 router.get('/cache-stats', async (_req: Request, res: Response) => {
   try {
     const sdk = sdkManager.getSDK();
@@ -558,35 +432,6 @@ router.get('/cache-stats', async (_req: Request, res: Response) => {
 // Authenticated Routes (Require clientAuth middleware)
 // ============================================================================
 
-/**
- * @openapi
- * /client/{environment}/test:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Test client authentication
- *     description: Verifies client authentication and returns context.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *     responses:
- *       200:
- *         description: Authentication successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 message: { type: string, example: 'Client SDK authentication successful' }
- *                 data:
- *                   type: object
- *                   example: { tokenId: 'edge-token', tokenName: 'app-1', tokenType: 'client', environment: 'production', timestamp: '2025-12-12T12:00:00Z' }
- */
 router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response) => {
   const { applicationName, environment } = req.clientContext!;
 
@@ -603,38 +448,6 @@ router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response)
   });
 });
 
-/**
- * @openapi
- * /client/{environment}/banners:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get all published banners
- *     description: Returns all published banners for the client's environment (Cached).
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *     responses:
- *       200:
- *         description: List of banners
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   type: object
- *                   properties:
- *                     banners:
- *                       type: array
- *                       items: { $ref: '#/components/schemas/Banner' }
- *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
- */
 router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
@@ -688,41 +501,6 @@ router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: 
   }
 });
 
-/**
- * @openapi
- * /client/{environment}/banners/{bannerId}:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get specific banner
- *     description: Returns a single banner by ID (Cached).
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *       - in: path
- *         name: bannerId
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Banner details
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean }
- *                 data:
- *                   type: object
- *                   properties:
- *                     banner: { $ref: '#/components/schemas/Banner' }
- *                     timestamp: { type: string, format: date-time }
- *       404: { $ref: '#/components/responses/NotFoundError' }
- */
 router.get(
   '/:environment/banners/:bannerId',
   clientAuth,
@@ -791,38 +569,6 @@ router.get(
 // Edge-specific Routes (Not in Backend)
 // ============================================================================
 
-/**
- * @openapi
- * /client/{environment}/client-versions:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get all client versions (List)
- *     description: Returns list of all client versions for the environment. Useful for patchers.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *     responses:
- *       200:
- *         description: List of client versions
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   type: object
- *                   properties:
- *                     versions:
- *                       type: array
- *                       items: { $ref: '#/components/schemas/ClientVersion' }
- *                     total: { type: integer, example: 5 }
- */
 router.get(
   '/:environment/client-versions',
   clientAuth,
@@ -877,38 +623,6 @@ router.get(
   }
 );
 
-/**
- * @openapi
- * /client/{environment}/service-notices:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Get service notices
- *     description: Returns list of active service notices.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *     responses:
- *       200:
- *         description: List of notices
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean, example: true }
- *                 data:
- *                   type: object
- *                   properties:
- *                     notices:
- *                       type: array
- *                       items: { $ref: '#/components/schemas/ServiceNotice' }
- *                     total: { type: integer, example: 3 }
- */
 router.get(
   '/:environment/service-notices',
   clientAuth,
@@ -968,57 +682,6 @@ router.get(
 // Crash Upload Proxy (Forward to Backend)
 // ============================================================================
 
-/**
- * @openapi
- * /client/{environment}/crashes/upload:
- *   post:
- *     tags: [EdgeClient]
- *     summary: Upload crash report (Proxy)
- *     description: Proxies crash report to backend.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *         description: Environment name (e.g., 'staging', 'production')
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [platform, branch, stack]
- *             properties:
- *               platform: { type: string, example: 'android' }
- *               branch: { type: string, example: 'main' }
- *               stack: { type: string, example: 'Error at MainActivity.java:10' }
- *               marketType: { type: string, example: 'google' }
- *               isEditor: { type: boolean, example: false }
- *               appVersion: { type: string, example: '1.2.3' }
- *               resVersion: { type: string, example: '1.2.3.456' }
- *               accountId: { type: string, example: 'acc_123' }
- *               characterId: { type: string, example: 'char_456' }
- *               gameUserId: { type: string, example: 'user_789' }
- *               userName: { type: string, example: 'PlayerOne' }
- *               gameServerId: { type: string, example: 'S1' }
- *               userMessage: { type: string, example: 'Game crashed when opening inventory' }
- *               log: { type: string, example: 'System log content...' }
- *     responses:
- *       200:
- *         description: Crash reported successfully
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/SuccessResponse' }
- *             example: { success: true, message: "Crash uploaded successfully", data: { crashId: "crash_123" } }
- *       503:
- *         description: Service Unavailable (Backend unreachable)
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/ErrorResponse' }
- *             example: { success: false, error: "SERVICE_UNAVAILABLE", message: "Failed to connect to backend server" }
- */
 router.post(
   '/:environment/crashes/upload',
   clientAuth,
@@ -1105,72 +768,6 @@ router.post(
 // Feature Flag Routes
 // ============================================================================
 
-/**
- * @openapi
- * /client/features/{environment}/eval:
- *   post:
- *     tags: [EdgeClient]
- *     summary: Evaluate feature flags (Local Evaluation)
- *     description: Evaluates feature flags for the given context using local cache.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               context: { type: object }
- *               flagNames: { type: array, items: { type: string } }
- *     responses:
- *       200:
- *         description: Evaluation result
- *   get:
- *     tags: [EdgeClient]
- *     summary: Evaluate feature flags (Local Evaluation - GET)
- *     description: Evaluates feature flags for the given context using local cache.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *       - in: query
- *         name: context
- *         schema: { type: string }
- *         description: Base64 encoded JSON string of the evaluation context.
- *       - in: query
- *         name: userId
- *         schema: { type: string }
- *         description: User ID for context.
- *       - in: query
- *         name: sessionId
- *         schema: { type: string }
- *         description: Session ID for context.
- *       - in: query
- *         name: remoteAddress
- *         schema: { type: string }
- *         description: Remote IP address for context.
- *       - in: query
- *         name: appName
- *         schema: { type: string }
- *         description: Application name for context.
- *       - in: query
- *         name: flagNames
- *         schema: { type: string }
- *         description: Comma-separated list of flag names to evaluate. If omitted, all flags are evaluated.
- *     responses:
- *       200:
- *         description: Evaluation result
- */
-
 router.post(
   '/features/:environment/eval',
   clientAuth,
@@ -1183,30 +780,6 @@ router.get('/features/:environment/eval', clientAuth, async (req: ClientRequest,
   await performEvaluation(req, res, req.clientContext, false);
 });
 
-/**
- * @openapi
- * /client/features/{environment}/stream:
- *   get:
- *     tags: [EdgeClient]
- *     summary: Stream feature flag changes (SSE)
- *     description: |
- *       Establishes a Server-Sent Events connection for real-time flag invalidation signals.
- *       Events: 'connected' (initial), 'flags_changed' (invalidation), 'heartbeat' (keepalive).
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: environment
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: SSE stream established
- *         content:
- *           text/event-stream:
- *             schema:
- *               type: string
- */
 router.get(
   '/features/:environment/stream/sse',
   clientAuth,
@@ -1215,7 +788,7 @@ router.get(
       const { environment } = req.clientContext!;
 
       // Lazy-import to avoid import-time side effects
-      const { flagStreamingService } = await import('../services/FlagStreamingService');
+      const { flagStreamingService } = await import('../services/flag-streaming-service');
 
       // Generate unique client ID
       const clientId = `edge-flag-stream-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
@@ -1237,14 +810,6 @@ router.get(
   }
 );
 
-/**
- * @openapi
- * /client/features/{environment}/metrics:
- *   post:
- *     tags: [EdgeClient]
- *     summary: Submit feature flag metrics (Buffered Aggregation)
- *     description: Buffers and aggregates metrics at edge before flushing to backend.
- */
 router.post(
   '/features/:environment/metrics',
   clientAuth,

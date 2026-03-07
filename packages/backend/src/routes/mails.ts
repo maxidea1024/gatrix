@@ -137,7 +137,7 @@ router.get('/stats', (async (req: AuthenticatedRequest, res: Response) => {
 router.get('/:id', (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const mailId = parseInt(req.params.id, 10);
+    const mailId = req.params.id;
 
     const mail = await mailService.getMailById(mailId, userId);
 
@@ -217,7 +217,7 @@ router.post('/', (async (req: AuthenticatedRequest, res: Response) => {
 router.patch('/:id/read', (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const mailId = parseInt(req.params.id, 10);
+    const mailId = req.params.id;
 
     const result = await mailService.markAsRead(mailId, userId);
 
@@ -301,7 +301,7 @@ router.patch('/read-all', (async (req: AuthenticatedRequest, res: Response) => {
 router.patch('/:id/star', (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const mailId = parseInt(req.params.id, 10);
+    const mailId = req.params.id;
 
     const isStarred = await mailService.toggleStarred(mailId, userId);
 
@@ -354,7 +354,7 @@ router.delete('/delete-all', (async (req: AuthenticatedRequest, res: Response) =
 router.delete('/:id', (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const mailId = parseInt(req.params.id, 10);
+    const mailId = req.params.id;
 
     const result = await mailService.deleteMail(mailId, userId);
 

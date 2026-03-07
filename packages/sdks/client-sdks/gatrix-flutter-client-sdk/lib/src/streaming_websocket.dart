@@ -99,7 +99,7 @@ class WebSocketConnection {
   Uri _buildUrl() {
     String baseUrl = config.url ?? _convertToWsUrl(apiUrl);
     if (config.url == null) {
-      baseUrl += '/client/features/$environment/stream/ws';
+      baseUrl += '/client/features/stream/ws';
     }
 
     final uri = Uri.parse(baseUrl);

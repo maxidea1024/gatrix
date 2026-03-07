@@ -49,6 +49,7 @@ interface RevertPreviewDrawerProps {
   onClose: () => void;
   changeRequestId: string | null;
   onRevertCreated?: (newCrId: string) => void;
+  onRollbackCreated?: (newCrId?: string) => void;
 }
 
 const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
@@ -202,7 +203,7 @@ const RevertPreviewDrawer: React.FC<RevertPreviewDrawerProps> = ({
 
     const commonMappings: Record<string, string> = {
       id: 'ID',
-      environment: t('common.environment'),
+      environmentId: t('common.environment'),
       createdAt: t('common.createdAt'),
       updatedAt: t('common.updatedAt'),
       createdBy: t('common.createdBy'),

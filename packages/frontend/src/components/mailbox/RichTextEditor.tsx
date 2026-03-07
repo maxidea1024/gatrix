@@ -1099,7 +1099,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         if (html) {
           // Convert HTML to delta
-          const delta = editor.clipboard.convert(html);
+          const delta = (editor.clipboard as any).convert(html);
 
           // Trim trailing newline if it exists to prevent extra line feed
           const ops = delta.ops;

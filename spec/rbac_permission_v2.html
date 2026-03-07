@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>RBAC &#xd37c;&#xbbf8;&#xc158; &#xc2dc;&#xc2a4;&#xd15c; &#xb9ac;&#xd329;&#xd1a0;&#xb9c1; &#xc2a4;&#xd399;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="rbac-퍼미션-시스템-리팩토링-스펙">RBAC 퍼미션 시스템 리팩토링 스펙</h1>
+<h2 id="1-현재-시스템-문제점">1. 현재 시스템 문제점</h2>
+<table>
+<thead>
+<tr>
+<th>문제</th>
+<th>상세</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FE/BE 퍼미션 값 불일치</td>
+<td>BE: <code>org.users.read</code> / FE: <code>users.view</code></td>
+</tr>
+<tr>
+<td>CRUD 미분리</td>
+<td><code>write</code> 하나로 create+update+delete 묶음</td>
+</tr>
+<tr>
+<td>호환 코드 비대</td>
+<td>BE에 flat <code>PERMISSIONS</code> alias 별도 존재</td>
+</tr>
+<tr>
+<td>메뉴 권한 3방식 혼재</td>
+<td><code>adminOnly</code> + shorthand + <code>requiredPermission</code></td>
+</tr>
+<tr>
+<td>와일드카드 미지원</td>
+<td><code>users:*</code>, <code>*:read</code> 불가</td>
+</tr>
+<tr>
+<td>슈퍼어드민 이메일 하드코딩</td>
+<td><code>SUPER_ADMIN_EMAIL = 'admin@gatrix.com'</code></td>
+</tr>
+<tr>
+<td>새 인스턴스 자동 접근 불가</td>
+<td>환경 추가 시 기존 역할에 자동 적용 안 됨</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="2-퍼미션-포맷">2. 퍼미션 포맷</h2>
+<pre><code>resource:action
+</code></pre>
+<div class="markdown-alert markdown-alert-caution"><p class="markdown-alert-title"><svg class="octicon octicon-stop mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Caution</p><p><strong>퍼미션 문자열 하드코딩 절대 금지.</strong> FE/BE 모두 반드시 <code>shared</code>에 정의된 상수만 사용.</p>
+<pre><code class="language-typescript"><span class="hljs-comment">// ❌ 금지</span>
+requirePermission(<span class="hljs-string">&#x27;users:read&#x27;</span>)
+
+<span class="hljs-comment">// ✅ 필수</span>
+<span class="hljs-keyword">import</span> { P } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@gatrix/shared/permissions&#x27;</span>;
+requirePermission(P.<span class="hljs-property">USERS_READ</span>)
+</code></pre>
+</div>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p><strong>퍼미션 UI 표시 시 반드시 로컬라이징 (ko, zh, en).</strong> 리소스명, 액션명, 카테고리명 모두 <code>t()</code> 사용.</p>
+<pre><code>permissions.resource.users       → &quot;사용자&quot; / &quot;Users&quot; / &quot;用户&quot;
+permissions.action.create        → &quot;생성&quot; / &quot;Create&quot; / &quot;创建&quot;
+permissions.category.workspace   → &quot;워크스페이스&quot; / &quot;Workspace&quot; / &quot;工作区&quot;
+</code></pre>
+</div>
+<h3 id="21-액션-crud--특수">2.1 액션 (CRUD + 특수)</h3>
+<table>
+<thead>
+<tr>
+<th>액션</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create</code></td>
+<td>생성</td>
+</tr>
+<tr>
+<td><code>read</code></td>
+<td>조회</td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>수정</td>
+</tr>
+<tr>
+<td><code>delete</code></td>
+<td>삭제</td>
+</tr>
+<tr>
+<td><code>access</code></td>
+<td>접근 (콘솔, 채팅)</td>
+</tr>
+<tr>
+<td><code>approve</code></td>
+<td>승인 (CR)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>write</code> 사용 안 함 — &quot;수정만 가능하고 생성 불가&quot; 표현 가능.</p>
+</blockquote>
+<h3 id="22-와일드카드">2.2 와일드카드</h3>
+<table>
+<thead>
+<tr>
+<th>패턴</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*:*</code></td>
+<td>모든 리소스, 모든 액션</td>
+</tr>
+<tr>
+<td><code>users:*</code></td>
+<td>users 전체 액션</td>
+</tr>
+<tr>
+<td><code>*:read</code></td>
+<td>모든 리소스 읽기</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3-scope-계층">3. Scope 계층</h2>
+<p>4개 scope: <strong>system &gt; org &gt; project &gt; env</strong></p>
+<h3 id="31-system-레벨">3.1 System 레벨</h3>
+<p>조직 위의 시스템 전체 범위. 멀티 조직 환경에서의 글로벌 관리.</p>
+<table>
+<thead>
+<tr>
+<th>리소스</th>
+<th>액션</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>organisations</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+<td>조직 관리</td>
+</tr>
+<tr>
+<td><code>system_config</code></td>
+<td><code>read</code> <code>update</code></td>
+<td>시스템 설정</td>
+</tr>
+<tr>
+<td><code>system_monitoring</code></td>
+<td><code>read</code></td>
+<td>글로벌 모니터링</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-org-레벨">3.2 Org 레벨</h3>
+<table>
+<thead>
+<tr>
+<th>리소스</th>
+<th>액션</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>groups</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>roles</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>invitations</code></td>
+<td><code>create</code> <code>read</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>projects</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>audit_logs</code></td>
+<td><code>read</code></td>
+</tr>
+<tr>
+<td><code>system_settings</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>admin_tokens</code></td>
+<td><code>create</code> <code>read</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>ip_whitelist</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>account_whitelist</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>integrations</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>translation</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>console</code></td>
+<td><code>access</code></td>
+</tr>
+<tr>
+<td><code>chat</code></td>
+<td><code>access</code></td>
+</tr>
+<tr>
+<td><code>monitoring</code></td>
+<td><code>read</code></td>
+</tr>
+<tr>
+<td><code>open_api</code></td>
+<td><code>read</code></td>
+</tr>
+<tr>
+<td><code>scheduler</code></td>
+<td><code>read</code> <code>create</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>event_lens</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>crash_events</code></td>
+<td><code>read</code></td>
+</tr>
+<tr>
+<td><code>realtime_events</code></td>
+<td><code>read</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="33-project-레벨">3.3 Project 레벨</h3>
+<table>
+<thead>
+<tr>
+<th>리소스</th>
+<th>액션</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>features</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>segments</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>context_fields</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>release_flows</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>planning_data</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>service_accounts</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>signal_endpoints</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>actions</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>unknown_flags</code></td>
+<td><code>read</code></td>
+</tr>
+<tr>
+<td><code>impact_metrics</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="34-env-레벨">3.4 Env 레벨</h3>
+<table>
+<thead>
+<tr>
+<th>리소스</th>
+<th>액션</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>environments</code></td>
+<td><code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>env_features</code></td>
+<td><code>update</code></td>
+</tr>
+<tr>
+<td><code>change_requests</code></td>
+<td><code>create</code> <code>approve</code></td>
+</tr>
+<tr>
+<td><code>env_keys</code></td>
+<td><code>create</code> <code>read</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>client_versions</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>game_worlds</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>maintenance</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>maintenance_templates</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>service_notices</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>banners</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>coupons</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>coupon_settings</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+<tr>
+<td><code>surveys</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>store_products</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>reward_templates</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>ingame_popups</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>operation_events</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>servers</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>message_templates</code></td>
+<td><code>create</code> <code>read</code> <code>update</code> <code>delete</code></td>
+</tr>
+<tr>
+<td><code>vars</code></td>
+<td><code>read</code> <code>update</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="4-인스턴스-와일드카드">4. 인스턴스 와일드카드</h2>
+<p>프로젝트/환경 ID에 <code>*</code> → 새로 추가되는 인스턴스에 자동 적용.</p>
+<table>
+<thead>
+<tr>
+<th>DB 값</th>
+<th>효과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>projectId='*'</code>, <code>features:read</code></td>
+<td>모든 프로젝트 피처 읽기 (신규 포함)</td>
+</tr>
+<tr>
+<td><code>projectId='ABC'</code>, <code>features:update</code></td>
+<td>ABC만</td>
+</tr>
+<tr>
+<td><code>environmentId='*'</code>, <code>client_versions:*</code></td>
+<td>모든 환경의 클라이언트 버전 전체</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-역할-상속">5. 역할 상속</h2>
+<p>역할이 다른 역할을 상속. <code>Editor</code> → <code>Viewer</code> 상속 시 <code>Viewer</code> 퍼미션 자동 포함.</p>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> g_role_inheritance (
+  id <span class="hljs-type">CHAR</span>(<span class="hljs-number">26</span>) <span class="hljs-keyword">PRIMARY</span> KEY,
+  roleId <span class="hljs-type">CHAR</span>(<span class="hljs-number">26</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,        <span class="hljs-comment">-- 자식</span>
+  parentRoleId <span class="hljs-type">CHAR</span>(<span class="hljs-number">26</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,   <span class="hljs-comment">-- 부모</span>
+  <span class="hljs-keyword">UNIQUE</span> KEY uniq_role_parent (roleId, parentRoleId)
+);
+</code></pre>
+<p>최대 5레벨, 순환 참조 방지.</p>
+<hr>
+<h2 id="6-abac-조건-선택적-1단계에선-컬럼만">6. ABAC 조건 (선택적, 1단계에선 컬럼만)</h2>
+<p>퍼미션 테이블에 <code>permCondition TEXT NULL</code> 추가. JEXL 표현식으로 런타임 컨텍스트 평가.</p>
+<ul>
+<li><code>null</code> = 무조건 허용</li>
+<li>평가 실패 → 거부 (fail-closed)</li>
+<li>1단계: 컬럼 추가만, 평가 로직은 추후</li>
+</ul>
+<hr>
+<h2 id="7-슈퍼어드민">7. 슈퍼어드민</h2>
+<p><code>admin@gatrix.com</code> 하드코딩 제거 → <code>orgRole = 'admin'</code>이면 <code>*:*</code> 취급.
+<code>isSuperAdmin()</code>, <code>SUPER_ADMIN_EMAIL</code> 코드 제거.</p>
+<hr>
+<h2 id="8-퍼미션-프리뷰-ui">8. 퍼미션 프리뷰 UI</h2>
+<h3 id="81-역할-기준-프리뷰">8.1 역할 기준 프리뷰</h3>
+<p>역할 편집 화면에서 &quot;이 역할이 부여하는 실제 퍼미션&quot; 확인:</p>
+<pre><code>┌─────────────────────────────────────────────┐
+│ 역할: Editor                                │
+│ 상속: Viewer                                │
+├─────────────────────────────────────────────┤
+│ 리소스           │ C │ R │ U │ D │ 출처      │
+│──────────────────┼───┼───┼───┼───┼──────────│
+│ features         │   │ ✓ │ ✓ │   │ 직접     │
+│ segments         │   │ ✓ │   │   │ Viewer   │
+│ tags             │   │ ✓ │   │   │ Viewer   │
+└─────────────────────────────────────────────┘
+</code></pre>
+<ul>
+<li><strong>직접</strong>: 이 역할에 직접 부여된 퍼미션</li>
+<li><strong>상속</strong>: 부모 역할에서 온 퍼미션 (역할명 표시, readonly)</li>
+</ul>
+<h3 id="82-사용자-기준-프리뷰">8.2 사용자 기준 프리뷰</h3>
+<p>사용자 편집 화면에서 &quot;이 사용자에게 실제 적용되는 모든 퍼미션&quot; 종합 확인:</p>
+<pre><code>┌─────────────────────────────────────────────────────┐
+│ 사용자: user@example.com                            │
+│ Org Role: user                                      │
+│ 역할: Editor (직접), QA (qa-team 그룹)               │
+├─────────────────────────────────────────────────────┤
+│ 리소스           │ C │ R │ U │ D │ 출처              │
+│──────────────────┼───┼───┼───┼───┼──────────────────│
+│ features         │   │ ✓ │ ✓ │   │ Editor (직접)    │
+│ segments         │   │ ✓ │   │   │ Viewer→Editor    │
+│ client_versions  │ ✓ │ ✓ │ ✓ │ ✓ │ QA (qa-team)     │
+└─────────────────────────────────────────────────────┘
+</code></pre>
+<p>출처 유형:</p>
+<ul>
+<li><strong>직접</strong>: 사용자에게 직접 할당된 역할</li>
+<li><strong>그룹</strong>: 그룹 소속으로 부여된 역할 (그룹명 표시)</li>
+<li><strong>상속</strong>: 역할의 부모 역할에서 온 것 (체인 표시)</li>
+</ul>
+<blockquote>
+<p>이 컴포넌트는 <strong>재사용 가능</strong>하도록 만들어 역할 편집, 사용자 편집, 그룹 편집 화면 모두에서 사용.</p>
+</blockquote>
+<hr>
+<h2 id="9-권한-체크-우선순위">9. 권한 체크 우선순위</h2>
+<pre><code>1. Org Admin (orgRole='admin') → 모든 퍼미션
+2. 역할 수집 (직접 + 그룹 + 상속)
+3. 인스턴스 와일드카드 (projectId='*')
+4. 특정 인스턴스 퍼미션
+5. 퍼미션 와일드카드 (features:*, *:read)
+6. ABAC 조건 평가 (있을 경우)
+</code></pre>
+<blockquote>
+<p><code>write → read</code> 폴백 제거. UI에서 <code>resource:*</code> 선택 시 CRUD 전체 자동 부여 UX.</p>
+</blockquote>
+<hr>
+<h2 id="10-기본-역할-프리셋">10. 기본 역할 프리셋</h2>
+<p>시스템 초기화 시 자동 생성되는 기본 역할. 삭제 불가 (<code>isSystemDefined</code> 플래그).</p>
+<table>
+<thead>
+<tr>
+<th>역할</th>
+<th>Scope</th>
+<th>퍼미션</th>
+<th>상속</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>System Admin</strong></td>
+<td>system</td>
+<td><code>*:*</code></td>
+<td>—</td>
+<td>시스템 전체 관리</td>
+</tr>
+<tr>
+<td><strong>Org Admin</strong></td>
+<td>org</td>
+<td><code>*:*</code></td>
+<td>—</td>
+<td>조직 전체 관리 (orgRole='admin'과 동일)</td>
+</tr>
+<tr>
+<td><strong>Project Admin</strong></td>
+<td>project</td>
+<td><code>*:*</code></td>
+<td>—</td>
+<td>프로젝트 + 하위 환경 전체</td>
+</tr>
+<tr>
+<td><strong>Editor</strong></td>
+<td>project+env</td>
+<td><code>features:*</code>, <code>segments:*</code>, <code>client_versions:*</code> 등 CUD 중심</td>
+<td>Viewer</td>
+<td>데이터 편집 가능</td>
+</tr>
+<tr>
+<td><strong>Viewer</strong></td>
+<td>project+env</td>
+<td><code>*:read</code></td>
+<td>—</td>
+<td>모든 리소스 읽기 전용</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>프리셋은 참고용 기본값이며, 관리자가 복제하여 커스텀 역할을 만들 수 있도록 &quot;복사하여 새 역할 만들기&quot; UI 제공.</p>
+</blockquote>
+<p>DB 시드에서 <code>g_roles</code>에 <code>isSystemDefined = TRUE</code>로 INSERT. 마이그레이션에 포함.</p>
+<hr>
+<h2 id="11-shared-패키지">11. shared 패키지</h2>
+<pre><code>packages/shared/src/permissions/
+├── index.ts           # re-export
+├── constants.ts       # RESOURCES, ACTIONS, RESOURCE_SCOPES, RESOURCE_ACTIONS
+├── types.ts           # Permission 타입
+├── matcher.ts         # 와일드카드 매칭
+└── categories.ts      # UI 카테고리
+</code></pre>
+<hr>
+<h2 id="12-db-마이그레이션">12. DB 마이그레이션</h2>
+<p>기존 값 변환:</p>
+<ul>
+<li><code>org.users.read</code> → <code>users:read</code></li>
+<li><code>org.users.write</code> → <code>users:create</code> + <code>users:update</code> + <code>users:delete</code> (3 row)</li>
+<li><code>isAdmin=true</code> → <code>*:*</code></li>
+</ul>
+<p>신규 테이블: <code>g_role_inheritance</code>
+컬럼 추가: <code>permCondition TEXT NULL</code> (3개 퍼미션 테이블)</p>
+<hr>
+<h2 id="13-변경-범위-요약">13. 변경 범위 요약</h2>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>변경</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>packages/shared</code></td>
+<td>퍼미션 정의 + 매처 신규</td>
+</tr>
+<tr>
+<td>Backend types</td>
+<td>shared re-export로 교체</td>
+</tr>
+<tr>
+<td><code>PermissionService</code></td>
+<td>isSuperAdmin 제거, 와일드카드 매칭, 상속 탐색</td>
+</tr>
+<tr>
+<td><code>requireAdmin.ts</code></td>
+<td>삭제</td>
+</tr>
+<tr>
+<td>라우트</td>
+<td><code>resource:action</code> 형태로 교체</td>
+</tr>
+<tr>
+<td>Frontend types</td>
+<td>삭제, shared 사용</td>
+</tr>
+<tr>
+<td><code>AuthContext</code></td>
+<td>isAdmin → orgRole, hasPermission → shared 매처</td>
+</tr>
+<tr>
+<td><code>navigation.tsx</code></td>
+<td>adminOnly 제거, requiredPermission 통일</td>
+</tr>
+<tr>
+<td><code>ProtectedRoute</code></td>
+<td>requiredRoles 제거, 퍼미션 기반</td>
+</tr>
+<tr>
+<td>역할/사용자/그룹 편집 UI</td>
+<td>퍼미션 프리뷰 컴포넌트</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="14-작업-순서">14. 작업 순서</h2>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>shared 퍼미션 정의 + 와일드카드 매처</td>
+</tr>
+<tr>
+<td>2</td>
+<td>DB 마이그레이션 (값 변환 + 상속 테이블 + ABAC 컬럼)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>백엔드 (PermissionService, 미들웨어, 라우트)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>프론트엔드 (AuthContext, navigation, ProtectedRoute)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>퍼미션 프리뷰 컴포넌트 + 역할/사용자/그룹 편집 UI</td>
+</tr>
+<tr>
+<td>6</td>
+<td>빌드 + 브라우저 검증</td>
+</tr>
+</tbody>
+</table>
+
+            
+            
+        </body>
+        </html>

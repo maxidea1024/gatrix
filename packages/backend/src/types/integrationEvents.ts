@@ -136,8 +136,8 @@ export const ALL_INTEGRATION_EVENTS: IntegrationEventType[] = Object.values(INTE
 export interface IntegrationSystemEvent {
   type: IntegrationEventType;
   createdBy?: string;
-  createdByUserId?: number;
-  environment?: string;
+  createdByUserId?: string;
+  environmentId?: string;
   data?: Record<string, any>;
   preData?: Record<string, any>;
   createdAt: Date;

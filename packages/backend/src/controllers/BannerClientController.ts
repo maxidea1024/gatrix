@@ -9,8 +9,8 @@ export class BannerClientController {
    * GET /api/v1/client/banners
    */
   static getBanners = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const environment = req.environment || 'development';
-    const banners = await BannerService.getPublishedBanners(environment);
+    const environmentId = req.environmentId || 'development';
+    const banners = await BannerService.getPublishedBanners(environmentId);
 
     // Transform for client (remove internal fields)
     const clientBanners = banners.map((banner) => ({
@@ -39,9 +39,9 @@ export class BannerClientController {
    */
   static getBannerById = asyncHandler(async (req: SDKRequest, res: Response) => {
     const { bannerId } = req.params;
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
-    const banner = await BannerService.getPublishedBannerById(bannerId, environment);
+    const banner = await BannerService.getPublishedBannerById(bannerId, environmentId);
 
     // Transform for client (remove internal fields)
     const clientBanner = {

@@ -47,14 +47,14 @@ import { devLogger } from '@/utils/logger';
 
 // Validation schema - will be created inside component to access t function
 
-// 사용자 친화적인 오류 메시지 함수
+// Used자 친화적인 오류 메시지 함수
 const getErrorMessage = (error: any, t: any): string => {
   if (!error) return '';
 
   const errorCode = error.message || error.error?.message || '';
   const status = error.status;
 
-  // 상태 코드별 메시지
+  // Status 코드별 메시지
   if (status === 401) {
     return t('auth.errors.invalidCredentials');
   }
@@ -154,7 +154,7 @@ const LoginPage: React.FC = () => {
       navigate(location.pathname, { replace: true });
     }
 
-    // OAuth 로딩 상태 초기화
+    // OAuth Loading state Initialization
     setOauthLoading(null);
   }, [location.search, location.pathname, navigate, t]);
 
@@ -184,8 +184,8 @@ const LoginPage: React.FC = () => {
     watch,
     setValue,
   } = useForm<LoginCredentials & { rememberMe: boolean }>({
-    resolver,
-    mode: 'onChange', // 실시간 validation 활성화
+    resolver: resolver as any,
+    mode: 'onChange', // 실시간 validation Active화
     defaultValues: {
       email: '',
       password: '',
@@ -214,7 +214,7 @@ const LoginPage: React.FC = () => {
       const rememberedEmail = AuthService.getRememberedEmail();
       const isRememberMeEnabled = AuthService.isRememberMeEnabled();
 
-      // 기억된 이메일과 설정이 모두 있을 때만 폼에 설정
+      // 기억된 이메일과 Settings이 All 있을 때만 Form에 설정
       if (rememberedEmail && isRememberMeEnabled) {
         reset({
           email: rememberedEmail,
@@ -222,7 +222,7 @@ const LoginPage: React.FC = () => {
           rememberMe: true,
         });
       } else {
-        // 기억된 설정이 없거나 불일치하면 초기화
+        // 기억된 Settings이 없거나 불일치하면 Initialization
         reset({
           email: '',
           password: '',
@@ -342,13 +342,13 @@ const LoginPage: React.FC = () => {
     // 최소 2초 대기
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // 타임아웃 설정 (30초)
+    // 타임아웃 Settings (30초)
     const timeout = setTimeout(() => {
       setOauthLoading(null);
       setLoginError(t('auth.errors.oauthTimeout'));
     }, 30000);
 
-    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
+    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 Save
     sessionStorage.setItem('oauthTimeout', timeout.toString());
     sessionStorage.setItem('oauthProvider', provider);
 
@@ -386,20 +386,20 @@ const LoginPage: React.FC = () => {
       setPendingRememberMe(true);
       setShowRememberMeWarning(true);
     } else {
-      // 체크 해제할 때는 즉시 적용하고 저장된 이메일도 삭제
+      // 체크 Unregister할 때는 즉시 적용하고 Save된 이메일도 Delete
       onChange(false);
       AuthService.clearRememberedCredentials();
     }
   };
 
-  // 보안 경고 확인 시
+  // 보안 경고 Confirm 시
   const handleRememberMeConfirm = () => {
     setValue('rememberMe', true);
     setShowRememberMeWarning(false);
     setPendingRememberMe(false);
   };
 
-  // 보안 경고 취소 시
+  // 보안 경고 Cancel 시
   const handleRememberMeCancel = () => {
     setShowRememberMeWarning(false);
     setPendingRememberMe(false);
@@ -600,8 +600,8 @@ const LoginPage: React.FC = () => {
                   // Mask characters when using type=text on WebKit browsers
                   ...(isWebkit && !showPassword
                     ? {
-                        WebkitTextSecurity: 'disc',
-                      }
+                      WebkitTextSecurity: 'disc',
+                    }
                     : {}),
                   '&:-webkit-autofill': {
                     WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -881,7 +881,7 @@ const LoginPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // 임시 비Active화
                 sx={{
                   width: 56,
                   height: 56,
@@ -910,7 +910,7 @@ const LoginPage: React.FC = () => {
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
-                disabled={true} // 임시 비활성화
+                disabled={true} // 임시 비Active화
                 sx={{
                   width: 56,
                   height: 56,

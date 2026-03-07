@@ -1,9 +1,16 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { tokenMirrorService } from '../services/tokenMirrorService';
-import { metricsAggregator } from '../services/metricsAggregator';
-import { performEvaluation } from '../utils/evaluationHelper';
-import { ErrorCodes, sendUnauthorized, sendBadRequest, sendInternalError } from '../utils/apiResponse';
-import logger from '../config/logger';
+import { tokenMirrorService } from '../services/token-mirror-service';
+import { metricsAggregator } from '../services/metrics-aggregator';
+import { performEvaluation } from '../utils/evaluation-helper';
+import {
+  ErrorCodes,
+  sendUnauthorized,
+  sendBadRequest,
+  sendInternalError,
+} from '../utils/api-response';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerRoute');
 
 const router = Router();
 
@@ -21,7 +28,11 @@ function serverAuth(req: Request, res: Response, next: NextFunction): void {
 
   const validation = tokenMirrorService.validateToken(apiToken, 'server', environment);
   if (!validation.valid) {
-    sendUnauthorized(res, 'Invalid or unauthorized server API token', ErrorCodes.AUTH_TOKEN_INVALID);
+    sendUnauthorized(
+      res,
+      'Invalid or unauthorized server API token',
+      ErrorCodes.AUTH_TOKEN_INVALID
+    );
     return;
   }
 
@@ -34,7 +45,7 @@ function serverAuth(req: Request, res: Response, next: NextFunction): void {
  */
 router.get('/:env/features', serverAuth, async (req: Request, res: Response) => {
   try {
-    const { getSDKOrError } = await import('../utils/evaluationHelper');
+    const { getSDKOrError } = await import('../utils/evaluation-helper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
@@ -45,7 +56,10 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
     const flagNamesParam = req.query.flagNames as string | undefined;
     if (flagNamesParam) {
       const flagNamesFilter = new Set(
-        flagNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+        flagNamesParam
+          .split(',')
+          .map((n) => n.trim())
+          .filter(Boolean)
       );
       flags = flags.filter((f: any) => flagNamesFilter.has(f.name));
     }
@@ -62,8 +76,8 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
         }
       }
       const allSegments = sdk.featureFlag.getAllSegments();
-      segments = Array.from(allSegments.values()).filter(
-        (s: any) => referencedSegmentNames.has(s.name)
+      segments = Array.from(allSegments.values()).filter((s: any) =>
+        referencedSegmentNames.has(s.name)
       );
     } else {
       segments = Array.from(sdk.featureFlag.getAllSegments().values());
@@ -75,12 +89,12 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
     // When compact mode is enabled, strip evaluation data from disabled flags
     const responseFlags = compact
       ? flags.map((f: any) => {
-        if (!f.isEnabled) {
-          const { strategies, variants, enabledValue, ...rest } = f;
-          return { ...rest, compact: true };
-        }
-        return f;
-      })
+          if (!f.isEnabled) {
+            const { strategies, variants, enabledValue, ...rest } = f;
+            return { ...rest, compact: true };
+          }
+          return f;
+        })
       : flags;
 
     const data: { flags: any[]; segments?: any[] } = { flags: responseFlags };
@@ -94,7 +108,12 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
       cached: true,
     });
   } catch (error) {
-    sendInternalError(res, 'Failed to serve features from edge', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+    sendInternalError(
+      res,
+      'Failed to serve features from edge',
+      error,
+      ErrorCodes.RESOURCE_FETCH_FAILED
+    );
   }
 });
 
@@ -104,7 +123,7 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
  */
 router.get('/segments', serverAuth, async (req: Request, res: Response) => {
   try {
-    const { getSDKOrError } = await import('../utils/evaluationHelper');
+    const { getSDKOrError } = await import('../utils/evaluation-helper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
@@ -114,7 +133,10 @@ router.get('/segments', serverAuth, async (req: Request, res: Response) => {
     const segmentNamesParam = req.query.segmentNames as string | undefined;
     if (segmentNamesParam) {
       const segmentNamesFilter = new Set(
-        segmentNamesParam.split(',').map((n) => n.trim()).filter(Boolean)
+        segmentNamesParam
+          .split(',')
+          .map((n) => n.trim())
+          .filter(Boolean)
       );
       segments = segments.filter((s: any) => segmentNamesFilter.has(s.name));
     }
@@ -125,7 +147,12 @@ router.get('/segments', serverAuth, async (req: Request, res: Response) => {
       cached: true,
     });
   } catch (error) {
-    sendInternalError(res, 'Failed to serve segments from edge', error, ErrorCodes.RESOURCE_FETCH_FAILED);
+    sendInternalError(
+      res,
+      'Failed to serve segments from edge',
+      error,
+      ErrorCodes.RESOURCE_FETCH_FAILED
+    );
   }
 });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -55,7 +56,8 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { getContrastColor } from '@/utils/colorUtils';
 
@@ -75,7 +77,9 @@ const JobsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+  const canManage = hasPermission([P.SCHEDULER_UPDATE]);
 
   // Column settings state
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
@@ -143,7 +147,7 @@ const JobsPage: React.FC = () => {
           jobTypeId: selectedJobType || undefined,
           isEnabled: enabledFilter !== '' ? enabledFilter : undefined,
           search: searchTerm || undefined,
-          tags: tagIds.length > 0 ? tagIds : undefined,
+          tags: tagIds.length > 0 ? tagIds.map(Number) : undefined,
           limit: rowsPerPage,
           offset: page * rowsPerPage,
         }),
@@ -167,7 +171,7 @@ const JobsPage: React.FC = () => {
   // 태그 로딩
   const loadTags = useCallback(async () => {
     try {
-      const tags = await tagService.list();
+      const tags = await tagService.list(projectApiPath);
       setAllTags(tags);
     } catch (error) {
       console.error('Failed to load tags:', error);
@@ -201,7 +205,7 @@ const JobsPage: React.FC = () => {
     // loadData will be called automatically by useEffect
   };
 
-  // 태그 필터 변경 핸들러
+  // 태그 Filter 변경 핸들러
   const handleTagFilterChange = useCallback((tags: Tag[]) => {
     setTagFilter(tags);
     setPage(0);
@@ -510,14 +514,14 @@ const JobsPage: React.FC = () => {
                   }}
                 >
                   <MenuItem value="">{t('common.all')}</MenuItem>
-                  <MenuItem value={true}>{t('common.usable')}</MenuItem>
-                  <MenuItem value={false}>{t('common.unavailable')}</MenuItem>
+                  <MenuItem value={'true' as any}>{t('common.usable')}</MenuItem>
+                  <MenuItem value={'false' as any}>{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
             <Grid size={{ xs: 12, md: 5 }}>
-              {/* 태그 필터 */}
+              {/* 태그 Filter */}
               <Autocomplete
                 multiple
                 sx={{ minWidth: 400 }}
@@ -594,102 +598,101 @@ const JobsPage: React.FC = () => {
       </Box>
 
       {/* Jobs Table */}
-      {loading ? (
-        <Paper sx={{ p: 6, textAlign: 'center' }}>
-          <Typography color="text.secondary">{t('common.loadingJobs')}</Typography>
-        </Paper>
-      ) : jobs.length === 0 ? (
-        <Paper sx={{ p: 0 }}>
-          <EmptyState
-            message={t('jobs.noJobsFound')}
-            subtitle={canManage ? t('common.addFirstItem') : undefined}
-            onAddClick={canManage ? handleAddJob : undefined}
-            addButtonLabel={t('jobs.addJob')}
-          />
-        </Paper>
-      ) : (
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxWidth: '100%',
-            overflow: 'auto',
-          }}
-        >
-          <Table sx={{ tableLayout: 'auto' }}>
-            <TableHead>
-              <TableRow>
-                {columns
-                  .filter((col) => col.visible)
-                  .map((column) => (
-                    <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
-                  ))}
-                {canManage && (
-                  <TableCell align="right" sx={{ width: 150 }}>
-                    {t('common.actions')}
-                  </TableCell>
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {jobs.map((job, index) => (
-                <TableRow
-                  key={job.id}
-                  sx={{
-                    bgcolor:
-                      index % 2 === 0
-                        ? theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.02)'
-                          : 'rgba(0, 0, 0, 0.02)'
-                        : 'transparent',
-                  }}
-                >
+      <PageContentLoader loading={loading}>
+        {jobs.length === 0 ? (
+          <Paper sx={{ p: 0 }}>
+            <EmptyPagePlaceholder
+              message={t('jobs.noJobsFound')}
+              subtitle={canManage ? t('common.addFirstItem') : undefined}
+              onAddClick={canManage ? handleAddJob : undefined}
+              addButtonLabel={t('jobs.addJob')}
+            />
+          </Paper>
+        ) : (
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxWidth: '100%',
+              overflow: 'auto',
+            }}
+          >
+            <Table sx={{ tableLayout: 'auto' }}>
+              <TableHead>
+                <TableRow>
                   {columns
                     .filter((col) => col.visible)
                     .map((column) => (
-                      <TableCell key={column.id}>{renderCellContent(job, column.id)}</TableCell>
+                      <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
                     ))}
                   {canManage && (
-                    <TableCell align="right">
-                      <Tooltip title={t('jobs.execute')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleExecuteJob(job)}
-                          disabled={!job.isEnabled}
-                        >
-                          <ExecuteIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('jobs.viewHistory')}>
-                        <IconButton size="small" onClick={() => handleViewHistory(job)}>
-                          <HistoryIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('common.edit')}>
-                        <IconButton size="small" onClick={() => handleEditJob(job)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('common.delete')}>
-                        <IconButton size="small" onClick={() => handleDeleteJob(job)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
+                    <TableCell align="right" sx={{ width: 150 }}>
+                      {t('common.actions')}
                     </TableCell>
                   )}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {jobs.map((job, index) => (
+                  <TableRow
+                    hover
+                    key={job.id}
+                    sx={{
+                      bgcolor:
+                        index % 2 === 0
+                          ? theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.02)'
+                            : 'rgba(0, 0, 0, 0.02)'
+                          : 'transparent',
+                    }}
+                  >
+                    {columns
+                      .filter((col) => col.visible)
+                      .map((column) => (
+                        <TableCell key={column.id}>{renderCellContent(job, column.id)}</TableCell>
+                      ))}
+                    {canManage && (
+                      <TableCell align="right">
+                        <Tooltip title={t('jobs.execute')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleExecuteJob(job)}
+                            disabled={!job.isEnabled}
+                          >
+                            <ExecuteIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('jobs.viewHistory')}>
+                          <IconButton size="small" onClick={() => handleViewHistory(job)}>
+                            <HistoryIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('common.edit')}>
+                          <IconButton size="small" onClick={() => handleEditJob(job)}>
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('common.delete')}>
+                          <IconButton size="small" onClick={() => handleDeleteJob(job)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-          />
-        </TableContainer>
-      )}
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+          </TableContainer>
+        )}
+      </PageContentLoader>
 
       {/* Job Form Drawer */}
       <Drawer

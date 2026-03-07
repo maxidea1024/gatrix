@@ -5,6 +5,7 @@ import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { SurveyConfig } from '../../services/surveyService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface SurveyConfigDialogProps {
   open: boolean;
@@ -14,6 +15,8 @@ interface SurveyConfigDialogProps {
 const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [config, setConfig] = useState<SurveyConfig>({
     baseSurveyUrl: '',
@@ -34,7 +37,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
   const loadConfig = async () => {
     try {
       setLoading(true);
-      const data = await surveyService.getSurveyConfig();
+      const data = await surveyService.getSurveyConfig(projectApiPath);
       setConfig(data);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('surveys.configLoadFailed'), {
@@ -48,7 +51,7 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-      await surveyService.updateSurveyConfig(config);
+      await surveyService.updateSurveyConfig(projectApiPath, config);
       enqueueSnackbar(t('surveys.configUpdateSuccess'), { variant: 'success' });
       onClose();
     } catch (error: any) {

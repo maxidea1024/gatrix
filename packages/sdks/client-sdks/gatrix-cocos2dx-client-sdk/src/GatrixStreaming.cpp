@@ -146,7 +146,7 @@ void StreamingManager::disconnect() {
 std::string StreamingManager::buildSseUrl() const {
   std::string baseUrl = _config.features.streaming.sse.url;
   if (baseUrl.empty()) {
-    baseUrl = _config.apiUrl + "/client/features/" + _config.environment + "/stream/sse";
+    baseUrl = _config.apiUrl + "/client/features/stream/sse";
   }
 
   // Add query params
@@ -169,7 +169,7 @@ std::string StreamingManager::buildWsUrl() const {
     } else if (baseUrl.find("http://") == 0) {
       baseUrl.replace(0, 7, "ws://");
     }
-    baseUrl += "/client/features/" + _config.environment + "/stream/ws";
+    baseUrl += "/client/features/stream/ws";
   }
 
   // Add query params
@@ -220,7 +220,6 @@ void StreamingManager::runSseLoop() {
   headers.push_back("Cache-Control: no-cache");
   headers.push_back("X-API-Token: " + _config.apiToken);
   headers.push_back("X-Application-Name: " + _config.appName);
-  headers.push_back("X-Environment: " + _config.environment);
   headers.push_back("X-Connection-Id: " + _connectionId);
   headers.push_back("X-SDK-Version: " + std::string(SDK_NAME) + "/" + std::string(SDK_VERSION));
   for (auto& kv : _config.customHeaders) {

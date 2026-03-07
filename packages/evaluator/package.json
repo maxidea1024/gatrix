@@ -1,0 +1,29 @@
+{
+  "name": "@gatrix/evaluator",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Feature flag evaluation engine for Gatrix",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@gatrix/shared": "file:../shared",
+    "murmurhash": "^2.0.1"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.18"
+  }
+}

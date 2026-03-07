@@ -6,9 +6,13 @@ import { UserModel } from '../models/User';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Knex } from 'knex';
+import { createLogger } from '../config/logger';
+import { UserOnboardingService } from '../services/UserOnboardingService';
+
+const logger = createLogger('PublicInvitationController');
 
 export class PublicInvitationController {
-  // 초대 토큰 검증 (공개 API)
+  // 초대 Verify token (Public API)
   static validateInvitation = asyncHandler(async (req: Request, res: Response) => {
     const { token } = req.params;
 
@@ -22,7 +26,7 @@ export class PublicInvitationController {
     try {
       // 초대 정보 조회
       const invitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive'])
+        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'autoJoinConfig'])
         .where('token', token)
         .where('isActive', true)
         .first();
@@ -34,7 +38,7 @@ export class PublicInvitationController {
         });
       }
 
-      // 만료 확인
+      // Expired Confirm
       const now = new Date();
       const expiresAt = new Date(invitation.expiresAt);
 
@@ -45,12 +49,21 @@ export class PublicInvitationController {
         });
       }
 
-      // 이미 사용된 초대인지 확인
+      // 이미 Used된 초대인지 Confirm
       if (invitation.usedAt) {
         return res.status(400).json({
           success: false,
           error: 'Invitation has already been used',
         });
+      }
+
+      // Resolve autoJoinConfig to display names for invitee
+      let autoJoinInfo = null;
+      if (invitation.autoJoinConfig) {
+        const config = typeof invitation.autoJoinConfig === 'string'
+          ? JSON.parse(invitation.autoJoinConfig)
+          : invitation.autoJoinConfig;
+        autoJoinInfo = await UserOnboardingService.resolveAutoJoinConfigNames(config);
       }
 
       res.json({
@@ -64,10 +77,11 @@ export class PublicInvitationController {
             createdAt: invitation.createdAt,
             expiresAt: invitation.expiresAt,
           },
+          autoJoinInfo,
         },
       });
     } catch (error) {
-      console.error('Failed to validate invitation:', error);
+      logger.error('Failed to validate invitation:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -75,9 +89,9 @@ export class PublicInvitationController {
     }
   });
 
-  // 초대 수락 및 사용자 등록 (공개 API)
+  // 초대 수락 및 Used자 Register (Public API)
   static acceptInvitation = asyncHandler(async (req: Request, res: Response) => {
-    // 입력 검증
+    // 입력 Validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -98,9 +112,9 @@ export class PublicInvitationController {
     }
 
     try {
-      // 초대 정보 조회 및 검증
+      // 초대 정보 조회 및 Validation
       const invitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'usedAt'])
+        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'isActive', 'usedAt', 'autoJoinConfig'])
         .where('token', token)
         .where('isActive', true)
         .first();
@@ -112,7 +126,7 @@ export class PublicInvitationController {
         });
       }
 
-      // 만료 확인
+      // Expired Confirm
       const now = new Date();
       const expiresAt = new Date(invitation.expiresAt);
 
@@ -123,7 +137,7 @@ export class PublicInvitationController {
         });
       }
 
-      // 이미 사용된 초대인지 확인
+      // 이미 Used된 초대인지 Confirm
       if (invitation.usedAt) {
         return res.status(400).json({
           success: false,
@@ -131,7 +145,7 @@ export class PublicInvitationController {
         });
       }
 
-      // 이메일이 초대에 지정된 경우 일치하는지 확인
+      // 이메일이 초대에 지정된 경우 일치하는지 Confirm
       if (invitation.email && invitation.email !== email) {
         return res.status(400).json({
           success: false,
@@ -139,7 +153,7 @@ export class PublicInvitationController {
         });
       }
 
-      // 이미 등록된 사용자인지 확인
+      // 이미 Register된 Used자인지 Confirm
       const existingUser = await UserModel.findByEmailWithoutPassword(email);
       if (existingUser) {
         return res.status(409).json({
@@ -148,7 +162,7 @@ export class PublicInvitationController {
         });
       }
 
-      // 사용자명 중복 확인
+      // Used자명 중복 Confirm
       const existingUsername = await db('g_users').select('id').where('name', username).first();
       if (existingUsername) {
         return res.status(409).json({
@@ -160,9 +174,9 @@ export class PublicInvitationController {
       // 비밀번호 해시화
       const hashedPassword = await bcrypt.hash(password, 12);
 
-      // 트랜잭션으로 사용자 생성 및 초대 사용 처리
+      // Transaction: create user, mark invitation used, apply auto-join
       await db.transaction(async (trx: Knex.Transaction) => {
-        // 사용자 생성
+        // Create user
         const userId = uuidv4();
         await trx('g_users').insert({
           id: userId,
@@ -171,18 +185,30 @@ export class PublicInvitationController {
           password: hashedPassword,
           fullName: fullName || username,
           role: invitation.role || 'user',
-          status: 'active', // 초대를 통한 가입은 바로 활성화
-          emailVerified: true, // 초대를 통한 가입은 이메일 인증 완료로 처리
+          status: 'active', // 초대를 통한 가입은 바로 Active화
+          emailVerified: true, // 초대를 통한 가입은 이메일 Authentication 완료로 처리
           createdAt: now,
           updatedAt: now,
         });
 
-        // 초대 사용 처리
+        // Mark invitation as used
         await trx('g_invitations').where('id', invitation.id).update({
           usedAt: now,
           usedBy: userId,
           updatedAt: now,
         });
+
+        // Apply auto-join config if present
+        if (invitation.autoJoinConfig) {
+          const config = typeof invitation.autoJoinConfig === 'string'
+            ? JSON.parse(invitation.autoJoinConfig)
+            : invitation.autoJoinConfig;
+          await UserOnboardingService.applyAutoJoinConfig(
+            userId,
+            config,
+            invitation.createdBy || userId
+          );
+        }
       });
 
       res.status(201).json({
@@ -190,7 +216,7 @@ export class PublicInvitationController {
         message: 'User registered successfully through invitation',
       });
     } catch (error) {
-      console.error('Failed to accept invitation:', error);
+      logger.error('Failed to accept invitation:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -199,7 +225,7 @@ export class PublicInvitationController {
   });
 }
 
-// 초대 수락 검증 규칙
+// 초대 수락 Validation 규칙
 export const acceptInvitationValidation = [
   body('username')
     .notEmpty()

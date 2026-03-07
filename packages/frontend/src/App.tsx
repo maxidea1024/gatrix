@@ -30,6 +30,7 @@ import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
 import { GameWorldProvider } from './contexts/GameWorldContext';
 import { PlanningDataProvider } from './contexts/PlanningDataContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
+import { OrgProjectProvider } from './contexts/OrgProjectContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -39,7 +40,6 @@ import { useAuth } from './contexts/AuthContext';
 // Layout Components
 import { MainLayout } from './components/layout/MainLayout';
 import { EnvironmentAwareLayout } from './components/layout/EnvironmentAwareLayout';
-import { EnvironmentChangeOverlay } from './components/EnvironmentChangeOverlay';
 
 // Pages - Auth
 import LoginPage from './pages/auth/LoginPage';
@@ -108,6 +108,11 @@ import EditIntegrationPage from './pages/settings/EditIntegrationPage';
 import SignalEndpointsPage from './pages/admin/SignalEndpointsPage';
 import ActionSetsPage from './pages/admin/ActionSetsPage';
 import ServiceAccountsPage from './pages/admin/ServiceAccountsPage';
+import RolesPage from './pages/admin/RolesPage';
+import GroupsPage from './pages/admin/GroupsPage';
+
+import ProjectsPage from './pages/admin/ProjectsPage';
+import WorkspacePage from './pages/admin/WorkspacePage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -125,15 +130,15 @@ import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
 import LiveEventPage from './pages/game/LiveEventPage';
 import PlanningDataPage from './pages/game/PlanningDataPage';
 import PlanningDataHistoryPage from './pages/game/PlanningDataHistoryPage';
-import FeatureFlagsPage from './pages/game/FeatureFlagsPage';
-import FeatureFlagDetailPage from './pages/game/FeatureFlagDetailPage';
-import FeatureSegmentsPage from './pages/game/FeatureSegmentsPage';
-import FeatureContextFieldsPage from './pages/game/FeatureContextFieldsPage';
-import FeatureFlagTypesPage from './pages/game/FeatureFlagTypesPage';
-import FeatureNetworkPage from './pages/game/FeatureNetworkPage';
+import FeatureFlagsPage from './pages/features/FeatureFlagsPage';
+import FeatureFlagDetailPage from './pages/features/FeatureFlagDetailPage';
+import FeatureSegmentsPage from './pages/features/FeatureSegmentsPage';
+import FeatureContextFieldsPage from './pages/features/FeatureContextFieldsPage';
+import FeatureFlagTypesPage from './pages/features/FeatureFlagTypesPage';
+import FeatureNetworkPage from './pages/features/FeatureNetworkPage';
 import UnknownFlagsPage from './pages/features/UnknownFlagsPage';
-import ReleaseFlowTemplatesPage from './pages/game/ReleaseFlowTemplatesPage';
-import ImpactMetricsPage from './pages/game/ImpactMetricsPage';
+import ReleaseFlowTemplatesPage from './pages/features/ReleaseFlowTemplatesPage';
+import ImpactMetricsPage from './pages/features/ImpactMetricsPage';
 
 // Conditional Landing Page Component - Simplified since FirstVisitGuard handles first-visit logic
 const ConditionalLandingPage: React.FC = () => {
@@ -315,432 +320,445 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <EnvironmentProvider>
-          <EnvironmentChangeOverlay />
-          <PlatformConfigProvider>
-            <GameWorldProvider>
-              <AuthInitializer>
-                <LocalizedDatePickers>
-                  <CssBaseline />
-                  {/* Global scrollbar styles */}
-                  <GlobalStyles
-                    styles={(theme) => ({
-                      // Firefox - thin scrollbar for all elements
-                      'html, body, *, div, main, section, article, aside, nav': {
-                        scrollbarWidth: 'thin',
-                        scrollbarColor:
-                          theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.2) transparent'
-                            : 'rgba(0, 0, 0, 0.2) transparent',
-                      },
-                      // WebKit/Blink (Chrome, Edge, Safari)
-                      'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar':
-                        {
-                          width: '8px',
-                          height: '8px',
-                        },
-                      'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track':
-                        {
-                          background: 'transparent',
-                        },
-                      'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb':
-                        {
-                          backgroundColor:
+        <OrgProjectProvider>
+          <EnvironmentProvider>
+            <PlatformConfigProvider>
+              <GameWorldProvider>
+                <AuthInitializer>
+                  <LocalizedDatePickers>
+                    <CssBaseline />
+                    {/* Global scrollbar styles */}
+                    <GlobalStyles
+                      styles={(theme) => ({
+                        // Firefox - thin scrollbar for all elements
+                        'html, body, *, div, main, section, article, aside, nav': {
+                          scrollbarWidth: 'thin',
+                          scrollbarColor:
                             theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.2)'
-                              : 'rgba(0, 0, 0, 0.2)',
-                          borderRadius: 0,
+                              ? 'rgba(255, 255, 255, 0.2) transparent'
+                              : 'rgba(0, 0, 0, 0.2) transparent',
                         },
-                      'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover':
-                        {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.3)'
-                              : 'rgba(0, 0, 0, 0.3)',
-                        },
-                      'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active':
-                        {
-                          backgroundColor:
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.4)'
-                              : 'rgba(0, 0, 0, 0.4)',
-                        },
-                    })}
-                  />
-                  <SnackbarProvider
-                    maxSnack={3}
-                    dense
-                    autoHideDuration={3000}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    classes={{
-                      containerRoot: 'snackbar-container-root',
-                    }}
-                    action={(snackbarId) => (
-                      <IconButton
-                        size="small"
-                        onClick={() => closeSnackbar(snackbarId)}
-                        sx={{ color: 'inherit' }}
-                      >
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  >
-                    <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
-                      <FirstVisitGuard>
-                        <Routes>
-                          {/* Public Routes */}
-                          <Route path="/login" element={<LoginPage />} />
-                          <Route path="/logout" element={<LogoutPage />} />
-                          <Route path="/register" element={<RegisterPage />} />
-                          <Route path="/signup" element={<RegisterPage />} />
-                          <Route path="/invalid-invite" element={<InvalidInvitePage />} />
-                          <Route path="/pending-approval" element={<PendingApprovalPage />} />
-                          <Route path="/session-expired" element={<SessionExpiredPage />} />
-                          <Route path="/auth/pending" element={<PendingApprovalPage />} />
-                          <Route path="/auth/callback" element={<OAuthCallbackPage />} />
-                          <Route path="/account-suspended" element={<AccountSuspendedPage />} />
-                          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                          <Route path="/reset-password" element={<ResetPasswordPage />} />
-                          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                        // WebKit/Blink (Chrome, Edge, Safari)
+                        'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar':
+                          {
+                            width: '8px',
+                            height: '8px',
+                          },
+                        'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track':
+                          {
+                            background: 'transparent',
+                          },
+                        'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb':
+                          {
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.2)'
+                                : 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: 0,
+                          },
+                        'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover':
+                          {
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.3)'
+                                : 'rgba(0, 0, 0, 0.3)',
+                          },
+                        'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active':
+                          {
+                            backgroundColor:
+                              theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.4)'
+                                : 'rgba(0, 0, 0, 0.4)',
+                          },
+                      })}
+                    />
+                    <SnackbarProvider
+                      maxSnack={3}
+                      dense
+                      autoHideDuration={3000}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      classes={{
+                        containerRoot: 'snackbar-container-root',
+                      }}
+                      action={(snackbarId) => (
+                        <IconButton
+                          size="small"
+                          onClick={() => closeSnackbar(snackbarId)}
+                          sx={{ color: 'inherit' }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    >
+                      <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
+                        <FirstVisitGuard>
+                          <Routes>
+                            {/* Public Routes */}
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/logout" element={<LogoutPage />} />
+                            <Route path="/register" element={<RegisterPage />} />
+                            <Route path="/signup" element={<RegisterPage />} />
+                            <Route path="/invalid-invite" element={<InvalidInvitePage />} />
+                            <Route path="/pending-approval" element={<PendingApprovalPage />} />
+                            <Route path="/session-expired" element={<SessionExpiredPage />} />
+                            <Route path="/auth/pending" element={<PendingApprovalPage />} />
+                            <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+                            <Route path="/account-suspended" element={<AccountSuspendedPage />} />
+                            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                            <Route path="/reset-password" element={<ResetPasswordPage />} />
+                            <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                          {/* Service Notices Preview - Public Route */}
-                          <Route
-                            path="/service-notices-preview"
-                            element={<ServiceNoticesPreviewPage />}
-                          />
+                            {/* Service Notices Preview - Public Route */}
+                            <Route
+                              path="/service-notices-preview"
+                              element={<ServiceNoticesPreviewPage />}
+                            />
 
-                          {/* Landing Page - only for first-time visitors */}
-                          <Route path="/" element={<ConditionalLandingPage />} />
+                            {/* Landing Page - only for first-time visitors */}
+                            <Route path="/" element={<ConditionalLandingPage />} />
 
-                          {/* Protected Routes */}
+                            {/* Protected Routes */}
 
-                          <Route
-                            path="/dashboard"
-                            element={
-                              <ProtectedRoute>
-                                <MainLayout>
-                                  <DashboardPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
+                            <Route
+                              path="/dashboard"
+                              element={
+                                <ProtectedRoute>
+                                  <MainLayout>
+                                    <DashboardPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          <Route
-                            path="/chat"
-                            element={
-                              <ProtectedRoute>
-                                <MainLayout>
-                                  <ChatPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
+                            <Route
+                              path="/chat"
+                              element={
+                                <ProtectedRoute>
+                                  <MainLayout>
+                                    <ChatPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          <Route
-                            path="/mailbox"
-                            element={
-                              <ProtectedRoute>
-                                <MainLayout>
-                                  <MailboxPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
+                            <Route
+                              path="/mailbox"
+                              element={
+                                <ProtectedRoute>
+                                  <MainLayout>
+                                    <MailboxPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          <Route
-                            path="/profile"
-                            element={
-                              <ProtectedRoute>
-                                <MainLayout>
-                                  <ProfilePage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
+                            <Route
+                              path="/profile"
+                              element={
+                                <ProtectedRoute>
+                                  <MainLayout>
+                                    <ProfilePage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          {/* Settings Routes */}
-                          <Route
-                            path="/settings"
-                            element={
-                              <ProtectedRoute>
-                                <EnvironmentAwareLayout>
-                                  <SettingsPage />
-                                </EnvironmentAwareLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/tags"
-                            element={
-                              <ProtectedRoute>
-                                <EnvironmentAwareLayout>
-                                  <TagsPage />
-                                </EnvironmentAwareLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/environments"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <EnvironmentsPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/system"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <SystemSettingsPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/kv"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <EnvironmentAwareLayout>
-                                  <KeyValuePage />
-                                </EnvironmentAwareLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/integrations"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <IntegrationsPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/integrations/sdks"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <IntegrationsSdksPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/integrations/create"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <CreateIntegrationPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/settings/integrations/:id/edit"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <EditIntegrationPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
+                            {/* Settings Routes */}
+                            <Route
+                              path="/settings"
+                              element={
+                                <ProtectedRoute>
+                                  <EnvironmentAwareLayout>
+                                    <SettingsPage />
+                                  </EnvironmentAwareLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/tags"
+                              element={
+                                <ProtectedRoute>
+                                  <EnvironmentAwareLayout>
+                                    <TagsPage />
+                                  </EnvironmentAwareLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/environments"
+                              element={<Navigate to="/admin/environments" replace />}
+                            />
+                            <Route
+                              path="/settings/system"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <SystemSettingsPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/kv"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <EnvironmentAwareLayout>
+                                    <KeyValuePage />
+                                  </EnvironmentAwareLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/integrations"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <IntegrationsPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/integrations/sdks"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <IntegrationsSdksPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/integrations/create"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <CreateIntegrationPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/settings/integrations/:id/edit"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <EditIntegrationPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          {/* Admin Routes */}
-                          <Route
-                            path="/admin/*"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <EnvironmentAwareLayout>
-                                  <Routes>
-                                    <Route index element={<Navigate to="/admin/users" replace />} />
-                                    <Route path="users" element={<UsersManagementPage />} />
-                                    <Route
-                                      path="client-versions"
-                                      element={<ClientVersionsPage />}
-                                    />
-                                    <Route path="game-worlds" element={<GameWorldsPage />} />
-                                    <Route path="maintenance" element={<MaintenancePage />} />
-                                    <Route
-                                      path="player-connections"
-                                      element={<PlayerConnectionsPage />}
-                                    />
-                                    <Route
-                                      path="maintenance-templates"
-                                      element={<MessageTemplatesPage />}
-                                    />
-                                    <Route path="scheduler" element={<SchedulerPage />} />
-                                    <Route path="whitelist" element={<WhitelistPage />} />
-
-                                    <Route path="jobs" element={<JobsPage />} />
-                                    <Route path="queue-monitor" element={<QueueMonitorPage />} />
-                                    <Route path="audit-logs" element={<AuditLogsPage />} />
-                                    <Route
-                                      path="realtime-events"
-                                      element={<RealtimeEventsPage />}
-                                    />
-                                    <Route path="crash-events" element={<CrashEventsPage />} />
-                                    <Route path="api-tokens" element={<ApiTokensPage />} />
-                                    <Route path="console" element={<SystemConsolePage />} />
-                                    <Route path="server-list" element={<ServerListPage />} />
-                                    <Route
-                                      path="server-lifecycle"
-                                      element={<ServerLifecyclePage />}
-                                    />
-                                    <Route
-                                      path="change-requests"
-                                      element={<ChangeRequestsPage />}
-                                    />
-                                    <Route
-                                      path="change-requests/:id"
-                                      element={<ChangeRequestDetailPage />}
-                                    />
-                                    <Route
-                                      path="grafana-dashboard"
-                                      element={<GrafanaDashboardPage />}
-                                    />
-                                    <Route path="open-api" element={<OpenApiPage />} />
-                                    <Route
-                                      path="event-lens/projects"
-                                      element={<EventLensProjectsPage />}
-                                    />
-                                    <Route
-                                      path="data-management"
-                                      element={<DataManagementPage />}
-                                    />
-                                    <Route path="gatrix-edges" element={<GatrixEdgesPage />} />
-                                    <Route
-                                      path="signal-endpoints"
-                                      element={<SignalEndpointsPage />}
-                                    />
-                                    <Route path="actions" element={<ActionSetsPage />} />
-                                    <Route
-                                      path="service-accounts"
-                                      element={<ServiceAccountsPage />}
-                                    />
-                                  </Routes>
-                                </EnvironmentAwareLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-
-                          {/* Monitoring Routes */}
-                          <Route
-                            path="/monitoring/logs"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <LogsPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/monitoring/alerts"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <MainLayout>
-                                  <AlertsPage />
-                                </MainLayout>
-                              </ProtectedRoute>
-                            }
-                          />
-
-                          {/* Game Routes */}
-                          <Route
-                            path="/game/*"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <PlanningDataProvider>
+                            {/* Admin Routes */}
+                            <Route
+                              path="/admin/*"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
                                   <EnvironmentAwareLayout>
                                     <Routes>
                                       <Route
-                                        path="service-notices"
-                                        element={<ServiceNoticesPage />}
+                                        index
+                                        element={<Navigate to="/admin/users" replace />}
+                                      />
+                                      <Route path="users" element={<UsersManagementPage />} />
+                                      <Route path="workspace" element={<WorkspacePage />} />
+                                      <Route
+                                        path="client-versions"
+                                        element={<ClientVersionsPage />}
+                                      />
+                                      <Route path="game-worlds" element={<GameWorldsPage />} />
+                                      <Route path="maintenance" element={<MaintenancePage />} />
+                                      <Route
+                                        path="player-connections"
+                                        element={<PlayerConnectionsPage />}
                                       />
                                       <Route
-                                        path="ingame-popup-notices"
-                                        element={<IngamePopupNoticesPage />}
+                                        path="maintenance-templates"
+                                        element={<MessageTemplatesPage />}
                                       />
-                                      <Route path="coupons" element={<CouponsPage />} />
-                                      <Route path="surveys" element={<SurveysPage />} />
+                                      <Route path="scheduler" element={<SchedulerPage />} />
+                                      <Route path="whitelist" element={<WhitelistPage />} />
+
+                                      <Route path="jobs" element={<JobsPage />} />
+                                      <Route path="queue-monitor" element={<QueueMonitorPage />} />
+                                      <Route path="audit-logs" element={<AuditLogsPage />} />
                                       <Route
-                                        path="store-products"
-                                        element={<StoreProductsPage />}
+                                        path="realtime-events"
+                                        element={<RealtimeEventsPage />}
+                                      />
+                                      <Route path="crash-events" element={<CrashEventsPage />} />
+                                      <Route path="api-tokens" element={<ApiTokensPage />} />
+                                      <Route path="console" element={<SystemConsolePage />} />
+                                      <Route path="server-list" element={<ServerListPage />} />
+                                      <Route
+                                        path="server-lifecycle"
+                                        element={<ServerLifecyclePage />}
                                       />
                                       <Route
-                                        path="reward-templates"
-                                        element={<RewardTemplatesPage />}
-                                      />
-                                      <Route path="banners" element={<BannerManagementPage />} />
-                                      <Route
-                                        path="hot-time-button-event"
-                                        element={<HotTimeButtonEventPage />}
+                                        path="change-requests"
+                                        element={<ChangeRequestsPage />}
                                       />
                                       <Route
-                                        path="coupon-settings"
-                                        element={<CouponSettingsPage />}
+                                        path="change-requests/:id"
+                                        element={<ChangeRequestDetailPage />}
                                       />
-                                      <Route path="coupon-usage" element={<CouponUsagePage />} />
-                                      <Route path="live-event" element={<LiveEventPage />} />
-                                      <Route path="planning-data" element={<PlanningDataPage />} />
                                       <Route
-                                        path="planning-data-history"
-                                        element={<PlanningDataHistoryPage />}
+                                        path="grafana-dashboard"
+                                        element={<GrafanaDashboardPage />}
                                       />
+                                      <Route path="open-api" element={<OpenApiPage />} />
+                                      <Route
+                                        path="event-lens/projects"
+                                        element={<EventLensProjectsPage />}
+                                      />
+                                      <Route
+                                        path="data-management"
+                                        element={<DataManagementPage />}
+                                      />
+                                      <Route path="gatrix-edges" element={<GatrixEdgesPage />} />
+                                      <Route
+                                        path="signal-endpoints"
+                                        element={<SignalEndpointsPage />}
+                                      />
+                                      <Route path="actions" element={<ActionSetsPage />} />
+                                      <Route
+                                        path="service-accounts"
+                                        element={<ServiceAccountsPage />}
+                                      />
+                                      <Route path="roles" element={<RolesPage />} />
+                                      <Route path="groups" element={<GroupsPage />} />
+                                      <Route
+                                        path="organisations"
+                                        element={<Navigate to="/admin/workspace" replace />}
+                                      />
+                                      <Route path="projects" element={<ProjectsPage />} />
+                                      <Route path="environments" element={<EnvironmentsPage />} />
                                     </Routes>
                                   </EnvironmentAwareLayout>
-                                </PlanningDataProvider>
-                              </ProtectedRoute>
-                            }
-                          />
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          {/* Feature Flags Routes - Independent from /game */}
-                          <Route
-                            path="/feature-flags/*"
-                            element={
-                              <ProtectedRoute requiredRoles={['admin']}>
-                                <EnvironmentAwareLayout>
-                                  <Routes>
-                                    <Route index element={<FeatureFlagsPage />} />
-                                    <Route path="segments" element={<FeatureSegmentsPage />} />
-                                    <Route
-                                      path="context-fields"
-                                      element={<FeatureContextFieldsPage />}
-                                    />
-                                    <Route path="types" element={<FeatureFlagTypesPage />} />
-                                    <Route path="network" element={<FeatureNetworkPage />} />
-                                    <Route
-                                      path="templates"
-                                      element={<ReleaseFlowTemplatesPage />}
-                                    />
-                                    <Route path="unknown" element={<UnknownFlagsPage />} />
-                                    <Route path="impact-metrics" element={<ImpactMetricsPage />} />
-                                    <Route path=":flagName" element={<FeatureFlagDetailPage />} />
-                                  </Routes>
-                                </EnvironmentAwareLayout>
-                              </ProtectedRoute>
-                            }
-                          />
+                            {/* Monitoring Routes */}
+                            <Route
+                              path="/monitoring/logs"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <LogsPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/monitoring/alerts"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <MainLayout>
+                                    <AlertsPage />
+                                  </MainLayout>
+                                </ProtectedRoute>
+                              }
+                            />
 
-                          {/* 404 Route */}
-                          <Route path="*" element={<NotFoundPage />} />
-                        </Routes>
-                      </FirstVisitGuard>
-                    </Router>
-                  </SnackbarProvider>
-                </LocalizedDatePickers>
-              </AuthInitializer>
-            </GameWorldProvider>
-          </PlatformConfigProvider>
-        </EnvironmentProvider>
+                            {/* Game Routes */}
+                            <Route
+                              path="/game/*"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <PlanningDataProvider>
+                                    <EnvironmentAwareLayout>
+                                      <Routes>
+                                        <Route
+                                          path="service-notices"
+                                          element={<ServiceNoticesPage />}
+                                        />
+                                        <Route
+                                          path="ingame-popup-notices"
+                                          element={<IngamePopupNoticesPage />}
+                                        />
+                                        <Route path="coupons" element={<CouponsPage />} />
+                                        <Route path="surveys" element={<SurveysPage />} />
+                                        <Route
+                                          path="store-products"
+                                          element={<StoreProductsPage />}
+                                        />
+                                        <Route
+                                          path="reward-templates"
+                                          element={<RewardTemplatesPage />}
+                                        />
+                                        <Route path="banners" element={<BannerManagementPage />} />
+                                        <Route
+                                          path="hot-time-button-event"
+                                          element={<HotTimeButtonEventPage />}
+                                        />
+                                        <Route
+                                          path="coupon-settings"
+                                          element={<CouponSettingsPage />}
+                                        />
+                                        <Route path="coupon-usage" element={<CouponUsagePage />} />
+                                        <Route path="live-event" element={<LiveEventPage />} />
+                                        <Route
+                                          path="planning-data"
+                                          element={<PlanningDataPage />}
+                                        />
+                                        <Route
+                                          path="planning-data-history"
+                                          element={<PlanningDataHistoryPage />}
+                                        />
+                                      </Routes>
+                                    </EnvironmentAwareLayout>
+                                  </PlanningDataProvider>
+                                </ProtectedRoute>
+                              }
+                            />
+
+                            {/* Feature Flags Routes - Independent from /game */}
+                            <Route
+                              path="/feature-flags/*"
+                              element={
+                                <ProtectedRoute requiredRoles={['admin']}>
+                                  <EnvironmentAwareLayout>
+                                    <Routes>
+                                      <Route index element={<FeatureFlagsPage />} />
+                                      <Route path="segments" element={<FeatureSegmentsPage />} />
+                                      <Route
+                                        path="context-fields"
+                                        element={<FeatureContextFieldsPage />}
+                                      />
+                                      <Route path="types" element={<FeatureFlagTypesPage />} />
+                                      <Route path="network" element={<FeatureNetworkPage />} />
+                                      <Route
+                                        path="templates"
+                                        element={<ReleaseFlowTemplatesPage />}
+                                      />
+                                      <Route path="unknown" element={<UnknownFlagsPage />} />
+                                      <Route
+                                        path="impact-metrics"
+                                        element={<ImpactMetricsPage />}
+                                      />
+                                      <Route path=":flagName" element={<FeatureFlagDetailPage />} />
+                                    </Routes>
+                                  </EnvironmentAwareLayout>
+                                </ProtectedRoute>
+                              }
+                            />
+
+                            {/* 404 Route */}
+                            <Route path="*" element={<NotFoundPage />} />
+                          </Routes>
+                        </FirstVisitGuard>
+                      </Router>
+                    </SnackbarProvider>
+                  </LocalizedDatePickers>
+                </AuthInitializer>
+              </GameWorldProvider>
+            </PlatformConfigProvider>
+          </EnvironmentProvider>
+        </OrgProjectProvider>
       </AuthProvider>
     </ThemeProvider>
   );

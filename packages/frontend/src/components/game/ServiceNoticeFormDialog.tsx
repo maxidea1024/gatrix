@@ -47,6 +47,7 @@ import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGrou
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useEntityLock } from '../../hooks/useEntityLock';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -70,6 +71,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const { currentEnvironment } = useEnvironment();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms: platformConfig, channels: channelConfig } = usePlatformConfig();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [submitting, setSubmitting] = useState(false);
   const [previewCollapsed, setPreviewCollapsed] = useState(true); // Default: collapsed
 
@@ -598,7 +601,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
       if (notice) {
         const result = await import('../../services/serviceNoticeService').then((m) =>
-          m.default.updateServiceNotice(notice.id, data)
+          m.default.updateServiceNotice(projectApiPath, notice.id, data)
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
@@ -609,7 +612,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         }
       } else {
         const result = await import('../../services/serviceNoticeService').then((m) =>
-          m.default.createServiceNotice(data as CreateServiceNoticeData)
+          m.default.createServiceNotice(projectApiPath, data as CreateServiceNoticeData)
         );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);

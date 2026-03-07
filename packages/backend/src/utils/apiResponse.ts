@@ -1,5 +1,7 @@
 import { Response } from 'express';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('apiResponse');
 
 // Re-export ErrorCodes from shared package for backward compatibility
 // This allows existing imports to continue working

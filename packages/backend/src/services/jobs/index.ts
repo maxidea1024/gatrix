@@ -3,7 +3,9 @@ import { MailSendJob } from './MailSendJob';
 import { HttpRequestJob } from './HttpRequestJob';
 import { SshCommandJob } from './SshCommandJob';
 import { LogMessageJob } from './LogMessageJob';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('index');
 
 // Register job types with Factory
 export function initializeJobTypes(): void {

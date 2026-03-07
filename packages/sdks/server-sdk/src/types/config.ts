@@ -124,7 +124,10 @@ export interface GatrixSDKConfig {
   applicationName: string; // Application name
   service: string; // Service name for identification (e.g., 'auth', 'lobby', 'world', 'chat'). Used in metrics labels and service discovery.
   group: string; // Service group for categorization (e.g., 'kr', 'us', 'production'). Used in metrics labels and service discovery.
-  environment: string; // Environment identifier (e.g., 'env_prod', 'env_staging'). Used in metrics labels and service discovery.
+
+  // Optional - Environment metadata (used for metrics labels and service discovery only, NOT for API auth)
+  // API authentication is handled entirely by the apiToken
+  environment?: string; // Environment label (e.g., 'production', 'staging'). Used in metrics labels and service discovery.
 
   // Optional - Cloud configuration for auto-detecting region
   cloud?: CloudConfig; // Cloud provider configuration. Region is auto-detected from cloud metadata.
@@ -158,14 +161,9 @@ export interface GatrixSDKConfig {
   // Optional - Feature flag specific settings
   featureFlags?: FeatureFlagConfig;
 
-  // Optional - Target environments (for Edge server)
-  // When specified, SDK loads data for these environments instead of just the current one
+  // Optional - Target environments (for Edge server mode)
   // Edge server uses this to serve requests for multiple environments
-  // Values:
-  //   - '*': All environments mode - dynamically handles all active environments
-  //   - ['env1', 'env2', ...]: Specific environments mode - only handle listed environments
-  //   - undefined or []: Single-environment mode - use current environment only
-  // Example: '*' or ['development', 'production'] or ['env_prod', 'env_staging']
+  // Values: '*' = all environments, ['env1', 'env2'] = specific, undefined = token-determined
   environments?: string[] | '*';
 }
 
@@ -192,7 +190,7 @@ export interface GatrixSDKInitOptions {
   // Core identification overrides
   service?: string; // Override service name
   group?: string; // Override service group
-  environment?: string; // Override environment identifier
+  environment?: string; // Override environment label (for metrics/discovery only)
 
   // Optional overrides
   gatrixUrl?: string; // Override Gatrix backend URL
@@ -211,6 +209,6 @@ export interface GatrixSDKInitOptions {
   metrics?: Partial<MetricsConfig>; // Override metrics settings
   features?: Partial<FeaturesConfig>; // Override feature toggles
   featureFlags?: Partial<FeatureFlagConfig>; // Override feature flag settings
-  environments?: string[] | '*'; // Override target environments
+  environments?: string[] | '*'; // Override target environments (Edge mode)
   cloud?: Partial<CloudConfig>; // Override cloud configuration
 }

@@ -1,6 +1,8 @@
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
 
-// Job 실행 결과 인터페이스
+const logger = createLogger('JobFactory');
+
+// Job 실행 Results Interface
 export interface JobExecutionResult {
   success: boolean;
   data?: any;
@@ -10,17 +12,17 @@ export interface JobExecutionResult {
 
 // Job 실행 컨텍스트
 export interface JobExecutionContext {
-  jobId: number;
+  jobId: string;
   jobName: string;
   jobType: string;
   jobDataMap: any;
-  executionId: number;
+  executionId: string;
   retryAttempt: number;
   maxRetryCount: number;
   timeoutSeconds: number;
 }
 
-// 기본 Job 인터페이스
+// 기본 Job Interface
 export abstract class BaseJob {
   protected context: JobExecutionContext;
 

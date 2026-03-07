@@ -30,6 +30,7 @@ import { Tag, tagService } from '../../services/tagService';
 import { jobService } from '../../services/jobService';
 import DynamicJobDataForm from './DynamicJobDataForm';
 import { getContrastColor } from '@/utils/colorUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface JobFormProps {
   job?: Job | null;
@@ -47,6 +48,8 @@ const JobForm: React.FC<JobFormProps> = ({
   isDrawer = false,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   console.log('JobForm - Component rendered with jobTypes:', jobTypes);
   console.log('JobForm - jobTypes length:', jobTypes?.length);
@@ -80,10 +83,7 @@ const JobForm: React.FC<JobFormProps> = ({
       console.log('Has jobDataMap:', hasJobDataMap);
 
       if (!hasJobDataMap && job.id) {
-        console.log('JobDataMap is empty, fetching detailed job info...');
-        // 상세 정보 조회
-        fetchJobDetails(job.id);
-        return;
+        console.log('JobDataMap is empty, but no fetcher is defined.');
       }
 
       const newFormData = {
@@ -110,7 +110,7 @@ const JobForm: React.FC<JobFormProps> = ({
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -128,7 +128,7 @@ const JobForm: React.FC<JobFormProps> = ({
     setFormData((prev) => ({
       ...prev,
       jobTypeId: jobTypeId,
-      // Job 편집 모드에서는 기존 jobDataMap 유지, 새 생성 시에만 초기화
+      // Job 편집 모드에서는 Existing jobDataMap 유지, 새 Create 시에만 Initialization
       jobDataMap: job ? prev.jobDataMap : {},
     }));
   };
@@ -255,23 +255,22 @@ const JobForm: React.FC<JobFormProps> = ({
                     },
                   }}
                 >
-                  {console.log('JobForm - Rendering job types:', jobTypes) ||
-                    jobTypes
-                      .filter((jt) => jt.isEnabled)
-                      .map((jobType) => (
-                        <MenuItem key={jobType.id} value={jobType.id.toString()}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                            }}
-                          >
-                            {jobType.displayName}
-                            <Chip label={jobType.name} size="small" variant="outlined" />
-                          </Box>
-                        </MenuItem>
-                      ))}
+                  {jobTypes
+                    .filter((jt) => jt.isEnabled)
+                    .map((jobType) => (
+                      <MenuItem key={jobType.id} value={jobType.id.toString()}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          {jobType.displayName}
+                          <Chip label={jobType.name} size="small" variant="outlined" />
+                        </Box>
+                      </MenuItem>
+                    ))}
                 </Select>
                 {errors.jobTypeId && (
                   <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>

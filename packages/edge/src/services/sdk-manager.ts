@@ -1,0 +1,184 @@
+import { GatrixServerSDK, GatrixSDKConfig } from '@gatrix/server-sdk';
+import { config } from '../config/env';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('SDKManager');
+
+/**
+ * SDK Manager - Singleton for managing GatrixServerSDK instance
+ */
+class SDKManager {
+  private sdk: GatrixServerSDK | null = null;
+  private initPromise: Promise<void> | null = null;
+
+  /**
+   * Initialize the SDK
+   */
+  async initialize(): Promise<void> {
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    this.initPromise = this.doInitialize();
+    return this.initPromise;
+  }
+
+  private async doInitialize(): Promise<void> {
+    logger.info('Initializing GatrixServerSDK...');
+
+    // Resolve environment name to ULID ID from backend
+    let resolvedEnvironmentId = config.environment;
+    try {
+      const axios = require('axios');
+      const envResponse = await axios.get(`${config.gatrixUrl}/api/v1/server/environments`, {
+        headers: {
+          'x-api-token': config.apiToken,
+        },
+        timeout: 10000,
+      });
+
+      if (envResponse.data?.success && envResponse.data?.data?.environments) {
+        const envList = envResponse.data.data.environments;
+        // Find environment by name match
+        const matched = envList.find((e: any) => e.name === config.environment);
+        if (matched) {
+          resolvedEnvironmentId = matched.environmentId;
+          logger.info(
+            `Resolved environment '${config.environment}' -> ID: ${resolvedEnvironmentId}`
+          );
+        } else {
+          logger.warn(`Environment '${config.environment}' not found in backend, using as-is`);
+        }
+      }
+    } catch (error: any) {
+      logger.warn(
+        `Failed to resolve environment from backend: ${error.message}, using '${config.environment}' as-is`
+      );
+    }
+
+    const sdkConfig: GatrixSDKConfig = {
+      gatrixUrl: config.gatrixUrl,
+      apiToken: config.apiToken,
+      applicationName: config.applicationName,
+
+      // SDK required fields
+      service: config.service,
+      group: config.group,
+      environment: resolvedEnvironmentId,
+
+      // Multi-environment mode for Edge
+      environments: config.environments,
+
+      // Redis for PubSub (optional)
+      redis: config.redis.host
+        ? {
+            host: config.redis.host,
+            port: config.redis.port,
+            password: config.redis.password,
+            db: config.redis.db,
+          }
+        : undefined,
+
+      // Cache configuration
+      cache: {
+        refreshMethod: config.cache.syncMethod,
+      },
+
+      // Enable all features for Edge (cache everything)
+      features: {
+        gameWorld: true,
+        popupNotice: true,
+        survey: true,
+        whitelist: true,
+        serviceMaintenance: true,
+        clientVersion: true,
+        serviceNotice: true,
+        banner: true,
+        storeProduct: true,
+        featureFlag: true,
+        vars: true,
+      },
+
+      // Enable metrics
+      metrics: {
+        enabled: true,
+        serverEnabled: true,
+        port: config.metricsPort,
+        userMetricsEnabled: true,
+      },
+    };
+
+    try {
+      // Use APP_VERSION env var (set via Docker build-arg) or fallback to package.json
+      let serverVersion = process.env.APP_VERSION || '0.0.0';
+      if (serverVersion === '0.0.0') {
+        try {
+          const packageJson = require('../../package.json');
+          serverVersion = packageJson.version || '0.0.0';
+        } catch (err) {
+          logger.warn('Failed to load package.json version, using default 0.0.0');
+        }
+      }
+
+      this.sdk = new GatrixServerSDK(sdkConfig);
+      await this.sdk.initialize();
+      logger.info('GatrixServerSDK initialized successfully', {
+        environments: config.environments,
+        syncMethod: config.cache.syncMethod,
+      });
+
+      // Register Edge service to Service Discovery
+      const result = await this.sdk.registerService({
+        labels: {
+          service: 'edge',
+          group: config.group,
+          appVersion: serverVersion,
+        },
+        ports: {
+          externalApi: config.port,
+          internalApi: config.port + 10,
+          metricsApi: config.metricsPort,
+        },
+        status: 'ready',
+        meta: {
+          instanceName: 'edge-1',
+        },
+      });
+      logger.info('Edge service registered to Service Discovery via SDK', {
+        instanceId: result.instanceId,
+        version: serverVersion,
+      });
+    } catch (error) {
+      logger.error('Failed to initialize GatrixServerSDK:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the SDK instance
+   */
+  getSDK(): GatrixServerSDK | null {
+    return this.sdk;
+  }
+
+  /**
+   * Shutdown the SDK
+   */
+  async shutdown(): Promise<void> {
+    if (this.sdk) {
+      try {
+        await this.sdk.unregisterService();
+        logger.info('Edge service unregistered from Service Discovery');
+      } catch (error) {
+        logger.warn('Error unregistering Edge service:', error);
+      }
+      await this.sdk.close();
+      this.sdk = null;
+      this.initPromise = null;
+      logger.info('GatrixServerSDK shutdown complete');
+    }
+  }
+}
+
+// Export singleton instance
+export const sdkManager = new SDKManager();

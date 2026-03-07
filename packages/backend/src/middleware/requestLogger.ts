@@ -60,14 +60,14 @@ export const requestLogger = (
     authHeaderPrefix: req.get('Authorization')?.substring(0, 20) + '...' || 'none',
   };
 
-  // 개발 환경에서만 추가 정보 로깅
+  // 개발 ?�경?�서�?추�? ?�보 로깅
   if (isDevelopment) {
-    // Query parameters 추가
+    // Query parameters 추�?
     if (req.query && Object.keys(req.query).length > 0) {
       requestLogData.queryParams = req.query;
     }
 
-    // Request body 추가 (Content-Type이 application/json인 경우만)
+    // Request body 추�? (Content-Type??application/json??경우�?
     const contentType = req.get('Content-Type');
     if (contentType?.includes('application/json') && req.body && Object.keys(req.body).length > 0) {
       requestLogData.requestBody = req.body;
@@ -89,27 +89,26 @@ export const requestLogger = (
       contentLength: res.get('Content-Length'),
     };
 
-    // 개발 환경에서만 response body 추가 (Content-Type이 application/json인 경우만)
+    // 개발 ?�경?�서�?response body 추�? (Content-Type??application/json??경우�?
     if (isDevelopment && chunk && res.get('Content-Type')?.includes('application/json')) {
       try {
         let responseText: string | undefined;
 
         if (Buffer.isBuffer(chunk)) {
-          // Buffer를 문자열로 변환
-          responseText = chunk.toString('utf8');
+          // Buffer�?문자?�로 변??          responseText = chunk.toString('utf8');
         } else if (typeof chunk === 'string') {
           responseText = chunk;
         } else {
-          // 이미 객체인 경우 그대로 사용
+          // ?��? 객체??경우 그�?�??�용
           responseLogData.responseBody = chunk;
         }
 
-        // 문자열인 경우 JSON 파싱 시도
+        // 문자?�인 경우 JSON ?�싱 ?�도
         if (responseText) {
           responseLogData.responseBody = JSON.parse(responseText);
         }
       } catch (error) {
-        // JSON 파싱 실패시 무시
+        // JSON ?�싱 ?�패??Ignore
       }
     }
 

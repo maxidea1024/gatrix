@@ -41,7 +41,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { RelativeTime } from '@/components/common/RelativeTime';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
-import changeRequestService, { ActionGroup, ChangeItem } from '@/services/changeRequestService';
+import changeRequestService, {
+  ActionGroup,
+  ChangeItem,
+  ChangeRequestStatus,
+} from '@/services/changeRequestService';
 import { formatChangeRequestTitle, formatChangeItemTitle } from '@/utils/changeRequestFormatter';
 import RevertPreviewDrawer from './RevertPreviewDrawer';
 import SubmitPreviewDrawer from './SubmitPreviewDrawer';
@@ -120,7 +124,8 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuth();
+  const { user, permissions } = useAuth();
+  const hasAnyPermissions = permissions.length > 0;
 
   const [actionLoading, setActionLoading] = useState(false);
   const [comment, setComment] = useState('');
@@ -278,6 +283,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
         operation,
         changes,
         actionGroupId: item.actionGroupId,
+        afterData: item.afterData,
       };
     });
   }, [cr]);
@@ -531,7 +537,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
     // Common field mappings (fallback)
     const commonMappings: Record<string, string> = {
       id: 'ID',
-      environment: t('common.environment'),
+      environmentId: t('common.environment'),
       createdAt: t('common.createdAt'),
       updatedAt: t('common.updatedAt'),
       createdBy: t('common.createdBy'),
@@ -1140,7 +1146,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
 
                   {/* Status Banners */}
                   {cr.status === 'rejected' &&
-                    (cr.requesterId === user?.id || user?.role === 'admin' || user?.role === 0) && (
+                    (cr.requesterId === user?.id || hasAnyPermissions) && (
                       <Paper
                         sx={{
                           p: 2,
@@ -1207,7 +1213,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                     )}
 
                   {cr.status === 'conflict' &&
-                    (cr.requesterId === user?.id || user?.role === 'admin' || user?.role === 0) && (
+                    (cr.requesterId === user?.id || hasAnyPermissions) && (
                       <Paper
                         sx={{
                           p: 2,
@@ -1516,7 +1522,7 @@ const ChangeRequestDetailDrawer: React.FC<ChangeRequestDetailDrawerProps> = ({
                                           {formatChangeItemTitle(
                                             item.table,
                                             item.targetId,
-                                            item.afterData,
+                                            item?.afterData,
                                             t
                                           )}
                                         </Typography>

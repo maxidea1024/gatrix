@@ -47,7 +47,7 @@ export interface ReleaseFlowPlan {
   displayName?: string;
   description?: string;
   flagId: string;
-  environment: string;
+  environmentId: string;
   templateId?: string;
   activeMilestoneId?: string;
   status: FlowStatus;
@@ -76,33 +76,47 @@ export interface CreateTemplateInput {
 
 export interface ApplyTemplateInput {
   flagId: string;
-  environment: string;
+  environmentId: string;
   templateId: string;
 }
 
 // ==================== Service ====================
 
+/** Build release-flows base path from project-scoped path or fallback */
+function basePath(projectApiPath: string | null): string {
+  return projectApiPath ? `${projectApiPath}/release-flows` : '/admin/release-flows';
+}
+
 /**
  * List all templates
  */
-export async function getTemplates(search?: string): Promise<ReleaseFlowTemplate[]> {
-  const response = await api.get('/admin/release-flows/templates', { params: { search } });
+export async function getTemplates(
+  search?: string,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowTemplate[]> {
+  const response = await api.get(`${basePath(projectApiPath)}/templates`, { params: { search } });
   return response.data || [];
 }
 
 /**
  * Create a new template
  */
-export async function createTemplate(data: CreateTemplateInput): Promise<ReleaseFlowTemplate> {
-  const response = await api.post('/admin/release-flows/templates', data);
+export async function createTemplate(
+  data: CreateTemplateInput,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowTemplate> {
+  const response = await api.post(`${basePath(projectApiPath)}/templates`, data);
   return response.data;
 }
 
 /**
  * Apply a template to a feature flag and environment
  */
-export async function applyTemplate(data: ApplyTemplateInput): Promise<ReleaseFlowPlan> {
-  const response = await api.post('/admin/release-flows/apply', data);
+export async function applyTemplate(
+  data: ApplyTemplateInput,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowPlan> {
+  const response = await api.post(`${basePath(projectApiPath)}/apply`, data);
   return response.data;
 }
 
@@ -111,24 +125,32 @@ export async function applyTemplate(data: ApplyTemplateInput): Promise<ReleaseFl
  */
 export async function getPlan(
   flagId: string,
-  environment: string
+  environmentId: string,
+  projectApiPath: string | null = null
 ): Promise<ReleaseFlowPlan | null> {
-  const response = await api.get(`/admin/release-flows/plans/${flagId}/${environment}`);
+  const response = await api.get(`${basePath(projectApiPath)}/plans/${flagId}/${environmentId}`);
   return response.data;
 }
 
 /**
  * Start a milestone in a release plan
  */
-export async function startMilestone(planId: string, milestoneId: string): Promise<void> {
-  await api.post(`/admin/release-flows/plans/${planId}/milestones/${milestoneId}/start`);
+export async function startMilestone(
+  planId: string,
+  milestoneId: string,
+  projectApiPath: string | null = null
+): Promise<void> {
+  await api.post(`${basePath(projectApiPath)}/plans/${planId}/milestones/${milestoneId}/start`);
 }
 
 /**
  * Get a single template by ID (with milestones and strategies)
  */
-export async function getTemplate(id: string): Promise<ReleaseFlowTemplate> {
-  const response = await api.get(`/admin/release-flows/templates/${id}`);
+export async function getTemplate(
+  id: string,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowTemplate> {
+  const response = await api.get(`${basePath(projectApiPath)}/templates/${id}`);
   return response.data;
 }
 
@@ -137,24 +159,31 @@ export async function getTemplate(id: string): Promise<ReleaseFlowTemplate> {
  */
 export async function updateTemplate(
   id: string,
-  data: Partial<CreateTemplateInput>
+  data: Partial<CreateTemplateInput>,
+  projectApiPath: string | null = null
 ): Promise<ReleaseFlowTemplate> {
-  const response = await api.put(`/admin/release-flows/templates/${id}`, data);
+  const response = await api.put(`${basePath(projectApiPath)}/templates/${id}`, data);
   return response.data;
 }
 
 /**
  * Delete (archive) a template
  */
-export async function deleteTemplate(id: string): Promise<void> {
-  await api.delete(`/admin/release-flows/templates/${id}`);
+export async function deleteTemplate(
+  id: string,
+  projectApiPath: string | null = null
+): Promise<void> {
+  await api.delete(`${basePath(projectApiPath)}/templates/${id}`);
 }
 
 /**
  * Delete (archive) an applied plan
  */
-export async function deletePlan(planId: string): Promise<void> {
-  await api.delete(`/admin/release-flows/plans/${planId}`);
+export async function deletePlan(
+  planId: string,
+  projectApiPath: string | null = null
+): Promise<void> {
+  await api.delete(`${basePath(projectApiPath)}/plans/${planId}`);
 }
 
 // ==================== Plan Lifecycle ====================
@@ -162,32 +191,44 @@ export async function deletePlan(planId: string): Promise<void> {
 /**
  * Start a release plan (begins from first milestone)
  */
-export async function startPlan(planId: string): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`/admin/release-flows/plans/${planId}/start`);
+export async function startPlan(
+  planId: string,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowPlan> {
+  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/start`);
   return response.data;
 }
 
 /**
  * Pause a running release plan
  */
-export async function pausePlan(planId: string): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`/admin/release-flows/plans/${planId}/pause`);
+export async function pausePlan(
+  planId: string,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowPlan> {
+  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/pause`);
   return response.data;
 }
 
 /**
  * Resume a paused release plan
  */
-export async function resumePlan(planId: string): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`/admin/release-flows/plans/${planId}/resume`);
+export async function resumePlan(
+  planId: string,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowPlan> {
+  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/resume`);
   return response.data;
 }
 
 /**
  * Progress to the next milestone manually
  */
-export async function progressToNext(planId: string): Promise<ReleaseFlowPlan> {
-  const response = await api.post(`/admin/release-flows/plans/${planId}/progress`);
+export async function progressToNext(
+  planId: string,
+  projectApiPath: string | null = null
+): Promise<ReleaseFlowPlan> {
+  const response = await api.post(`${basePath(projectApiPath)}/plans/${planId}/progress`);
   return response.data;
 }
 
@@ -196,11 +237,13 @@ export async function progressToNext(planId: string): Promise<ReleaseFlowPlan> {
  */
 export async function setTransitionCondition(
   milestoneId: string,
-  intervalMinutes: number
+  intervalMinutes: number,
+  projectApiPath: string | null = null
 ): Promise<ReleaseFlowMilestone> {
-  const response = await api.put(`/admin/release-flows/milestones/${milestoneId}/transition`, {
-    intervalMinutes,
-  });
+  const response = await api.put(
+    `${basePath(projectApiPath)}/milestones/${milestoneId}/transition`,
+    { intervalMinutes }
+  );
   return response.data;
 }
 
@@ -208,9 +251,12 @@ export async function setTransitionCondition(
  * Remove transition condition from a milestone
  */
 export async function removeTransitionCondition(
-  milestoneId: string
+  milestoneId: string,
+  projectApiPath: string | null = null
 ): Promise<ReleaseFlowMilestone> {
-  const response = await api.delete(`/admin/release-flows/milestones/${milestoneId}/transition`);
+  const response = await api.delete(
+    `${basePath(projectApiPath)}/milestones/${milestoneId}/transition`
+  );
   return response.data;
 }
 
@@ -271,16 +317,24 @@ export interface SafeguardEvaluationResult {
 /**
  * List safeguards for a milestone
  */
-export async function listSafeguards(milestoneId: string): Promise<Safeguard[]> {
-  const response = await api.get(`/admin/release-flows/milestones/${milestoneId}/safeguards`);
+export async function listSafeguards(
+  milestoneId: string,
+  projectApiPath: string | null = null
+): Promise<Safeguard[]> {
+  const response = await api.get(
+    `${basePath(projectApiPath)}/milestones/${milestoneId}/safeguards`
+  );
   return response.data || [];
 }
 
 /**
  * Create a safeguard
  */
-export async function createSafeguard(data: CreateSafeguardInput): Promise<Safeguard> {
-  const response = await api.post('/admin/release-flows/safeguards', data);
+export async function createSafeguard(
+  data: CreateSafeguardInput,
+  projectApiPath: string | null = null
+): Promise<Safeguard> {
+  const response = await api.post(`${basePath(projectApiPath)}/safeguards`, data);
   return response.data;
 }
 
@@ -289,28 +343,35 @@ export async function createSafeguard(data: CreateSafeguardInput): Promise<Safeg
  */
 export async function updateSafeguard(
   safeguardId: string,
-  data: UpdateSafeguardInput
+  data: UpdateSafeguardInput,
+  projectApiPath: string | null = null
 ): Promise<Safeguard> {
-  const response = await api.put(`/admin/release-flows/safeguards/${safeguardId}`, data);
+  const response = await api.put(`${basePath(projectApiPath)}/safeguards/${safeguardId}`, data);
   return response.data;
 }
 
 /**
  * Delete a safeguard
  */
-export async function deleteSafeguard(safeguardId: string): Promise<void> {
-  await api.delete(`/admin/release-flows/safeguards/${safeguardId}`);
+export async function deleteSafeguard(
+  safeguardId: string,
+  projectApiPath: string | null = null
+): Promise<void> {
+  await api.delete(`${basePath(projectApiPath)}/safeguards/${safeguardId}`);
 }
 
 /**
  * Evaluate safeguards for a milestone
  */
-export async function evaluateSafeguards(milestoneId: string): Promise<{
+export async function evaluateSafeguards(
+  milestoneId: string,
+  projectApiPath: string | null = null
+): Promise<{
   results: SafeguardEvaluationResult[];
   anyTriggered: boolean;
 }> {
   const response = await api.post(
-    `/admin/release-flows/milestones/${milestoneId}/safeguards/evaluate`
+    `${basePath(projectApiPath)}/milestones/${milestoneId}/safeguards/evaluate`
   );
   return response.data;
 }
@@ -318,8 +379,11 @@ export async function evaluateSafeguards(milestoneId: string): Promise<{
 /**
  * Reset a triggered safeguard
  */
-export async function resetSafeguard(safeguardId: string): Promise<void> {
-  await api.post(`/admin/release-flows/safeguards/${safeguardId}/reset`);
+export async function resetSafeguard(
+  safeguardId: string,
+  projectApiPath: string | null = null
+): Promise<void> {
+  await api.post(`${basePath(projectApiPath)}/safeguards/${safeguardId}/reset`);
 }
 
 // ==================== Impact Metrics ====================
@@ -333,8 +397,10 @@ export interface AvailableMetric {
 /**
  * Get available impact metrics for autocomplete
  */
-export async function getAvailableMetrics(): Promise<AvailableMetric[]> {
-  const response = await api.get('/admin/impact-metrics/available');
+export async function getAvailableMetrics(
+  projectApiPath: string | null = null
+): Promise<AvailableMetric[]> {
+  const response = await api.get(`${projectApiPath || '/admin'}/impact-metrics/available`);
   return response.data || [];
 }
 

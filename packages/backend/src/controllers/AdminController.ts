@@ -6,24 +6,13 @@ import { AuditLogModel } from '../models/AuditLog';
 import { UserModel } from '../models/User';
 import { GatrixError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AdminController');
 import db from '../config/knex';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
-
-const setEnvironmentAccessSchema = Joi.object({
-  allowAllEnvironments: Joi.boolean().required(),
-  environments: Joi.array().items(Joi.string().min(1).max(127)).default([]),
-});
-
-// Super admin email - this account cannot be modified by anyone except themselves (name only)
-const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
-
-// Helper function to check if a user is the super admin
-const isSuperAdminUser = async (userId: number): Promise<boolean> => {
-  const user = await db('g_users').where('id', userId).select('email').first();
-  return user?.email === SUPER_ADMIN_EMAIL;
-};
+import { permissionService } from '../services/PermissionService';
 
 export class AdminController {
   // Dashboard and statistics
@@ -100,14 +89,6 @@ export class AdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      // Handle role as single value or array
-      const role = req.query.role;
-      let roleValue: string | string[] | undefined;
-      if (role) {
-        roleValue = Array.isArray(role) ? role.map((r) => String(r)) : String(role);
-      }
-      const roleOperator = req.query.role_operator as 'any_of' | 'include_all' | undefined;
-
       // Handle status as single value or array
       const status = req.query.status;
       let statusValue: string | string[] | undefined;
@@ -121,10 +102,6 @@ export class AdminController {
       const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
       const filters: Record<string, any> = {};
-      if (roleValue) {
-        filters.role = roleValue;
-        if (roleOperator) filters.role_operator = roleOperator;
-      }
       if (statusValue) {
         filters.status = statusValue;
         if (statusOperator) filters.status_operator = statusOperator;
@@ -136,7 +113,17 @@ export class AdminController {
         if (tagsOperator) filters.tags_operator = tagsOperator;
       }
 
-      logger.debug('[AdminController] User filters:', { filters });
+      // Org scoping: non-SuperAdmin users only see members of their org
+      const userId = req.user?.userId || req.user?.id;
+      const orgId = req.user?.orgId;
+      if (orgId && userId) {
+        const isSuperAdmin = await permissionService.isOrgAdmin(userId, orgId);
+        if (!isSuperAdmin) {
+          filters.orgId = orgId;
+        }
+      }
+
+      logger.debug('User filters:', { filters });
 
       const result = await UserService.getAllUsers(filters, { page, limit });
 
@@ -155,7 +142,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const user = await UserService.getUserById(userId);
 
       res.json({
@@ -173,7 +160,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { name, email, password, role, tagIds, allowAllEnvironments, environments } = req.body;
+      const { name, email, password, tagIds, allowAllEnvironments, environments } = req.body;
 
       if (!req.user?.userId) {
         throw new GatrixError('User not authenticated', 401);
@@ -190,7 +177,6 @@ export class AdminController {
         name,
         email,
         password,
-        role: role || 'user',
         status: 'active' as const, // Admin-created users are active by default
         emailVerified: true, // Admin-created users are verified by default
         createdBy, // Set the creator
@@ -199,14 +185,9 @@ export class AdminController {
 
       let user = await UserService.createUser(userData);
 
-      // 태그 설정
+      // 태그 Settings
       if (tagIds && tagIds.length > 0) {
         await UserTagService.setUserTags(user.id, tagIds, req.user.userId);
-      }
-
-      // 환경 접근 권한 설정
-      if (environments && environments.length > 0 && !allowAllEnvironments) {
-        await UserModel.setEnvironmentAccess(user.id, false, environments, createdBy);
       }
 
       // Reload user to get all updated info
@@ -228,22 +209,23 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const { tagIds, ...updates } = req.body;
 
       if (!req.user?.userId) {
         throw new GatrixError('User not authenticated', 401);
       }
 
-      // Protect super admin from being modified by others
-      const isTargetSuperAdmin = await isSuperAdminUser(userId);
+      // Protect org admin from being modified by others
+      const orgId = req.user?.orgId;
+      const isTargetOrgAdmin = orgId ? await permissionService.isOrgAdmin(userId, orgId) : false;
       const isOwnAccount = req.user.userId === userId;
-      if (isTargetSuperAdmin && !isOwnAccount) {
-        throw new GatrixError('Cannot modify super admin account', 403);
+      if (isTargetOrgAdmin && !isOwnAccount) {
+        throw new GatrixError('Cannot modify org admin account', 403);
       }
 
-      // If it's super admin modifying their own account, only allow name changes
-      if (isTargetSuperAdmin && isOwnAccount) {
+      // If org admin modifying their own account, only allow name changes
+      if (isTargetOrgAdmin && isOwnAccount) {
         const allowedUpdates = { name: updates.name };
         const user = await UserService.updateUser(userId, allowedUpdates);
         res.json({
@@ -255,11 +237,11 @@ export class AdminController {
       }
       let user = await UserService.updateUser(userId, updates);
 
-      // 태그 설정 (tagIds가 제공된 경우에만)
+      // 태그 Settings (tagIds가 제공된 경우에만)
       if (tagIds !== undefined) {
         await UserTagService.setUserTags(userId, tagIds, req.user.userId);
 
-        // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+        // 태그 업데이트 후 User info를 다시 로드하여 최신 태그 정보 포함
         user = await UserService.getUserById(userId);
       }
 
@@ -279,16 +261,17 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
       // Prevent admin from deleting themselves
       if (req.user?.userId === userId) {
         throw new GatrixError('Cannot delete your own account', 400);
       }
 
-      // Protect super admin from being deleted
-      if (await isSuperAdminUser(userId)) {
-        throw new GatrixError('Cannot delete super admin account', 403);
+      // Protect org admin from being deleted
+      const orgId = req.user?.orgId;
+      if (orgId && (await permissionService.isOrgAdmin(userId, orgId))) {
+        throw new GatrixError('Cannot delete org admin account', 403);
       }
 
       await UserService.deleteUser(userId);
@@ -308,11 +291,16 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      // Protect super admin from being modified by others
-      if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
-        throw new GatrixError('Cannot modify super admin account', 403);
+      // Protect org admin from being modified by others
+      const orgId = req.user?.orgId;
+      if (
+        orgId &&
+        (await permissionService.isOrgAdmin(userId, orgId)) &&
+        req.user?.userId !== userId
+      ) {
+        throw new GatrixError('Cannot modify org admin account', 403);
       }
 
       await UserService.activateUser(userId);
@@ -332,16 +320,17 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
       // Prevent admin from suspending themselves
       if (req.user?.userId === userId) {
         throw new GatrixError('Cannot suspend your own account', 400);
       }
 
-      // Protect super admin from being suspended
-      if (await isSuperAdminUser(userId)) {
-        throw new GatrixError('Cannot suspend super admin account', 403);
+      // Protect org admin from being suspended
+      const orgId = req.user?.orgId;
+      if (orgId && (await permissionService.isOrgAdmin(userId, orgId))) {
+        throw new GatrixError('Cannot suspend org admin account', 403);
       }
 
       await UserService.suspendUser(userId);
@@ -364,99 +353,37 @@ export class AdminController {
     }
   }
 
-  static async promoteToAdmin(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = parseInt(req.params.id);
-      await UserService.promoteToAdmin(userId);
-
-      // Send real-time notification to the affected user
-      await pubSubService.publishNotification({
-        type: 'user_role_changed',
-        data: {
-          userId,
-          changeType: 'role',
-        },
-        targetUsers: [userId],
-      });
-
-      res.json({
-        success: true,
-        message: 'User promoted to admin successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async demoteFromAdmin(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = parseInt(req.params.id);
-
-      // Prevent admin from demoting themselves
-      if (req.user?.userId === userId) {
-        throw new GatrixError('Cannot demote your own account', 400);
-      }
-
-      await UserService.demoteFromAdmin(userId);
-
-      // Send real-time notification to the affected user
-      await pubSubService.publishNotification({
-        type: 'user_role_changed',
-        data: {
-          userId,
-          changeType: 'role',
-        },
-        targetUsers: [userId],
-      });
-
-      res.json({
-        success: true,
-        message: 'User demoted from admin successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
   static async verifyUserEmail(
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (!userId || isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await db('g_users').where('id', userId).first();
       if (!user) {
         throw new GatrixError('User not found', 404);
       }
 
-      // 이미 인증된 경우 확인
+      // 이미 Authentication된 경우 Confirm
       if (user.emailVerified) {
         throw new GatrixError('Email is already verified', 400);
       }
 
-      // 이메일 인증 상태 업데이트
+      // 이메일 Authentication Update state
       await db('g_users').where('id', userId).update({
         emailVerified: 1,
         emailVerifiedAt: new Date(),
         updatedAt: new Date(),
       });
 
-      // 캐시 클리어
+      // Cache 클리어
       clearAllCache();
 
       res.json({
@@ -530,7 +457,7 @@ export class AdminController {
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
 
-      logger.info('[AdminController] Audit log query filters:', filters);
+      logger.info('Audit log query filters:', filters);
 
       logger.debug('Calling AuditLogModel.findAll with:', {
         page,
@@ -699,7 +626,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       await UserService.activateUser(userId);
 
       res.json({
@@ -717,7 +644,7 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       await UserService.deleteUser(userId);
 
       res.json({
@@ -861,59 +788,6 @@ export class AdminController {
       res.json({
         success: true,
         message: `Updated status for ${userIds.length} users`,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async bulkUpdateUserRole(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const { userIds, role } = req.body;
-
-      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new GatrixError('User IDs are required', 400);
-      }
-
-      if (!role || !['user', 'admin'].includes(role)) {
-        throw new GatrixError('Valid role is required', 400);
-      }
-
-      if (!req.user?.userId) {
-        throw new GatrixError('User not authenticated', 401);
-      }
-
-      const currentUserId = req.user.userId;
-
-      await db.transaction(async (trx) => {
-        await trx('g_users').whereIn('id', userIds).update({
-          role,
-          updatedAt: new Date(),
-        });
-
-        // Log audit entries
-        for (const userId of userIds) {
-          await AuditLogModel.create({
-            userId: currentUserId,
-            action: 'user_role_updated',
-            description: `User #${userId} role changed to '${role}' (bulk operation)`,
-            resourceType: 'user',
-            resourceId: userId.toString(),
-            newValues: { role, bulkOperation: true },
-            ipAddress: req.ip,
-          });
-        }
-      });
-
-      clearAllCache();
-
-      res.json({
-        success: true,
-        message: `Updated role for ${userIds.length} users`,
       });
     } catch (error) {
       next(error);
@@ -1093,71 +967,6 @@ export class AdminController {
     }
   }
 
-  // User environment access
-
-  /**
-   * Get user's environment access settings
-   */
-  static async getUserEnvironmentAccess(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      const access = await UserModel.getEnvironmentAccess(userId);
-
-      res.json({
-        success: true,
-        data: access,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Set user's environment access
-   */
-  static async setUserEnvironmentAccess(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      // Protect super admin from being modified by others
-      if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
-        throw new GatrixError('Cannot modify super admin account', 403);
-      }
-
-      const { error, value } = setEnvironmentAccessSchema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
-
-      const { allowAllEnvironments, environments } = value;
-      const updatedBy = req.user!.userId;
-
-      await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environments, updatedBy);
-
-      res.json({
-        success: true,
-        message: 'Environment access updated successfully',
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
   // Permission management
 
   /**
@@ -1193,9 +1002,9 @@ export class AdminController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -1212,91 +1021,6 @@ export class AdminController {
         data: {
           userId,
           permissions,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Set permissions for a specific user
-   */
-  static async setUserPermissions(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = parseInt(req.params.id);
-
-      if (isNaN(userId)) {
-        throw new GatrixError('Invalid user ID', 400);
-      }
-
-      // Protect super admin from being modified by others
-      if ((await isSuperAdminUser(userId)) && req.user?.userId !== userId) {
-        throw new GatrixError('Cannot modify super admin account', 403);
-      }
-
-      // Validate request body
-      const schema = Joi.object({
-        permissions: Joi.array().items(Joi.string()).required(),
-      });
-
-      const { error, value } = schema.validate(req.body);
-      if (error) {
-        throw new GatrixError(error.details[0].message, 400);
-      }
-
-      // Check if user exists
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      // Validate that all permissions are valid
-      const { ALL_PERMISSIONS } = await import('../types/permissions');
-      const invalidPermissions = value.permissions.filter(
-        (p: string) => !ALL_PERMISSIONS.includes(p as any)
-      );
-      if (invalidPermissions.length > 0) {
-        throw new GatrixError(`Invalid permissions: ${invalidPermissions.join(', ')}`, 400);
-      }
-
-      await UserModel.setPermissions(userId, value.permissions);
-
-      // Log audit
-      const actorId = (req.user as any)?.id ?? (req.user as any)?.userId;
-      await AuditLogModel.create({
-        action: 'user_permissions_updated',
-        description: `User #${userId} (${user.email}) permissions updated (${value.permissions.length} permissions)`,
-        resourceType: 'user',
-        resourceId: userId.toString(),
-        userId: actorId,
-        newValues: {
-          permissions: value.permissions,
-        },
-        ipAddress: req.ip || 'unknown',
-        userAgent: req.headers['user-agent'] || 'unknown',
-      });
-
-      // Send real-time notification to the affected user
-      await pubSubService.publishNotification({
-        type: 'user_role_changed',
-        data: {
-          userId,
-          changeType: 'permissions',
-        },
-        targetUsers: [userId],
-      });
-
-      res.json({
-        success: true,
-        message: 'Permissions updated successfully',
-        data: {
-          userId,
-          permissions: value.permissions,
         },
       });
     } catch (error) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -42,6 +42,7 @@ import {
   Info as InfoIcon,
   SportsEsports as SportsEsportsIcon,
   PushPin as PushPinIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -59,7 +60,7 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
@@ -68,6 +69,8 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -75,7 +78,9 @@ const ServiceNoticesPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironment } = useEnvironment();
-  const canManage = hasPermission([PERMISSIONS.SERVICE_NOTICES_MANAGE]);
+  const canManage = hasPermission([P.SERVICE_NOTICES_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [notices, setNotices] = useState<ServiceNotice[]>([]);
@@ -166,6 +171,20 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Webview menu state
   const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<ServiceNotice | null>(null);
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, notice: ServiceNotice) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(notice);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
@@ -299,7 +318,12 @@ const ServiceNoticesPage: React.FC = () => {
         filters.sortOrder = order;
       }
 
-      const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
+      const result = await serviceNoticeService.getServiceNotices(
+        projectApiPath,
+        page + 1,
+        rowsPerPage,
+        filters
+      );
 
       // Validate response
       if (result && typeof result === 'object') {
@@ -428,7 +452,10 @@ const ServiceNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      const result = await serviceNoticeService.deleteServiceNotice(deletingNotice.id);
+      const result = await serviceNoticeService.deleteServiceNotice(
+        projectApiPath,
+        deletingNotice.id
+      );
 
       if (result.isChangeRequest) {
         // CR was created, not immediately deleted
@@ -459,7 +486,10 @@ const ServiceNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      const result = await serviceNoticeService.deleteMultipleServiceNotices(selectedIds);
+      const result = await serviceNoticeService.deleteMultipleServiceNotices(
+        projectApiPath,
+        selectedIds
+      );
 
       if (result.isChangeRequest) {
         // CR was created, not immediately deleted
@@ -501,7 +531,7 @@ const ServiceNoticesPage: React.FC = () => {
     const runtimeUrl = (window as any)?.ENV?.VITE_EDGE_URL as string | undefined;
     const edgeUrl = runtimeUrl || import.meta.env.VITE_EDGE_URL || 'http://localhost:3400';
     const envName = currentEnvironment?.environmentName || 'development';
-    return `${edgeUrl}/game-service-notices.html?environment=${encodeURIComponent(envName)}`;
+    return `${edgeUrl}/game-service-notices.html?environmentId=${encodeURIComponent(envName)}`;
   };
 
   const handleOpenWebviewPreview = () => {
@@ -538,7 +568,7 @@ const ServiceNoticesPage: React.FC = () => {
 
   const handleToggleActive = async (notice: ServiceNotice) => {
     try {
-      await serviceNoticeService.toggleActive(notice.id);
+      await serviceNoticeService.toggleActive(projectApiPath, notice.id);
       enqueueSnackbar(t('serviceNotices.toggleSuccess'), {
         variant: 'success',
       });
@@ -716,21 +746,17 @@ const ServiceNoticesPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : notices.length === 0 ? (
-            <EmptyState
-              message={t('serviceNotices.noNoticesFound')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('serviceNotices.createNotice')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={isInitialLoad && loading}>
+        {notices.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('serviceNotices.noNoticesFound')}
+            onAddClick={canManage ? handleCreate : undefined}
+            addButtonLabel={t('serviceNotices.createNotice')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
                   <TableHead>
@@ -1065,32 +1091,12 @@ const ServiceNoticesPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
-                              }}
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleActionMenuOpen(e, notice)}
                             >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(notice)}
-                                  color="primary"
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(notice)}
-                                  color="error"
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -1110,10 +1116,40 @@ const ServiceNoticesPage: React.FC = () => {
                   setPage(0);
                 }}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleDelete(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Form Drawer */}
       <ServiceNoticeFormDialog

@@ -1,7 +1,7 @@
 import api from './api';
 
 export interface Environment {
-  environment: string; // Primary identifier (environment name)
+  environmentId: string; // Primary identifier (environmentId name)
   environmentName: string; // Alias for backward compatibility
   displayName: string;
   environmentType: 'development' | 'staging' | 'production';
@@ -20,7 +20,6 @@ export interface Environment {
 }
 
 export interface CreateEnvironmentData {
-  environment: string; // Environment name (primary key)
   displayName: string;
   description?: string;
   environmentType: 'development' | 'staging' | 'production';
@@ -107,11 +106,11 @@ export interface CopyPreviewSummary {
 
 export interface CopyPreview {
   source: {
-    environment: string;
+    environmentId: string;
     name: string;
   };
   target: {
-    environment: string;
+    environmentId: string;
     name: string;
   };
   summary: {
@@ -173,8 +172,8 @@ export interface RelatedDataDetails {
 }
 
 export interface EnvironmentRelatedData {
-  environment: {
-    environment: string;
+  environmentId: {
+    environmentId: string;
     displayName: string;
     isSystemDefined: boolean;
     isDefault: boolean;
@@ -184,72 +183,91 @@ export interface EnvironmentRelatedData {
   hasData: boolean;
 }
 
+/**
+ * Build base path for environment API calls.
+ * All environment endpoints are project-scoped:
+ *   /admin/orgs/:orgId/projects/:projectId/environments
+ */
+function envBasePath(projectApiPath: string): string {
+  return `${projectApiPath}/environments`;
+}
+
+/**
+ * Map backend response (uses 'id') to frontend Environment (uses 'environmentId').
+ * Backend's g_environments table has 'id' as primary key,
+ * but the frontend references it as 'environmentId' throughout 20+ files.
+ */
+function mapEnvironment(raw: any): Environment {
+  if (!raw) return raw;
+  return {
+    ...raw,
+    environmentId: raw.environmentId || raw.id,
+  };
+}
+
 class EnvironmentService {
   /**
    * Get all environments
    */
-  async getEnvironments(includeHidden: boolean = false): Promise<Environment[]> {
+  async getEnvironments(
+    projectApiPath: string,
+    includeHidden: boolean = false
+  ): Promise<Environment[]> {
     try {
-      const response = await api.get('/admin/environments', {
+      const response = await api.get(envBasePath(projectApiPath), {
         params: includeHidden ? { includeHidden: 'true' } : undefined,
       });
-      return response.data || [];
+      return (response.data || []).map(mapEnvironment);
     } catch (error) {
       console.error('Error fetching environments:', error);
       throw error;
     }
   }
 
-  /**
-   * Get environment by name
-   * @param environment Environment name (primary key)
-   */
-  async getEnvironment(environment: string): Promise<Environment> {
+  async getEnvironment(projectApiPath: string, environmentId: string): Promise<Environment> {
     try {
-      const response = await api.get(`/admin/environments/${environment}`);
-      return response.data;
+      const response = await api.get(`${envBasePath(projectApiPath)}/${environmentId}`);
+      return mapEnvironment(response.data);
     } catch (error) {
       console.error('Error fetching environment:', error);
       throw error;
     }
   }
 
-  /**
-   * Create new environment
-   */
-  async createEnvironment(data: CreateEnvironmentData): Promise<Environment> {
+  async createEnvironment(
+    projectApiPath: string,
+    data: CreateEnvironmentData
+  ): Promise<Environment> {
     try {
-      const response = await api.post('/admin/environments', data);
-      return response.data;
+      const response = await api.post(envBasePath(projectApiPath), data);
+      return mapEnvironment(response.data);
     } catch (error) {
       console.error('Error creating environment:', error);
       throw error;
     }
   }
-
-  /**
-   * Update an existing environment
-   * @param environment Environment name (primary key)
-   */
-  async updateEnvironment(environment: string, data: UpdateEnvironmentData): Promise<Environment> {
+  async updateEnvironment(
+    projectApiPath: string,
+    environmentId: string,
+    data: UpdateEnvironmentData
+  ): Promise<Environment> {
     try {
-      const response = await api.put(`/admin/environments/${environment}`, data);
-      return response.data;
+      const response = await api.put(`${envBasePath(projectApiPath)}/${environmentId}`, data);
+      return mapEnvironment(response.data);
     } catch (error) {
       console.error('Error updating environment:', error);
       throw error;
     }
   }
 
-  /**
-   * Get copy preview between two environments
-   * @param sourceEnvironment Source environment name
-   * @param targetEnvironment Target environment name
-   */
-  async getCopyPreview(sourceEnvironment: string, targetEnvironment: string): Promise<CopyPreview> {
+  async getCopyPreview(
+    projectApiPath: string,
+    sourceEnvironment: string,
+    targetEnvironment: string
+  ): Promise<CopyPreview> {
     try {
       const response = await api.get(
-        `/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}/preview`
+        `${envBasePath(projectApiPath)}/${sourceEnvironment}/copy/${targetEnvironment}/preview`
       );
       return response.data;
     } catch (error) {
@@ -258,19 +276,15 @@ class EnvironmentService {
     }
   }
 
-  /**
-   * Copy data from one environment to another
-   * @param sourceEnvironment Source environment name
-   * @param targetEnvironment Target environment name
-   */
   async copyEnvironmentData(
+    projectApiPath: string,
     sourceEnvironment: string,
     targetEnvironment: string,
     options: CopyOptions
   ): Promise<CopyResult> {
     try {
       const response = await api.post(
-        `/admin/environments/${sourceEnvironment}/copy/${targetEnvironment}`,
+        `${envBasePath(projectApiPath)}/${sourceEnvironment}/copy/${targetEnvironment}`,
         options
       );
       return response.data;
@@ -280,13 +294,14 @@ class EnvironmentService {
     }
   }
 
-  /**
-   * Get related data counts for an environment (for delete confirmation)
-   * @param environment Environment name (primary key)
-   */
-  async getRelatedData(environment: string): Promise<EnvironmentRelatedData> {
+  async getRelatedData(
+    projectApiPath: string,
+    environmentId: string
+  ): Promise<EnvironmentRelatedData> {
     try {
-      const response = await api.get(`/admin/environments/${environment}/related-data`);
+      const response = await api.get(
+        `${envBasePath(projectApiPath)}/${environmentId}/related-data`
+      );
       return response.data;
     } catch (error) {
       console.error('Error fetching related data:', error);
@@ -294,14 +309,13 @@ class EnvironmentService {
     }
   }
 
-  /**
-   * Delete an environment
-   * @param environment Environment name (primary key)
-   * @param force If true, delete all related data as well
-   */
-  async deleteEnvironment(environment: string, force: boolean = false): Promise<void> {
+  async deleteEnvironment(
+    projectApiPath: string,
+    environmentId: string,
+    force: boolean = false
+  ): Promise<void> {
     try {
-      await api.delete(`/admin/environments/${environment}`, {
+      await api.delete(`${envBasePath(projectApiPath)}/${environmentId}`, {
         data: { force },
       });
     } catch (error) {

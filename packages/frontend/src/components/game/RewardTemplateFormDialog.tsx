@@ -37,6 +37,7 @@ import rewardTemplateService, {
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
 import { tagService, Tag } from '../../services/tagService';
 import { getContrastColor } from '@/utils/colorUtils';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface RewardTemplateFormDialogProps {
   open: boolean;
@@ -56,6 +57,8 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Form state
   const [name, setName] = useState('');
@@ -76,7 +79,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
     const loadTags = async () => {
       try {
         setLoadingTags(true);
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -276,7 +279,11 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           templateId: template.id,
           payload: updatePayload,
         });
-        const result = await rewardTemplateService.updateRewardTemplate(template.id, updatePayload);
+        const result = await rewardTemplateService.updateRewardTemplate(
+          projectApiPath,
+          template.id,
+          updatePayload
+        );
         console.log('[RewardTemplateFormDialog] Template updated successfully:', {
           templateId: template.id,
           tagIds,
@@ -295,7 +302,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
         }
       } else {
         // Create new template (including copied templates)
-        const result = await rewardTemplateService.createRewardTemplate({
+        const result = await rewardTemplateService.createRewardTemplate(projectApiPath, {
           name: name.trim(),
           description: description.trim() || undefined,
           rewardItems,

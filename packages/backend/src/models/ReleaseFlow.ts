@@ -1,5 +1,7 @@
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ReleaseFlow');
 import { ulid } from 'ulid';
 import { Constraint, StrategyParameters } from './FeatureFlag';
 import { parseJsonField } from '../utils/dbUtils';
@@ -7,7 +9,7 @@ import { parseJsonField } from '../utils/dbUtils';
 // ==================== Types ====================
 
 export type FlowDiscriminator = 'template' | 'plan';
-export type FlowStatus = 'draft' | 'active' | 'paused' | 'completed';
+export type FlowStatus = 'draft' | 'pending' | 'active' | 'paused' | 'completed';
 
 export interface TransitionCondition {
   intervalMinutes: number;
@@ -20,13 +22,13 @@ export interface ReleaseFlowAttributes {
   description?: string;
   discriminator: FlowDiscriminator;
   flagId?: string;
-  environment?: string;
+  environmentId?: string;
   activeMilestoneId?: string;
   status: FlowStatus;
   isArchived: boolean;
   archivedAt?: Date;
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -131,12 +133,12 @@ export class ReleaseFlowModel {
 
   static async findPlanByFlagAndEnv(
     flagId: string,
-    environment: string
+    environmentId: string
   ): Promise<ReleaseFlowAttributes | null> {
     try {
       const flow = await db('g_release_flows')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where('discriminator', 'plan')
         .where('isArchived', false)
         .first();
@@ -156,7 +158,7 @@ export class ReleaseFlowModel {
    */
   static async findPlansByFlag(flagId: string): Promise<
     Array<{
-      environment: string;
+      environmentId: string;
       status: string;
       displayName: string;
       activeMilestoneName: string | null;
@@ -165,7 +167,7 @@ export class ReleaseFlowModel {
     try {
       const flows = await db('g_release_flows')
         .select(
-          'g_release_flows.environment',
+          'g_release_flows.environmentId',
           'g_release_flows.status',
           'g_release_flows.displayName',
           db.raw(`(
@@ -201,7 +203,7 @@ export class ReleaseFlowModel {
         description: data.description || null,
         discriminator: data.discriminator,
         flagId: data.flagId || null,
-        environment: data.environment || null,
+        environmentId: data.environmentId || null,
         activeMilestoneId: data.activeMilestoneId || null,
         isArchived: false,
         createdBy: data.createdBy,

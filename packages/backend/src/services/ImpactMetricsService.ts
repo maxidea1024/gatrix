@@ -7,7 +7,9 @@
  * 3. Querying Prometheus HTTP API for time-series data (for chart visualization and safeguard evaluation)
  */
 
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ImpactMetrics');
 import config from '../config';
 
 // ==================== Types ====================
@@ -98,10 +100,10 @@ class ImpactMetricsService {
         origin: 'sdk',
       });
 
-      logger.info('[ImpactMetrics] Registry initialized');
+      logger.info('Registry initialized');
       return this.registry;
     } catch (error) {
-      logger.warn('[ImpactMetrics] prom-client not available, metrics will be ignored');
+      logger.warn('prom-client not available, metrics will be ignored');
       return null;
     }
   }
@@ -137,16 +139,16 @@ class ImpactMetricsService {
             this.processHistogram(prefixedName, metric);
             break;
           default:
-            logger.warn(`[ImpactMetrics] Unknown metric type: ${metric.type}`);
+            logger.warn(`Unknown metric type: ${metric.type}`);
         }
       } catch (error: any) {
-        logger.error(`[ImpactMetrics] Failed to process metric: ${metric.name}`, {
+        logger.error(`Failed to process metric: ${metric.name}`, {
           error: error.message,
         });
       }
     }
 
-    logger.debug('[ImpactMetrics] Processed impact metrics', {
+    logger.debug('Processed impact metrics', {
       count: metrics.length,
     });
   }
@@ -212,8 +214,8 @@ class ImpactMetricsService {
       const firstSample = bucketSamples[0];
       const buckets = firstSample
         ? firstSample.buckets
-            .map((b) => (b.le === '+Inf' ? Infinity : (b.le as number)))
-            .filter((b) => b !== Infinity)
+          .map((b) => (b.le === '+Inf' ? Infinity : (b.le as number)))
+          .filter((b) => b !== Infinity)
         : [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 
       const labelNames = this.extractLabelNames(bucketSamples);
@@ -313,7 +315,7 @@ class ImpactMetricsService {
       const data: any = await response.json();
 
       if (data.status !== 'success') {
-        logger.error('[ImpactMetrics] Prometheus query failed', {
+        logger.error('Prometheus query failed', {
           query: promqlQuery,
           error: data.error,
         });
@@ -335,7 +337,7 @@ class ImpactMetricsService {
         debug: { query: promqlQuery, isTruncated: transformedSeries.length > 50 },
       };
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Prometheus query error', {
+      logger.error('Prometheus query error', {
         query: promqlQuery,
         error: error.message,
       });
@@ -383,7 +385,7 @@ class ImpactMetricsService {
       const value = parseFloat(firstResult.value?.[1] || '0');
       return isNaN(value) ? null : value;
     } catch (error: any) {
-      logger.error('[ImpactMetrics] Prometheus instant query error', {
+      logger.error('Prometheus instant query error', {
         query: promqlQuery,
         error: error.message,
       });
@@ -422,7 +424,7 @@ class ImpactMetricsService {
       }
       return [];
     } catch (error) {
-      logger.error('[ImpactMetrics] Failed to fetch metric labels:', error);
+      logger.error('Failed to fetch metric labels:', error);
       return [];
     }
   }
@@ -454,7 +456,7 @@ class ImpactMetricsService {
       }
     } catch (error) {
       logger.warn(
-        '[ImpactMetrics] Failed to fetch metrics from Prometheus, falling back to local registry',
+        'Failed to fetch metrics from Prometheus, falling back to local registry',
         error
       );
     }

@@ -135,13 +135,13 @@ export abstract class Addon {
       // This is critical for events where the payload is the full object (like FeatureFlag)
       // but doesn't explicitly have the environment that triggered the event at the top level
       if (
-        event.environment &&
+        event.environmentId &&
         eventData &&
         typeof eventData === 'object' &&
         !Array.isArray(eventData) &&
-        !eventData.environment
+        !eventData.environmentId
       ) {
-        eventData = { ...eventData, environment: event.environment };
+        eventData = { ...eventData, environmentId: event.environmentId };
       }
 
       await IntegrationEventModel.create({

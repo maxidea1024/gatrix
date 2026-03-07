@@ -178,7 +178,7 @@ const AlertsPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {alerts.length === 0 ? (
-                      <TableRow>
+                      <TableRow hover>
                         <TableCell colSpan={6} align="center">
                           <Typography variant="body2" color="text.secondary">
                             {t('common.noData')}

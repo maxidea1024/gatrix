@@ -1,51 +1,53 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('SignalEndpointModel');
 
 // Types
 export interface SignalEndpoint {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   isEnabled: boolean;
-  createdBy: number;
+  createdBy: string;
   createdByName?: string;
-  updatedBy: number | null;
+  updatedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
   tokens: SignalEndpointToken[];
 }
 
 export interface SignalEndpointToken {
-  id: number;
-  signalEndpointId: number;
+  id: string;
+  signalEndpointId: string;
   name: string;
-  createdBy: number;
+  createdBy: string;
   createdAt: Date;
 }
 
 export interface Signal {
-  id: number;
+  id: string;
   source: string;
-  sourceId: number;
+  sourceId: string;
   payload: Record<string, unknown> | null;
   isProcessed: boolean;
-  createdByTokenId: number | null;
+  createdByTokenId: string | null;
   createdAt: Date;
 }
 
 export interface CreateSignalEndpointData {
   name: string;
   description?: string;
-  createdBy: number;
+  projectId: string;
+  createdBy: string;
 }
 
 export interface UpdateSignalEndpointData {
   name?: string;
   description?: string;
   isEnabled?: boolean;
-  updatedBy: number;
+  updatedBy: string;
 }
 
 export class SignalEndpointModel {
@@ -57,13 +59,16 @@ export class SignalEndpointModel {
 
   static async create(data: CreateSignalEndpointData): Promise<SignalEndpoint> {
     try {
-      const [insertId] = await db(this.TABLE).insert({
+      const id = generateULID();
+      await db(this.TABLE).insert({
+        id,
         name: data.name,
         description: data.description || null,
+        projectId: data.projectId,
         createdBy: data.createdBy,
       });
 
-      const endpoint = await this.findById(insertId);
+      const endpoint = await this.findById(id);
       if (!endpoint) {
         throw new Error('Failed to create signal endpoint');
       }
@@ -75,7 +80,7 @@ export class SignalEndpointModel {
     }
   }
 
-  static async findById(id: number): Promise<SignalEndpoint | null> {
+  static async findById(id: string): Promise<SignalEndpoint | null> {
     try {
       const row = await db(this.TABLE)
         .select([`${this.TABLE}.*`, 'creator.name as createdByName'])
@@ -106,19 +111,25 @@ export class SignalEndpointModel {
     }
   }
 
-  static async findAll(): Promise<SignalEndpoint[]> {
+  static async findAll(projectId?: string): Promise<SignalEndpoint[]> {
     try {
-      const rows = await db(this.TABLE)
+      let query = db(this.TABLE)
         .select([`${this.TABLE}.*`, 'creator.name as createdByName'])
         .leftJoin('g_users as creator', `${this.TABLE}.createdBy`, 'creator.id')
         .orderBy(`${this.TABLE}.createdAt`, 'desc');
+
+      if (projectId) {
+        query = query.where(`${this.TABLE}.projectId`, projectId);
+      }
+
+      const rows = await query;
 
       // Batch load tokens
       const endpointIds = rows.map((r: any) => r.id);
       const allTokens =
         endpointIds.length > 0
           ? await db(this.TOKENS_TABLE)
-              .select('id', 'signalEndpointId', 'name', 'createdBy', 'createdAt')
+              .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
               .whereIn('signalEndpointId', endpointIds)
               .orderBy('createdAt', 'desc')
           : [];
@@ -139,7 +150,7 @@ export class SignalEndpointModel {
     }
   }
 
-  static async update(id: number, data: UpdateSignalEndpointData): Promise<SignalEndpoint | null> {
+  static async update(id: string, data: UpdateSignalEndpointData): Promise<SignalEndpoint | null> {
     try {
       const updateData: any = { updatedBy: data.updatedBy, updatedAt: db.fn.now() };
       if (data.name !== undefined) updateData.name = data.name;
@@ -154,7 +165,7 @@ export class SignalEndpointModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await db(this.TABLE).where('id', id).del();
       return result > 0;
@@ -164,7 +175,7 @@ export class SignalEndpointModel {
     }
   }
 
-  static async toggleEnabled(id: number, updatedBy: number): Promise<SignalEndpoint | null> {
+  static async toggleEnabled(id: string, updatedBy: string): Promise<SignalEndpoint | null> {
     try {
       const endpoint = await db(this.TABLE).select('isEnabled').where('id', id).first();
       if (!endpoint) return null;
@@ -184,10 +195,10 @@ export class SignalEndpointModel {
 
   // ─── Endpoint Tokens ─────────────────────────
 
-  static async findTokens(endpointId: number): Promise<SignalEndpointToken[]> {
+  static async findTokens(endpointId: string): Promise<SignalEndpointToken[]> {
     try {
       return db(this.TOKENS_TABLE)
-        .select('id', 'signalEndpointId', 'name', 'createdBy', 'createdAt')
+        .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
         .where('signalEndpointId', endpointId)
         .orderBy('createdAt', 'desc');
     } catch (error) {
@@ -197,22 +208,24 @@ export class SignalEndpointModel {
   }
 
   static async createToken(
-    endpointId: number,
+    endpointId: string,
     name: string,
     tokenHash: string,
-    createdBy: number
+    createdBy: string
   ): Promise<SignalEndpointToken> {
     try {
-      const [insertId] = await db(this.TOKENS_TABLE).insert({
+      const id = generateULID();
+      await db(this.TOKENS_TABLE).insert({
+        id,
         signalEndpointId: endpointId,
-        name,
+        tokenName: name,
         tokenHash,
         createdBy,
       });
 
       return db(this.TOKENS_TABLE)
-        .select('id', 'signalEndpointId', 'name', 'createdBy', 'createdAt')
-        .where('id', insertId)
+        .select('id', 'signalEndpointId', 'tokenName', 'createdBy', 'createdAt')
+        .where('id', id)
         .first();
     } catch (error) {
       logger.error('Error creating endpoint token:', error);
@@ -220,7 +233,7 @@ export class SignalEndpointModel {
     }
   }
 
-  static async deleteToken(tokenId: number): Promise<boolean> {
+  static async deleteToken(tokenId: string): Promise<boolean> {
     try {
       const result = await db(this.TOKENS_TABLE).where('id', tokenId).del();
       return result > 0;
@@ -232,7 +245,7 @@ export class SignalEndpointModel {
 
   static async verifyEndpointToken(
     tokenHash: string
-  ): Promise<{ endpointId: number; tokenId: number } | null> {
+  ): Promise<{ endpointId: string; tokenId: string } | null> {
     try {
       const token = await db(this.TOKENS_TABLE).where('tokenHash', tokenHash).first();
 
@@ -257,19 +270,21 @@ export class SignalEndpointModel {
 
   static async createSignal(
     source: string,
-    sourceId: number,
+    sourceId: string,
     payload: Record<string, unknown> | null,
-    createdByTokenId: number | null
+    createdByTokenId: string | null
   ): Promise<Signal> {
     try {
-      const [insertId] = await db(this.SIGNALS_TABLE).insert({
+      const id = generateULID();
+      await db(this.SIGNALS_TABLE).insert({
+        id,
         source,
         sourceId,
         payload: payload ? JSON.stringify(payload) : null,
         createdByTokenId,
       });
 
-      return db(this.SIGNALS_TABLE).where('id', insertId).first();
+      return db(this.SIGNALS_TABLE).where('id', id).first();
     } catch (error) {
       logger.error('Error creating signal:', error);
       throw error;
@@ -277,7 +292,7 @@ export class SignalEndpointModel {
   }
 
   static async findSignals(
-    endpointId: number,
+    endpointId: string,
     limit: number = 50,
     offset: number = 0
   ): Promise<{ signals: Signal[]; total: number }> {
@@ -318,7 +333,7 @@ export class SignalEndpointModel {
     }
   }
 
-  static async markSignalProcessed(signalId: number): Promise<void> {
+  static async markSignalProcessed(signalId: string): Promise<void> {
     try {
       await db(this.SIGNALS_TABLE).where('id', signalId).update({ isProcessed: true });
     } catch (error) {

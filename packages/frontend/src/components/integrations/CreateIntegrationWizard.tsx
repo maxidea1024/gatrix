@@ -33,6 +33,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
 import { EventSelector, EnvironmentSelector } from './IntegrationSelectors';
+import { useEnvironments } from '@/contexts/EnvironmentContext';
 
 // Provider icons
 import slackIcon from '@/assets/icons/integrations/slack.svg';
@@ -218,19 +219,20 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
   const [parameters, setParameters] = useState<Record<string, any>>({});
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
-  const [environments, setEnvironments] = useState<{ environment: string; displayName?: string }[]>(
-    []
-  );
   const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { environments: envList } = useEnvironments();
+  const environments = envList.map((e) => ({
+    environmentId: e.environmentId,
+    displayName: e.displayName,
+  }));
 
   const STEPS = ['selectProvider', 'configure', 'selectEvents'];
 
   useEffect(() => {
     if (open) {
       fetchProviders();
-      fetchEnvironments();
       // Reset form - if initialProvider is set, start at step 1
       setActiveStep(initialProvider ? 1 : 0);
       setSelectedProvider(initialProvider || null);
@@ -273,15 +275,6 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
       enqueueSnackbar(t('integrations.providerLoadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchEnvironments = async () => {
-    try {
-      const res = await api.get('/admin/environments');
-      setEnvironments(res?.data || []);
-    } catch {
-      // Ignore error
     }
   };
 
@@ -344,7 +337,7 @@ export const CreateIntegrationWizard: React.FC<CreateIntegrationWizardProps> = (
         isEnabled,
         parameters,
         events: selectedEvents,
-        environments: selectedEnvironments,
+        environmentIds: selectedEnvironments,
       });
       enqueueSnackbar(t('integrations.saveSuccess'), { variant: 'success' });
       onSuccess();

@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import ServiceNoticeService from '../services/ServiceNoticeService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerServiceNoticeController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
@@ -17,9 +19,9 @@ export class ServerServiceNoticeController {
    */
   static async getServiceNotices(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -30,7 +32,7 @@ export class ServerServiceNoticeController {
       }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.SERVICE_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
@@ -52,13 +54,13 @@ export class ServerServiceNoticeController {
 
           const result = await ServiceNoticeService.getServiceNotices(1, 1000, {
             isActive: true,
-            environment: environment,
+            environmentId: environmentId,
           });
 
           const activeNotices = filterActiveNotices(result.notices);
 
           logger.info(
-            `Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${environment}`
+            `Server SDK: Retrieved ${activeNotices.length} active service notices for environmentId ${environmentId}`
           );
 
           return {
@@ -89,10 +91,10 @@ export class ServerServiceNoticeController {
   static async getServiceNoticeById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
-      const environment = req.environment;
-      const noticeId = parseInt(id);
+      const environmentId = req.environmentId;
+      const noticeId = id;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -102,7 +104,7 @@ export class ServerServiceNoticeController {
         });
       }
 
-      if (isNaN(noticeId)) {
+      if (!noticeId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -113,7 +115,7 @@ export class ServerServiceNoticeController {
         });
       }
 
-      const notice = await ServiceNoticeService.getServiceNoticeById(noticeId, environment);
+      const notice = await ServiceNoticeService.getServiceNoticeById(noticeId, environmentId);
 
       if (!notice) {
         return res.status(404).json({
@@ -126,7 +128,7 @@ export class ServerServiceNoticeController {
       }
 
       logger.info(
-        `Server SDK: Retrieved service notice ${noticeId} for environment ${environment}`
+        `Server SDK: Retrieved service notice ${noticeId} for environmentId ${environmentId}`
       );
 
       res.json({

@@ -188,6 +188,10 @@ services:
       CHAT_SERVER_URL: http://chat-server:5100
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-redis}
       ETCD_HOSTS: http://etcd:2379
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
     volumes:
       - backend_logs:/app/logs
       - backend_data:/app/data
@@ -203,6 +207,9 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${BACKEND_REPLICAS:-2}
+      placement:
+        constraints:
+          - node.labels.service == backend
       resources:
         limits:
           memory: 1G
@@ -234,6 +241,9 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${FRONTEND_REPLICAS:-2}
+      placement:
+        constraints:
+          - node.labels.service != backend
       resources:
         limits:
           memory: 256M
@@ -277,6 +287,9 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${EVENT_LENS_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.service != backend
       resources:
         limits:
           memory: 512M
@@ -327,6 +340,9 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${EVENT_LENS_WORKER_REPLICAS:-2}
+      placement:
+        constraints:
+          - node.labels.service != backend
       resources:
         limits:
           memory: 512M
@@ -377,6 +393,9 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${CHAT_SERVER_REPLICAS:-2}
+      placement:
+        constraints:
+          - node.labels.service != backend
       resources:
         limits:
           memory: 1G
@@ -411,6 +430,12 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       EDGE_CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-polling}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
+      EDGE_CACHE_REDIS_HOST: ${EDGE_CACHE_REDIS_HOST:-redis}
+      EDGE_CACHE_REDIS_PORT: ${EDGE_CACHE_REDIS_PORT:-6379}
+      EDGE_CACHE_REDIS_PASSWORD: ${EDGE_CACHE_REDIS_PASSWORD:-}
+      EDGE_CACHE_REDIS_DB: ${EDGE_CACHE_REDIS_DB:-0}
+      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-true}
     volumes:
       - edge_logs:/app/logs
     networks:
@@ -422,6 +447,9 @@ services:
       <<: *common-deploy
       mode: replicated
       replicas: ${EDGE_REPLICAS:-2}
+      placement:
+        constraints:
+          - node.labels.service != backend
       resources:
         limits:
           memory: 256M
@@ -478,6 +506,9 @@ services:
       GF_SECURITY_ADMIN_PASSWORD_FILE: /run/secrets/grafana_password
       GF_USERS_ALLOW_SIGN_UP: 'false'
       GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN:-localhost}
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: ${GRAFANA_TRUSTED_ORIGINS:-*}
+      GF_LIVE_ALLOWED_ORIGINS: ${GRAFANA_ALLOWED_ORIGINS:-*}
     volumes:
       - grafana_data:/var/lib/grafana
       - ../docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro

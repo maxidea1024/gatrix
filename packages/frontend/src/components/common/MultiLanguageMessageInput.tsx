@@ -41,7 +41,7 @@ export interface MultiLanguageMessageInputProps {
   onLocalesChange: (locales: MessageLocale[]) => void;
   languageSpecificMessagesLabel: string;
 
-  // 번역 기능
+  // Translation 기능
   enableTranslation?: boolean;
   translateButtonLabel: string;
   translateTooltip: string;
@@ -122,7 +122,7 @@ const MultiLanguageMessageInput = forwardRef<
 
         console.log('Translation results:', translations);
 
-        // 번역 결과를 locales에 적용
+        // Translation Results를 locales에 적용
         const newLocales = availableLanguages.map((lang) => {
           const existingLocale = locales.find((l) => l.lang === lang.code);
           const translationResult = translations[lang.code];
@@ -139,7 +139,7 @@ const MultiLanguageMessageInput = forwardRef<
 
         console.log('New locales:', newLocales);
 
-        // 번역 결과 적용 (부모 컴포넌트에서 자동으로 supportsMultiLanguage를 true로 설정함)
+        // Translation Results 적용 (부모 컴포넌트에서 자동으로 supportsMultiLanguage를 true로 Settings함)
         onLocalesChange(newLocales);
 
         enqueueSnackbar(t('multiLanguageMessage.translationCompleted'), {
@@ -182,7 +182,7 @@ const MultiLanguageMessageInput = forwardRef<
             inputRef={defaultMessageRef}
           />
 
-          {/* 언어별 메시지 사용 여부 및 번역 버튼 */}
+          {/* 언어별 메시지 Used 여부 및 Translation 버튼 */}
           <Box
             sx={{
               display: 'flex',
@@ -201,7 +201,7 @@ const MultiLanguageMessageInput = forwardRef<
               label={supportsMultiLanguageLabel}
             />
 
-            {/* 번역 버튼 */}
+            {/* Translation 버튼 */}
             {enableTranslation && (
               <Tooltip title={translateTooltip}>
                 <span>

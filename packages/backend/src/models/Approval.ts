@@ -7,7 +7,7 @@ export class Approval extends Model {
 
   id!: string;
   changeRequestId!: string;
-  approverId!: number;
+  approverId!: string;
   comment?: string;
   createdAt!: Date;
 

@@ -27,11 +27,14 @@ import {
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
 import { AuditLogModel } from '../models/AuditLog';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('FeatureFlagService');
 import { pubSubService } from './PubSubService';
 import { ENV_SCOPED } from '../constants/cacheKeys';
 import db from '../config/knex';
 import { validateFlagValue } from '../utils/validateFlagValue';
+import { FeatureFlagTypeModel } from '../models/FeatureFlagType';
 
 // Types for service methods
 export interface CreateFlagInput {
@@ -45,14 +48,14 @@ export interface CreateFlagInput {
   disabledValue: any;
 
   impressionDataEnabled?: boolean;
-  staleAfterDays?: number;
   tags?: string[];
   links?: { url: string; title?: string }[];
-  environment?: string; // Optional: initialize for specific environment
-  isEnabled?: boolean; // Optional: combined with environment
+  environmentId?: string; // Optional: initialize for specific environmentId
+  isEnabled?: boolean; // Optional: combined with environmentId
   strategies?: any[]; // Optional: strategies to create (used in import)
   variants?: any[]; // Optional: variants to create (used in import)
   validationRules?: ValidationRules; // Optional: validation rules for flag values
+  projectId?: string; // Project scoping
 }
 
 export interface UpdateFlagInput {
@@ -66,7 +69,6 @@ export interface UpdateFlagInput {
   isEnabled?: boolean;
   isArchived?: boolean;
   impressionDataEnabled?: boolean;
-  staleAfterDays?: number;
   stale?: boolean;
   tags?: string[];
   links?: { url: string; title?: string }[];
@@ -110,6 +112,7 @@ export interface CreateSegmentInput {
   constraints: Constraint[];
   isActive?: boolean;
   tags?: string[];
+  projectId?: string;
 }
 
 export interface UpdateSegmentInput {
@@ -121,7 +124,7 @@ export interface UpdateSegmentInput {
 }
 
 export interface FlagListQuery {
-  environment: string;
+  environmentId: string;
   search?: string;
   flagType?: string;
 
@@ -132,6 +135,7 @@ export interface FlagListQuery {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  projectId?: string;
 }
 
 // Request context for passing IP and user agent to audit logs
@@ -157,30 +161,43 @@ class FeatureFlagService {
   }
 
   /**
-   * Get stale flags (flags that haven't been seen for longer than their staleAfterDays setting)
+   * Get stale flags (flags that have exceeded their type's lifetimeDays)
    * A flag is considered stale if:
-   * - lastSeenAt is null (never been evaluated) OR
-   * - (now - lastSeenAt) > staleAfterDays
+   * - Its flag type has a non-null lifetimeDays AND
+   * - lastSeenAt exceeds lifetimeDays from now, or never evaluated and created more than lifetimeDays ago
+   * Flag types with lifetimeDays = null have infinite lifetime and are never stale.
    */
-  async getStaleFlags(environment: string): Promise<FeatureFlagAttributes[]> {
+  async getStaleFlags(environmentId: string, projectId?: string): Promise<FeatureFlagAttributes[]> {
+    // Load flag types to get lifetimeDays per type
+    const flagTypes = await FeatureFlagTypeModel.findAll(projectId);
+    const lifetimeMap = new Map<string, number | null>();
+    for (const ft of flagTypes) {
+      lifetimeMap.set(ft.flagType, ft.lifetimeDays);
+    }
+
     const result = await FeatureFlagModel.findAll({
-      environment,
+      environmentId,
+      projectId,
       isArchived: false,
       limit: 10000,
     });
 
     const now = new Date();
     return result.flags.filter((flag) => {
+      const lifetimeDays = lifetimeMap.get(flag.flagType);
+      // null lifetimeDays = infinite lifetime, never stale
+      if (lifetimeDays === null || lifetimeDays === undefined) return false;
+
       if (!flag.lastSeenAt) {
-        // Never been evaluated - check if created more than staleAfterDays ago
+        // Never been evaluated - check if created more than lifetimeDays ago
         const createdAt = flag.createdAt ? new Date(flag.createdAt) : now;
         const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
-        return daysSinceCreation > flag.staleAfterDays;
+        return daysSinceCreation > lifetimeDays;
       }
 
       const lastSeen = new Date(flag.lastSeenAt);
       const daysSinceLastSeen = (now.getTime() - lastSeen.getTime()) / (1000 * 60 * 60 * 24);
-      return daysSinceLastSeen > flag.staleAfterDays;
+      return daysSinceLastSeen > lifetimeDays;
     });
   }
 
@@ -188,18 +205,23 @@ class FeatureFlagService {
    * Mark a flag as seen (update lastSeenAt timestamp)
    * This is typically called when a flag is evaluated by the SDK
    */
-  async markFlagAsSeen(environment: string, flagName: string): Promise<void> {
-    const flag = await this.getFlag(environment, flagName);
+  async markFlagAsSeen(environmentId: string, flagName: string): Promise<void> {
+    const flag = await this.getFlag(environmentId, flagName);
     if (flag) {
-      await FeatureFlagModel.updateLastSeenAt(flag.id, environment);
+      await FeatureFlagModel.updateLastSeenAt(flag.id, environmentId);
     }
   }
 
   /**
    * Get a single feature flag by name
+   * @param projectId - When provided, restricts lookup to this project only
    */
-  async getFlag(environment: string, flagName: string): Promise<FeatureFlagAttributes | null> {
-    return FeatureFlagModel.findByName(environment, flagName);
+  async getFlag(
+    environmentId: string,
+    flagName: string,
+    projectId?: string
+  ): Promise<FeatureFlagAttributes | null> {
+    return FeatureFlagModel.findByName(environmentId, flagName, projectId);
   }
 
   /**
@@ -212,10 +234,14 @@ class FeatureFlagService {
   /**
    * Create a new feature flag
    */
-  async createFlag(input: CreateFlagInput, userId: number, requestContext?: RequestContext): Promise<FeatureFlagAttributes> {
+  async createFlag(
+    input: CreateFlagInput,
+    userId: string,
+    requestContext?: RequestContext
+  ): Promise<FeatureFlagAttributes> {
     const flagName = input.flagName || input.name;
     // Check for duplicate
-    const existing = await FeatureFlagModel.findByName(input.environment!, flagName!);
+    const existing = await FeatureFlagModel.findByName(input.environmentId!, flagName!);
     if (existing) {
       throw new GatrixError(
         `Flag '${flagName}' already exists`,
@@ -275,15 +301,15 @@ class FeatureFlagService {
       disabledValue: input.disabledValue,
       validationRules: input.validationRules,
       impressionDataEnabled: input.impressionDataEnabled ?? false,
-      staleAfterDays: input.staleAfterDays ?? 30,
       useFixedWeightVariants: false,
       tags: input.tags,
       links: input.links,
       createdBy: userId,
-      environment: input.environment,
+      environmentId: input.environmentId,
       isEnabled: input.isEnabled ?? false,
       isArchived: false,
-    });
+      projectId: input.projectId,
+    } as any);
 
     // Create strategies if provided
     if (input.strategies && input.strategies.length > 0) {
@@ -291,7 +317,7 @@ class FeatureFlagService {
         const strategyInput = input.strategies[i];
         await FeatureStrategyModel.create({
           flagId: flag.id,
-          environment: input.environment!,
+          environmentId: input.environmentId!,
           strategyName: strategyInput.strategyName,
           parameters: strategyInput.parameters,
           constraints: strategyInput.constraints,
@@ -307,7 +333,7 @@ class FeatureFlagService {
       for (const variantInput of input.variants) {
         await FeatureVariantModel.create({
           flagId: flag.id,
-          environment: input.environment!,
+          environmentId: input.environmentId!,
           variantName: variantInput.variantName,
           weight: variantInput.weight,
           value: variantInput.value,
@@ -320,11 +346,11 @@ class FeatureFlagService {
     // Audit log (also triggers integration events via fire-and-forget)
     await AuditLogModel.create({
       action: 'feature_flag.create',
-      description: `Feature flag '${input.flagName}' created in [${input.environment}]`,
+      description: `Feature flag '${input.flagName}' created in [${input.environmentId}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment: input.environment,
+      environmentId: input.environmentId,
       newValues: {
         ...flag,
         strategies: input.strategies,
@@ -335,9 +361,9 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(input.environment!, [input.flagName!]);
+    await this.invalidateCache(input.environmentId!, [input.flagName!]);
 
-    logger.info(`Feature flag created: ${input.flagName} in ${input.environment}`);
+    logger.info(`Feature flag created: ${input.flagName} in ${input.environmentId}`);
     return flag;
   }
 
@@ -345,13 +371,13 @@ class FeatureFlagService {
    * Update a feature flag
    */
   async updateFlag(
-    environment: string,
+    environmentId: string,
     flagName: string,
     input: UpdateFlagInput,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -397,7 +423,7 @@ class FeatureFlagService {
 
     // Update environment-specific settings (isEnabled, enabledValue, disabledValue)
     // ONLY if not explicitly requested to be a global-only update, or if environment is provided
-    if (environment && !isGlobal) {
+    if (environmentId && !isGlobal) {
       if (
         isEnabled !== undefined ||
         enabledValue !== undefined ||
@@ -405,7 +431,7 @@ class FeatureFlagService {
         overrideEnabledValue !== undefined ||
         overrideDisabledValue !== undefined
       ) {
-        await FeatureFlagEnvironmentModel.update(flag.id, environment, {
+        await FeatureFlagEnvironmentModel.update(flag.id, environmentId, {
           isEnabled,
           enabledValue,
           disabledValue,
@@ -418,7 +444,7 @@ class FeatureFlagService {
     // Update global flag properties
     // If isGlobal is true, enabledValue/disabledValue are applied as base values
     const baseValues: any = {};
-    if (isGlobal || !environment) {
+    if (isGlobal || !environmentId) {
       if (enabledValue !== undefined) baseValues.enabledValue = enabledValue;
       if (disabledValue !== undefined) baseValues.disabledValue = disabledValue;
     }
@@ -442,12 +468,12 @@ class FeatureFlagService {
       });
     }
 
-    const updated = await this.getFlag(environment, flagName);
+    const updated = await this.getFlag(environmentId, flagName);
 
     // Build human-readable description
-    let updateDesc = `Feature flag '${flagName}' updated in [${environment}]`;
+    let updateDesc = `Feature flag '${flagName}' updated in [${environmentId}]`;
     if (input.isEnabled !== undefined) {
-      updateDesc = `Feature flag '${flagName}' ${input.isEnabled ? 'enabled' : 'disabled'} in [${environment}]`;
+      updateDesc = `Feature flag '${flagName}' ${input.isEnabled ? 'enabled' : 'disabled'} in [${environmentId}]`;
     }
 
     // Audit log (also triggers integration events via fire-and-forget)
@@ -457,7 +483,7 @@ class FeatureFlagService {
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: flag,
       newValues: updated,
       ipAddress: requestContext?.ipAddress,
@@ -465,13 +491,13 @@ class FeatureFlagService {
     });
 
     // Increment version and invalidate cache
-    await this.incrementFlagVersion(flag.id, environment);
+    await this.incrementFlagVersion(flag.id, environmentId);
     // Detect if only isEnabled changed (no definition change)
     const isEnabledOnlyChange =
       input.isEnabled !== undefined &&
       Object.keys(input).filter((k) => k !== 'isEnabled').length === 0;
     await this.invalidateCache(
-      environment,
+      environmentId,
       [flagName],
       isEnabledOnlyChange ? 'enabled_changed' : 'definition_changed'
     );
@@ -480,21 +506,62 @@ class FeatureFlagService {
   }
 
   /**
-   * Toggle flag enabled state
+   * Toggle flag enabled state.
+   * Automatically controls the release-flow plan lifecycle:
+   *  - Enabling with a draft plan  → auto-start
+   *  - Enabling with a paused plan → auto-resume
+   *  - Disabling with an active plan → auto-pause
    */
   async toggleFlag(
-    environment: string,
+    environmentId: string,
     flagName: string,
     isEnabled: boolean,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    return this.updateFlag(environment, flagName, { isEnabled }, userId, requestContext);
+    const result = await this.updateFlag(
+      environmentId,
+      flagName,
+      { isEnabled },
+      userId,
+      requestContext
+    );
+
+    // Auto-control release flow plan based on toggle direction
+    if (result) {
+      try {
+        const { releaseFlowService } = await import('./ReleaseFlowService');
+        const plan = await releaseFlowService.getPlanForFlag(result.id, environmentId);
+        if (plan) {
+          if (isEnabled && (plan.status === 'draft' || plan.status === 'pending')) {
+            await releaseFlowService.startPlan(plan.id, userId);
+            logger.info(
+              `Auto-started release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`
+            );
+          } else if (isEnabled && plan.status === 'paused') {
+            await releaseFlowService.resumePlan(plan.id, userId);
+            logger.info(
+              `Auto-resumed release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`
+            );
+          } else if (!isEnabled && plan.status === 'active') {
+            await releaseFlowService.pausePlan(plan.id, userId);
+            logger.info(
+              `Auto-paused release flow plan '${plan.flowName}' for flag '${flagName}' in [${environmentId}]`
+            );
+          }
+        }
+      } catch (error) {
+        // Log but don't fail the toggle — release flow control is secondary
+        logger.error('Failed to auto-control release flow plan:', error);
+      }
+    }
+
+    return result;
   }
 
   async updateEnvironment(
     flagId: string,
-    environment: string,
+    environmentId: string,
     data: {
       isEnabled?: boolean;
       enabledValue?: any;
@@ -503,19 +570,19 @@ class FeatureFlagService {
       overrideDisabledValue?: boolean;
     }
   ): Promise<FeatureFlagEnvironmentAttributes> {
-    return FeatureFlagEnvironmentModel.update(flagId, environment, data);
+    return FeatureFlagEnvironmentModel.update(flagId, environmentId, data);
   }
 
   /**
    * Archive a flag
    */
   async archiveFlag(
-    environment: string,
+    environmentId: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -527,15 +594,15 @@ class FeatureFlagService {
     });
 
     // Also disable the flag in this environment
-    await FeatureFlagEnvironmentModel.updateIsEnabled(flag.id, environment, false);
+    await FeatureFlagEnvironmentModel.updateIsEnabled(flag.id, environmentId, false);
 
     await AuditLogModel.create({
       action: 'feature_flag.archive',
-      description: `Feature flag '${flagName}' archived in [${environment}]`,
+      description: `Feature flag '${flagName}' archived in [${environmentId}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: { isArchived: false },
       newValues: { isArchived: true },
       ipAddress: requestContext?.ipAddress,
@@ -543,7 +610,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache (archived = removed from SDK's perspective)
-    await this.invalidateCache(environment, [flagName], 'deleted');
+    await this.invalidateCache(environmentId, [flagName], 'deleted');
 
     return updated;
   }
@@ -552,12 +619,12 @@ class FeatureFlagService {
    * Revive an archived flag
    */
   async reviveFlag(
-    environment: string,
+    environmentId: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -570,11 +637,11 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.revive',
-      description: `Feature flag '${flagName}' revived (unarchived) in [${environment}]`,
+      description: `Feature flag '${flagName}' revived (unarchived) in [${environmentId}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: { isArchived: true },
       newValues: { isArchived: false },
       ipAddress: requestContext?.ipAddress,
@@ -582,7 +649,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    await this.invalidateCache(environmentId, [flagName]);
 
     return updated;
   }
@@ -591,13 +658,13 @@ class FeatureFlagService {
    * Toggle favorite status
    */
   async toggleFavorite(
-    environment: string,
+    environmentId: string,
     flagName: string,
     isFavorite: boolean,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -613,7 +680,7 @@ class FeatureFlagService {
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: { isFavorite: !isFavorite },
       newValues: { isFavorite },
       ipAddress: requestContext?.ipAddress,
@@ -627,12 +694,12 @@ class FeatureFlagService {
    * Mark a flag as stale
    */
   async markAsStale(
-    environment: string,
+    environmentId: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -644,11 +711,11 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.mark_stale',
-      description: `Feature flag '${flagName}' marked as stale in [${environment}]`,
+      description: `Feature flag '${flagName}' marked as stale in [${environmentId}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: { stale: false },
       newValues: { stale: true },
       ipAddress: requestContext?.ipAddress,
@@ -656,7 +723,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    await this.invalidateCache(environmentId, [flagName]);
 
     return updated;
   }
@@ -665,12 +732,12 @@ class FeatureFlagService {
    * Mark a flag as not stale
    */
   async markAsNotStale(
-    environment: string,
+    environmentId: string,
     flagName: string,
-    userId: number,
+    userId: string,
     requestContext?: RequestContext
   ): Promise<FeatureFlagAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -682,11 +749,11 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.unmark_stale',
-      description: `Feature flag '${flagName}' unmarked as stale in [${environment}]`,
+      description: `Feature flag '${flagName}' unmarked as stale in [${environmentId}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: { stale: true },
       newValues: { stale: false },
       ipAddress: requestContext?.ipAddress,
@@ -694,7 +761,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    await this.invalidateCache(environmentId, [flagName]);
 
     return updated;
   }
@@ -702,8 +769,13 @@ class FeatureFlagService {
   /**
    * Delete a flag (permanently)
    */
-  async deleteFlag(environment: string, flagName: string, userId: number, requestContext?: RequestContext): Promise<void> {
-    const flag = await this.getFlag(environment, flagName);
+  async deleteFlag(
+    environmentId: string,
+    flagName: string,
+    userId: string,
+    requestContext?: RequestContext
+  ): Promise<void> {
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -722,18 +794,18 @@ class FeatureFlagService {
 
     await AuditLogModel.create({
       action: 'feature_flag.delete',
-      description: `Feature flag '${flagName}' permanently deleted from [${environment}]`,
+      description: `Feature flag '${flagName}' permanently deleted from [${environmentId}]`,
       resourceType: 'FeatureFlag',
       resourceId: flag.id,
       userId,
-      environment,
+      environmentId,
       oldValues: flag,
       ipAddress: requestContext?.ipAddress,
       userAgent: requestContext?.userAgent,
     });
 
     // Invalidate cache (permanently deleted)
-    await this.invalidateCache(environment, [flagName], 'deleted');
+    await this.invalidateCache(environmentId, [flagName], 'deleted');
   }
 
   // ==================== Strategies ====================
@@ -742,12 +814,12 @@ class FeatureFlagService {
    * Add a strategy to a flag
    */
   async addStrategy(
-    environment: string,
+    environmentId: string,
     flagName: string,
     input: CreateStrategyInput,
-    userId: number
+    userId: string
   ): Promise<FeatureStrategyAttributes> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -757,7 +829,7 @@ class FeatureFlagService {
 
     const strategy = await FeatureStrategyModel.create({
       flagId: flag.id,
-      environment,
+      environmentId,
       strategyName: input.strategyName,
       title: input.title,
       parameters: input.parameters,
@@ -768,7 +840,7 @@ class FeatureFlagService {
     });
 
     // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    await this.invalidateCache(environmentId, [flagName]);
 
     return strategy;
   }
@@ -779,7 +851,7 @@ class FeatureFlagService {
   async updateStrategy(
     strategyId: string,
     input: UpdateStrategyInput,
-    userId: number
+    userId: string
   ): Promise<FeatureStrategyAttributes> {
     const strategy = await FeatureStrategyModel.findById(strategyId);
     if (!strategy) {
@@ -795,7 +867,7 @@ class FeatureFlagService {
 
     // Invalidate cache
     if (flag) {
-      await this.invalidateCache(strategy.environment, [flag.flagName]);
+      await this.invalidateCache(strategy.environmentId, [flag.flagName]);
     }
 
     return updated;
@@ -804,7 +876,7 @@ class FeatureFlagService {
   /**
    * Delete a strategy
    */
-  async deleteStrategy(strategyId: string, userId: number): Promise<void> {
+  async deleteStrategy(strategyId: string, userId: string): Promise<void> {
     const strategy = await FeatureStrategyModel.findById(strategyId);
     if (!strategy) {
       throw new GatrixError('Strategy not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -815,19 +887,19 @@ class FeatureFlagService {
     await FeatureStrategyModel.delete(strategyId);
 
     // Invalidate cache
-    await this.invalidateCache(strategy.environment, flag ? [flag.flagName] : undefined);
+    await this.invalidateCache(strategy.environmentId, flag ? [flag.flagName] : undefined);
   }
 
   /**
    * Update all strategies for a flag (bulk replace)
    */
   async updateStrategies(
-    environment: string,
+    environmentId: string,
     flagName: string,
     strategies: CreateStrategyInput[],
-    userId: number
+    userId: string
   ): Promise<FeatureStrategyAttributes[]> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -835,7 +907,7 @@ class FeatureFlagService {
     // Delete existing strategies for this environment
     const existingStrategies = await FeatureStrategyModel.findByFlagIdAndEnvironment(
       flag.id,
-      environment
+      environmentId
     );
     for (const strategy of existingStrategies) {
       await FeatureStrategyModel.delete(strategy.id);
@@ -847,7 +919,7 @@ class FeatureFlagService {
       const input = strategies[i];
       const strategy = await FeatureStrategyModel.create({
         flagId: flag.id,
-        environment,
+        environmentId,
         strategyName: input.strategyName,
         title: input.title,
         parameters: input.parameters,
@@ -872,7 +944,7 @@ class FeatureFlagService {
     }
 
     // Invalidate cache
-    await this.invalidateCache(environment, [flagName]);
+    await this.invalidateCache(environmentId, [flagName]);
 
     return newStrategies;
   }
@@ -894,16 +966,16 @@ class FeatureFlagService {
    * Update variants for a flag (bulk replace)
    */
   async updateVariants(
-    environment: string,
+    environmentId: string,
     flagName: string,
     variants: CreateVariantInput[],
-    userId: number,
+    userId: string,
     valueType?: ValueType,
     enabledValue?: any,
     disabledValue?: any,
     clearVariantValues?: boolean
   ): Promise<FeatureVariantAttributes[]> {
-    const flag = await this.getFlag(environment, flagName);
+    const flag = await this.getFlag(environmentId, flagName);
     if (!flag) {
       throw new GatrixError(`Flag '${flagName}' not found`, 404, true, ErrorCodes.NOT_FOUND);
     }
@@ -1004,13 +1076,13 @@ class FeatureFlagService {
     // Only update variants table if not a metadata-only update for Remote Config
     if (!isRemoteConfigMetadataUpdate) {
       // Delete existing variants for this environment
-      await FeatureVariantModel.deleteByFlagIdAndEnvironment(flag.id, environment);
+      await FeatureVariantModel.deleteByFlagIdAndEnvironment(flag.id, environmentId);
 
       // Insert new variants
       for (const variant of variants) {
         const created = await FeatureVariantModel.create({
           flagId: flag.id,
-          environment,
+          environmentId,
           variantName: variant.variantName,
           weight: variant.weight,
           value: variant.value,
@@ -1021,12 +1093,12 @@ class FeatureFlagService {
       }
     } else {
       // If metadata only update, return existing variants
-      resultVariants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environment);
+      resultVariants = await FeatureVariantModel.findByFlagIdAndEnvironment(flag.id, environmentId);
     }
 
     // Increment version and invalidate cache after variants update
-    await this.incrementFlagVersion(flag.id, environment);
-    await this.invalidateCache(environment, [flagName]);
+    await this.incrementFlagVersion(flag.id, environmentId);
+    await this.invalidateCache(environmentId, [flagName]);
 
     return resultVariants;
   }
@@ -1036,8 +1108,8 @@ class FeatureFlagService {
   /**
    * List segments
    */
-  async listSegments(search?: string): Promise<FeatureSegmentAttributes[]> {
-    return FeatureSegmentModel.findAll(search);
+  async listSegments(search?: string, projectId?: string): Promise<FeatureSegmentAttributes[]> {
+    return FeatureSegmentModel.findAll(search, projectId);
   }
 
   /**
@@ -1052,7 +1124,7 @@ class FeatureFlagService {
    */
   async createSegment(
     input: CreateSegmentInput,
-    userId: number
+    userId: string
   ): Promise<FeatureSegmentAttributes> {
     // Check if segment name already exists (segments are now global)
     const existing = await FeatureSegmentModel.findByName(input.segmentName);
@@ -1073,7 +1145,8 @@ class FeatureFlagService {
       isActive: input.isActive ?? true,
       tags: input.tags,
       createdBy: userId,
-    });
+      projectId: input.projectId,
+    } as any);
 
     // Publish segment.created event with full segment data
     // SDKs can update their segment cache directly without an API call
@@ -1095,7 +1168,7 @@ class FeatureFlagService {
   async updateSegment(
     id: string,
     input: UpdateSegmentInput,
-    userId: number
+    userId: string
   ): Promise<FeatureSegmentAttributes> {
     const segment = await this.getSegment(id);
     if (!segment) {
@@ -1127,7 +1200,7 @@ class FeatureFlagService {
   /**
    * Delete a segment
    */
-  async deleteSegment(id: string, userId: number): Promise<void> {
+  async deleteSegment(id: string, userId: string): Promise<void> {
     const segment = await this.getSegment(id);
     if (!segment) {
       throw new GatrixError('Segment not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -1162,8 +1235,11 @@ class FeatureFlagService {
   /**
    * List context fields
    */
-  async listContextFields(search?: string): Promise<FeatureContextFieldAttributes[]> {
-    return FeatureContextFieldModel.findAll(search);
+  async listContextFields(
+    search?: string,
+    projectId?: string
+  ): Promise<FeatureContextFieldAttributes[]> {
+    return FeatureContextFieldModel.findAll(search, projectId);
   }
 
   /**
@@ -1171,7 +1247,7 @@ class FeatureFlagService {
    */
   async createContextField(
     input: Partial<FeatureContextFieldAttributes>,
-    userId: number
+    userId: string
   ): Promise<FeatureContextFieldAttributes> {
     const existing = await FeatureContextFieldModel.findByFieldName(input.fieldName!);
     if (existing) {
@@ -1192,7 +1268,8 @@ class FeatureFlagService {
       stickiness: input.stickiness ?? false,
       sortOrder: input.sortOrder ?? 0,
       createdBy: userId,
-    });
+      projectId: input.projectId,
+    } as any);
   }
 
   /**
@@ -1201,7 +1278,7 @@ class FeatureFlagService {
   async updateContextField(
     fieldName: string,
     input: Partial<FeatureContextFieldAttributes>,
-    userId: number
+    userId: string
   ): Promise<FeatureContextFieldAttributes> {
     const field = await FeatureContextFieldModel.findByFieldName(fieldName);
     if (!field) {
@@ -1227,7 +1304,7 @@ class FeatureFlagService {
   /**
    * Delete a context field
    */
-  async deleteContextField(fieldName: string, userId: number): Promise<void> {
+  async deleteContextField(fieldName: string, userId: string): Promise<void> {
     const field = await FeatureContextFieldModel.findByFieldName(fieldName);
     if (!field) {
       throw new GatrixError(
@@ -1263,17 +1340,17 @@ class FeatureFlagService {
    * Record flag evaluation metrics
    */
   async recordMetrics(
-    environment: string,
+    environmentId: string,
     flagName: string,
     enabled: boolean,
     variantName?: string
   ): Promise<void> {
-    await FeatureMetricsModel.recordMetrics(environment, flagName, enabled, variantName);
+    await FeatureMetricsModel.recordMetrics(environmentId, flagName, enabled, variantName);
 
     // Update lastSeenAt on the flag environment settings
-    const flag = await FeatureFlagModel.findByName(environment, flagName);
+    const flag = await FeatureFlagModel.findByName(environmentId, flagName);
     if (flag) {
-      await FeatureFlagModel.updateLastSeenAt(flag.id, environment);
+      await FeatureFlagModel.updateLastSeenAt(flag.id, environmentId);
     }
   }
 
@@ -1281,33 +1358,33 @@ class FeatureFlagService {
    * Get metrics for a flag
    */
   async getMetrics(
-    environment: string,
+    environmentId: string,
     flagName: string,
     startDate: Date,
     endDate: Date,
     appName?: string | null
   ): Promise<FeatureMetricsAttributes[]> {
-    return FeatureMetricsModel.getMetrics(environment, flagName, startDate, endDate, appName);
+    return FeatureMetricsModel.getMetrics(environmentId, flagName, startDate, endDate, appName);
   }
 
   /**
    * Get distinct app names used in metrics
    */
   async getMetricsAppNames(
-    environment: string,
+    environmentId: string,
     flagName: string,
     startDate: Date,
     endDate: Date
   ): Promise<string[]> {
-    return FeatureMetricsModel.getAppNames(environment, flagName, startDate, endDate);
+    return FeatureMetricsModel.getAppNames(environmentId, flagName, startDate, endDate);
   }
 
   /**
    * Get all flags for an environment (for SDK initialization)
    */
-  async getAllFlagsForEnvironment(environment: string): Promise<FeatureFlagAttributes[]> {
+  async getAllFlagsForEnvironment(environmentId: string): Promise<FeatureFlagAttributes[]> {
     const result = await FeatureFlagModel.findAll({
-      environment,
+      environmentId,
       isArchived: false,
       limit: 10000,
     });
@@ -1317,7 +1394,7 @@ class FeatureFlagService {
   /**
    * Increment flag version (called when flag or its components are modified)
    */
-  async incrementFlagVersion(flagId: string, environment: string): Promise<void> {
+  async incrementFlagVersion(flagId: string, environmentId: string): Promise<void> {
     try {
       // Increment global flag version
       await db('g_feature_flags').where('id', flagId).increment('version', 1);
@@ -1325,7 +1402,7 @@ class FeatureFlagService {
       // Increment environment-specific version
       await db('g_feature_flag_environments')
         .where('flagId', flagId)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .increment('version', 1);
     } catch (error) {
       logger.error('Error incrementing flag version:', error);
@@ -1343,8 +1420,8 @@ class FeatureFlagService {
         .join('g_feature_flags as ff', 'fs.flagId', 'ff.id')
         .where('ffs.segmentId', segmentId)
         .where('ff.isArchived', false)
-        .select('ff.id as flagId', 'ff.flagName', 'fs.environment')
-        .groupBy('ff.id', 'ff.flagName', 'fs.environment');
+        .select('ff.id as flagId', 'ff.flagName', 'fs.environmentId')
+        .groupBy('ff.id', 'ff.flagName', 'fs.environmentId');
 
       if (rows.length === 0) return;
 
@@ -1352,10 +1429,10 @@ class FeatureFlagService {
       const byEnv = new Map<string, string[]>();
       for (const row of rows) {
         // Bump flag version
-        await this.incrementFlagVersion(row.flagId, row.environment);
-        const list = byEnv.get(row.environment) || [];
+        await this.incrementFlagVersion(row.flagId, row.environmentId);
+        const list = byEnv.get(row.environmentId) || [];
         list.push(row.flagName);
-        byEnv.set(row.environment, list);
+        byEnv.set(row.environmentId, list);
       }
 
       // Invalidate cache per environment
@@ -1380,18 +1457,18 @@ class FeatureFlagService {
         .whereRaw(`JSON_SEARCH(fs.constraints, 'one', ?, NULL, '$[*].contextName') IS NOT NULL`, [
           fieldName,
         ])
-        .select('ff.id as flagId', 'ff.flagName', 'fs.environment')
-        .groupBy('ff.id', 'ff.flagName', 'fs.environment');
+        .select('ff.id as flagId', 'ff.flagName', 'fs.environmentId')
+        .groupBy('ff.id', 'ff.flagName', 'fs.environmentId');
 
       if (rows.length === 0) return;
 
       // Group by environment for efficient cache invalidation
       const byEnv = new Map<string, string[]>();
       for (const row of rows) {
-        await this.incrementFlagVersion(row.flagId, row.environment);
-        const list = byEnv.get(row.environment) || [];
+        await this.incrementFlagVersion(row.flagId, row.environmentId);
+        const list = byEnv.get(row.environmentId) || [];
         list.push(row.flagName);
-        byEnv.set(row.environment, list);
+        byEnv.set(row.environmentId, list);
       }
 
       for (const [env, flagNames] of byEnv) {
@@ -1406,22 +1483,22 @@ class FeatureFlagService {
    * Invalidate feature flags cache for an environment
    */
   async invalidateCache(
-    environment: string,
+    environmentId: string,
     changedFlagNames?: string[],
     changeType: 'definition_changed' | 'enabled_changed' | 'deleted' = 'definition_changed'
   ): Promise<void> {
     try {
       // Invalidate feature flags cache (environment-scoped)
-      await pubSubService.invalidateKey(`${ENV_SCOPED.FEATURE_FLAGS.ALL}:${environment}`);
-      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.FEATURE_FLAGS}:${environment}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.FEATURE_FLAGS.ALL}:${environmentId}`);
+      await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.FEATURE_FLAGS}:${environmentId}`);
 
       // Invalidate evaluate API definitions cache
-      await pubSubService.invalidateKey(`feature_flags:definitions:${environment}`);
+      await pubSubService.invalidateKey(`feature_flags:definitions:${environmentId}`);
 
       // Increment revision ONCE here at the source, not in each instance's notifyClients.
       // This prevents N instances from incrementing revision N times for a single change.
       const { flagStreamingService } = await import('./FlagStreamingService');
-      const revision = await flagStreamingService.incrementGlobalRevision(environment);
+      const revision = await flagStreamingService.incrementGlobalRevision(environmentId);
 
       // Publish SDK event for real-time updates (revision included in payload)
       // changeType allows SDKs to optimize:
@@ -1431,7 +1508,7 @@ class FeatureFlagService {
       await pubSubService.publishSDKEvent({
         type: 'feature_flag.changed',
         data: {
-          environment,
+          environmentId,
           changedKeys: changedFlagNames ?? [],
           changeType,
           timestamp: Date.now(),
@@ -1439,7 +1516,7 @@ class FeatureFlagService {
         },
       });
 
-      logger.debug(`Feature flags cache invalidated for environment: ${environment}`);
+      logger.debug(`Feature flags cache invalidated for environmentId: ${environmentId}`);
     } catch (error) {
       logger.error('Error invalidating feature flags cache:', error);
     }

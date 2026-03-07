@@ -93,6 +93,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import changeRequestService from '@/services/changeRequestService';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import {
   computeMaintenanceStatus,
@@ -100,9 +101,14 @@ import {
   MaintenanceStatusType,
 } from '@/utils/maintenanceStatusUtils';
 import moment from 'moment';
-import { getMenuCategories, MenuItem as NavMenuItem, MenuCategory } from '@/config/navigation';
+import {
+  getMenuCategories,
+  getPathMatchMap,
+  MenuItem as NavMenuItem,
+  MenuCategory,
+} from '@/config/navigation';
 import mailService from '@/services/mailService';
-import { Permission, PERMISSIONS } from '@/types/permissions';
+import { Permission, P } from '@/types/permissions';
 
 // Sidebar width is now dynamic
 
@@ -208,7 +214,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
-  const { user, logout, isAdmin, hasPermission } = useAuth();
+  const { user, logout, hasPermission, permissions, permissionsLoading } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -218,6 +224,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     currentEnvironmentId,
     currentEnvironment,
   } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
 
   // Pending CR count for banner
   const [pendingCRCount, setPendingCRCount] = useState(0);
@@ -226,14 +233,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // My pending review count (open status - edits are locked)
   const [myPendingReviewCount, setMyPendingReviewCount] = useState(0);
 
-  // Check if admin user has environment access
-  const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
+  // User has RBAC permissions assigned (regardless of system role)
+  const hasAnyPermissions = !permissionsLoading && permissions.length > 0;
+
+  // Check if user has environment access (has permissions + environments loaded)
+  const hasEnvironmentAccess = hasAnyPermissions && !environmentsLoading && environments.length > 0;
+
+  // Show sidebar when user has any permissions
+  const showSidebar = hasAnyPermissions;
 
   // Filter menu items based on permissions
   const canAccessMenuItem = useCallback(
     (item: NavMenuItem): boolean => {
-      // Check admin-only restriction
-      if (item.adminOnly && !hasEnvironmentAccess) {
+      // Check admin-only restriction (requires RBAC permissions)
+      if (item.adminOnly && !hasAnyPermissions) {
         return false;
       }
       // Check permission-based access
@@ -245,7 +258,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
       return true;
     },
-    [hasEnvironmentAccess, hasPermission]
+    [hasAnyPermissions, hasPermission]
   );
 
   const filterMenuItems = useCallback(
@@ -276,7 +289,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Get filtered menu categories
   const getFilteredMenuCategories = useCallback((): MenuCategory[] => {
     const categories = getMenuCategories(
-      isAdmin(),
+      hasAnyPermissions,
       {
         'sidebar.changeRequests': pendingCRCount,
       },
@@ -290,7 +303,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         children: filterMenuItems(category.children),
       }))
       .filter((category) => category.children.length > 0);
-  }, [isAdmin, filterMenuItems, pendingCRCount, currentEnvironment]);
+  }, [hasAnyPermissions, filterMenuItems, pendingCRCount, currentEnvironment]);
 
   // Flag to track if initial URL sync has been done
   const initialSyncDoneRef = useRef(false);
@@ -395,6 +408,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [user?.id]);
 
+  // Handle 403 Forbidden - show global snackbar
+  useEffect(() => {
+    const handleForbidden = () => {
+      enqueueSnackbar(t('errors.insufficientPermissions'), {
+        variant: 'warning',
+        autoHideDuration: 5000,
+        preventDuplicate: true,
+      });
+    };
+
+    window.addEventListener('gatrix:forbidden', handleForbidden);
+    return () => {
+      window.removeEventListener('gatrix:forbidden', handleForbidden);
+    };
+  }, [enqueueSnackbar, t]);
+
   // Handle account suspension notification - immediately redirect to suspended page
   useEffect(() => {
     const handleUserSuspended = (event: CustomEvent) => {
@@ -494,8 +523,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Load pending CR count and my draft count
   const loadPendingCRCount = useCallback(async () => {
+    // Skip if user doesn't have change request permission
+    if (!hasPermission([P.CHANGE_REQUESTS_CREATE])) return;
     try {
-      const response = await changeRequestService.getMyRequests();
+      const projectApiPath = getProjectApiPath();
+      const response = await changeRequestService.getMyRequests(projectApiPath);
       setPendingCRCount(response?.pendingApproval?.length || 0);
       setMyDraftCount(response?.myDrafts?.length || 0);
       // Count my own CRs that are in 'open' status (pending review)
@@ -506,7 +538,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     } catch (error) {
       // Silently fail - don't spam errors for optional feature
     }
-  }, []);
+  }, [hasPermission]);
 
   // Load pending CR count on mount and environment change
   useEffect(() => {
@@ -567,8 +599,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     });
 
     let cancelled = false;
+    const projectApiPath = getProjectApiPath();
     maintenanceService
-      .getStatus()
+      .getStatus(projectApiPath)
       .then(({ isUnderMaintenance, detail }) => {
         if (cancelled) return;
         if (maintenanceUpdatedBySSE.current) return; // keep SSE-updated status
@@ -679,9 +712,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [maintenanceStatus.isMaintenance, maintenanceStatus.detail, maintenanceStatus.status]);
 
-  // SSE updates - 백엔드 연결 실패 시 적절히 처리
+  // SSE updates - 백엔드 연결 Failed 시 적절히 처리
   const sseConnection = useSSENotifications({
-    autoConnect: true, // 자동 연결 활성화
+    autoConnect: true, // 자동 연결 Active화
     maxReconnectAttempts: 3, // 재연결 시도 횟수 줄임
     reconnectInterval: 10000, // 재연결 간격 늘림 (10초)
     onEvent: (event) => {
@@ -740,7 +773,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           })
         );
       } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
-        // 초대링크 이벤트를 다른 컴포넌트에 전달
+        // 초대링크 Event를 다른 컴포넌트에 전달
         window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
       }
     },
@@ -777,7 +810,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [loadUnreadMailCount]);
 
-  // 사용자가 변경될 때마다 아바타 이미지 에러 상태 초기화
+  // Used자가 변경될 때마다 아바타 Images 에러 Status Initialization
   useEffect(() => {
     setAvatarImageError(false);
   }, [user?.avatarUrl]);
@@ -814,15 +847,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const isActivePath = (path: string) => {
-    // 정확한 경로 매칭
+    // Exact path match
     if (location.pathname === path) {
       return true;
     }
-    // /settings, /feature-flags 경로들은 정확한 매칭만 사용 (prefix 매칭 안 함)
+    // Check alias paths from navigation config (e.g., workspace matches projects/environments)
+    const pathMatchMap = getPathMatchMap();
+    const aliases = pathMatchMap[path];
+    if (aliases?.some((p) => location.pathname.startsWith(p))) {
+      return true;
+    }
+    // /settings, /feature-flags use exact match only (no prefix matching)
     if (path.startsWith('/settings') || path.startsWith('/feature-flags')) {
       return false;
     }
-    // 하위 경로인 경우에만 true (단, 정확히 '/'로 구분되는 경우만)
+    // Sub-path match (only when separated by '/')
     if (path !== '/' && location.pathname.startsWith(path + '/')) {
       return true;
     }
@@ -970,8 +1009,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   const isChildActive = isActivePath(child.path);
 
                   return (
+                    <React.Fragment key={childIndex}>
+                      {child.divider && <Divider sx={{ mx: 2, my: 0.5 }} />}
                     <ListItemButton
-                      key={childIndex}
                       onClick={() => openOrNavigate(child.path)}
                       sx={{
                         pl: 2,
@@ -1028,6 +1068,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         </>
                       )}
                     </ListItemButton>
+                    </React.Fragment>
                   );
                 })}
               </List>
@@ -1512,7 +1553,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* 사이드바 - 전체 높이 차지 */}
+      {/* 사이드바 - 전체 높이 차지 (admin only) */}
+      {showSidebar && (
       <Box
         component="nav"
         sx={{
@@ -1552,6 +1594,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: sidebarCollapsed ? 64 : sidebarWidth,
+              transition: 'width 0.3s ease',
               backgroundColor: theme.palette.background.paper,
               color: theme.palette.text.primary,
               position: 'fixed',
@@ -1570,6 +1613,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {drawerContent}
         </Drawer>
       </Box>
+      )}
 
       {/* 오른쪽 영역: AppBar + 메인 컨텐츠 */}
       <Box
@@ -1598,26 +1642,28 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {isMobile ? (
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  sx={{ mr: 1 }}
-                >
-                  <MenuIcon />
-                </IconButton>
-              ) : (
-                <IconButton
-                  color="inherit"
-                  aria-label="toggle sidebar"
-                  edge="start"
-                  onClick={handleSidebarToggle}
-                  sx={{ mr: 1 }}
-                >
-                  <MenuOpenIcon />
-                </IconButton>
+              {showSidebar && (
+                isMobile ? (
+                  <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    edge="start"
+                    onClick={handleDrawerToggle}
+                    sx={{ mr: 1 }}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    color="inherit"
+                    aria-label="toggle sidebar"
+                    edge="start"
+                    onClick={handleSidebarToggle}
+                    sx={{ mr: 1 }}
+                  >
+                    <MenuOpenIcon />
+                  </IconButton>
+                )
               )}
             </Box>
 
@@ -1633,7 +1679,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       🔧 {t('maintenance.tooltipTitle')}
                     </Typography>
 
-                    {/* 상태 */}
+                    {/* Status */}
                     <Typography
                       variant="body2"
                       sx={{ mb: 1, display: 'flex', alignItems: 'center' }}
@@ -1920,8 +1966,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {/* Chat button - only visible for admin users with chat permission */}
-              {isAdmin() && hasPermission(PERMISSIONS.CHAT_ACCESS) && (
+              {/* Chat button - visible for users with chat permission */}
+              {hasPermission(P.CHAT_ACCESS) && (
                 <Tooltip title={t('sidebar.chat')}>
                   <IconButton color="inherit" onClick={() => navigate('/chat')}>
                     <ChatIcon />
@@ -2002,7 +2048,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         height: 32,
                       }}
                       onError={() => {
-                        // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
+                        // Images 로드 Failed 시 AccountCircle 아이콘으로 대체
                         setAvatarImageError(true);
                       }}
                     >
@@ -2260,7 +2306,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Box>
       </Zoom>
       {/* SSE Notifications */}
-      {sseConnection.connected === false && (
+      {sseConnection.isConnected === false && (
         <Tooltip title={t('common.connectionLost')}>
           <Box
             sx={{

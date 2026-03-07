@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { JobExecutionModel } from '../models/JobExecution';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
 
-// Job 실행 이력 목록 조회
+const logger = createLogger('jobExecutionController');
+
+// Job 실행 이력 Get list
 export const getJobExecutions = async (req: Request, res: Response) => {
   try {
     const { jobId, scheduleId, status, dateFrom, dateTo, limit = 50, offset = 0 } = req.query;
@@ -32,11 +34,11 @@ export const getJobExecutions = async (req: Request, res: Response) => {
   }
 };
 
-// Job 실행 이력 상세 조회
+// Job 실행 이력 Get details
 export const getJobExecution = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const execution = await JobExecutionModel.findById(parseInt(id));
+    const execution = await JobExecutionModel.findById(id);
 
     if (!execution) {
       return res.status(404).json({

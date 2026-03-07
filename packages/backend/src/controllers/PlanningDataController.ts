@@ -3,11 +3,13 @@ import { AuthenticatedRequest } from '../types/auth';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { PlanningDataService } from '../services/PlanningDataService';
 import { pubSubService } from '../services/PubSubService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('PlanningDataController');
 
 // Helper to get environment from request
 function getEnvironment(req: AuthenticatedRequest): string {
-  const env = req.environment;
+  const env = req.environmentId;
   if (!env) {
     throw new GatrixError('Environment not specified', 400);
   }
@@ -32,10 +34,10 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/reward-lookup?lang=kr|en|zh
    */
   static getRewardLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getRewardLookup(environment, language);
+    const data = await PlanningDataService.getRewardLookup(environmentId, language);
 
     res.json({
       success: true,
@@ -49,8 +51,8 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/reward-types
    */
   static getRewardTypeList = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
-    const data = await PlanningDataService.getRewardTypeList(environment);
+    const environmentId = getEnvironment(req);
+    const data = await PlanningDataService.getRewardTypeList(environmentId);
 
     res.json({
       success: true,
@@ -64,12 +66,12 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/reward-types/:rewardType/items?lang=kr|en|zh
    */
   static getRewardTypeItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const { rewardType } = req.params;
     const language = mapLanguage(req.query.lang as string);
 
     const data = await PlanningDataService.getRewardTypeItems(
-      environment,
+      environmentId,
       parseInt(rewardType),
       language
     );
@@ -86,10 +88,10 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/ui-list?lang=kr|en|zh
    */
   static getUIListData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getUIListData(environment, language);
+    const data = await PlanningDataService.getUIListData(environmentId, language);
 
     res.json({
       success: true,
@@ -103,11 +105,11 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/ui-list/:category/items?lang=kr|en|zh
    */
   static getUIListItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const { category } = req.params;
     const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getUIListItems(environment, category, language);
+    const data = await PlanningDataService.getUIListItems(environmentId, category, language);
 
     res.json({
       success: true,
@@ -121,8 +123,8 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/stats
    */
   static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
-    const stats = await PlanningDataService.getStats(environment);
+    const environmentId = getEnvironment(req);
+    const stats = await PlanningDataService.getStats(environmentId);
 
     res.json({
       success: true,
@@ -136,10 +138,10 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/hottimebuff?lang=kr|en|zh
    */
   static getHotTimeBuffLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getHotTimeBuffLookup(environment, language);
+    const data = await PlanningDataService.getHotTimeBuffLookup(environmentId, language);
 
     res.json({
       success: true,
@@ -153,10 +155,10 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/eventpage?lang=kr|en|zh
    */
   static getEventPageLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getEventPageLookup(environment, language);
+    const data = await PlanningDataService.getEventPageLookup(environmentId, language);
     res.json({
       success: true,
       data,
@@ -169,10 +171,10 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/liveevent?lang=kr|en|zh
    */
   static getLiveEventLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const language = mapLanguage(req.query.lang as string);
 
-    const data = await PlanningDataService.getLiveEventLookup(environment, language);
+    const data = await PlanningDataService.getLiveEventLookup(environmentId, language);
     res.json({
       success: true,
       data,
@@ -186,10 +188,10 @@ export class PlanningDataController {
    */
   static getMateRecruitingGroupLookup = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environment = getEnvironment(req);
+      const environmentId = getEnvironment(req);
       const language = mapLanguage(req.query.lang as string);
 
-      const data = await PlanningDataService.getMateRecruitingGroupLookup(environment, language);
+      const data = await PlanningDataService.getMateRecruitingGroupLookup(environmentId, language);
       res.json({
         success: true,
         data,
@@ -204,10 +206,10 @@ export class PlanningDataController {
    */
   static getOceanNpcAreaSpawnerLookup = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const environment = getEnvironment(req);
+      const environmentId = getEnvironment(req);
       const language = mapLanguage(req.query.lang as string);
 
-      const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup(environment, language);
+      const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup(environmentId, language);
       res.json({
         success: true,
         data,
@@ -221,14 +223,14 @@ export class PlanningDataController {
    * POST /api/v1/admin/planning-data/upload
    */
   static uploadPlanningData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const uploadComment = req.body?.comment || req.query?.comment;
     const forceUpload = req.body?.forceUpload === 'true' || req.body?.forceUpload === true;
 
     logger.info('Planning data upload requested', {
       userId: req.user?.userId,
       filesCount: req.files ? Object.keys(req.files).length : 0,
-      environment,
+      environmentId,
       forceUpload,
     });
 
@@ -249,23 +251,21 @@ export class PlanningDataController {
     };
 
     const result = await PlanningDataService.uploadPlanningData(
-      environment,
+      environmentId,
       req.files as any,
       uploadInfo
     );
 
     await pubSubService.invalidateByPattern('*planning_data*');
 
-    logger.info('Planning data cache invalidated across all servers', {
-      environment,
-    });
+    logger.info('Planning data cache invalidated across all servers', { environmentId });
 
     // Notify all clients via SSE about planning data update (via PubSub for cross-instance delivery)
     await pubSubService.publishNotification({
       type: 'planning_data_updated',
       data: {
         filesUploaded: result.filesUploaded,
-        environment,
+        environmentId,
         timestamp: new Date().toISOString(),
         uploadRecord: result.uploadRecord,
       },
@@ -284,10 +284,10 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/history
    */
   static getUploadHistory = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const limit = parseInt(req.query.limit as string) || 20;
 
-    const history = await PlanningDataService.getUploadHistory(environment, limit);
+    const history = await PlanningDataService.getUploadHistory(environmentId, limit);
 
     res.json({
       success: true,
@@ -301,9 +301,9 @@ export class PlanningDataController {
    * GET /api/v1/admin/planning-data/latest
    */
   static getLatestUpload = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
 
-    const latestUpload = await PlanningDataService.getLatestUpload(environment);
+    const latestUpload = await PlanningDataService.getLatestUpload(environmentId);
 
     res.json({
       success: true,
@@ -317,9 +317,9 @@ export class PlanningDataController {
    * DELETE /api/v1/admin/planning-data/history
    */
   static resetUploadHistory = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
 
-    const deletedCount = await PlanningDataService.resetUploadHistory(environment);
+    const deletedCount = await PlanningDataService.resetUploadHistory(environmentId);
 
     res.json({
       success: true,
@@ -333,15 +333,15 @@ export class PlanningDataController {
    * POST /api/v1/admin/planning-data/preview-diff
    */
   static previewDiff = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
 
-    logger.info('[PlanningData] Preview diff requested', {
+    logger.info('Preview diff requested', {
       userId: req.user?.userId,
       filesCount: req.files ? Object.keys(req.files).length : 0,
-      environment,
+      environmentId,
     });
 
-    const result = await PlanningDataService.previewDiff(environment, req.files);
+    const result = await PlanningDataService.previewDiff(environmentId, req.files);
 
     res.json({
       success: true,

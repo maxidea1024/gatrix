@@ -12,9 +12,9 @@ export interface Integration {
   isEnabled: boolean;
   parameters: Record<string, any>;
   events: string[];
-  environments: string[];
-  createdBy: number | null;
-  updatedBy: number | null;
+  environmentIds: string[];
+  createdBy: string | null;
+  updatedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
   // Joined fields
@@ -33,8 +33,8 @@ export interface CreateIntegrationData {
   isEnabled?: boolean;
   parameters: Record<string, any>;
   events: string[];
-  environments?: string[];
-  createdBy?: number;
+  environmentIds?: string[];
+  createdBy?: string;
 }
 
 export interface UpdateIntegrationData {
@@ -43,8 +43,8 @@ export interface UpdateIntegrationData {
   isEnabled?: boolean;
   parameters?: Record<string, any>;
   events?: string[];
-  environments?: string[];
-  updatedBy?: number;
+  environmentIds?: string[];
+  updatedBy?: string;
 }
 
 export class IntegrationModel {
@@ -64,7 +64,7 @@ export class IntegrationModel {
         isEnabled: data.isEnabled ?? true,
         parameters: JSON.stringify(data.parameters || {}),
         events: JSON.stringify(data.events || []),
-        environments: JSON.stringify(data.environments || []),
+        environmentIds: JSON.stringify(data.environmentIds || []),
         createdBy: data.createdBy || null,
         updatedBy: data.createdBy || null,
       });
@@ -174,7 +174,10 @@ export class IntegrationModel {
   /**
    * Find enabled integrations for a specific event
    */
-  static async findEnabledByEvent(eventType: string, environment?: string): Promise<Integration[]> {
+  static async findEnabledByEvent(
+    eventType: string,
+    environmentId?: string
+  ): Promise<Integration[]> {
     try {
       const integrations = await this.findAll({ isEnabled: true });
 
@@ -197,10 +200,10 @@ export class IntegrationModel {
         if (!eventMatch) return false;
 
         // Then check environment
-        if (environment && integration.environments.length > 0) {
+        if (environmentId && integration.environmentIds.length > 0) {
           if (
-            !integration.environments.includes(environment) &&
-            !integration.environments.includes('*')
+            !integration.environmentIds.includes(environmentId) &&
+            !integration.environmentIds.includes('*')
           ) {
             return false;
           }
@@ -231,8 +234,8 @@ export class IntegrationModel {
       if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
       if (data.parameters !== undefined) updateData.parameters = JSON.stringify(data.parameters);
       if (data.events !== undefined) updateData.events = JSON.stringify(data.events);
-      if (data.environments !== undefined)
-        updateData.environments = JSON.stringify(data.environments);
+      if (data.environmentIds !== undefined)
+        updateData.environmentIds = JSON.stringify(data.environmentIds);
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       await db(this.TABLE).where('id', id).update(updateData);
@@ -265,7 +268,7 @@ export class IntegrationModel {
   /**
    * Toggle integration enabled status
    */
-  static async toggleEnabled(id: string, updatedBy?: number): Promise<Integration | null> {
+  static async toggleEnabled(id: string, updatedBy?: string): Promise<Integration | null> {
     try {
       const existing = await this.findById(id);
       if (!existing) {
@@ -312,10 +315,10 @@ export class IntegrationModel {
       parameters:
         typeof row.parameters === 'string' ? JSON.parse(row.parameters) : row.parameters || {},
       events: typeof row.events === 'string' ? JSON.parse(row.events) : row.events || [],
-      environments:
-        typeof row.environments === 'string'
-          ? JSON.parse(row.environments)
-          : row.environments || [],
+      environmentIds:
+        typeof row.environmentIds === 'string'
+          ? JSON.parse(row.environmentIds)
+          : row.environmentIds || [],
       createdBy: row.createdBy,
       updatedBy: row.updatedBy,
       createdAt: row.createdAt,

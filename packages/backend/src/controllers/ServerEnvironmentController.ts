@@ -6,7 +6,9 @@
 import { Response } from 'express';
 import { SDKRequest } from '../middleware/apiTokenAuth';
 import { Environment } from '../models/Environment';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerEnvironmentController');
 
 export class ServerEnvironmentController {
   /**
@@ -17,10 +19,11 @@ export class ServerEnvironmentController {
     try {
       const environments = await Environment.query()
         .orderBy('displayOrder', 'asc')
-        .orderBy('environment', 'asc');
+        .orderBy('id', 'asc');
 
       const result = environments.map((env) => ({
-        environment: env.environment,
+        environmentId: env.id,
+        name: env.id,
         displayName: env.displayName,
         environmentType: env.environmentType,
         color: env.color,

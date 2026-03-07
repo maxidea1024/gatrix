@@ -350,13 +350,13 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
                 </Typography>
               </Box>
             )}
-            {frame.link && (
+            {frame.clickUrl && (
               <Box sx={{ flex: 1, minWidth: 150 }}>
                 <Typography variant="caption" color="text.secondary">
                   {t('banners.link')}
                 </Typography>
-                <Typography variant="body2" noWrap title={frame.link}>
-                  {frame.link}
+                <Typography variant="body2" noWrap title={frame.clickUrl}>
+                  {frame.clickUrl}
                 </Typography>
               </Box>
             )}

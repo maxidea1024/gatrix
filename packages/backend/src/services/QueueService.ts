@@ -1,5 +1,7 @@
 import { Queue, Worker, Job, QueueEvents, RepeatableJob } from 'bullmq';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('QueueService');
 import { BullBoardConfig } from '../config/bullboard';
 
 export interface QueueJobData {
@@ -447,7 +449,7 @@ export class QueueService {
       // 이메일 발송 로직 구현
       const nodemailer = require('nodemailer');
 
-      // 개발 환경에서는 Ethereal Email 사용
+      // 개발 환경에서는 Ethereal Email Used
       const transporter = nodemailer.createTransporter({
         host: process.env.SMTP_HOST || 'smtp.ethereal.email',
         port: parseInt(process.env.SMTP_PORT || '587'),

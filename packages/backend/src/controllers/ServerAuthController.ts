@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserService } from '../services/userService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerAuthController');
 
 export interface ServerAuthRequest extends Request {
   apiToken?: any;
 }
 
 class ServerAuthController {
-  // JWT 토큰 검증
+  // JWT Verify token
   static async verifyToken(req: ServerAuthRequest, res: Response) {
     try {
       const { token } = req.body;
@@ -20,7 +22,7 @@ class ServerAuthController {
         });
       }
 
-      // JWT 토큰 검증
+      // JWT Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
       if (!decoded || !decoded.userId) {
@@ -30,7 +32,7 @@ class ServerAuthController {
         });
       }
 
-      // 사용자 정보 조회
+      // User info 조회
       const user = await UserService.getUserById(decoded.userId);
 
       if (!user) {
@@ -40,7 +42,7 @@ class ServerAuthController {
         });
       }
 
-      // 사용자가 활성 상태인지 확인
+      // Used자가 Active Status인지 Confirm
       if (user.status !== 'active') {
         return res.status(401).json({
           success: false,
@@ -55,7 +57,7 @@ class ServerAuthController {
           email: user.email,
           name: user.name,
           avatarUrl: user.avatarUrl,
-          role: user.role,
+
           status: user.status,
           lastLoginAt: user.lastLoginAt,
           createdAt: user.createdAt,
@@ -79,12 +81,12 @@ class ServerAuthController {
     }
   }
 
-  // 사용자 ID로 사용자 정보 조회
+  // Used자 ID로 User info 조회
   static async getUserById(req: ServerAuthRequest, res: Response) {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         return res.status(400).json({
           success: false,
           error: 'Invalid user ID',
@@ -107,7 +109,7 @@ class ServerAuthController {
           email: user.email,
           name: user.name,
           avatarUrl: user.avatarUrl,
-          role: user.role,
+
           status: user.status,
           lastLoginAt: user.lastLoginAt,
           createdAt: user.createdAt,

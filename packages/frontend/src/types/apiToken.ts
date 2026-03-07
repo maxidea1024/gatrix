@@ -1,14 +1,14 @@
-export type TokenType = 'client' | 'server' | 'edge' | 'all';
+export type TokenType = 'client' | 'server' | 'edge';
 
 export interface ApiAccessToken {
   id: string; // ULID (26 characters)
+  projectId?: string;
   tokenName: string;
   description?: string;
   tokenHash: string;
   tokenValue?: string; // Original token value for copying (only in list response)
   tokenType: TokenType;
-  allowAllEnvironments: boolean;
-  environments?: string[]; // Environment names
+  environmentId?: string;
   expiresAt?: string;
   lastUsedAt?: string;
   usageCount?: number;
@@ -33,16 +33,15 @@ export interface CreateTokenRequest {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
-  allowAllEnvironments?: boolean;
-  environments?: string[];
+  environmentId?: string;
   expiresAt?: string;
+  projectId?: string;
 }
 
 export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
-  allowAllEnvironments?: boolean;
-  environments?: string[];
+  environmentId?: string;
   expiresAt?: string;
 }
 
@@ -58,7 +57,7 @@ export interface CreateTokenResponse {
   };
 }
 
-// 토큰 생성 시 사용하는 별도 타입
+// 토큰 Create 시 Used하는 별도 Type
 export interface TokenCreationResponse {
   token: ApiAccessToken;
   plainToken: string;
@@ -68,9 +67,10 @@ export interface GetTokensRequest {
   page?: number;
   limit?: number;
   tokenType?: TokenType;
-  environment?: string;
+  environmentId?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  projectId?: string;
 }
 
 export interface GetTokensResponse {

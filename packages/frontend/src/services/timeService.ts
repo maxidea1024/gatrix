@@ -5,16 +5,16 @@ export interface ServerTimeResponse {
   serverLocalTimeISO: string;
   serverLocalTime: number;
   clientLocalTime: number;
-  uptime: number; // 서버 업타임 (초 단위)
+  uptime: number; // Server uptime (in seconds)
 }
 
 export interface ServerTimeData {
   serverTime: Date;
   localTime: Date;
   ping: number;
-  offset: number; // 서버와 클라이언트 시간 차이 (ms)
-  uptime: number; // 서버 업타임 (초 단위)
-  uptimeBaseTime: number; // uptime 기준 시간 (timestamp)
+  offset: number; // Time difference between server and client (ms)
+  uptime: number; // Server uptime (in seconds)
+  uptimeBaseTime: number; // Uptime base time (timestamp)
 }
 
 class TimeService {
@@ -23,7 +23,7 @@ class TimeService {
   private listeners: ((data: ServerTimeData) => void)[] = [];
 
   /**
-   * 서버 시간 조회 및 핑 계산
+   * Get server time and calculate ping
    */
   async fetchServerTime(): Promise<ServerTimeData> {
     const clientLocalTime = new Date().getTime();
@@ -62,7 +62,7 @@ class TimeService {
   }
 
   /**
-   * 현재 계산된 서버 시간 반환 (실시간)
+   * Return currently calculated server time (real-time)
    */
   getCurrentServerTime(): Date {
     if (!this.currentServerTime) {
@@ -75,7 +75,7 @@ class TimeService {
   }
 
   /**
-   * 현재 서버 업타임 반환 (실시간)
+   * Return current server uptime (real-time)
    */
   getCurrentUptime(): number {
     if (!this.currentServerTime) {
@@ -83,25 +83,25 @@ class TimeService {
     }
 
     const now = Date.now();
-    const timeSinceLastSync = (now - this.currentServerTime.uptimeBaseTime) / 1000; // 초 단위
+    const timeSinceLastSync = (now - this.currentServerTime.uptimeBaseTime) / 1000; // In seconds
     return this.currentServerTime.uptime + timeSinceLastSync;
   }
 
   /**
-   * 서버 시간 동기화 시작
+   * Start server time synchronization
    */
   startSync(): void {
-    // 최초에 한번은 즉시 호출
+    // Call immediately for the first time
     this.fetchServerTime().catch(console.error);
 
-    // 일정주기마다 동기화
+    // Synchronize at regular intervals
     this.intervalId = setInterval(() => {
       this.fetchServerTime().catch(console.error);
     }, 60_000);
   }
 
   /**
-   * 서버 시간 동기화 중지
+   * Stop server time synchronization
    */
   stopSync(): void {
     if (this.intervalId) {
@@ -111,14 +111,14 @@ class TimeService {
   }
 
   /**
-   * 서버 시간 업데이트 리스너 추가
+   * Add server time update listener
    */
   addListener(callback: (data: ServerTimeData) => void): void {
     this.listeners.push(callback);
   }
 
   /**
-   * 서버 시간 업데이트 리스너 제거
+   * Remove server time update listener
    */
   removeListener(callback: (data: ServerTimeData) => void): void {
     const index = this.listeners.indexOf(callback);
@@ -128,7 +128,7 @@ class TimeService {
   }
 
   /**
-   * 모든 리스너에게 알림
+   * Notify all listeners
    */
   private notifyListeners(data: ServerTimeData): void {
     this.listeners.forEach((callback) => {
@@ -141,7 +141,7 @@ class TimeService {
   }
 
   /**
-   * 현재 서버 시간 정보 반환
+   * Return current server time information
    */
   getServerTimeData(): ServerTimeData | null {
     return this.currentServerTime;

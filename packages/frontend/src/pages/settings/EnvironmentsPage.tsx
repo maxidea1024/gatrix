@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Paper,
@@ -30,6 +30,12 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
+  Menu,
+  ListItemIcon,
+  ListItemText,
+  Breadcrumbs,
+  Link,
+  Divider,
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
@@ -40,9 +46,14 @@ import {
   Warning as WarningIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  MoreVert as MoreVertIcon,
+  NavigateNext as NavigateNextIcon,
+  SwapHoriz as SwapHorizIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import {
   environmentService,
   Environment,
@@ -50,16 +61,51 @@ import {
   UpdateEnvironmentData,
   EnvironmentRelatedData,
 } from '../../services/environmentService';
+import { apiService } from '../../services/api';
 import EnvironmentCopyDialog from '../../components/EnvironmentCopyDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import PageContentLoader from '../../components/common/PageContentLoader';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 
 const EnvironmentsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { refresh: refreshEnvironments } = useEnvironment();
+  const {
+    refresh: refreshEnvironments,
+    switchEnvironment,
+    currentEnvironmentId,
+  } = useEnvironment();
+  const { getProjectApiPath, currentOrg, currentProject, projects, organisations } =
+    useOrgProject();
+  const [searchParams] = useSearchParams();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
+  const canManage = hasPermission([P.ENVIRONMENTS_UPDATE]);
+
+  // Resolve the effective project from URL param or current context
+  const urlProjectId = searchParams.get('projectId');
+  const urlOrgId = searchParams.get('orgId');
+  const effectiveProject = urlProjectId
+    ? projects.find((p) => p.id === urlProjectId) || currentProject
+    : currentProject;
+  const effectiveOrg = urlOrgId
+    ? organisations.find((o) => o.id === urlOrgId) || currentOrg
+    : effectiveProject
+      ? organisations.find((o) => o.id === effectiveProject.orgId) || currentOrg
+      : currentOrg;
+
+  // Build API path: prefer URL params directly if both orgId and projectId are given
+  const projectApiPath = (() => {
+    if (urlOrgId && urlProjectId) {
+      return `/admin/orgs/${urlOrgId}/projects/${urlProjectId}`;
+    }
+    if (effectiveOrg && effectiveProject) {
+      return `/admin/orgs/${effectiveOrg.id}/projects/${effectiveProject.id}`;
+    }
+    return getProjectApiPath();
+  })();
 
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +116,6 @@ const EnvironmentsPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [newEnv, setNewEnv] = useState<CreateEnvironmentData>({
-    environment: '',
     displayName: '',
     description: '',
     environmentType: 'development',
@@ -90,20 +135,56 @@ const EnvironmentsPage: React.FC = () => {
   const addNameFieldRef = useRef<HTMLInputElement>(null);
   const editDisplayNameFieldRef = useRef<HTMLInputElement>(null);
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTargetEnv, setMenuTargetEnv] = useState<Environment | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, env: Environment) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTargetEnv(env);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTargetEnv(null);
+  };
+
   const loadEnvironments = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       // Include hidden environments in management page so they can be unhidden
-      const data = await environmentService.getEnvironments(true);
-      setEnvironments(data);
+      const data = await environmentService.getEnvironments(projectApiPath, true);
+
+      // Apply RBAC filtering: only show environments user has access to
+      if (canManage) {
+        // Managers can see all environments
+        setEnvironments(data);
+      } else {
+        try {
+          const accessResponse = await apiService.get<{
+            allowAllEnvironments: boolean;
+            environments: string[];
+          }>('/admin/users/me/environments');
+          const userAccess = accessResponse.data;
+          if (userAccess.allowAllEnvironments) {
+            setEnvironments(data);
+          } else {
+            const accessList = userAccess.environments || [];
+            setEnvironments(data.filter((env) => accessList.includes(env.environmentId)));
+          }
+        } catch {
+          // If access check fails, show all (fail-open for usability)
+          setEnvironments(data);
+        }
+      }
     } catch (err) {
       setError(t('common.loadError'));
       console.error('Failed to load environments:', err);
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, projectApiPath, canManage]);
 
   useEffect(() => {
     loadEnvironments();
@@ -124,7 +205,6 @@ const EnvironmentsPage: React.FC = () => {
 
   const handleOpenAddDialog = () => {
     setNewEnv({
-      environment: '',
       displayName: '',
       description: '',
       environmentType: 'development',
@@ -141,12 +221,12 @@ const EnvironmentsPage: React.FC = () => {
   };
 
   const handleCreateEnvironment = async () => {
-    if (!newEnv.environment || !newEnv.displayName) return;
+    if (!newEnv.displayName) return;
 
     setCreating(true);
     try {
       // Create the environment with optional base environment for data copy
-      await environmentService.createEnvironment({
+      await environmentService.createEnvironment(projectApiPath, {
         ...newEnv,
         baseEnvironment: baseEnvironment || undefined,
       });
@@ -154,7 +234,7 @@ const EnvironmentsPage: React.FC = () => {
       enqueueSnackbar(t('environments.createSuccess'), { variant: 'success' });
       setAddDialogOpen(false);
       loadEnvironments();
-      refreshEnvironments(); // Refresh the global environment context
+      refreshEnvironments(); // Refresh the global environmentId context
     } catch (err: any) {
       const message = err?.response?.data?.message || t('environments.createFailed');
       enqueueSnackbar(message, { variant: 'error' });
@@ -184,7 +264,7 @@ const EnvironmentsPage: React.FC = () => {
     setLoadingRelatedData(true);
 
     try {
-      const data = await environmentService.getRelatedData(env.environment);
+      const data = await environmentService.getRelatedData(projectApiPath, env.environmentId);
       setRelatedData(data);
     } catch (err) {
       console.error('Failed to load related data:', err);
@@ -208,7 +288,11 @@ const EnvironmentsPage: React.FC = () => {
 
     setDeleting(true);
     try {
-      await environmentService.deleteEnvironment(selectedEnvForDelete.environment, forceDelete);
+      await environmentService.deleteEnvironment(
+        projectApiPath,
+        selectedEnvForDelete.environmentId,
+        forceDelete
+      );
       enqueueSnackbar(t('environments.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setSelectedEnvForDelete(null);
@@ -261,98 +345,98 @@ const EnvironmentsPage: React.FC = () => {
       });
     };
 
-    if (rd.templates.count > 0)
+    if (rd.templates?.count > 0)
       items.push({
         key: 'templates',
         label: t('environments.relatedData.templates'),
         count: rd.templates.count,
         items: formatItems(rd.templates, 'name'),
       });
-    if (rd.gameWorlds.count > 0)
+    if (rd.gameWorlds?.count > 0)
       items.push({
         key: 'gameWorlds',
         label: t('environments.relatedData.gameWorlds'),
         count: rd.gameWorlds.count,
         items: formatItems(rd.gameWorlds, 'worldId'),
       });
-    if (rd.segments.count > 0)
+    if (rd.segments?.count > 0)
       items.push({
         key: 'segments',
         label: t('environments.relatedData.segments'),
         count: rd.segments.count,
         items: formatItems(rd.segments, 'name'),
       });
-    if (rd.tags.count > 0)
+    if (rd.tags?.count > 0)
       items.push({
         key: 'tags',
         label: t('environments.relatedData.tags'),
         count: rd.tags.count,
         items: formatItems(rd.tags, 'name'),
       });
-    if (rd.vars.count > 0)
+    if (rd.vars?.count > 0)
       items.push({
         key: 'vars',
         label: t('environments.relatedData.vars'),
         count: rd.vars.count,
         items: formatItems(rd.vars, 'varKey'),
       });
-    if (rd.messageTemplates.count > 0)
+    if (rd.messageTemplates?.count > 0)
       items.push({
         key: 'messageTemplates',
         label: t('environments.relatedData.messageTemplates'),
         count: rd.messageTemplates.count,
         items: formatItems(rd.messageTemplates, 'name'),
       });
-    if (rd.serviceNotices.count > 0)
+    if (rd.serviceNotices?.count > 0)
       items.push({
         key: 'serviceNotices',
         label: t('environments.relatedData.serviceNotices'),
         count: rd.serviceNotices.count,
         items: formatItems(rd.serviceNotices, 'title'),
       });
-    if (rd.ingamePopups.count > 0)
+    if (rd.ingamePopups?.count > 0)
       items.push({
         key: 'ingamePopups',
         label: t('environments.relatedData.ingamePopups'),
         count: rd.ingamePopups.count,
         items: formatItems(rd.ingamePopups, 'title'),
       });
-    if (rd.surveys.count > 0)
+    if (rd.surveys?.count > 0)
       items.push({
         key: 'surveys',
         label: t('environments.relatedData.surveys'),
         count: rd.surveys.count,
         items: formatItems(rd.surveys, 'name'),
       });
-    if (rd.coupons.count > 0)
+    if (rd.coupons?.count > 0)
       items.push({
         key: 'coupons',
         label: t('environments.relatedData.coupons'),
         count: rd.coupons.count,
         items: formatItems(rd.coupons, 'name'),
       });
-    if (rd.banners.count > 0)
+    if (rd.banners?.count > 0)
       items.push({
         key: 'banners',
         label: t('environments.relatedData.banners'),
         count: rd.banners.count,
         items: formatItems(rd.banners, 'name'),
       });
-    if (rd.jobs.count > 0)
+    if (rd.jobs?.count > 0)
       items.push({
         key: 'jobs',
         label: t('environments.relatedData.jobs'),
         count: rd.jobs.count,
         items: formatItems(rd.jobs, 'jobName'),
       });
-    if (rd.clientVersions.count > 0)
+    if (rd.clientVersions?.count > 0)
       items.push({
         key: 'clientVersions',
         label: t('environments.relatedData.clientVersions'),
         count: rd.clientVersions.count,
         items: formatItems(rd.clientVersions, 'version'),
       });
-    if (rd.apiTokens.count > 0)
+    if (rd.apiTokens?.count > 0)
       items.push({
         key: 'apiTokens',
         label: t('environments.relatedData.apiTokens'),
@@ -409,7 +493,11 @@ const EnvironmentsPage: React.FC = () => {
 
     setUpdating(true);
     try {
-      await environmentService.updateEnvironment(selectedEnvForEdit.environment, editEnv);
+      await environmentService.updateEnvironment(
+        projectApiPath,
+        selectedEnvForEdit.environmentId,
+        editEnv
+      );
       enqueueSnackbar(t('environments.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       setSelectedEnvForEdit(null);
@@ -426,7 +514,7 @@ const EnvironmentsPage: React.FC = () => {
   // Handle toggle visibility
   const handleToggleVisibility = async (env: Environment) => {
     try {
-      await environmentService.updateEnvironment(env.environment, {
+      await environmentService.updateEnvironment(projectApiPath, env.environmentId, {
         isHidden: !env.isHidden,
       });
       enqueueSnackbar(
@@ -454,7 +542,32 @@ const EnvironmentsPage: React.FC = () => {
         }}
       >
         <Box>
-          <Typography variant="h4" gutterBottom>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 1 }}>
+            <Link
+              component={RouterLink}
+              to="/admin/workspace"
+              underline="hover"
+              color="inherit"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              {t('workspace.title')}
+            </Link>
+            <Link
+              component={RouterLink}
+              to={`/admin/projects?orgId=${effectiveOrg?.id || ''}`}
+              underline="hover"
+              color="inherit"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              {effectiveOrg?.displayName || effectiveOrg?.orgName || t('common.organisation')}
+            </Link>
+            <Typography color="text.primary" fontWeight={500}>
+              {effectiveProject?.displayName ||
+                effectiveProject?.projectName ||
+                t('common.project')}
+            </Typography>
+          </Breadcrumbs>
+          <Typography variant="h4" gutterBottom sx={{ mt: 1 }}>
             {t('environments.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -462,13 +575,6 @@ const EnvironmentsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Tooltip title={t('common.refresh')}>
-            <span>
-              <IconButton onClick={loadEnvironments} disabled={loading}>
-                <RefreshIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
           {canManage && (
             <>
               <Button
@@ -493,172 +599,259 @@ const EnvironmentsPage: React.FC = () => {
         </Alert>
       )}
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('environments.name')}</TableCell>
-                <TableCell>{t('environments.displayName')}</TableCell>
-                <TableCell>{t('environments.type')}</TableCell>
-                <TableCell>{t('environments.description')}</TableCell>
-                <TableCell align="center">{t('environments.isDefault')}</TableCell>
-                <TableCell align="center">{t('environments.isSystemDefined')}</TableCell>
-                <TableCell align="center">{t('environments.requiresApproval')}</TableCell>
-                {canManage && <TableCell align="center">{t('common.visible')}</TableCell>}
-                {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {environments
-                .filter((env) => env.environmentName !== 'gatrix-env')
-                .map((env) => (
-                  <TableRow key={env.environment}>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {env.environmentName}
-                        </Typography>
-                        <Tooltip title={t('common.copy')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => {
-                              copyToClipboardWithNotification(
-                                env.environmentName,
-                                () =>
-                                  enqueueSnackbar(t('common.copiedToClipboard'), {
-                                    variant: 'success',
-                                  }),
-                                () =>
-                                  enqueueSnackbar(t('common.copyFailed'), {
-                                    variant: 'error',
-                                  })
-                              );
-                            }}
-                            sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-                          >
-                            <CopyIcon fontSize="small" sx={{ fontSize: 14 }} />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        {env.color && (
-                          <Box
-                            sx={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: '50%',
-                              backgroundColor: env.color,
-                            }}
-                          />
+      <PageContentLoader loading={loading}>
+        {environments.filter((env) => env.environmentName !== 'gatrix-env').length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('environments.noEnvironmentsRegistered')}
+            onAddClick={canManage ? handleOpenAddDialog : undefined}
+            addButtonLabel={t('environments.addEnvironment')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: 40, p: 0.5 }} />
+                  <TableCell>{t('environments.name')}</TableCell>
+                  <TableCell>{t('environments.displayName')}</TableCell>
+                  <TableCell>{t('common.project')}</TableCell>
+                  <TableCell>{t('common.organisation')}</TableCell>
+                  <TableCell>{t('environments.type')}</TableCell>
+                  <TableCell>{t('environments.description')}</TableCell>
+                  <TableCell align="center">{t('environments.isDefault')}</TableCell>
+                  <TableCell align="center">{t('environments.isSystemDefined')}</TableCell>
+                  <TableCell align="center">{t('environments.requiresApproval')}</TableCell>
+                  {canManage && <TableCell align="center">{t('common.visible')}</TableCell>}
+                  {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {environments
+                  .filter((env) => env.environmentName !== 'gatrix-env')
+                  .map((env) => (
+                    <TableRow key={env.environmentId} hover>
+                      <TableCell sx={{ width: 40, p: 0.5, textAlign: 'center' }}>
+                        {env.environmentId === currentEnvironmentId && (
+                          <CheckIcon sx={{ fontSize: 18, color: 'primary.main' }} />
                         )}
-                        {env.displayName}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={t(`environments.types.${env.environmentType}`)}
-                        color={getEnvironmentTypeColor(env.environmentType)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>{env.description || '-'}</TableCell>
-                    <TableCell align="center">
-                      {(env as any).isDefault ? (
-                        <Chip label="✓" color="primary" size="small" />
-                      ) : (
-                        '-'
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
-                    </TableCell>
-                    <TableCell align="center">
-                      {env.requiresApproval ? (
-                        <Chip
-                          label={`${env.requiredApprovers || 1}`}
-                          color="warning"
-                          size="small"
-                        />
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          -
-                        </Typography>
-                      )}
-                    </TableCell>
-                    {canManage && (
-                      <TableCell align="center">
-                        <Tooltip
-                          title={env.isHidden ? t('environments.show') : t('environments.hide')}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleToggleVisibility(env)}
-                            sx={{
-                              color: env.isHidden ? 'text.disabled' : 'success.main',
-                            }}
-                          >
-                            {env.isHidden ? (
-                              <VisibilityOffIcon fontSize="small" />
-                            ) : (
-                              <VisibilityIcon fontSize="small" />
-                            )}
-                          </IconButton>
-                        </Tooltip>
                       </TableCell>
-                    )}
-                    {canManage && (
-                      <TableCell align="center">
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: 0.5,
-                          }}
-                        >
-                          <Tooltip title={t('common.edit')}>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {env.environmentName}
+                          </Typography>
+                          <Tooltip title={t('common.copy')}>
                             <IconButton
                               size="small"
-                              color="primary"
-                              onClick={() => handleOpenEditDialog(env)}
+                              onClick={() => {
+                                copyToClipboardWithNotification(
+                                  env.environmentName,
+                                  () =>
+                                    enqueueSnackbar(t('common.copiedToClipboard'), {
+                                      variant: 'success',
+                                    }),
+                                  () =>
+                                    enqueueSnackbar(t('common.copyFailed'), {
+                                      variant: 'error',
+                                    })
+                                );
+                              }}
+                              sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}
                             >
-                              <EditIcon fontSize="small" />
+                              <CopyIcon sx={{ fontSize: 14 }} />
                             </IconButton>
                           </Tooltip>
-                          {Boolean(env.isSystemDefined) ? (
-                            <Tooltip title={t('environments.cannotDeleteSystem')}>
-                              <span>
-                                <IconButton size="small" color="error" disabled>
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </span>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title={t('common.delete')}>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleOpenDeleteDialog(env)}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
                         </Box>
                       </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {env.color && (
+                            <Box
+                              sx={{
+                                width: 12,
+                                height: 12,
+                                borderRadius: '50%',
+                                backgroundColor: env.color,
+                                flexShrink: 0,
+                              }}
+                            />
+                          )}
+                          {env.displayName}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          component={RouterLink}
+                          to={`/admin/projects?orgId=${effectiveOrg?.id || ''}`}
+                          underline="hover"
+                          color="inherit"
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            {effectiveProject?.displayName || effectiveProject?.projectName || '-'}
+                          </Typography>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          component={RouterLink}
+                          to="/admin/workspace"
+                          underline="hover"
+                          color="inherit"
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            {effectiveOrg?.displayName || effectiveOrg?.orgName || '-'}
+                          </Typography>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={t(`environments.types.${env.environmentType}`)}
+                          color={getEnvironmentTypeColor(env.environmentType)}
+                          size="small"
+                          sx={{ borderRadius: '8px' }}
+                        />
+                      </TableCell>
+                      <TableCell>{env.description || '-'}</TableCell>
+                      <TableCell align="center">
+                        {(env as any).isDefault ? (
+                          <Chip
+                            label="✓"
+                            color="primary"
+                            size="small"
+                            sx={{ borderRadius: '8px' }}
+                          />
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {env.isSystemDefined ? (
+                          <Chip
+                            label="✓"
+                            color="default"
+                            size="small"
+                            sx={{ borderRadius: '8px' }}
+                          />
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {env.requiresApproval ? (
+                          <Chip
+                            label={`${env.requiredApprovers || 1}`}
+                            color="warning"
+                            size="small"
+                            sx={{ borderRadius: '8px' }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            -
+                          </Typography>
+                        )}
+                      </TableCell>
+                      {canManage && (
+                        <TableCell align="center">
+                          <Tooltip
+                            title={env.isHidden ? t('environments.show') : t('environments.hide')}
+                          >
+                            <IconButton
+                              size="small"
+                              onClick={() => handleToggleVisibility(env)}
+                              sx={{
+                                color: env.isHidden ? 'text.disabled' : 'success.main',
+                              }}
+                            >
+                              {env.isHidden ? (
+                                <VisibilityOffIcon fontSize="small" />
+                              ) : (
+                                <VisibilityIcon fontSize="small" />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      )}
+                      {canManage && (
+                        <TableCell align="center">
+                          <IconButton size="small" onClick={(e) => handleMenuOpen(e, env)}>
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTargetEnv && effectiveOrg && effectiveProject) {
+              switchEnvironment(effectiveOrg.id, effectiveProject.id, menuTargetEnv.environmentId);
+            }
+            handleMenuClose();
+          }}
+          disabled={menuTargetEnv?.environmentId === currentEnvironmentId}
+        >
+          <ListItemIcon>
+            <SwapHorizIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {t('environments.switchTo', { name: menuTargetEnv?.displayName || '' })}
+          </ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTargetEnv) handleOpenEditDialog(menuTargetEnv);
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        {canManage && (
+          <MenuItem
+            onClick={() => {
+              if (menuTargetEnv) handleToggleVisibility(menuTargetEnv);
+              handleMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              {menuTargetEnv?.isHidden ? (
+                <VisibilityIcon fontSize="small" />
+              ) : (
+                <VisibilityOffIcon fontSize="small" />
+              )}
+            </ListItemIcon>
+            <ListItemText>
+              {menuTargetEnv?.isHidden ? t('environments.show') : t('environments.hide')}
+            </ListItemText>
+          </MenuItem>
+        )}
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            if (menuTargetEnv) handleOpenDeleteDialog(menuTargetEnv);
+            handleMenuClose();
+          }}
+          disabled={Boolean(menuTargetEnv?.isSystemDefined)}
+        >
+          <ListItemIcon>
+            <DeleteIcon
+              fontSize="small"
+              color={menuTargetEnv?.isSystemDefined ? 'disabled' : 'error'}
+            />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       <EnvironmentCopyDialog
         open={copyDialogOpen}
@@ -667,48 +860,22 @@ const EnvironmentsPage: React.FC = () => {
         onCopyComplete={loadEnvironments}
       />
 
-      {/* Add Environment Dialog */}
-      <Dialog
+      {/* Add Environment Drawer */}
+      <ResizableDrawer
         open={addDialogOpen}
         onClose={handleCloseAddDialog}
-        maxWidth="sm"
-        fullWidth
-        TransitionProps={{
-          onEntered: () => {
-            setTimeout(() => addNameFieldRef.current?.focus(), 100);
-          },
-        }}
+        title={t('environments.addNew')}
+        subtitle={t('environments.addDescription')}
+        storageKey="environmentAddDrawerWidth"
+        defaultWidth={500}
+        minWidth={400}
+        zIndex={1300}
       >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AddIcon />
-            {t('environments.addNew')}
-          </Box>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {t('environments.addDescription')}
-          </Typography>
-
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
               inputRef={addNameFieldRef}
-              label={t('environments.name')}
-              value={newEnv.environment}
-              onChange={(e) =>
-                setNewEnv({
-                  ...newEnv,
-                  environment: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''),
-                })
-              }
-              placeholder={t('environments.namePlaceholder')}
-              helperText={t('environments.nameHelperText')}
-              fullWidth
-              required
-              disabled={creating}
-            />
-
-            <TextField
               label={t('environments.displayName')}
               value={newEnv.displayName}
               onChange={(e) => setNewEnv({ ...newEnv, displayName: e.target.value })}
@@ -716,6 +883,7 @@ const EnvironmentsPage: React.FC = () => {
               fullWidth
               required
               disabled={creating}
+              autoFocus
             />
 
             <FormControl fullWidth>
@@ -761,7 +929,7 @@ const EnvironmentsPage: React.FC = () => {
                   <em>{t('environments.noBase')}</em>
                 </MenuItem>
                 {environments.map((env) => (
-                  <MenuItem key={env.environment} value={env.environment}>
+                  <MenuItem key={env.environmentId} value={env.environmentId}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Box
                         sx={{
@@ -779,15 +947,8 @@ const EnvironmentsPage: React.FC = () => {
               <FormHelperText>{t('environments.baseEnvironmentDescription')}</FormHelperText>
             </FormControl>
 
-            {/* Change Request Settings for New Environment */}
-            <Box
-              sx={{
-                mt: 1,
-                p: 2,
-                bgcolor: 'background.default',
-                borderRadius: 0,
-              }}
-            >
+            {/* Change Request Settings */}
+            <Box sx={{ mt: 1, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
               <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
                 {t('environments.changeRequestSettings')}
               </Typography>
@@ -798,12 +959,7 @@ const EnvironmentsPage: React.FC = () => {
                 control={
                   <Switch
                     checked={newEnv.requiresApproval || false}
-                    onChange={(e) =>
-                      setNewEnv({
-                        ...newEnv,
-                        requiresApproval: e.target.checked,
-                      })
-                    }
+                    onChange={(e) => setNewEnv({ ...newEnv, requiresApproval: e.target.checked })}
                     color="primary"
                     disabled={creating}
                   />
@@ -817,10 +973,7 @@ const EnvironmentsPage: React.FC = () => {
                     value={newEnv.requiredApprovers || 1}
                     label={t('environments.requiredApprovers')}
                     onChange={(e) =>
-                      setNewEnv({
-                        ...newEnv,
-                        requiredApprovers: Number(e.target.value),
-                      })
+                      setNewEnv({ ...newEnv, requiredApprovers: Number(e.target.value) })
                     }
                     disabled={creating}
                   >
@@ -844,20 +997,33 @@ const EnvironmentsPage: React.FC = () => {
               </Typography>
             </Box>
           )}
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Actions */}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
           <Button onClick={handleCloseAddDialog} disabled={creating}>
             {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
             onClick={handleCreateEnvironment}
-            disabled={!newEnv.environment || !newEnv.displayName || creating}
+            disabled={!newEnv.displayName || creating}
+            startIcon={creating ? <CircularProgress size={20} /> : <AddIcon />}
           >
             {t('environments.create')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </ResizableDrawer>
 
       {/* Delete Environment Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} maxWidth="sm" fullWidth>
@@ -890,7 +1056,7 @@ const EnvironmentsPage: React.FC = () => {
 
                 {!relatedData.canDelete && (
                   <Alert severity="error" sx={{ mt: 2 }}>
-                    {relatedData.environment.isSystemDefined
+                    {relatedData.environmentId.isSystemDefined
                       ? t('environments.cannotDeleteSystem')
                       : t('environments.cannotDeleteDefault')}
                   </Alert>
@@ -994,206 +1160,169 @@ const EnvironmentsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Environment Dialog */}
-      <Dialog
+      {/* Edit Environment Drawer */}
+      <ResizableDrawer
         open={editDialogOpen}
         onClose={handleCloseEditDialog}
-        maxWidth="sm"
-        fullWidth
-        TransitionProps={{
-          onEntered: () => {
-            setTimeout(() => editDisplayNameFieldRef.current?.focus(), 100);
-          },
-        }}
+        title={t('environments.editTitle')}
+        subtitle={t('environments.editDescription')}
+        storageKey="environmentEditDrawerWidth"
+        defaultWidth={500}
+        minWidth={400}
+        zIndex={1300}
       >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <EditIcon />
-            {t('environments.editTitle')}
-          </Box>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {t('environments.editDescription')}
-          </Typography>
-
-          <TextField
-            label={t('environments.name')}
-            value={selectedEnvForEdit?.environmentName || ''}
-            fullWidth
-            margin="normal"
-            disabled
-            helperText={t('environments.nameHelperText')}
-          />
-
-          <TextField
-            inputRef={editDisplayNameFieldRef}
-            label={t('environments.displayName')}
-            value={editEnv.displayName || ''}
-            onChange={(e) => setEditEnv({ ...editEnv, displayName: e.target.value })}
-            fullWidth
-            margin="normal"
-            placeholder={t('environments.displayNamePlaceholder')}
-          />
-
-          <TextField
-            label={t('environments.description')}
-            value={editEnv.description || ''}
-            onChange={(e) => setEditEnv({ ...editEnv, description: e.target.value })}
-            fullWidth
-            margin="normal"
-            multiline
-            rows={2}
-          />
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel>{t('environments.type')}</InputLabel>
-            <Select
-              value={editEnv.environmentType || 'development'}
-              onChange={(e) =>
-                setEditEnv({
-                  ...editEnv,
-                  environmentType: e.target.value as any,
-                })
-              }
-              label={t('environments.type')}
-            >
-              <MenuItem value="development">{t('environments.types.development')}</MenuItem>
-              <MenuItem value="staging">{t('environments.types.staging')}</MenuItem>
-              <MenuItem value="production">{t('environments.types.production')}</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              {t('environments.color')}
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <input
-                type="color"
-                value={editEnv.color || '#2e7d32'}
-                onChange={(e) => setEditEnv({ ...editEnv, color: e.target.value })}
-                style={{ width: 50, height: 40, cursor: 'pointer' }}
-              />
-              <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                {editEnv.color || '#2e7d32'}
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Change Request Settings */}
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'background.default', borderRadius: 0 }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-              {t('environments.changeRequestSettings')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {t('environments.changeRequestSettingsDescription')}
-            </Typography>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={editEnv.requiresApproval || false}
-                  onChange={(e) =>
-                    setEditEnv({
-                      ...editEnv,
-                      requiresApproval: e.target.checked,
-                    })
-                  }
-                  color="primary"
-                />
-              }
-              label={t('environments.requiresApproval')}
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              inputRef={editDisplayNameFieldRef}
+              label={t('environments.displayName')}
+              value={editEnv.displayName || ''}
+              onChange={(e) => setEditEnv({ ...editEnv, displayName: e.target.value })}
+              fullWidth
+              placeholder={t('environments.displayNamePlaceholder')}
+              required
+              autoFocus
             />
-            {editEnv.requiresApproval && (
-              <FormControl fullWidth margin="normal" size="small">
-                <InputLabel>{t('environments.requiredApprovers')}</InputLabel>
-                <Select
-                  value={editEnv.requiredApprovers || 1}
-                  label={t('environments.requiredApprovers')}
-                  onChange={(e) =>
-                    setEditEnv({
-                      ...editEnv,
-                      requiredApprovers: Number(e.target.value),
-                    })
-                  }
-                >
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <MenuItem key={n} value={n}>
-                      {n}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>{t('environments.requiredApproversHelperText')}</FormHelperText>
-              </FormControl>
-            )}
-          </Box>
 
-          {/* Lock Settings - only show when CR is enabled */}
-          {editEnv.requiresApproval && (
-            <Box
-              sx={{
-                mt: 2,
-                p: 2,
-                bgcolor: 'background.default',
-                borderRadius: 0,
-              }}
-            >
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                {t('environments.lockSettings')}
+            <TextField
+              label={t('environments.description')}
+              value={editEnv.description || ''}
+              onChange={(e) => setEditEnv({ ...editEnv, description: e.target.value })}
+              fullWidth
+              multiline
+              rows={2}
+            />
+
+            <FormControl fullWidth>
+              <InputLabel>{t('environments.type')}</InputLabel>
+              <Select
+                value={editEnv.environmentType || 'development'}
+                onChange={(e) => setEditEnv({ ...editEnv, environmentType: e.target.value as any })}
+                label={t('environments.type')}
+              >
+                <MenuItem value="development">{t('environments.types.development')}</MenuItem>
+                <MenuItem value="staging">{t('environments.types.staging')}</MenuItem>
+                <MenuItem value="production">{t('environments.types.production')}</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('environments.color')}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('environments.lockSettingsDescription')}
-              </Typography>
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={(editEnv as any).enableSoftLock || false}
-                      onChange={(e) =>
-                        setEditEnv({
-                          ...editEnv,
-                          enableSoftLock: e.target.checked,
-                        } as any)
-                      }
-                      color="primary"
-                    />
-                  }
-                  label={
-                    <Box>
-                      <Typography variant="body2">{t('environments.enableSoftLock')}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('environments.enableSoftLockDescription')}
-                      </Typography>
-                    </Box>
-                  }
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <input
+                  type="color"
+                  value={editEnv.color || '#2e7d32'}
+                  onChange={(e) => setEditEnv({ ...editEnv, color: e.target.value })}
+                  style={{ width: 50, height: 40, cursor: 'pointer' }}
                 />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={(editEnv as any).enableHardLock || false}
-                      onChange={(e) =>
-                        setEditEnv({
-                          ...editEnv,
-                          enableHardLock: e.target.checked,
-                        } as any)
-                      }
-                      color="primary"
-                    />
-                  }
-                  label={
-                    <Box>
-                      <Typography variant="body2">{t('environments.enableHardLock')}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('environments.enableHardLockDescription')}
-                      </Typography>
-                    </Box>
-                  }
-                />
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  {editEnv.color || '#2e7d32'}
+                </Typography>
               </Box>
             </Box>
-          )}
+
+            {/* Change Request Settings */}
+            <Box sx={{ mt: 1, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                {t('environments.changeRequestSettings')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('environments.changeRequestSettingsDescription')}
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editEnv.requiresApproval || false}
+                    onChange={(e) => setEditEnv({ ...editEnv, requiresApproval: e.target.checked })}
+                    color="primary"
+                  />
+                }
+                label={t('environments.requiresApproval')}
+              />
+              {editEnv.requiresApproval && (
+                <FormControl fullWidth margin="normal" size="small">
+                  <InputLabel>{t('environments.requiredApprovers')}</InputLabel>
+                  <Select
+                    value={editEnv.requiredApprovers || 1}
+                    label={t('environments.requiredApprovers')}
+                    onChange={(e) =>
+                      setEditEnv({ ...editEnv, requiredApprovers: Number(e.target.value) })
+                    }
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <MenuItem key={n} value={n}>
+                        {n}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>{t('environments.requiredApproversHelperText')}</FormHelperText>
+                </FormControl>
+              )}
+            </Box>
+
+            {/* Lock Settings - only show when CR is enabled */}
+            {editEnv.requiresApproval && (
+              <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                  {t('environments.lockSettings')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('environments.lockSettingsDescription')}
+                </Typography>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={(editEnv as any).enableSoftLock || false}
+                        onChange={(e) =>
+                          setEditEnv({
+                            ...editEnv,
+                            enableSoftLock: e.target.checked,
+                          } as any)
+                        }
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body2">{t('environments.enableSoftLock')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('environments.enableSoftLockDescription')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={(editEnv as any).enableHardLock || false}
+                        onChange={(e) =>
+                          setEditEnv({
+                            ...editEnv,
+                            enableHardLock: e.target.checked,
+                          } as any)
+                        }
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body2">{t('environments.enableHardLock')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('environments.enableHardLockDescription')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </Box>
+              </Box>
+            )}
+          </Box>
 
           {updating && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
@@ -1203,8 +1332,20 @@ const EnvironmentsPage: React.FC = () => {
               </Typography>
             </Box>
           )}
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Actions */}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
           <Button onClick={handleCloseEditDialog} disabled={updating}>
             {t('common.cancel')}
           </Button>
@@ -1212,11 +1353,12 @@ const EnvironmentsPage: React.FC = () => {
             variant="contained"
             onClick={handleUpdateEnvironment}
             disabled={!editEnv.displayName || updating || !isEditDirty}
+            startIcon={updating ? <CircularProgress size={20} /> : <EditIcon />}
           >
             {t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </ResizableDrawer>
     </Box>
   );
 };

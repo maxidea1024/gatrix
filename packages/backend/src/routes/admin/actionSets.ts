@@ -7,6 +7,13 @@
 import { Router, Request, Response } from 'express';
 import { ActionSetModel } from '../../models/ActionSet';
 import { createLogger } from '../../config/logger';
+import {
+  sendConflict,
+  sendBadRequest,
+  sendNotFound,
+  sendInternalError,
+} from '../../utils/apiResponse';
+import { ErrorCodes } from '@gatrix/shared';
 
 const router = Router();
 const logger = createLogger('ActionSetRoutes');
@@ -17,7 +24,7 @@ const logger = createLogger('ActionSetRoutes');
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const actionSets = await ActionSetModel.findAll();
+    const actionSets = await ActionSetModel.findAll((req as any).projectId);
     res.json({ data: actionSets });
   } catch (error) {
     logger.error('Error getting action sets:', error);
@@ -31,7 +38,7 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const actionSet = await ActionSetModel.findById(id);
 
     if (!actionSet) {
@@ -52,33 +59,49 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
+    const projectId = (req as any).projectId;
 
     if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'Name is required' });
+      return sendBadRequest(res, 'Name is required');
     }
 
     if (!actions || !Array.isArray(actions) || actions.length === 0) {
-      return res.status(400).json({ error: 'At least one action is required' });
+      return sendBadRequest(res, 'At least one action is required');
+    }
+
+    if (!sourceId) {
+      return sendBadRequest(res, 'Signal endpoint selection is required');
+    }
+
+    // Check for duplicate name within the same project
+    const allSets = await ActionSetModel.findAll(projectId);
+    const duplicate = allSets.find((s) => s.name === name.trim());
+    if (duplicate) {
+      return sendConflict(
+        res,
+        'An action set with this name already exists',
+        ErrorCodes.RESOURCE_ALREADY_EXISTS
+      );
     }
 
     const actionSet = await ActionSetModel.create({
       name: name.trim(),
       description,
       isEnabled,
-      actorId,
-      source,
+      actorId: actorId || user.id,
+      source: source || 'signal-endpoint',
       sourceId,
       filters,
       actions,
+      projectId,
       createdBy: user.id,
     });
 
     res.status(201).json({ data: actionSet });
   } catch (error) {
     logger.error('Error creating action set:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create action set';
-    res.status(400).json({ error: message });
+    return sendInternalError(res, 'Failed to create action set', error);
   }
 });
 
@@ -88,16 +111,30 @@ router.post('/', async (req: Request, res: Response) => {
  */
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const { name, description, isEnabled, actorId, source, sourceId, filters, actions } = req.body;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
+    const projectId = (req as any).projectId;
+
+    // Check for duplicate name if name is being changed
+    if (name && name.trim()) {
+      const allSets = await ActionSetModel.findAll(projectId);
+      const duplicate = allSets.find((s) => s.name === name.trim() && s.id !== id);
+      if (duplicate) {
+        return sendConflict(
+          res,
+          'An action set with this name already exists',
+          ErrorCodes.RESOURCE_ALREADY_EXISTS
+        );
+      }
+    }
 
     const actionSet = await ActionSetModel.update(id, {
       name,
       description,
       isEnabled,
       actorId,
-      source,
+      source: source || 'signal-endpoint',
       sourceId,
       filters,
       actions,
@@ -105,14 +142,13 @@ router.put('/:id', async (req: Request, res: Response) => {
     });
 
     if (!actionSet) {
-      return res.status(404).json({ error: 'Action set not found' });
+      return sendNotFound(res, 'Action set not found');
     }
 
     res.json({ data: actionSet });
   } catch (error) {
     logger.error('Error updating action set:', error);
-    const message = error instanceof Error ? error.message : 'Failed to update action set';
-    res.status(400).json({ error: message });
+    return sendInternalError(res, 'Failed to update action set', error);
   }
 });
 
@@ -122,7 +158,7 @@ router.put('/:id', async (req: Request, res: Response) => {
  */
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const success = await ActionSetModel.delete(id);
 
     if (!success) {
@@ -142,8 +178,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
  */
 router.post('/:id/toggle', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
-    const user = req.user as { id: number; name: string };
+    const id = req.params.id;
+    const user = req.user as { id: string; name: string };
 
     const actionSet = await ActionSetModel.toggleEnabled(id, user.id);
 
@@ -164,7 +200,7 @@ router.post('/:id/toggle', async (req: Request, res: Response) => {
  */
 router.get('/:id/events', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
 

@@ -93,11 +93,11 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
 
   // Convert our Message type to ChatScope MessageModel
   const convertToChatScopeMessages = (messages: Message[]): MessageModel[] => {
-    return messages.map((msg, index) => {
+    return (messages as any[]).map((msg: any, index: number) => {
       const currentUser = state.user;
       const direction = msg.userId === currentUser?.id ? 'outgoing' : 'incoming';
 
-      // 사용자 정보 안전하게 가져오기
+      // User info 안전하게 가져오기
       const messageUser = state.users[msg.userId];
       const senderName = messageUser?.username || messageUser?.name || `User ${msg.userId}`;
 
@@ -107,9 +107,9 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
         sender: senderName,
         direction: direction as any,
         position: getMessagePosition(msg, index),
-        type: getMessageType(msg.type),
+        type: getMessageType(msg.type) as any,
       };
-    });
+    }) as MessageModel[];
   };
 
   const getMessagePosition = (message: Message, index: number) => {
@@ -171,7 +171,7 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
 
           <MessageInput
             placeholder={t('chat.typeMessage')}
-            onSend={handleSendMessage}
+            onSend={handleSendMessage as any}
             attachButton={true}
           />
         </ChatContainer>
@@ -192,7 +192,7 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
           <ConversationHeader.Actions>
             <VoiceCallButton />
             <VideoCallButton />
-            <InfoButton />
+            <IconButton />
           </ConversationHeader.Actions>
         </ConversationHeader>
 
@@ -240,7 +240,7 @@ const MessageList: React.FC<MessageListProps> = ({ channelId, onSendMessage }) =
         {/* Message Input */}
         <MessageInput
           placeholder={t('chat.typeMessage')}
-          onSend={handleSendMessage}
+          onSend={handleSendMessage as any}
           attachButton={true}
           disabled={!currentChannel}
         />

@@ -17,10 +17,10 @@ export type {
   EvaluationReason,
   EvaluationResult,
   EvaluationResultWithDetails,
-} from '@gatrix/shared';
+} from '@gatrix/evaluator';
 
 // Import types for local usage
-import type { FeatureFlag } from '@gatrix/shared';
+import type { FeatureFlag } from '@gatrix/evaluator';
 
 // SDK-specific types below
 export type FlagType =

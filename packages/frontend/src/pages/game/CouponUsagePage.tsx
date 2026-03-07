@@ -41,7 +41,7 @@ import DynamicFilterBar, {
   ActiveFilter,
   FilterDefinition,
 } from '@/components/common/DynamicFilterBar';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
 import {
   formatDateTime,
@@ -51,12 +51,16 @@ import {
 } from '@/utils/dateFormat';
 import { useI18n } from '@/contexts/I18nContext';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // settings list
   const [settings, setSettings] = useState<CouponSetting[]>([]);
@@ -341,7 +345,7 @@ const CouponUsagePage: React.FC = () => {
   // fetch settings list once
   useEffect(() => {
     (async () => {
-      const res = await couponService.listSettings({ page: 1, limit: 100 });
+      const res = await couponService.listSettings(projectApiPath, { page: 1, limit: 100 });
       setSettings(res.settings || []);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -395,7 +399,7 @@ const CouponUsagePage: React.FC = () => {
       setExportMenuAnchor(null);
 
       // Call backend API to get data with timezone conversion
-      const exportResult = await couponService.exportUsage({
+      const exportResult = await couponService.exportUsage(projectApiPath, {
         ...(settingIdFilter && { settingId: settingIdFilter }),
         ...(couponCodeFilter && { couponCode: couponCodeFilter }),
         ...(platformFilter && { platform: platformFilter }),
@@ -609,16 +613,12 @@ const CouponUsagePage: React.FC = () => {
       </Card>
 
       {/* List */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loading')}</Typography>
-            </Box>
-          ) : records.length === 0 ? (
-            <EmptyState message={t('coupons.couponUsage.noRecords')} />
-          ) : (
-            <>
+      <PageContentLoader loading={loading}>
+        {records.length === 0 ? (
+          <EmptyPagePlaceholder message={t('coupons.couponUsage.noRecords')} />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
@@ -853,10 +853,10 @@ const CouponUsagePage: React.FC = () => {
                   setPage(0);
                 }}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

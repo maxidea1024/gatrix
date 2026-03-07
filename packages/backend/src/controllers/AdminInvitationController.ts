@@ -5,13 +5,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { body, validationResult } from 'express-validator';
 import { UserModel } from '../models/User';
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AdminInvitationController');
 import { pubSubService } from '../services/PubSubService';
 
 export class AdminInvitationController {
-  // 사용자 초대 생성
+  // Used자 초대 Create
   static createInvitation = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    // 입력 검증
+    // 입력 Validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -22,7 +24,7 @@ export class AdminInvitationController {
       });
     }
 
-    const { email, role = 'user', expirationHours = 168 } = req.body; // 기본값: 168시간(7일)
+    const { email, expirationHours = 168, autoJoinConfig } = req.body; // Default values: 168시간(7일)
     const userId = req.user?.id;
 
     if (!userId) {
@@ -33,7 +35,7 @@ export class AdminInvitationController {
       });
     }
 
-    // 이미 등록된 사용자인지 확인
+    // 이미 Register된 Used자인지 Confirm
     if (email) {
       const existingUser = await UserModel.findByEmailWithoutPassword(email);
       if (existingUser) {
@@ -45,7 +47,7 @@ export class AdminInvitationController {
       }
     }
 
-    // 이메일이 제공된 경우에만 기존 초대 확인
+    // 이메일이 제공된 경우에만 Existing 초대 Confirm
     if (email) {
       const existingInvitation = await db('g_invitations')
         .where('email', email)
@@ -62,21 +64,21 @@ export class AdminInvitationController {
       }
     }
 
-    // 새 초대 생성
+    // 새 초대 Create
     const invitationId = uuidv4();
     const token = uuidv4();
     const expiresAt = new Date();
-    expiresAt.setTime(expiresAt.getTime() + expirationHours * 60 * 60 * 1000); // 설정된 시간 후 만료
+    expiresAt.setTime(expiresAt.getTime() + expirationHours * 60 * 60 * 1000); // Settings된 시간 후 Expired
 
     await db('g_invitations').insert({
       id: invitationId,
       token,
-      email: email || null, // 이메일이 없으면 null로 저장
-      role,
+      email: email || null, // 이메일이 없으면 null로 Save
       createdBy: userId,
       createdAt: new Date(),
       expiresAt,
       isActive: true,
+      autoJoinConfig: autoJoinConfig ? JSON.stringify(autoJoinConfig) : null,
     });
 
     const invitationData = {
@@ -87,6 +89,7 @@ export class AdminInvitationController {
       createdAt: new Date().toISOString(),
       createdBy: userId.toString(),
       isActive: true,
+      autoJoinConfig: autoJoinConfig || null,
     };
 
     // PubSub을 통해 모든 인스턴스가 수신 후 각자 SSE로 전파 (자신 제외)
@@ -103,7 +106,7 @@ export class AdminInvitationController {
       logger.info(`PubSub notification queued for invitation creation: ${invitationId}`);
     } catch (err) {
       logger.error('Failed to enqueue PubSub notification for invitation creation:', err);
-      // 실패해도 초대 생성 응답은 정상 반환
+      // Failed해도 초대 Create Response은 정상 반환
     }
 
     res.status(201).json({
@@ -114,15 +117,15 @@ export class AdminInvitationController {
     });
   });
 
-  // 현재 활성 초대 조회
+  // 현재 Active 초대 조회
   static getCurrent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
       const activeInvitation = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
+        .select(['id', 'token', 'email', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
         .where('isActive', true)
         .where('expiresAt', '>', new Date())
         .orderBy('createdAt', 'desc')
-        .first(); // 가장 최근의 활성 초대 하나만 가져오기
+        .first(); // 가장 최근의 Active 초대 하나만 가져오기
 
       // Return 200 with null data if no active invitation exists (not an error)
       if (!activeInvitation) {
@@ -138,7 +141,6 @@ export class AdminInvitationController {
           id: activeInvitation.id,
           token: activeInvitation.token,
           email: activeInvitation.email,
-          role: activeInvitation.role,
           createdAt: activeInvitation.createdAt,
           expiresAt: activeInvitation.expiresAt,
           createdBy: activeInvitation.createdBy,
@@ -155,11 +157,11 @@ export class AdminInvitationController {
     }
   });
 
-  // 초대 목록 조회
+  // 초대 Get list
   static getInvitations = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
       const allInvitations = await db('g_invitations')
-        .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
+        .select(['id', 'token', 'email', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
         .orderBy('createdAt', 'desc');
 
       res.json({
@@ -168,7 +170,6 @@ export class AdminInvitationController {
           id: inv.id,
           token: inv.token,
           email: inv.email,
-          role: inv.role,
           createdAt: inv.createdAt,
           expiresAt: inv.expiresAt,
           createdBy: inv.createdBy,
@@ -186,7 +187,7 @@ export class AdminInvitationController {
     }
   });
 
-  // 초대 삭제
+  // 초대 Delete
   static deleteInvitation = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
 
@@ -217,7 +218,7 @@ export class AdminInvitationController {
         logger.info(`PubSub notification queued for invitation deletion: ${id}`);
       } catch (err) {
         logger.error('Failed to enqueue PubSub notification for invitation deletion:', err);
-        // 실패해도 응답은 정상적으로 보냄
+        // Failed해도 Response은 정상적으로 보냄
       }
 
       res.json({
@@ -236,16 +237,21 @@ export class AdminInvitationController {
   });
 }
 
-// 입력 검증 미들웨어
+// 입력 Validation Middleware
 export const createInvitationValidation = [
   body('email')
     .optional()
     .isEmail()
     .withMessage('Valid email is required when provided')
     .normalizeEmail(),
-  body('role').optional().isIn(['user', 'admin']).withMessage('Role must be either user or admin'),
+
   body('expirationHours')
     .optional()
     .isInt({ min: 1, max: 8760 }) // 최소 1시간, 최대 1년(365*24)
     .withMessage('Expiration hours must be between 1 and 8760 (1 year)'),
+
+  body('autoJoinConfig')
+    .optional()
+    .isObject()
+    .withMessage('autoJoinConfig must be a valid object'),
 ];

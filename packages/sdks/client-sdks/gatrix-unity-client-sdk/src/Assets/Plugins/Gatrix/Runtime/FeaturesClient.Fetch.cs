@@ -41,7 +41,7 @@ namespace Gatrix.Unity.SDK
                 _fetchFlagsCount++;
                 _lastFetchTime = DateTime.UtcNow;
 
-                // Build URL: {apiUrl}/client/features/{environment}/eval
+                // Build URL: {apiUrl}/client/features/eval
                 var urlBuilder = new StringBuilder(_config.ApiUrl);
                 urlBuilder.Append("/client/features/");
                 urlBuilder.Append(Uri.EscapeDataString(_config.Environment));
@@ -69,7 +69,6 @@ namespace Gatrix.Unity.SDK
                 // Headers
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
-                request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
                 request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
                 if (!string.IsNullOrEmpty(_lastContextHash))
@@ -418,7 +417,6 @@ namespace Gatrix.Unity.SDK
                 // Headers — NO If-None-Match (intentionally skip ETag for partial fetch)
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
-                request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
                 request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
                 if (!string.IsNullOrEmpty(_lastContextHash))

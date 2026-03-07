@@ -5,6 +5,7 @@ import { Reward } from '../../services/surveyService';
 import { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
 import rewardTemplateService from '../../services/rewardTemplateService';
 import { usePlanningData } from '../../contexts/PlanningDataContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface RewardDisplayProps {
   rewards?: any[];
@@ -23,6 +24,8 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 }) => {
   const { t } = useTranslation();
   const { rewardTypes, rewardLookup, isLoading: contextLoading } = usePlanningData();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,16 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
         // If rewards are provided, use them
         if (rewards && rewards.length > 0) {
           // Convert from backend format (rewardType, itemId) to frontend format (type, id)
-          const convertedRewards = rewards.map((reward: any) => ({
+          const convertedRewards: Reward[] = rewards.map((reward: any) => ({
+            rewardType: String(reward.type !== undefined ? reward.type : reward.rewardType),
+            itemId: String(
+              reward.id !== undefined
+                ? reward.id
+                : reward.itemId
+                  ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
+                  : 0
+            ),
+            quantity: reward.quantity,
             type: reward.type !== undefined ? reward.type : reward.rewardType,
             id:
               reward.id !== undefined
@@ -44,7 +56,6 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
                 : reward.itemId
                   ? parseInt(reward.itemId.split('_')[1] || reward.itemId)
                   : 0,
-            quantity: reward.quantity,
           }));
           setDisplayRewards(convertedRewards);
           return;
@@ -52,12 +63,17 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({
 
         // If no rewards but rewardTemplateId is provided, load from template
         if (rewardTemplateId) {
-          const template = await rewardTemplateService.getRewardTemplateById(rewardTemplateId);
+          const template = await rewardTemplateService.getRewardTemplateById(
+            projectApiPath,
+            rewardTemplateId
+          );
           if (template && template.rewardItems && Array.isArray(template.rewardItems)) {
-            const convertedRewards = template.rewardItems.map((item: any) => ({
+            const convertedRewards: Reward[] = template.rewardItems.map((item: any) => ({
+              rewardType: String(item.rewardType || item.type || 0),
+              itemId: String(item.itemId || item.id || 0),
+              quantity: item.quantity || 0,
               type: item.rewardType || item.type || 0,
               id: item.itemId || item.id || 0,
-              quantity: item.quantity || 0,
             }));
             setDisplayRewards(convertedRewards);
           } else {

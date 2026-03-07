@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import VarsModel from '../models/Vars';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServiceDiscoveryConfigController');
 
 /**
  * Service Discovery Configuration Controller
@@ -11,12 +14,12 @@ export class ServiceDiscoveryConfigController {
    */
   static async getConfig(req: Request, res: Response) {
     try {
-      const environment = 'development'; // Global settings stored in development environment
+      const environmentId = 'development'; // Global settings stored in development environmentId
       const [mode, etcdHosts, defaultTtl, heartbeatInterval] = await Promise.all([
-        VarsModel.get('serviceDiscovery.mode', environment),
-        VarsModel.get('serviceDiscovery.etcdHosts', environment),
-        VarsModel.get('serviceDiscovery.defaultTtl', environment),
-        VarsModel.get('serviceDiscovery.heartbeatInterval', environment),
+        VarsModel.get('serviceDiscovery.mode', environmentId),
+        VarsModel.get('serviceDiscovery.etcdHosts', environmentId),
+        VarsModel.get('serviceDiscovery.defaultTtl', environmentId),
+        VarsModel.get('serviceDiscovery.heartbeatInterval', environmentId),
       ]);
 
       res.json({
@@ -29,7 +32,7 @@ export class ServiceDiscoveryConfigController {
         },
       });
     } catch (error: any) {
-      console.error('Failed to get service discovery config:', error);
+      logger.error('Failed to get service discovery config:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get service discovery configuration',
@@ -43,7 +46,7 @@ export class ServiceDiscoveryConfigController {
   static async updateConfig(req: Request, res: Response) {
     try {
       const { mode, etcdHosts, defaultTtl, heartbeatInterval } = req.body;
-      const environment = 'development'; // Global settings stored in development environment
+      const environmentId = 'development'; // Global settings stored in development environmentId
 
       // Validate mode
       if (mode && !['redis', 'etcd'].includes(mode)) {
@@ -74,16 +77,16 @@ export class ServiceDiscoveryConfigController {
       const updates: Promise<void>[] = [];
 
       if (mode !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.mode', mode, userId, environment));
+        updates.push(VarsModel.set('serviceDiscovery.mode', mode, userId, environmentId));
       }
 
       if (etcdHosts !== undefined) {
-        updates.push(VarsModel.set('serviceDiscovery.etcdHosts', etcdHosts, userId, environment));
+        updates.push(VarsModel.set('serviceDiscovery.etcdHosts', etcdHosts, userId, environmentId));
       }
 
       if (defaultTtl !== undefined) {
         updates.push(
-          VarsModel.set('serviceDiscovery.defaultTtl', defaultTtl.toString(), userId, environment)
+          VarsModel.set('serviceDiscovery.defaultTtl', defaultTtl.toString(), userId, environmentId)
         );
       }
 
@@ -93,7 +96,7 @@ export class ServiceDiscoveryConfigController {
             'serviceDiscovery.heartbeatInterval',
             heartbeatInterval.toString(),
             userId,
-            environment
+            environmentId
           )
         );
       }
@@ -106,7 +109,7 @@ export class ServiceDiscoveryConfigController {
           'Service discovery configuration updated. Restart the server for changes to take effect.',
       });
     } catch (error: any) {
-      console.error('Failed to update service discovery config:', error);
+      logger.error('Failed to update service discovery config:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update service discovery configuration',

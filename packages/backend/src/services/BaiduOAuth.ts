@@ -1,5 +1,7 @@
 import axios from 'axios';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('BaiduOAuth');
 import config from '../config';
 
 export interface BaiduProfile {
@@ -32,7 +34,7 @@ export class BaiduOAuthService {
   private static readonly AUTH_URL = 'https://openapi.baidu.com/oauth/2.0/authorize';
 
   /**
-   * Baidu OAuth 인증 URL 생성
+   * Baidu OAuth Authentication URL Create
    */
   static getAuthUrl(redirectUri: string, state?: string): string {
     const params = new URLSearchParams({
@@ -77,7 +79,7 @@ export class BaiduOAuthService {
   }
 
   /**
-   * Access Token으로 사용자 정보 획득
+   * Access Token으로 User info 획득
    */
   static async getUserInfo(accessToken: string): Promise<BaiduProfile> {
     try {

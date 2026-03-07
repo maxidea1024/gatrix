@@ -48,7 +48,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
     try {
       const date = new Date(dateString);
 
-      // 유효한 날짜인지 확인
+      // Check if the date is valid
       if (isNaN(date.getTime())) {
         return t('invitations.invalidDate');
       }
@@ -72,7 +72,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* 성공 알림 */}
+      {/* Success notification */}
       <Alert
         severity="success"
         icon={<CheckIcon />}
@@ -92,7 +92,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
         <Typography variant="body2">{t('invitations.successDescription')}</Typography>
       </Alert>
 
-      {/* 초대 정보 카드 */}
+      {/* Invitation information card */}
       <Paper
         elevation={0}
         sx={{
@@ -103,7 +103,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
           borderRadius: 2,
         }}
       >
-        {/* 초대 대상 이메일 */}
+        {/* Invited email */}
         {invitationData?.invitation?.email && (
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
             <EmailIcon color="primary" fontSize="small" />
@@ -119,7 +119,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
           </Stack>
         )}
 
-        {/* 만료 정보 */}
+        {/* Expiration information */}
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
           <ScheduleIcon color="warning" fontSize="small" />
           <Typography variant="body2" color="text.secondary">
@@ -137,7 +137,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
           />
         </Stack>
 
-        {/* 초대 링크 */}
+        {/* Invitation link */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
             {t('invitations.inviteLink')}:
@@ -163,7 +163,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({ invitationData, o
           />
         </Box>
 
-        {/* 액션 버튼들 */}
+        {/* Action buttons */}
         <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
           <Button
             onClick={handleCopyLink}

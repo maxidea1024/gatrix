@@ -44,6 +44,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
         onChange={onChange}
         label={typeof label === 'string' ? label : undefined}
         displayEmpty={displayEmpty}
+        variant="outlined"
         {...selectProps}
       >
         {children}

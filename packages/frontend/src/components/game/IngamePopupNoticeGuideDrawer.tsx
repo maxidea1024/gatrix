@@ -303,7 +303,7 @@ curl -X GET "http://localhost:5000/api/v1/server/${currentEnvironmentId || 'your
                   <strong>{t('ingamePopupNotices.sdkGuideDrawer.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/{'{environment}'}/ingame-popup-notices
+                  /api/v1/server/{'{ environmentId }'}/ingame-popup-notices
                 </Typography>
               </Box>
 

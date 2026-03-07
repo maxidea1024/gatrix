@@ -30,7 +30,7 @@ router.get(
     query('limit').optional().isInt({ min: 1, max: 100 }),
     query('search').optional().isString(),
     query('platform').optional().isString(),
-    query('environment').optional().isString(),
+    query('environmentId').optional().isString(),
     query('branch').optional().isString(),
     query('marketType').optional().isString(),
     query('isEditor').optional().isBoolean(),

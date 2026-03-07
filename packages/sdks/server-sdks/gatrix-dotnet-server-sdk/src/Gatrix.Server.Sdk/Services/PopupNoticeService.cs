@@ -31,7 +31,7 @@ public class PopupNoticeService : BaseEnvironmentService<PopupNotice, List<Popup
 
     protected override string ServiceName => "PopupNotice";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/ingame-popup-notices";
+        $"/api/v1/server/ingame-popup-notices";
     protected override List<PopupNotice> ExtractItems(List<PopupNotice> response) => response;
     protected override object GetItemId(PopupNotice item) => item.Id;
 
@@ -55,7 +55,7 @@ public class PopupNoticeService : BaseEnvironmentService<PopupNotice, List<Popup
             await Task.Delay(100, ct);
 
             var response = await ApiClient.GetAsync<PopupNoticeByIdResponse>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/ingame-popup-notices/{id}", ct: ct);
+                $"/api/v1/server/ingame-popup-notices/{id}", ct: ct);
 
             if (!response.Success || response.Data?.Notice is null)
             {

@@ -8,9 +8,11 @@ import express, { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import ServiceDiscoveryController from '../../controllers/ServiceDiscoveryController';
 import { ServiceDiscoveryConfigController } from '../../controllers/ServiceDiscoveryConfigController';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import serviceDiscoveryService from '../../services/serviceDiscoveryService';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('serviceDiscovery');
 
 const router = express.Router();
 
@@ -141,7 +143,7 @@ router.get('/sse', authenticateSSE, async (req, res) => {
 });
 
 // All other routes (non-SSE) require authentication and admin role
-router.use(authenticate as any, requireAdmin as any);
+router.use(authenticate as any as any);
 
 /**
  * Clean up all terminated, error, and no-response services

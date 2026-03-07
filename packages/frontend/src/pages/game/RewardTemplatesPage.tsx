@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -39,7 +39,7 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
 import { tagService } from '../../services/tagService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -51,12 +51,16 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const RewardTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.REWARD_TEMPLATES_MANAGE]);
+  const canManage = hasPermission([P.REWARD_TEMPLATES_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [templates, setTemplates] = useState<RewardTemplate[]>([]);
@@ -246,7 +250,7 @@ const RewardTemplatesPage: React.FC = () => {
   const loadTemplates = async () => {
     setLoading(true);
     try {
-      const result = await rewardTemplateService.getRewardTemplates({
+      const result = await rewardTemplateService.getRewardTemplates(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
@@ -331,7 +335,7 @@ const RewardTemplatesPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAllRegistryTags(tags);
         console.log('[RewardTemplatesPage] Registry tags loaded:', tags.length);
       } catch (error) {
@@ -452,7 +456,7 @@ const RewardTemplatesPage: React.FC = () => {
     if (!deletingTemplate) return;
 
     try {
-      await rewardTemplateService.deleteRewardTemplate(deletingTemplate.id);
+      await rewardTemplateService.deleteRewardTemplate(projectApiPath, deletingTemplate.id);
       enqueueSnackbar(t('rewardTemplates.deleteSuccess'), {
         variant: 'success',
       });
@@ -482,7 +486,9 @@ const RewardTemplatesPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => rewardTemplateService.deleteRewardTemplate(id)));
+      await Promise.all(
+        selectedIds.map((id) => rewardTemplateService.deleteRewardTemplate(projectApiPath, id))
+      );
       enqueueSnackbar(t('rewardTemplates.bulkDeleteSuccess'), {
         variant: 'success',
       });
@@ -681,21 +687,17 @@ const RewardTemplatesPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading && isInitialLoad ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : templates.length === 0 ? (
-            <EmptyState
-              message={t('rewardTemplates.noTemplatesFound')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('rewardTemplates.createTemplate')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={loading && isInitialLoad}>
+        {templates.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('rewardTemplates.noTemplatesFound')}
+            onAddClick={canManage ? handleCreate : undefined}
+            addButtonLabel={t('rewardTemplates.createTemplate')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
                   <TableHead>
@@ -898,10 +900,10 @@ const RewardTemplatesPage: React.FC = () => {
                   setPage(0);
                 }}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

@@ -499,7 +499,6 @@ void UGatrixFeaturesClient::DoFetchFlags() {
   HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
   HttpRequest->SetHeader(TEXT("X-API-Token"), ClientConfig.ApiToken);
   HttpRequest->SetHeader(TEXT("X-Application-Name"), ClientConfig.AppName);
-  HttpRequest->SetHeader(TEXT("X-Environment"), ClientConfig.Environment);
   HttpRequest->SetHeader(TEXT("X-Connection-Id"), ConnectionId);
   HttpRequest->SetHeader(TEXT("X-Gatrix-Context-Hash"), LastContextHash);
   HttpRequest->SetHeader(
@@ -1418,7 +1417,7 @@ void UGatrixFeaturesClient::SendMetrics() {
 // ==================== URL Building ====================
 
 FString UGatrixFeaturesClient::BuildFetchUrl() const {
-  // URL pattern: {apiUrl}/client/features/{environment}/eval
+  // URL pattern: {apiUrl}/client/features/eval
   FString BaseUrl = FString::Printf(TEXT("%s/client/features/%s/eval"), *ClientConfig.ApiUrl,
                                     *FGenericPlatformHttp::UrlEncode(ClientConfig.Environment));
 
@@ -2293,7 +2292,7 @@ FString UGatrixFeaturesClient::BuildStreamingUrl() const {
   }
 
   // If no custom URL, derive from ApiUrl
-  // URL pattern: {apiUrl}/client/features/{environment}/stream/sse|ws
+  // URL pattern: {apiUrl}/client/features/stream/sse|ws
   if (BaseUrl.IsEmpty()) {
     FString EncodedEnv = FGenericPlatformHttp::UrlEncode(ClientConfig.Environment);
     if (StreamConfig.Transport == EGatrixStreamingTransport::WebSocket) {

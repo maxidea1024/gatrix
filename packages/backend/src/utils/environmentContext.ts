@@ -11,24 +11,24 @@
  * Environment filter helper for Knex queries
  * Adds environment filter to a query builder
  */
-export function withEnvironmentFilter<T>(query: T, environment: string): T {
-  if (!environment) {
+export function withEnvironmentFilter<T>(query: T, environmentId: string): T {
+  if (!environmentId) {
     throw new Error('Environment must be explicitly specified for filtering.');
   }
-  return (query as any).where('environment', environment);
+  return (query as any).where('environmentId', environmentId);
 }
 
 /**
  * Validate environment format
  * - environment: lowercase letters, numbers, underscore, hyphen (1-100 chars)
  */
-export function isValidEnvironment(environment: string): boolean {
-  if (!environment || typeof environment !== 'string') return false;
+export function isValidEnvironment(environmentId: string): boolean {
+  if (!environmentId || typeof environmentId !== 'string') return false;
 
   // Validate environment: lowercase, numbers, underscore, hyphen
-  if (environment.length < 1 || environment.length > 100) return false;
-  const envRegex = /^[a-z0-9_-]+$/;
-  return envRegex.test(environment);
+  if (environmentId.length < 1 || environmentId.length > 100) return false;
+  const envRegex = /^[a-zA-Z0-9_-]+$/;
+  return envRegex.test(environmentId);
 }
 
 /**
@@ -37,19 +37,19 @@ export function isValidEnvironment(environment: string): boolean {
  */
 export function getEnvironmentFromRequest(req: any): string {
   // Check header first
-  const headerEnv = req.headers?.['x-environment'];
+  const headerEnv = req.headers?.['x-environment-id'];
   if (headerEnv && isValidEnvironment(headerEnv)) {
     return headerEnv;
   }
 
   // Check query param
-  const queryEnv = req.query?.environment;
+  const queryEnv = req.query?.environmentId;
   if (queryEnv && isValidEnvironment(queryEnv)) {
     return queryEnv;
   }
 
   // Check body (for POST/PUT requests)
-  const bodyEnv = req.body?.environment;
+  const bodyEnv = req.body?.environmentId;
   if (bodyEnv && isValidEnvironment(bodyEnv)) {
     return bodyEnv;
   }
@@ -60,11 +60,11 @@ export function getEnvironmentFromRequest(req: any): string {
 /**
  * Validate that an environment exists
  */
-export async function validateEnvironment(db: any, environment: string): Promise<boolean> {
-  if (!isValidEnvironment(environment)) {
+export async function validateEnvironment(db: any, environmentId: string): Promise<boolean> {
+  if (!isValidEnvironment(environmentId)) {
     return false;
   }
-  const result = await db('g_environments').where('environment', environment).first();
+  const result = await db('g_environments').where('id', environmentId).first();
   return !!result;
 }
 
@@ -72,10 +72,8 @@ export async function validateEnvironment(db: any, environment: string): Promise
  * Get all available environments
  */
 export async function getAllEnvironments(db: any): Promise<string[]> {
-  const environments = await db('g_environments')
-    .select('environment')
-    .orderBy('displayOrder', 'asc');
-  return environments.map((e: any) => e.environment);
+  const environments = await db('g_environments').select('id').orderBy('displayOrder', 'asc');
+  return environments.map((e: any) => e.id);
 }
 
 /**
@@ -83,7 +81,7 @@ export async function getAllEnvironments(db: any): Promise<string[]> {
  */
 export async function hasEnvironmentAccess(
   _db: any,
-  _userId: number,
+  _userId: string,
   _environment: string
 ): Promise<boolean> {
   // TODO: Implement environment access control based on user roles and token permissions

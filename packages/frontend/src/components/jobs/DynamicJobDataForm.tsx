@@ -37,7 +37,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   console.log('DynamicJobDataForm received data:', data);
   console.log('DynamicJobDataForm received jobSchema:', jobSchema);
 
-  // 스키마가 변경될 때만 기본값 설정
+  // 스키마가 변경될 때만 Set default values
   useEffect(() => {
     if (!jobSchema || Object.keys(jobSchema).length === 0) return;
 
@@ -45,12 +45,12 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     console.log('Current data:', data);
     console.log('JobSchema:', jobSchema);
 
-    // 기본값이 필요한 필드만 처리
+    // Default values이 필요한 필드만 처리
     const newData = { ...data };
     let hasChanges = false;
 
     Object.entries(jobSchema).forEach(([fieldName, field]) => {
-      // 필드에 값이 없고 기본값이 있는 경우에만 기본값 설정
+      // 필드에 값이 없고 Default values이 있는 경우에만 Set default values
       const currentValue = data[fieldName];
       const hasValue = currentValue !== undefined && currentValue !== null && currentValue !== '';
 
@@ -58,7 +58,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         `Field ${fieldName}: currentValue=${currentValue}, hasValue=${hasValue}, default=${field.default}`
       );
 
-      // 기본값이 있고 현재 값이 없는 경우에만 설정
+      // Default values이 있고 현재 값이 없는 경우에만 Settings
       if (!hasValue && field.default !== undefined) {
         console.log(`Setting default value for ${fieldName}: ${field.default}`);
         newData[fieldName] = field.default;
@@ -72,7 +72,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     if (hasChanges) {
       onChange(newData);
     }
-  }, [jobSchema]); // jobSchema만 의존성으로 설정
+  }, [jobSchema]); // jobSchema만 의존성으로 Settings
 
   const handleFieldChange = (fieldName: string, value: any) => {
     const newData = { ...data, [fieldName]: value };
@@ -258,7 +258,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
                   const parsed = JSON.parse(newValue);
                   handleFieldChange(fieldName, parsed);
                 } catch (error) {
-                  // 유효하지 않은 JSON인 경우 문자열로 저장
+                  // 유효하지 않은 JSON인 경우 문자열로 Save
                   handleFieldChange(fieldName, newValue);
                 }
               }}
@@ -292,13 +292,13 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     );
   }
 
-  // HTTP 요청 타입인지 확인
+  // HTTP Request Type인지 Confirm
   const isHttpRequest =
     Object.keys(jobSchema).includes('url') && Object.keys(jobSchema).includes('method');
   const httpMethod = data.method || 'GET';
   const shouldHideBody = isHttpRequest && httpMethod === 'GET';
 
-  // 필드 순서 정의 (HTTP 요청의 경우)
+  // 필드 순서 정의 (HTTP Request의 경우)
   const getFieldOrder = () => {
     if (isHttpRequest) {
       const orderedFields = ['method', 'url', 'headers', 'body'];
@@ -310,7 +310,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* GET 요청일 때 body 필드가 숨겨졌다는 안내 메시지 */}
+      {/* GET Request일 때 body 필드가 숨겨졌다는 안내 메시지 */}
       {shouldHideBody && jobSchema.body && (
         <Box
           sx={{
@@ -330,7 +330,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
         const field = jobSchema[fieldName];
         if (!field) return null;
 
-        // GET 요청일 때 body 필드 숨기기
+        // GET Request일 때 body 필드 숨기기
         if (shouldHideBody && fieldName === 'body') {
           return null;
         }

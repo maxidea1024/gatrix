@@ -32,7 +32,7 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
 
     protected override string ServiceName => "Survey";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/surveys";
+        $"/api/v1/server/surveys";
     protected override List<Survey> ExtractItems(SurveyListResponse response) => response.Surveys;
     protected override object GetItemId(Survey item) => item.Id;
 
@@ -69,7 +69,7 @@ public class SurveyService : BaseEnvironmentService<Survey, SurveyListResponse>,
             await Task.Delay(100, ct);
 
             var response = await ApiClient.GetAsync<Survey>(
-                $"/api/v1/server/{Uri.EscapeDataString(environment)}/surveys/{Uri.EscapeDataString(id)}", ct: ct);
+                $"/api/v1/server/surveys/{Uri.EscapeDataString(id)}", ct: ct);
 
             if (!response.Success || response.Data is null)
             {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { formatDateTimeDetailed, formatRelativeTime } from '@/utils/dateFormat';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { usePageState } from '../../hooks/usePageState';
@@ -18,42 +18,36 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
-  TextField,
-  InputAdornment,
   IconButton,
+  Chip,
+  TextField,
+  Button,
   Menu,
   MenuItem,
-  Chip,
-  Button,
+  Tabs,
+  Tab,
+  Checkbox,
+  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   LinearProgress,
   Pagination,
-  Tooltip,
-  Tabs,
-  Tab,
-  Box as MuiBox,
-  Checkbox,
-  Drawer,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
-  MoreVert as MoreVertIcon,
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Upload as UploadIcon,
-  Refresh as RefreshIcon,
-  Cancel as CancelIcon,
   Block as BlockIcon,
   CheckCircle as CheckCircleIcon,
-  Close as CloseIcon,
-  Save as SaveIcon,
-  ContentCopy as ContentCopyIcon,
   Security as SecurityIcon,
+  Upload as UploadIcon,
+  ContentCopy as ContentCopyIcon,
+  Close as CloseIcon,
+  MoreVert as MoreVertIcon,
+  Cancel as CancelIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 
 import { useSnackbar } from 'notistack';
@@ -63,9 +57,12 @@ import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
-import EmptyState from '../../components/common/EmptyState';
+import SearchTextField from '@/components/common/SearchTextField';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import ResizableDrawer from '@/components/common/ResizableDrawer';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 
 const WhitelistPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -74,12 +71,12 @@ const WhitelistPage: React.FC = () => {
   const { hasPermission } = useAuth();
 
   // Check if user can manage (create/edit/delete) whitelist entries
-  const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
+  const canManage = hasPermission([P.IP_WHITELIST_UPDATE]);
 
   // Refs for form focus
   const accountIdFieldRef = useRef<HTMLInputElement>(null);
 
-  // 페이지 상태 관리 (localStorage 연동)
+  // 페이지 State management (localStorage 연동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -120,7 +117,7 @@ const WhitelistPage: React.FC = () => {
   // Tab state
   const [currentTab, setCurrentTab] = useState(getInitialTab);
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // Debouncing된 Search어 (500ms 지연)
   const debouncedSearch = useDebounce(pageState.filters?.search || '', 500);
 
   // State
@@ -212,7 +209,7 @@ const WhitelistPage: React.FC = () => {
         console.error('Invalid response structure:', result);
         setWhitelists([]);
         setTotal(0);
-        // 오류 메시지를 사용자에게 표시하지 않음 (서버 응답 구조 문제일 수 있음)
+        // 오류 메시지를 Used자에게 표시하지 않음 (서버 Response 구조 문제일 수 있음)
       }
     } catch (error: any) {
       console.error('Error loading whitelists:', error);
@@ -281,7 +278,7 @@ const WhitelistPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    // selectedWhitelist는 다이얼로그가 닫힐 때까지 유지
+    // selectedWhitelist는 Dialog가 닫힐 때까지 유지
   };
 
   // Toggle whitelist status
@@ -386,7 +383,7 @@ const WhitelistPage: React.FC = () => {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    // 계정 ID 유효성 검사
+    // 계정 ID Validation
     if (
       !formData.accountId ||
       formData.accountId.trim().length < 4 ||
@@ -395,7 +392,7 @@ const WhitelistPage: React.FC = () => {
       errors.accountId = t('whitelist.form.accountIdValidation');
     }
 
-    // 사용목적 필수 검사
+    // Used목적 필수 검사
     if (!formData.purpose || formData.purpose.trim().length === 0) {
       errors.purpose = t('whitelist.form.purposeRequired');
     }
@@ -522,86 +519,49 @@ const WhitelistPage: React.FC = () => {
 
           {/* Tab Content */}
           <Box sx={{ display: currentTab === 0 ? 'block' : 'none' }}>
-            {/* Nickname Whitelist Header */}
-            {canManage && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  gap: 2,
-                  mb: 3,
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  startIcon={<UploadIcon />}
-                  onClick={() => setBulkDialog(true)}
-                >
-                  {t('whitelist.bulkImport')}
-                </Button>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-                  {t('whitelist.addEntry')}
-                </Button>
-              </Box>
-            )}
-
-            {/* Search & Filters */}
-            <Card variant="outlined" sx={{ mb: 3 }}>
-              <CardContent>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 2,
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      gap: 2,
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                    }}
+            {/* Search & Actions Row */}
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                mb: 3,
+                alignItems: 'center',
+              }}
+            >
+              <SearchTextField
+                placeholder={t('whitelist.searchPlaceholder')}
+                value={pageState.filters?.search || ''}
+                onChange={(value) => updateFilters({ search: value })}
+                sx={{ minWidth: 300 }}
+              />
+              {canManage && (
+                <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<UploadIcon />}
+                    onClick={() => setBulkDialog(true)}
                   >
-                    <TextField
-                      placeholder={t('whitelist.searchPlaceholder')}
-                      value={pageState.filters?.search || ''}
-                      onChange={handleSearchChange}
-                      size="small"
-                      slotProps={{
-                        input: {
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchIcon />
-                            </InputAdornment>
-                          ),
-                        },
-                      }}
-                      sx={{ minWidth: 300 }}
-                    />
-                  </Box>
+                    {t('whitelist.bulkImport')}
+                  </Button>
+                  <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+                    {t('whitelist.addEntry')}
+                  </Button>
                 </Box>
-              </CardContent>
-            </Card>
+              )}
+            </Box>
 
             {/* Nickname Whitelist Table */}
-            <Card variant="outlined">
-              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                {loading ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                    <Typography color="text.secondary">{t('common.loadingWhitelist')}</Typography>
-                  </Box>
-                ) : whitelists.length === 0 ? (
-                  <EmptyState
-                    message={t('whitelist.noEntries')}
-                    subtitle={canManage ? t('common.addFirstItem') : undefined}
-                    onAddClick={canManage ? handleAdd : undefined}
-                    addButtonLabel={t('whitelist.addEntry')}
-                  />
-                ) : (
-                  <>
+            <PageContentLoader loading={loading}>
+              {whitelists.length === 0 ? (
+                <EmptyPagePlaceholder
+                  message={t('whitelist.noEntries')}
+                  subtitle={canManage ? t('common.addFirstItem') : undefined}
+                  onAddClick={canManage ? handleAdd : undefined}
+                  addButtonLabel={t('whitelist.addEntry')}
+                />
+              ) : (
+                <Card variant="outlined">
+                  <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
                     <TableContainer>
                       <Table>
                         <TableHead>
@@ -750,9 +710,11 @@ const WhitelistPage: React.FC = () => {
                                 </Box>
                               </TableCell>
                               <TableCell>
-                                <Typography variant="body2">
-                                  {formatDateTimeDetailed(whitelist.createdAt)}
-                                </Typography>
+                                <Tooltip title={formatDateTimeDetailed(whitelist.createdAt)}>
+                                  <Typography variant="body2">
+                                    {formatRelativeTime(whitelist.createdAt)}
+                                  </Typography>
+                                </Tooltip>
                               </TableCell>
                               <TableCell align="center">
                                 <IconButton
@@ -775,10 +737,10 @@ const WhitelistPage: React.FC = () => {
                       onRowsPerPageChange={handleChangeRowsPerPage}
                       rowsPerPageOptions={[5, 10, 25, 50, 100]}
                     />
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              )}
+            </PageContentLoader>
 
             {/* Action Menu */}
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
@@ -812,8 +774,7 @@ const WhitelistPage: React.FC = () => {
             </Menu>
 
             {/* Add/Edit Drawer */}
-            <Drawer
-              anchor="right"
+            <ResizableDrawer
               open={addDialog || editDialog}
               onClose={() => {
                 setSelectedWhitelist(null);
@@ -821,167 +782,92 @@ const WhitelistPage: React.FC = () => {
                 setAddDialog(false);
                 setEditDialog(false);
               }}
-              sx={{
-                zIndex: 1301,
-                '& .MuiDrawer-paper': {
-                  width: { xs: '100%', sm: 500 },
-                  maxWidth: '100vw',
-                  display: 'flex',
-                  flexDirection: 'column',
-                },
-              }}
+              title={editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
+              subtitle={
+                editDialog
+                  ? t('whitelist.dialog.editDescription')
+                  : t('whitelist.dialog.addDescription')
+              }
+              storageKey="whitelistDrawerWidth"
+              defaultWidth={500}
+              minWidth={400}
             >
-              {/* Header */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  p: 2,
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: 'background.paper',
-                }}
-              >
-                <Box>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-                    {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {editDialog
-                      ? t('whitelist.dialog.editDescription')
-                      : t('whitelist.dialog.addDescription')}
-                  </Typography>
-                </Box>
-                <IconButton
-                  onClick={() => {
-                    setSelectedWhitelist(null);
-                    setAddDialog(false);
-                    setEditDialog(false);
-                  }}
-                  size="small"
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-
               {/* Content */}
               <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <Box>
-                    <TextField
-                      fullWidth
-                      label={t('whitelist.form.accountId')}
-                      value={formData.accountId}
-                      onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
-                      required
-                      placeholder={t('whitelist.form.accountIdPlaceholder')}
-                      error={!!formErrors.accountId}
-                      helperText={formErrors.accountId || t('whitelist.form.accountIdHelp')}
-                      inputRef={accountIdFieldRef}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mt: 0.5, display: 'block' }}
-                    >
-                      {t('whitelist.form.accountIdHelp')}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <TextField
-                      fullWidth
-                      label={t('whitelist.form.ipAddressOpt')}
-                      value={formData.ipAddress}
-                      onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-                      placeholder={t('whitelist.form.ipPlaceholder')}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mt: 0.5, display: 'block' }}
-                    >
-                      {t('whitelist.form.ipHelp')}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <DatePicker
-                      key={`start-date-${i18n.language}`}
-                      label={t('whitelist.form.startDateOpt')}
-                      value={formData.startDate ? dayjs(formData.startDate) : null}
-                      onChange={(date) => {
-                        setFormData({
-                          ...formData,
-                          startDate: date && dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : '',
-                        });
-                      }}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: false,
-                        },
-                        popper: {
-                          style: {
-                            zIndex: 9999,
-                          },
-                        },
-                      }}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mt: 0.5, display: 'block' }}
-                    >
-                      {t('whitelist.form.startDateHelp')}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <DatePicker
-                      key={`end-date-${i18n.language}`}
-                      label={t('whitelist.form.endDateOpt')}
-                      value={formData.endDate ? dayjs(formData.endDate) : null}
-                      onChange={(date) =>
-                        setFormData({
-                          ...formData,
-                          endDate: date ? date.format('YYYY-MM-DD') : '',
-                        })
-                      }
-                      slotProps={{
-                        textField: { fullWidth: true },
-                        popper: {
-                          style: {
-                            zIndex: 9999,
-                          },
-                        },
-                      }}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mt: 0.5, display: 'block' }}
-                    >
-                      {t('whitelist.form.endDateHelp')}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <TextField
-                      fullWidth
-                      label={t('whitelist.form.purpose')}
-                      value={formData.purpose}
-                      onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                      multiline
-                      rows={3}
-                      placeholder={t('whitelist.form.purposePlaceholder')}
-                      required
-                      error={!!formErrors.purpose}
-                      helperText={formErrors.purpose || t('whitelist.form.purposeHelp')}
-                    />
-                  </Box>
+                  <TextField
+                    fullWidth
+                    label={t('whitelist.form.accountId')}
+                    value={formData.accountId}
+                    onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                    required
+                    placeholder={t('whitelist.form.accountIdPlaceholder')}
+                    error={!!formErrors.accountId}
+                    helperText={formErrors.accountId || t('whitelist.form.accountIdHelp')}
+                    inputRef={accountIdFieldRef}
+                  />
+                  <TextField
+                    fullWidth
+                    label={t('whitelist.form.ipAddressOpt')}
+                    value={formData.ipAddress}
+                    onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
+                    placeholder={t('whitelist.form.ipPlaceholder')}
+                    helperText={t('whitelist.form.ipHelp')}
+                  />
+                  <DateTimePicker
+                    key={`start-date-${i18n.language}`}
+                    label={t('whitelist.form.startDateOpt')}
+                    value={formData.startDate ? dayjs(formData.startDate) : null}
+                    onChange={(date) => {
+                      setFormData({
+                        ...formData,
+                        startDate:
+                          date && dayjs.isDayjs(date) && date.isValid() ? date.toISOString() : '',
+                      });
+                    }}
+                    timeSteps={{ minutes: 1 }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: false,
+                        slotProps: { input: { readOnly: true } },
+                        helperText: t('whitelist.form.startDateHelp'),
+                      },
+                    }}
+                  />
+                  <DateTimePicker
+                    key={`end-date-${i18n.language}`}
+                    label={t('whitelist.form.endDateOpt')}
+                    value={formData.endDate ? dayjs(formData.endDate) : null}
+                    onChange={(date) =>
+                      setFormData({
+                        ...formData,
+                        endDate:
+                          date && dayjs.isDayjs(date) && date.isValid() ? date.toISOString() : '',
+                      })
+                    }
+                    minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
+                    timeSteps={{ minutes: 1 }}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        slotProps: { input: { readOnly: true } },
+                        helperText: t('whitelist.form.endDateHelp'),
+                      },
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    label={t('whitelist.form.purpose')}
+                    value={formData.purpose}
+                    onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                    multiline
+                    rows={3}
+                    placeholder={t('whitelist.form.purposePlaceholder')}
+                    required
+                    error={!!formErrors.purpose}
+                    helperText={formErrors.purpose || t('whitelist.form.purposeHelp')}
+                  />
                 </Box>
               </Box>
 
@@ -993,7 +879,7 @@ const WhitelistPage: React.FC = () => {
                   borderColor: 'divider',
                   bgcolor: 'background.paper',
                   display: 'flex',
-                  gap: 2,
+                  gap: 1,
                   justifyContent: 'flex-end',
                 }}
               >
@@ -1003,69 +889,30 @@ const WhitelistPage: React.FC = () => {
                     setAddDialog(false);
                     setEditDialog(false);
                   }}
-                  startIcon={<CancelIcon />}
-                  variant="outlined"
                 >
                   {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={handleSave}
                   variant="contained"
-                  startIcon={<SaveIcon />}
                   disabled={loading || (editDialog && !!selectedWhitelist && !isDirty)}
                 >
-                  {editDialog && selectedWhitelist
-                    ? t('whitelist.dialog.update')
-                    : t('whitelist.dialog.add')}
+                  {t('common.save')}
                 </Button>
               </Box>
-            </Drawer>
+            </ResizableDrawer>
 
             {/* Bulk Import Drawer */}
-            <Drawer
-              anchor="right"
+            <ResizableDrawer
               open={bulkDialog}
               onClose={() => setBulkDialog(false)}
-              sx={{
-                zIndex: 1301,
-                '& .MuiDrawer-paper': {
-                  width: { xs: '100%', sm: 600 },
-                  maxWidth: '100vw',
-                  display: 'flex',
-                  flexDirection: 'column',
-                },
-              }}
+              title={t('whitelist.dialog.bulkTitle')}
+              storageKey="whitelistBulkDrawerWidth"
+              defaultWidth={600}
+              minWidth={450}
             >
-              {/* Header */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  p: 2,
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: 'background.paper',
-                }}
-              >
-                <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-                  {t('whitelist.dialog.bulkTitle')}
-                </Typography>
-                <IconButton
-                  onClick={() => setBulkDialog(false)}
-                  size="small"
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-
               {/* Content */}
-              <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+              <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {t('whitelist.dialog.bulkHint1')}
@@ -1092,83 +939,28 @@ const WhitelistPage: React.FC = () => {
                   borderColor: 'divider',
                   bgcolor: 'background.paper',
                   display: 'flex',
-                  gap: 2,
+                  gap: 1,
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button onClick={() => setBulkDialog(false)} variant="outlined">
-                  {t('common.cancel')}
-                </Button>
+                <Button onClick={() => setBulkDialog(false)}>{t('common.cancel')}</Button>
                 <Button onClick={handleBulkCreate} variant="contained" startIcon={<UploadIcon />}>
                   {t('whitelist.dialog.import')}
                 </Button>
               </Box>
-            </Drawer>
+            </ResizableDrawer>
 
-            {/* Confirmation Drawer */}
-            <Drawer
-              anchor="right"
+            {/* Confirmation Dialog */}
+            <Dialog
               open={confirmDialog.open}
               onClose={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
-              sx={{
-                zIndex: 1301,
-                '& .MuiDrawer-paper': {
-                  width: { xs: '100%', sm: 400 },
-                  maxWidth: '100vw',
-                  display: 'flex',
-                  flexDirection: 'column',
-                },
-              }}
             >
-              {/* Header */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  p: 2,
-                  borderBottom: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: 'background.paper',
-                }}
-              >
-                <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-                  {confirmDialog.title}
-                </Typography>
-                <IconButton
-                  onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
-                  size="small"
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-
-              {/* Content */}
-              <Box sx={{ flex: 1, p: 2 }}>
+              <DialogTitle>{confirmDialog.title}</DialogTitle>
+              <DialogContent>
                 <Typography>{confirmDialog.message}</Typography>
-              </Box>
-
-              {/* Footer */}
-              <Box
-                sx={{
-                  p: 2,
-                  borderTop: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: 'background.paper',
-                  display: 'flex',
-                  gap: 2,
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <Button
-                  onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}
-                  variant="outlined"
-                >
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setConfirmDialog((prev) => ({ ...prev, open: false }))}>
                   {t('common.cancel')}
                 </Button>
                 <Button
@@ -1179,8 +971,8 @@ const WhitelistPage: React.FC = () => {
                 >
                   {t('common.confirm')}
                 </Button>
-              </Box>
-            </Drawer>
+              </DialogActions>
+            </Dialog>
           </Box>
 
           <Box sx={{ display: currentTab === 1 ? 'block' : 'none' }}>

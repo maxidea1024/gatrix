@@ -33,6 +33,7 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
 import { useEntityLock } from '../../hooks/useEntityLock';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface StoreProductFormDrawerProps {
   open: boolean;
@@ -66,6 +67,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   const { currentEnvironment } = useEnvironment();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const navigate = useNavigate();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // Form state
   const [productId, setProductId] = useState('');
@@ -110,7 +113,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
     const loadTags = async () => {
       try {
         setLoadingTags(true);
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -262,7 +265,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
 
       if (product && product.id) {
         // Update existing product
-        const result = await storeProductService.updateStoreProduct(product.id, payload);
+        const result = await storeProductService.updateStoreProduct(
+          projectApiPath,
+          product.id,
+          payload
+        );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
@@ -272,7 +279,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         }
       } else {
         // Create new product
-        const result = await storeProductService.createStoreProduct(payload);
+        const result = await storeProductService.createStoreProduct(projectApiPath, payload);
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
@@ -474,9 +481,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   <TextField
                     type="number"
                     value={price}
-                    onChange={(e) =>
-                      setPrice(e.target.value === '' ? '' : parseFloat(e.target.value) || 0)
-                    }
+                    onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
                     fullWidth
                     size="small"
                     inputProps={{ min: 0, step: 0.01, readOnly: isEditMode }}

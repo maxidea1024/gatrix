@@ -44,7 +44,7 @@ import changeRequestService, {
   ChangeRequestStatus,
 } from '@/services/changeRequestService';
 import SimplePagination from '@/components/common/SimplePagination';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import ChangeRequestDetailDrawer from '@/components/admin/ChangeRequestDetailDrawer';
 import RevertPreviewDrawer from '@/components/admin/RevertPreviewDrawer';
 import { formatChangeRequestTitle } from '@/utils/changeRequestFormatter';
@@ -180,7 +180,7 @@ const JsonDiffView: React.FC<{ before?: any; after?: any }> = ({ before, after }
           </TableHead>
           <TableBody>
             {changes.map((change) => (
-              <TableRow key={change.field}>
+              <TableRow key={change.field} hover>
                 <TableCell sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
                   {change.field}
                 </TableCell>
@@ -692,7 +692,7 @@ const ChangeRequestsPage: React.FC = () => {
         </Button>
       </Box>
 
-      <Card>
+      <Card variant="outlined">
         <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
           {/* Status Tabs */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
@@ -728,7 +728,7 @@ const ChangeRequestsPage: React.FC = () => {
           {isLoading && <LinearProgress />}
 
           {!isLoading && (!data?.items || data.items.length === 0) ? (
-            <EmptyState message={t('changeRequest.noRequests')} />
+            <EmptyPagePlaceholder message={t('changeRequest.noRequests')} />
           ) : (
             <>
               <TableContainer>

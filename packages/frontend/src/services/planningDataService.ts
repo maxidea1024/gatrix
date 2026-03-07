@@ -105,9 +105,9 @@ class PlanningDataService {
   /**
    * Get reward lookup data
    */
-  async getRewardLookup(): Promise<RewardLookupData> {
+  async getRewardLookup(projectApiPath: string): Promise<RewardLookupData> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/reward-lookup', {
+    const response = await api.get(`${projectApiPath}/planning-data/reward-lookup`, {
       params: { lang },
     });
     return response.data;
@@ -116,8 +116,8 @@ class PlanningDataService {
   /**
    * Get reward type list
    */
-  async getRewardTypeList(): Promise<RewardTypeInfo[]> {
-    const response = await api.get('/admin/planning-data/reward-types');
+  async getRewardTypeList(projectApiPath: string): Promise<RewardTypeInfo[]> {
+    const response = await api.get(`${projectApiPath}/planning-data/reward-types`);
     return response.data;
   }
 
@@ -127,34 +127,38 @@ class PlanningDataService {
    * @param language - Language code (kr, en, zh)
    */
   async getRewardTypeItems(
+    projectApiPath: string,
     rewardType: number,
     language?: 'kr' | 'en' | 'zh'
   ): Promise<RewardItem[]> {
     const lang = language || this.getCurrentLanguage();
-    const response = await api.get(`/admin/planning-data/reward-types/${rewardType}/items`, {
-      params: { lang },
-    });
+    const response = await api.get(
+      `${projectApiPath}/planning-data/reward-types/${rewardType}/items`,
+      {
+        params: { lang },
+      }
+    );
     return response.data;
   }
 
   /**
    * Rebuild reward lookup data
    */
-  async rebuildRewardLookup(): Promise<{
+  async rebuildRewardLookup(projectApiPath: string): Promise<{
     success: boolean;
     message: string;
     stats?: any;
   }> {
-    const response = await api.post('/admin/planning-data/rebuild');
+    const response = await api.post(`${projectApiPath}/planning-data/rebuild`);
     return response.data;
   }
 
   /**
    * Get UI list data (nations, towns, villages, etc.)
    */
-  async getUIListData(): Promise<UIListData> {
+  async getUIListData(projectApiPath: string): Promise<UIListData> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/ui-list', {
+    const response = await api.get(`${projectApiPath}/planning-data/ui-list`, {
       params: { lang },
     });
     return response.data;
@@ -164,9 +168,9 @@ class PlanningDataService {
    * Get items for a specific UI list category
    * @param category - Category name (nations, towns, villages, ships, mates, etc.)
    */
-  async getUIListItems(category: string): Promise<any[]> {
+  async getUIListItems(projectApiPath: string, category: string): Promise<any[]> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get(`/admin/planning-data/ui-list/${category}/items`, {
+    const response = await api.get(`${projectApiPath}/planning-data/ui-list/${category}/items`, {
       params: { lang },
     });
     return response.data;
@@ -175,17 +179,17 @@ class PlanningDataService {
   /**
    * Get planning data statistics
    */
-  async getStats(): Promise<PlanningDataStats> {
-    const response = await api.get('/admin/planning-data/stats');
+  async getStats(projectApiPath: string): Promise<PlanningDataStats> {
+    const response = await api.get(`${projectApiPath}/planning-data/stats`);
     return response.data;
   }
 
   /**
    * Get HotTimeBuff lookup data
    */
-  async getHotTimeBuffLookup(): Promise<HotTimeBuffLookup> {
+  async getHotTimeBuffLookup(projectApiPath: string): Promise<HotTimeBuffLookup> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/hottimebuff', {
+    const response = await api.get(`${projectApiPath}/planning-data/hottimebuff`, {
       params: { lang },
     });
     // api.get() returns { success, data: { totalCount, items }, message }
@@ -196,21 +200,21 @@ class PlanningDataService {
   /**
    * Build HotTimeBuff lookup data
    */
-  async buildHotTimeBuffLookup(): Promise<{
+  async buildHotTimeBuffLookup(projectApiPath: string): Promise<{
     success: boolean;
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post('/admin/planning-data/hottimebuff/build');
+    const response = await api.post(`${projectApiPath}/planning-data/hottimebuff/build`);
     return response.data;
   }
 
   /**
    * Get EventPage lookup data
    */
-  async getEventPageLookup(): Promise<any> {
+  async getEventPageLookup(projectApiPath: string): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/eventpage', {
+    const response = await api.get(`${projectApiPath}/planning-data/eventpage`, {
       params: { lang },
     });
     // api.get() returns { success, data: { totalCount, items }, message }
@@ -221,21 +225,21 @@ class PlanningDataService {
   /**
    * Build EventPage lookup data
    */
-  async buildEventPageLookup(): Promise<{
+  async buildEventPageLookup(projectApiPath: string): Promise<{
     success: boolean;
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post('/admin/planning-data/eventpage/build');
+    const response = await api.post(`${projectApiPath}/planning-data/eventpage/build`);
     return response.data;
   }
 
   /**
    * Get LiveEvent lookup data
    */
-  async getLiveEventLookup(): Promise<any> {
+  async getLiveEventLookup(projectApiPath: string): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/liveevent', {
+    const response = await api.get(`${projectApiPath}/planning-data/liveevent`, {
       params: { lang },
     });
     // api.get() returns { success, data: { totalCount, items }, message }
@@ -246,21 +250,21 @@ class PlanningDataService {
   /**
    * Build LiveEvent lookup data
    */
-  async buildLiveEventLookup(): Promise<{
+  async buildLiveEventLookup(projectApiPath: string): Promise<{
     success: boolean;
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post('/admin/planning-data/liveevent/build');
+    const response = await api.post(`${projectApiPath}/planning-data/liveevent/build`);
     return response.data;
   }
 
   /**
    * Get MateRecruitingGroup lookup data
    */
-  async getMateRecruitingGroupLookup(): Promise<any> {
+  async getMateRecruitingGroupLookup(projectApiPath: string): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/materecruiting', {
+    const response = await api.get(`${projectApiPath}/planning-data/materecruiting`, {
       params: { lang },
     });
     return response.data;
@@ -269,21 +273,21 @@ class PlanningDataService {
   /**
    * Build MateRecruitingGroup lookup data
    */
-  async buildMateRecruitingGroupLookup(): Promise<{
+  async buildMateRecruitingGroupLookup(projectApiPath: string): Promise<{
     success: boolean;
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post('/admin/planning-data/materecruiting/build');
+    const response = await api.post(`${projectApiPath}/planning-data/materecruiting/build`);
     return response.data;
   }
 
   /**
    * Get OceanNpcAreaSpawner lookup data
    */
-  async getOceanNpcAreaSpawnerLookup(): Promise<any> {
+  async getOceanNpcAreaSpawnerLookup(projectApiPath: string): Promise<any> {
     const lang = this.getCurrentLanguage();
-    const response = await api.get('/admin/planning-data/oceannpcarea', {
+    const response = await api.get(`${projectApiPath}/planning-data/oceannpcarea`, {
       params: { lang },
     });
     return response.data;
@@ -292,12 +296,12 @@ class PlanningDataService {
   /**
    * Build OceanNpcAreaSpawner lookup data
    */
-  async buildOceanNpcAreaSpawnerLookup(): Promise<{
+  async buildOceanNpcAreaSpawnerLookup(projectApiPath: string): Promise<{
     success: boolean;
     message: string;
     itemCount: number;
   }> {
-    const response = await api.post('/admin/planning-data/oceannpcarea/build');
+    const response = await api.post(`${projectApiPath}/planning-data/oceannpcarea/build`);
     return response.data;
   }
 
@@ -308,6 +312,7 @@ class PlanningDataService {
    * @param forceUpload - Force upload even if data hasn't changed
    */
   async uploadPlanningData(
+    projectApiPath: string,
     files: File[],
     comment?: string,
     forceUpload?: boolean
@@ -335,7 +340,7 @@ class PlanningDataService {
       formData.append('forceUpload', 'true');
     }
 
-    const response = await api.post('/admin/planning-data/upload', formData, {
+    const response = await api.post(`${projectApiPath}/planning-data/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -349,6 +354,7 @@ class PlanningDataService {
    * Compares uploaded files with cached data without saving
    */
   async previewDiff(
+    projectApiPath: string,
     files: File[],
     onProgress?: (progress: number) => void
   ): Promise<PreviewDiffResult> {
@@ -357,7 +363,7 @@ class PlanningDataService {
       formData.append('files', file);
     });
 
-    const response = await api.post('/admin/planning-data/preview-diff', formData, {
+    const response = await api.post(`${projectApiPath}/planning-data/preview-diff`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -375,8 +381,8 @@ class PlanningDataService {
   /**
    * Get upload history
    */
-  async getUploadHistory(limit: number = 20): Promise<UploadRecord[]> {
-    const response = await api.get('/admin/planning-data/history', {
+  async getUploadHistory(projectApiPath: string, limit: number = 20): Promise<UploadRecord[]> {
+    const response = await api.get(`${projectApiPath}/planning-data/history`, {
       params: { limit },
     });
     return response.data;
@@ -385,16 +391,16 @@ class PlanningDataService {
   /**
    * Get latest upload record
    */
-  async getLatestUpload(): Promise<UploadRecord | null> {
-    const response = await api.get('/admin/planning-data/latest');
+  async getLatestUpload(projectApiPath: string): Promise<UploadRecord | null> {
+    const response = await api.get(`${projectApiPath}/planning-data/latest`);
     return response.data;
   }
 
   /**
    * Reset all upload history
    */
-  async resetUploadHistory(): Promise<{ deletedCount: number }> {
-    const response = await api.delete('/admin/planning-data/history');
+  async resetUploadHistory(projectApiPath: string): Promise<{ deletedCount: number }> {
+    const response = await api.delete(`${projectApiPath}/planning-data/history`);
     return response.data;
   }
 }

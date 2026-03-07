@@ -3,7 +3,9 @@ import ClientVersionService from '../services/ClientVersionService';
 import { ClientVersionModel } from '../models/ClientVersion';
 import VarsModel from '../models/Vars';
 import { TagService } from '../services/TagService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ServerClientVersionController');
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import { EnvironmentRequest } from '../middleware/environmentResolver';
@@ -21,9 +23,9 @@ export class ServerClientVersionController {
    */
   static async getClientVersions(req: EnvironmentRequest, res: Response) {
     try {
-      const environment = req.environment;
+      const environmentId = req.environmentId;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -34,12 +36,12 @@ export class ServerClientVersionController {
       }
 
       await respondWithEtagCache(res, {
-        cacheKey: `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment}`,
+        cacheKey: `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environmentId}`,
         ttlMs: DEFAULT_CONFIG.CLIENT_VERSION_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
           const result = await ClientVersionModel.findAll({
-            environment: environment,
+            environmentId: environmentId,
             limit: 1000,
             offset: 0,
             sortBy: 'clientVersion',
@@ -49,7 +51,7 @@ export class ServerClientVersionController {
           // Get clientVersionPassiveData from KV settings
           let passiveDataStr: string | null = null;
           try {
-            passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
+            passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
           } catch (error) {
             logger.warn('Failed to fetch clientVersionPassiveData for Server SDK:', error);
           }
@@ -93,7 +95,7 @@ export class ServerClientVersionController {
               const mergedMeta = { ...passiveData, ...customPayload };
 
               // Remove internal fields from response
-              const { environment: _env, ...versionWithoutEnv } = version;
+              const { environmentId: _env, ...versionWithoutEnv } = version;
               void _env;
 
               return {
@@ -105,7 +107,7 @@ export class ServerClientVersionController {
           );
 
           logger.info(
-            `Server SDK: Retrieved ${versionsWithTags.length} client versions for environment ${environment}`
+            `Server SDK: Retrieved ${versionsWithTags.length} client versions for environmentId ${environmentId}`
           );
 
           return {
@@ -136,10 +138,10 @@ export class ServerClientVersionController {
   static async getClientVersionById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
-      const environment = req.environment;
-      const versionId = parseInt(id);
+      const environmentId = req.environmentId;
+      const versionId = id;
 
-      if (!environment) {
+      if (!environmentId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -149,7 +151,7 @@ export class ServerClientVersionController {
         });
       }
 
-      if (isNaN(versionId)) {
+      if (!versionId) {
         return res.status(400).json({
           success: false,
           error: {
@@ -160,7 +162,7 @@ export class ServerClientVersionController {
         });
       }
 
-      const version = await ClientVersionService.getClientVersionById(versionId, environment);
+      const version = await ClientVersionService.getClientVersionById(versionId, environmentId);
 
       if (!version) {
         return res.status(404).json({
@@ -178,7 +180,7 @@ export class ServerClientVersionController {
       // Get clientVersionPassiveData from KV settings and resolve by version
       let passiveData = {};
       try {
-        const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment);
+        const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
         passiveData = resolvePassiveData(passiveDataStr, version.clientVersion);
       } catch (error) {
         logger.warn('Failed to resolve clientVersionPassiveData for Server SDK (Single):', error);
@@ -214,7 +216,7 @@ export class ServerClientVersionController {
       const mergedMeta = { ...passiveData, ...customPayload };
 
       logger.info(
-        `Server SDK: Retrieved client version ${versionId} for environment ${environment}`
+        `Server SDK: Retrieved client version ${versionId} for environmentId ${environmentId}`
       );
 
       res.json({

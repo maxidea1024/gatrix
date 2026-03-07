@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Button,
@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { varsService, VarItem } from '@/services/varsService';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
@@ -38,13 +38,16 @@ import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const KeyValuePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
   const { currentEnvironmentId } = useEnvironment();
-  const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+  const canManage = hasPermission([P.SYSTEM_SETTINGS_UPDATE]);
 
   const [items, setItems] = useState<VarItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,7 +66,7 @@ const KeyValuePage: React.FC = () => {
   const loadItems = async () => {
     setLoading(true);
     try {
-      const data = await varsService.getAllKV();
+      const data = await varsService.getAllKV(projectApiPath);
       setItems(data);
     } catch (error: any) {
       enqueueSnackbar(parseApiErrorMessage(error, 'settings.kv.loadFailed'), {
@@ -170,7 +173,7 @@ const KeyValuePage: React.FC = () => {
 
     const keyName = deleteConfirm.item.varKey.replace('kv:', '');
     try {
-      await varsService.deleteKV(keyName);
+      await varsService.deleteKV(projectApiPath, keyName);
       enqueueSnackbar(t('settings.kv.deleteSuccess', { key: keyName }), {
         variant: 'success',
       });
@@ -260,21 +263,20 @@ const KeyValuePage: React.FC = () => {
         )}
       </Box>
 
-      {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading && items.length === 0 ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : items.length === 0 ? (
-            <EmptyState
-              message={t('settings.kv.noItems')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('settings.kv.create')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
+      {loading && items.length === 0 ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+          <Typography color="text.secondary">{t('common.loadingData')}</Typography>
+        </Box>
+      ) : items.length === 0 ? (
+        <EmptyPagePlaceholder
+          message={t('settings.kv.noItems')}
+          onAddClick={canManage ? handleCreate : undefined}
+          addButtonLabel={t('settings.kv.create')}
+          subtitle={canManage ? t('common.addFirstItem') : undefined}
+        />
+      ) : (
+        <Card variant="outlined">
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -400,9 +402,9 @@ const KeyValuePage: React.FC = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Form Drawer */}
       <KeyValueFormDrawer

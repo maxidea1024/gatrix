@@ -17,7 +17,7 @@ export interface UsePageStateOptions {
 export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // URL params에서 초기 상태를 즉시 읽어서 설정 (렌더링 전에 실행)
+  // URL params에서 초기 Status를 즉시 읽어서 Settings (렌더링 전에 실행)
   const [pageState, setPageState] = useState<PageState>(() => {
     try {
       const page = parseInt(searchParams.get('page') || '1');
@@ -52,14 +52,14 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
     }
   });
 
-  // URL params에 상태 저장
+  // URL params에 Status Save
   const savePageState = useCallback(
     (newState: Partial<PageState>) => {
       const updatedState = { ...pageState, ...newState };
       setPageState(updatedState);
 
       try {
-        // URL params 생성
+        // URL params Create
         const params = new URLSearchParams();
 
         // page, limit, sortBy, sortOrder 추가
@@ -99,7 +99,7 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
     [pageState, setSearchParams]
   );
 
-  // 개별 상태 업데이트 함수들
+  // 개별 Update state 함수들
   const updatePage = useCallback(
     (page: number) => {
       savePageState({ page });
@@ -116,14 +116,14 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
 
   const updateSort = useCallback(
     (sortBy: string, sortOrder: 'ASC' | 'DESC') => {
-      savePageState({ sortBy, sortOrder, page: 1 }); // 정렬 변경 시 첫 페이지로
+      savePageState({ sortBy, sortOrder, page: 1 }); // Sorting 변경 시 첫 페이지로
     },
     [savePageState]
   );
 
   const updateFilters = useCallback(
     (filters: Record<string, any>) => {
-      savePageState({ filters, page: 1 }); // 필터 변경 시 첫 페이지로
+      savePageState({ filters, page: 1 }); // Filter 변경 시 첫 페이지로
     },
     [savePageState]
   );

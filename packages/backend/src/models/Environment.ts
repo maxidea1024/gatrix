@@ -5,12 +5,7 @@ import { ulid } from 'ulid';
 // Environment type classification
 export type EnvironmentType = 'development' | 'staging' | 'production';
 
-// System-defined environment names that cannot be deleted or modified
-export const SYSTEM_DEFINED_ENVIRONMENTS = ['development', 'qa', 'production'] as const;
-export type SystemDefinedEnvironment = (typeof SYSTEM_DEFINED_ENVIRONMENTS)[number];
-
 export interface EnvironmentData {
-  environment: string;
   displayName: string;
   description?: string;
   environmentType: EnvironmentType;
@@ -18,24 +13,25 @@ export interface EnvironmentData {
   isHidden: boolean;
   displayOrder: number;
   color: string;
-  projectId?: string; // ULID
+  projectId: string; // ULID
   isDefault: boolean;
   requiresApproval: boolean;
   requiredApprovers: number;
   strictConflictCheck?: boolean; // CR version conflict check strictness
   enableSoftLock?: boolean; // Soft lock for concurrent editing
   enableHardLock?: boolean; // Hard lock warning for pending CRs
-  createdBy: number;
-  updatedBy?: number;
+  createdBy: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export class Environment extends Model implements EnvironmentData {
   static tableName = 'g_environments';
-  static idColumn = 'environment';
+  static idColumn = 'id';
 
-  environment!: string;
+  id!: string;
+
   displayName!: string;
   description?: string;
   environmentType!: EnvironmentType;
@@ -43,15 +39,15 @@ export class Environment extends Model implements EnvironmentData {
   isHidden!: boolean;
   displayOrder!: number;
   color!: string;
-  projectId?: string; // ULID
+  projectId!: string; // ULID
   isDefault!: boolean;
   requiresApproval!: boolean;
   requiredApprovers!: number;
   strictConflictCheck?: boolean; // CR version conflict check strictness
   enableSoftLock?: boolean; // Soft lock for concurrent editing
   enableHardLock?: boolean; // Hard lock warning for pending CRs
-  createdBy!: number;
-  updatedBy?: number;
+  createdBy!: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -63,14 +59,9 @@ export class Environment extends Model implements EnvironmentData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['environment', 'displayName', 'createdBy'],
+      required: ['displayName'],
+
       properties: {
-        environment: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 100,
-          pattern: '^[a-z0-9_-]+$', // Only lowercase, numbers, underscore, hyphen
-        },
         displayName: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: ['string', 'null'], maxLength: 1000 },
         environmentType: {
@@ -81,15 +72,15 @@ export class Environment extends Model implements EnvironmentData {
         isHidden: { type: 'boolean' },
         displayOrder: { type: 'integer', minimum: 0 },
         color: { type: 'string', maxLength: 7, pattern: '^#[0-9A-Fa-f]{6}$' },
-        projectId: { type: ['string', 'null'], minLength: 26, maxLength: 26 }, // ULID
+        projectId: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
         isDefault: { type: 'boolean' },
         requiresApproval: { type: 'boolean' },
         requiredApprovers: { type: 'integer', minimum: 1, maximum: 10 },
         strictConflictCheck: { type: 'boolean' },
         enableSoftLock: { type: 'boolean' },
         enableHardLock: { type: 'boolean' },
-        createdBy: { type: 'integer' },
-        updatedBy: { type: ['integer', 'null'] },
+        createdBy: { type: 'string' },
+        updatedBy: { type: ['string', 'null'] },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' },
       },
@@ -127,6 +118,9 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   $beforeInsert() {
+    if (!this.id) {
+      this.id = ulid();
+    }
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -144,17 +138,17 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
-   * Get environment by name
+   * Get environment by ID (ULID)
    */
-  static async getByName(environment: string): Promise<Environment | undefined> {
-    return await this.query().where('environment', environment).first();
+  static async getById(id: string): Promise<Environment | undefined> {
+    return await this.query().findById(id);
   }
 
   /**
    * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
   static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
-    const query = this.query().orderBy('displayOrder', 'asc').orderBy('environment');
+    const query = this.query().orderBy('displayOrder', 'asc').orderBy('displayName');
 
     if (!includeHidden) {
       query.where('isHidden', false);
@@ -205,17 +199,13 @@ export class Environment extends Model implements EnvironmentData {
   static async createEnvironment(
     data: Omit<EnvironmentData, 'createdAt' | 'updatedAt'>
   ): Promise<Environment> {
-    // Validate environment name
-    if (!this.isValidEnvironmentName(data.environment)) {
-      throw new Error(
-        'Invalid environment name. Use only lowercase letters, numbers, underscore, and hyphen.'
-      );
-    }
-
-    // Check if environment already exists
-    const existing = await this.getByName(data.environment);
+    // Check if environment with same displayName already exists in same project
+    const existing = await this.query()
+      .where('displayName', data.displayName)
+      .where('projectId', data.projectId)
+      .first();
     if (existing) {
-      throw new Error(`Environment '${data.environment}' already exists`);
+      throw new Error(`Environment '${data.displayName}' already exists`);
     }
 
     // If this is set as default, unset other defaults
@@ -229,7 +219,7 @@ export class Environment extends Model implements EnvironmentData {
   /**
    * Update environment
    */
-  async updateEnvironment(data: Partial<EnvironmentData>, updatedBy: number): Promise<Environment> {
+  async updateEnvironment(data: Partial<EnvironmentData>, updatedBy: string): Promise<Environment> {
     // If setting as default, unset other defaults
     if (data.isDefault) {
       await Environment.query().patch({ isDefault: false });
@@ -262,8 +252,8 @@ export class Environment extends Model implements EnvironmentData {
     featureSegments: { count: number; items: Array<{ id: string; segmentName: string }> };
     featureMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
     featureVariantMetrics: { count: number; items: Array<{ id: string; flagName: string }> };
-    networkTraffic: { count: number; items: Array<{ id: number; appName: string }> };
-    unknownFlags: { count: number; items: Array<{ id: number; flagName: string }> };
+    featureNetworkTraffic: { count: number; items: Array<{ id: string; appName: string }> };
+    unknownFlags: { count: number; items: Array<{ id: string; flagName: string }> };
     changeRequests: { count: number; items: Array<{ id: string; title: string }> };
     entityLocks: { count: number; items: Array<{ id: string; entityType: string }> };
     messageTemplates: {
@@ -296,11 +286,11 @@ export class Environment extends Model implements EnvironmentData {
     };
     banners: {
       count: number;
-      items: Array<{ bannerId: string; name: string }>;
+      items: Array<{ id: string; name: string }>;
     };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
     serverLifecycleEvents: { count: number; items: Array<{ id: string; eventType: string }> };
-    userEnvironments: { count: number; items: Array<{ id: string; userId: number }> };
+    userEnvironments: { count: number; items: Array<{ id: string; userId: string }> };
     auditLogs: { count: number; items: Array<{ id: string; action: string }> };
     total: number;
   }> {
@@ -315,12 +305,12 @@ export class Environment extends Model implements EnvironmentData {
     ): Promise<{ count: number; items: T[] }> => {
       try {
         // Check if table has environment column
-        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environment'`);
+        const columns = await knex.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
         if (columns[0].length === 0) {
           return { count: 0, items: [] };
         }
 
-        const query = knex(tableName).where('environment', this.environment);
+        const query = knex(tableName).where('environmentId', this.id);
         if (modifyQuery) {
           modifyQuery(query);
         }
@@ -350,7 +340,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments,
       featureMetrics,
       featureVariantMetrics,
-      networkTraffic,
+      featureNetworkTraffic,
       unknownFlags,
       changeRequests,
       entityLocks,
@@ -399,8 +389,8 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; segmentName: string }>('g_feature_segments', ['id', 'segmentName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_metrics', ['id', 'flagName']),
       safeQuery<{ id: string; flagName: string }>('g_feature_variant_metrics', ['id', 'flagName']),
-      safeQuery<{ id: number; appName: string }>('NetworkTraffic', ['id', 'appName']),
-      safeQuery<{ id: number; flagName: string }>('unknown_flags', ['id', 'flagName']),
+      safeQuery<{ id: string; appName: string }>('g_feature_network_traffic', ['id', 'appName']),
+      safeQuery<{ id: string; flagName: string }>('g_unknown_flags', ['id', 'flagName']),
       safeQuery<{ id: string; title: string }>('g_change_requests', ['id', 'title']),
       safeQuery<{ id: string; entityType: string }>('g_entity_locks', ['id', 'entityType']),
       safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
@@ -412,8 +402,8 @@ export class Environment extends Model implements EnvironmentData {
         'description',
       ]),
       safeQuery<{ id: string; surveyTitle: string }>('g_surveys', ['id', 'surveyTitle']),
-      safeQuery<{ id: string; branch: string }>('crashes', ['id', 'branch']),
-      safeQuery<{ id: string; platform: string }>('crash_events', ['id', 'platform']),
+      safeQuery<{ id: string; branch: string }>('g_crashes', ['id', 'branch']),
+      safeQuery<{ id: string; platform: string }>('g_crash_events', ['id', 'platform']),
       safeQuery<{ id: string; name: string }>('g_reward_item_templates', ['id', 'name']),
       safeQuery<{ id: string; name: string }>('g_reward_templates', ['id', 'name']),
       safeQuery<{ id: string; name: string }>('g_coupon_settings', ['id', 'name']),
@@ -425,29 +415,21 @@ export class Environment extends Model implements EnvironmentData {
           qb.where('isActive', true);
         }
       ),
-      safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
-      safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
+      safeQuery<{ id: string; name: string }>('g_banners', ['id', 'name']),
+      safeQuery<{ id: string; tokenName: string }>('g_api_access_tokens', ['id', 'tokenName']),
       safeQuery<{ id: string; eventType: string }>('g_server_lifecycle_events', [
         'id',
         'eventType',
       ]),
-      safeQuery<{ id: string; userId: number }>('g_user_environments', ['id', 'userId']),
+      safeQuery<{ id: string; userId: string }>('g_user_environments', ['id', 'userId']),
       safeQuery<{ id: string; action: string }>('g_audit_logs', ['id', 'action']),
     ]);
 
-    // For API tokens, we need to get the token names
-    let apiTokens: {
-      count: number;
-      items: Array<{ id: string; name: string }>;
-    } = { count: 0, items: [] };
-    if (apiTokenEnvs.count > 0) {
-      const tokenIds = apiTokenEnvs.items.map((item) => item.tokenId);
-      const tokens = await knex('g_api_access_tokens')
-        .whereIn('id', tokenIds)
-        .select(['id', 'tokenName as name'])
-        .limit(maxItems);
-      apiTokens = { count: apiTokenEnvs.count, items: tokens };
-    }
+    // API tokens now have direct environmentId column
+    const apiTokens = {
+      count: apiTokenEnvs.count,
+      items: apiTokenEnvs.items.map((t: any) => ({ id: t.id, name: t.tokenName })),
+    };
 
     const result = {
       gameWorlds,
@@ -461,7 +443,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments,
       featureMetrics,
       featureVariantMetrics,
-      networkTraffic,
+      featureNetworkTraffic,
       unknownFlags,
       changeRequests,
       entityLocks,
@@ -498,7 +480,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments.count +
       featureMetrics.count +
       featureVariantMetrics.count +
-      networkTraffic.count +
+      featureNetworkTraffic.count +
       unknownFlags.count +
       changeRequests.count +
       entityLocks.count +
@@ -539,7 +521,7 @@ export class Environment extends Model implements EnvironmentData {
     featureSegments: number;
     featureMetrics: number;
     featureVariantMetrics: number;
-    networkTraffic: number;
+    featureNetworkTraffic: number;
     unknownFlags: number;
     changeRequests: number;
     entityLocks: number;
@@ -576,7 +558,7 @@ export class Environment extends Model implements EnvironmentData {
       featureSegments: details.featureSegments.count,
       featureMetrics: details.featureMetrics.count,
       featureVariantMetrics: details.featureVariantMetrics.count,
-      networkTraffic: details.networkTraffic.count,
+      featureNetworkTraffic: details.featureNetworkTraffic.count,
       unknownFlags: details.unknownFlags.count,
       changeRequests: details.changeRequests.count,
       entityLocks: details.entityLocks.count,
@@ -630,14 +612,14 @@ export class Environment extends Model implements EnvironmentData {
 
     // If force delete, remove all related data in correct order
     if (force && relatedData.total > 0) {
-      const environment = this.environment;
+      const environment = this.id;
 
       // Helper to safely delete from a table if it has environment column
       const safeDelete = async (trx: any, tableName: string): Promise<void> => {
         try {
-          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environment'`);
+          const columns = await trx.raw(`SHOW COLUMNS FROM ${tableName} LIKE 'environmentId'`);
           if (columns[0].length > 0) {
-            await trx(tableName).where('environment', environment).del();
+            await trx(tableName).where('environmentId', environment).del();
           }
         } catch {
           // Table doesn't exist or other error, skip
@@ -658,8 +640,8 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_feature_segments');
         await safeDelete(trx, 'g_feature_metrics');
         await safeDelete(trx, 'g_feature_variant_metrics');
-        await safeDelete(trx, 'NetworkTraffic');
-        await safeDelete(trx, 'unknown_flags');
+        await safeDelete(trx, 'g_feature_network_traffic');
+        await safeDelete(trx, 'g_unknown_flags');
         await safeDelete(trx, 'g_change_requests');
         await safeDelete(trx, 'g_entity_locks');
         await safeDelete(trx, 'g_message_templates');
@@ -668,21 +650,21 @@ export class Environment extends Model implements EnvironmentData {
         await safeDelete(trx, 'g_service_notices');
         await safeDelete(trx, 'g_ingame_popup_notices');
         await safeDelete(trx, 'g_surveys');
-        await safeDelete(trx, 'crashes');
-        await safeDelete(trx, 'crash_events');
+        await safeDelete(trx, 'g_crashes');
+        await safeDelete(trx, 'g_crash_events');
         await safeDelete(trx, 'g_reward_item_templates');
         await safeDelete(trx, 'g_reward_templates');
         await safeDelete(trx, 'g_coupon_settings');
         await safeDelete(trx, 'g_coupons');
         await safeDelete(trx, 'g_store_products');
         await safeDelete(trx, 'g_banners');
-        await safeDelete(trx, 'g_api_access_token_environments');
+        await safeDelete(trx, 'g_api_access_tokens');
         await safeDelete(trx, 'g_server_lifecycle_events');
         await safeDelete(trx, 'g_user_environments');
-        await safeDelete(trx, 'g_tags'); // Tags are global, but check for environment column just in case schema changes
+        await safeDelete(trx, 'g_tags');
 
         // Finally delete the environment itself
-        await trx('g_environments').where('environment', environment).del();
+        await trx('g_environments').where('id', environment).del();
       });
     } else {
       // No related data, just delete

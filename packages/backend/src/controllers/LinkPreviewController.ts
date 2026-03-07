@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 
-// 타입은 프런트엔드의 LinkPreview와 호환되도록 정의
+// Type은 프런트엔드의 LinkPreview와 호환되도록 정의
 interface LinkPreview {
   url: string;
   title?: string;
@@ -105,7 +105,7 @@ function buildPreviewFromHtml(html: string, url: string): LinkPreview {
         `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`,
         `https://img.youtube.com/vi/${vid}/hqdefault.jpg`,
       ];
-      // 우선 첫 번째를 사용 (프런트에서 onError로 자연 처리)
+      // 우선 첫 번째를 Used (프런트에서 onError로 자연 처리)
       return {
         url,
         title: title || 'YouTube 동영상',
@@ -176,7 +176,7 @@ export class LinkPreviewController {
         return res.status(400).json({ success: false, error: 'urls 배열이 필요합니다' });
       }
 
-      // 과도한 요청 방지: 최대 10개로 제한
+      // 과도한 Request 방지: 최대 10개로 제한
       const limited = urls.slice(0, 10);
       const results = await Promise.all(
         limited.map(async (u) => {

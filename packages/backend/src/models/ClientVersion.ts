@@ -1,12 +1,16 @@
 import db from '../config/knex';
-import logger from '../config/logger';
+import { generateULID } from '../utils/ulid';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientVersion');
 
 export interface ClientVersionFilters {
-  environment: string;
+  environmentId: string;
   clientVersion?: string | string[];
   platform?: string | string[];
   clientStatus?: string | string[];
   guestModeAllowed?: boolean | boolean[];
+  search?: string;
   limit?: number;
   offset?: number;
   sortBy?: string;
@@ -31,8 +35,8 @@ export enum ClientStatus {
 }
 
 export interface ClientVersionAttributes {
-  id?: number;
-  environment: string;
+  id?: string;
+  environmentId: string;
   clientVersion: string;
   platform: string;
   clientStatus: ClientStatus;
@@ -48,19 +52,19 @@ export interface ClientVersionAttributes {
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface ClientVersionMaintenanceLocale {
-  id?: number;
-  clientVersionId: number;
+  id?: string;
+  clientVersionId: string;
   lang: 'ko' | 'en' | 'zh';
   message: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -80,12 +84,12 @@ export interface BulkCreateClientVersionRequest {
 }
 
 export class ClientVersionModel {
-  // 사용 가능한 버전 목록 조회 (distinct)
-  static async getDistinctVersions(environment: string): Promise<string[]> {
+  // Used 가능한 버전 Get list (distinct)
+  static async getDistinctVersions(environmentId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('clientVersion')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .orderBy('clientVersion', 'desc');
 
       return result.map((row) => row.clientVersion);
@@ -97,21 +101,21 @@ export class ClientVersionModel {
 
   static async findAll(filters: ClientVersionFilters): Promise<ClientVersionListResult> {
     try {
-      // 기본값 설정
+      // Set default values
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
-      const environment = filters.environment;
+      const environmentId = filters.environmentId;
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_client_versions as cv')
           .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
-          .where('cv.environment', environment);
+          .where('cv.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
         // clientVersion filter - support both single value and array (any_of)
         if (filters?.clientVersion) {
@@ -147,13 +151,13 @@ export class ClientVersionModel {
             const guestModeValues = filters.guestModeAllowed.map((val) => (val ? 1 : 0));
             query.whereIn('cv.guestModeAllowed', guestModeValues);
           } else {
-            // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
+            // TINYINT Type이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
             const guestModeValue = filters.guestModeAllowed ? 1 : 0;
             query.where('cv.guestModeAllowed', guestModeValue);
           }
         }
 
-        // 태그 필터링 - support both any_of and include_all
+        // 태그 Filter링 - support both any_of and include_all
         if (filters?.tags && filters.tags.length > 0) {
           const tagsOperator = filters.tagsOperator || 'any_of';
 
@@ -182,13 +186,25 @@ export class ClientVersionModel {
           }
         }
 
+        // Search filter - search across multiple fields
+        if (filters?.search) {
+          const searchTerm = `%${filters.search}%`;
+          query.where(function (this: any) {
+            this.where('cv.clientVersion', 'like', searchTerm)
+              .orWhere('cv.platform', 'like', searchTerm)
+              .orWhere('cv.gameServerAddress', 'like', searchTerm)
+              .orWhere('cv.patchAddress', 'like', searchTerm)
+              .orWhere('cv.memo', 'like', searchTerm);
+          });
+        }
+
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('cv.id as total').first();
 
-      // Data 쿼리
+      // Data Query
       const dataQuery = applyFilters(baseQuery())
         .select([
           'cv.*',
@@ -227,7 +243,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async findById(id: number, environment: string, trx?: any): Promise<any | null> {
+  static async findById(id: string, environmentId: string, trx?: any): Promise<any | null> {
     try {
       const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
       const clientVersion = await query
@@ -241,7 +257,7 @@ export class ClientVersionModel {
           'updater.email as updatedByEmail',
         ])
         .where('cv.id', id)
-        .where('cv.environment', environment)
+        .where('cv.environmentId', environmentId)
         .first();
 
       if (!clientVersion) {
@@ -251,7 +267,7 @@ export class ClientVersionModel {
       // 태그 정보 로드
       const tags = await this.getTags(id, trx);
 
-      // 점검 메시지 로케일 정보 로드
+      // 점검 메시지 Locale 정보 로드
       const localesQuery = trx
         ? trx('g_client_version_maintenance_locales')
         : db('g_client_version_maintenance_locales');
@@ -270,23 +286,26 @@ export class ClientVersionModel {
     }
   }
 
-  static async create(data: any, environment: string): Promise<any> {
+  static async create(data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
         const { tags, maintenanceLocales, ...clientVersionData } = data;
 
-        const [insertId] = await trx('g_client_versions').insert({
+        const id = generateULID();
+
+        await trx('g_client_versions').insert({
+          id,
           ...clientVersionData,
-          environment: environment,
+          environmentId: environmentId,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
 
-        // 점검 메시지 로케일 처리
+        // 점검 메시지 Locale 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
           const localeInserts = maintenanceLocales.map((locale: any) => ({
-            clientVersionId: insertId,
+            clientVersionId: id,
             lang: locale.lang,
             message: locale.message,
             createdBy: data.createdBy,
@@ -298,7 +317,7 @@ export class ClientVersionModel {
           await trx('g_client_version_maintenance_locales').insert(localeInserts);
         }
 
-        return await this.findById(insertId, environment, trx);
+        return await this.findById(id, environmentId, trx);
       });
     } catch (error) {
       logger.error('Error creating client version:', error);
@@ -306,7 +325,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async update(id: number, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environmentId: string): Promise<any> {
     try {
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
@@ -314,18 +333,18 @@ export class ClientVersionModel {
 
         await trx('g_client_versions')
           .where('id', id)
-          .where('environment', environment)
+          .where('environmentId', environmentId)
           .update({
             ...clientVersionData,
             updatedAt: new Date(),
           });
 
-        // 점검 메시지 로케일 처리
+        // 점검 메시지 Locale 처리
         if (maintenanceLocales !== undefined) {
-          // 기존 로케일 삭제
+          // Existing Locale Delete
           await trx('g_client_version_maintenance_locales').where('clientVersionId', id).del();
 
-          // 새 로케일 추가
+          // 새 Locale 추가
           if (maintenanceLocales.length > 0) {
             const localeInserts = maintenanceLocales.map((locale: any) => ({
               clientVersionId: id,
@@ -341,7 +360,7 @@ export class ClientVersionModel {
           }
         }
 
-        return await this.findById(id, environment, trx);
+        return await this.findById(id, environmentId, trx);
       });
     } catch (error) {
       logger.error('Error updating client version:', error);
@@ -349,9 +368,9 @@ export class ClientVersionModel {
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_client_versions').where('id', id).where('environment', environment).del();
+      await db('g_client_versions').where('id', id).where('environmentId', environmentId).del();
     } catch (error) {
       logger.error('Error deleting client version:', error);
       throw error;
@@ -361,10 +380,10 @@ export class ClientVersionModel {
   // 추가 메서드들
   static async bulkCreate(
     data: ClientVersionCreationAttributes[],
-    environment: string
+    environmentId: string
   ): Promise<any> {
     try {
-      const insertedIds: number[] = [];
+      const insertedIds: string[] = [];
 
       // 먼저 모든 데이터를 삽입
       await db.transaction(async (trx) => {
@@ -372,26 +391,29 @@ export class ClientVersionModel {
           // tags 필드는 별도 테이블에서 관리하므로 제거
           const { maintenanceLocales, ...clientVersionData } = item as any;
 
-          const [insertId] = await trx('g_client_versions').insert({
+          const id = generateULID();
+
+          await trx('g_client_versions').insert({
+            id,
             ...clientVersionData,
-            environment: environment,
+            environmentId: environmentId,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-          insertedIds.push(insertId);
+          insertedIds.push(id);
         }
       });
 
-      // 트랜잭션 완료 후 생성된 데이터 조회
+      // 트랜잭션 완료 후 Create된 Query data
       const results = [];
-      for (const id of insertedIds) {
-        const clientVersion = await this.findById(id, environment);
+      for (const cvId of insertedIds) {
+        const clientVersion = await this.findById(cvId, environmentId);
         if (clientVersion) {
           results.push(clientVersion);
         } else {
-          logger.warn(`Failed to find created client version with id: ${id}`);
+          logger.warn(`Failed to find created client version with id: ${cvId}`);
           // 기본 객체라도 반환하여 null 방지
-          results.push({ id, platform: 'unknown', clientVersion: 'unknown' });
+          results.push({ id: cvId, platform: 'unknown', clientVersion: 'unknown' });
         }
       }
 
@@ -402,7 +424,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async bulkUpdateStatus(data: any, environment: string): Promise<any> {
+  static async bulkUpdateStatus(data: any, environmentId: string): Promise<any> {
     try {
       const updateData: any = {
         clientStatus: data.clientStatus,
@@ -429,15 +451,15 @@ export class ClientVersionModel {
 
       await db('g_client_versions')
         .whereIn('id', data.ids)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update(updateData);
 
       // 언어별 메시지 처리
       if (data.maintenanceLocales && Array.isArray(data.maintenanceLocales)) {
-        // 기존 언어별 메시지 삭제
+        // Existing 언어별 메시지 Delete
         await db('g_client_version_maintenance_locales').whereIn('clientVersionId', data.ids).del();
 
-        // 새로운 언어별 메시지 추가
+        // New 언어별 메시지 추가
         if (data.maintenanceLocales.length > 0) {
           const localeInserts = [];
           for (const id of data.ids) {
@@ -464,12 +486,12 @@ export class ClientVersionModel {
     }
   }
 
-  static async getPlatforms(environment: string): Promise<string[]> {
+  static async getPlatforms(environmentId: string): Promise<string[]> {
     try {
       const result = await db('g_client_versions')
         .distinct('platform')
         .select('platform')
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .whereNotNull('platform')
         .orderBy('platform');
       return result.map((row) => row.platform);
@@ -482,18 +504,18 @@ export class ClientVersionModel {
   static async checkDuplicate(
     platform: string,
     clientVersion: string,
-    excludeId?: number,
-    environment?: string
+    excludeId?: string,
+    environmentId?: string
   ): Promise<boolean> {
     try {
-      if (!environment) {
+      if (!environmentId) {
         throw new Error('Environment is required for checking duplicate client versions');
       }
 
       let query = db('g_client_versions')
         .where('platform', platform)
         .where('clientVersion', clientVersion)
-        .where('environment', environment);
+        .where('environmentId', environmentId);
 
       if (excludeId) {
         query = query.where('id', '!=', excludeId);
@@ -509,15 +531,15 @@ export class ClientVersionModel {
 
   // 태그 관련 메서드들
   static async setTags(
-    clientVersionId: number,
-    tagIds: number[],
-    createdBy?: number
+    clientVersionId: string,
+    tagIds: string[],
+    createdBy?: string
   ): Promise<void> {
     try {
       logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
 
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         const deletedCount = await trx('g_tag_assignments')
           .where('entityType', 'client_version')
           .where('entityId', clientVersionId)
@@ -533,7 +555,7 @@ export class ClientVersionModel {
             entityType: 'client_version',
             entityId: clientVersionId,
             tagId: tagId,
-            createdBy: createdBy || 1,
+            createdBy: createdBy || '',
             createdAt: new Date(),
           }));
 
@@ -550,7 +572,7 @@ export class ClientVersionModel {
     }
   }
 
-  static async getTags(clientVersionId: number, trx?: any): Promise<any[]> {
+  static async getTags(clientVersionId: string, trx?: any): Promise<any[]> {
     try {
       const query = trx ? trx('g_tag_assignments as ta') : db('g_tag_assignments as ta');
       const tags = await query
@@ -568,7 +590,7 @@ export class ClientVersionModel {
   }
 
   static async getMaintenanceLocales(
-    clientVersionId: number
+    clientVersionId: string
   ): Promise<ClientVersionMaintenanceLocale[]> {
     try {
       const locales = await db('g_client_version_maintenance_locales')

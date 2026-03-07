@@ -4,14 +4,14 @@ import { apiService } from '../services/api';
 // URL 정규식 패턴
 const URL_REGEX = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
 
-// 캐시 저장소 (메모리 캐시)
+// Cache Save소 (메모리 캐시)
 const previewCache = new Map<string, { data: LinkPreview; timestamp: number }>();
 const CACHE_DURATION = 1000 * 60 * 60; // 1시간
 
-// URL에서 미리보기 데이터를 추출하는 함수 (백엔드 API 사용)
+// URL에서 미리보기 데이터를 추출하는 함수 (백엔드 API Used)
 export const extractLinkPreview = async (url: string): Promise<LinkPreview | null> => {
   try {
-    // 캐시 확인
+    // Cache Confirm
     const cached = previewCache.get(url);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
@@ -25,27 +25,27 @@ export const extractLinkPreview = async (url: string): Promise<LinkPreview | nul
       url,
     });
 
-    if (response.success && response.data) {
-      // 캐시에 저장
+    if ((response as any).success && (response as any).data) {
+      // Cache result
       previewCache.set(url, {
-        data: response.data,
+        data: (response as any).data,
         timestamp: Date.now(),
       });
 
-      return response.data;
+      return (response as any).data;
     }
 
-    // API 실패 시 클라이언트 사이드 폴백
+    // API Failed 시 클라이언트 사이드 폴백
     return extractLinkPreviewFallback(url);
   } catch (error) {
     console.error('백엔드 링크 미리보기 API 실패, 폴백 사용:', error);
 
-    // 백엔드 API 실패 시 클라이언트 사이드 폴백
+    // 백엔드 API Failed 시 클라이언트 사이드 폴백
     return extractLinkPreviewFallback(url);
   }
 };
 
-// 클라이언트 사이드 폴백 함수 (기존 로직)
+// 클라이언트 사이드 폴백 함수 (Existing 로직)
 const extractLinkPreviewFallback = async (url: string): Promise<LinkPreview | null> => {
   try {
     // 기본 링크 미리보기 객체
@@ -112,7 +112,7 @@ export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkP
   if (urls.length === 0) return [];
 
   try {
-    // 캐시된 결과 확인
+    // Cache된 Results Confirm
     const cachedResults: LinkPreview[] = [];
     const uncachedUrls: string[] = [];
 
@@ -125,7 +125,7 @@ export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkP
       }
     });
 
-    // 캐시되지 않은 URL들만 API 호출
+    // Cache되지 않은 URL들만 API 호출
     if (uncachedUrls.length > 0) {
       const response = await apiService.post<{
         success: boolean;
@@ -138,10 +138,10 @@ export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkP
         urls: uncachedUrls,
       });
 
-      if (response.success && response.data) {
-        response.data.forEach((result) => {
+      if ((response as any).success && (response as any).data) {
+        ((response as any).data as any[]).forEach((result: any) => {
           if (result.success && result.data) {
-            // 캐시에 저장
+            // Cache에 Save
             previewCache.set(result.url, {
               data: result.data,
               timestamp: Date.now(),
@@ -180,7 +180,7 @@ const extractTitleFromUrl = (url: string): string => {
       return filename;
     }
 
-    // 경로에서 제목 추출
+    // Path에서 제목 추출
     const pathParts = pathname.split('/').filter((part) => part.length > 0);
     if (pathParts.length > 0) {
       return pathParts[pathParts.length - 1].replace(/-|_/g, ' ');
@@ -202,12 +202,12 @@ const extractSiteNameFromUrl = (url: string): string => {
   }
 };
 
-// YouTube URL 확인
+// YouTube URL Confirm
 const isYouTubeUrl = (url: string): boolean => {
   return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
 };
 
-// YouTube 비디오 ID 추출
+// YouTube Videos ID 추출
 const extractYouTubeVideoId = (url: string): string | null => {
   const match = url.match(
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
@@ -215,12 +215,12 @@ const extractYouTubeVideoId = (url: string): string | null => {
   return match ? match[1] : null;
 };
 
-// GitHub URL 확인
+// GitHub URL Confirm
 const isGitHubUrl = (url: string): boolean => {
   return /github\.com/.test(url);
 };
 
-// GitHub 저장소 정보 추출 (개선됨)
+// GitHub Save소 정보 추출 (개선됨)
 const extractGitHubRepoInfo = (url: string): { owner: string; repo: string } | null => {
   const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
   if (match) {
@@ -232,23 +232,23 @@ const extractGitHubRepoInfo = (url: string): { owner: string; repo: string } | n
   return null;
 };
 
-// GitHub 저장소명 추출 (하위 호환성을 위해 유지)
+// GitHub Save소명 추출 (하위 호환성을 위해 유지)
 const extractGitHubRepoName = (url: string): string => {
   const repoInfo = extractGitHubRepoInfo(url);
   return repoInfo ? `${repoInfo.owner}/${repoInfo.repo}` : 'GitHub Repository';
 };
 
-// Twitter URL 확인
+// Twitter URL Confirm
 const isTwitterUrl = (url: string): boolean => {
   return /(?:twitter\.com|x\.com)/.test(url);
 };
 
-// 이미지 URL 확인
+// Images URL Confirm
 export const isImageUrl = (url: string): boolean => {
   return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
 };
 
-// 비디오 URL 확인
+// Videos URL Confirm
 export const isVideoUrl = (url: string): boolean => {
   return /\.(mp4|webm|ogg|mov|avi)(\?.*)?$/i.test(url);
 };

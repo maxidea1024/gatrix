@@ -1,7 +1,7 @@
 /**
  * Feature Flag Service
  * Handles feature flag retrieval and evaluation
- * Uses per-environment API pattern: GET /api/v1/server/:env/features
+ * Uses per-environment API pattern: GET /api/v1/server/features
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly
@@ -24,7 +24,7 @@ import {
   FlagMetric,
 } from '../types/featureFlags';
 import { FeatureFlagError, FeatureFlagErrorCode } from '../utils/errors';
-import { FeatureFlagEvaluator, VALUE_SOURCE } from '@gatrix/shared';
+import { FeatureFlagEvaluator, VALUE_SOURCE } from '@gatrix/evaluator';
 import { SDK_VERSION } from '../version';
 
 export class FeatureFlagService {
@@ -224,11 +224,11 @@ export class FeatureFlagService {
 
   /**
    * Fetch all flags for a specific environment
-   * GET /api/v1/server/:env/features
+   * GET /api/v1/server/features
    * Also caches referenced segments returned by the backend
    */
   async listByEnvironment(environment: string): Promise<FeatureFlag[]> {
-    let endpoint = `/api/v1/server/${encodeURIComponent(environment)}/features`;
+    let endpoint = `/api/v1/server/features`;
 
     // Append compact query param when enabled
     if (this.compactFlags) {
@@ -888,7 +888,6 @@ export class FeatureFlagService {
           weight: 100,
           enabled: false,
           value: null,
-          valueType: 'string',
         },
       };
     }
@@ -987,7 +986,7 @@ export class FeatureFlagService {
         // Send aggregated metrics to backend (per environment) with time window
         const bucketStop = new Date();
         await this.apiClient.post(
-          `/api/v1/server/${environment}/features/metrics`,
+          `/api/v1/server/features/metrics`,
           {
             metrics: aggregatedMetrics,
             bucket: {
@@ -1047,7 +1046,7 @@ export class FeatureFlagService {
 
       // Fetch updated flag from server
       const response = await this.apiClient.get<{ flag: FeatureFlag }>(
-        `/api/v1/server/${encodeURIComponent(environment)}/features/${encodeURIComponent(flagName)}`
+        `/api/v1/server/features/${encodeURIComponent(flagName)}`
       );
 
       if (!response.success || !response.data) {

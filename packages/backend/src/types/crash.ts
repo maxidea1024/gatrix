@@ -25,7 +25,7 @@ export interface ClientCrash {
   id: string; // ULID
   chash: string; // MD5 hash of stack trace
   branch: string; // Branch name (qa_2025, main, etc)
-  environment: string; // Environment (dev, staging, production, qa)
+  environmentId: string; // Environment (dev, staging, production, qa)
   platform: string; // Platform (windows, ios, android, mac)
   marketType?: string; // Market type (googleplay, apple, etc)
   isEditor: boolean; // Whether crash occurred in editor
@@ -61,7 +61,7 @@ export interface CrashEvent {
   platform: string; // Platform (windows, ios, android, mac)
   marketType?: string; // Market type (googleplay, apple, etc)
   branch: string; // Branch name
-  environment: string; // Environment (dev, staging, production, qa)
+  environmentId: string; // Environment (dev, staging, production, qa)
   isEditor: boolean; // Whether crash occurred in editor
 
   appVersion?: string; // App version (semver format)
@@ -88,7 +88,7 @@ export interface CrashUploadRequest {
   platform: string; // Platform (windows, ios, android, mac) - required
   marketType?: string; // Market type (googleplay, apple, etc) - optional
   branch: string; // Branch name (qa_2025, main, etc) - required
-  environment: string; // Environment (dev, staging, production, qa) - required
+  environmentId: string; // Environment (dev, staging, production, qa) - required
   isEditor?: boolean; // Whether crash occurred in editor - optional
 
   appVersion?: string; // App version (semver format) - optional
@@ -113,7 +113,7 @@ export interface CrashFilters {
   dateFrom?: string; // Filter by firstCrashAt >= dateFrom
   dateTo?: string; // Filter by lastCrashAt <= dateTo
   platform?: string; // Filter by platform
-  environment?: string; // Filter by environment
+  environmentId?: string; // Filter by environmentId
   branch?: string; // Filter by branch
   marketType?: string; // Filter by marketType
   isEditor?: boolean; // Filter by isEditor
@@ -145,13 +145,13 @@ export interface CrashDetail extends ClientCrash {
  * Crash retention settings
  */
 export interface CrashRetentionSettings {
-  id: number;
+  id: string;
   crashEventsRetentionDays: number; // Retention period for crash events in days
   crashesRetentionDays: number; // Retention period for crashes in days
   stackFilesRetentionDays: number; // Retention period for stack files in days
   logFilesRetentionDays: number; // Retention period for log files in days
   updatedAt: Date;
-  updatedBy?: number; // User ID who updated settings
+  updatedBy?: string; // User ID who updated settings
 }
 
 /**

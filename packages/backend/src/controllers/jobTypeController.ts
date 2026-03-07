@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { JobTypeModel } from '../models/JobType';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
 
-// Job 타입 목록 조회
+const logger = createLogger('jobTypeController');
+
+// Job Type Get list
 export const getJobTypes = async (req: Request, res: Response) => {
   try {
     const { enabled } = req.query;
@@ -162,11 +164,11 @@ export const getJobTypes = async (req: Request, res: Response) => {
   }
 };
 
-// Job 타입 상세 조회
+// Job Type Get details
 export const getJobType = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const jobType = await JobTypeModel.findById(parseInt(id));
+    const jobType = await JobTypeModel.findById(id);
 
     if (!jobType) {
       return res.status(404).json({

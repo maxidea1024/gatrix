@@ -9,7 +9,9 @@ import ClientVersionService, {
 import { ClientStatus } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ClientVersionController');
 import { UnifiedChangeGateway } from '../services/UnifiedChangeGateway';
 
 /**
@@ -80,12 +82,12 @@ const createClientVersionSchema = Joi.object({
   tags: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().integer().positive().required(),
+        id: Joi.string().required(),
         name: Joi.string().optional(),
         color: Joi.string().optional(),
         description: Joi.string().optional().allow(null),
-        createdBy: Joi.number().integer().optional(),
-        updatedBy: Joi.number().integer().optional(),
+        createdBy: Joi.string().optional(),
+        updatedBy: Joi.string().optional(),
         createdAt: Joi.date().optional(),
         updatedAt: Joi.date().optional(),
       }).unknown(true)
@@ -166,8 +168,8 @@ const getClientVersionsQuerySchema = Joi.object({
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
-  createdBy: Joi.number().integer().optional(),
-  updatedBy: Joi.number().integer().optional(),
+  createdBy: Joi.string().optional(),
+  updatedBy: Joi.string().optional(),
   createdAtFrom: Joi.date().iso().optional(),
   createdAtTo: Joi.date().iso().optional(),
   updatedAtFrom: Joi.date().iso().optional(),
@@ -175,10 +177,10 @@ const getClientVersionsQuerySchema = Joi.object({
   search: Joi.string().optional(),
   tags: Joi.array().items(Joi.string()).optional(),
   tagsOperator: Joi.string().valid('any_of', 'include_all').optional().default('any_of'),
-  _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
+  _t: Joi.string().optional(), // Cache 방지용 타임스탬프
 });
 
-// 내보내기 전용 스키마 (limit 제한 없음)
+// 내보내기 전용 스키마 (limit 제한 None)
 const exportClientVersionsQuerySchema = Joi.object({
   version: Joi.string().optional(),
   platform: Joi.string().optional(),
@@ -198,8 +200,8 @@ const exportClientVersionsQuerySchema = Joi.object({
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
-  createdBy: Joi.number().integer().optional(),
-  updatedBy: Joi.number().integer().optional(),
+  createdBy: Joi.string().optional(),
+  updatedBy: Joi.string().optional(),
   createdAtFrom: Joi.date().iso().optional(),
   createdAtTo: Joi.date().iso().optional(),
   updatedAtFrom: Joi.date().iso().optional(),
@@ -209,7 +211,7 @@ const exportClientVersionsQuerySchema = Joi.object({
 });
 
 const bulkUpdateStatusSchema = Joi.object({
-  ids: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
+  ids: Joi.array().items(Joi.string()).min(1).required(),
   clientStatus: Joi.string()
     .valid(...Object.values(ClientStatus))
     .required(),
@@ -226,7 +228,7 @@ const bulkUpdateStatusSchema = Joi.object({
       })
     )
     .optional(),
-  messageTemplateId: Joi.number().integer().positive().optional(),
+  messageTemplateId: Joi.string().optional(),
 });
 
 const bulkCreateClientVersionSchema = Joi.object({
@@ -287,7 +289,7 @@ const bulkCreateClientVersionSchema = Joi.object({
   tags: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().integer().positive().required(),
+        id: Joi.string().required(),
         name: Joi.string().required(),
         color: Joi.string().required(),
       })
@@ -297,11 +299,11 @@ const bulkCreateClientVersionSchema = Joi.object({
 });
 
 export class ClientVersionController {
-  // 사용 가능한 버전 목록 조회 (distinct)
+  // Used 가능한 버전 Get list (distinct)
   static async getAvailableVersions(req: AuthenticatedRequest, res: Response) {
     try {
-      const environment = req.environment || 'development';
-      const versions = await ClientVersionService.getAvailableVersions(environment);
+      const environmentId = req.environmentId || 'development';
+      const versions = await ClientVersionService.getAvailableVersions(environmentId);
       res.json({
         success: true,
         data: versions,
@@ -315,7 +317,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 목록 조회
+  // 클라이언트 버전 Get list
   static async getClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = getClientVersionsQuerySchema.validate(req.query);
     if (error) {
@@ -335,7 +337,7 @@ export class ClientVersionController {
       sortOrder,
     };
 
-    // 필터 조건 설정
+    // Filter 조건 Settings
     Object.keys(filterParams).forEach((key) => {
       const value = filterParams[key];
       // guestModeAllowed는 boolean이므로 false도 유효한 값
@@ -346,9 +348,9 @@ export class ClientVersionController {
         const processedValue: any = value;
 
         // guestModeAllowed는 이미 Joi에서 boolean 또는 boolean[]로 변환됨
-        // 다른 필드는 그대로 사용
+        // 다른 필드는 그대로 Used
 
-        // 타입 안전하게 할당
+        // Type 안전하게 할당
         if (key === 'guestModeAllowed') {
           (filters as any).guestModeAllowed = processedValue;
         } else if (key === 'tags') {
@@ -361,9 +363,9 @@ export class ClientVersionController {
       }
     });
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const result = await ClientVersionService.getAllClientVersions(
-      environment,
+      environmentId,
       filters,
       pagination
     );
@@ -374,18 +376,18 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 상세 조회
+  // 클라이언트 버전 Get details
   static async getClientVersionById(req: AuthenticatedRequest, res: Response) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = req.params.id;
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Invalid client version ID',
       });
     }
 
-    const environment = req.environment || 'development';
-    const clientVersion = await ClientVersionService.getClientVersionById(id, environment);
+    const environmentId = req.environmentId || 'development';
+    const clientVersion = await ClientVersionService.getClientVersionById(id, environmentId);
     if (!clientVersion) {
       return res.status(404).json({
         success: false,
@@ -399,7 +401,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 생성
+  // 클라이언트 버전 Create
   static async createClientVersion(req: AuthenticatedRequest, res: Response) {
     const { error, value } = createClientVersionSchema.validate(req.body);
     if (error) {
@@ -426,16 +428,16 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
       userId,
-      environment,
+      environmentId,
       'g_client_versions',
       clientVersionData,
       async () => {
-        return await ClientVersionService.createClientVersion(clientVersionData, environment);
+        return await ClientVersionService.createClientVersion(clientVersionData, environmentId);
       }
     );
 
@@ -457,7 +459,7 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 간편 생성
+  // 클라이언트 버전 간편 Create
   static async bulkCreateClientVersions(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkCreateClientVersionSchema.validate(req.body);
     if (error) {
@@ -475,7 +477,7 @@ export class ClientVersionController {
       });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const bulkCreateData = {
       ...value,
       // Convert ISO 8601 datetime to MySQL DATETIME format
@@ -483,17 +485,17 @@ export class ClientVersionController {
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
-      environment,
+      environmentId,
     };
 
     // Check if CR is required
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environmentId);
 
     if (requiresApproval) {
       let lastResult;
       for (const platform of value.platforms) {
         const itemData = {
-          environment,
+          environmentId,
           platform: platform.platform,
           clientVersion: value.clientVersion,
           clientStatus: value.clientStatus,
@@ -514,7 +516,7 @@ export class ClientVersionController {
 
         lastResult = await UnifiedChangeGateway.requestCreation(
           userId,
-          environment,
+          environmentId,
           'g_client_versions',
           itemData,
           async () => {
@@ -536,7 +538,7 @@ export class ClientVersionController {
       try {
         clientVersions = await ClientVersionService.bulkCreateClientVersions(
           bulkCreateData,
-          environment
+          environmentId
         );
       } catch (error: any) {
         if (error.message && error.message.includes('Duplicate client versions found')) {
@@ -553,10 +555,10 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 수정
+  // 클라이언트 버전 Edit
   static async updateClientVersion(req: AuthenticatedRequest, res: Response) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = req.params.id;
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Invalid client version ID',
@@ -584,21 +586,21 @@ export class ClientVersionController {
       // Convert ISO 8601 datetime to MySQL DATETIME format
       maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
       maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
-      createdBy: userId, // maintenanceLocales 새로 생성 시 필요
+      createdBy: userId, // maintenanceLocales 새로 Create 시 필요
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
-      environment,
+      environmentId,
       'g_client_versions',
-      String(id),
+      id,
       updateData,
       async (processedData: any) => {
-        return await ClientVersionService.updateClientVersion(id, processedData, environment);
+        return await ClientVersionService.updateClientVersion(id, processedData, environmentId);
       }
     );
 
@@ -606,7 +608,7 @@ export class ClientVersionController {
       const clientVersion = await ClientVersionService.updateClientVersion(
         id,
         updateData,
-        environment
+        environmentId
       );
       if (!clientVersion) {
         return res.status(404).json({
@@ -632,17 +634,17 @@ export class ClientVersionController {
     }
   }
 
-  // 클라이언트 버전 삭제
+  // 클라이언트 버전 Delete
   static async deleteClientVersion(req: AuthenticatedRequest, res: Response) {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = req.params.id;
+    if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Invalid client version ID',
       });
     }
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
     const userId = (req as any).user?.userId;
     if (!userId) {
       return res.status(401).json({
@@ -654,11 +656,11 @@ export class ClientVersionController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       userId,
-      environment,
+      environmentId,
       'g_client_versions',
-      String(id),
+      id,
       async () => {
-        await ClientVersionService.deleteClientVersion(id, environment);
+        await ClientVersionService.deleteClientVersion(id, environmentId);
       }
     );
 
@@ -679,7 +681,7 @@ export class ClientVersionController {
     }
   }
 
-  // 일괄 상태 변경
+  // 일괄 Status 변경
   static async bulkUpdateStatus(req: AuthenticatedRequest, res: Response) {
     const { error, value } = bulkUpdateStatusSchema.validate(req.body);
     if (error) {
@@ -705,10 +707,10 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const environment = req.environment || 'development';
+    const environmentId = req.environmentId || 'development';
 
     // Check if CR is required
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environmentId);
 
     if (requiresApproval) {
       let lastResult;
@@ -727,9 +729,9 @@ export class ClientVersionController {
 
         lastResult = await UnifiedChangeGateway.requestModification(
           userId,
-          environment,
+          environmentId,
           'g_client_versions',
-          String(id),
+          id,
           updateDataAttrs
         );
       }
@@ -743,7 +745,10 @@ export class ClientVersionController {
         message: 'Change request created. The bulk status update will be applied after approval.',
       });
     } else {
-      const updatedCount = await ClientVersionService.bulkUpdateStatus(bulkUpdateData, environment);
+      const updatedCount = await ClientVersionService.bulkUpdateStatus(
+        bulkUpdateData,
+        environmentId
+      );
       res.json({
         success: true,
         data: {
@@ -753,10 +758,10 @@ export class ClientVersionController {
     }
   }
 
-  // 채널 목록 조회
+  // 채널 Get list
   static async getPlatforms(req: AuthenticatedRequest, res: Response) {
-    const environment = req.environment || 'development';
-    const platforms = await ClientVersionService.getPlatforms(environment);
+    const environmentId = req.environmentId || 'development';
+    const platforms = await ClientVersionService.getPlatforms(environmentId);
 
     res.json({
       success: true,
@@ -764,7 +769,7 @@ export class ClientVersionController {
     });
   }
 
-  // 클라이언트 버전 태그 설정
+  // 클라이언트 버전 태그 Settings
   static async setTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -777,7 +782,7 @@ export class ClientVersionController {
         });
       }
 
-      await ClientVersionModel.setTags(parseInt(id), tagIds);
+      await ClientVersionModel.setTags(id, tagIds);
 
       res.json({
         success: true,
@@ -796,7 +801,7 @@ export class ClientVersionController {
   static async getTags(req: AuthenticatedRequest, res: Response) {
     try {
       const { id } = req.params;
-      const tags = await ClientVersionModel.getTags(parseInt(id));
+      const tags = await ClientVersionModel.getTags(id);
 
       res.json({
         success: true,
@@ -822,9 +827,9 @@ export class ClientVersionController {
     }
 
     try {
-      const environment = req.environment || 'development';
-      // 모든 데이터를 가져오기 위해 매우 큰 limit 사용
-      const result = await ClientVersionService.getAllClientVersions(environment, value, {
+      const environmentId = req.environmentId || 'development';
+      // 모든 데이터를 가져오기 위해 매우 큰 limit Used
+      const result = await ClientVersionService.getAllClientVersions(environmentId, value, {
         page: 1,
         limit: 50000, // 충분히 큰 값
         sortBy: 'createdAt',

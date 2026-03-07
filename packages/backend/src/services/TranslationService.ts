@@ -1,5 +1,7 @@
 import axios from 'axios';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('TranslationService');
 import redisClient from '../config/redis';
 import crypto from 'crypto';
 import { TRANSLATION, DEFAULT_CONFIG } from '../constants/cacheKeys';
@@ -21,7 +23,7 @@ export class TranslationService {
     'https://translate.googleapis.com/translate_a/single';
 
   /**
-   * 무료 구글 번역 API를 사용하여 텍스트 번역
+   * 무료 구글 Translation API를 Used하여 텍스트 번역
    */
   static async translateText(request: TranslationRequest): Promise<TranslationResponse> {
     try {
@@ -31,7 +33,7 @@ export class TranslationService {
         throw new Error('Translation text is required');
       }
 
-      // 캐시 조회 (입력 원문 해시 기반)
+      // Cache 조회 (입력 Based on original text hash)
       const baseText = text.trim();
       const hash = crypto.createHash('sha256').update(baseText).digest('hex');
       const cacheKey = TRANSLATION.BY_TEXT_LANG(hash, targetLanguage);
@@ -53,7 +55,7 @@ export class TranslationService {
         logger.debug('Translation cache get failed', e);
       }
 
-      // 언어 코드 매핑 (구글 번역 API 형식으로)
+      // Language code mapping (구글 Translation API 형식으로)
       const languageMap: Record<string, string> = {
         ko: 'ko',
         en: 'en',
@@ -65,7 +67,7 @@ export class TranslationService {
         throw new Error(`Unsupported target language: ${targetLanguage}`);
       }
 
-      // 먼저 언어 감지
+      // 먼저 Detect language
       let detectedLang = sourceLanguage;
       if (sourceLanguage === 'auto') {
         detectedLang = await this.detectLanguage(text);
@@ -88,7 +90,7 @@ export class TranslationService {
         return result;
       }
 
-      // 구글 번역 API 호출 (무료 버전)
+      // 구글 Translation API 호출 (무료 버전)
       const params = new URLSearchParams({
         client: 'gtx',
         sl: detectedLang,
@@ -108,7 +110,7 @@ export class TranslationService {
         timeout: 10000,
       });
 
-      // 응답 파싱
+      // Response 파싱
       if (!response.data || !Array.isArray(response.data) || !response.data[0]) {
         throw new Error('Invalid translation response format');
       }
@@ -141,7 +143,7 @@ export class TranslationService {
         stack: error.stack,
       });
 
-      // 번역 실패 시 원본 텍스트 반환
+      // Translation Failed 시 원본 텍스트 반환
       return {
         translatedText: request.text,
         sourceLanguage: request.sourceLanguage || 'auto',
@@ -151,7 +153,7 @@ export class TranslationService {
   }
 
   /**
-   * 여러 언어로 동시 번역
+   * 여러 언어로 동시 Translation
    */
   static async translateToMultipleLanguages(
     text: string,
@@ -189,7 +191,7 @@ export class TranslationService {
   }
 
   /**
-   * 언어 감지
+   * Detect language
    */
   static async detectLanguage(text: string): Promise<string> {
     try {
@@ -197,7 +199,7 @@ export class TranslationService {
       const hash = crypto.createHash('sha256').update(base).digest('hex');
       const cacheKey = TRANSLATION.DETECT(hash);
 
-      // 캐시 조회
+      // Cache 조회
       try {
         const cached = await redisClient.get(cacheKey);
         if (cached) {
@@ -212,7 +214,7 @@ export class TranslationService {
         sl: 'auto',
         tl: 'en',
         dt: 't',
-        q: base, // 처음 100자만 사용
+        q: base, // 처음 100자만 Used
       });
 
       const response = await axios.get(`${this.GOOGLE_TRANSLATE_API_URL}?${params}`, {
@@ -224,7 +226,7 @@ export class TranslationService {
 
       const detected = response.data[2] || 'auto';
 
-      // 캐시 저장
+      // Cache Save
       try {
         const TRANSLATION_TTL_SECONDS = Math.floor(DEFAULT_CONFIG.TRANSLATION_TTL / 1000);
         await redisClient.set(cacheKey, detected, TRANSLATION_TTL_SECONDS);

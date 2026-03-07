@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -22,6 +22,7 @@ import {
   alpha,
   CircularProgress,
   Tooltip,
+  Collapse,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -34,33 +35,51 @@ import {
   Visibility,
   VisibilityOff,
   VpnKey as PermissionIcon,
-  Public as EnvironmentIcon,
+  AccountTree as AccessTreeIcon,
   CheckCircle as CheckCircleIcon,
   Info as InfoIcon,
+  Business as OrgIcon,
+  Folder as ProjectIcon,
+  Circle as EnvDotIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
-import { Permission, getPermissionLabelKey, PERMISSION_CATEGORIES } from '@/types/permissions';
+import { inferRoleLabelKey, getRoleLabelColor } from '@gatrix/shared/permissions';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsViewer';
+import type { EffectivePermissions } from '@/services/rbacService';
 
 interface Environment {
-  environment: string;
+  environmentId: string;
   environmentName: string;
   displayName: string;
   color?: string;
   description?: string;
 }
 
-interface UserEnvironmentAccess {
-  allowAllEnvironments: boolean;
-  environments: string[]; // List of environment names
+interface AccessOrg {
+  orgId: string;
+  orgName: string;
+  displayName: string;
+  projects: AccessProject[];
+}
+
+interface AccessProject {
+  projectId: string;
+  projectName: string;
+  displayName: string;
+  environments: Environment[];
 }
 
 const ProfilePage: React.FC = () => {
   const { user, refreshAuth, permissions } = useAuth();
+  const { organisations, projects } = useOrgProject();
   const { t } = useTranslation();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -84,33 +103,80 @@ const ProfilePage: React.FC = () => {
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  // Environment access state
-  const [environmentAccess, setEnvironmentAccess] = useState<UserEnvironmentAccess | null>(null);
-  const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [envLoading, setEnvLoading] = useState(true);
+  // Access tree state
+  const [accessTree, setAccessTree] = useState<AccessOrg[]>([]);
+  const [accessLoading, setAccessLoading] = useState(true);
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
-  // Fetch environment access
+  // Convert user permissions to EffectivePermissions format for the viewer
+  const effectivePermsData = useMemo((): EffectivePermissions | null => {
+    if (!permissions || permissions.length === 0) return null;
+    return {
+      own: permissions as string[],
+      inherited: [],
+    };
+  }, [permissions]);
+
+  // Fetch accessible orgs/projects/environments tree
   useEffect(() => {
-    const fetchEnvironmentAccess = async () => {
+    const fetchAccessTree = async () => {
       if (!user) return;
+      if (permissions.length === 0) {
+        setAccessLoading(false);
+        return;
+      }
 
       try {
-        setEnvLoading(true);
-        const [accessResponse, envsResponse] = await Promise.all([
-          api.get<UserEnvironmentAccess>('/admin/users/me/environments'),
-          api.get<Environment[]>('/admin/environments'),
-        ]);
-        setEnvironmentAccess(accessResponse.data || null);
-        setEnvironments(envsResponse.data || []);
-      } catch (error) {
-        console.error('Failed to fetch environment access:', error);
+        setAccessLoading(true);
+
+        // Build tree from OrgProjectContext data + environment API
+        const tree: AccessOrg[] = [];
+        for (const org of organisations) {
+          const orgProjects = projects.filter((p) => p.orgId === org.id);
+          const accessProjects: AccessProject[] = [];
+
+          for (const proj of orgProjects) {
+            let envs: Environment[] = [];
+            try {
+              const envResult = await api.get<Environment[]>(
+                `/admin/orgs/${org.id}/projects/${proj.id}/environments`
+              );
+              envs = envResult.data || [];
+            } catch {
+              // Silently ignore
+            }
+            accessProjects.push({
+              projectId: proj.id,
+              projectName: proj.projectName,
+              displayName: proj.displayName,
+              environments: envs,
+            });
+          }
+
+          tree.push({
+            orgId: org.id,
+            orgName: org.orgName,
+            displayName: org.displayName,
+            projects: accessProjects,
+          });
+        }
+
+        setAccessTree(tree);
+        // Auto-expand all orgs and projects
+        setExpandedOrgs(new Set(tree.map((o) => o.orgId)));
+        setExpandedProjects(
+          new Set(tree.flatMap((o) => o.projects.map((p) => p.projectId)))
+        );
+      } catch {
+        // Silently ignore
       } finally {
-        setEnvLoading(false);
+        setAccessLoading(false);
       }
     };
 
-    fetchEnvironmentAccess();
-  }, [user]);
+    fetchAccessTree();
+  }, [user, permissions, organisations, projects]);
 
   if (!user) {
     return (
@@ -126,16 +192,23 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  // Get accessible environments
-  const accessibleEnvironments = environmentAccess?.allowAllEnvironments
-    ? environments
-    : environments.filter((env) =>
-        (
-          environmentAccess?.environments ||
-          (environmentAccess as any)?.environments ||
-          []
-        ).includes(env.environment)
-      );
+  const toggleOrg = (orgId: string) => {
+    setExpandedOrgs((prev) => {
+      const next = new Set(prev);
+      if (next.has(orgId)) next.delete(orgId);
+      else next.add(orgId);
+      return next;
+    });
+  };
+
+  const toggleProject = (projectId: string) => {
+    setExpandedProjects((prev) => {
+      const next = new Set(prev);
+      if (next.has(projectId)) next.delete(projectId);
+      else next.add(projectId);
+      return next;
+    });
+  };
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -203,7 +276,7 @@ const ProfilePage: React.FC = () => {
       }
 
       await AuthService.updateProfile(updateData);
-      await refreshAuth(); // 사용자 정보 새로고침
+      await refreshAuth(); // User info Refresh
       enqueueSnackbar(t('profile.profileUpdated'), { variant: 'success' });
       setIsEditing(false);
       setAvatarFile(null);
@@ -401,9 +474,10 @@ const ProfilePage: React.FC = () => {
               >
                 <Chip
                   icon={<SecurityIcon />}
-                  label={t(`roles.${user.role}`)}
-                  color={getRoleColor(user.role || '')}
+                  label={t(inferRoleLabelKey(permissions))}
+                  color={getRoleLabelColor(inferRoleLabelKey(permissions))}
                   size="small"
+                  variant="outlined"
                 />
                 <Chip
                   icon={<CheckCircleIcon />}
@@ -530,10 +604,10 @@ const ProfilePage: React.FC = () => {
           )}
         </Grid>
 
-        {/* Right Column - Permissions & Environments */}
+        {/* Right Column - Permissions & Access Tree */}
         <Grid size={{ xs: 12, md: 6 }}>
           {/* Permissions */}
-          {user.role === 'admin' && (
+          {permissions.length > 0 && (
             <Card sx={{ mb: 3 }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -547,23 +621,16 @@ const ProfilePage: React.FC = () => {
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
 
-                {permissions.includes('*') ? (
+                {permissions.includes('*' as any) ? (
                   <Box
                     sx={{
                       p: 2,
-                      borderRadius: 0,
+                      borderRadius: 1,
                       bgcolor: alpha(theme.palette.success.main, 0.1),
                       border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mb: 1,
-                      }}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                       <SecurityIcon sx={{ color: 'success.main' }} />
                       <Typography
                         variant="subtitle1"
@@ -576,148 +643,150 @@ const ProfilePage: React.FC = () => {
                       {t('profile.superAdminAccessDesc')}
                     </Typography>
                   </Box>
-                ) : permissions.length > 0 ? (
-                  <Stack spacing={2}>
-                    {Object.entries(PERMISSION_CATEGORIES).map(([categoryKey, category]) => {
-                      const categoryPermissions = category.permissions.filter((p) =>
-                        permissions.includes(p)
-                      );
-                      if (categoryPermissions.length === 0) return null;
-
-                      return (
-                        <Box key={categoryKey}>
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{
-                              display: 'block',
-                              mb: 1,
-                              fontWeight: 600,
-                              textTransform: 'uppercase',
-                              letterSpacing: 0.5,
-                            }}
-                          >
-                            {t(category.label)}
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              flexWrap: 'wrap',
-                              gap: 0.75,
-                            }}
-                          >
-                            {categoryPermissions.map((permission) => {
-                              const isManage = permission.includes('.manage');
-                              const permissionLabel = t(
-                                getPermissionLabelKey(permission as Permission)
-                              );
-                              // Get localized description for tooltip (e.g., permissions.users_view_desc)
-                              const descKey = `permissions.${permission.replace('.', '_')}_desc`;
-                              const permissionDesc = t(descKey, {
-                                defaultValue: '',
-                              });
-                              return (
-                                <Tooltip
-                                  key={permission}
-                                  title={permissionDesc || permissionLabel}
-                                  arrow
-                                  placement="top"
-                                >
-                                  <Box
-                                    sx={{
-                                      px: 1,
-                                      py: 0.5,
-                                      borderRadius: 0,
-                                      bgcolor: isManage
-                                        ? alpha(theme.palette.warning.main, 0.15)
-                                        : alpha(theme.palette.primary.main, 0.1),
-                                      color: isManage ? 'warning.dark' : 'primary.main',
-                                      fontWeight: 500,
-                                      fontSize: '0.75rem',
-                                      border: `1px solid ${isManage ? alpha(theme.palette.warning.main, 0.3) : alpha(theme.palette.primary.main, 0.2)}`,
-                                      cursor: 'default',
-                                      '&:hover': {
-                                        bgcolor: isManage
-                                          ? alpha(theme.palette.warning.main, 0.25)
-                                          : alpha(theme.palette.primary.main, 0.15),
-                                      },
-                                    }}
-                                  >
-                                    {permissionLabel}
-                                  </Box>
-                                </Tooltip>
-                              );
-                            })}
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </Stack>
                 ) : (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      color: 'text.secondary',
-                    }}
-                  >
-                    <InfoIcon fontSize="small" />
-                    <Typography variant="body2">{t('profile.noPermissions')}</Typography>
-                  </Box>
+                  <EffectivePermissionsViewer
+                    data={effectivePermsData}
+                    maxHeight={350}
+                  />
                 )}
               </CardContent>
             </Card>
           )}
 
-          {/* Accessible Environments */}
+          {/* Accessible Organisations / Projects / Environments */}
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <EnvironmentIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <AccessTreeIcon sx={{ mr: 1, color: 'primary.main' }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {t('profile.accessibleEnvironments')}
+                  {t('profile.accessScope')}
                 </Typography>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('profile.accessibleEnvironmentsDesc')}
+                {t('profile.accessScopeDesc')}
               </Typography>
               <Divider sx={{ mb: 2 }} />
 
-              {envLoading ? (
+              {accessLoading ? (
                 <Stack spacing={1}>
-                  <Skeleton variant="rectangular" height={32} width="60%" />
-                  <Skeleton variant="rectangular" height={32} width="40%" />
+                  <Skeleton variant="rectangular" height={32} width="80%" />
+                  <Skeleton variant="rectangular" height={24} width="60%" sx={{ ml: 3 }} />
+                  <Skeleton variant="rectangular" height={24} width="50%" sx={{ ml: 6 }} />
                 </Stack>
-              ) : environmentAccess?.allowAllEnvironments ? (
-                <Chip
-                  icon={<CheckCircleIcon />}
-                  label={t('profile.allEnvironments')}
-                  color="success"
-                  variant="outlined"
-                />
-              ) : accessibleEnvironments.length > 0 ? (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {accessibleEnvironments.map((env) => (
-                    <Tooltip
-                      key={env.environment}
-                      title={env.description || ''}
-                      arrow
-                      placement="top"
-                    >
-                      <Chip
-                        label={env.displayName || env.environmentName}
-                        size="small"
+              ) : accessTree.length > 0 ? (
+                <Box
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {accessTree.map((org) => (
+                    <Box key={org.orgId}>
+                      {/* Organisation row */}
+                      <Box
+                        onClick={() => toggleOrg(org.orgId)}
                         sx={{
-                          bgcolor: env.color
-                            ? alpha(env.color, 0.15)
-                            : alpha(theme.palette.info.main, 0.1),
-                          color: env.color || 'info.main',
-                          fontWeight: 500,
-                          borderLeft: `3px solid ${env.color || theme.palette.info.main}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          px: 1.5,
+                          py: 1,
+                          cursor: 'pointer',
+                          bgcolor: alpha(theme.palette.primary.main, 0.04),
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                          },
                         }}
-                      />
-                    </Tooltip>
+                      >
+                        {expandedOrgs.has(org.orgId) ? (
+                          <ExpandMoreIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                        ) : (
+                          <ChevronRightIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                        )}
+                        <OrgIcon fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {org.displayName || org.orgName}
+                        </Typography>
+                        <Chip
+                          label={t('common.organisation')}
+                          size="small"
+                          sx={{ ml: 'auto', height: 20, fontSize: '0.65rem' }}
+                          variant="outlined"
+                        />
+                      </Box>
+
+                      {/* Projects */}
+                      <Collapse in={expandedOrgs.has(org.orgId)}>
+                        {org.projects.map((proj) => (
+                          <Box key={proj.projectId}>
+                            {/* Project row */}
+                            <Box
+                              onClick={() => toggleProject(proj.projectId)}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                pl: 4,
+                                pr: 1.5,
+                                py: 0.75,
+                                cursor: 'pointer',
+                                borderBottom: 1,
+                                borderColor: 'divider',
+                                '&:hover': {
+                                  bgcolor: 'action.hover',
+                                },
+                              }}
+                            >
+                              {proj.environments.length > 0 ? (
+                                expandedProjects.has(proj.projectId) ? (
+                                  <ExpandMoreIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                ) : (
+                                  <ChevronRightIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                )
+                              ) : (
+                                <Box sx={{ width: 24, mr: 0.5 }} />
+                              )}
+                              <ProjectIcon fontSize="small" sx={{ mr: 1, color: 'warning.main' }} />
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                {proj.displayName || proj.projectName}
+                              </Typography>
+                            </Box>
+
+                            {/* Environments */}
+                            <Collapse in={expandedProjects.has(proj.projectId)}>
+                              {proj.environments.map((env) => (
+                                <Box
+                                  key={env.environmentId}
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    pl: 8,
+                                    pr: 1.5,
+                                    py: 0.5,
+                                    borderBottom: 1,
+                                    borderColor: 'divider',
+                                    '&:last-child': { borderBottom: 0 },
+                                  }}
+                                >
+                                  <EnvDotIcon
+                                    sx={{
+                                      mr: 1,
+                                      fontSize: 10,
+                                      color: env.color || theme.palette.info.main,
+                                    }}
+                                  />
+                                  <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                                    {env.displayName || env.environmentName}
+                                  </Typography>
+                                </Box>
+                              ))}
+                            </Collapse>
+                          </Box>
+                        ))}
+                      </Collapse>
+                    </Box>
                   ))}
                 </Box>
               ) : (
@@ -730,7 +799,7 @@ const ProfilePage: React.FC = () => {
                   }}
                 >
                   <InfoIcon fontSize="small" />
-                  <Typography variant="body2">{t('profile.noEnvironments')}</Typography>
+                  <Typography variant="body2">{t('profile.noAccessScope')}</Typography>
                 </Box>
               )}
             </CardContent>

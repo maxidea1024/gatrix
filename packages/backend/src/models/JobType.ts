@@ -1,9 +1,12 @@
 import db from '../config/knex';
-import logger from '../config/logger';
+import { generateULID } from '../utils/ulid';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('JobType');
 import { getCurrentEnvironment } from '../utils/environmentContext';
 
 export interface JobTypeAttributes {
-  id: number;
+  id: string;
   name: string;
   displayName: string;
   description?: string;
@@ -11,8 +14,8 @@ export interface JobTypeAttributes {
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdByName?: string;
   updatedByName?: string;
 }
@@ -23,7 +26,7 @@ export interface CreateJobTypeData {
   description?: string;
   jobSchema?: any;
   isEnabled?: boolean;
-  createdBy?: number;
+  createdBy?: string;
 }
 
 export interface UpdateJobTypeData {
@@ -31,7 +34,7 @@ export interface UpdateJobTypeData {
   description?: string;
   jobSchema?: any;
   isEnabled?: boolean;
-  updatedBy?: number;
+  updatedBy?: string;
 }
 
 export class JobTypeModel {
@@ -57,14 +60,14 @@ export class JobTypeModel {
     return null;
   }
 
-  static async findAll(environment?: string): Promise<JobTypeAttributes[]> {
+  static async findAll(environmentId?: string): Promise<JobTypeAttributes[]> {
     try {
-      const envName = environment ?? getCurrentEnvironment();
+      const envName = environmentId ?? getCurrentEnvironment();
       const results = await db('g_job_types as jt')
         .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
-        .where('jt.environment', envName)
+        .where('jt.environmentId', envName)
         .orderBy('jt.name', 'asc');
 
       return results.map((row: any) => ({
@@ -87,15 +90,15 @@ export class JobTypeModel {
     }
   }
 
-  static async findById(id: number, environment?: string): Promise<JobTypeAttributes | null> {
+  static async findById(id: string, environmentId?: string): Promise<JobTypeAttributes | null> {
     try {
-      const envName = environment ?? getCurrentEnvironment();
+      const envName = environmentId ?? getCurrentEnvironment();
       const row = await db('g_job_types as jt')
         .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
         .where('jt.id', id)
-        .where('jt.environment', envName)
+        .where('jt.environmentId', envName)
         .first();
 
       if (!row) return null;
@@ -110,14 +113,14 @@ export class JobTypeModel {
     }
   }
 
-  static async findByName(name: string, environment?: string): Promise<JobTypeAttributes | null> {
+  static async findByName(name: string, environmentId?: string): Promise<JobTypeAttributes | null> {
     try {
-      const envName = environment ?? getCurrentEnvironment();
+      const envName = environmentId ?? getCurrentEnvironment();
       const row = await db('g_job_types as jt')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
         .where('jt.name', name)
-        .where('jt.environment', envName)
+        .where('jt.environmentId', envName)
         .first();
 
       if (!row) return null;
@@ -138,8 +141,11 @@ export class JobTypeModel {
       const envName = getCurrentEnvironment();
       const schemaJson = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
 
-      const [insertId] = await db('g_job_types').insert({
-        environment: envName,
+      const id = generateULID();
+
+      await db('g_job_types').insert({
+        id,
+        environmentId: envName,
         name: data.name,
         displayName: data.displayName,
         description: data.description || null,
@@ -148,7 +154,7 @@ export class JobTypeModel {
         createdBy: data.createdBy || null,
       });
 
-      const created = await this.findById(insertId, envName);
+      const created = await this.findById(id, envName);
       if (!created) {
         throw new Error('Failed to retrieve created job type');
       }
@@ -161,33 +167,24 @@ export class JobTypeModel {
   }
 
   static async update(
-    id: number,
+    id: string,
     data: UpdateJobTypeData,
-    environment?: string
+    environmentId?: string
   ): Promise<JobTypeAttributes> {
     try {
-      const envName = environment ?? getCurrentEnvironment();
+      const envName = environmentId ?? getCurrentEnvironment();
       const updateData: any = {};
 
-      if (data.displayName !== undefined) {
-        updateData.displayName = data.displayName;
-      }
-      if (data.description !== undefined) {
-        updateData.description = data.description;
-      }
-      if (data.jobSchema !== undefined) {
+      if (data.displayName !== undefined) updateData.displayName = data.displayName;
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.jobSchema !== undefined)
         updateData.jobSchema = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
-      }
-      if (data.isEnabled !== undefined) {
-        updateData.isEnabled = data.isEnabled;
-      }
-      if (data.updatedBy !== undefined) {
-        updateData.updatedBy = data.updatedBy;
-      }
+      if (data.isEnabled !== undefined) updateData.isEnabled = data.isEnabled;
+      if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
       updateData.updatedAt = db.fn.now();
 
-      await db('g_job_types').where('id', id).where('environment', envName).update(updateData);
+      await db('g_job_types').where('id', id).where('environmentId', envName).update(updateData);
 
       const updated = await this.findById(id, envName);
       if (!updated) {
@@ -201,10 +198,10 @@ export class JobTypeModel {
     }
   }
 
-  static async delete(id: number, environment?: string): Promise<boolean> {
+  static async delete(id: string, environmentId?: string): Promise<boolean> {
     try {
-      const envName = environment ?? getCurrentEnvironment();
-      const result = await db('g_job_types').where('id', id).where('environment', envName).del();
+      const envName = environmentId ?? getCurrentEnvironment();
+      const result = await db('g_job_types').where('id', id).where('environmentId', envName).del();
 
       return result > 0;
     } catch (error) {
@@ -213,13 +210,13 @@ export class JobTypeModel {
     }
   }
 
-  static async findEnabled(environment?: string): Promise<JobTypeAttributes[]> {
+  static async findEnabled(environmentId?: string): Promise<JobTypeAttributes[]> {
     try {
-      const envName = environment ?? getCurrentEnvironment();
+      const envName = environmentId ?? getCurrentEnvironment();
       const results = await db('g_job_types as jt')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select(['jt.*', 'cu.name as createdByName', 'uu.name as updatedByName'])
-        .where('jt.environment', envName)
+        .where('jt.environmentId', envName)
         .where('jt.isEnabled', true)
         .orderBy('jt.name', 'asc');
 

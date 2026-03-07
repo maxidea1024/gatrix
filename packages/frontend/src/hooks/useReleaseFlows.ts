@@ -1,13 +1,17 @@
 import { useApi, useConditionalApi } from './useSWR';
 import { ReleaseFlowTemplate, ReleaseFlowPlan } from '@/services/releaseFlowService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 /**
  * Hook for release flow templates
  */
 export function useReleaseFlowTemplates(search?: string) {
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+
   const url = search
-    ? `/admin/release-flows/templates?search=${encodeURIComponent(search)}`
-    : '/admin/release-flows/templates';
+    ? `${projectApiPath}/release-flows/templates?search=${encodeURIComponent(search)}`
+    : `${projectApiPath}/release-flows/templates`;
 
   return useApi<ReleaseFlowTemplate[]>(url);
 }
@@ -15,8 +19,14 @@ export function useReleaseFlowTemplates(search?: string) {
 /**
  * Hook for a specific release flow plan for a flag and environment
  */
-export function useReleaseFlowPlan(flagId: string | null, environment: string | null) {
-  const url = flagId && environment ? `/admin/release-flows/plans/${flagId}/${environment}` : null;
+export function useReleaseFlowPlan(flagId: string | null, environmentId: string | null) {
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+
+  const url =
+    flagId && environmentId
+      ? `${projectApiPath}/release-flows/plans/${flagId}/${environmentId}`
+      : null;
 
   return useApi<ReleaseFlowPlan>(url);
 }
@@ -26,16 +36,22 @@ export function useReleaseFlowPlan(flagId: string | null, environment: string | 
  */
 export function useConditionalReleaseFlowPlan(
   flagId: string | null,
-  environment: string | null,
+  environmentId: string | null,
   condition: boolean
 ) {
-  const url = flagId && environment ? `/admin/release-flows/plans/${flagId}/${environment}` : null;
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+
+  const url =
+    flagId && environmentId
+      ? `${projectApiPath}/release-flows/plans/${flagId}/${environmentId}`
+      : null;
 
   return useConditionalApi<ReleaseFlowPlan>(url, condition);
 }
 
 export interface ReleaseFlowPlanSummary {
-  environment: string;
+  environmentId: string;
   status: string;
   displayName: string;
   activeMilestoneName: string | null;
@@ -45,7 +61,10 @@ export interface ReleaseFlowPlanSummary {
  * Hook for fetching all active release flow plans for a flag
  */
 export function useReleaseFlowPlansByFlag(flagId: string | null) {
-  const url = flagId ? `/admin/release-flows/plans/flag/${flagId}` : null;
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+
+  const url = flagId ? `${projectApiPath}/release-flows/plans/flag/${flagId}` : null;
 
   return useApi<ReleaseFlowPlanSummary[]>(url);
 }

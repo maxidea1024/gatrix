@@ -5,10 +5,11 @@ import { Close as CloseIcon } from '@mui/icons-material';
 interface ResizableDrawerProps {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   subtitle?: string;
   children: ReactNode;
-  storageKey: string; // localStorage key for persisting width
+  anchor?: string; // Kept for compatibility but always 'right'
+  storageKey?: string; // localStorage key for persisting width
   defaultWidth?: number;
   minWidth?: number;
   maxWidth?: number;
@@ -26,7 +27,7 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
   title,
   subtitle,
   children,
-  storageKey,
+  storageKey = 'resizable-drawer',
   defaultWidth = 600,
   minWidth = 400,
   maxWidth,

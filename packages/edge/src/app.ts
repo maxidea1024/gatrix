@@ -2,13 +2,15 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
-import logger from './config/logger';
+import { createLogger } from './config/logger';
+
+const logger = createLogger('EdgeApp');
 import clientRoutes from './routes/client';
 import serverRoutes from './routes/server';
 import healthRoutes from './routes/health';
 import publicRoutes from './routes/public';
-import { sdkManager } from './services/sdkManager';
-import { requestStats } from './services/requestStats';
+import { sdkManager } from './services/sdk-manager';
+import { requestStats } from './services/request-stats';
 import { ALLOWED_HEADERS } from './constants/headers';
 
 // Create Express application

@@ -1,4 +1,6 @@
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CmsCashShopService');
 import { PlanningDataService } from './PlanningDataService';
 
 // Supported language codes
@@ -19,7 +21,7 @@ export interface MultiLangText {
  * Matches the structure from cashshop-lookup.json planning data
  */
 export interface CmsCashShopProduct {
-  id: number;
+  id: string;
   name: MultiLangText; // Multi-language product name
   description: MultiLangText; // Multi-language product description
   productCode: string; // SDO product code
@@ -38,16 +40,18 @@ export class CmsCashShopService {
    * Get all valid CMS CashShop products for an environment
    * @param environment Environment name
    */
-  static async getProducts(environment: string): Promise<CmsCashShopProduct[]> {
+  static async getProducts(environmentId: string): Promise<CmsCashShopProduct[]> {
     try {
-      const data = await PlanningDataService.getCashShopLookup(environment);
+      const data = await PlanningDataService.getCashShopLookup(environmentId);
       const products: CmsCashShopProduct[] = data.items || [];
-      logger.info(`Loaded ${products.length} CMS CashShop products for environment ${environment}`);
+      logger.info(
+        `Loaded ${products.length} CMS CashShop products for environmentId ${environmentId}`
+      );
       return products;
     } catch (error) {
       logger.error('Failed to load CMS CashShop products', {
         error,
-        environment,
+        environmentId,
       });
       throw error;
     }

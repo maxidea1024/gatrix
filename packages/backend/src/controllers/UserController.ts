@@ -6,7 +6,11 @@ import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { UserModel } from '../models/User';
 import Joi from 'joi';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+import { UserOnboardingService } from '../services/UserOnboardingService';
+import { permissionService } from '../services/PermissionService';
+
+const logger = createLogger('UserController');
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
@@ -14,7 +18,6 @@ const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.pn
 const getUsersQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).optional(),
   limit: Joi.number().integer().min(1).max(100).optional(),
-  role: Joi.string().valid('admin', 'user').optional(),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional(),
   search: Joi.string().max(100).optional(),
 });
@@ -23,14 +26,13 @@ const updateUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   email: Joi.string().email().optional(),
   avatarUrl: Joi.string().uri().optional().allow(''),
-  role: Joi.string().valid('admin', 'user').optional(),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional(),
   email_verified: Joi.boolean().optional(),
-  tagIds: Joi.array().items(Joi.number().integer().positive()).optional(),
+  tagIds: Joi.array().items(Joi.string()).optional(),
 });
 
 const setUserTagsSchema = Joi.object({
-  tagIds: Joi.array().items(Joi.number().integer().positive()).required(),
+  tagIds: Joi.array().items(Joi.string()).required(),
 });
 
 const updateLanguageSchema = Joi.object({
@@ -38,29 +40,24 @@ const updateLanguageSchema = Joi.object({
 });
 
 const addUserTagSchema = Joi.object({
-  tagId: Joi.number().integer().positive().required(),
+  tagId: Joi.string().required(),
 });
 
 const verifyEmailSchema = Joi.object({
-  userId: Joi.number().integer().positive().required(),
+  userId: Joi.string().required(),
 });
 
 const createUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  role: Joi.string().valid('admin', 'user').optional().default('user'),
   status: Joi.string()
     .valid('pending', 'active', 'suspended', 'deleted')
     .optional()
     .default('active'),
   emailVerified: Joi.boolean().optional().default(true),
-  tagIds: Joi.array().items(Joi.number().integer().positive()).optional().default([]),
-});
-
-const setEnvironmentAccessSchema = Joi.object({
-  allowAllEnvironments: Joi.boolean().required(),
-  environments: Joi.array().items(Joi.string().min(1).max(127)).default([]),
+  tagIds: Joi.array().items(Joi.string()).optional().default([]),
+  autoJoinConfig: Joi.object().optional(),
 });
 
 export class UserController {
@@ -71,9 +68,22 @@ export class UserController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const { page, limit, role, status, search } = value;
+    const { page, limit, status, search } = value;
 
-    const filters = { role, status, search };
+    // Scope filtering by hierarchy: filter users visible based on actor's scope level
+    let orgId: string | undefined;
+    let excludeHigherScopeUsers = false;
+    let actorScopeLevel = 1;
+    if (req.user?.orgId) {
+      actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user.id);
+      const { SCOPE_LEVELS } = require('../utils/scopeHierarchy');
+      if (actorScopeLevel > SCOPE_LEVELS.system) {
+        orgId = req.user.orgId;
+        excludeHigherScopeUsers = true;
+      }
+    }
+
+    const filters = { status, search, orgId, excludeSystemAdmins: excludeHigherScopeUsers, actorScopeLevel };
     const pagination = { page, limit };
 
     const result = await UserService.getAllUsers(filters, pagination);
@@ -90,16 +100,16 @@ export class UserController {
       throw new GatrixError(error.details[0].message, 400);
     }
 
-    const { tagIds, ...userData } = value;
+    const { tagIds, autoJoinConfig, ...userData } = value;
     const createdBy = req.user?.userId;
 
-    // 사용자 생성
+    // Create user
     let user = await UserService.createUser({
       ...userData,
       createdBy,
     });
 
-    // 태그 설정
+    // Set tags
     if (tagIds && tagIds.length > 0) {
       logger.debug('Setting user tags for new user:', {
         userId: user.id,
@@ -109,8 +119,23 @@ export class UserController {
       await UserTagService.setUserTags(user.id, tagIds, createdBy!);
       logger.debug('User tags set successfully for new user');
 
-      // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+      // Reload user to include latest tag info
       user = await UserService.getUserById(user.id);
+    }
+
+    // Apply auto-join config if provided
+    if (autoJoinConfig) {
+      try {
+        await UserOnboardingService.applyAutoJoinConfig(
+          user.id,
+          autoJoinConfig,
+          createdBy || user.id
+        );
+        logger.info('Auto-join config applied for new user', { userId: user.id });
+      } catch (error) {
+        logger.error('Failed to apply auto-join config for new user:', error);
+        // User is already created, log the error but don't fail the request
+      }
     }
 
     res.status(201).json({
@@ -121,9 +146,9 @@ export class UserController {
   });
 
   static getUserById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -136,9 +161,9 @@ export class UserController {
   });
 
   static updateUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -154,6 +179,13 @@ export class UserController {
     const { tagIds, ...userData } = value;
     const updatedBy = req.user?.userId;
 
+    // Prevent managing users with higher scope level
+    const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user!.id);
+    const targetScopeLevel = await permissionService.getUserMaxScopeLevel(userId);
+    if (targetScopeLevel < actorScopeLevel) {
+      throw new GatrixError('Cannot modify users with higher scope level', 403);
+    }
+
     logger.debug('Update user request:', {
       userId,
       tagIds,
@@ -161,22 +193,15 @@ export class UserController {
       updatedBy,
     });
 
-    // Prevent users from modifying their own role or status (except admins)
-    if (req.user?.userId === userId && req.user?.role !== 'admin') {
-      if (userData.role || userData.status) {
-        throw new GatrixError('You cannot modify your own role or status', 403);
-      }
-    }
-
     let user = await UserService.updateUser(userId, userData);
 
-    // 태그 설정 (tagIds가 제공된 경우에만)
+    // 태그 Settings (tagIds가 제공된 경우에만)
     if (tagIds !== undefined) {
       logger.debug('Setting user tags:', { userId, tagIds, updatedBy });
       await UserTagService.setUserTags(userId, tagIds, updatedBy!);
       logger.debug('User tags set successfully');
 
-      // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+      // 태그 업데이트 후 User info를 다시 로드하여 최신 태그 정보 포함
       user = await UserService.getUserById(userId);
     } else {
       logger.debug('No tagIds provided, skipping tag update');
@@ -190,15 +215,22 @@ export class UserController {
   });
 
   static deleteUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
     // Prevent users from deleting themselves
     if (req.user?.userId === userId) {
       throw new GatrixError('You cannot delete your own account', 403);
+    }
+
+    // Prevent managing users with higher scope level
+    const actorScopeLevel = await permissionService.getUserMaxScopeLevel(req.user!.id);
+    const targetScopeLevel = await permissionService.getUserMaxScopeLevel(userId);
+    if (targetScopeLevel < actorScopeLevel) {
+      throw new GatrixError('Cannot delete users with higher scope level', 403);
     }
 
     await UserService.deleteUser(userId);
@@ -210,9 +242,9 @@ export class UserController {
   });
 
   static approveUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -227,9 +259,9 @@ export class UserController {
   });
 
   static rejectUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -242,9 +274,9 @@ export class UserController {
   });
 
   static suspendUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -263,9 +295,9 @@ export class UserController {
   });
 
   static unsuspendUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -276,43 +308,6 @@ export class UserController {
       success: true,
       data: { user },
       message: 'User unsuspended successfully',
-    });
-  });
-
-  static promoteToAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-
-    if (isNaN(userId)) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    const user = await UserService.promoteToAdmin(userId);
-
-    res.json({
-      success: true,
-      data: { user },
-      message: 'User promoted to admin successfully',
-    });
-  });
-
-  static demoteFromAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-
-    if (isNaN(userId)) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    // Prevent users from demoting themselves
-    if (req.user?.userId === userId) {
-      throw new GatrixError('You cannot demote your own account', 403);
-    }
-
-    const user = await UserService.demoteFromAdmin(userId);
-
-    res.json({
-      success: true,
-      data: { user },
-      message: 'User demoted from admin successfully',
     });
   });
 
@@ -334,9 +329,9 @@ export class UserController {
     });
   });
 
-  // 사용자 검색 (채팅 시스템용)
+  // Used자 Search (채팅 시스템용)
   static searchUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { q: query, limit = 20 } = req.query;
+    const { q: query, limit = 20, orgId } = req.query;
 
     if (!query || typeof query !== 'string') {
       throw new GatrixError('Search query is required', 400);
@@ -346,9 +341,10 @@ export class UserController {
       throw new GatrixError('Search query must be at least 2 characters', 400);
     }
 
-    const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // 최대 50개로 제한
+    const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // Max 50
+    const searchOrgId = typeof orgId === 'string' ? orgId : undefined;
 
-    const users = await UserService.searchUsers(query, searchLimit);
+    const users = await UserService.searchUsers(query, searchLimit, searchOrgId);
 
     res.json({
       success: true,
@@ -389,7 +385,7 @@ export class UserController {
 
     const user = await UserService.updateUser(req.user.userId, value);
 
-    // Chat Server에 사용자 정보 동기화 (백그라운드에서 실행)
+    // Chat Server에 User info 동기화 (백그라운드에서 실행)
     try {
       const chatServerService = ChatServerService.getInstance();
       await chatServerService.syncUser({
@@ -404,7 +400,7 @@ export class UserController {
         updatedAt: user.updatedAt?.toISOString(),
       });
     } catch (error) {
-      // Chat Server 동기화 실패는 로그만 남기고 사용자에게는 성공 응답
+      // Chat Server 동기화 Failed는 로그만 남기고 Used자에게는 Success Response
       logger.error('Failed to sync user to Chat Server:', error);
     }
 
@@ -417,9 +413,9 @@ export class UserController {
 
   // 태그 관련 엔드포인트들
   static getUserTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -432,9 +428,9 @@ export class UserController {
   });
 
   static setUserTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -455,9 +451,9 @@ export class UserController {
   });
 
   static addUserTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -478,10 +474,10 @@ export class UserController {
   });
 
   static removeUserTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-    const tagId = parseInt(req.params.tagId);
+    const userId = req.params.id;
+    const tagId = req.params.tagId;
 
-    if (isNaN(userId) || isNaN(tagId)) {
+    if (!userId || !tagId) {
       throw new GatrixError('Invalid user ID or tag ID', 400);
     }
 
@@ -493,11 +489,11 @@ export class UserController {
     });
   });
 
-  // 관리자가 사용자 이메일을 강제 인증 처리
+  // 관리자가 Force verify user email
   static verifyUserEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.params.id;
 
-    if (isNaN(userId)) {
+    if (!userId) {
       throw new GatrixError('Invalid user ID', 400);
     }
 
@@ -509,12 +505,12 @@ export class UserController {
     });
   });
 
-  // 사용자에게 이메일 인증 메일 재전송
+  // Used자에게 이메일 Resend verification email
   static resendVerificationEmail = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         throw new GatrixError('Invalid user ID', 400);
       }
 
@@ -549,64 +545,22 @@ export class UserController {
       },
     });
   });
-
-  // Environment access endpoints
-
   /**
-   * Get user's environment access settings
+   * Get current user's RBAC permissions (self-service, no admin required)
    */
-  static getEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
-      throw new GatrixError('Invalid user ID', 400);
+  static getMyPermissions = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      throw new GatrixError('User not authenticated', 401);
     }
 
-    const access = await UserModel.getEnvironmentAccess(userId);
-
-    res.json({
-      success: true,
-      data: access,
-    });
-  });
-
-  /**
-   * Set user's environment access
-   */
-  static setEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = parseInt(req.params.id);
-    if (isNaN(userId)) {
-      throw new GatrixError('Invalid user ID', 400);
-    }
-
-    const { error, value } = setEnvironmentAccessSchema.validate(req.body);
-    if (error) {
-      throw new GatrixError(error.details[0].message, 400);
-    }
-
-    const { allowAllEnvironments, environments } = value;
-    const updatedBy = req.user!.userId;
-
-    await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environments, updatedBy);
-
-    res.json({
-      success: true,
-      message: 'Environment access updated successfully',
-    });
-  });
-
-  /**
-   * Get current user's accessible environments
-   */
-  static getMyEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user!.userId;
-
-    const accessibleEnvs = await UserModel.getAccessibleEnvironments(userId);
+    const userId = req.user.userId;
+    const permissions = await UserModel.getPermissions(userId);
 
     res.json({
       success: true,
       data: {
-        allowAllEnvironments: accessibleEnvs === 'all',
-        environments: accessibleEnvs === 'all' ? [] : accessibleEnvs,
+        userId,
+        permissions,
       },
     });
   });

@@ -53,8 +53,11 @@ class RewardTemplateService {
   /**
    * Get all reward templates with pagination
    */
-  async getRewardTemplates(params?: GetRewardTemplatesParams): Promise<GetRewardTemplatesResponse> {
-    const response = await api.get('/admin/reward-templates', { params });
+  async getRewardTemplates(
+    projectApiPath: string,
+    params?: GetRewardTemplatesParams
+  ): Promise<GetRewardTemplatesResponse> {
+    const response = await api.get(`${projectApiPath}/reward-templates`, { params });
     // API service already unwraps response.data, so response = { success: true, data: { templates, total, page, limit }, message: "..." }
     return response.data;
   }
@@ -62,8 +65,8 @@ class RewardTemplateService {
   /**
    * Get reward template by ID
    */
-  async getRewardTemplateById(id: string): Promise<RewardTemplate> {
-    const response = await api.get(`/admin/reward-templates/${id}`);
+  async getRewardTemplateById(projectApiPath: string, id: string): Promise<RewardTemplate> {
+    const response = await api.get(`${projectApiPath}/reward-templates/${id}`);
     // API service already unwraps response.data, so response = { success: true, data: { template }, message: "..." }
     return response.data.template;
   }
@@ -72,9 +75,10 @@ class RewardTemplateService {
    * Create a new reward template
    */
   async createRewardTemplate(
+    projectApiPath: string,
     input: CreateRewardTemplateInput
   ): Promise<MutationResult<RewardTemplate>> {
-    const response = await api.post('/admin/reward-templates', input);
+    const response = await api.post(`${projectApiPath}/reward-templates`, input);
     return parseChangeRequestResponse<RewardTemplate>(response, (r) => r?.template);
   }
 
@@ -82,26 +86,30 @@ class RewardTemplateService {
    * Update a reward template
    */
   async updateRewardTemplate(
+    projectApiPath: string,
     id: string,
     input: UpdateRewardTemplateInput
   ): Promise<MutationResult<RewardTemplate>> {
-    const response = await api.put(`/admin/reward-templates/${id}`, input);
+    const response = await api.put(`${projectApiPath}/reward-templates/${id}`, input);
     return parseChangeRequestResponse<RewardTemplate>(response, (r) => r?.template);
   }
 
   /**
    * Delete a reward template
    */
-  async deleteRewardTemplate(id: string): Promise<MutationResult<void>> {
-    const response = await api.delete(`/admin/reward-templates/${id}`);
+  async deleteRewardTemplate(projectApiPath: string, id: string): Promise<MutationResult<void>> {
+    const response = await api.delete(`${projectApiPath}/reward-templates/${id}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Check references for a reward template
    */
-  async checkReferences(id: string): Promise<{ surveys: any[]; coupons: any[] }> {
-    const response = await api.get(`/admin/reward-templates/${id}/references`);
+  async checkReferences(
+    projectApiPath: string,
+    id: string
+  ): Promise<{ surveys: any[]; coupons: any[] }> {
+    const response = await api.get(`${projectApiPath}/reward-templates/${id}/references`);
     return response.data.data;
   }
 }

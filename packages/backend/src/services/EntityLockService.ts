@@ -5,11 +5,13 @@
  * Uses Redis with TTL for automatic expiration.
  */
 import redisClient from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('EntityLock');
 import { pubSubService } from './PubSubService';
 
 interface LockInfo {
-  userId: number;
+  userId: string;
   userName: string;
   userEmail: string;
   lockedAt: number; // Unix timestamp in ms
@@ -26,8 +28,8 @@ class EntityLockService {
   /**
    * Generate Redis key for entity lock
    */
-  private getLockKey(table: string, entityId: string | number, environment: string): string {
-    return `${LOCK_KEY_PREFIX}:${environment}:${table}:${entityId}`;
+  private getLockKey(table: string, entityId: string, environmentId: string): string {
+    return `${LOCK_KEY_PREFIX}:${environmentId}:${table}:${entityId}`;
   }
 
   /**
@@ -36,14 +38,14 @@ class EntityLockService {
    */
   async acquireLock(
     table: string,
-    entityId: string | number,
-    environment: string,
-    userId: number,
+    entityId: string,
+    environmentId: string,
+    userId: string,
     userName: string,
     userEmail: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<{ success: boolean; existingLock?: LockInfo }> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       // Check if already locked
@@ -79,10 +81,10 @@ class EntityLockService {
       };
       await redisClient.set(key, JSON.stringify(lockInfo), ttlSeconds);
 
-      logger.debug(`[EntityLock] Lock acquired: ${key} by user ${userId}`);
+      logger.debug(`Lock acquired: ${key} by user ${userId}`);
       return { success: true };
     } catch (error) {
-      logger.error('[EntityLock] Failed to acquire lock', error);
+      logger.error('Failed to acquire lock', error);
       // On error, allow editing (fail open)
       return { success: true };
     }
@@ -93,14 +95,14 @@ class EntityLockService {
    */
   async forceAcquireLock(
     table: string,
-    entityId: string | number,
-    environment: string,
-    userId: number,
+    entityId: string,
+    environmentId: string,
+    userId: string,
     userName: string,
     userEmail: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       // Get the previous lock owner before overwriting
@@ -119,7 +121,7 @@ class EntityLockService {
       };
       await redisClient.set(key, JSON.stringify(lockInfo), ttlSeconds);
 
-      logger.info(`[EntityLock] Lock force acquired: ${key} by user ${userId}`);
+      logger.info(`Lock force acquired: ${key} by user ${userId}`);
 
       // Send SSE notification to notify the previous owner
       if (previousOwner && previousOwner.userId !== userId) {
@@ -128,8 +130,8 @@ class EntityLockService {
             type: 'entity_lock.taken_over',
             data: {
               table,
-              entityId: String(entityId),
-              environment,
+              entityId: entityId,
+              environmentId,
               previousOwner: {
                 userId: previousOwner.userId,
                 userName: previousOwner.userName,
@@ -143,13 +145,13 @@ class EntityLockService {
             },
           });
         } catch (sseError) {
-          logger.warn('[EntityLock] Failed to send SSE notification for force takeover', sseError);
+          logger.warn('Failed to send SSE notification for force takeover', sseError);
         }
       }
 
       return true;
     } catch (error) {
-      logger.error('[EntityLock] Failed to force acquire lock', error);
+      logger.error('Failed to force acquire lock', error);
       return false;
     }
   }
@@ -159,11 +161,11 @@ class EntityLockService {
    */
   async releaseLock(
     table: string,
-    entityId: string | number,
-    environment: string,
-    userId: number
+    entityId: string,
+    environmentId: string,
+    userId: string
   ): Promise<boolean> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       // Only release if locked by the same user
@@ -171,13 +173,13 @@ class EntityLockService {
       if (existingLockStr) {
         const existingLock: LockInfo = JSON.parse(existingLockStr);
         if (existingLock.userId !== userId) {
-          logger.warn(`[EntityLock] Cannot release lock owned by another user: ${key}`);
+          logger.warn(`Cannot release lock owned by another user: ${key}`);
           return false;
         }
       }
 
       await redisClient.del(key);
-      logger.debug(`[EntityLock] Lock released: ${key}`);
+      logger.debug(`Lock released: ${key}`);
 
       // Send SSE notification for lock release
       try {
@@ -185,18 +187,18 @@ class EntityLockService {
           type: 'entity_lock.released',
           data: {
             table,
-            entityId: String(entityId),
-            environment,
+            entityId: entityId,
+            environmentId,
             releasedBy: userId,
           },
         });
       } catch (sseError) {
-        logger.warn('[EntityLock] Failed to send SSE notification for lock release', sseError);
+        logger.warn('Failed to send SSE notification for lock release', sseError);
       }
 
       return true;
     } catch (error) {
-      logger.error('[EntityLock] Failed to release lock', error);
+      logger.error('Failed to release lock', error);
       return false;
     }
   }
@@ -206,10 +208,10 @@ class EntityLockService {
    */
   async checkLock(
     table: string,
-    entityId: string | number,
-    environment: string
+    entityId: string,
+    environmentId: string
   ): Promise<LockInfo | null> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       const lockStr = await redisClient.get(key);
@@ -218,7 +220,7 @@ class EntityLockService {
       }
       return null;
     } catch (error) {
-      logger.error('[EntityLock] Failed to check lock', error);
+      logger.error('Failed to check lock', error);
       return null;
     }
   }
@@ -228,12 +230,12 @@ class EntityLockService {
    */
   async extendLock(
     table: string,
-    entityId: string | number,
-    environment: string,
-    userId: number,
+    entityId: string,
+    environmentId: string,
+    userId: string,
     ttlSeconds: number = DEFAULT_LOCK_TTL_SECONDS
   ): Promise<boolean> {
-    const key = this.getLockKey(table, entityId, environment);
+    const key = this.getLockKey(table, entityId, environmentId);
 
     try {
       const existingLockStr = await redisClient.get(key);
@@ -252,7 +254,7 @@ class EntityLockService {
 
       return true;
     } catch (error) {
-      logger.error('[EntityLock] Failed to extend lock', error);
+      logger.error('Failed to extend lock', error);
       return false;
     }
   }
@@ -262,8 +264,8 @@ class EntityLockService {
    */
   async checkPendingCR(
     table: string,
-    entityId: string | number,
-    environment: string
+    entityId: string,
+    environmentId: string
   ): Promise<{ hasPending: boolean; crId?: string; crTitle?: string }> {
     // Import dynamically to avoid circular dependency
     const { ChangeRequest } = await import('../models/ChangeRequest');
@@ -273,12 +275,12 @@ class EntityLockService {
       // Find open or approved CRs that affect this entity
       const pendingItem = await ChangeItem.query()
         .where('targetTable', table)
-        .where('targetId', String(entityId))
+        .where('targetId', entityId)
         .whereIn('opType', ['UPDATE', 'DELETE'])
         .whereExists(
           ChangeRequest.query()
             .whereRaw('g_change_requests.id = g_change_items.changeRequestId')
-            .where('environment', environment)
+            .where('environmentId', environmentId)
             .whereIn('status', ['open', 'approved'])
         )
         .first();
@@ -295,7 +297,7 @@ class EntityLockService {
 
       return { hasPending: false };
     } catch (error) {
-      logger.error('[EntityLock] Failed to check pending CR', error);
+      logger.error('Failed to check pending CR', error);
       return { hasPending: false };
     }
   }

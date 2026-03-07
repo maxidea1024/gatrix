@@ -56,7 +56,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // 현재 설정 로드
+  // 현재 Load settings
   const loadSettings = async () => {
     setLoading(true);
     try {
@@ -80,7 +80,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
     }
   };
 
-  // 설정 저장
+  // Settings Save
   const saveSettings = async () => {
     setSaving(true);
     try {
@@ -114,7 +114,7 @@ const PrivacySettings: React.FC<PrivacySettingsProps> = ({ open, onClose, title,
     }
   };
 
-  // 다이얼로그 열릴 때 설정 로드
+  // Dialog 열릴 때 Load settings
   useEffect(() => {
     if (open) {
       loadSettings();

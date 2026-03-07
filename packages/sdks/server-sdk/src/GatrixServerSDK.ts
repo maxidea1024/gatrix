@@ -288,7 +288,6 @@ export class GatrixServerSDK {
       baseURL: configWithDefaults.gatrixUrl,
       apiToken: configWithDefaults.apiToken,
       applicationName: configWithDefaults.applicationName,
-      environment: configWithDefaults.environment, // Pass environment for X-Environment header
       logger: this.logger,
       retry: configWithDefaults.retry,
       metrics: this.metrics,
@@ -347,9 +346,10 @@ export class GatrixServerSDK {
       throw createError(ErrorCode.INVALID_CONFIG, 'group is required');
     }
 
-    if (!config.environment) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'environment is required');
-    }
+    // environment is now optional (token handles it)
+    // if (!config.environment) {
+    //   throw createError(ErrorCode.INVALID_CONFIG, 'environment is required');
+    // }
 
     // Validate URL format
     try {
@@ -442,10 +442,10 @@ export class GatrixServerSDK {
       },
       redis: this.config.redis
         ? {
-          host: this.config.redis.host,
-          port: this.config.redis.port,
-          db: this.config.redis.db ?? 0,
-        }
+            host: this.config.redis.host,
+            port: this.config.redis.port,
+            db: this.config.redis.db ?? 0,
+          }
         : 'disabled',
       retry: this.config.retry ?? 'default',
     });
@@ -900,7 +900,7 @@ export class GatrixServerSDK {
    * Used in single-environment mode (game servers)
    */
   getDefaultEnvironment(): string {
-    return this.config.environment;
+    return this.config.environment || 'unknown';
   }
 
   /**
@@ -923,7 +923,7 @@ export class GatrixServerSDK {
       );
     }
 
-    return this.config.environment;
+    return this.config.environment || 'unknown';
   }
 
   // ============================================================================
@@ -1650,7 +1650,7 @@ export class GatrixServerSDK {
     if (refreshMethod === 'event') {
       if (!this.eventListener) {
         this.logger.warn('Event listener not initialized. Events will not be received.');
-        return () => { }; // Return no-op function
+        return () => {}; // Return no-op function
       }
       return this.eventListener.on(eventType, callback);
     }
@@ -1658,7 +1658,7 @@ export class GatrixServerSDK {
     else if (refreshMethod === 'polling') {
       if (!this.cacheManager) {
         this.logger.warn('Cache manager not initialized.');
-        return () => { }; // Return no-op function
+        return () => {}; // Return no-op function
       }
       const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
         // Convert cache refresh events to SDK events
@@ -1679,7 +1679,7 @@ export class GatrixServerSDK {
       return unsubscribe;
     }
 
-    return () => { }; // Return no-op function as fallback
+    return () => {}; // Return no-op function as fallback
   }
 
   /**
@@ -1874,15 +1874,15 @@ export class GatrixServerSDK {
    */
   getUserMetricsProvider():
     | {
-      createCounter: (name: string, help: string, labelNames?: string[]) => any;
-      createGauge: (name: string, help: string, labelNames?: string[]) => any;
-      createHistogram: (
-        name: string,
-        help: string,
-        labelNames?: string[],
-        buckets?: number[]
-      ) => any;
-    }
+        createCounter: (name: string, help: string, labelNames?: string[]) => any;
+        createGauge: (name: string, help: string, labelNames?: string[]) => any;
+        createHistogram: (
+          name: string,
+          help: string,
+          labelNames?: string[],
+          buckets?: number[]
+        ) => any;
+      }
     | undefined {
     if (!this.userRegistry) return undefined;
 

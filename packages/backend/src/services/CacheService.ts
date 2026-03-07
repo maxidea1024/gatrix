@@ -1,7 +1,9 @@
 import { EventEmitter } from 'events';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CacheService');
 import { config } from '../config/index';
 
 export class CacheService extends EventEmitter {

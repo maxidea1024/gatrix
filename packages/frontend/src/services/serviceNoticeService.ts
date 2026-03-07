@@ -59,6 +59,7 @@ class ServiceNoticeService {
    * Get service notices with pagination and filters
    */
   async getServiceNotices(
+    projectApiPath: string,
     page: number = 1,
     limit: number = 10,
     filters: ServiceNoticeFilters = {}
@@ -93,23 +94,26 @@ class ServiceNoticeService {
       params.sortOrder = filters.sortOrder;
     }
 
-    const response = await api.get('/admin/service-notices', { params });
+    const response = await api.get(`${projectApiPath}/service-notices`, { params });
     return response.data;
   }
 
   /**
    * Get service notice by ID
    */
-  async getServiceNoticeById(id: number): Promise<ServiceNotice> {
-    const response = await api.get(`/admin/service-notices/${id}`);
+  async getServiceNoticeById(projectApiPath: string, id: number): Promise<ServiceNotice> {
+    const response = await api.get(`${projectApiPath}/service-notices/${id}`);
     return response.data.notice;
   }
 
   /**
    * Create service notice
    */
-  async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNoticeMutationResult> {
-    const response = await api.post('/admin/service-notices', data);
+  async createServiceNotice(
+    projectApiPath: string,
+    data: CreateServiceNoticeData
+  ): Promise<ServiceNoticeMutationResult> {
+    const response = await api.post(`${projectApiPath}/service-notices`, data);
     return parseChangeRequestResponse<ServiceNotice>(response, (r) => r?.notice);
   }
 
@@ -117,26 +121,30 @@ class ServiceNoticeService {
    * Update service notice
    */
   async updateServiceNotice(
+    projectApiPath: string,
     id: number,
     data: UpdateServiceNoticeData
   ): Promise<ServiceNoticeMutationResult> {
-    const response = await api.put(`/admin/service-notices/${id}`, data);
+    const response = await api.put(`${projectApiPath}/service-notices/${id}`, data);
     return parseChangeRequestResponse<ServiceNotice>(response, (r) => r?.notice);
   }
 
   /**
    * Delete service notice
    */
-  async deleteServiceNotice(id: number): Promise<MutationResult<void>> {
-    const response = await api.delete(`/admin/service-notices/${id}`);
+  async deleteServiceNotice(projectApiPath: string, id: number): Promise<MutationResult<void>> {
+    const response = await api.delete(`${projectApiPath}/service-notices/${id}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(ids: number[]): Promise<MutationResult<void>> {
-    const response = await api.post('/admin/service-notices/bulk-delete', {
+  async deleteMultipleServiceNotices(
+    projectApiPath: string,
+    ids: number[]
+  ): Promise<MutationResult<void>> {
+    const response = await api.post(`${projectApiPath}/service-notices/bulk-delete`, {
       ids,
     });
     return parseChangeRequestResponse<void>(response, () => undefined);
@@ -145,8 +153,8 @@ class ServiceNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: number): Promise<ServiceNoticeMutationResult> {
-    const response = await api.patch(`/admin/service-notices/${id}/toggle-active`);
+  async toggleActive(projectApiPath: string, id: number): Promise<ServiceNoticeMutationResult> {
+    const response = await api.patch(`${projectApiPath}/service-notices/${id}/toggle-active`);
     return parseChangeRequestResponse<ServiceNotice>(response, (r) => r?.notice);
   }
 }

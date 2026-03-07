@@ -1,7 +1,7 @@
 /**
  * Service Notice Service
  * Handles service notice list and retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/service-notices
+ * Uses per-environment API pattern: GET /api/v1/server/service-notices
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
@@ -82,10 +82,10 @@ export class ServiceNoticeService {
 
   /**
    * Get service notices for a specific environment
-   * GET /api/v1/server/:env/service-notices -> { notices: [...] }
+   * GET /api/v1/server/service-notices -> { notices: [...] }
    */
   async listByEnvironment(environment: string): Promise<ServiceNotice[]> {
-    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/service-notices`;
+    const endpoint = `/api/v1/server/service-notices`;
 
     this.logger.debug('Fetching service notices', { environment });
 

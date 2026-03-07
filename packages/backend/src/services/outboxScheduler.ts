@@ -4,7 +4,9 @@
  * Schedules periodic processing of outbox events.
  * Uses BullMQ to ensure only one instance processes at a time across all backend instances.
  */
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('outboxScheduler');
 import { queueService } from './QueueService';
 import { OutboxService } from './OutboxService';
 import { LockService } from './LockService';

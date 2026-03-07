@@ -1,55 +1,49 @@
 import express from 'express';
-import { auth, requirePermission } from '../../middleware/auth';
-import { requireAdmin } from '../../middleware/requireAdmin';
+import { auth, requireProjectPermission } from '../../middleware/auth';
 import EnvironmentController from '../../controllers/EnvironmentController';
-import { PERMISSIONS } from '../../types/permissions';
+import { P } from '@gatrix/shared/permissions';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // Apply authentication to all routes
 router.use(auth as any);
 
 // List environments - no special permission required (returns only user's accessible environments)
 // This is needed for AppBar environment selector
-router.get('/', requireAdmin, EnvironmentController.getEnvironments);
+router.get('/', EnvironmentController.getEnvironments);
 
-// Read-only access requires environments.view permission
-const viewPermission = requirePermission([
-  PERMISSIONS.ENVIRONMENTS_VIEW,
-  PERMISSIONS.ENVIRONMENTS_MANAGE,
+// Read-only access requires environments.read permission
+const viewPermission = requireProjectPermission([
+  P.ENVIRONMENTS_READ,
+  P.ENVIRONMENTS_UPDATE,
 ]) as any;
-router.get('/:environment', requireAdmin, viewPermission, EnvironmentController.getEnvironment);
+router.get('/:environmentId', viewPermission, EnvironmentController.getEnvironment);
 router.get(
-  '/:environment/stats',
-  requireAdmin,
+  '/:environmentId/stats',
   viewPermission,
   EnvironmentController.getEnvironmentStats
 );
 router.get(
-  '/:environment/related-data',
-  requireAdmin,
+  '/:environmentId/related-data',
   viewPermission,
   EnvironmentController.getEnvironmentRelatedData
 );
 
-// Write access requires environments.manage permission
-const managePermission = requirePermission(PERMISSIONS.ENVIRONMENTS_MANAGE) as any;
-router.post('/', requireAdmin, managePermission, EnvironmentController.createEnvironment);
+// Write access requires environments.update permission
+const managePermission = requireProjectPermission(P.ENVIRONMENTS_UPDATE) as any;
+router.post('/', managePermission, EnvironmentController.createEnvironment);
 router.put(
-  '/:environment',
-  requireAdmin,
+  '/:environmentId',
   managePermission,
   EnvironmentController.updateEnvironment
 );
 router.delete(
-  '/:environment',
-  requireAdmin,
+  '/:environmentId',
   managePermission,
   EnvironmentController.deleteEnvironment
 );
 router.post(
   '/validate-name',
-  requireAdmin,
   managePermission,
   EnvironmentController.validateEnvironmentName
 );
@@ -57,13 +51,11 @@ router.post(
 // Environment copy routes (requires manage permission)
 router.get(
   '/:sourceEnvironmentId/copy/:targetEnvironmentId/preview',
-  requireAdmin,
   managePermission,
   EnvironmentController.getCopyPreview
 );
 router.post(
   '/:sourceEnvironmentId/copy/:targetEnvironmentId',
-  requireAdmin,
   managePermission,
   EnvironmentController.copyEnvironmentData
 );

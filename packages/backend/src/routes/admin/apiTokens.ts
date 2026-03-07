@@ -1,8 +1,9 @@
 import express from 'express';
 import { body } from 'express-validator';
 import ApiTokensController from '../../controllers/ApiTokensController';
-import { authenticate, requireRole } from '../../middleware/auth';
+import { authenticate, requireOrgPermission, requireProjectPermission, requireEnvPermission } from '../../middleware/auth';
 import { auditLog } from '../../middleware/auditLog';
+import { P } from '@gatrix/shared/permissions';
 
 const router = express.Router();
 
@@ -15,8 +16,10 @@ const createTokenValidation = [
     .withMessage('Token name must be between 3 and 200 characters'),
 
   body('tokenType')
-    .isIn(['client', 'server', 'edge', 'all'])
-    .withMessage('Token type must be client, server, edge, or all'),
+    .isIn(['client', 'server', 'edge'])
+    .withMessage('Token type must be client, server, or edge'),
+
+  body('environmentId').notEmpty().withMessage('Environment ID is required'),
 
   body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
 ];
@@ -28,12 +31,14 @@ const updateTokenValidation = [
     .isLength({ min: 3, max: 200 })
     .withMessage('Token name must be between 3 and 200 characters'),
 
+  body('environmentId').notEmpty().withMessage('Environment ID is required'),
+
   body('expiresAt').optional().isISO8601().withMessage('Expires at must be a valid ISO 8601 date'),
 ];
 
-// Apply authentication and admin role requirement to all routes
+// Apply authentication and permission requirement to all routes
 router.use(authenticate as any);
-router.use(requireRole(['admin']) as any);
+router.use(requireProjectPermission([P.SERVICE_ACCOUNTS_READ, P.SERVICE_ACCOUNTS_UPDATE]) as any);
 
 // Routes
 router.get('/', ApiTokensController.getTokens as any);

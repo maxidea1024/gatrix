@@ -1,11 +1,11 @@
 import { Request } from 'express';
 
 export interface AppUser {
-  id: number;
-  userId: number; // backward compatibility
+  id: string;
+  userId: string; // same as id, for gradual migration from number-based code
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  orgId: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -13,13 +13,15 @@ export interface AppUser {
 
 export interface AuthenticatedRequest extends Request {
   user?: AppUser;
-  environment?: string;
+  environmentId?: string;
+  orgId?: string;
+  projectId?: string;
 }
 
 export interface JWTPayload {
-  userId: number;
+  userId: string;
   email: string;
-  role: string;
+  orgId: string;
   iat?: number;
   exp?: number;
 }

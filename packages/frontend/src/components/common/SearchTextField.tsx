@@ -17,6 +17,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   onClear,
   placeholder,
   sx,
+  InputProps: externalInputProps,
   ...rest
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +85,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
             </IconButton>
           </InputAdornment>
         ) : null,
+        ...externalInputProps,
       }}
       {...rest}
     />

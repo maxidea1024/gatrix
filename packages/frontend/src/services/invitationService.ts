@@ -1,5 +1,5 @@
 import { apiService } from './api';
-import { Invitation, CreateInvitationRequest, InvitationResponse } from '../types/invitation';
+import { Invitation, CreateInvitationRequest, InvitationResponse, AutoJoinInfo } from '../types/invitation';
 
 class InvitationService {
   private readonly ADMIN_BASE_URL = '/admin/invitations';
@@ -16,8 +16,8 @@ class InvitationService {
     const response = await apiService.get(`${this.ADMIN_BASE_URL}/current`);
 
     // Backend now returns 200 with data: null when no invitation exists
-    // apiService는 이미 response.data를 반환하므로
-    // response는 백엔드에서 보낸 { success: true, data: {...} | null } 구조
+    // apiService already returns response.data
+    // response is the { success: true, data: {...} | null } structure sent from backend
     if (response?.success && response?.data) {
       return response.data;
     }
@@ -31,7 +31,11 @@ class InvitationService {
   }
 
   // Public: validate invitation token
-  async validateInvitation(token: string): Promise<{ valid: boolean; invitation?: Invitation }> {
+  async validateInvitation(token: string): Promise<{
+    valid: boolean;
+    invitation?: Invitation;
+    autoJoinInfo?: AutoJoinInfo | null;
+  }> {
     const response = await apiService.get(`${this.PUBLIC_BASE_URL}/validate/${token}`);
     return response.data;
   }

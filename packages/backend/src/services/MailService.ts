@@ -1,10 +1,12 @@
 import { MailModel, MailType, MailPriority, ContentType, MailData } from '../models/Mail';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MailService');
 
 export interface SendMailOptions {
-  senderId?: number | null;
+  senderId?: string | null;
   senderName?: string | null;
-  recipientId: number;
+  recipientId: string;
   subject: string;
   content: string;
   contentType?: ContentType;
@@ -40,7 +42,7 @@ export class MailService {
    * This is a convenience function that can be called from anywhere in the application
    */
   async sendSystemMail(
-    recipientId: number,
+    recipientId: string,
     subject: string,
     content: string,
     options: SendSystemMailOptions = {}
@@ -59,7 +61,7 @@ export class MailService {
    * Get mails for a user
    */
   async getMailsForUser(
-    userId: number,
+    userId: string,
     filters: {
       isRead?: boolean;
       isStarred?: boolean;
@@ -81,7 +83,7 @@ export class MailService {
    * Get sent mails for a user
    */
   async getSentMailsForUser(
-    userId: number,
+    userId: string,
     options: {
       page?: number;
       limit?: number;
@@ -98,7 +100,7 @@ export class MailService {
   /**
    * Get a single mail by ID
    */
-  async getMailById(mailId: number, userId: number) {
+  async getMailById(mailId: string, userId: string) {
     try {
       const mail = await MailModel.query()
         .findById(mailId)
@@ -115,7 +117,7 @@ export class MailService {
   /**
    * Get unread count for a user
    */
-  async getUnreadCount(userId: number): Promise<number> {
+  async getUnreadCount(userId: string): Promise<number> {
     try {
       return await MailModel.getUnreadCount(userId);
     } catch (error) {
@@ -127,7 +129,7 @@ export class MailService {
   /**
    * Mark mail as read
    */
-  async markAsRead(mailId: number, userId: number): Promise<boolean> {
+  async markAsRead(mailId: string, userId: string): Promise<boolean> {
     try {
       const result = await MailModel.markAsRead(mailId, userId);
       if (result) {
@@ -143,7 +145,7 @@ export class MailService {
   /**
    * Mark multiple mails as read
    */
-  async markMultipleAsRead(mailIds: number[], userId: number): Promise<number> {
+  async markMultipleAsRead(mailIds: string[], userId: string): Promise<number> {
     try {
       const count = await MailModel.markMultipleAsRead(mailIds, userId);
       logger.info(`${count} mails marked as read by user ${userId}`);
@@ -157,7 +159,7 @@ export class MailService {
   /**
    * Mark all unread mails as read (with optional filters)
    */
-  async markAllAsRead(userId: number, filters: any = {}): Promise<number> {
+  async markAllAsRead(userId: string, filters: any = {}): Promise<number> {
     try {
       const count = await MailModel.markAllAsRead(userId, filters);
       logger.info(`${count} mails marked as read by user ${userId} with filters:`, filters);
@@ -171,7 +173,7 @@ export class MailService {
   /**
    * Toggle starred status
    */
-  async toggleStarred(mailId: number, userId: number): Promise<boolean> {
+  async toggleStarred(mailId: string, userId: string): Promise<boolean> {
     try {
       const isStarred = await MailModel.toggleStarred(mailId, userId);
       logger.info(`Mail ${mailId} starred status toggled to ${isStarred} by user ${userId}`);
@@ -185,7 +187,7 @@ export class MailService {
   /**
    * Delete mail (soft delete)
    */
-  async deleteMail(mailId: number, userId: number): Promise<boolean> {
+  async deleteMail(mailId: string, userId: string): Promise<boolean> {
     try {
       const result = await MailModel.softDelete(mailId, userId);
       if (result) {
@@ -201,7 +203,7 @@ export class MailService {
   /**
    * Delete multiple mails
    */
-  async deleteMultiple(mailIds: number[], userId: number): Promise<number> {
+  async deleteMultiple(mailIds: string[], userId: string): Promise<number> {
     try {
       const count = await MailModel.deleteMultiple(mailIds, userId);
       logger.info(`${count} mails deleted by user ${userId}`);
@@ -215,7 +217,7 @@ export class MailService {
   /**
    * Delete all mails (with optional filters)
    */
-  async deleteAllMails(userId: number, filters: any = {}): Promise<number> {
+  async deleteAllMails(userId: string, filters: any = {}): Promise<number> {
     try {
       const count = await MailModel.deleteAllMails(userId, filters);
       logger.info(`${count} mails deleted by user ${userId} with filters:`, filters);
@@ -229,7 +231,7 @@ export class MailService {
   /**
    * Get mail statistics for a user
    */
-  async getMailStats(userId: number) {
+  async getMailStats(userId: string) {
     try {
       const [unreadCount, starredCount, totalCount] = await Promise.all([
         MailModel.query()
@@ -274,7 +276,7 @@ export const mailService = new MailService();
 
 // Export helper function for sending system mails from anywhere
 export async function sendSystemMail(
-  recipientId: number,
+  recipientId: string,
   subject: string,
   content: string,
   options: SendSystemMailOptions = {}

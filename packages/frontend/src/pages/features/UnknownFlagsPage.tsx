@@ -25,8 +25,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  TextField,
-  InputAdornment,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -36,12 +34,12 @@ import {
   MoreVert as MoreVertIcon,
   Undo as UndoIcon,
   ContentCopy as CopyIcon,
-  Search as SearchIcon,
   ViewColumn as ViewColumnIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '../../contexts/OrgProjectContext';
 import { unknownFlagService, UnknownFlag } from '../../services/unknownFlagService';
 import RelativeTime from '../../components/common/RelativeTime';
 import DynamicFilterBar, {
@@ -52,11 +50,16 @@ import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/Colu
 import HelpTip from '../../components/common/HelpTip';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { useDebounce } from '../../hooks/useDebounce';
+import PageContentLoader from '@/components/common/PageContentLoader';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import SearchTextField from '@/components/common/SearchTextField';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { currentEnvironmentId } = useEnvironment();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [flags, setFlags] = useState<UnknownFlag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +82,7 @@ const UnknownFlagsPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
   const defaultColumns: ColumnConfig[] = [
     { id: 'flagName', labelKey: 'featureFlags.flagName', visible: true },
-    { id: 'environment', labelKey: 'featureFlags.environment', visible: true },
+    { id: 'environment', labelKey: 'common.environment', visible: true },
     { id: 'appName', labelKey: 'featureFlags.appName', visible: true },
     { id: 'sdkVersion', labelKey: 'featureFlags.sdkVersion', visible: true },
     { id: 'accessCount', labelKey: 'featureFlags.accessCount', visible: true },
@@ -145,13 +148,16 @@ const UnknownFlagsPage: React.FC = () => {
       // Determine includeResolved based on filter
       const includeResolved =
         statusFilter?.includes('resolved') || statusFilter?.length === 2 || !statusFilter;
-      const result = await unknownFlagService.getUnknownFlags({
-        includeResolved,
-        environment: currentEnvironmentId || undefined,
-      });
+      const result = await unknownFlagService.getUnknownFlags(
+        {
+          includeResolved,
+          environmentId: currentEnvironmentId || undefined,
+        },
+        projectApiPath
+      );
       setFlags(result.flags);
     } catch {
-      enqueueSnackbar(t('common.loadError'), { variant: 'error' });
+      enqueueSnackbar(String(t('common.loadError')), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -174,7 +180,7 @@ const UnknownFlagsPage: React.FC = () => {
       if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
         return prev;
       }
-      return [...prev, { key, value }];
+      return [...prev, { key, value, label: key }];
     });
   }, []);
 
@@ -252,15 +258,15 @@ const UnknownFlagsPage: React.FC = () => {
     try {
       switch (confirmDialog.type) {
         case 'resolve':
-          await unknownFlagService.resolveUnknownFlag(confirmDialog.flag.id);
+          await unknownFlagService.resolveUnknownFlag(confirmDialog.flag.id, projectApiPath);
           enqueueSnackbar(t('featureFlags.resolvedSuccessfully'), { variant: 'success' });
           break;
         case 'unresolve':
-          await unknownFlagService.unresolveUnknownFlag(confirmDialog.flag.id);
+          await unknownFlagService.unresolveUnknownFlag(confirmDialog.flag.id, projectApiPath);
           enqueueSnackbar(t('featureFlags.unresolvedSuccessfully'), { variant: 'success' });
           break;
         case 'delete':
-          await unknownFlagService.deleteUnknownFlag(confirmDialog.flag.id);
+          await unknownFlagService.deleteUnknownFlag(confirmDialog.flag.id, projectApiPath);
           enqueueSnackbar(t('common.deleted'), { variant: 'success' });
           break;
       }
@@ -299,7 +305,11 @@ const UnknownFlagsPage: React.FC = () => {
   const dialogContent = getDialogContent();
 
   const handleCopyFlagName = (flagName: string) => {
-    copyToClipboardWithNotification(flagName, t('common.copiedToClipboard'), enqueueSnackbar);
+    copyToClipboardWithNotification(
+      flagName,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   return (
@@ -359,43 +369,15 @@ const UnknownFlagsPage: React.FC = () => {
                 minWidth: 0,
               }}
             >
-              <TextField
+              <SearchTextField
                 placeholder={t('featureFlags.searchUnknownFlags')}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(value) => setSearchTerm(value)}
                 sx={{
                   minWidth: 300,
                   flexGrow: 1,
                   maxWidth: 500,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
-                    '& fieldset': { borderColor: 'divider' },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': { borderColor: 'primary.light' },
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                    },
-                  },
-                  '& .MuiInputBase-input': { fontSize: '0.875rem' },
                 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
               />
               <DynamicFilterBar
                 availableFilters={filterDefinitions}
@@ -428,147 +410,135 @@ const UnknownFlagsPage: React.FC = () => {
       </Card>
 
       {/* Content */}
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={32} />
-        </Box>
-      ) : filteredFlags.length === 0 ? (
-        <Box
-          sx={{
-            border: '2px dashed',
-            borderColor: 'divider',
-            borderRadius: 2,
-            p: 6,
-            textAlign: 'center',
-          }}
-        >
-          <Typography color="text.secondary">{t('featureFlags.noUnknownFlags')}</Typography>
-        </Box>
-      ) : (
-        <Card>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {visibleColumns.map((col) => (
-                    <TableCell
-                      key={col.id}
-                      align={col.id === 'accessCount' || col.id === 'status' ? 'center' : 'left'}
-                    >
-                      {t(col.labelKey)}
-                    </TableCell>
-                  ))}
-                  <TableCell align="center">{t('common.actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredFlags.map((flag) => (
-                  <TableRow key={flag.id}>
-                    {visibleColumns.map((col) => {
-                      switch (col.id) {
-                        case 'flagName':
-                          return (
-                            <TableCell key={col.id}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <UnknownIcon fontSize="small" color="warning" />
-                                <Typography fontWeight={500} sx={{ fontFamily: 'monospace' }}>
-                                  {flag.flagName}
-                                </Typography>
-                                <Tooltip title={t('common.copy')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleCopyFlagName(flag.flagName)}
-                                    sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
-                                  >
-                                    <CopyIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            </TableCell>
-                          );
-                        case 'environment':
-                          return (
-                            <TableCell key={col.id}>
-                              <Chip
-                                label={flag.environment}
-                                size="small"
-                                sx={{ borderRadius: '16px' }}
-                              />
-                            </TableCell>
-                          );
-                        case 'appName':
-                          return (
-                            <TableCell key={col.id}>
-                              {flag.appName ? (
+      <PageContentLoader loading={loading}>
+        {filteredFlags.length === 0 ? (
+          <EmptyPagePlaceholder message={t('featureFlags.noUnknownFlags')} />
+        ) : (
+          <Card>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {visibleColumns.map((col) => (
+                      <TableCell
+                        key={col.id}
+                        align={col.id === 'accessCount' || col.id === 'status' ? 'center' : 'left'}
+                      >
+                        {t(col.labelKey)}
+                      </TableCell>
+                    ))}
+                    <TableCell align="center">{t('common.actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredFlags.map((flag) => (
+                    <TableRow key={flag.id} hover>
+                      {visibleColumns.map((col) => {
+                        switch (col.id) {
+                          case 'flagName':
+                            return (
+                              <TableCell key={col.id}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <UnknownIcon fontSize="small" color="warning" />
+                                  <Typography fontWeight={500} sx={{ fontFamily: 'monospace' }}>
+                                    {flag.flagName}
+                                  </Typography>
+                                  <Tooltip title={t('common.copy')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleCopyFlagName(flag.flagName)}
+                                      sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+                                    >
+                                      <CopyIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
+                            );
+                          case 'environment':
+                            return (
+                              <TableCell key={col.id}>
                                 <Chip
-                                  label={flag.appName}
+                                  label={flag.environmentId}
                                   size="small"
-                                  variant="outlined"
                                   sx={{ borderRadius: '16px' }}
                                 />
-                              ) : (
+                              </TableCell>
+                            );
+                          case 'appName':
+                            return (
+                              <TableCell key={col.id}>
+                                {flag.appName ? (
+                                  <Chip
+                                    label={flag.appName}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ borderRadius: '16px' }}
+                                  />
+                                ) : (
+                                  <Typography variant="body2" color="text.secondary">
+                                    -
+                                  </Typography>
+                                )}
+                              </TableCell>
+                            );
+                          case 'sdkVersion':
+                            return (
+                              <TableCell key={col.id}>
                                 <Typography variant="body2" color="text.secondary">
-                                  -
+                                  {flag.sdkVersion || '-'}
                                 </Typography>
-                              )}
-                            </TableCell>
-                          );
-                        case 'sdkVersion':
-                          return (
-                            <TableCell key={col.id}>
-                              <Typography variant="body2" color="text.secondary">
-                                {flag.sdkVersion || '-'}
-                              </Typography>
-                            </TableCell>
-                          );
-                        case 'accessCount':
-                          return (
-                            <TableCell key={col.id} align="center">
-                              <Typography variant="body2">
-                                {flag.accessCount.toLocaleString()}
-                              </Typography>
-                            </TableCell>
-                          );
-                        case 'lastReportedAt':
-                          return (
-                            <TableCell key={col.id}>
-                              <RelativeTime date={flag.lastReportedAt} />
-                            </TableCell>
-                          );
-                        case 'status':
-                          return (
-                            <TableCell key={col.id} align="center">
-                              {flag.isResolved ? (
-                                <Chip
-                                  label={t('featureFlags.resolved')}
-                                  size="small"
-                                  color="success"
-                                />
-                              ) : (
-                                <Chip
-                                  label={t('featureFlags.unresolved')}
-                                  size="small"
-                                  color="warning"
-                                />
-                              )}
-                            </TableCell>
-                          );
-                        default:
-                          return <TableCell key={col.id}>-</TableCell>;
-                      }
-                    })}
-                    <TableCell align="center">
-                      <IconButton size="small" onClick={(e) => handleMenuOpen(e, flag)}>
-                        <MoreVertIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
-      )}
+                              </TableCell>
+                            );
+                          case 'accessCount':
+                            return (
+                              <TableCell key={col.id} align="center">
+                                <Typography variant="body2">
+                                  {flag.accessCount.toLocaleString()}
+                                </Typography>
+                              </TableCell>
+                            );
+                          case 'lastReportedAt':
+                            return (
+                              <TableCell key={col.id}>
+                                <RelativeTime date={flag.lastReportedAt} />
+                              </TableCell>
+                            );
+                          case 'status':
+                            return (
+                              <TableCell key={col.id} align="center">
+                                {flag.isResolved ? (
+                                  <Chip
+                                    label={t('featureFlags.resolved')}
+                                    size="small"
+                                    color="success"
+                                  />
+                                ) : (
+                                  <Chip
+                                    label={t('featureFlags.unresolved')}
+                                    size="small"
+                                    color="warning"
+                                  />
+                                )}
+                              </TableCell>
+                            );
+                          default:
+                            return <TableCell key={col.id}>-</TableCell>;
+                        }
+                      })}
+                      <TableCell align="center">
+                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, flag)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Action Menu */}
       <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
@@ -598,12 +568,11 @@ const UnknownFlagsPage: React.FC = () => {
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog
-        open={Boolean(columnSettingsAnchor)}
         anchorEl={columnSettingsAnchor}
         columns={columns}
-        defaultColumns={defaultColumns}
         onColumnsChange={handleColumnsChange}
         onClose={() => setColumnSettingsAnchor(null)}
+        onReset={() => handleColumnsChange(defaultColumns)}
       />
 
       {/* Confirmation Dialog */}

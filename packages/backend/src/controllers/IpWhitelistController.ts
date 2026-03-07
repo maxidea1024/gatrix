@@ -62,7 +62,7 @@ const getIpWhitelistsQuerySchema = Joi.object({
   ipAddress: Joi.string().optional(),
   purpose: Joi.string().optional(),
   isEnabled: Joi.boolean().optional(),
-  createdBy: Joi.number().integer().optional(),
+  createdBy: Joi.string().optional(),
   search: Joi.string().optional(),
   tags: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).optional(),
   _t: Joi.string().optional(), // Cache busting parameter
@@ -100,8 +100,8 @@ const bulkCreateSchema = Joi.object({
 
 export class IpWhitelistController {
   static getIpWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -116,7 +116,7 @@ export class IpWhitelistController {
     const filters = { ipAddress, purpose, isEnabled, createdBy, search };
     const pagination = { page, limit };
 
-    const result = await IpWhitelistService.getAllIpWhitelists(environment, filters, pagination);
+    const result = await IpWhitelistService.getAllIpWhitelists(environmentId, filters, pagination);
 
     res.json({
       success: true,
@@ -125,17 +125,17 @@ export class IpWhitelistController {
   });
 
   static getIpWhitelistById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
-    const environment = req.environment;
+    const id = req.params.id;
+    const environmentId = req.environmentId;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid IP whitelist ID', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const ipWhitelist = await IpWhitelistService.getIpWhitelistById(id, environment);
+    const ipWhitelist = await IpWhitelistService.getIpWhitelistById(id, environmentId);
 
     res.json({
       success: true,
@@ -144,8 +144,8 @@ export class IpWhitelistController {
   });
 
   static createIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -173,12 +173,12 @@ export class IpWhitelistController {
 
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestCreation(
-      req.user?.userId || 0,
-      environment,
+      req.user?.userId || '',
+      environmentId,
       'g_ip_whitelist',
-      { ...createData, environment },
+      { ...createData, environmentId },
       async () => {
-        return await IpWhitelistService.createIpWhitelist(environment, createData);
+        return await IpWhitelistService.createIpWhitelist(environmentId, createData);
       }
     );
 
@@ -200,13 +200,13 @@ export class IpWhitelistController {
   });
 
   static updateIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
-    const environment = req.environment;
+    const id = req.params.id;
+    const environmentId = req.environmentId;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid IP whitelist ID', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -230,12 +230,12 @@ export class IpWhitelistController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.processChange(
       userId,
-      environment,
+      environmentId,
       'g_ip_whitelist',
-      String(id),
+      id,
       updateData,
       async (processedData) => {
-        return await IpWhitelistService.updateIpWhitelist(id, environment, processedData as any);
+        return await IpWhitelistService.updateIpWhitelist(id, environmentId, processedData as any);
       }
     );
 
@@ -257,13 +257,13 @@ export class IpWhitelistController {
   });
 
   static deleteIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const id = parseInt(req.params.id);
-    const environment = req.environment;
+    const id = req.params.id;
+    const environmentId = req.environmentId;
 
-    if (isNaN(id)) {
+    if (!id) {
       throw new GatrixError('Invalid IP whitelist ID', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -276,11 +276,11 @@ export class IpWhitelistController {
     // Use UnifiedChangeGateway for CR support
     const gatewayResult = await UnifiedChangeGateway.requestDeletion(
       userId,
-      environment,
+      environmentId,
       'g_ip_whitelist',
-      String(id),
+      id,
       async () => {
-        await IpWhitelistService.deleteIpWhitelist(id, environment);
+        await IpWhitelistService.deleteIpWhitelist(id, environmentId);
       }
     );
 
@@ -303,13 +303,13 @@ export class IpWhitelistController {
 
   static toggleIpWhitelistStatus = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const id = parseInt(req.params.id);
-      const environment = req.environment;
+      const id = req.params.id;
+      const environmentId = req.environmentId;
 
-      if (isNaN(id)) {
+      if (!id) {
         throw new GatrixError('Invalid IP whitelist ID', 400);
       }
-      if (!environment) {
+      if (!environmentId) {
         throw new GatrixError('Environment not specified', 400);
       }
 
@@ -322,14 +322,14 @@ export class IpWhitelistController {
       // Use UnifiedChangeGateway for CR support
       const gatewayResult = await UnifiedChangeGateway.processChange(
         userId,
-        environment,
+        environmentId,
         'g_ip_whitelist',
-        String(id),
+        id,
         async (currentData: any) => {
           return { isEnabled: !currentData.isEnabled };
         },
         async (processedData: any) => {
-          return await IpWhitelistService.updateIpWhitelist(id, environment, {
+          return await IpWhitelistService.updateIpWhitelist(id, environmentId, {
             ...(processedData as any),
             updatedBy: userId,
           });
@@ -355,8 +355,8 @@ export class IpWhitelistController {
   );
 
   static bulkCreateIpWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = req.environment;
-    if (!environment) {
+    const environmentId = req.environmentId;
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
@@ -373,7 +373,7 @@ export class IpWhitelistController {
 
     // Use UnifiedChangeGateway for CR support
     // Since requestCreation and bulkCreate are different patterns, we check approval requirement first
-    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environment);
+    const requiresApproval = await UnifiedChangeGateway.requiresApproval(environmentId);
 
     if (requiresApproval) {
       // For bulk creation in CR, we wrap the whole operation or individual items?
@@ -382,12 +382,12 @@ export class IpWhitelistController {
       // However, we can pass the whole array as createData.
       const gatewayResult = await UnifiedChangeGateway.requestCreation(
         userId,
-        environment,
+        environmentId,
         'g_ip_whitelist',
         { entries: value.entries, bulk: true },
         async () => {
           return await IpWhitelistService.bulkCreateIpWhitelists(
-            environment,
+            environmentId,
             value.entries,
             userId
           );
@@ -404,7 +404,7 @@ export class IpWhitelistController {
       });
     } else {
       const createdCount = await IpWhitelistService.bulkCreateIpWhitelists(
-        environment,
+        environmentId,
         value.entries,
         userId
       );
@@ -422,16 +422,16 @@ export class IpWhitelistController {
 
   static checkIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { ipAddress } = req.query;
-    const environment = req.environment;
+    const environmentId = req.environmentId;
 
     if (!ipAddress || typeof ipAddress !== 'string') {
       throw new GatrixError('IP address is required', 400);
     }
-    if (!environment) {
+    if (!environmentId) {
       throw new GatrixError('Environment not specified', 400);
     }
 
-    const isWhitelisted = await IpWhitelistService.isIpWhitelisted(ipAddress, environment);
+    const isWhitelisted = await IpWhitelistService.isIpWhitelisted(ipAddress, environmentId);
 
     res.json({
       success: true,

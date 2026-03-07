@@ -17,7 +17,9 @@ import {
   CreateInvitationRequest,
   InvitationDuration,
   InvitationDurationLabels,
+  AutoJoinMembership,
 } from '../../types/invitation';
+import OrgProjectTreeSelector from '../rbac/OrgProjectTreeSelector';
 
 interface InvitationFormProps {
   onSubmit: (data: CreateInvitationRequest) => Promise<void>;
@@ -35,6 +37,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [expirationHours, setExpirationHours] = useState<number>(InvitationDuration.HOURS_48);
+  const [autoJoinMemberships, setAutoJoinMemberships] = useState<AutoJoinMembership[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +45,9 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     const data: CreateInvitationRequest = {
       expirationHours,
       ...(email.trim() && { email: email.trim() }),
+      ...(autoJoinMemberships.length > 0 && {
+        autoJoinConfig: { memberships: autoJoinMemberships },
+      }),
     };
 
     await onSubmit(data);
@@ -54,7 +60,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         onSubmit={handleSubmit}
         sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
       >
-        {/* Content - 스크롤 가능한 영역 */}
+        {/* Content - scrollable area */}
         <Box
           sx={{
             flex: 1,
@@ -102,8 +108,13 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             </Select>
           </FormControl>
 
-          {/* 추가 공간을 위한 여백 */}
-          <Box sx={{ minHeight: '200px' }} />
+          <Divider />
+
+          {/* Auto-Join Configuration */}
+          <OrgProjectTreeSelector
+            value={autoJoinMemberships}
+            onChange={setAutoJoinMemberships}
+          />
         </Box>
 
         {/* Footer */}
@@ -183,6 +194,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       </FormControl>
 
       <Divider />
+
+      {/* Auto-Join Configuration */}
+      <OrgProjectTreeSelector
+        value={autoJoinMemberships}
+        onChange={setAutoJoinMemberships}
+      />
 
       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
         <Button onClick={onCancel} startIcon={<CancelIcon />} variant="outlined" disabled={loading}>

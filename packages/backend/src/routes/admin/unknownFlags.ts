@@ -1,5 +1,8 @@
 import express from 'express';
 import { unknownFlagService } from '../../services/UnknownFlagService';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('UnknownFlagsRoutes');
 
 const router = express.Router();
 
@@ -10,16 +13,16 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const includeResolved = req.query.includeResolved === 'true';
-    const environment = req.query.environment as string | undefined;
+    const environmentId = req.query.environmentId as string | undefined;
 
     const flags = await unknownFlagService.getUnknownFlags({
       includeResolved,
-      environment,
+      environmentId,
     });
 
     res.json({ success: true, data: { flags, total: flags.length } });
   } catch (error) {
-    console.error('Error fetching unknown flags:', error);
+    logger.error('Error fetching unknown flags:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch unknown flags' });
   }
 });
@@ -33,7 +36,7 @@ router.get('/count', async (req, res) => {
     const count = await unknownFlagService.getUnresolvedCount();
     res.json({ success: true, data: { count } });
   } catch (error) {
-    console.error('Error fetching unknown flag count:', error);
+    logger.error('Error fetching unknown flag count:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch count' });
   }
 });
@@ -44,14 +47,14 @@ router.get('/count', async (req, res) => {
  */
 router.post('/:id/resolve', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     const user = (req as any).user;
     const resolvedBy = user?.username || 'unknown';
 
     await unknownFlagService.resolveUnknownFlag(id, resolvedBy);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
-    console.error('Error resolving unknown flag:', error);
+    logger.error('Error resolving unknown flag:', error);
     res.status(500).json({ success: false, message: 'Failed to resolve flag' });
   }
 });
@@ -62,11 +65,11 @@ router.post('/:id/resolve', async (req, res) => {
  */
 router.post('/:id/unresolve', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     await unknownFlagService.unresolveUnknownFlag(id);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
-    console.error('Error unresolving unknown flag:', error);
+    logger.error('Error unresolving unknown flag:', error);
     res.status(500).json({ success: false, message: 'Failed to unresolve flag' });
   }
 });
@@ -77,11 +80,11 @@ router.post('/:id/unresolve', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = req.params.id;
     await unknownFlagService.deleteUnknownFlag(id);
     res.json({ success: true, data: { success: true } });
   } catch (error) {
-    console.error('Error deleting unknown flag:', error);
+    logger.error('Error deleting unknown flag:', error);
     res.status(500).json({ success: false, message: 'Failed to delete flag' });
   }
 });

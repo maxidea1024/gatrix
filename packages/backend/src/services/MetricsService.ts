@@ -2,6 +2,9 @@ import type express from 'express';
 import config from '../config';
 import AppInstance from '../utils/AppInstance';
 import os from 'os';
+import { createLogger } from '../config/logger';
+
+const metricsLogger = createLogger('MetricsService');
 
 /**
  * MetricsService for Backend (Express)
@@ -228,8 +231,7 @@ export const initMetrics = (app: express.Application): void => {
     });
   } catch (err) {
     // Do not crash app because of metrics init
-    // eslint-disable-next-line no-console
-    console.warn('[Metrics] Initialization skipped due to error:', err);
+    metricsLogger.warn('Initialization skipped due to error:', err);
   }
 };
 

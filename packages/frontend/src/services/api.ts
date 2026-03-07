@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import i18next from 'i18next';
 import { ApiResponse } from '@/types';
 
 class ApiService {
@@ -13,13 +14,6 @@ class ApiService {
     // In production: API calls go to the same origin, so '/api/v1' is safest
     let baseURL = (import.meta as any).env?.VITE_API_URL || '/api/v1';
 
-    // Debugging: exact source of baseURL
-    console.log('[ApiService] Initial baseURL evaluation:', {
-      envValue: (import.meta as any).env?.VITE_API_URL,
-      fallback: '/api/v1',
-      evaluated: baseURL,
-    });
-
     // Only use runtime config in production (when explicitly set)
     if (import.meta.env.PROD) {
       const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as
@@ -27,7 +21,6 @@ class ApiService {
         | undefined;
       if (runtimeEnv && runtimeEnv.trim()) {
         baseURL = runtimeEnv.trim();
-        console.log('[ApiService] PROD: Using runtime config baseURL:', baseURL);
       }
     }
 
@@ -44,8 +37,6 @@ class ApiService {
       baseURL = '/api/v1';
     }
 
-    console.log('[ApiService] Final baseURL:', baseURL, 'PROD:', import.meta.env.PROD);
-
     this.api = axios.create({
       baseURL,
       timeout: 60000,
@@ -54,8 +45,6 @@ class ApiService {
         'Content-Type': 'application/json',
       },
     });
-
-    console.log('[ApiService] After axios.create - baseURL:', this.api.defaults.baseURL);
 
     this.setupInterceptors();
   }
@@ -75,17 +64,15 @@ class ApiService {
 
         // Add environment header for multi-environment support
         // Only set from localStorage if not explicitly provided in the request config
-        // Check both lowercase and uppercase header names (HTTP headers are case-insensitive)
         const hasEnvironmentHeader =
-          config.headers['x-environment'] || config.headers['X-Environment'];
+          config.headers['x-environment-id'] || config.headers['X-Environment-Id'];
         if (!hasEnvironmentHeader) {
-          const environment =
+          const environmentId =
             typeof window !== 'undefined'
-              ? localStorage.getItem('gatrix_selected_environment')
+              ? localStorage.getItem('gatrix_selected_environment_id')
               : null;
-          if (environment) {
-            // The backend expects X-Environment header with environment name
-            config.headers['X-Environment'] = environment;
+          if (environmentId) {
+            config.headers['X-Environment-Id'] = environmentId;
           }
         }
 
@@ -107,8 +94,10 @@ class ApiService {
 
         // Check for "user not found" error - this happens when user is deleted but token is still valid
         // Redirect to session expired page to prevent infinite loop
+        // BUT skip for login requests - login USER_NOT_FOUND should show error on login page
         if (
           error.response?.status === 404 &&
+          !originalRequest.url?.includes('/auth/login') &&
           (error.response?.data?.message === 'USER_NOT_FOUND' ||
             error.response?.data?.error?.message === 'USER_NOT_FOUND' ||
             error.response?.data?.message?.includes('User not found'))
@@ -226,22 +215,31 @@ class ApiService {
           }
         }
 
-        // Handle 403 Forbidden - just set error message, don't redirect automatically
-        // Redirecting on every 403 causes issues during initial load when some APIs may fail
-        // Individual pages should handle 403 errors appropriately
+        // Handle 403 Forbidden - dispatch a global event for the UI layer to display a snackbar
+        // Deduplicate: only fire once within a cooldown window
         if (error.response?.status === 403) {
-          error.message = '접근 권한이 없습니다.';
+          error.message = error.response?.data?.error?.message || 'Insufficient permissions';
+          if (typeof window !== 'undefined') {
+            const now = Date.now();
+            const lastForbidden = (window as any).__lastForbiddenAt || 0;
+            if (now - lastForbidden > 3000) {
+              (window as any).__lastForbiddenAt = now;
+              window.dispatchEvent(new CustomEvent('gatrix:forbidden', {
+                detail: { url: error.config?.url, message: error.message },
+              }));
+            }
+          }
         }
 
         // Enhance error message for better user experience
         if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
-          error.message = '서버 응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
+          error.message = i18next.t('errors.timeout');
         } else if (error.code === 'ERR_NETWORK' || !error.response) {
-          error.message = '서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.';
+          error.message = i18next.t('errors.networkError');
         } else if (error.response?.status === 500) {
-          error.message = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+          error.message = i18next.t('errors.serverError');
         } else if (error.response?.status === 404) {
-          error.message = '요청한 리소스를 찾을 수 없습니다.';
+          error.message = i18next.t('errors.notFound');
         }
 
         return Promise.reject(error);
@@ -252,7 +250,7 @@ class ApiService {
   setAccessToken(token: string) {
     this.accessToken = token;
 
-    // 토큰 정보 디버깅
+    // Token information debugging
     // try {
     //   const payload = JSON.parse(atob(token.split('.')[1]));
     //   console.log('Token set:', {
@@ -297,7 +295,7 @@ class ApiService {
         throw errorData;
       }
 
-      // 네트워크 오류 구분
+      // Network error classification
       const isNetworkError =
         !error.response &&
         (error.code === 'NETWORK_ERROR' ||

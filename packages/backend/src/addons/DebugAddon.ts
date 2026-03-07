@@ -29,7 +29,7 @@ export class DebugAddon extends Addon {
 
     // Simulate custom attribute logging if provided
     if (simulateAttribute) {
-      this.debugLogger.info(`[Debug] Custom Attribute: ${simulateAttribute}`, {
+      this.debugLogger.info(`Custom Attribute: ${simulateAttribute}`, {
         integrationId,
       });
     }
@@ -39,7 +39,7 @@ export class DebugAddon extends Addon {
       integrationId,
       eventType: event.type,
       eventData: event.data,
-      environment: event.environment,
+      environmentId: event.environmentId,
       createdAt: event.createdAt,
       parameters: { ...parameters, sensitive: '***' }, // conceal sensitive if any
     };
@@ -47,17 +47,17 @@ export class DebugAddon extends Addon {
     // Log with requested level
     switch (logLevel) {
       case 'error':
-        this.debugLogger.error(`[Debug] Event Received: ${event.type}`, logData);
+        this.debugLogger.error(`Event Received: ${event.type}`, logData);
         break;
       case 'warn':
-        this.debugLogger.warn(`[Debug] Event Received: ${event.type}`, logData);
+        this.debugLogger.warn(`Event Received: ${event.type}`, logData);
         break;
       case 'debug':
-        this.debugLogger.debug(`[Debug] Event Received: ${event.type}`, logData);
+        this.debugLogger.debug(`Event Received: ${event.type}`, logData);
         break;
       case 'info':
       default:
-        this.debugLogger.info(`[Debug] Event Received: ${event.type}`, logData);
+        this.debugLogger.info(`Event Received: ${event.type}`, logData);
         break;
     }
 

@@ -5,7 +5,9 @@
  */
 
 import db from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UnknownFlagService');
 import redisClient from '../config/redis';
 
 // Redis key prefix for unknown flags buffer
@@ -13,9 +15,9 @@ const REDIS_KEY_PREFIX = 'unknown_flags:buffer:';
 const REDIS_METADATA_PREFIX = 'unknown_flags:meta:';
 
 export interface UnknownFlag {
-  id: number;
+  id: string;
   flagName: string;
-  environment: string;
+  environmentId: string;
   appName: string | null;
   sdkVersion: string | null;
   accessCount: number;
@@ -28,7 +30,7 @@ export interface UnknownFlag {
 
 export interface ReportUnknownFlagInput {
   flagName: string;
-  environment: string;
+  environmentId: string;
   appName?: string;
   sdkVersion?: string;
   count?: number;
@@ -46,8 +48,8 @@ export class UnknownFlagService {
       const count = input.count || 1;
 
       // Create unique key for this flag + environment combo
-      const bufferKey = `${REDIS_KEY_PREFIX}${input.environment}:${input.flagName}`;
-      const metadataKey = `${REDIS_METADATA_PREFIX}${input.environment}:${input.flagName}`;
+      const bufferKey = `${REDIS_KEY_PREFIX}${input.environmentId}:${input.flagName}`;
+      const metadataKey = `${REDIS_METADATA_PREFIX}${input.environmentId}:${input.flagName}`;
 
       // Increment count in Redis (atomic operation, handles high volume)
       await client.hIncrBy(bufferKey, 'count', count);
@@ -66,7 +68,7 @@ export class UnknownFlagService {
 
       logger.debug('Unknown flag buffered in Redis', {
         flagName: input.flagName,
-        environment: input.environment,
+        environmentId: input.environmentId,
       });
     } catch (error) {
       logger.error('Failed to buffer unknown flag in Redis', { error, input });
@@ -80,10 +82,10 @@ export class UnknownFlagService {
    */
   private async directDbReport(input: ReportUnknownFlagInput): Promise<void> {
     const count = input.count || 1;
-    const updated = await db('unknown_flags')
+    const updated = await db('g_unknown_flags')
       .where({
         flagName: input.flagName,
-        environment: input.environment,
+        environmentId: input.environmentId,
         appName: input.appName || null,
         sdkVersion: input.sdkVersion || null,
       })
@@ -93,9 +95,9 @@ export class UnknownFlagService {
       });
 
     if (updated === 0) {
-      await db('unknown_flags').insert({
+      await db('g_unknown_flags').insert({
         flagName: input.flagName,
-        environment: input.environment,
+        environmentId: input.environmentId,
         appName: input.appName || null,
         sdkVersion: input.sdkVersion || null,
         accessCount: count,
@@ -125,7 +127,7 @@ export class UnknownFlagService {
           const keyParts = bufferKey.replace(REDIS_KEY_PREFIX, '').split(':');
           if (keyParts.length < 2) continue;
 
-          const environment = keyParts[0];
+          const environmentId = keyParts[0];
           const flagName = keyParts.slice(1).join(':'); // flagName might contain ":"
 
           // Get count and delete atomically using GETDEL (or GET + DEL)
@@ -138,7 +140,7 @@ export class UnknownFlagService {
           }
 
           // Get metadata
-          const metadataKey = `${REDIS_METADATA_PREFIX}${environment}:${flagName}`;
+          const metadataKey = `${REDIS_METADATA_PREFIX}${environmentId}:${flagName}`;
           const metadata = await client.hGetAll(metadataKey);
 
           // Delete keys first (to avoid double counting on retry)
@@ -148,14 +150,14 @@ export class UnknownFlagService {
           // Upsert to database
           await this.upsertToDb({
             flagName,
-            environment,
+            environmentId,
             appName: metadata.appName || null,
             sdkVersion: metadata.sdkVersion || null,
             count,
           });
 
           flushed++;
-          logger.debug('Flushed unknown flag to DB', { flagName, environment, count });
+          logger.debug('Flushed unknown flag to DB', { flagName, environmentId, count });
         } catch (error) {
           errors++;
           logger.error('Failed to flush buffer key', { bufferKey, error });
@@ -177,15 +179,15 @@ export class UnknownFlagService {
    */
   private async upsertToDb(data: {
     flagName: string;
-    environment: string;
+    environmentId: string;
     appName: string | null;
     sdkVersion: string | null;
     count: number;
   }): Promise<void> {
-    const updated = await db('unknown_flags')
+    const updated = await db('g_unknown_flags')
       .where({
         flagName: data.flagName,
-        environment: data.environment,
+        environmentId: data.environmentId,
         appName: data.appName,
         sdkVersion: data.sdkVersion,
       })
@@ -195,9 +197,9 @@ export class UnknownFlagService {
       });
 
     if (updated === 0) {
-      await db('unknown_flags').insert({
+      await db('g_unknown_flags').insert({
         flagName: data.flagName,
-        environment: data.environment,
+        environmentId: data.environmentId,
         appName: data.appName,
         sdkVersion: data.sdkVersion,
         accessCount: data.count,
@@ -214,18 +216,18 @@ export class UnknownFlagService {
   async getUnknownFlags(
     options: {
       includeResolved?: boolean;
-      environment?: string;
+      environmentId?: string;
       limit?: number;
     } = {}
   ): Promise<UnknownFlag[]> {
-    let query = db('unknown_flags').select('*');
+    let query = db('g_unknown_flags').select('*');
 
     if (!options.includeResolved) {
       query = query.where('isResolved', false);
     }
 
-    if (options.environment) {
-      query = query.where('environment', options.environment);
+    if (options.environmentId) {
+      query = query.where('environmentId', options.environmentId);
     }
 
     query = query.orderBy('lastReportedAt', 'desc');
@@ -240,8 +242,8 @@ export class UnknownFlagService {
   /**
    * Resolve an unknown flag (mark as handled)
    */
-  async resolveUnknownFlag(id: number, resolvedBy: string): Promise<void> {
-    await db('unknown_flags')
+  async resolveUnknownFlag(id: string, resolvedBy: string): Promise<void> {
+    await db('g_unknown_flags')
       .where({ id })
       .update({
         isResolved: true,
@@ -253,8 +255,8 @@ export class UnknownFlagService {
   /**
    * Unresolve an unknown flag (mark as unresolved again)
    */
-  async unresolveUnknownFlag(id: number): Promise<void> {
-    await db('unknown_flags').where({ id }).update({
+  async unresolveUnknownFlag(id: string): Promise<void> {
+    await db('g_unknown_flags').where({ id }).update({
       isResolved: false,
       resolvedAt: null,
       resolvedBy: null,
@@ -264,15 +266,15 @@ export class UnknownFlagService {
   /**
    * Delete an unknown flag record
    */
-  async deleteUnknownFlag(id: number): Promise<void> {
-    await db('unknown_flags').where({ id }).delete();
+  async deleteUnknownFlag(id: string): Promise<void> {
+    await db('g_unknown_flags').where({ id }).delete();
   }
 
   /**
    * Get count of unresolved unknown flags
    */
   async getUnresolvedCount(): Promise<number> {
-    const result = await db('unknown_flags')
+    const result = await db('g_unknown_flags')
       .where('isResolved', false)
       .count('id as count')
       .first();

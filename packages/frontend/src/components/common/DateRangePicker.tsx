@@ -267,7 +267,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   }, [isDragging]);
 
   // Custom day renderer for range selection - Mixpanel style
-  const CustomDay = (props: PickersDayProps<Dayjs>) => {
+  const CustomDay = (props: any) => {
     const { day, ...other } = props;
 
     if (!tempFrom) {

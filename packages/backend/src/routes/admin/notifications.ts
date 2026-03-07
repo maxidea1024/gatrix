@@ -4,7 +4,9 @@ import jwt from 'jsonwebtoken';
 import { authenticate, AuthenticatedRequest } from '../../middleware/auth';
 import SSENotificationService from '../../services/sseNotificationService';
 import { pubSubService } from '../../services/PubSubService';
-import logger from '../../config/logger';
+import { createLogger } from '../../config/logger';
+
+const logger = createLogger('notifications');
 
 const router = Router();
 const sseService = SSENotificationService.getInstance();

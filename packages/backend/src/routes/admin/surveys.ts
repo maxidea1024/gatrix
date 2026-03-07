@@ -1,13 +1,11 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { SurveyController } from '../../controllers/SurveyController';
 
 const router = Router();
 
 // All survey routes require authentication and admin role
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // Survey configuration routes
 router.get('/config', SurveyController.getSurveyConfig);
 router.put('/config', SurveyController.updateSurveyConfig);

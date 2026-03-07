@@ -16,8 +16,8 @@ export function formatEventMessage(event: IntegrationSystemEvent): string {
 
   let message = `*${eventName}* by ${actor} at ${timestamp}`;
 
-  if (event.environment) {
-    message += ` (${event.environment})`;
+  if (event.environmentId) {
+    message += ` (${event.environmentId})`;
   }
 
   return message;
@@ -165,7 +165,7 @@ export function formatTeamsMessage(event: IntegrationSystemEvent): Record<string
         activityTitle: `${emoji} ${eventName}`,
         activitySubtitle: `by ${actor}`,
         facts: [
-          ...(event.environment ? [{ name: 'Environment', value: event.environment }] : []),
+          ...(event.environmentId ? [{ name: 'Environment', value: event.environmentId }] : []),
           { name: 'Time', value: formatTimestamp(event.createdAt) },
         ],
         text: details.length > 0 ? details.join('\n') : undefined,
@@ -187,7 +187,7 @@ export function formatLarkMessage(event: IntegrationSystemEvent): Record<string,
   const content = [
     `${emoji} **${eventName}**`,
     `By: ${actor}`,
-    event.environment ? `Environment: ${event.environment}` : null,
+    event.environmentId ? `Environment: ${event.environmentId}` : null,
     `Time: ${formatTimestamp(event.createdAt)}`,
     ...details,
   ]
@@ -250,7 +250,7 @@ export function formatPagerDutyMessage(
       custom_details: {
         eventType: event.type,
         actor,
-        environment: event.environment,
+        environmentId: event.environmentId,
         ...event.data,
       },
       text: details.join('\n'),
@@ -269,7 +269,7 @@ export function formatTelegramMessage(event: IntegrationSystemEvent): string {
 
   let content = `${emoji} *${eventName}*\n`;
   content += `By: ${actor}\n`;
-  if (event.environment) content += `Env: ${event.environment}\n`;
+  if (event.environmentId) content += `Env: ${event.environmentId}\n`;
   content += `Time: ${formatTimestamp(event.createdAt)}\n\n`;
   content += details.join('\n');
 
@@ -291,7 +291,7 @@ export function formatWhatsAppMessage(
   const content = [
     `${emoji} *${eventName}*`,
     `By: ${actor}`,
-    event.environment ? `Env: ${event.environment}` : null,
+    event.environmentId ? `Env: ${event.environmentId}` : null,
     `Time: ${formatTimestamp(event.createdAt)}`,
     '',
     ...details,
@@ -321,7 +321,7 @@ export function formatLineMessage(event: IntegrationSystemEvent, to: string): Re
   const content = [
     `${emoji} ${eventName}`,
     `By: ${actor}`,
-    event.environment ? `Env: ${event.environment}` : null,
+    event.environmentId ? `Env: ${event.environmentId}` : null,
     `Time: ${formatTimestamp(event.createdAt)}`,
     '',
     ...details,
@@ -353,7 +353,7 @@ export function formatKakaoMessage(event: IntegrationSystemEvent): Record<string
     `${emoji} [Gatrix Alert]`,
     `Event: ${eventName}`,
     `Actor: ${actor}`,
-    event.environment ? `Environment: ${event.environment}` : null,
+    event.environmentId ? `Environment: ${event.environmentId}` : null,
     `Time: ${formatTimestamp(event.createdAt)}`,
     '',
     ...details,
@@ -391,7 +391,7 @@ export function formatGoogleChatMessage(event: IntegrationSystemEvent): Record<s
                 {
                   textParagraph: {
                     text: [
-                      event.environment ? `<b>Environment:</b> ${event.environment}` : null,
+                      event.environmentId ? `<b>Environment:</b> ${event.environmentId}` : null,
                       `<b>Time:</b> ${formatTimestamp(event.createdAt)}`,
                     ]
                       .filter(Boolean)
@@ -424,7 +424,7 @@ export function formatWeComMessage(event: IntegrationSystemEvent): Record<string
   const content = [
     `# ${emoji} ${eventName}`,
     `**Actor**: ${actor}`,
-    event.environment ? `**Environment**: ${event.environment}` : null,
+    event.environmentId ? `**Environment**: ${event.environmentId}` : null,
     `**Time**: ${formatTimestamp(event.createdAt)}`,
     '',
     ...details.map((d) => `> ${d}`),
@@ -452,7 +452,7 @@ export function formatDingTalkMessage(event: IntegrationSystemEvent): Record<str
   const content = [
     `### ${emoji} ${eventName}`,
     `- **Actor**: ${actor}`,
-    event.environment ? `- **Environment**: ${event.environment}` : null,
+    event.environmentId ? `- **Environment**: ${event.environmentId}` : null,
     `- **Time**: ${formatTimestamp(event.createdAt)}`,
     '',
     ...details,
@@ -478,7 +478,7 @@ export function formatWebhookPayload(event: IntegrationSystemEvent): Record<stri
       type: event.type,
       createdBy: event.createdBy,
       createdByUserId: event.createdByUserId,
-      environment: event.environment,
+      environmentId: event.environmentId,
       createdAt: event.createdAt.toISOString(),
       data: event.data,
       preData: event.preData,

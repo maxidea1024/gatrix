@@ -3,7 +3,9 @@ import { AuthService } from '../services/AuthService';
 import passwordResetService from '../services/PasswordResetService';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuthController');
 import Joi from 'joi';
 
 // Validation schemas

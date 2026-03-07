@@ -6,10 +6,10 @@ import {
 
 const router = Router();
 
-// GET /api/v1/invitations/validate/:token - 초대 토큰 검증 (공개 API)
+// GET /api/v1/invitations/validate/:token - 초대 Verify token (Public API)
 router.get('/validate/:token', PublicInvitationController.validateInvitation as any);
 
-// POST /api/v1/invitations/accept/:token - 초대 수락 및 사용자 등록 (공개 API)
+// POST /api/v1/invitations/accept/:token - 초대 수락 및 Used자 Register (Public API)
 router.post(
   '/accept/:token',
   acceptInvitationValidation,

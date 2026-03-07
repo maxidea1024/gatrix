@@ -1,0 +1,237 @@
+Total errors: 157
+
+src/components/admin/ClientVersionForm.tsx (10):
+  L237: TS2554 Expected 2 arguments, but got 1.
+  L295: TS2554 Expected 2 arguments, but got 1.
+  L341: TS2345 Argument of type '{ isEnabled: boolean; }' is not assignable to parameter of type 'string'.
+  L438: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+  L460: TS2554 Expected 2 arguments, but got 1.
+  L549: TS2554 Expected 3 arguments, but got 2.
+  L573: TS2554 Expected 2 arguments, but got 1.
+  L605: TS2554 Expected 3 arguments, but got 2.
+  L608: TS2554 Expected 3 arguments, but got 2.
+  L755: TS2554 Expected 2 arguments, but got 1.
+
+src/components/admin/PlatformDefaultsDialog.tsx (2):
+  L48: TS2554 Expected 1 arguments, but got 0.
+  L93: TS2554 Expected 2 arguments, but got 1.
+
+src/components/features/ImpactMetricsChart.tsx (2):
+  L233: TS2304 Cannot find name 'projectApiPath'.
+  L680: TS2304 Cannot find name 'projectApiPath'.
+
+src/components/game/BannerFormDialog.tsx (2):
+  L325: TS2554 Expected 3 arguments, but got 2.
+  L340: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/IngamePopupNoticeFormDialog.tsx (3):
+  L111: TS2345 Argument of type '{ isEnabled: boolean; limit: number; }' is not assignable to parameter of type 'string'.
+  L360: TS2554 Expected 3 arguments, but got 2.
+  L369: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/RewardDisplay.tsx (1):
+  L63: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/RewardItemSelector.tsx (2):
+  L57: TS2554 Expected 1 arguments, but got 0.
+  L84: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+
+src/components/game/RewardSelector.tsx (1):
+  L90: TS2345 Argument of type '{ limit: number; }' is not assignable to parameter of type 'string'.
+
+src/components/game/RewardTemplateFormDialog.tsx (2):
+  L279: TS2554 Expected 3 arguments, but got 2.
+  L298: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/ServiceNoticeFormDialog.tsx (2):
+  L601: TS2554 Expected 3 arguments, but got 2.
+  L612: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/StoreProductFormDrawer.tsx (2):
+  L265: TS2554 Expected 3 arguments, but got 2.
+  L275: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/SurveyConfigDialog.tsx (2):
+  L37: TS2554 Expected 1 arguments, but got 0.
+  L51: TS2554 Expected 2 arguments, but got 1.
+
+src/components/game/SurveyFormDialog.tsx (2):
+  L442: TS2554 Expected 3 arguments, but got 2.
+  L449: TS2554 Expected 2 arguments, but got 1.
+
+src/components/layout/MainLayout.tsx (1):
+  L574: TS2554 Expected 1 arguments, but got 0.
+
+src/components/planning-data/PlanningDataUpload.tsx (4):
+  L262: TS2554 Expected 2-3 arguments, but got 1.
+  L298: TS2345 Argument of type 'File[]' is not assignable to parameter of type 'string'.
+  L351: TS2345 Argument of type 'File[]' is not assignable to parameter of type 'string'.
+  L398: TS2554 Expected 2-3 arguments, but got 1.
+
+src/components/settings/KeyValueFormDrawer.tsx (2):
+  L168: TS2554 Expected 3 arguments, but got 2.
+  L171: TS2554 Expected 2 arguments, but got 1.
+
+src/contexts/PlanningDataContext.tsx (2):
+  L73: TS2554 Expected 1 arguments, but got 0.
+  L77: TS2554 Expected 1 arguments, but got 0.
+
+src/pages/admin/ActionSetsPage.tsx (6):
+  L422: TS2304 Cannot find name 'projectApiPath'.
+  L438: TS2304 Cannot find name 'projectApiPath'.
+  L468: TS2304 Cannot find name 'projectApiPath'.
+  L471: TS2304 Cannot find name 'projectApiPath'.
+  L486: TS2304 Cannot find name 'projectApiPath'.
+  L496: TS2304 Cannot find name 'projectApiPath'.
+
+src/pages/admin/ApiTokensPage.tsx (4):
+  L402: TS2554 Expected 0-2 arguments, but got 3.
+  L599: TS2554 Expected 1-2 arguments, but got 3.
+  L657: TS2554 Expected 2-3 arguments, but got 4.
+  L705: TS2554 Expected 1-2 arguments, but got 3.
+
+src/pages/admin/ClientVersionsPage.tsx (9):
+  L512: TS2345 Argument of type '{ isEnabled: boolean; }' is not assignable to parameter of type 'string'.
+  L778: TS2554 Expected 2 arguments, but got 1.
+  L839: TS2554 Expected 2 arguments, but got 1.
+  L888: TS2554 Expected 2 arguments, but got 1.
+  L915: TS2345 Argument of type 'Record<string, any>' is not assignable to parameter of type 'string'.
+  L919: TS2345 Argument of type 'Record<string, any>' is not assignable to parameter of type 'string'.
+  L940: TS2345 Argument of type 'Record<string, any>' is not assignable to parameter of type 'string'.
+  L1226: TS2554 Expected 2 arguments, but got 1.
+  L1242: TS2554 Expected 3 arguments, but got 2.
+
+src/pages/admin/GameWorldsPage.tsx (9):
+  L530: TS2345 Argument of type '{ limit: number; }' is not assignable to parameter of type 'string'.
+  L791: TS2345 Argument of type '{ search: string; tagIds: string; tags_operator: "any_of" | "include_all"; }' is not assignable to par
+  L1088: TS2554 Expected 3 arguments, but got 2.
+  L1095: TS2554 Expected 2 arguments, but got 1.
+  L1149: TS2554 Expected 2 arguments, but got 1.
+  L1172: TS2554 Expected 2 arguments, but got 1.
+  L1285: TS2554 Expected 3 arguments, but got 2.
+  L1296: TS2554 Expected 3 arguments, but got 2.
+  L1356: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/admin/MaintenancePage.tsx (5):
+  L152: TS2554 Expected 1 arguments, but got 0.
+  L195: TS2345 Argument of type '{ isEnabled: boolean; }' is not assignable to parameter of type 'string'.
+  L423: TS2554 Expected 2 arguments, but got 1.
+  L434: TS2554 Expected 2 arguments, but got 1.
+  L483: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/admin/MessageTemplatesPage.tsx (9):
+  L512: TS2554 Expected 2 arguments, but got 1.
+  L538: TS2554 Expected 3 arguments, but got 2.
+  L576: TS2554 Expected 2 arguments, but got 1.
+  L625: TS2554 Expected 2 arguments, but got 1.
+  L641: TS2554 Expected 3 arguments, but got 2.
+  L681: TS2554 Expected 3 arguments, but got 2.
+  L685: TS2554 Expected 2 arguments, but got 1.
+  L696: TS2554 Expected 3 arguments, but got 2.
+  L702: TS2554 Expected 3 arguments, but got 2.
+
+src/pages/admin/ServerLifecyclePage.tsx (1):
+  L845: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/admin/ServiceAccountsPage.tsx (7):
+  L249: TS2304 Cannot find name 'projectApiPath'.
+  L403: TS2304 Cannot find name 'projectApiPath'.
+  L419: TS2304 Cannot find name 'projectApiPath'.
+  L448: TS2304 Cannot find name 'projectApiPath'.
+  L451: TS2304 Cannot find name 'projectApiPath'.
+  L468: TS2304 Cannot find name 'projectApiPath'.
+  L471: TS2304 Cannot find name 'projectApiPath'.
+
+src/pages/admin/SignalEndpointsPage.tsx (8):
+  L192: TS2304 Cannot find name 'projectApiPath'.
+  L336: TS2304 Cannot find name 'projectApiPath'.
+  L352: TS2304 Cannot find name 'projectApiPath'.
+  L375: TS2304 Cannot find name 'projectApiPath'.
+  L378: TS2304 Cannot find name 'projectApiPath'.
+  L393: TS2304 Cannot find name 'projectApiPath'.
+  L404: TS2304 Cannot find name 'projectApiPath'.
+  L407: TS2304 Cannot find name 'projectApiPath'.
+
+src/pages/common/DashboardPage.tsx (2):
+  L660: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+  L688: TS2554 Expected 1 arguments, but got 0.
+
+src/pages/features/ReleaseFlowTemplatesPage.tsx (2):
+  L627: TS2304 Cannot find name 'projectApiPath'.
+  L634: TS2304 Cannot find name 'projectApiPath'.
+
+src/pages/game/BannerManagementPage.tsx (6):
+  L127: TS2345 Argument of type '{ page: number; limit: number; search: string; sortBy: string; sortOrder: "desc" | "asc"; }' is not as
+  L225: TS2554 Expected 2 arguments, but got 1.
+  L252: TS2554 Expected 2 arguments, but got 1.
+  L283: TS2554 Expected 2 arguments, but got 1.
+  L298: TS2554 Expected 2 arguments, but got 1.
+  L313: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/game/CouponSettingsPage.tsx (9):
+  L241: TS2345 Argument of type '{ offset: number; limit: number; search: string; }' is not assignable to parameter of type 'string'.
+  L792: TS2345 Argument of type '{ page: number; limit: number; search: string; type: CouponType; status: CouponStatus; }' is not assig
+  L824: TS2554 Expected 2 arguments, but got 1.
+  L848: TS2345 Argument of type '{ page: number; limit: number; search: string; }' is not assignable to parameter of type 'string'.
+  L870: TS2554 Expected 2 arguments, but got 1.
+  L1016: TS2554 Expected 3 arguments, but got 2.
+  L1029: TS2554 Expected 2 arguments, but got 1.
+  L1072: TS2554 Expected 2 arguments, but got 1.
+  L1173: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/game/CouponUsagePage.tsx (2):
+  L344: TS2345 Argument of type '{ page: number; limit: number; }' is not assignable to parameter of type 'string'.
+  L398: TS2345 Argument of type '{ timezone: string; characterId: string; gameWorldId: string; subChannel: string; channel: string; pla
+
+src/pages/game/IngamePopupNoticesPage.tsx (4):
+  L228: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+  L342: TS2554 Expected 2 arguments, but got 1.
+  L363: TS2554 Expected 2 arguments, but got 1.
+  L382: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/game/PlanningDataHistoryPage.tsx (2):
+  L78: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+  L100: TS2554 Expected 1 arguments, but got 0.
+
+src/pages/game/PlanningDataPage.tsx (9):
+  L236: TS2554 Expected 1 arguments, but got 0.
+  L237: TS2554 Expected 1 arguments, but got 0.
+  L263: TS2554 Expected 1 arguments, but got 0.
+  L285: TS2554 Expected 1 arguments, but got 0.
+  L307: TS2554 Expected 1 arguments, but got 0.
+  L329: TS2554 Expected 1 arguments, but got 0.
+  L347: TS2554 Expected 1 arguments, but got 0.
+  L422: TS2554 Expected 2 arguments, but got 1.
+  L463: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+
+src/pages/game/RewardTemplatesPage.tsx (3):
+  L249: TS2345 Argument of type '{ page: number; limit: number; search: string; sortBy: string; sortOrder: "desc" | "asc"; }' is not as
+  L455: TS2554 Expected 2 arguments, but got 1.
+  L485: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/game/ServiceNoticesPage.tsx (4):
+  L302: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+  L431: TS2554 Expected 2 arguments, but got 1.
+  L462: TS2554 Expected 2 arguments, but got 1.
+  L541: TS2554 Expected 2 arguments, but got 1.
+
+src/pages/game/ServiceNoticesPreviewPage.tsx (1):
+  L188: TS2345 Argument of type 'number' is not assignable to parameter of type 'string'.
+
+src/pages/game/StoreProductsPage.tsx (11):
+  L313: TS2345 Argument of type '{ page: number; limit: number; search: string; sortBy: string; sortOrder: "desc" | "asc"; }' is not as
+  L360: TS2554 Expected 1 arguments, but got 0.
+  L485: TS2554 Expected 1 arguments, but got 0.
+  L501: TS2345 Argument of type 'SelectedSyncItems' is not assignable to parameter of type 'string'.
+  L533: TS2554 Expected 2 arguments, but got 1.
+  L548: TS2554 Expected 2 arguments, but got 1.
+  L560: TS2554 Expected 2 arguments, but got 1.
+  L587: TS2554 Expected 2 arguments, but got 1.
+  L609: TS2554 Expected 3 arguments, but got 2.
+  L628: TS2554 Expected 3 arguments, but got 2.
+  L647: TS2554 Expected 3 arguments, but got 2.
+
+src/pages/settings/EnvironmentsPage.tsx (2):
+  L217: TS2554 Expected 2-3 arguments, but got 4.
+  L422: TS2554 Expected 3 arguments, but got 4.
+

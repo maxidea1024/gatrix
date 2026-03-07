@@ -2,7 +2,8 @@ import { Queue, QueueOptions } from 'bullmq';
 import { redis } from './redis';
 import logger from '../utils/logger';
 
-const connection = redis;
+// Cast to any: workaround for ioredis type mismatch between root and bullmq's bundled version
+const connection = redis as any;
 
 const defaultQueueOptions: QueueOptions = {
   connection,

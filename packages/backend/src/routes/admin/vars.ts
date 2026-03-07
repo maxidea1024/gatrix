@@ -1,12 +1,10 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { VarsController } from '../../controllers/VarsController';
 
 const router = Router();
 
 router.use(authenticate as any);
-router.use(requireAdmin as any);
-
 // KV management routes (must come before /:key to avoid conflicts)
 router.get('/kv', VarsController.getAllKV as any);
 router.post('/kv', VarsController.createKV as any);

@@ -17,7 +17,7 @@ public class CouponService : ICouponService
     public async Task<RedeemCouponResponse> RedeemAsync(RedeemCouponRequest request, string environment, CancellationToken ct = default)
     {
         var response = await _apiClient.PostAsync<RedeemCouponResponse>(
-            $"/api/v1/server/{Uri.EscapeDataString(environment)}/coupons/redeem", request, ct);
+            $"/api/v1/server/coupons/redeem", request, ct);
 
         if (!response.Success || response.Data is null)
             throw new InvalidOperationException(response.Error?.Message ?? "Coupon redemption failed");

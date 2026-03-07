@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate, requireOrgPermission } from '../../middleware/auth';
 import { AdminController } from '../../controllers/AdminController';
 import apiTokenRoutes from './apiTokens';
 import {
@@ -9,65 +9,61 @@ import {
   auditUserReject,
   auditUserSuspend,
   auditUserUnsuspend,
-  auditUserPromote,
-  auditUserDemote,
 } from '../../middleware/auditLog';
+import { P } from '@gatrix/shared/permissions';
 
 const router = Router();
 
+// Permission shorthands
+const usersView = requireOrgPermission([P.USERS_READ, P.USERS_UPDATE]) as any;
+const usersManage = requireOrgPermission(P.USERS_UPDATE) as any;
+const systemManage = requireOrgPermission(P.SYSTEM_SETTINGS_UPDATE) as any;
+
 // All admin routes require authentication and admin privileges
 router.use(authenticate as any);
-router.use(requireAdmin as any);
 
-// Dashboard and statistics
-router.get('/dashboard', AdminController.getDashboard as any);
-router.get('/stats', AdminController.getStats as any);
-router.get('/stats/users', AdminController.getUserStats as any);
+// Dashboard and statistics (any authenticated org member can view)
+router.get('/dashboard', usersView, AdminController.getDashboard as any);
+router.get('/stats', usersView, AdminController.getStats as any);
+router.get('/stats/users', usersView, AdminController.getUserStats as any);
 
 // Health check for debugging
-router.get('/health', AdminController.healthCheck as any);
+router.get('/health', systemManage, AdminController.healthCheck as any);
 
 // User management
-router.get('/users', AdminController.getAllUsers as any);
-router.post('/users', AdminController.createUser as any);
-router.get('/users/:id', AdminController.getUserById as any);
+router.get('/users', usersView, AdminController.getAllUsers as any);
+router.post('/users', usersManage, AdminController.createUser as any);
+router.get('/users/:id', usersView, AdminController.getUserById as any);
 
-router.put('/users/:id', auditUserUpdate as any, AdminController.updateUser as any);
-router.delete('/users/:id', auditUserDelete as any, AdminController.deleteUser as any);
-router.post('/users/:id/activate', auditUserUnsuspend as any, AdminController.activateUser as any);
-router.post('/users/:id/suspend', auditUserSuspend as any, AdminController.suspendUser as any);
-router.post('/users/:id/promote', auditUserPromote as any, AdminController.promoteToAdmin as any);
-router.post('/users/:id/demote', auditUserDemote as any, AdminController.demoteFromAdmin as any);
-router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
+router.put('/users/:id', usersManage, auditUserUpdate as any, AdminController.updateUser as any);
+router.delete('/users/:id', usersManage, auditUserDelete as any, AdminController.deleteUser as any);
+router.post('/users/:id/activate', usersManage, auditUserUnsuspend as any, AdminController.activateUser as any);
+router.post('/users/:id/suspend', usersManage, auditUserSuspend as any, AdminController.suspendUser as any);
 
-// User environment access
-router.get('/users/:id/environments', AdminController.getUserEnvironmentAccess as any);
-router.put('/users/:id/environments', AdminController.setUserEnvironmentAccess as any);
+router.post('/users/:id/verify-email', usersManage, AdminController.verifyUserEmail as any);
 
 // User permissions (RBAC)
-router.get('/permissions', AdminController.getAllPermissions as any);
-router.get('/users/:id/permissions', AdminController.getUserPermissions as any);
-router.put('/users/:id/permissions', AdminController.setUserPermissions as any);
+router.get('/permissions', usersView, AdminController.getAllPermissions as any);
+router.get('/users/:id/permissions', usersView, AdminController.getUserPermissions as any);
 
 // Bulk user operations
-router.post('/users/bulk/status', AdminController.bulkUpdateUserStatus as any);
-router.post('/users/bulk/role', AdminController.bulkUpdateUserRole as any);
-router.post('/users/bulk/email-verified', AdminController.bulkUpdateUserEmailVerified as any);
-router.post('/users/bulk/tags', AdminController.bulkUpdateUserTags as any);
-router.post('/users/bulk/delete', AdminController.bulkDeleteUsers as any);
+router.post('/users/bulk/status', usersManage, AdminController.bulkUpdateUserStatus as any);
+router.post('/users/bulk/email-verified', usersManage, AdminController.bulkUpdateUserEmailVerified as any);
+router.post('/users/bulk/tags', usersManage, AdminController.bulkUpdateUserTags as any);
+router.post('/users/bulk/delete', usersManage, AdminController.bulkDeleteUsers as any);
 
 // Audit logs
-router.get('/audit-logs', AdminController.getAuditLogs as any);
-router.get('/audit-logs/stats', AdminController.getAuditStats as any);
+router.get('/audit-logs', usersView, AdminController.getAuditLogs as any);
+router.get('/audit-logs/stats', usersView, AdminController.getAuditStats as any);
 
-// System management
-router.post('/cache/clear', AdminController.clearCache as any);
-router.post('/audit-logs/cleanup', AdminController.cleanupAuditLogs as any);
+// System management (Super Admin only)
+router.post('/cache/clear', systemManage, AdminController.clearCache as any);
+router.post('/audit-logs/cleanup', systemManage, AdminController.cleanupAuditLogs as any);
 
 // Pending user approvals
-router.get('/pending-users', AdminController.getPendingUsers as any);
-router.post('/users/:id/approve', auditUserApprove as any, AdminController.approveUser as any);
-router.post('/users/:id/reject', auditUserReject as any, AdminController.rejectUser as any);
+router.get('/pending-users', usersView, AdminController.getPendingUsers as any);
+router.post('/users/:id/approve', usersManage, auditUserApprove as any, AdminController.approveUser as any);
+router.post('/users/:id/reject', usersManage, auditUserReject as any, AdminController.rejectUser as any);
 
 // API Token management
 router.use('/api-tokens', apiTokenRoutes);

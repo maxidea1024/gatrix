@@ -10,7 +10,9 @@ import { FeatureStrategyModel } from '../models/FeatureFlag';
 import { AuditLogModel } from '../models/AuditLog';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '../utils/apiResponse';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ReleaseFlowService');
 import db from '../config/knex';
 import { ulid } from 'ulid';
 import { pubSubService } from './PubSubService';
@@ -60,7 +62,9 @@ export class ReleaseFlowService {
       { planId },
       { delay: delayMs }
     );
-    logger.info(`Scheduled milestone progression for plan ${planId} in ${delayMs}ms (jobId hint: ${jobId})`);
+    logger.info(
+      `Scheduled milestone progression for plan ${planId} in ${delayMs}ms (jobId hint: ${jobId})`
+    );
   }
 
   /**
@@ -90,7 +94,7 @@ export class ReleaseFlowService {
   /**
    * Create a new release flow template
    */
-  async createTemplate(input: CreateTemplateInput, userId: number): Promise<ReleaseFlowAttributes> {
+  async createTemplate(input: CreateTemplateInput, userId: string): Promise<ReleaseFlowAttributes> {
     const trx = await db.transaction();
     try {
       const flow = await ReleaseFlowModel.create({
@@ -150,16 +154,16 @@ export class ReleaseFlowService {
    */
   async applyTemplateToFlag(
     flagId: string,
-    environment: string,
+    environmentId: string,
     templateId: string,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowAttributes> {
     const template = await ReleaseFlowModel.findById(templateId);
     if (!template || template.discriminator !== 'template') {
       throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
     }
 
-    const existingPlan = await ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environment);
+    const existingPlan = await ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environmentId);
     if (existingPlan) {
       throw new GatrixError(
         'A release flow is already active for this flag and environment',
@@ -177,7 +181,7 @@ export class ReleaseFlowService {
         description: template.description,
         discriminator: 'plan',
         flagId,
-        environment,
+        environmentId,
         createdBy: userId,
         isArchived: false,
         status: 'draft',
@@ -211,12 +215,12 @@ export class ReleaseFlowService {
 
       await AuditLogModel.create({
         action: 'release_flow.apply_plan',
-        description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environment}]`,
+        description: `Release flow template '${template.flowName}' applied to flag '${flagId}' in [${environmentId}]`,
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId,
-        environment,
-        newValues: { flagId, environment, templateId },
+        environmentId,
+        newValues: { flagId, environmentId, templateId },
       });
 
       return (await ReleaseFlowModel.findById(plan.id))!;
@@ -233,7 +237,7 @@ export class ReleaseFlowService {
   async startMilestone(
     planId: string,
     milestoneId: string,
-    userId: number | null
+    userId: string | null
   ): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
@@ -270,7 +274,7 @@ export class ReleaseFlowService {
       // This is a design choice: a release flow milestone OVERWRITES existing strategies
       await db('g_feature_strategies')
         .where('flagId', plan.flagId)
-        .where('environment', plan.environment)
+        .where('environmentId', plan.environmentId)
         .del();
 
       // 3. CRITICAL: Promote milestone strategies to feature strategies
@@ -279,7 +283,7 @@ export class ReleaseFlowService {
         await db('g_feature_strategies').insert({
           id: strategyId,
           flagId: plan.flagId,
-          environment: plan.environment,
+          environmentId: plan.environmentId,
           strategyName: ms.strategyName,
           parameters: ms.parameters ? JSON.stringify(ms.parameters) : null,
           constraints: ms.constraints ? JSON.stringify(ms.constraints) : '[]',
@@ -313,17 +317,14 @@ export class ReleaseFlowService {
         resourceType: 'ReleaseFlow',
         resourceId: plan.id,
         userId: userId ?? undefined,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
         newValues: { milestoneId, milestoneName: milestone.name },
       });
 
       // 4. CRITICAL: Bump flag version and notify SDKs about strategy changes
       // Without this, SDKs will not detect the new strategies from the milestone
-      const flag = await db('g_feature_flags')
-        .where('id', plan.flagId)
-        .select('flagName')
-        .first();
-      if (flag && plan.environment) {
+      const flag = await db('g_feature_flags').where('id', plan.flagId).select('flagName').first();
+      if (flag && plan.environmentId) {
         await db('g_feature_flags')
           .where('id', plan.flagId)
           .update({
@@ -331,7 +332,7 @@ export class ReleaseFlowService {
             updatedAt: new Date(),
           });
         const { featureFlagService } = await import('./FeatureFlagService');
-        await featureFlagService.invalidateCache(plan.environment, [flag.flagName]);
+        await featureFlagService.invalidateCache(plan.environmentId, [flag.flagName]);
       }
 
       // 5. Schedule delayed job for automatic progression
@@ -349,7 +350,7 @@ export class ReleaseFlowService {
         data: {
           planId: plan.id,
           flagId: plan.flagId,
-          environment: plan.environment,
+          environmentId: plan.environmentId,
           activeMilestoneId: milestone.id,
           milestoneName: milestone.name,
           status: 'active',
@@ -367,7 +368,7 @@ export class ReleaseFlowService {
   /**
    * Start a plan (begins from the first milestone)
    */
-  async startPlan(planId: string, userId: number): Promise<ReleaseFlowAttributes> {
+  async startPlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -390,7 +391,7 @@ export class ReleaseFlowService {
   /**
    * Pause the current plan (stops progression timer)
    */
-  async pausePlan(planId: string, userId: number): Promise<ReleaseFlowAttributes> {
+  async pausePlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -418,7 +419,7 @@ export class ReleaseFlowService {
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
-      environment: plan.environment,
+      environmentId: plan.environmentId,
     });
 
     // Broadcast SSE event for UI real-time update
@@ -427,7 +428,7 @@ export class ReleaseFlowService {
       data: {
         planId,
         flagId: plan.flagId,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
         status: 'paused',
       },
     });
@@ -438,7 +439,7 @@ export class ReleaseFlowService {
   /**
    * Resume a paused plan
    */
-  async resumePlan(planId: string, userId: number): Promise<ReleaseFlowAttributes> {
+  async resumePlan(planId: string, userId: string): Promise<ReleaseFlowAttributes> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Release plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -488,7 +489,7 @@ export class ReleaseFlowService {
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
-      environment: plan.environment,
+      environmentId: plan.environmentId,
     });
 
     // Broadcast SSE event for UI real-time update
@@ -497,7 +498,7 @@ export class ReleaseFlowService {
       data: {
         planId,
         flagId: plan.flagId,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
         status: 'active',
       },
     });
@@ -510,7 +511,7 @@ export class ReleaseFlowService {
    */
   async progressToNextMilestone(
     planId: string,
-    userId?: number
+    userId?: string
   ): Promise<ReleaseFlowAttributes | null> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan' || plan.status !== 'active') {
@@ -541,7 +542,7 @@ export class ReleaseFlowService {
         resourceType: 'ReleaseFlow',
         resourceId: planId,
         userId: userId ?? undefined,
-        environment: plan.environment,
+        environmentId: plan.environmentId,
       });
 
       // Broadcast SSE event for UI real-time update
@@ -550,7 +551,7 @@ export class ReleaseFlowService {
         data: {
           planId,
           flagId: plan.flagId,
-          environment: plan.environment,
+          environmentId: plan.environmentId,
           status: 'completed',
         },
       });
@@ -577,7 +578,7 @@ export class ReleaseFlowService {
   async setTransitionCondition(
     milestoneId: string,
     transitionCondition: TransitionCondition,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowMilestoneAttributes> {
     const milestone = await ReleaseFlowMilestoneModel.findById(milestoneId);
     if (!milestone) {
@@ -612,7 +613,7 @@ export class ReleaseFlowService {
    */
   async removeTransitionCondition(
     milestoneId: string,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowMilestoneAttributes> {
     const milestone = await ReleaseFlowMilestoneModel.findById(milestoneId);
     if (!milestone) {
@@ -637,7 +638,7 @@ export class ReleaseFlowService {
   async updateTemplate(
     id: string,
     input: Partial<CreateTemplateInput>,
-    userId: number
+    userId: string
   ): Promise<ReleaseFlowAttributes> {
     const trx = await db.transaction();
     try {
@@ -706,7 +707,7 @@ export class ReleaseFlowService {
     }
   }
 
-  async deleteTemplate(id: string, userId: number): Promise<void> {
+  async deleteTemplate(id: string, userId: string): Promise<void> {
     const existing = await ReleaseFlowModel.findById(id);
     if (!existing || existing.discriminator !== 'template') {
       throw new GatrixError('Template not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -741,14 +742,17 @@ export class ReleaseFlowService {
     return ReleaseFlowModel.listTemplates();
   }
 
-  async getPlanForFlag(flagId: string, environment: string): Promise<ReleaseFlowAttributes | null> {
-    return ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environment);
+  async getPlanForFlag(
+    flagId: string,
+    environmentId: string
+  ): Promise<ReleaseFlowAttributes | null> {
+    return ReleaseFlowModel.findPlanByFlagAndEnv(flagId, environmentId);
   }
 
   /**
    * Delete (archive) an applied release flow plan
    */
-  async deletePlan(planId: string, userId: number): Promise<void> {
+  async deletePlan(planId: string, userId: string): Promise<void> {
     const plan = await ReleaseFlowModel.findById(planId);
     if (!plan || plan.discriminator !== 'plan') {
       throw new GatrixError('Plan not found', 404, true, ErrorCodes.NOT_FOUND);
@@ -765,11 +769,11 @@ export class ReleaseFlowService {
 
     await AuditLogModel.create({
       action: 'release_flow.plan_delete',
-      description: `Release flow plan '${plan.flowName}' removed from flag '${plan.flagId}' in [${plan.environment}]`,
+      description: `Release flow plan '${plan.flowName}' removed from flag '${plan.flagId}' in [${plan.environmentId}]`,
       resourceType: 'ReleaseFlow',
       resourceId: planId,
       userId,
-      environment: plan.environment,
+      environmentId: plan.environmentId,
     });
   }
 }

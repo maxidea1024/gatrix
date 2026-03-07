@@ -26,26 +26,29 @@ export interface MessageTemplateListResponse {
 }
 
 export const messageTemplateService = {
-  async list(params?: {
-    type?: MessageTemplateType;
-    isEnabled?: boolean;
-    q?: string;
-    limit?: number;
-    offset?: number;
-  }): Promise<MessageTemplateListResponse> {
+  async list(
+    projectApiPath: string,
+    params?: {
+      type?: MessageTemplateType;
+      isEnabled?: boolean;
+      q?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<MessageTemplateListResponse> {
     const res = await apiService.get<MessageTemplateListResponse | MessageTemplate[]>(
-      '/admin/message-templates',
+      `${projectApiPath}/message-templates`,
       { params } as any
     );
     const d: any = res.data;
 
-    // 백워드 호환성: 배열이면 기존 형식, 객체면 새 형식
+    // Backward compatibility: existing format if array, new format if object
     if (Array.isArray(d)) {
       return { templates: d, total: d.length };
     }
 
-    // 서버 응답 구조: { success: true, data: { items: ..., total: ... } }
-    // data.data가 있으면 중첩된 구조
+    // Server response structure: { success: true, data: { items: ..., total: ... } }
+    // Nested structure if data.data exists
     const actualData = d?.data || d;
 
     return {
@@ -53,49 +56,53 @@ export const messageTemplateService = {
       total: actualData?.total ?? 0,
     };
   },
-  async get(id: number): Promise<MessageTemplate> {
-    const res = await apiService.get<MessageTemplate>(`/admin/message-templates/${id}`);
+  async get(projectApiPath: string, id: number): Promise<MessageTemplate> {
+    const res = await apiService.get<MessageTemplate>(`${projectApiPath}/message-templates/${id}`);
     return res.data as any;
   },
-  async create(data: MessageTemplate): Promise<MessageTemplate> {
-    const res = await apiService.post<any>('/admin/message-templates', data);
+  async create(projectApiPath: string, data: MessageTemplate): Promise<MessageTemplate> {
+    const res = await apiService.post<any>(`${projectApiPath}/message-templates`, data);
 
-    // 서버 응답 구조: { success: true, data: created }
+    // Server response structure: { success: true, data: created }
     if (res?.data?.success && res?.data?.data) {
       return res.data.data;
     }
 
-    // 백워드 호환성을 위한 다른 구조들
+    // Other structures for backward compatibility
     return res?.data?.data || res?.data || res;
   },
-  async update(id: number, data: MessageTemplate): Promise<MessageTemplate> {
-    const res = await apiService.put<any>(`/admin/message-templates/${id}`, data);
+  async update(
+    projectApiPath: string,
+    id: number,
+    data: MessageTemplate
+  ): Promise<MessageTemplate> {
+    const res = await apiService.put<any>(`${projectApiPath}/message-templates/${id}`, data);
 
-    // 서버 응답 구조: { success: true, data: updated }
+    // Server response structure: { success: true, data: updated }
     if (res?.data?.success && res?.data?.data) {
       return res.data.data;
     }
 
-    // 백워드 호환성을 위한 다른 구조들
+    // Other structures for backward compatibility
     return res?.data?.data || res?.data || res;
   },
-  async remove(id: number): Promise<void> {
-    await apiService.delete(`/admin/message-templates/${id}`);
+  async remove(projectApiPath: string, id: number): Promise<void> {
+    await apiService.delete(`${projectApiPath}/message-templates/${id}`);
   },
-  async delete(id: number): Promise<void> {
-    await apiService.delete(`/admin/message-templates/${id}`);
+  async delete(projectApiPath: string, id: number): Promise<void> {
+    await apiService.delete(`${projectApiPath}/message-templates/${id}`);
   },
-  async bulkDelete(ids: number[]): Promise<void> {
-    await apiService.post('/admin/message-templates/bulk-delete', { ids });
+  async bulkDelete(projectApiPath: string, ids: number[]): Promise<void> {
+    await apiService.post(`${projectApiPath}/message-templates/bulk-delete`, { ids });
   },
 
-  // 태그 관련 메서드
-  async getTags(id: number): Promise<any[]> {
-    const response = await apiService.get(`/admin/message-templates/${id}/tags`);
+  // Tag related methods
+  async getTags(projectApiPath: string, id: number): Promise<any[]> {
+    const response = await apiService.get(`${projectApiPath}/message-templates/${id}/tags`);
     return response.data?.data || [];
   },
 
-  async setTags(id: number, tagIds: number[]): Promise<void> {
-    await apiService.put(`/admin/message-templates/${id}/tags`, { tagIds });
+  async setTags(projectApiPath: string, id: number, tagIds: number[]): Promise<void> {
+    await apiService.put(`${projectApiPath}/message-templates/${id}/tags`, { tagIds });
   },
 };

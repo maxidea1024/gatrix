@@ -1,7 +1,7 @@
 /**
  * Service Maintenance Service
  * Handles global service maintenance status retrieval and caching
- * Uses per-environment API pattern: GET /api/v1/server/:env/maintenance
+ * Uses per-environment API pattern: GET /api/v1/server/maintenance
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
@@ -74,10 +74,10 @@ export class ServiceMaintenanceService {
 
   /**
    * Fetch service maintenance status for a specific environment
-   * GET /api/v1/server/:env/maintenance
+   * GET /api/v1/server/maintenance
    */
   async getStatusByEnvironment(environment: string): Promise<MaintenanceStatus> {
-    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/maintenance`;
+    const endpoint = `/api/v1/server/maintenance`;
 
     this.logger.debug('Fetching service maintenance status', { environment });
 

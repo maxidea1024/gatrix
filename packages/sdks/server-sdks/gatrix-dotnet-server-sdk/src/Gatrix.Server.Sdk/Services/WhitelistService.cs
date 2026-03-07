@@ -22,7 +22,7 @@ public class WhitelistService : BaseEnvironmentService<WhitelistData, WhitelistD
 
     protected override string ServiceName => "Whitelist";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/whitelist";
+        $"/api/v1/server/whitelist";
     protected override List<WhitelistData> ExtractItems(WhitelistData response) => [response];
     protected override object GetItemId(WhitelistData item) => "singleton";
 

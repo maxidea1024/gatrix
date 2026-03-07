@@ -83,16 +83,16 @@ const loadCachedMessages = (): Record<number, Message[]> => {
   return {};
 };
 
-// 메시지를 로컬 스토리지에 저장 (디바운스 적용)
+// 메시지를 로컬 스토리지에 Save (디바운스 적용)
 let saveTimeout: NodeJS.Timeout | null = null;
 const saveCachedMessages = (messages: Record<number, Message[]>) => {
   try {
-    // 기존 타임아웃 취소
+    // Existing 타임아웃 Cancel
     if (saveTimeout) {
       clearTimeout(saveTimeout);
     }
 
-    // 500ms 후에 저장 (디바운스)
+    // 500ms 후에 Save (디바운스)
     saveTimeout = setTimeout(() => {
       console.log(
         '💾 Saving messages to cache:',
@@ -241,7 +241,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state.messages,
         [action.payload.channelId]: action.payload.messages,
       };
-      // 메시지 상태 변경 시 localStorage에 저장
+      // 메시지 Status 변경 시 localStorage에 Save
       saveCachedMessages(newMessagesState);
       return {
         ...state,
@@ -277,7 +277,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         newMessagesCount: updatedMessages[channelId].length,
       });
 
-      // 새 메시지 추가 시 localStorage에 저장
+      // 새 메시지 추가 시 localStorage에 Save
       saveCachedMessages(updatedMessages);
 
       return {
@@ -342,7 +342,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         [prependChannelId]: [...action.payload.messages, ...existingMessages],
       };
 
-      // 이전 메시지 추가 시 localStorage에 저장
+      // 이전 메시지 추가 시 localStorage에 Save
       saveCachedMessages(prependedMessages);
 
       return {
@@ -520,10 +520,10 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       };
 
     case 'REFRESH_CHANNELS':
-      // 채널 목록 새로고침을 위한 플래그 설정
+      // 채널 목록 Refresh을 위한 플래그 Settings
       return {
         ...state,
-        isLoading: true, // 새로고침 중임을 표시
+        isLoading: true, // Refresh 중임을 표시
       };
 
     case 'SET_PENDING_INVITATIONS_COUNT':
@@ -554,7 +554,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { enqueueSnackbar } = useSnackbar();
   const wsService = getChatWebSocketService(getToken);
 
-  // 디버깅: 초기 상태 확인 (한 번만 실행)
+  // 디버깅: 초기 Status Confirm (한 번만 실행)
   useEffect(() => {
     console.log(
       '🚀 ChatProvider initialized with messages:',
@@ -562,12 +562,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   }, []); // 빈 의존성 배열로 한 번만 실행
 
-  // 페이지 전환 시 메시지 상태 보존을 위한 ref
+  // 페이지 전환 시 메시지 Status 보존을 위한 ref
   const isInitializedRef = useRef(false);
 
-  // markAsRead 요청 추적을 위한 ref
+  // markAsRead Request 추적을 위한 ref
   const markAsReadRequestsRef = useRef<Set<string>>(new Set());
-  // 채널별 최초 새로고침 여부 (캐시 → 서버 메타데이터 동기화)
+  // 채널별 최초 Refresh 여부 (Cache → 서버 메타데이터 동기화)
   const refreshedChannelsRef = useRef<Set<number>>(new Set());
   // Track in-flight message loads to avoid duplicate concurrent fetches per channel
   const loadingMessagesRef = useRef<Set<number>>(new Set());
@@ -587,8 +587,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user && !isInitializedRef.current) {
       isInitializedRef.current = true;
 
-      // 현재 사용자 정보를 설정
-      dispatch({ type: 'SET_CURRENT_USER', payload: user });
+      // 현재 User info를 Settings
+      dispatch({ type: 'SET_CURRENT_USER', payload: user as any });
 
       // WebSocket 연결 함수는 이제 위에서 useCallback으로 정의됨
 
@@ -599,7 +599,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('📨 Current channel ID:', state.currentChannelId);
           console.log('📨 Message channel ID:', message.channelId);
 
-          // 🔍 메시지에 사용자 정보가 포함되어 있는지 확인
+          // 🔍 메시지에 User info가 포함되어 있는지 Confirm
           console.log('🔍 Message user info check:', {
             hasMessageUser: !!message.user,
             messageUser: message.user,
@@ -607,7 +607,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             hasUserInState: !!state.users[message.userId],
           });
 
-          // 메시지에 사용자 정보가 포함되어 있으면 사용
+          // 메시지에 User info가 포함되어 있으면 Used
           if (message.user && message.userId) {
             console.log('✅ Using user info from message:', message.user);
             dispatch({
@@ -625,7 +625,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ],
             });
           }
-          // 메시지에 사용자 정보가 없고 state에도 없으면 fallback 사용
+          // 메시지에 User info가 없고 state에도 없으면 fallback Used
           else if (message.userId && !state.users[message.userId]) {
             console.log('⚠️ Using fallback user data for userId:', message.userId);
             dispatch({
@@ -651,18 +651,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           dispatch({ type: 'UPDATE_MESSAGE', payload: message });
         });
 
-        // 스레드 메시지 생성 이벤트 리스너
+        // 스레드 메시지 Create Event 리스너
         wsService.on('thread_message_created', (data) => {
           console.log('🧵 Thread message created:', data);
           // 스레드 메시지는 메인 채팅에 추가하지 않음
           // ThreadView 컴포넌트에서 별도로 처리
         });
 
-        // 스레드 정보 업데이트 이벤트 리스너
+        // 스레드 정보 업데이트 Event 리스너
         wsService.on('thread_updated', (data) => {
           console.log('🧵 Thread updated:', data);
 
-          // 다양한 래핑 케이스를 모두 처리
+          // 다양한 래핑 케이스를 All 처리
           // 1) data.data.data (현재 구조)
           // 2) data.data (정규화된 구조)
           // 3) data (직접 전달된 구조)
@@ -694,12 +694,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         });
 
-        // 리액션 업데이트 이벤트 리스너
+        // 리액션 업데이트 Event 리스너
         wsService.on('message_reaction_updated', (data) => {
           console.log('🔍 Message reaction updated:', data);
 
           // 메시지 리액션 정보를 업데이트
-          const reactionData = data.data || data; // data.data 또는 data 직접 사용
+          const reactionData = data.data || data; // data.data 또는 data 직접 Used
           dispatch({
             type: 'UPDATE_MESSAGE_REACTIONS',
             payload: {
@@ -712,7 +712,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         });
 
-        // 연결 상태 이벤트 리스너
+        // 연결 Status Event 리스너
         wsService.on('connection_established', () => {
           console.log('WebSocket connection established');
           dispatch({ type: 'SET_CONNECTED', payload: true });
@@ -750,7 +750,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           dispatch({ type: 'SET_CONNECTED', payload: false });
 
           try {
-            // 토큰 갱신 시도
+            // Refresh token 시도
             await AuthService.refreshToken();
 
             console.log('✅ Token refreshed, reconnecting WebSocket...');
@@ -768,7 +768,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         });
 
-        // 메시지 삭제 이벤트 리스너
+        // 메시지 Delete Event 리스너
         wsService.onMessageDeleted((messageId) => {
           // Find the channel for this message
           const channelId = findChannelIdForMessage(messageId);
@@ -780,7 +780,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         });
 
-        // 타이핑 이벤트 리스너
+        // 타이핑 Event 리스너
         wsService.onUserTyping((typing) => {
           dispatch({ type: 'ADD_TYPING_USER', payload: typing });
           // 5초 후 자동으로 타이핑 인디케이터 제거 (백업 안전장치)
@@ -794,7 +794,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       setupEventListeners();
-      // 초기 채널 로딩 시작 (사용자 동기화 + WebSocket 연결 + 채널 로딩)
+      // 초기 채널 로딩 시작 (Used자 동기화 + WebSocket 연결 + 채널 로딩)
       loadChannels();
 
       wsService.onUserStopTyping((typing) => {
@@ -804,7 +804,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       });
 
-      // 스레드 타이핑 이벤트 리스너
+      // 스레드 타이핑 Event 리스너
       wsService.onUserTypingThread((typing) => {
         dispatch({ type: 'ADD_THREAD_TYPING_USER', payload: typing });
         // 5초 후 자동으로 타이핑 인디케이터 제거 (백업 안전장치)
@@ -838,7 +838,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       });
 
-      // 사용자 채널 참여 이벤트 리스너
+      // Used자 채널 참여 Event 리스너
       wsService.on('user_joined_channel', (event) => {
         console.log('📨 User joined channel in ChatContext:', event);
         const { data } = event;
@@ -858,19 +858,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isEdited: false,
           };
 
-          dispatch({ type: 'ADD_MESSAGE', payload: systemMessage });
+          dispatch({ type: 'ADD_MESSAGE', payload: systemMessage as any });
         }
 
-        // 채널 목록 새로고침 (멤버 수 업데이트)
+        // 채널 목록 Refresh (멤버 수 업데이트)
         dispatch({ type: 'REFRESH_CHANNELS' });
       });
 
-      // 초대 응답 이벤트 리스너 (초대한 사람에게만 표시)
+      // 초대 Response Event 리스너 (초대한 사람에게만 표시)
       wsService.on('invitation_response', (event) => {
         console.log('📨 Invitation response received in ChatContext:', event);
         const { data } = event;
 
-        // 백엔드에서 inviterId에게만 전송하므로, 이 이벤트를 받은 사람은 초대한 사람임
+        // 백엔드에서 inviterId에게만 전송하므로, 이 Event를 받은 사람은 초대한 사람임
         // 따라서 조건 없이 메시지 표시
         if (user) {
           if (data.action === 'accept') {
@@ -884,11 +884,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        // 채널 목록 새로고침
+        // 채널 목록 Refresh
         dispatch({ type: 'REFRESH_CHANNELS' });
       });
 
-      // 채널 초대 이벤트 리스너
+      // 채널 초대 Event 리스너
       wsService.on('channel_invitation', (event) => {
         console.log('📨 Channel invitation received in ChatContext:', event);
         const { data } = event;
@@ -899,7 +899,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           payload: state.pendingInvitationsCount + 1,
         });
 
-        // 토스트 알림 표시 (백엔드 메시지가 있으면 사용, 없으면 기본 번역 메시지 사용)
+        // 토스트 Notification 표시 (백엔드 메시지가 있으면 Used, 없으면 기본 Translation 메시지 사용)
         const displayMessage =
           data.message ||
           t('chat.invitationReceived', {
@@ -934,16 +934,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         type: 'SET_PENDING_INVITATIONS_COUNT',
                         payload: Math.max(0, state.pendingInvitationsCount - 1),
                       });
-                      // 채널 목록 새로고침 후 해당 채널로 이동
+                      // 채널 목록 Refresh 후 해당 채널로 이동
                       await loadChannels();
-                      if (response.channelId) {
+                      if ((response as any).channelId) {
                         console.log(
                           '🎉 Invitation accepted, switching to channel:',
-                          response.channelId
+                          (response as any).channelId
                         );
                         dispatch({
                           type: 'SET_CURRENT_CHANNEL',
-                          payload: response.channelId,
+                          payload: (response as any).channelId,
                         });
                       }
                     } else {
@@ -1026,15 +1026,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       return () => {
-        // 이벤트 리스너 정리
+        // Event 리스너 Cleanup
         wsService.removeAllListeners();
         wsService.disconnect();
         dispatch({ type: 'SET_CONNECTED', payload: false });
       };
     }
-  }, [user?.userId]); // user 객체 전체가 아닌 userId만 의존성으로 사용
+  }, [user?.id]); // user 객체 전체가 아닌 id만 의존성으로 Used
 
-  // Load messages for a channel - 깜빡임 방지를 위해 로딩 상태 설정 제거
+  // Load messages for a channel - 깜빡임 방지를 위해 Loading state Settings 제거
   const loadMessages = useCallback(
     async (channelId: number, forceReload = false) => {
       // Prevent concurrent loads for the same channel
@@ -1047,7 +1047,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('🔄 loadMessages called for channel:', channelId, 'forceReload:', forceReload);
         console.log('📊 Current messages state:', state.messages);
 
-        // 강제 리로드가 아니고 이미 메시지가 있고, 해당 채널이 이번 세션에서 한 번 이상 새로고침 되었으면 스킵
+        // 강제 리로드가 아니고 이미 메시지가 있고, 해당 채널이 이번 세션에서 한 번 이상 Refresh 되었으면 스킵
         if (
           !forceReload &&
           state.messages[channelId] &&
@@ -1063,25 +1063,25 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        // 현재 상태에서 캐시된 메시지 확인
+        // Current state에서 Cache된 메시지 Confirm
         const currentCachedMessages = loadCachedMessages();
         const cachedMessages = currentCachedMessages[channelId];
 
         if (!forceReload && cachedMessages && cachedMessages.length > 0) {
           console.log('Using cached messages:', cachedMessages.length);
-          // 캐시된 메시지를 먼저 상태에 설정 (빠른 렌더링)
+          // Cache된 메시지를 먼저 Status에 Settings (빠른 렌더링)
           dispatch({
             type: 'SET_MESSAGES',
             payload: { channelId, messages: cachedMessages },
           });
 
-          // 1) 최신 추가 메시지만 확인 (after)
+          // 1) 최신 추가 메시지만 Confirm (after)
           try {
             const latestCachedMessage = cachedMessages[cachedMessages.length - 1];
             const incremental = await ChatService.getMessages({
               channelId,
-              limit: 20, // 최신 20개만 확인
-              after: latestCachedMessage.id?.toString(), // 마지막 캐시된 메시지 이후만 (string)
+              limit: 20, // 최신 20개만 Confirm
+              after: latestCachedMessage.id?.toString(), // 마지막 Cache된 메시지 이후만 (string)
             });
 
             if (incremental.messages.length > 0) {
@@ -1116,7 +1116,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        // 캐시된 메시지가 없거나 강제 리로드인 경우 서버에서 로딩
+        // Cache된 메시지가 없거나 강제 리로드인 경우 서버에서 로딩
         const result = await ChatService.getMessages({
           channelId,
           limit: 50, // 최근 50개 메시지만 로딩
@@ -1148,12 +1148,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // REFRESH_CHANNELS 액션 처리
   useEffect(() => {
     if (state.isLoading && state.channels.length === 0) {
-      // 초기 로딩이 아닌 경우에만 새로고침
+      // 초기 로딩이 아닌 경우에만 Refresh
       return;
     }
 
     if (state.isLoading) {
-      // REFRESH_CHANNELS 액션으로 인한 로딩 상태인 경우 채널 새로고침
+      // REFRESH_CHANNELS 액션으로 인한 Loading state인 경우 채널 Refresh
       loadChannels();
     }
   }, [state.isLoading]);
@@ -1198,11 +1198,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }, 1000);
         } catch (syncError) {
           console.error('❌ Failed to sync user to Chat Server:', syncError);
-          // 동기화 실패해도 앱은 계속 동작하도록 함
+          // 동기화 Failed해도 앱은 계속 동작하도록 함
           dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: 0 });
         }
       } else {
-        // 다른 오류의 경우 기본값 설정
+        // 다른 오류의 경우 Set default values
         dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: 0 });
       }
     }
@@ -1244,7 +1244,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // WebSocket 연결 함수를 별도로 분리
   const connectWebSocket = useCallback(async () => {
     try {
-      // 인증 토큰 확인
+      // Authentication 토큰 Confirm
       const token = localStorage.getItem('accessToken');
       if (!token) {
         console.error('No authentication token found in localStorage');
@@ -1270,7 +1270,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔄 loadChannels() called');
     try {
       const startTime = Date.now();
-      // 깜빡임 방지를 위해 로딩 상태 설정 제거
+      // 깜빡임 방지를 위해 Loading state Settings 제거
       // dispatch({ type: 'SET_LOADING', payload: true });
       // dispatch({ type: 'SET_LOADING_STAGE', payload: 'syncing' });
       // dispatch({ type: 'SET_LOADING_START_TIME', payload: startTime });
@@ -1279,20 +1279,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startTime
       );
 
-      // 먼저 사용자를 Chat Server에 동기화
+      // 먼저 Used자를 Chat Server에 동기화
       try {
         console.log('🔄 Syncing current user to Chat Server...');
         await ChatService.syncCurrentUser();
         console.log('✅ User synced to Chat Server successfully');
 
-        // 사용자 동기화 완료 후 WebSocket 연결
+        // Used자 동기화 완료 후 WebSocket 연결
         // dispatch({ type: 'SET_LOADING_STAGE', payload: 'connecting' });
         console.log('🔄 Connecting to WebSocket after user sync...');
         await connectWebSocket();
         console.log('✅ WebSocket connected after user sync');
       } catch (error) {
         console.error('❌ Failed to sync user to Chat Server:', error);
-        // 동기화 실패해도 채팅은 계속 진행
+        // 동기화 Failed해도 채팅은 계속 진행
       }
 
       // dispatch({ type: 'SET_LOADING_STAGE', payload: 'loading_channels' });
@@ -1301,7 +1301,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('✅ Channels loaded:', channels);
       dispatch({ type: 'SET_CHANNELS', payload: channels });
 
-      // 사용자 데이터와 초대 수도 함께 로드 (개별 오류 처리)
+      // Used자 데이터와 초대 수도 함께 로드 (개별 오류 처리)
       await Promise.allSettled([
         loadUsers().catch((error) => console.error('❌ Failed to load users:', error)),
         loadPendingInvitationsCount().catch((error) =>
@@ -1368,7 +1368,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const previousChannelId = state.currentChannelId;
       dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
 
-      // 마지막 채널 ID 저장
+      // 마지막 채널 ID Save
       if (channelId) {
         localStorage.setItem('lastChannelId', channelId.toString());
         console.log('Saved last channel ID:', channelId);
@@ -1541,26 +1541,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     markAsRead: async (channelId, messageId) => {
       try {
-        // 요청 키 생성
+        // Request 키 Create
         const requestKey = `${channelId}_${messageId || 'latest'}`;
 
-        // 이미 진행 중인 요청이 있으면 스킵
+        // 이미 진행 중인 Request이 있으면 스킵
         if (markAsReadRequestsRef.current.has(requestKey)) {
           console.log(`⏭️ Skipping duplicate markAsRead request for channel ${channelId}`);
           return;
         }
 
-        // 디바운스를 위한 키 생성
+        // 디바운스를 위한 키 Create
         const debounceKey = `markAsRead_${requestKey}`;
 
-        // 기존 타임아웃 취소
+        // Existing 타임아웃 Cancel
         if ((window as any)[debounceKey]) {
           clearTimeout((window as any)[debounceKey]);
         }
 
         // 5초 후에 실행 (디바운스 시간 대폭 증가)
         (window as any)[debounceKey] = setTimeout(async () => {
-          // 요청 시작 표시
+          // Request 시작 표시
           markAsReadRequestsRef.current.add(requestKey);
 
           try {
@@ -1583,9 +1583,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.error('Failed to mark as read:', error);
             }
           } finally {
-            // 요청 완료 표시
+            // Request 완료 표시
             markAsReadRequestsRef.current.delete(requestKey);
-            // 타임아웃 정리
+            // 타임아웃 Cleanup
             delete (window as any)[debounceKey];
           }
         }, 500);
@@ -1654,7 +1654,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     inviteUser: async (channelId: number, userId: number, message?: string) => {
       try {
         await ChatService.inviteUser(channelId, userId, message);
-        // 초대 성공 시 채널 멤버 목록 새로고침 (필요한 경우)
+        // 초대 Success 시 채널 멤버 목록 Refresh (필요한 경우)
         // await loadChannels();
       } catch (error: any) {
         dispatch({

@@ -10,9 +10,48 @@ export interface Invitation {
   usedBy?: string;
 }
 
+// ─── Auto-Join Types ─────────────────────────
+
+export interface AutoJoinRoleBinding {
+  roleId: string;
+  scopeType: 'org' | 'project';
+  scopeId: string;
+}
+
+export interface AutoJoinMembership {
+  orgId: string;
+  projectIds: string[];
+  roleBindings: AutoJoinRoleBinding[];
+}
+
+export interface AutoJoinConfig {
+  memberships: AutoJoinMembership[];
+}
+
+// Resolved names returned by the validate API for display on invitation acceptance page
+export interface AutoJoinInfoProject {
+  projectId: string;
+  projectName: string;
+  projectDisplayName: string;
+}
+
+export interface AutoJoinInfoMembership {
+  orgId: string;
+  orgName: string;
+  orgDisplayName: string;
+  projects: AutoJoinInfoProject[];
+}
+
+export interface AutoJoinInfo {
+  memberships: AutoJoinInfoMembership[];
+}
+
+// ─── Request/Response Types ─────────────────────────
+
 export interface CreateInvitationRequest {
   email?: string;
   expirationHours: number;
+  autoJoinConfig?: AutoJoinConfig;
 }
 
 export interface InvitationResponse {
@@ -31,3 +70,4 @@ export const InvitationDurationLabels = {
   [InvitationDuration.WEEK]: '1주일',
   [InvitationDuration.MONTH]: '1개월',
 };
+

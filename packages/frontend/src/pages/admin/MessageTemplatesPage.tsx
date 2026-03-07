@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import {
@@ -42,7 +42,9 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  ListItemIcon,
   ClickAwayListener,
+  Menu as MuiMenu,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -79,6 +81,7 @@ import {
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -96,7 +99,7 @@ import translationService from '@/services/translationService';
 import { getLanguageDisplayName } from '@/contexts/I18nContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
-import EmptyState from '@/components/common/EmptyState';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import MultiLanguageMessageInput, {
   MessageLocale,
 } from '@/components/common/MultiLanguageMessageInput';
@@ -104,7 +107,9 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '@/components/common/DynamicFilterBar';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { api } from '@/services/api';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // Column definition interface
 interface ColumnConfig {
@@ -172,7 +177,9 @@ const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.REMOTE_CONFIG_MANAGE]);
+  const canManage = hasPermission([P.MAINTENANCE_TEMPLATES_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -192,17 +199,17 @@ const MessageTemplatesPage: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
 
-  // 페이지네이션
+  // Pagination
   const [page, setPage] = useState(0); // SimplePagination은 0-based
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
-  // 필터
+  // Filter
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // Debouncing된 Search어 (500ms 지연)
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  // 동적 필터 상태 (localStorage에서 복원)
+  // 동적 Filter Status (localStorage에서 복원)
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
     try {
       const saved = localStorage.getItem('messageTemplatesPage.activeFilters');
@@ -213,7 +220,7 @@ const MessageTemplatesPage: React.FC = () => {
   });
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
+  // 동적 Filter에서 값 추출 (useMemo로 참조 안정화)
   const isEnabledFilter = useMemo(() => {
     const filter = activeFilters.find((f) => f.key === 'isEnabled');
     return filter?.value as boolean | boolean[] | undefined;
@@ -234,7 +241,7 @@ const MessageTemplatesPage: React.FC = () => {
     return filter?.operator;
   }, [activeFilters]);
 
-  // 필터를 문자열로 변환하여 의존성 배열에 사용
+  // Filter를 문자열로 변환하여 의존성 배열에 Used
   const isEnabledFilterString = useMemo(
     () =>
       Array.isArray(isEnabledFilter)
@@ -256,7 +263,24 @@ const MessageTemplatesPage: React.FC = () => {
   const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
-  // 태그 관련 상태
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<MessageTemplate | null>(null);
+
+  const handleActionMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    template: MessageTemplate
+  ) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(template);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
+
+  // 태그 관련 Status
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(
@@ -346,7 +370,7 @@ const MessageTemplatesPage: React.FC = () => {
     })
   );
 
-  // 폼 필드 ref들
+  // Form 필드 ref들
   const nameFieldRef = useRef<HTMLInputElement>(null);
   const defaultMessageFieldRef = useRef<HTMLInputElement>(null);
 
@@ -369,7 +393,7 @@ const MessageTemplatesPage: React.FC = () => {
         if (tagOperator) params.tags_operator = tagOperator;
       }
 
-      const result = await messageTemplateService.list(params);
+      const result = await messageTemplateService.list(projectApiPath, params);
 
       setItems(result.templates);
       setTotal(result.total);
@@ -398,7 +422,7 @@ const MessageTemplatesPage: React.FC = () => {
   // 태그 로딩
   const loadTags = useCallback(async () => {
     try {
-      const tags = await tagService.list();
+      const tags = await tagService.list(projectApiPath);
       setAllTags(tags);
     } catch (error) {
       // Error handling
@@ -410,7 +434,7 @@ const MessageTemplatesPage: React.FC = () => {
     loadTags();
   }, [load, loadTags]);
 
-  // 동적 필터 정의
+  // 동적 Filter 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
@@ -441,7 +465,7 @@ const MessageTemplatesPage: React.FC = () => {
     [t, allTags]
   );
 
-  // 동적 필터 핸들러
+  // 동적 Filter 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
     setPage(0);
@@ -491,7 +515,7 @@ const MessageTemplatesPage: React.FC = () => {
       setSelectedIds((prev) => {
         const newIds = checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id);
 
-        // 전체 선택 상태 업데이트
+        // 전체 선택 Update state
         const availableIds = items.filter((item) => item.id).map((item) => item.id!);
         setSelectAll(newIds.length === availableIds.length && availableIds.length > 0);
 
@@ -501,7 +525,7 @@ const MessageTemplatesPage: React.FC = () => {
     [items]
   );
 
-  // 일괄 삭제
+  // 일괄 Delete
   const handleBulkDelete = useCallback(() => {
     if (selectedIds.length === 0) return;
     setBulkDeleteDialogOpen(true);
@@ -509,7 +533,7 @@ const MessageTemplatesPage: React.FC = () => {
 
   const confirmBulkDelete = useCallback(async () => {
     try {
-      await messageTemplateService.bulkDelete(selectedIds);
+      await messageTemplateService.bulkDelete(projectApiPath, selectedIds);
       enqueueSnackbar(t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), {
         variant: 'success',
       });
@@ -525,7 +549,7 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
-  // 일괄 사용 가능/불가 변경
+  // 일괄 Used 가능/불가 변경
   const handleBulkToggleAvailability = useCallback(
     async (isEnabled: boolean) => {
       if (selectedIds.length === 0) return;
@@ -535,7 +559,7 @@ const MessageTemplatesPage: React.FC = () => {
           selectedIds.map(async (id) => {
             const template = items.find((item) => item.id === id);
             if (template) {
-              await messageTemplateService.update(id, {
+              await messageTemplateService.update(projectApiPath, id, {
                 ...template,
                 isEnabled,
               });
@@ -563,7 +587,7 @@ const MessageTemplatesPage: React.FC = () => {
     [selectedIds, items, t, enqueueSnackbar, load]
   );
 
-  // 개별 삭제
+  // 개별 Delete
   const openDeleteDialog = useCallback((template: MessageTemplate) => {
     setDeletingTemplate(template);
     setDeleteDialogOpen(true);
@@ -573,7 +597,7 @@ const MessageTemplatesPage: React.FC = () => {
     if (!deletingTemplate?.id) return;
 
     try {
-      await messageTemplateService.delete(deletingTemplate.id);
+      await messageTemplateService.delete(projectApiPath, deletingTemplate.id);
       enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setDeletingTemplate(null);
@@ -622,7 +646,7 @@ const MessageTemplatesPage: React.FC = () => {
     async (template: MessageTemplate) => {
       try {
         setSelectedTemplateForTags(template);
-        const tags = await messageTemplateService.getTags(template.id!);
+        const tags = await messageTemplateService.getTags(projectApiPath, template.id!);
         setTemplateTags(tags);
         setTagDialogOpen(true);
       } catch (error) {
@@ -638,10 +662,10 @@ const MessageTemplatesPage: React.FC = () => {
       if (!selectedTemplateForTags?.id) return;
 
       try {
-        await messageTemplateService.setTags(selectedTemplateForTags.id, tagIds);
+        await messageTemplateService.setTags(projectApiPath, selectedTemplateForTags.id, tagIds);
         setTagDialogOpen(false);
         enqueueSnackbar(t('common.success'), { variant: 'success' });
-        // 필요시 목록 새로고침
+        // 필요시 목록 Refresh
         load();
       } catch (error) {
         console.error('Error saving template tags:', error);
@@ -678,11 +702,11 @@ const MessageTemplatesPage: React.FC = () => {
       let templateId: number;
 
       if (editing?.id) {
-        await messageTemplateService.update(editing.id, payload);
+        await messageTemplateService.update(projectApiPath, editing.id, payload);
         templateId = editing.id;
         enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
       } else {
-        const created = await messageTemplateService.create(payload);
+        const created = await messageTemplateService.create(projectApiPath, payload);
         templateId = created?.id || (created as any)?.data?.id || (created as any)?.insertId;
 
         if (!templateId) {
@@ -691,15 +715,16 @@ const MessageTemplatesPage: React.FC = () => {
         enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
       }
 
-      // 태그 설정
+      // 태그 Settings
       if (form.tags && form.tags.length > 0) {
         await messageTemplateService.setTags(
+          projectApiPath,
           templateId,
           form.tags.map((tag) => tag.id)
         );
       } else {
-        // 태그가 없으면 기존 태그 모두 제거
-        await messageTemplateService.setTags(templateId, []);
+        // 태그가 없으면 Remove all existing tags
+        await messageTemplateService.setTags(projectApiPath, templateId, []);
       }
 
       setDialogOpen(false);
@@ -707,7 +732,7 @@ const MessageTemplatesPage: React.FC = () => {
       setFullEditingData(null);
       await load();
     } catch (error: any) {
-      // Handle duplicate name error - 두 가지 오류 구조 모두 처리
+      // Handle duplicate name error - 두 가지 오류 구조 All 처리
       const status = error?.response?.status || error?.status;
       const errorData = error?.response?.data?.error || error?.error;
 
@@ -867,7 +892,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* 필터 */}
+      {/* Filter */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
@@ -888,7 +913,7 @@ const MessageTemplatesPage: React.FC = () => {
                 flex: 1,
               }}
             >
-              {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
+              {/* Search 컨트롤을 맨 앞으로 이동하고 개선 */}
               <TextField
                 placeholder={t('messageTemplates.searchPlaceholderDetailed')}
                 size="small"
@@ -1031,21 +1056,17 @@ const MessageTemplatesPage: React.FC = () => {
         </Card>
       )}
 
-      <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : items.length === 0 ? (
-            <EmptyState
-              message={t('messageTemplates.noTemplatesFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAdd : undefined}
-              addButtonLabel={t('messageTemplates.addTemplate')}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={isInitialLoad && loading}>
+        {items.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('messageTemplates.noTemplatesFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAdd : undefined}
+            addButtonLabel={t('messageTemplates.addTemplate')}
+          />
+        ) : (
+          <Card variant="outlined" sx={{ position: 'relative' }}>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer
                 sx={{
                   opacity: !isInitialLoad && loading ? 0.5 : 1,
@@ -1103,15 +1124,8 @@ const MessageTemplatesPage: React.FC = () => {
                           ))}
                         {canManage && (
                           <TableCell align="right">
-                            <IconButton size="small" onClick={() => handleEdit(row)}>
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => openDeleteDialog(row)}
-                            >
-                              <DeleteIcon fontSize="small" />
+                            <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, row)}>
+                              <MoreVertIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
                         )}
@@ -1127,10 +1141,40 @@ const MessageTemplatesPage: React.FC = () => {
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <MuiMenu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) openDeleteDialog(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </MuiMenu>
 
       <ResizableDrawer
         open={dialogOpen}
@@ -1206,7 +1250,7 @@ const MessageTemplatesPage: React.FC = () => {
                     message: l.message,
                   })),
                 }));
-                // 번역 결과가 있으면 자동으로 다국어 지원 활성화
+                // Translation Results가 있으면 자동으로 다국어 지원 Active화
                 const hasNonEmptyLocales = locales.some(
                   (l) => l.message && l.message.trim() !== ''
                 );
@@ -1223,7 +1267,6 @@ const MessageTemplatesPage: React.FC = () => {
             {/* 태그 선택 */}
             <TextField
               select
-              multiple
               label={t('common.tags')}
               value={form.tags?.map((tag) => tag.id) || []}
               onChange={(e) => {
@@ -1305,7 +1348,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* 개별 삭제 확인 Drawer */}
+      {/* 개별 Delete Confirm Drawer */}
       <ResizableDrawer
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -1351,7 +1394,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* 일괄 삭제 확인 Drawer */}
+      {/* 일괄 Delete Confirm Drawer */}
       <ResizableDrawer
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
@@ -1397,7 +1440,7 @@ const MessageTemplatesPage: React.FC = () => {
         </Box>
       </ResizableDrawer>
 
-      {/* 태그 관리 다이얼로그 */}
+      {/* 태그 관리 Dialog */}
       <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           {t('common.tags')} - {selectedTemplateForTags?.name}
@@ -1406,7 +1449,6 @@ const MessageTemplatesPage: React.FC = () => {
           <Box sx={{ mt: 2 }}>
             <TextField
               select
-              multiple
               label={t('common.selectTags')}
               value={templateTags.map((tag) => tag.id)}
               onChange={(e) => {

@@ -886,7 +886,7 @@ class FeaturesClient implements VariationProvider {
     try {
       final headers = _buildHeaders();
       final response = await http.post(
-        Uri.parse('$_apiUrl/client/features/$_environment/metrics'),
+        Uri.parse('$_apiUrl/client/features/metrics'),
         headers: headers,
         body: jsonEncode(payload),
       );
@@ -930,7 +930,7 @@ class FeaturesClient implements VariationProvider {
     try {
       final headers = _buildHeaders();
       final response = await http.post(
-        Uri.parse('$_apiUrl/client/features/$_environment/metrics'),
+        Uri.parse('$_apiUrl/client/features/metrics'),
         headers: headers,
         body: jsonEncode(payload),
       );
@@ -1231,7 +1231,6 @@ class FeaturesClient implements VariationProvider {
       'Content-Type': 'application/json',
       'X-API-Token': _apiToken,
       'X-Application-Name': _appName,
-      'X-Environment': _environment,
       'X-Connection-Id': _connectionId,
       'X-SDK-Version': '${GatrixClient.sdkName}/${GatrixClient.sdkVersion}',
       'X-Gatrix-Context-Hash': _lastContextHash,
@@ -1348,7 +1347,7 @@ class FeaturesClient implements VariationProvider {
     ]);
 
     try {
-      final url = Uri.parse('$_apiUrl/client/features/$_environment/eval');
+      final url = Uri.parse('$_apiUrl/client/features/eval');
       final queryParams = _context.toJson().map((k, v) => MapEntry(k, v.toString()));
       queryParams['flagNames'] = keysStr;
 

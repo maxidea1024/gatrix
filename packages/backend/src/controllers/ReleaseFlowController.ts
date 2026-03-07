@@ -157,8 +157,8 @@ export class ReleaseFlowController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { flagId, environment } = req.params;
-      const plan = await releaseFlowService.getPlanForFlag(flagId, environment);
+      const { flagId, environmentId } = req.params;
+      const plan = await releaseFlowService.getPlanForFlag(flagId, environmentId);
 
       res.json({
         success: true,
@@ -181,14 +181,14 @@ export class ReleaseFlowController {
       const userId = req.user?.userId;
       if (!userId) throw new GatrixError('Unauthorized', 401);
 
-      const { flagId, environment, templateId } = req.body;
-      if (!flagId || !environment || !templateId) {
-        throw new GatrixError('flagId, environment, and templateId are required', 400);
+      const { flagId, environmentId, templateId } = req.body;
+      if (!flagId || !environmentId || !templateId) {
+        throw new GatrixError('flagId, environmentId, and templateId are required', 400);
       }
 
       const plan = await releaseFlowService.applyTemplateToFlag(
         flagId,
-        environment,
+        environmentId,
         templateId,
         userId
       );

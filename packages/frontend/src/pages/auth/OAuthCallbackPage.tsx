@@ -10,14 +10,14 @@ const OAuthCallbackPage: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    // 타임아웃 설정 (30초)
+    // 타임아웃 Settings (30초)
     const timeout = setTimeout(() => {
       navigate('/login?error=oauth_timeout', { replace: true });
     }, 30000);
 
     const handleCallback = async () => {
       try {
-        // 성공 시 타임아웃 클리어
+        // Success 시 타임아웃 클리어
         clearTimeout(timeout);
 
         // Get token from URL parameters

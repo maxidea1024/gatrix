@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -34,6 +34,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   InputLabel,
+  LinearProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -64,10 +65,11 @@ import enLocale from '@fullcalendar/core/locales/en-gb';
 import zhLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 
-// 스케줄 이벤트 타입 정의
+// 스케줄 Event Type 정의
 interface ScheduleEvent {
   id: string;
   title: string;
@@ -80,7 +82,7 @@ interface ScheduleEvent {
   textColor?: string;
 }
 
-// Job 및 Trigger 타입 정의 (Quartzmin 스타일)
+// Job 및 Trigger Type 정의 (Quartzmin 스타일)
 interface JobDetail {
   id: string;
   name: string;
@@ -149,7 +151,7 @@ const SchedulerPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const calendarRef = useRef<FullCalendar>(null);
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
+  const canManage = hasPermission([P.SCHEDULER_UPDATE]);
 
   // State
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
@@ -179,7 +181,7 @@ const SchedulerPage: React.FC = () => {
     jobDataMap: {},
   });
 
-  // 스케줄 이벤트 로딩 (실제로는 API에서 가져옴)
+  // 스케줄 Event 로딩 (실제로는 API에서 가져옴)
   const loadEvents = async () => {
     setLoading(true);
     try {
@@ -226,11 +228,12 @@ const SchedulerPage: React.FC = () => {
     loadEvents();
   }, []);
 
-  // 캘린더 이벤트 핸들러
+  // 캘린더 Event 핸들러
   const handleDateSelect = (selectInfo: any) => {
     setSelectedDate(selectInfo.start);
     setEditingEvent(null);
     setFormData({
+      ...formData,
       title: '',
       start: selectInfo.start,
       end: selectInfo.end,
@@ -253,6 +256,7 @@ const SchedulerPage: React.FC = () => {
       borderColor: event.borderColor,
     });
     setFormData({
+      ...formData,
       title: event.title,
       start: event.start,
       end: event.end,
@@ -266,6 +270,7 @@ const SchedulerPage: React.FC = () => {
     setEditingEvent(null);
     setSelectedDate(new Date());
     setFormData({
+      ...formData,
       title: '',
       start: new Date(),
       end: undefined,
@@ -286,7 +291,7 @@ const SchedulerPage: React.FC = () => {
       return;
     }
 
-    // 종료 시간이 시작 시간보다 이전인지 확인
+    // 종료 시간이 시작 시간보다 이전인지 Confirm
     if (formData.end && formData.end <= formData.start) {
       enqueueSnackbar(t('scheduler.endTimeAfterStart'), { variant: 'error' });
       return;
@@ -329,11 +334,11 @@ const SchedulerPage: React.FC = () => {
     }
   };
 
-  // 현재 언어에 따른 로케일 설정
+  // 현재 언어에 따른 Locale Settings
   const currentLanguage = i18n.language;
   moment.locale(currentLanguage);
 
-  // FullCalendar 로케일 선택
+  // FullCalendar Locale 선택
   const getCalendarLocale = () => {
     switch (currentLanguage) {
       case 'en':
@@ -413,40 +418,42 @@ const SchedulerPage: React.FC = () => {
       </Box>
 
       {/* Calendar */}
-      <Card>
-        <CardContent>
-          {loading && <LinearProgress sx={{ mb: 2 }} />}
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay',
-            }}
-            initialView="dayGridMonth"
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={true}
-            events={events}
-            select={handleDateSelect}
-            eventClick={handleEventClick}
-            height="auto"
-            locale={getCalendarLocale()}
-            buttonText={getButtonText()}
-            eventDisplay="block"
-            eventTimeFormat={{
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }}
-            nowIndicator={true}
-            scrollTime="09:00:00"
-          />
-        </CardContent>
-      </Card>
+      <PageContentLoader loading={loading}>
+        <Card>
+          <CardContent>
+            {loading && <LinearProgress sx={{ mb: 2 }} />}
+            <FullCalendar
+              ref={calendarRef}
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay',
+              }}
+              initialView="dayGridMonth"
+              editable={true}
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={true}
+              weekends={true}
+              events={events}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              height="auto"
+              locale={getCalendarLocale()}
+              buttonText={getButtonText()}
+              eventDisplay="block"
+              eventTimeFormat={{
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              }}
+              nowIndicator={true}
+              scrollTime="09:00:00"
+            />
+          </CardContent>
+        </Card>
+      </PageContentLoader>
 
       {/* Add/Edit Event Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
@@ -465,7 +472,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="Start Date/Time"
-                  value={formData.start ? moment(formData.start) : null}
+                  value={formData.start ? (moment(formData.start) as any) : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,
@@ -484,7 +491,7 @@ const SchedulerPage: React.FC = () => {
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
                   label="End Date/Time"
-                  value={formData.end ? moment(formData.end) : null}
+                  value={formData.end ? (moment(formData.end) as any) : null}
                   onChange={(date) =>
                     setFormData({
                       ...formData,
@@ -575,7 +582,7 @@ const SchedulerPage: React.FC = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      intervalMinutes: e.target.value === '' ? '' : Number(e.target.value) || 1,
+                      intervalMinutes: e.target.value === '' ? 1 : Number(e.target.value) || 1,
                     })
                   }
                   inputProps={{ min: 1 }}
@@ -643,7 +650,7 @@ const SchedulerPage: React.FC = () => {
               </Grid>
             </Grid>
 
-            {/* 시간 범위 설정 */}
+            {/* 시간 범위 Settings */}
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid size={{ xs: 6 }}>
                 <TextField
@@ -729,7 +736,7 @@ const SchedulerPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* 기본 Count 파라미터 */}
+              {/* 기본 Count Parameters */}
               <Grid container spacing={2} sx={{ mb: 1 }}>
                 <Grid size={{ xs: 4 }}>
                   <TextField fullWidth size="small" value="Count" disabled />
@@ -761,7 +768,7 @@ const SchedulerPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* 추가 파라미터 */}
+              {/* 추가 Parameters */}
               <Grid container spacing={2}>
                 <Grid size={{ xs: 4 }}>
                   <TextField fullWidth size="small" placeholder="Parameter Name" />

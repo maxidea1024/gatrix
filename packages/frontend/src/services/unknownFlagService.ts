@@ -3,7 +3,7 @@ import { apiService } from './api';
 export interface UnknownFlag {
   id: number;
   flagName: string;
-  environment: string;
+  environmentId: string;
   appName: string | null;
   sdkVersion: string | null;
   accessCount: number;
@@ -14,44 +14,47 @@ export interface UnknownFlag {
   resolvedBy: string | null;
 }
 
+/** Build unknown-flags base path from project-scoped path or fallback */
+function basePath(projectApiPath: string | null): string {
+  return projectApiPath ? `${projectApiPath}/unknown-flags` : '/admin/unknown-flags';
+}
+
 export const unknownFlagService = {
-  async getUnknownFlags(options?: {
-    includeResolved?: boolean;
-    environment?: string;
-  }): Promise<{ flags: UnknownFlag[]; total: number }> {
+  async getUnknownFlags(
+    options?: {
+      includeResolved?: boolean;
+      environmentId?: string;
+    },
+    projectApiPath: string | null = null
+  ): Promise<{ flags: UnknownFlag[]; total: number }> {
     const params = new URLSearchParams();
     if (options?.includeResolved) {
       params.append('includeResolved', 'true');
     }
-    if (options?.environment) {
-      params.append('environment', options.environment);
+    if (options?.environmentId) {
+      params.append('environment', options.environmentId);
     }
     const queryString = params.toString();
-    const url = `/admin/unknown-flags${queryString ? `?${queryString}` : ''}`;
-    const response = await apiService.get<{
-      success: boolean;
-      data: { flags: UnknownFlag[]; total: number };
-    }>(url);
+    const base = basePath(projectApiPath);
+    const url = `${base}${queryString ? `?${queryString}` : ''}`;
+    const response = await apiService.get<any>(url);
     return response.data;
   },
 
-  async getUnresolvedCount(): Promise<number> {
-    const response = await apiService.get<{
-      success: boolean;
-      data: { count: number };
-    }>('/admin/unknown-flags/count');
-    return response.data.count;
+  async getUnresolvedCount(projectApiPath: string | null = null): Promise<number> {
+    const response = await apiService.get<any>(`${basePath(projectApiPath)}/count`);
+    return response.data?.count || 0;
   },
 
-  async resolveUnknownFlag(id: number): Promise<void> {
-    await apiService.post(`/admin/unknown-flags/${id}/resolve`);
+  async resolveUnknownFlag(id: number, projectApiPath: string | null = null): Promise<void> {
+    await apiService.post(`${basePath(projectApiPath)}/${id}/resolve`);
   },
 
-  async unresolveUnknownFlag(id: number): Promise<void> {
-    await apiService.post(`/admin/unknown-flags/${id}/unresolve`);
+  async unresolveUnknownFlag(id: number, projectApiPath: string | null = null): Promise<void> {
+    await apiService.post(`${basePath(projectApiPath)}/${id}/unresolve`);
   },
 
-  async deleteUnknownFlag(id: number): Promise<void> {
-    await apiService.delete(`/admin/unknown-flags/${id}`);
+  async deleteUnknownFlag(id: number, projectApiPath: string | null = null): Promise<void> {
+    await apiService.delete(`${basePath(projectApiPath)}/${id}`);
   },
 };

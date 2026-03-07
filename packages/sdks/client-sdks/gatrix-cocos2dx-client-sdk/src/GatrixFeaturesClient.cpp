@@ -1337,7 +1337,7 @@ void FeaturesClient::fetchPartialFlags(const std::vector<std::string>& changedKe
   request->setRequestType(HttpRequest::Type::GET);
 
   // URL: apiUrl/client/features/environment/eval?flagNames=...
-  std::string url = _config.apiUrl + "/client/features/" + _config.environment + "/eval";
+  std::string url = _config.apiUrl + "/client/features/eval";
 
   // Build query params
   std::stringstream ss;

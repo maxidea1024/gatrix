@@ -66,8 +66,8 @@ router.get('/:id', async (req: Request, res: Response) => {
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { provider, description, isEnabled, parameters, events, environments } = req.body;
-    const user = req.user as { id: number; name: string };
+    const { provider, description, isEnabled, parameters, events, environmentIds } = req.body;
+    const user = req.user as { id: string; name: string };
 
     if (!provider) {
       return res.status(400).json({ error: 'Provider is required' });
@@ -98,7 +98,7 @@ router.post('/', async (req: Request, res: Response) => {
         isEnabled: isEnabled !== false,
         parameters: parameters || {},
         events,
-        environments: environments || [],
+        environmentIds: environmentIds || [],
         createdBy: user.id,
       },
       user
@@ -119,8 +119,8 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { description, isEnabled, parameters, events, environments } = req.body;
-    const user = req.user as { id: number; name: string };
+    const { description, isEnabled, parameters, events, environmentIds } = req.body;
+    const user = req.user as { id: string; name: string };
 
     const integration = await IntegrationService.update(
       id,
@@ -129,7 +129,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         isEnabled,
         parameters,
         events,
-        environments,
+        environmentIds,
         updatedBy: user.id,
       },
       user
@@ -154,7 +154,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     const success = await IntegrationService.delete(id, user);
 
@@ -176,7 +176,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 router.post('/:id/toggle', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     const integration = await IntegrationService.toggle(id, user);
 
@@ -234,7 +234,7 @@ router.get('/:id/events', async (req: Request, res: Response) => {
 router.post('/:id/test', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = req.user as { id: number; name: string };
+    const user = req.user as { id: string; name: string };
 
     const integration = await IntegrationService.getById(id);
     if (!integration) {

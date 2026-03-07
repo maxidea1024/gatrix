@@ -1,7 +1,7 @@
 /**
  * Client Version Service
  * Handles client version list and retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/client-versions
+ * Uses per-environment API pattern: GET /api/v1/server/client-versions
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
@@ -29,7 +29,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   // ==================== Abstract Method Implementations ====================
 
   protected getEndpoint(environment: string): string {
-    return `/api/v1/server/${encodeURIComponent(environment)}/client-versions`;
+    return `/api/v1/server/client-versions`;
   }
 
   protected extractItems(response: ClientVersionListResponse): ClientVersion[] {

@@ -275,7 +275,7 @@ const startServer = async () => {
       logger.warn('Queue service initialization failed, continuing without queues:', error);
     }
 
-    // Initialize ApiTokenUsageService (QueueService 초기화 뒤에 실행)
+    // Initialize ApiTokenUsageService (QueueService Initialization 뒤에 실행)
     try {
       await apiTokenUsageService.initialize();
       logger.info('ApiTokenUsageService initialized successfully');
@@ -371,7 +371,7 @@ const startServer = async () => {
           return;
         }
 
-        const environment = wsPathMatch[1];
+        const environmentId = wsPathMatch[1];
         const apiToken =
           url.searchParams.get('x-api-token') ||
           url.searchParams.get('apiToken') ||
@@ -406,7 +406,7 @@ const startServer = async () => {
         wss.handleUpgrade(request, socket, head, async (ws) => {
           const { ulid } = await import('ulid');
           const clientId = `flag-ws-${ulid()}`;
-          await flagStreamingService.addWebSocketClient(clientId, environment, ws);
+          await flagStreamingService.addWebSocketClient(clientId, environmentId, ws);
         });
       } catch (err) {
         logger.error('WebSocket upgrade error:', err);

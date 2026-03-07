@@ -32,6 +32,9 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -45,6 +48,7 @@ import {
   VpnKey as TokenIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { enqueueSnackbar } from 'notistack';
@@ -53,8 +57,13 @@ import signalEndpointService, {
   SignalEndpointToken,
 } from '@/services/signalEndpointService';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useAuth } from '@/hooks/useAuth';
+import { P } from '@/types/permissions';
 
 // ==================== Create/Edit Dialog ====================
 interface EndpointDialogProps {
@@ -171,6 +180,8 @@ interface TokenDialogProps {
 
 const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, onCreated }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [tokenName, setTokenName] = useState('');
   const [createdToken, setCreatedToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -186,7 +197,7 @@ const TokenDialog: React.FC<TokenDialogProps> = ({ open, endpointId, onClose, on
     if (!endpointId || !tokenName.trim()) return;
     setLoading(true);
     try {
-      const result = await signalEndpointService.createToken(endpointId, {
+      const result = await signalEndpointService.createToken(projectApiPath, endpointId, {
         name: tokenName.trim(),
       });
       setCreatedToken(result.secret);
@@ -302,7 +313,12 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
 
 // ==================== Main Page ====================
 const SignalEndpointsPage: React.FC = () => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([P.SIGNAL_ENDPOINTS_UPDATE]);
+
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [endpoints, setEndpoints] = useState<SignalEndpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -327,10 +343,24 @@ const SignalEndpointsPage: React.FC = () => {
     name: string;
   } | null>(null);
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuTarget, setMenuTarget] = useState<SignalEndpoint | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, item: SignalEndpoint) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuTarget(item);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuTarget(null);
+  };
+
   const fetchEndpoints = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await signalEndpointService.getAll();
+      const data = await signalEndpointService.getAll(projectApiPath);
       setEndpoints(data);
     } catch (error) {
       enqueueSnackbar(t('signalEndpoints.loadFailed'), { variant: 'error' });
@@ -346,7 +376,7 @@ const SignalEndpointsPage: React.FC = () => {
   const fetchTokens = useCallback(
     async (endpointId: number) => {
       try {
-        const endpoint = await signalEndpointService.getById(endpointId);
+        const endpoint = await signalEndpointService.getById(projectApiPath, endpointId);
         if (endpoint.tokens) {
           setEndpointTokens((prev) => ({ ...prev, [endpointId]: endpoint.tokens! }));
         }
@@ -369,10 +399,10 @@ const SignalEndpointsPage: React.FC = () => {
   const handleSaveEndpoint = async (data: { name: string; description?: string }) => {
     try {
       if (editDialog.endpoint) {
-        await signalEndpointService.update(editDialog.endpoint.id, data);
+        await signalEndpointService.update(projectApiPath, editDialog.endpoint.id, data);
         enqueueSnackbar(t('signalEndpoints.updateSuccess'), { variant: 'success' });
       } else {
-        await signalEndpointService.create(data);
+        await signalEndpointService.create(projectApiPath, data);
         enqueueSnackbar(t('signalEndpoints.createSuccess'), { variant: 'success' });
       }
       setEditDialog({ open: false, endpoint: null });
@@ -387,7 +417,7 @@ const SignalEndpointsPage: React.FC = () => {
 
   const handleToggle = async (endpoint: SignalEndpoint) => {
     try {
-      await signalEndpointService.toggle(endpoint.id);
+      await signalEndpointService.toggle(projectApiPath, endpoint.id);
       fetchEndpoints();
     } catch (error) {
       enqueueSnackbar(t('signalEndpoints.toggleFailed'), { variant: 'error' });
@@ -398,10 +428,14 @@ const SignalEndpointsPage: React.FC = () => {
     if (!deleteDialog) return;
     try {
       if (deleteDialog.type === 'endpoint') {
-        await signalEndpointService.delete(deleteDialog.endpointId);
+        await signalEndpointService.delete(projectApiPath, deleteDialog.endpointId);
         enqueueSnackbar(t('signalEndpoints.deleteSuccess'), { variant: 'success' });
       } else if (deleteDialog.tokenId) {
-        await signalEndpointService.deleteToken(deleteDialog.endpointId, deleteDialog.tokenId);
+        await signalEndpointService.deleteToken(
+          projectApiPath,
+          deleteDialog.endpointId,
+          deleteDialog.tokenId
+        );
         enqueueSnackbar(t('signalEndpoints.tokenDeleteSuccess'), { variant: 'success' });
         fetchTokens(deleteDialog.endpointId);
       }
@@ -435,7 +469,7 @@ const SignalEndpointsPage: React.FC = () => {
           <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchEndpoints}>
             {t('common.refresh')}
           </Button>
-          {endpoints.length > 0 && (
+          {endpoints.length > 0 && canManage && (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -448,34 +482,38 @@ const SignalEndpointsPage: React.FC = () => {
       </Box>
 
       {/* Content */}
-      {!loading && endpoints.length === 0 ? (
-        <EmptyPlaceholder
-          message={t('signalEndpoints.noEndpoints')}
-          onAddClick={() => setEditDialog({ open: true, endpoint: null })}
-          addButtonLabel={t('signalEndpoints.createEndpoint')}
-        />
-      ) : (
-        <TableContainer component={Paper} variant="outlined">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell width={40} />
-                <TableCell>{t('signalEndpoints.name')}</TableCell>
-                <TableCell>{t('signalEndpoints.description')}</TableCell>
-                <TableCell align="center">{t('signalEndpoints.status')}</TableCell>
-                <TableCell align="center">{t('signalEndpoints.tokens')}</TableCell>
-                <TableCell align="right">{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
+      <PageContentLoader loading={loading}>
+        {endpoints.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('signalEndpoints.noEndpoints')}
+            onAddClick={canManage ? () => setEditDialog({ open: true, endpoint: null }) : undefined}
+            addButtonLabel={t('signalEndpoints.createEndpoint')}
+          />
+        ) : (
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">{t('common.loading')}</Typography>
-                  </TableCell>
+                  <TableCell width={40} />
+                  <TableCell>{t('signalEndpoints.name')}</TableCell>
+                  <TableCell>{t('signalEndpoints.description')}</TableCell>
+                  <TableCell align="center">{t('signalEndpoints.status')}</TableCell>
+                  <TableCell align="center">{t('signalEndpoints.tokens')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
-              ) : (
-                endpoints.map((endpoint) => (
+              </TableHead>
+              <TableBody
+                sx={{
+                  '& .MuiTableRow-root:nth-of-type(4n+1)': {
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'dark' ? '#1e2125' : '#f8f9fa',
+                  },
+                  '& .MuiTableRow-root:nth-of-type(4n+3)': {
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
+                {endpoints.map((endpoint) => (
                   <React.Fragment key={endpoint.id}>
                     <TableRow
                       hover
@@ -530,44 +568,15 @@ const SignalEndpointsPage: React.FC = () => {
                           icon={<TokenIcon sx={{ fontSize: 14 }} />}
                         />
                       </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('signalEndpoints.createToken')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => setTokenDialog({ open: true, endpointId: endpoint.id })}
-                          >
-                            <TokenIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => setEditDialog({ open: true, endpoint })}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() =>
-                              setDeleteDialog({
-                                open: true,
-                                type: 'endpoint',
-                                endpointId: endpoint.id,
-                                name: endpoint.name,
-                              })
-                            }
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                      <TableCell align="center">
+                        <IconButton size="small" onClick={(e) => handleMenuOpen(e, endpoint)}>
+                          <MoreVertIcon fontSize="small" />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
 
                     {/* Expanded Token List */}
-                    <TableRow>
+                    <TableRow hover>
                       <TableCell
                         colSpan={6}
                         sx={{
@@ -610,7 +619,11 @@ const SignalEndpointsPage: React.FC = () => {
                                   <ListItem key={token.id} sx={{ px: 0 }}>
                                     <ListItemText
                                       primary={token.tokenName}
-                                      secondary={new Date(token.createdAt).toLocaleDateString()}
+                                      secondary={
+                                        <Tooltip title={formatDateTimeDetailed(token.createdAt)}>
+                                          <span>{formatRelativeTime(token.createdAt)}</span>
+                                        </Tooltip>
+                                      }
                                     />
                                     <ListItemSecondaryAction>
                                       <IconButton
@@ -667,12 +680,55 @@ const SignalEndpointsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </React.Fragment>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) setTokenDialog({ open: true, endpointId: menuTarget.id });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <TokenIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('signalEndpoints.createToken')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget) setEditDialog({ open: true, endpoint: menuTarget });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuTarget)
+              setDeleteDialog({
+                open: true,
+                type: 'endpoint',
+                endpointId: menuTarget.id,
+                name: menuTarget.name,
+              });
+            handleMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Dialogs */}
       <EndpointDialog

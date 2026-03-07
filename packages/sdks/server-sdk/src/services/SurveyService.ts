@@ -1,7 +1,7 @@
 /**
  * Survey Service
  * Handles survey retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/surveys
+ * Uses per-environment API pattern: GET /api/v1/server/surveys
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
@@ -83,13 +83,13 @@ export class SurveyService {
 
   /**
    * Get active surveys with settings for a specific environment
-   * GET /api/v1/server/:env/surveys
+   * GET /api/v1/server/surveys
    */
   async listByEnvironment(
     environment: string,
     params?: SurveyListParams
   ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
-    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/surveys`;
+    const endpoint = `/api/v1/server/surveys`;
 
     this.logger.debug('Fetching surveys', { environment, params });
 
@@ -225,16 +225,14 @@ export class SurveyService {
 
   /**
    * Get survey by ID
-   * GET /api/v1/server/:env/surveys/:id
+   * GET /api/v1/server/surveys/:id
    * @param id Survey ID
    * @param environment Environment name (required)
    */
   async getById(id: string, environment: string): Promise<Survey> {
     this.logger.debug('Fetching survey by ID', { id, environment });
 
-    const response = await this.apiClient.get<{ survey: Survey }>(
-      `/api/v1/server/${encodeURIComponent(environment)}/surveys/${id}`
-    );
+    const response = await this.apiClient.get<{ survey: Survey }>(`/api/v1/server/surveys/${id}`);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch survey');
@@ -247,14 +245,14 @@ export class SurveyService {
 
   /**
    * Refresh survey settings only
-   * GET /api/v1/server/:env/surveys/settings
+   * GET /api/v1/server/surveys/settings
    * @param environment Environment name (required)
    */
   async refreshSettings(environment: string): Promise<SurveySettings> {
     this.logger.info('Refreshing survey settings', { environment });
 
     const response = await this.apiClient.get<{ settings: SurveySettings }>(
-      `/api/v1/server/${encodeURIComponent(environment)}/surveys/settings`
+      `/api/v1/server/surveys/settings`
     );
 
     if (!response.success || !response.data) {

@@ -34,10 +34,10 @@ async function showStatus() {
 
     logger.info('\n=== Migration Status ===');
     logger.info(`Executed migrations: ${status.executed.length}`);
-    status.executed.forEach((id) => logger.info(`  ✓ ${id}`));
+    status.executed.forEach((id) => logger.info(`  [done] ${id}`));
 
     logger.info(`\nPending migrations: ${status.pending.length}`);
-    status.pending.forEach((id) => logger.info(`  ○ ${id}`));
+    status.pending.forEach((id) => logger.info(`  [pending] ${id}`));
     logger.info('');
   } catch (error) {
     logger.error('Failed to get migration status:', error);

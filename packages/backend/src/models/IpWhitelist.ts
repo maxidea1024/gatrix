@@ -1,12 +1,15 @@
 import db from '../config/knex';
-import logger from '../config/logger';
+import { generateULID } from '../utils/ulid';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('IpWhitelist');
 
 export interface IpWhitelistFilters {
-  environment: string;
+  environmentId: string;
   ipAddress?: string;
   purpose?: string;
   isEnabled?: boolean;
-  createdBy?: number;
+  createdBy?: string;
   limit?: number;
   offset?: number;
 }
@@ -20,22 +23,22 @@ export interface IpWhitelistListResponse {
 }
 
 export interface IpWhitelist {
-  id?: number;
-  environment: string;
+  id?: string;
+  environmentId: string;
   ipAddress: string;
   purpose?: string;
   isEnabled: boolean;
   startDate?: Date;
   endDate?: Date;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface CreateIpWhitelistData extends Omit<IpWhitelist, 'id' | 'createdAt' | 'updatedAt'> {
   purpose?: string;
-  createdBy?: number;
+  createdBy?: string;
   startDate?: Date;
   endDate?: Date;
 }
@@ -46,25 +49,25 @@ export class IpWhitelistModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    filters: IpWhitelistFilters = { environment: '' }
+    filters: IpWhitelistFilters = { environmentId: '' }
   ): Promise<IpWhitelistListResponse> {
     try {
-      // 기본값 설정
+      // Set default values
       const pageNum = Number(page) || 1;
       const limitNum = Number(limit) || 10;
       const offset = (pageNum - 1) * limitNum;
-      const environment = filters.environment;
+      const environmentId = filters.environmentId;
 
-      // 기본 쿼리 빌더 with environment filter
+      // 기본 Query 빌더 with environment filter
       const baseQuery = () =>
         db('g_ip_whitelist as iw')
           .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
           .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
-          .where('iw.environment', environment);
+          .where('iw.environmentId', environmentId);
 
-      // 필터 적용 함수
+      // Filter 적용 함수
       const applyFilters = (query: any) => {
-        // 기본 조건: 만료되지 않은 항목만
+        // 기본 조건: Expired되지 않은 항목만
         query.where(function (this: any) {
           this.whereNull('iw.endDate').orWhere('iw.endDate', '>', new Date());
         });
@@ -90,10 +93,10 @@ export class IpWhitelistModel {
         return query;
       };
 
-      // Count 쿼리
+      // Count Query
       const countQuery = applyFilters(baseQuery()).count('iw.id as total').first();
 
-      // Data 쿼리
+      // Data Query
       const dataQuery = applyFilters(baseQuery())
         .select(['iw.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .orderBy('iw.createdAt', 'desc')
@@ -119,14 +122,14 @@ export class IpWhitelistModel {
     }
   }
 
-  static async findById(id: number, environment: string): Promise<any | null> {
+  static async findById(id: string, environmentId: string): Promise<any | null> {
     try {
       const ipWhitelist = await db('g_ip_whitelist as iw')
         .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
         .select(['iw.*', 'creator.name as createdByName', 'updater.name as updatedByName'])
         .where('iw.id', id)
-        .where('iw.environment', environment)
+        .where('iw.environmentId', environmentId)
         .first();
 
       return ipWhitelist ? this.mapRowToIpWhitelist(ipWhitelist) : null;
@@ -136,42 +139,44 @@ export class IpWhitelistModel {
     }
   }
 
-  static async create(data: any, environment: string): Promise<any> {
+  static async create(data: any, environmentId: string): Promise<any> {
     try {
-      const [insertId] = await db('g_ip_whitelist').insert({
+      const id = generateULID();
+      await db('g_ip_whitelist').insert({
+        id,
         ...data,
-        environment: environment,
+        environmentId: environmentId,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
-      return await this.findById(insertId, environment);
+      return await this.findById(id, environmentId);
     } catch (error) {
       logger.error('Error creating IP whitelist:', error);
       throw error;
     }
   }
 
-  static async update(id: number, data: any, environment: string): Promise<any> {
+  static async update(id: string, data: any, environmentId: string): Promise<any> {
     try {
       await db('g_ip_whitelist')
         .where('id', id)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .update({
           ...data,
           updatedAt: new Date(),
         });
 
-      return await this.findById(id, environment);
+      return await this.findById(id, environmentId);
     } catch (error) {
       logger.error('Error updating IP whitelist:', error);
       throw error;
     }
   }
 
-  static async delete(id: number, environment: string): Promise<void> {
+  static async delete(id: string, environmentId: string): Promise<void> {
     try {
-      await db('g_ip_whitelist').where('id', id).where('environment', environment).del();
+      await db('g_ip_whitelist').where('id', id).where('environmentId', environmentId).del();
     } catch (error) {
       logger.error('Error deleting IP whitelist:', error);
       throw error;
@@ -197,11 +202,11 @@ export class IpWhitelistModel {
   }
 
   // 추가 메서드들
-  static async findByIpAddress(ip: string, environment: string): Promise<any | null> {
+  static async findByIpAddress(ip: string, environmentId: string): Promise<any | null> {
     try {
       return await db('g_ip_whitelist')
         .where('ipAddress', ip)
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .first();
     } catch (error) {
       logger.error('Error finding IP whitelist by IP address:', error);
@@ -210,10 +215,10 @@ export class IpWhitelistModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(whitelistId: number, tagIds: number[]): Promise<void> {
+  static async setTags(whitelistId: string, tagIds: string[]): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments')
           .where('entityType', 'whitelist')
           .where('entityId', whitelistId)
@@ -236,7 +241,7 @@ export class IpWhitelistModel {
     }
   }
 
-  static async getTags(whitelistId: number): Promise<any[]> {
+  static async getTags(whitelistId: string): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')

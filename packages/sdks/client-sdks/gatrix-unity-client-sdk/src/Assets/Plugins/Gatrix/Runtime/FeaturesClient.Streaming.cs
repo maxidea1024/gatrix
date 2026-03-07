@@ -45,7 +45,7 @@ namespace Gatrix.Unity.SDK
             {
                 _devLog.Log("Connecting to SSE streaming endpoint...");
                 var streamUrl = FeaturesConfig.Streaming.Sse.Url
-                    ?? $"{_config.ApiUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream/sse";
+                    ?? $"{_config.ApiUrl}/client/features/stream/sse";
                 RunSseLoopAsync(streamUrl, ct).Forget();
             }
         }
@@ -64,7 +64,6 @@ namespace Gatrix.Unity.SDK
                 request.Headers.TryAddWithoutValidation("Cache-Control", "no-cache");
                 request.Headers.TryAddWithoutValidation("X-API-Token", _config.ApiToken);
                 request.Headers.TryAddWithoutValidation("X-Application-Name", _config.AppName);
-                request.Headers.TryAddWithoutValidation("X-Environment", _config.Environment);
                 request.Headers.TryAddWithoutValidation("X-Connection-Id", _connectionId);
                 request.Headers.TryAddWithoutValidation("X-SDK-Version", $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");
                 if (_config.CustomHeaders != null)
@@ -234,7 +233,7 @@ namespace Gatrix.Unity.SDK
                 {
                     // Convert http(s):// to ws(s)://
                     baseUrl = _config.ApiUrl.Replace("https://", "wss://").Replace("http://", "ws://");
-                    baseUrl = $"{baseUrl}/client/features/{Uri.EscapeDataString(_config.Environment)}/stream/ws";
+                    baseUrl = $"{baseUrl}/client/features/stream/ws";
                 }
 
                 // All essential metadata is sent as query parameters because
@@ -258,7 +257,6 @@ namespace Gatrix.Unity.SDK
                 ws = GatrixWebSocketFactory.Create();
                 ws.SetRequestHeader("X-API-Token", _config.ApiToken);
                 ws.SetRequestHeader("X-Application-Name", _config.AppName);
-                ws.SetRequestHeader("X-Environment", _config.Environment);
                 ws.SetRequestHeader("X-Connection-Id", _connectionId);
                 ws.SetRequestHeader("X-SDK-Version",
                     $"{GatrixClient.SdkName}/{GatrixClient.SdkVersion}");

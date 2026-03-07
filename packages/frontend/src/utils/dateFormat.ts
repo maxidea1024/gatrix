@@ -1,5 +1,5 @@
 /**
- * 날짜/시간 포맷 유틸 - 사용자 설정(timezone, datetimeFormat)에 따라 출력
+ * Date/time format utility - output based on user settings (timezone, datetimeFormat)
  */
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -18,7 +18,7 @@ dayjs.extend(relativeTime);
 const DEFAULT_TZ = 'Asia/Seoul';
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
-// UI 표시용 통일된 포맷 (사용자 설정과 별개)
+// Unified format for UI display (Used자 Settings과 별개)
 const UI_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 export const getStoredTimezone = (): string => {
@@ -48,7 +48,7 @@ export const setStoredDateTimeFormat = (fmt: string) => {
   } catch {}
 };
 
-// 내부: 다양한 문자열을 dayjs로 변환 (UTC -> 사용자 timezone)
+// 내부: 다양한 문자열을 dayjs로 변환 (UTC -> Used자 timezone)
 function toDayjs(date: string | Date): Dayjs | null {
   if (!date) return null;
 
@@ -65,7 +65,7 @@ function toDayjs(date: string | Date): Dayjs | null {
 }
 
 /**
- * 날짜만 포맷 (YYYY-MM-DD)
+ * Format date only (YYYY-MM-DD)
  */
 export const formatDate = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
@@ -78,7 +78,7 @@ export const formatDate = (date: string | Date | null | undefined): string => {
 };
 
 /**
- * 날짜/시간 포맷 - 사용자 설정 포맷 사용
+ * Format date/time - using user settings format
  */
 export const formatDateTime = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
@@ -91,15 +91,15 @@ export const formatDateTime = (date: string | Date | null | undefined): string =
 };
 
 /**
- * 상세 포맷 - 사용자 설정 포맷 그대로 사용
+ * Detailed format - using user settings format as-is
  */
 export const formatDateTimeDetailed = (date: string | Date | null | undefined): string => {
   return formatDateTime(date);
 };
 
 /**
- * UI 표시용 통일된 포맷 (YYYY-MM-DD HH:mm:ss 고정)
- * 테이블, 리스트 등에서 일관된 시간 표시를 위해 사용
+ * Unified format for UI display (YYYY-MM-DD HH:mm:ss 고정)
+ * 테이블, 리스트 등에서 일관된 시간 표시를 위해 Used
  */
 export const formatDateTimeUI = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
@@ -112,7 +112,7 @@ export const formatDateTimeUI = (date: string | Date | null | undefined): string
 };
 
 /**
- * 임의 포맷으로 출력 (설정된 타임존 사용)
+ * Output with custom format (using configured timezone)
  */
 export const formatWith = (date: string | Date | null | undefined, format: string): string => {
   if (!date) return '-';
@@ -121,7 +121,7 @@ export const formatWith = (date: string | Date | null | undefined, format: strin
 };
 
 /**
- * 시간 간격을 사람이 읽기 쉬운 형태로 포맷
+ * Format time interval in human-readable form
  */
 export const formatDuration = (milliseconds: number): string => {
   if (milliseconds < 1000) {
@@ -145,7 +145,7 @@ export const formatDuration = (milliseconds: number): string => {
 };
 
 /**
- * 서버 업타임을 HH:MM:SS 형태로 포맷 (초 단위 입력)
+ * Format server uptime as HH:MM:SS (input in seconds)
  */
 export const formatUptime = (uptimeSeconds: number): string => {
   const totalSeconds = Math.floor(uptimeSeconds);
@@ -165,7 +165,7 @@ export const formatUptime = (uptimeSeconds: number): string => {
 };
 
 /**
- * 시간만 포맷 (HH:mm:ss)
+ * Format time only (HH:mm:ss)
  */
 export const formatTime = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
@@ -178,7 +178,7 @@ export const formatTime = (date: string | Date | null | undefined): string => {
 };
 
 /**
- * 상대 시간 포맷 옵션
+ * Relative time format options
  */
 interface FormatRelativeTimeOptions {
   /** 초단위 표시 여부 (기본: false, true이면 "5초 전" 형태로 표시) */
@@ -188,7 +188,7 @@ interface FormatRelativeTimeOptions {
 }
 
 /**
- * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
+ * Relative time format (예: "2 minutes ago", "Just now")
  * @param date 날짜/시간 값
  * @param options 옵션 (showSeconds: 초단위 표시 여부)
  * @param language 언어 코드 (옵션, i18n의 현재 언어)
@@ -235,7 +235,7 @@ export const formatRelativeTime = (
 };
 
 /**
- * 날짜 비교 유틸리티
+ * 날짜 비교 Utility
  */
 export const isToday = (date: string | Date | null | undefined): boolean => {
   if (!date) return false;

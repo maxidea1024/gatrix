@@ -6,11 +6,13 @@ import { ChangeRequest } from '../models/ChangeRequest';
 import { ChangeItem } from '../models/ChangeItem';
 import { ActionGroup } from '../models/ActionGroup';
 import { Approval } from '../models/Approval';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ChangeRequestController');
 
 // Helper to get environment from request
 function getEnvironment(req: AuthenticatedRequest): string {
-  const env = req.environment;
+  const env = req.environmentId;
   if (!env) {
     throw new GatrixError('Environment not specified', 400);
   }
@@ -40,7 +42,7 @@ export class ChangeRequestController {
    * GET /api/v1/admin/change-requests
    */
   static list = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const status = req.query.status as string | undefined;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -48,7 +50,7 @@ export class ChangeRequestController {
     const userId = req.user?.id;
 
     let query = ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .withGraphFetched('[requester, rejector, environmentModel, changeItems, approvals]')
       .orderBy('updatedAt', 'desc')
       .limit(limit)
@@ -65,7 +67,7 @@ export class ChangeRequestController {
       // Show: all non-draft OR (draft AND own)
       query = query.where((builder) => {
         builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-          subBuilder.where('status', 'draft').where('requesterId', userId || 0);
+          subBuilder.where('status', 'draft').where('requesterId', userId || '');
         });
       });
     }
@@ -73,7 +75,7 @@ export class ChangeRequestController {
     const [items, countResult] = await Promise.all([
       query,
       ChangeRequest.query()
-        .where('environment', environment)
+        .where('environmentId', environmentId)
         .where((builder) => {
           if (status) {
             builder.where('status', status);
@@ -82,7 +84,7 @@ export class ChangeRequestController {
             }
           } else {
             builder.whereNot('status', 'draft').orWhere((subBuilder) => {
-              subBuilder.where('status', 'draft').where('requesterId', userId || 0);
+              subBuilder.where('status', 'draft').where('requesterId', userId || '');
             });
           }
         })
@@ -180,7 +182,7 @@ export class ChangeRequestController {
 
     const submitted = await ChangeRequestService.submitChangeRequest(id);
 
-    logger.info('[ChangeRequest] Submitted', {
+    logger.info('Submitted', {
       changeRequestId: id,
       userId: req.user?.userId,
     });
@@ -209,7 +211,7 @@ export class ChangeRequestController {
       ChangeRequestService.approveChangeRequest(id, userId, comment)
     );
 
-    logger.info('[ChangeRequest] Approved', {
+    logger.info('Approved', {
       changeRequestId: id,
       approverId: userId,
     });
@@ -245,7 +247,7 @@ export class ChangeRequestController {
       ChangeRequestService.rejectChangeRequest(id, userId, comment)
     );
 
-    logger.info('[ChangeRequest] Rejected', {
+    logger.info('Rejected', {
       changeRequestId: id,
       rejectorId: userId,
     });
@@ -271,7 +273,7 @@ export class ChangeRequestController {
 
     const reopened = await withMinimumDelay(ChangeRequestService.reopenChangeRequest(id, userId));
 
-    logger.info('[ChangeRequest] Reopened', { changeRequestId: id, userId });
+    logger.info('Reopened', { changeRequestId: id, userId });
 
     res.json({
       success: true,
@@ -297,7 +299,7 @@ export class ChangeRequestController {
         ChangeRequestService.executeChangeRequest(id, userId)
       );
 
-      logger.info('[ChangeRequest] Executed', {
+      logger.info('Executed', {
         changeRequestId: id,
         executorId: userId,
       });
@@ -309,7 +311,7 @@ export class ChangeRequestController {
       });
     } catch (error: any) {
       // Log full error details for internal debugging
-      logger.error('[ChangeRequest] Execution failed', {
+      logger.error('Execution failed', {
         changeRequestId: id,
         executorId: userId,
         errorMessage: error.message,
@@ -335,7 +337,7 @@ export class ChangeRequestController {
               status: 'conflict',
               rejectionReason: '$i18n:errors.DATA_CONFLICT_DURING_EXECUTION',
             });
-            logger.info('[ChangeRequest] Marked as conflict', {
+            logger.info('Marked as conflict', {
               changeRequestId: id,
             });
           } else {
@@ -345,13 +347,13 @@ export class ChangeRequestController {
               null,
               '$i18n:errors.DUPLICATE_ENTRY_DURING_EXECUTION'
             );
-            logger.info('[ChangeRequest] Auto-rejected due to duplicate', {
+            logger.info('Auto-rejected due to duplicate', {
               changeRequestId: id,
             });
           }
         } catch (updateError) {
           logger.error(
-            '[ChangeRequest] Failed to update CR status after execution failure',
+            'Failed to update CR status after execution failure',
             updateError
           );
         }
@@ -401,7 +403,7 @@ export class ChangeRequestController {
     await Approval.query().where('changeRequestId', id).delete();
     await ChangeRequest.query().deleteById(id);
 
-    logger.info('[ChangeRequest] Deleted', {
+    logger.info('Deleted', {
       changeRequestId: id,
       userId: req.user?.userId,
     });
@@ -417,7 +419,7 @@ export class ChangeRequestController {
    * GET /api/v1/admin/change-requests/my
    */
   static getMyRequests = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -425,14 +427,14 @@ export class ChangeRequestController {
     }
 
     const asRequester = await ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where('requesterId', userId)
       .whereIn('status', ['draft', 'open', 'rejected'])
       .withGraphFetched('changeItems')
       .orderBy('updatedAt', 'desc');
 
     const pendingApproval = await ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where('status', 'open')
       .whereNotIn('id', (qb) => {
         qb.select('changeRequestId').from('g_approvals').where('approverId', userId);
@@ -483,7 +485,7 @@ export class ChangeRequestController {
 
     const newCr = await ChangeRequestService.revertChangeRequest(id, userId);
 
-    logger.info('[ChangeRequest] Reverted', {
+    logger.info('Reverted', {
       originalId: id,
       newId: newCr.id,
       userId,
@@ -500,14 +502,14 @@ export class ChangeRequestController {
    * GET /api/v1/admin/change-requests/stats
    */
   static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environment = getEnvironment(req);
+    const environmentId = getEnvironment(req);
     const userId = req.user?.userId;
 
     if (!userId) {
       throw new GatrixError('User not authenticated', 401);
     }
 
-    const stats = await ChangeRequestService.getChangeRequestCounts(environment, userId);
+    const stats = await ChangeRequestService.getChangeRequestCounts(environmentId, userId);
 
     res.json({
       success: true,
@@ -541,7 +543,7 @@ export class ChangeRequestController {
         await Approval.query().where('changeRequestId', id).delete();
         await ChangeRequest.query().deleteById(id);
 
-        logger.info('[ChangeRequest] Deleted', {
+        logger.info('Deleted', {
           changeRequestId: id,
           userId: req.user?.userId,
         });
@@ -584,7 +586,7 @@ export class ChangeRequestController {
       }
     }
 
-    logger.info('[ChangeRequest] Item deleted', {
+    logger.info('Item deleted', {
       changeRequestId: id,
       itemId,
       userId: req.user?.userId,

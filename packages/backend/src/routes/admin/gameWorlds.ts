@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate } from '../../middleware/auth';
 import { GameWorldController } from '../../controllers/GameWorldController';
 import {
   auditGameWorldCreate,
@@ -21,11 +21,11 @@ router.use(authenticate as any);
  * @openapi
  * tags:
  *   - name: GameWorlds
- *     description: 관리자 권한으로 게임월드를 조회/생성/수정/삭제하는 엔드포인트입니다.
+ *     description: 관리자 권한으로 게임월드를 조회/Create/Edit/Delete하는 엔드포인트입니다.
  * paths:
  *   /admin/game-worlds:
  *     get:
- *       summary: 게임월드 목록 조회
+ *       summary: 게임월드 Get list
  *       tags: [GameWorlds]
  *       security:
  *         - bearerAuth: []
@@ -33,15 +33,15 @@ router.use(authenticate as any);
  *         - in: query
  *           name: search
  *           schema: { type: string }
- *           description: worldId, name, description, tags 필드에 대한 부분 일치 검색어
+ *           description: worldId, name, description, tags 필드에 대한 부분 일치 Search어
  *         - in: query
  *           name: isVisible
  *           schema: { type: boolean }
- *           description: 노출 여부로 필터링
+ *           description: 노출 여부로 Filter링
  *         - in: query
  *           name: isMaintenance
  *           schema: { type: boolean }
- *           description: 점검 여부로 필터링
+ *           description: 점검 여부로 Filter링
  *         - in: query
  *           name: tags
  *           schema: { type: string }
@@ -49,17 +49,17 @@ router.use(authenticate as any);
  *         - in: query
  *           name: tagIds
  *           schema: { type: string }
- *           description: 쉼표(,) 구분된 태그 ID 목록. 서버가 각 항목의 태그를 조회한 뒤 필터링합니다.
+ *           description: 쉼표(,) 구분된 태그 ID 목록. 서버가 각 항목의 태그를 조회한 뒤 Filter링합니다.
  *         - in: query
  *           name: tags_operator
  *           schema:
  *             type: string
  *             enum: [any_of, include_all]
  *             default: include_all
- *           description: any_of(OR) 또는 include_all(AND) 방식으로 tagIds 필터를 적용합니다.
+ *           description: any_of(OR) 또는 include_all(AND) 방식으로 tagIds Filter를 적용합니다.
  *       responses:
  *         '200':
- *           description: 목록 조회 성공
+ *           description: Get list Success
  *           content:
  *             application/json:
  *               schema:
@@ -92,9 +92,9 @@ router.use(authenticate as any);
  *                       total: 1
  *                     message: gameWorlds.list.success
  *         '401':
- *           description: 인증 필요
+ *           description: Authentication 필요
  *     post:
- *       summary: 게임월드 생성
+ *       summary: 게임월드 Create
  *       tags: [GameWorlds]
  *       security:
  *         - bearerAuth: []
@@ -136,7 +136,7 @@ router.use(authenticate as any);
  *                   displayOrder: 10
  *       responses:
  *         '201':
- *           description: 생성 성공
+ *           description: Create Success
  *           content:
  *             application/json:
  *               schema:
@@ -150,7 +150,7 @@ router.use(authenticate as any);
  *                         $ref: '#/components/schemas/GameWorld'
  *                   message: { type: string }
  *         '400':
- *           description: 유효성 검사 실패
+ *           description: Validation Failed
  *         '409':
  *           description: worldId 중복 등으로 인한 충돌
  *   /admin/game-worlds/id/{id}:
@@ -166,7 +166,7 @@ router.use(authenticate as any);
  *           required: true
  *       responses:
  *         '200':
- *           description: 조회 성공
+ *           description: 조회 Success
  *           content:
  *             application/json:
  *               schema:
@@ -180,10 +180,10 @@ router.use(authenticate as any);
  *                         $ref: '#/components/schemas/GameWorld'
  *                   message: { type: string }
  *         '404':
- *           description: 존재하지 않는 리소스
+ *           description: Does not exist 리소스
  *   /admin/game-worlds/{id}:
  *     put:
- *       summary: 게임월드 수정
+ *       summary: 게임월드 Edit
  *       tags: [GameWorlds]
  *       security:
  *         - bearerAuth: []
@@ -222,7 +222,7 @@ router.use(authenticate as any);
  *                   items: { type: integer }
  *       responses:
  *         '200':
- *           description: 수정 성공
+ *           description: Edit Success
  *           content:
  *             application/json:
  *               schema:
@@ -236,11 +236,11 @@ router.use(authenticate as any);
  *                         $ref: '#/components/schemas/GameWorld'
  *                   message: { type: string }
  *         '400':
- *           description: 유효성 검사 실패
+ *           description: Validation Failed
  *         '404':
- *           description: 존재하지 않는 리소스
+ *           description: Does not exist 리소스
  *     delete:
- *       summary: 게임월드 삭제
+ *       summary: 게임월드 Delete
  *       tags: [GameWorlds]
  *       security:
  *         - bearerAuth: []
@@ -251,13 +251,13 @@ router.use(authenticate as any);
  *           required: true
  *       responses:
  *         '200':
- *           description: 삭제 성공
+ *           description: Delete Success
  *           content:
  *             application/json:
  *               schema:
  *                 $ref: '#/components/schemas/SuccessResponse'
  *         '404':
- *           description: 존재하지 않는 리소스
+ *           description: Does not exist 리소스
  *   /admin/game-worlds/{id}/toggle-visibility:
  *     patch:
  *       summary: 노출 여부 토글
@@ -271,7 +271,7 @@ router.use(authenticate as any);
  *           required: true
  *       responses:
  *         '200':
- *           description: 토글 성공
+ *           description: 토글 Success
  *   /admin/game-worlds/{id}/toggle-maintenance:
  *     patch:
  *       summary: 점검 여부 토글
@@ -285,16 +285,16 @@ router.use(authenticate as any);
  *           required: true
  *       responses:
  *         '200':
- *           description: 토글 성공
+ *           description: 토글 Success
  *   /admin/game-worlds/invalidate-cache:
  *     post:
- *       summary: 게임월드 캐시 무효화
+ *       summary: 게임월드 Cache 무효화
  *       tags: [GameWorlds]
  *       security:
  *         - bearerAuth: []
  *       responses:
  *         '200':
- *           description: 캐시 무효화 성공
+ *           description: Cache 무효화 Success
  */
 
 // Public routes (for authenticated users)
@@ -303,7 +303,6 @@ router.get('/id/:id', GameWorldController.getGameWorldById);
 router.get('/world/:worldId', GameWorldController.getGameWorldByWorldId);
 
 // Admin-only routes
-router.use(requireAdmin as any);
 router.post('/', auditGameWorldCreate as any, GameWorldController.createGameWorld);
 router.put('/:id', auditGameWorldUpdate as any, GameWorldController.updateGameWorld);
 router.delete('/:id', auditGameWorldDelete as any, GameWorldController.deleteGameWorld);

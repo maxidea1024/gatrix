@@ -2,12 +2,16 @@
 
 export interface User {
   id: number;
+  userId?: number;
   username: string;
   name?: string;
   email: string;
   avatarUrl?: string;
   isOnline: boolean;
   lastSeen?: string;
+  lastSeenAt?: string;
+  status?: UserStatus;
+  role?: string;
 }
 
 export interface Channel {
@@ -23,6 +27,7 @@ export interface Channel {
   lastMessage?: Message;
   isArchived: boolean;
   settings: ChannelSettings;
+  members?: ChannelMember[];
 }
 
 export interface ChannelSettings {
@@ -65,6 +70,10 @@ export interface Message {
   attachments: MessageAttachment[];
   mentions: MessageMention[];
   hashtags: string[];
+  isEdited?: boolean;
+  readBy?: any[];
+  status?: MessageStatus;
+  location?: LocationData;
 }
 
 export type MessageType =
@@ -103,6 +112,7 @@ export interface LocationData {
   longitude: number;
   address?: string;
   placeName?: string;
+  name?: string;
 }
 
 export interface EditHistory {
@@ -132,6 +142,7 @@ export interface MessageAttachment {
   messageId: number;
   fileName: string;
   originalName: string;
+  name?: string;
   mimeType: string;
   size: number;
   url: string;
@@ -190,52 +201,52 @@ export interface WebSocketEvent {
 }
 
 export type WebSocketEventType =
-  // 서버 → 클라이언트 이벤트 (서버에서 실제로 emit하는 이벤트들)
-  | 'connected' // 연결 성공
+  // 서버 → 클라이언트 Event (서버에서 실제로 emit하는 이벤트들)
+  | 'connected' // 연결 Success
   | 'error' // 오류 발생
   | 'message_sent' // 메시지 전송 완료
-  | 'user_typing' // 타이핑 시작 알림
-  | 'user_stop_typing' // 타이핑 중지 알림
-  | 'user_typing_thread' // 스레드 타이핑 시작 알림
-  | 'user_stop_typing_thread' // 스레드 타이핑 중지 알림
-  | 'user_status_changed' // 사용자 상태 변경 알림
-  | 'user_left' // 사용자 채널 퇴장 알림
+  | 'user_typing' // 타이핑 시작 Notification
+  | 'user_stop_typing' // 타이핑 중지 Notification
+  | 'user_typing_thread' // 스레드 타이핑 시작 Notification
+  | 'user_stop_typing_thread' // 스레드 타이핑 중지 Notification
+  | 'user_status_changed' // Used자 Status 변경 Notification
+  | 'user_left' // Used자 채널 퇴장 Notification
   | 'message' // 일반 메시지 (MessageController)
   | 'new_message' // 새 메시지 (BroadcastService)
 
-  // 클라이언트 → 서버 이벤트 (클라이언트에서 서버로 보내는 이벤트들)
+  // 클라이언트 → 서버 Event (클라이언트에서 서버로 보내는 이벤트들)
   | 'join_channel' // 채널 입장
   | 'leave_channel' // 채널 퇴장
   | 'send_message' // 메시지 전송
   | 'start_typing' // 타이핑 시작
   | 'stop_typing' // 타이핑 중지
   | 'mark_read' // 메시지 읽음 처리
-  | 'update_status' // 상태 업데이트
+  | 'update_status' // Update state
   | 'activity' // 활동 업데이트
 
-  // 클라이언트 내부 이벤트 (프론트엔드에서만 사용)
-  | 'message_created' // 메시지 생성 (message 이벤트에서 파싱)
-  | 'message_updated' // 메시지 수정 (message 이벤트에서 파싱)
-  | 'message_deleted' // 메시지 삭제 (message 이벤트에서 파싱)
-  | 'thread_message_created' // 스레드 메시지 생성 (message 이벤트에서 파싱)
-  | 'thread_updated' // 스레드 업데이트 (message 이벤트에서 파싱)
+  // 클라이언트 내부 Event (프론트엔드에서만 Used)
+  | 'message_created' // 메시지 Create (message Event에서 파싱)
+  | 'message_updated' // 메시지 Edit (message Event에서 파싱)
+  | 'message_deleted' // 메시지 Delete (message Event에서 파싱)
+  | 'thread_message_created' // 스레드 메시지 Create (message Event에서 파싱)
+  | 'thread_updated' // 스레드 업데이트 (message Event에서 파싱)
   | 'message_reaction_updated' // 리액션 업데이트
-  | 'connection_established' // 연결 설정됨
+  | 'connection_established' // 연결 Settings됨
   | 'connection_lost' // 연결 끊어짐
   | 'connection_error' // 연결 오류
-  | 'connection_failed' // 연결 실패
-  | 'authentication_failed' // 인증 실패
+  | 'connection_failed' // 연결 Failed
+  | 'authentication_failed' // Authentication Failed
   | 'channel_invitation' // 채널 초대
-  | 'invitation_response' // 초대 응답
-  | 'invitation_cancelled' // 초대 취소
-  | 'user_joined_channel' // 사용자 채널 입장
-  | 'user_left_channel' // 사용자 채널 퇴장
+  | 'invitation_response' // 초대 Response
+  | 'invitation_cancelled' // 초대 Cancel
+  | 'user_joined_channel' // Used자 채널 입장
+  | 'user_left_channel' // Used자 채널 퇴장
   | 'channel_updated' // 채널 업데이트
   | 'reaction_added' // 리액션 추가
   | 'reaction_removed' // 리액션 제거
-  | 'user_online' // 사용자 온라인
-  | 'user_offline' // 사용자 오프라인
-  | 'presence_update'; // 상태 업데이트
+  | 'user_online' // Used자 온라인
+  | 'user_offline' // Used자 오프라인
+  | 'presence_update'; // Update state
 
 // API request/response types
 export interface CreateChannelRequest {
@@ -346,3 +357,7 @@ export interface RichTextElement {
   content: string;
   data?: any; // additional data for specific types
 }
+
+// Status types
+export type UserStatus = 'online' | 'away' | 'busy' | 'offline' | 'invisible';
+export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';

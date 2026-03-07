@@ -20,15 +20,17 @@ export interface ClientVersionMutationResult {
 }
 
 export class ClientVersionService {
-  private static readonly BASE_URL = '/admin/client-versions';
+  private static basePath(projectApiPath: string): string {
+    return `${projectApiPath}/client-versions`;
+  }
 
   /**
-   * 사용 가능한 버전 목록 조회
+   * Get list of available versions
    */
-  static async getAvailableVersions(): Promise<string[]> {
+  static async getAvailableVersions(projectApiPath: string): Promise<string[]> {
     try {
-      const response = await apiService.get(`${this.BASE_URL}/meta/versions`);
-      // apiService.get()이 이미 response.data를 반환하므로 response.data가 실제 데이터
+      const response = await apiService.get(`${this.basePath(projectApiPath)}/meta/versions`);
+      // apiService.get() already returns response.data, so response.data is the actual data
       return response.data || [];
     } catch (error) {
       console.error('Error getting available versions:', error);
@@ -37,15 +39,16 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 목록 조회
+   * Get list of client versions
    */
   static async getClientVersions(
+    projectApiPath: string,
     page: number = 1,
     limit: number = CLIENT_VERSION_DEFAULTS.PAGE_SIZE,
     filters: ClientVersionFilters = {},
     sortBy: string = CLIENT_VERSION_DEFAULTS.SORT_BY,
     sortOrder: string = CLIENT_VERSION_DEFAULTS.SORT_ORDER
-  ): Promise<ClientVersionListResponse> {
+  ): Promise<any> {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -53,16 +56,16 @@ export class ClientVersionService {
       sortOrder,
     });
 
-    // 필터 조건 추가
+    // Add filter conditions
     Object.entries(filters).forEach(([key, value]) => {
       if (value === undefined || value === null || value === '') return;
 
-      // 태그는 백엔드에서 배열 타입으로 기대하므로 반드시 배열 파라미터로 직렬화
+      // Tags are expected as an array type by backend, so must be serialized as array parameters
       if (key === 'tags') {
         if (Array.isArray(value)) {
           value.forEach((item) => params.append('tags[]', item.toString()));
         } else if (typeof value === 'string') {
-          // 콤마 구분 문자열도 지원: "1,2,3" -> tags[]=1&tags[]=2&tags[]=3
+          // Also supports comma-separated string: "1,2,3" -> tags[]=1&tags[]=2&tags[]=3
           const parts = value
             .split(',')
             .map((s) => s.trim())
@@ -78,7 +81,7 @@ export class ClientVersionService {
         return;
       }
 
-      // 배열인 경우 각 요소를 개별적으로 추가
+      // If array, add each element individually
       if (Array.isArray(value)) {
         value.forEach((item) => params.append(key, item.toString()));
       } else {
@@ -86,20 +89,18 @@ export class ClientVersionService {
       }
     });
 
-    const response = await apiService.get<ApiResponse<ClientVersionListResponse>>(
-      `${this.BASE_URL}?${params}`
-    );
+    const response = await apiService.get<any>(`${this.basePath(projectApiPath)}?${params}`);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
-    // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
+    // ApiService.request() already returns response.data
+    // response is the { success: true, data: {...} } structure sent from backend
     if (response?.success && response?.data) {
       return response.data;
-    } else if (response?.clientVersions) {
-      // 혹시 다른 구조일 경우
+    } else if ((response as any)?.clientVersions) {
+      // In case of different structure
       return response;
     }
 
-    // 응답이 올바르지 않거나 데이터가 없는 경우 기본값 반환
+    // Return default value if response is invalid or data is missing
     return {
       clientVersions: [],
       total: 0,
@@ -110,27 +111,28 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 상세 조회
+   * Get client version details
    */
-  static async getClientVersionById(id: number): Promise<ClientVersion> {
-    const response = await apiService.get<ApiResponse<ClientVersion>>(`${this.BASE_URL}/${id}`);
+  static async getClientVersionById(projectApiPath: string, id: number): Promise<ClientVersion> {
+    const response = await apiService.get<any>(`${this.basePath(projectApiPath)}/${id}`);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
       return response.data;
     }
 
     console.error('Unexpected getById response structure:', response);
-    return null;
+    return null as any;
   }
 
   /**
-   * 클라이언트 버전 생성
+   * Create client version
    */
   static async createClientVersion(
+    projectApiPath: string,
     data: ClientVersionFormData
   ): Promise<ClientVersionMutationResult> {
-    const response: any = await apiService.post<ApiResponse<ClientVersion>>(this.BASE_URL, data);
+    const response: any = await apiService.post<any>(this.basePath(projectApiPath), data);
 
     // Check if this is a change request response
     // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
@@ -142,7 +144,7 @@ export class ClientVersionService {
       };
     }
 
-    // 정상 생성: { success: true, data: { ...created client version } }
+    // Normal creation: { success: true, data: { ...created client version } }
     if (response?.success && response?.data && response.data.id) {
       return {
         clientVersion: response.data,
@@ -150,10 +152,14 @@ export class ClientVersionService {
       };
     }
 
-    // 일부 서버는 생성 시 본문 없이 { success: true }만 반환할 수 있음
+    // Some servers may return only { success: true } without body upon creation
     if (response?.success && !response?.data) {
       try {
-        const found = await this.findByPlatformAndVersion(data.platform, data.clientVersion);
+        const found = await this.findByPlatformAndVersion(
+          projectApiPath,
+          data.platform,
+          data.clientVersion
+        );
         if (found) {
           return {
             clientVersion: found,
@@ -169,14 +175,15 @@ export class ClientVersionService {
     throw new Error('Invalid response structure from server');
   }
   /**
-   * 생성 직후 데이터 본문이 없는 서버 대응: 플랫폼/버전으로 재조회
+   * Handle servers missing data body immediately after creation: re-fetch by platform/version
    */
   static async findByPlatformAndVersion(
+    projectApiPath: string,
     platform: string,
     clientVersion: string
   ): Promise<ClientVersion | null> {
     try {
-      const result = await this.getClientVersions(1, 100, {
+      const result = await this.getClientVersions(projectApiPath, 1, 100, {
         platform,
         search: clientVersion,
       });
@@ -191,20 +198,20 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 간편 생성
+   * Quick create client version
    */
-  static async bulkCreateClientVersions(data: BulkCreateFormData): Promise<ClientVersion[]> {
-    const response = await apiService.post<ApiResponse<ClientVersion[]>>(
-      `${this.BASE_URL}/bulk`,
-      data
-    );
+  static async bulkCreateClientVersions(
+    projectApiPath: string,
+    data: BulkCreateFormData
+  ): Promise<ClientVersion[]> {
+    const response = await apiService.post<any>(`${this.basePath(projectApiPath)}/bulk`, data);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
       return response.data;
     }
 
-    // 일부 서버는 본문 없이 { success: true }만 반환할 수 있음
+    // Some servers may return only { success: true } without body
     if (response?.success && !response?.data) {
       return [];
     }
@@ -214,16 +221,14 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 수정
+   * Update client version
    */
   static async updateClientVersion(
+    projectApiPath: string,
     id: number,
     data: Partial<ClientVersionFormData>
   ): Promise<ClientVersionMutationResult> {
-    const response: any = await apiService.put<ApiResponse<ClientVersion>>(
-      `${this.BASE_URL}/${id}`,
-      data
-    );
+    const response: any = await apiService.put<any>(`${this.basePath(projectApiPath)}/${id}`, data);
 
     // Check if this is a change request response
     // Backend returns: { success: true, data: { changeRequestId: "...", status: "DRAFT_SAVED" } }
@@ -235,7 +240,7 @@ export class ClientVersionService {
       };
     }
 
-    // 정상 수정: { success: true, data: { ...updated client version } }
+    // Normal update: { success: true, data: { ...updated client version } }
     if (response?.success && response?.data && response.data.id) {
       return {
         clientVersion: response.data,
@@ -248,16 +253,15 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 삭제
+   * Delete client version
    */
   static async deleteClientVersion(
+    projectApiPath: string,
     id: number
   ): Promise<{ isChangeRequest: boolean; changeRequestId?: string }> {
-    const response = await apiService.delete<
-      ApiResponse<{ changeRequestId?: string; status?: string }>
-    >(`${this.BASE_URL}/${id}`);
-    const data = response.data;
-    // 202 응답은 CR 생성을 의미
+    const response = await apiService.delete<any>(`${this.basePath(projectApiPath)}/${id}`);
+    const data = (response as any).data;
+    // 202 response indicates CR creation
     const isChangeRequest = !!data?.changeRequestId;
     return {
       isChangeRequest,
@@ -266,19 +270,20 @@ export class ClientVersionService {
   }
 
   /**
-   * 일괄 상태 변경
+   * Bulk update status
    */
   static async bulkUpdateStatus(
+    projectApiPath: string,
     data: BulkStatusUpdateRequest
   ): Promise<{ updatedCount: number; message: string }> {
-    const response = await apiService.patch<ApiResponse<{ updatedCount: number; message: string }>>(
-      `${this.BASE_URL}/bulk-status`,
+    const response = await apiService.patch<any>(
+      `${this.basePath(projectApiPath)}/bulk-status`,
       data
     );
 
     console.log('🔍 Bulk update response:', response);
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // ApiService.request() already returns response.data
     if (response?.success && response?.data) {
       return response.data;
     }
@@ -288,14 +293,12 @@ export class ClientVersionService {
   }
 
   /**
-   * 채널 목록 조회
+   * Get list of channels
    */
-  static async getPlatforms(): Promise<string[]> {
+  static async getPlatforms(projectApiPath: string): Promise<string[]> {
     try {
-      const response = await apiService.get<ApiResponse<string[]>>(
-        `${this.BASE_URL}/meta/platforms`
-      );
-      return response.data?.data || [];
+      const response = await apiService.get<any>(`${this.basePath(projectApiPath)}/meta/platforms`);
+      return response?.data || [];
     } catch (error) {
       console.error('Error fetching platforms:', error);
       return [];
@@ -303,10 +306,10 @@ export class ClientVersionService {
   }
 
   /**
-   * 메타데이터 조회 (플랫폼)
+   * Get metadata (platform)
    */
-  static async getMetadata(): Promise<ClientVersionMetadata> {
-    const platforms = await this.getPlatforms();
+  static async getMetadata(projectApiPath: string): Promise<ClientVersionMetadata> {
+    const platforms = await this.getPlatforms(projectApiPath);
 
     return {
       platforms,
@@ -314,9 +317,10 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 중복 검사
+   * Check for duplicate client version
    */
   static async checkDuplicate(
+    projectApiPath: string,
     platform: string,
     clientVersion: string,
     excludeId?: number
@@ -327,9 +331,9 @@ export class ClientVersionService {
         search: clientVersion,
       };
 
-      const result = await this.getClientVersions(1, 100, filters);
+      const result = await this.getClientVersions(projectApiPath, 1, 100, filters);
 
-      // 정확히 일치하는 버전이 있는지 확인
+      // Check if exactly matching version exists
       const duplicate = result.clientVersions.find(
         (cv) =>
           cv.platform === platform && cv.clientVersion === clientVersion && cv.id !== excludeId
@@ -343,13 +347,16 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 내보내기 (CSV)
+   * Export client versions (CSV)
    */
-  static async exportToCSV(filters: ClientVersionFilters = {}): Promise<Blob> {
-    // 내보내기 전용 엔드포인트 사용
+  static async exportToCSV(
+    projectApiPath: string,
+    filters: ClientVersionFilters = {}
+  ): Promise<Blob> {
+    // Use endpoint dedicated for export
     const params: Record<string, any> = {};
 
-    // 필터 추가
+    // Add filter
     if (filters.platform) params.platform = filters.platform;
     if (filters.clientStatus) params.clientStatus = filters.clientStatus;
     if (filters.gameServerAddress) params.gameServerAddress = filters.gameServerAddress;
@@ -369,7 +376,7 @@ export class ClientVersionService {
     if (filters.tags && filters.tags.length > 0) params.tags = filters.tags;
 
     try {
-      const result = await apiService.get(`${this.BASE_URL}/export`, {
+      const result = await apiService.get(`${this.basePath(projectApiPath)}/export`, {
         params,
       });
 
@@ -442,7 +449,7 @@ export class ClientVersionService {
   }
 
   /**
-   * 로컬 스토리지에서 페이지 크기 가져오기
+   * Get page size from local storage
    */
   static getStoredPageSize(): number {
     try {
@@ -454,7 +461,7 @@ export class ClientVersionService {
   }
 
   /**
-   * 로컬 스토리지에 페이지 크기 저장
+   * Save page size to local storage
    */
   static setStoredPageSize(pageSize: number): void {
     try {
@@ -465,7 +472,7 @@ export class ClientVersionService {
   }
 
   /**
-   * 로컬 스토리지에서 필터 가져오기
+   * Get filter from local storage
    */
   static getStoredFilters(): ClientVersionFilters {
     try {
@@ -477,7 +484,7 @@ export class ClientVersionService {
   }
 
   /**
-   * 로컬 스토리지에 필터 저장
+   * Save filter to local storage
    */
   static setStoredFilters(filters: ClientVersionFilters): void {
     try {
@@ -488,7 +495,7 @@ export class ClientVersionService {
   }
 
   /**
-   * 로컬 스토리지에서 정렬 설정 가져오기
+   * Get sorting options from local storage
    */
   static getStoredSort(): { sortBy: string; sortOrder: string } {
     try {
@@ -508,7 +515,7 @@ export class ClientVersionService {
   }
 
   /**
-   * 로컬 스토리지에 정렬 설정 저장
+   * Save sorting options to local storage
    */
   static setStoredSort(sortBy: string, sortOrder: string): void {
     try {
@@ -519,18 +526,18 @@ export class ClientVersionService {
   }
 
   /**
-   * 클라이언트 버전 태그 조회
+   * Get client version tags
    */
-  static async getTags(id: number): Promise<any[]> {
-    const response = await apiService.get<ApiResponse<any[]>>(`${this.BASE_URL}/${id}/tags`);
-    return response.data.data || [];
+  static async getTags(projectApiPath: string, id: number): Promise<any[]> {
+    const response = await apiService.get<any>(`${this.basePath(projectApiPath)}/${id}/tags`);
+    return response?.data || [];
   }
 
   /**
-   * 클라이언트 버전 태그 설정
+   * Set client version tag
    */
-  static async setTags(id: number, tagIds: number[]): Promise<void> {
-    await apiService.put(`${this.BASE_URL}/${id}/tags`, { tagIds });
+  static async setTags(projectApiPath: string, id: number, tagIds: number[]): Promise<void> {
+    await apiService.put(`${this.basePath(projectApiPath)}/${id}/tags`, { tagIds });
   }
 }
 

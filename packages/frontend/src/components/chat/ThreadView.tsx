@@ -84,7 +84,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wasAtBottomRef = useRef(true);
 
-  // 스레드 타이핑 사용자들
+  // 스레드 타이핑 Used자들
   const threadTypingUsers = state.threadTypingUsers[originalMessage.id] || [];
 
   const getDateLocale = () => {
@@ -138,16 +138,16 @@ const ThreadView: React.FC<ThreadViewProps> = ({
     }
   }, [threadMessages.length, state.user?.id]);
 
-  // 스레드가 열릴 때 입력창에 포커스 설정
+  // 스레드가 열릴 때 입력창에 포커스 Settings
   useEffect(() => {
-    // 스레드가 처음 마운트될 때만 포커스 설정
+    // 스레드가 처음 마운트될 때만 포커스 Settings
     const timer = setTimeout(() => {
       const input = inputRef.current?.querySelector('input, textarea') as HTMLElement;
       if (input && !input.matches(':focus')) {
-        // 이미 포커스가 있지 않을 때만 포커스 설정
+        // 이미 포커스가 있지 않을 때만 포커스 Settings
         input.focus();
       }
-    }, 150); // 메인 입력창의 포커스 설정보다 늦게 실행
+    }, 150); // 메인 입력창의 포커스 Settings보다 늦게 실행
 
     return () => clearTimeout(timer);
   }, []); // 의존성 배열을 비워서 마운트 시에만 실행
@@ -168,7 +168,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({
       });
 
       if (threadId === originalMessage.id && newThreadMessage) {
-        // 새로운 스레드 메시지를 현재 목록에 추가
+        // New 스레드 메시지를 현재 목록에 추가
         setThreadMessages((prev) => [...prev, newThreadMessage]);
       }
     };
@@ -181,7 +181,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({
       setThreadMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, reactions } : m)));
     };
 
-    // WebSocket 이벤트 리스너 등록 (싱글톤 인스턴스)
+    // WebSocket Event 리스너 Register (싱글톤 인스턴스)
     const wsService = getChatWebSocketService(() => localStorage.getItem('accessToken'));
     wsService.on('thread_message_created', handleThreadMessage);
     wsService.on('message_reaction_updated', handleReactionUpdated);

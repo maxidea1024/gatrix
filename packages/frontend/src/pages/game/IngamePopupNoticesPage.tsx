@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -25,6 +25,10 @@ import {
   DialogActions,
   DialogContentText,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -36,6 +40,7 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   Code as CodeIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -53,12 +58,14 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { formatDateTime, formatRelativeTime, formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useI18n } from '../../contexts/I18nContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import dayjs from 'dayjs';
 
 const IngamePopupNoticesPage: React.FC = () => {
@@ -67,7 +74,9 @@ const IngamePopupNoticesPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE]);
+  const canManage = hasPermission([P.INGAME_POPUPS_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
@@ -119,6 +128,23 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [deletingNotice, setDeletingNotice] = useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<IngamePopupNotice | null>(null);
+
+  const handleActionMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    notice: IngamePopupNotice
+  ) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(notice);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -225,6 +251,7 @@ const IngamePopupNoticesPage: React.FC = () => {
       }
 
       const result = await ingamePopupNoticeService.getIngamePopupNotices(
+        projectApiPath,
         page + 1,
         rowsPerPage,
         filters
@@ -339,7 +366,7 @@ const IngamePopupNoticesPage: React.FC = () => {
     if (!deletingNotice) return;
 
     try {
-      await ingamePopupNoticeService.deleteIngamePopupNotice(deletingNotice.id);
+      await ingamePopupNoticeService.deleteIngamePopupNotice(projectApiPath, deletingNotice.id);
       enqueueSnackbar(t('ingamePopupNotices.deleteSuccess'), {
         variant: 'success',
       });
@@ -360,7 +387,7 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const confirmBulkDelete = async () => {
     try {
-      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(selectedIds);
+      await ingamePopupNoticeService.deleteMultipleIngamePopupNotices(projectApiPath, selectedIds);
       enqueueSnackbar(
         t('ingamePopupNotices.bulkDeleteSuccess', {
           count: selectedIds.length,
@@ -379,7 +406,7 @@ const IngamePopupNoticesPage: React.FC = () => {
 
   const handleToggleActive = async (notice: IngamePopupNotice) => {
     try {
-      await ingamePopupNoticeService.toggleActive(notice.id);
+      await ingamePopupNoticeService.toggleActive(projectApiPath, notice.id);
       enqueueSnackbar(t('ingamePopupNotices.toggleSuccess'), {
         variant: 'success',
       });
@@ -552,21 +579,17 @@ const IngamePopupNoticesPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : notices.length === 0 ? (
-            <EmptyState
-              message={t('ingamePopupNotices.noNoticesFound')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('ingamePopupNotices.createNotice')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={isInitialLoad && loading}>
+        {notices.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('ingamePopupNotices.noNoticesFound')}
+            onAddClick={canManage ? handleCreate : undefined}
+            addButtonLabel={t('ingamePopupNotices.createNotice')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
                   <TableHead>
@@ -772,32 +795,12 @@ const IngamePopupNoticesPage: React.FC = () => {
                         })}
                         {canManage && (
                           <TableCell align="center">
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 0.5,
-                                justifyContent: 'center',
-                              }}
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleActionMenuOpen(e, notice)}
                             >
-                              <Tooltip title={t('common.edit')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEdit(notice)}
-                                  color="primary"
-                                >
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('common.delete')}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleDelete(notice)}
-                                  color="error"
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
+                              <MoreVertIcon fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         )}
                       </TableRow>
@@ -817,10 +820,40 @@ const IngamePopupNoticesPage: React.FC = () => {
                   setPage(0);
                 }}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleDelete(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Form Drawer */}
       <IngamePopupNoticeFormDialog

@@ -22,7 +22,7 @@ public class ServiceMaintenanceService : BaseEnvironmentService<MaintenanceStatu
 
     protected override string ServiceName => "ServiceMaintenance";
     protected override string GetEndpoint(string environment) =>
-        $"/api/v1/server/{Uri.EscapeDataString(environment)}/service-maintenance";
+        $"/api/v1/server/service-maintenance";
     protected override List<MaintenanceStatus> ExtractItems(MaintenanceStatus response) => [response];
     protected override object GetItemId(MaintenanceStatus item) => "singleton";
 

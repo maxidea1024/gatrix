@@ -38,7 +38,7 @@ const LogoutPage: React.FC = () => {
 
       setLogoutComplete(true);
 
-      // 2초 후 로그인 페이지로 이동
+      // 2초 후 Login 페이지로 이동
       setTimeout(() => {
         console.log('[LogoutPage] Navigating to login page...');
         navigate('/login', { replace: true });
@@ -61,9 +61,9 @@ const LogoutPage: React.FC = () => {
     handleLogout();
   };
 
-  // 페이지 로드 시 자동으로 로그아웃 시작하지 않음 (사용자 확인 필요)
+  // 페이지 로드 시 자동으로 Logout 시작하지 않음 (Used자 Confirm 필요)
   useEffect(() => {
-    // URL 파라미터로 자동 로그아웃 여부 확인
+    // URL Parameters로 자동 Logout 여부 Confirm
     const urlParams = new URLSearchParams(window.location.search);
     const autoLogout = urlParams.get('auto') === 'true';
 

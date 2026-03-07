@@ -62,7 +62,7 @@ const WhitelistOverview: React.FC = () => {
     }
   };
 
-  // 초기화 함수
+  // Reset function
   const handleReset = () => {
     setTestAccountId('');
     setTestIpAddress('');

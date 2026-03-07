@@ -1134,7 +1134,7 @@ export class FeaturesClient implements VariationProvider {
       this.lastFetchTime = new Date();
 
       // Build endpoint: {apiUrl}/client/features/{environment}/eval
-      const url = new URL(`${this.config.apiUrl}/client/features/${this.config.environment}/eval`);
+      const url = new URL(`${this.config.apiUrl}/client/features/eval`);
 
       const headers = this.buildHeaders();
 
@@ -1684,7 +1684,6 @@ export class FeaturesClient implements VariationProvider {
       'Content-Type': 'application/json',
       'X-API-Token': this.config.apiToken,
       'X-Application-Name': this.config.appName,
-      'X-Environment': this.config.environment,
       'X-Connection-Id': this.connectionId,
       'X-SDK-Version': `${SDK_NAME}/${SDK_VERSION}`,
       'X-Gatrix-Context-Hash': this.lastContextHash,
@@ -1748,8 +1747,7 @@ export class FeaturesClient implements VariationProvider {
     this.streamingAbortController = new AbortController();
 
     const streamUrl =
-      this.featuresConfig.streaming?.sse?.url ??
-      `${this.config.apiUrl}/client/features/${this.config.environment}/stream/sse`;
+      this.featuresConfig.streaming?.sse?.url ?? `${this.config.apiUrl}/client/features/stream/sse`;
 
     const headers = this.buildHeaders();
 
@@ -1891,7 +1889,7 @@ export class FeaturesClient implements VariationProvider {
     // Build WS URL
     const baseUrl =
       this.featuresConfig.streaming?.websocket?.url ??
-      `${this.config.apiUrl}/client/features/${this.config.environment}/stream/ws`;
+      `${this.config.apiUrl}/client/features/stream/ws`;
 
     // Convert http(s) to ws(s)
     const wsUrl = baseUrl.replace(/^http/, 'ws');
@@ -2185,7 +2183,7 @@ export class FeaturesClient implements VariationProvider {
       this.lastFetchTime = new Date();
 
       // Build endpoint with flagNames parameter
-      const url = new URL(`${this.config.apiUrl}/client/features/${this.config.environment}/eval`);
+      const url = new URL(`${this.config.apiUrl}/client/features/eval`);
 
       const headers = this.buildHeaders();
       // NO If-None-Match header (intentionally skip ETag for partial fetch)

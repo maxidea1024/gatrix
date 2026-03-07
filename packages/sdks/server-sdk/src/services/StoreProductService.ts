@@ -1,7 +1,7 @@
 /**
  * Store Product Service
  * Handles store product list and retrieval
- * Uses per-environment API pattern: GET /api/v1/server/:env/store-products
+ * Uses per-environment API pattern: GET /api/v1/server/store-products
  * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
@@ -29,7 +29,7 @@ export class StoreProductService extends BaseEnvironmentService<
   // ==================== Abstract Method Implementations ====================
 
   protected getEndpoint(environment: string): string {
-    return `/api/v1/server/${encodeURIComponent(environment)}/store-products`;
+    return `/api/v1/server/store-products`;
   }
 
   protected extractItems(response: StoreProductListResponse): StoreProduct[] {
@@ -75,7 +75,7 @@ export class StoreProductService extends BaseEnvironmentService<
    */
   async getById(id: string, environment: string): Promise<StoreProduct> {
     const response = await this.apiClient.get<{ product: StoreProduct }>(
-      `/api/v1/server/${encodeURIComponent(environment)}/store-products/${id}`
+      `/api/v1/server/store-products/${id}`
     );
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch store product');

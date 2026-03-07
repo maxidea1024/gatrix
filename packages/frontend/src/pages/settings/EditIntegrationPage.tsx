@@ -48,7 +48,8 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { useEnvironments } from '@/contexts/EnvironmentContext';
+import { formatRelativeTime, formatDateTimeUI } from '@/utils/dateFormat';
 
 // Provider icons
 import slackIcon from '@/assets/icons/integrations/slack.svg';
@@ -65,7 +66,7 @@ interface Integration {
   isEnabled: boolean;
   parameters: Record<string, any>;
   events: string[];
-  environments: string[];
+  environmentIds: string[];
 }
 
 interface ProviderDefinition {
@@ -228,7 +229,7 @@ const getEventDescriptionConfig = (log: EventLog): { key: string; params: any } 
     ...data,
     // Prefer friendly names if available
     name: data.segmentName || data.flagName || data.name || data.title || data.id || '',
-    environment: data.environment || '',
+    environmentId: data.environmentId || '',
     message: data.message || '',
     email: data.email || '',
     displayName: data.displayName || '',
@@ -265,7 +266,7 @@ const FallbackDescription: React.FC<{ log: EventLog }> = ({ log }) => {
   const data = log.eventData || {};
   if (data.email) return <>{data.email}</>;
   if (data.displayName) return <>{data.displayName}</>;
-  if (data.name && data.environment) return <>{`${data.environment}: ${data.name}`}</>;
+  if (data.name && data.environmentId) return <>{`${data.environmentId}: ${data.name}`}</>;
   if (data.name) return <>{data.name}</>;
   if (data.title) return <>{data.title}</>;
   if (data.message) return <>{data.message}</>;
@@ -342,7 +343,7 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
                     sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500 }}
                   />
                 ),
-                environment: (
+                environmentId: (
                   <LabelChip
                     size="small"
                     color="primary"
@@ -375,7 +376,9 @@ const LogDetailsRow: React.FC<{ log: EventLog; index: number }> = ({ log, index 
         </TableCell>
         <TableCell>{log.statusCode ?? '-'}</TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {formatRelativeTime(log.createdAt, { showSeconds: true })}
+          <Tooltip title={formatDateTimeUI(log.createdAt)} arrow>
+            <span>{formatRelativeTime(log.createdAt, { showSeconds: true })}</span>
+          </Tooltip>
         </TableCell>
       </TableRow>
       <TableRow
@@ -464,9 +467,11 @@ export const EditIntegrationPage: React.FC = () => {
 
   const [tabValue, setTabValue] = useState(parseInt(searchParams.get('tab') || '0', 10));
   const [providers, setProviders] = useState<ProviderDefinition[]>([]);
-  const [environments, setEnvironments] = useState<{ environment: string; displayName?: string }[]>(
-    []
-  );
+  const { environments: envList } = useEnvironments();
+  const environments = envList.map((e) => ({
+    environmentId: e.environmentId,
+    displayName: e.displayName,
+  }));
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [description, setDescription] = useState('');
   const [isEnabled, setIsEnabled] = useState(true);
@@ -491,7 +496,6 @@ export const EditIntegrationPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    fetchEnvironments();
   }, [id]);
 
   useEffect(() => {
@@ -528,7 +532,7 @@ export const EditIntegrationPage: React.FC = () => {
         setIsEnabled(integrationData.isEnabled);
         setParameters(integrationData.parameters || {});
         setSelectedEvents(integrationData.events || []);
-        setSelectedEnvironments(integrationData.environments || []);
+        setSelectedEnvironments(integrationData.environmentIds || []);
 
         // Store initial values for dirty check
         setInitialValues({
@@ -536,7 +540,7 @@ export const EditIntegrationPage: React.FC = () => {
           isEnabled: integrationData.isEnabled,
           parameters: integrationData.parameters || {},
           events: integrationData.events || [],
-          environments: integrationData.environments || [],
+          environments: integrationData.environmentIds || [],
         });
       }
     } catch {
@@ -544,15 +548,6 @@ export const EditIntegrationPage: React.FC = () => {
       navigate('/settings/integrations');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchEnvironments = async () => {
-    try {
-      const res = await api.get('/admin/environments');
-      setEnvironments(res?.data || []);
-    } catch {
-      // Ignore error
     }
   };
 
@@ -662,7 +657,7 @@ export const EditIntegrationPage: React.FC = () => {
         isEnabled,
         parameters,
         events: selectedEvents,
-        environments: selectedEnvironments,
+        environmentIds: selectedEnvironments,
       });
       enqueueSnackbar(t('integrations.saveSuccess'), { variant: 'success' });
       navigate('/settings/integrations');
@@ -946,20 +941,20 @@ export const EditIntegrationPage: React.FC = () => {
             <FormGroup row>
               {environments.map((env) => (
                 <FormControlLabel
-                  key={env.environment}
+                  key={env.environmentId}
                   control={
                     <Checkbox
-                      checked={selectedEnvironments.includes(env.environment)}
+                      checked={selectedEnvironments.includes(env.environmentId)}
                       onChange={() => {
                         setSelectedEnvironments((prev) =>
-                          prev.includes(env.environment)
-                            ? prev.filter((e) => e !== env.environment)
-                            : [...prev, env.environment]
+                          prev.includes(env.environmentId)
+                            ? prev.filter((e) => e !== env.environmentId)
+                            : [...prev, env.environmentId]
                         );
                       }}
                     />
                   }
-                  label={env.displayName || env.environment}
+                  label={env.displayName || env.environmentId}
                 />
               ))}
             </FormGroup>

@@ -44,7 +44,7 @@ import { AuditLogService, AuditLogFilters } from '../../services/auditLogService
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { useI18n } from '../../contexts/I18nContext';
 import dayjs, { Dayjs } from 'dayjs';
 import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
@@ -363,13 +363,13 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
           </Tooltip>
         );
       case 'user':
-        return log.user_name ? (
+        return log.userName ? (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {log.user_name}
+              {log.userName}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {log.user_email}
+              {log.userEmail}
             </Typography>
           </Box>
         ) : (
@@ -393,7 +393,10 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
             </Typography>
             {(() => {
               const resourceName =
-                log.oldValues?.name || log.newValues?.name || log.oldValues?.worldId || log.newValues?.worldId;
+                log.oldValues?.name ||
+                log.newValues?.name ||
+                log.oldValues?.worldId ||
+                log.newValues?.worldId;
               return resourceName ? (
                 <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
                   {resourceName}
@@ -542,7 +545,7 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({ flagName, f
           <CircularProgress size={30} />
         </Box>
       ) : auditLogs.length === 0 ? (
-        <EmptyState message={t('auditLogs.noLogsFound')} />
+        <EmptyPagePlaceholder message={t('auditLogs.noLogsFound')} />
       ) : (
         <>
           <TableContainer>

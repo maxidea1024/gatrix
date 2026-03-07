@@ -2,6 +2,9 @@ import knex from 'knex';
 import { Model } from 'objection';
 import dotenv from 'dotenv';
 import { config } from './index';
+import { createLogger } from './logger';
+
+const knexLogger = createLogger('Knex');
 
 dotenv.config();
 
@@ -46,7 +49,7 @@ const convertBitToBoolean = (obj: any): any => {
       } else if (value instanceof Date) {
         // Convert Date to UTC ISO string with error handling
         if (isNaN(value.getTime())) {
-          console.warn(`[knex] Invalid Date for key ${key}:`, value);
+          knexLogger.warn(`Invalid Date for key ${key}:`, value);
           converted[key] = null;
         } else {
           converted[key] = value.toISOString();
@@ -74,7 +77,7 @@ const knexConfig = {
     charset: 'utf8mb4',
     timezone: 'Z',
   },
-  debug: config.database.debug, // .env의 DB_DEBUG 설정으로 제어
+  debug: config.database.debug, // .env의 DB_DEBUG Settings으로 제어
   pool: {
     min: 2,
     max: 10,
@@ -97,10 +100,10 @@ const knexConfig = {
   },
 };
 
-// Knex 인스턴스 생성
+// Knex 인스턴스 Create
 const db = knex(knexConfig);
 
-// Objection.js 초기화
+// Objection.js Initialization
 Model.knex(db);
 
 export default db;

@@ -78,9 +78,6 @@ const UnauthorizedPage: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 {t('common.loggedInAs')}: <strong>{user.name}</strong>
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('dashboard.role')}: <strong>{user.role}</strong>
-              </Typography>
             </Box>
           )}
 

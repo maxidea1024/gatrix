@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   TextField,
@@ -51,9 +51,10 @@ import { MessageTemplate, messageTemplateService } from '../../services/messageT
 import ResizableDrawer from '../common/ResizableDrawer';
 import { getContrastColor } from '@/utils/colorUtils';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getActionLabel } from '../../utils/changeRequestToast';
 
-// 클라이언트 상태 라벨 매핑
+// Client status label mapping
 const ClientStatusLabels = {
   [ClientStatus.ONLINE]: 'clientVersions.status.online',
   [ClientStatus.OFFLINE]: 'clientVersions.status.offline',
@@ -70,7 +71,7 @@ interface BulkClientVersionFormProps {
   onSuccess: () => void;
 }
 
-// 폼 유효성 검사 스키마
+// Form validation schema
 const createValidationSchema = (t: any) =>
   yup.object({
     clientVersion: yup
@@ -118,7 +119,7 @@ const createValidationSchema = (t: any) =>
       )
       .min(1, t('clientVersions.form.selectAtLeastOnePlatform'))
       .required(),
-    // 점검 관련 필드
+    // Maintenance-related fields
     maintenanceStartDate: yup.string().optional(),
     maintenanceEndDate: yup.string().optional(),
     maintenanceMessage: yup.string().when('clientStatus', {
@@ -139,30 +140,32 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
   const { currentEnvironment } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
-  // 태그 관련 상태
+  // Tag-related state
   const [allTags, setAllTags] = useState<
     { id: number; name: string; color: string; description?: string }[]
   >([]);
-  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>(
-    []
-  );
+  const [selectedTags, setSelectedTags] = useState<
+    { id: number; name: string; color: string; description?: string }[]
+  >([]);
 
-  // 점검 관련 상태
+  // Maintenance-related state
   const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>(
     []
   );
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
-  // 메시지 소스 선택
+  // Message source selection
   const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
 
-  // 기본값 설정
+  // Default values
   const defaultValues: BulkCreateFormData = {
     clientVersion: '',
     clientStatus: ClientStatus.OFFLINE,
@@ -188,11 +191,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     watch,
     setError,
   } = useForm<BulkCreateFormData>({
-    resolver: yupResolver(createValidationSchema(t)),
+    resolver: yupResolver(createValidationSchema(t)) as any,
     defaultValues,
   });
 
-  // 폼 초기화
+  // Form initialization
   useEffect(() => {
     if (open) {
       reset(defaultValues);
@@ -203,12 +206,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     }
   }, [open, reset]);
 
-  // 태그 목록 및 메시지 템플릿 로드
+  // Load tag list and message templates
   useEffect(() => {
     if (open) {
       const loadTags = async () => {
         try {
-          const tags = await tagService.list();
+          const tags = await tagService.list(projectApiPath);
           setAllTags(tags);
         } catch (error) {
           console.error('Failed to load tags:', error);
@@ -217,7 +220,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
       const loadTemplates = async () => {
         try {
-          const result = await messageTemplateService.list({
+          const result = await messageTemplateService.list(projectApiPath, {
             type: 'maintenance',
             isEnabled: true,
           });
@@ -232,33 +235,12 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     }
   }, [open]);
 
-  // 점검 메시지 로케일 관리 함수들
-  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
-    if (!maintenanceLocales.find((l) => l.lang === lang)) {
-      const newLocales = [...maintenanceLocales, { lang, message: '' }];
-      setMaintenanceLocales(newLocales);
-      setValue('maintenanceLocales', newLocales);
-    }
-  };
-
-  const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
-    const newLocales = maintenanceLocales.map((l) => (l.lang === lang ? { ...l, message } : l));
-    setMaintenanceLocales(newLocales);
-    setValue('maintenanceLocales', newLocales);
-  };
-
-  const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
-    const newLocales = maintenanceLocales.filter((l) => l.lang !== lang);
-    setMaintenanceLocales(newLocales);
-    setValue('maintenanceLocales', newLocales);
-  };
-
-  // 언어별 메시지 사용 여부 변경
+  // Toggle multi-language message support
   const handleSupportsMultiLanguageChange = (enabled: boolean) => {
     setSupportsMultiLanguage(enabled);
     setValue('supportsMultiLanguage', enabled);
     if (enabled) {
-      // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
+      // On enable, preserve existing values and add missing languages
       const availableLanguages = [
         { code: 'ko' as const, label: t('clientVersions.maintenance.korean') },
         { code: 'en' as const, label: t('clientVersions.maintenance.english') },
@@ -271,22 +253,25 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       setMaintenanceLocales(merged);
       setValue('maintenanceLocales', merged);
     } else {
-      // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/form 값은 건드리지 않음)
+      // On disable, keep input values and only hide UI (do not modify state/form values)
       // no-op
     }
   };
 
-  // 현재 상태 감시
+  // Watch current status
   const currentStatus = watch('clientStatus');
   const isMaintenanceMode = currentStatus === ClientStatus.MAINTENANCE;
 
-  // 선택된 플랫폼이 변경될 때 platforms 배열 업데이트 및 기본값 적용
+  // Update platforms array and apply defaults when selected platforms change
   useEffect(() => {
     const applyPlatformDefaults = async () => {
       const newPlatforms: PlatformSpecificSettings[] = await Promise.all(
         selectedPlatforms.map(async (platform) => {
           try {
-            const defaults = await PlatformDefaultsService.getPlatformDefaults(platform);
+            const defaults = await PlatformDefaultsService.getPlatformDefaults(
+              projectApiPath,
+              platform
+            );
             return {
               platform,
               gameServerAddress: defaults.gameServerAddress || '',
@@ -312,15 +297,15 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     applyPlatformDefaults();
   }, [selectedPlatforms, setValue]);
 
-  // 플랫폼 선택 핸들러
+  // Platform selection handler
   const handlePlatformChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
     setSelectedPlatforms(typeof value === 'string' ? value.split(',') : value);
   };
 
-  // 폼 제출 핸들러
+  // Form submission handler
   const onSubmit = async (data: BulkCreateFormData) => {
-    // 플랫폼 선택 검증
+    // Platform selection validation
     if (selectedPlatforms.length === 0) {
       setError('platforms', {
         type: 'manual',
@@ -332,7 +317,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     try {
       setLoading(true);
 
-      // 템플릿 모드일 때 메시지 처리
+      // Handle message for template mode
       let finalMaintenanceMessage = data.maintenanceMessage;
       let finalMaintenanceLocales = maintenanceLocales.filter((l) => l.message.trim() !== '');
 
@@ -353,7 +338,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         }
       }
 
-      // 빈 문자열을 undefined로 변환하고 태그 데이터 포함
+      // Convert empty strings to undefined and include tag data
       const cleanedData = {
         ...data,
         externalClickLink: data.externalClickLink || undefined,
@@ -369,18 +354,21 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || undefined,
           patchAddressForWhiteList: platform.patchAddressForWhiteList || undefined,
         })),
-        // 선택된 태그를 포함 (필요한 필드만 전송)
+        // Include selected tags (send only required fields)
         tags:
           selectedTags && selectedTags.length > 0
             ? selectedTags.map((tag) => ({
-                id: tag.id,
-                name: tag.name,
-                color: tag.color,
-              }))
+              id: tag.id,
+              name: tag.name,
+              color: tag.color,
+            }))
             : [],
       };
 
-      const result = await ClientVersionService.bulkCreateClientVersions(cleanedData);
+      const result = await ClientVersionService.bulkCreateClientVersions(
+        projectApiPath,
+        cleanedData
+      );
 
       enqueueSnackbar(t('clientVersions.bulkCreateSuccess', { count: result?.length || 0 }), {
         variant: 'success',
@@ -433,7 +421,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       zIndex={1300}
     >
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit as any)}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -442,15 +430,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       >
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -462,7 +442,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   gap: 1,
                 }}
               >
-                📋 {t('clientVersions.form.basicInfo')}
+                {t('clientVersions.form.basicInfo')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t('clientVersions.form.bulkBasicInfoDescription')}
@@ -508,7 +488,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       *
                     </Typography>
                   </InputLabel>
-                  <Select
+                  <Select<string[]>
                     labelId="bulk-platform-label"
                     multiple
                     value={selectedPlatforms}
@@ -614,7 +594,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     onMaintenanceLocalesChange={(locales) => {
                       setMaintenanceLocales(locales);
                       setValue('maintenanceLocales', locales);
-                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
+                      // Auto-enable multi-language messages when translation results exist
                       const hasNonEmptyLocales = locales.some(
                         (l) => l.message && l.message.trim() !== ''
                       );
@@ -633,15 +613,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               </Stack>
             </Paper>
 
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
+            <Paper variant="outlined" elevation={0} sx={{ p: 2 }}>
               <Typography
                 variant="h6"
                 gutterBottom
@@ -653,7 +625,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   gap: 1,
                 }}
               >
-                🏷️ {t('common.tags')}
+                {t('common.tags')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t('clientVersions.form.tagsHelp')}
@@ -728,15 +700,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               />
             </Paper>
 
-            <Accordion
-              defaultExpanded={false}
-              disableGutters
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.default',
-              }}
-            >
+            <Accordion defaultExpanded={false} disableGutters variant="outlined">
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography
                   variant="subtitle1"
@@ -748,7 +712,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     gap: 1,
                   }}
                 >
-                  ⚙️ {t('clientVersions.form.additionalSettings')}
+                  {t('clientVersions.form.additionalSettings')}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -842,7 +806,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     gap: 1,
                   }}
                 >
-                  🌐 {t('clientVersions.form.serverAddresses')}
+                  {t('clientVersions.form.serverAddresses')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {t('clientVersions.form.platformSpecificDescription')}
@@ -862,7 +826,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           gap: 1,
                         }}
                       >
-                        📱 {platform.toUpperCase()}
+                        {platform.toUpperCase()}
                       </Typography>
 
                       <Stack spacing={2}>

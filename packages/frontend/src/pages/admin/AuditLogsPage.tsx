@@ -78,7 +78,7 @@ import { AuditLogService, AuditLogFilters } from '../../services/auditLogService
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed, formatRelativeTime } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
@@ -88,8 +88,8 @@ import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
 } from '../../components/common/DynamicFilterBar';
-import { InputAdornment } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+import PageContentLoader from '@/components/common/PageContentLoader';
+import SearchTextField from '@/components/common/SearchTextField';
 
 // Column definition interface
 interface ColumnConfig {
@@ -158,7 +158,7 @@ const AuditLogsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
 
-  // 페이지 상태 관리 (localStorage 연동)
+  // 페이지 State management (localStorage 연동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -203,11 +203,11 @@ const AuditLogsPage: React.FC = () => {
   // Filters - localStorage에서 복원
   const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
 
-  // 동적 필터 상태
+  // 동적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 디바운싱된 검색어 (500ms 지연)
+  // Debouncing된 Search어 (500ms 지연)
   const debouncedUserFilter = useDebounce(userFilter, 500);
 
   // Column configuration
@@ -377,7 +377,7 @@ const AuditLogsPage: React.FC = () => {
     const restoredFilters: ActiveFilter[] = [];
     const filters = pageState.filters;
 
-    // action 필터 복원
+    // action Filter 복원
     if (filters.action) {
       restoredFilters.push({
         key: 'action',
@@ -387,7 +387,7 @@ const AuditLogsPage: React.FC = () => {
       });
     }
 
-    // resource_type 필터 복원
+    // resource_type Filter 복원
     if (filters.resource_type) {
       restoredFilters.push({
         key: 'resource_type',
@@ -399,7 +399,7 @@ const AuditLogsPage: React.FC = () => {
       });
     }
 
-    // ip_address 필터 복원
+    // ip_address Filter 복원
     if (filters.ip_address) {
       restoredFilters.push({
         key: 'ip_address',
@@ -461,20 +461,20 @@ const AuditLogsPage: React.FC = () => {
     switch (columnId) {
       case 'createdAt':
         return (
-          <Tooltip title={formatDateTimeDetailed((log as any).createdAt || log.created_at)}>
+          <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
             <Typography variant="body2">
-              {formatRelativeTime((log as any).createdAt || log.created_at, undefined, language)}
+              {formatRelativeTime(log.createdAt, undefined, language)}
             </Typography>
           </Tooltip>
         );
       case 'user':
-        return log.user_name ? (
+        return log.userName ? (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {log.user_name}
+              {log.userName}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {log.user_email}
+              {log.userEmail}
             </Typography>
           </Box>
         ) : (
@@ -496,7 +496,7 @@ const AuditLogsPage: React.FC = () => {
         return resourceType ? (
           <Box>
             <Typography variant="body2" fontWeight="medium">
-              {t(`auditLogs.resources.${resourceType}`, resourceType)}
+              {String(t(`auditLogs.resources.${resourceType}`, resourceType))}
             </Typography>
             {(() => {
               const oldVals = (log as any).oldValues || (log as any).old_values;
@@ -530,7 +530,7 @@ const AuditLogsPage: React.FC = () => {
       case 'ipAddress':
         return (
           <Typography variant="body2" fontFamily="monospace">
-            {(log as any).ipAddress || log.ip_address || '-'}
+            {log.ipAddress || '-'}
           </Typography>
         );
       case 'description':
@@ -656,52 +656,12 @@ const AuditLogsPage: React.FC = () => {
             />
 
             {/* Search */}
-            <TextField
+            <SearchTextField
               placeholder={t('auditLogs.searchUserPlaceholder')}
-              size="small"
-              sx={{
-                minWidth: 200,
-                flexGrow: 1,
-                maxWidth: 320,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    },
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    },
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                },
-              }}
               value={userFilter}
-              onChange={(e) => {
-                const value = e.target.value;
+              onChange={(value) => {
                 setUserFilter(value);
                 handleFilterChange('user', value);
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
               }}
             />
 
@@ -735,16 +695,12 @@ const AuditLogsPage: React.FC = () => {
 
       {/* Audit Logs Table */}
 
-      <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingAuditLogs')}</Typography>
-            </Box>
-          ) : auditLogs.length === 0 ? (
-            <EmptyState message={t('auditLogs.noLogsFound')} />
-          ) : (
-            <>
+      <PageContentLoader loading={isInitialLoad && loading}>
+        {auditLogs.length === 0 ? (
+          <EmptyPagePlaceholder message={t('auditLogs.noLogsFound')} />
+        ) : (
+          <Card sx={{ position: 'relative' }}>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer
                 sx={{
                   opacity: !isInitialLoad && loading ? 0.5 : 1,
@@ -801,7 +757,7 @@ const AuditLogsPage: React.FC = () => {
                         </TableRow>
 
                         {/* Expanded Detail Row */}
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             style={{ paddingBottom: 0, paddingTop: 0 }}
                             colSpan={columns.filter((col) => col.visible).length + 1}
@@ -841,17 +797,19 @@ const AuditLogsPage: React.FC = () => {
                                   {((log as any).resourceType ||
                                     (log as any).resource_type ||
                                     (log as any).entityType) && (
-                                      <Chip
-                                        label={t(
+                                    <Chip
+                                      label={String(
+                                        t(
                                           `auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`,
                                           (log as any).resourceType ||
-                                          (log as any).resource_type ||
-                                          (log as any).entityType
-                                        )}
-                                        variant="outlined"
-                                        size="small"
-                                      />
-                                    )}
+                                            (log as any).resource_type ||
+                                            (log as any).entityType
+                                        )
+                                      )}
+                                      variant="outlined"
+                                      size="small"
+                                    />
+                                  )}
                                 </Box>
 
                                 {/* Detail Fields in OpenSearch Discovery Style */}
@@ -880,17 +838,9 @@ const AuditLogsPage: React.FC = () => {
                                       variant="body1"
                                       sx={{ mt: 0.5, fontFamily: 'monospace' }}
                                     >
-                                      <Tooltip
-                                        title={formatDateTimeDetailed(
-                                          (log as any).createdAt || log.created_at
-                                        )}
-                                      >
+                                      <Tooltip title={formatDateTimeDetailed(log.createdAt)}>
                                         <span>
-                                          {formatRelativeTime(
-                                            (log as any).createdAt || log.created_at,
-                                            undefined,
-                                            language
-                                          )}
+                                          {formatRelativeTime(log.createdAt, undefined, language)}
                                         </span>
                                       </Tooltip>
                                     </Typography>
@@ -912,10 +862,10 @@ const AuditLogsPage: React.FC = () => {
                                       {t('auditLogs.user')}
                                     </Typography>
                                     <Box sx={{ mt: 0.5 }}>
-                                      {log.user_name ? (
+                                      {log.userName ? (
                                         <>
                                           <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                            {log.user_name}
+                                            {log.userName}
                                           </Typography>
                                           <Typography
                                             variant="body2"
@@ -925,7 +875,7 @@ const AuditLogsPage: React.FC = () => {
                                               fontSize: '0.8rem',
                                             }}
                                           >
-                                            {log.user_email}
+                                            {log.userEmail}
                                           </Typography>
                                         </>
                                       ) : (
@@ -942,69 +892,69 @@ const AuditLogsPage: React.FC = () => {
                                   {((log as any).resourceId ||
                                     (log as any).resource_id ||
                                     (log as any).entityId) && (
-                                      <>
-                                        <Box>
-                                          <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            sx={{
-                                              fontWeight: 600,
-                                              textTransform: 'uppercase',
-                                              letterSpacing: 0.5,
-                                            }}
-                                          >
-                                            {t('auditLogs.resource')}
-                                          </Typography>
-                                          <Box sx={{ mt: 0.5 }}>
-                                            {(() => {
-                                              const oldVals =
-                                                (log as any).oldValues || (log as any).old_values;
-                                              const newVals =
-                                                (log as any).newValues || (log as any).new_values;
-                                              const resourceName =
-                                                oldVals?.name ||
-                                                newVals?.name ||
-                                                oldVals?.worldId ||
-                                                newVals?.worldId;
-                                              const resourceType =
-                                                (log as any).resourceType ||
-                                                (log as any).resource_type ||
-                                                (log as any).entityType;
-                                              const resourceId =
-                                                (log as any).resourceId ||
-                                                (log as any).resource_id ||
-                                                (log as any).entityId;
+                                    <>
+                                      <Box>
+                                        <Typography
+                                          variant="caption"
+                                          color="text.secondary"
+                                          sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: 0.5,
+                                          }}
+                                        >
+                                          {t('auditLogs.resource')}
+                                        </Typography>
+                                        <Box sx={{ mt: 0.5 }}>
+                                          {(() => {
+                                            const oldVals =
+                                              (log as any).oldValues || (log as any).old_values;
+                                            const newVals =
+                                              (log as any).newValues || (log as any).new_values;
+                                            const resourceName =
+                                              oldVals?.name ||
+                                              newVals?.name ||
+                                              oldVals?.worldId ||
+                                              newVals?.worldId;
+                                            const resourceType =
+                                              (log as any).resourceType ||
+                                              (log as any).resource_type ||
+                                              (log as any).entityType;
+                                            const resourceId =
+                                              (log as any).resourceId ||
+                                              (log as any).resource_id ||
+                                              (log as any).entityId;
 
-                                              return (
-                                                <>
-                                                  {resourceName && (
-                                                    <Typography
-                                                      variant="body1"
-                                                      sx={{
-                                                        fontWeight: 600,
-                                                        mb: 0.5,
-                                                      }}
-                                                    >
-                                                      {resourceName}
-                                                    </Typography>
-                                                  )}
+                                            return (
+                                              <>
+                                                {resourceName && (
                                                   <Typography
-                                                    variant="body2"
+                                                    variant="body1"
                                                     sx={{
-                                                      fontFamily: 'monospace',
-                                                      color: 'text.secondary',
+                                                      fontWeight: 600,
+                                                      mb: 0.5,
                                                     }}
                                                   >
-                                                    {resourceType} #{resourceId}
+                                                    {resourceName}
                                                   </Typography>
-                                                </>
-                                              );
-                                            })()}
-                                          </Box>
+                                                )}
+                                                <Typography
+                                                  variant="body2"
+                                                  sx={{
+                                                    fontFamily: 'monospace',
+                                                    color: 'text.secondary',
+                                                  }}
+                                                >
+                                                  {resourceType} #{resourceId}
+                                                </Typography>
+                                              </>
+                                            );
+                                          })()}
                                         </Box>
-                                        <Divider />
-                                      </>
-                                    )}
+                                      </Box>
+                                      <Divider />
+                                    </>
+                                  )}
 
                                   {/* IP Address */}
                                   <Box>
@@ -1023,12 +973,12 @@ const AuditLogsPage: React.FC = () => {
                                       variant="body1"
                                       sx={{ mt: 0.5, fontFamily: 'monospace' }}
                                     >
-                                      {log.ip_address || log.ipAddress || '-'}
+                                      {log.ipAddress || '-'}
                                     </Typography>
                                   </Box>
 
                                   {/* User Agent */}
-                                  {(log.user_agent || log.userAgent) && (
+                                  {log.userAgent && (
                                     <>
                                       <Divider />
                                       <Box>
@@ -1053,7 +1003,7 @@ const AuditLogsPage: React.FC = () => {
                                             color: 'text.secondary',
                                           }}
                                         >
-                                          {log.user_agent || log.userAgent}
+                                          {log.userAgent}
                                         </Typography>
                                       </Box>
                                     </>
@@ -1097,6 +1047,7 @@ const AuditLogsPage: React.FC = () => {
                                               <Table size="small">
                                                 <TableHead>
                                                   <TableRow
+                                                    hover
                                                     sx={{
                                                       bgcolor: 'action.hover',
                                                     }}
@@ -1154,7 +1105,7 @@ const AuditLogsPage: React.FC = () => {
                                                     });
                                                     if (changedFields.length === 0) {
                                                       return (
-                                                        <TableRow>
+                                                        <TableRow hover>
                                                           <TableCell
                                                             colSpan={3}
                                                             align="center"
@@ -1171,6 +1122,7 @@ const AuditLogsPage: React.FC = () => {
                                                     return changedFields.map(
                                                       ({ key, oldVal, newVal }) => (
                                                         <TableRow
+                                                          hover
                                                           key={key}
                                                           sx={{
                                                             '&:nth-of-type(odd)': {
@@ -1361,10 +1313,10 @@ const AuditLogsPage: React.FC = () => {
                 onRowsPerPageChange={handleRowsPerPageChange}
                 rowsPerPageOptions={[5, 10, 25, 50, 100]}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Column Settings Popover */}
       <Popover

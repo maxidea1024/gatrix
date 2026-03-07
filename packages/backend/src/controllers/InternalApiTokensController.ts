@@ -1,7 +1,9 @@
 import { Response } from 'express';
 import { SDKRequest } from '../middleware/apiTokenAuth';
 import knex from '../config/knex';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('InternalApiTokens');
 import apiTokenUsageService from '../services/ApiTokenUsageService';
 import {
   sendForbidden,
@@ -54,14 +56,14 @@ class InternalApiTokensController {
       const environmentAssignments =
         tokenIds.length > 0
           ? await knex('g_api_access_token_environments')
-              .whereIn('tokenId', tokenIds)
-              .select('tokenId', 'environment')
+            .whereIn('tokenId', tokenIds)
+            .select('tokenId', 'environmentId')
           : [];
 
       // Group environment names by token
       const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
         if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environment);
+        acc[env.tokenId].push(env.environmentId);
         return acc;
       }, {});
 
@@ -78,7 +80,7 @@ class InternalApiTokensController {
         updatedAt: new Date(token.updatedAt).toISOString(),
       }));
 
-      logger.info(`[InternalApiTokens] Edge fetched ${formattedTokens.length} tokens`);
+      logger.info(`Edge fetched ${formattedTokens.length} tokens`);
 
       return sendSuccessResponse(res, {
         tokens: formattedTokens,
@@ -123,7 +125,7 @@ class InternalApiTokensController {
         );
       }
 
-      logger.info(`[InternalApiTokens] Received usage report from Edge`, {
+      logger.info(`Received usage report from Edge`, {
         edgeInstanceId,
         tokenCount: usageData.length,
         reportedAt,
@@ -135,7 +137,7 @@ class InternalApiTokensController {
         const { tokenId, usageCount } = usage;
 
         if (!tokenId || typeof usageCount !== 'number') {
-          logger.warn('[InternalApiTokens] Invalid usage entry:', usage);
+          logger.warn('Invalid usage entry:', usage);
           continue;
         }
 
@@ -146,11 +148,11 @@ class InternalApiTokensController {
           }
           processedCount++;
         } catch (error) {
-          logger.error(`[InternalApiTokens] Failed to record usage for token ${tokenId}:`, error);
+          logger.error(`Failed to record usage for token ${tokenId}:`, error);
         }
       }
 
-      logger.info(`[InternalApiTokens] Processed usage report`, {
+      logger.info(`Processed usage report`, {
         edgeInstanceId,
         processedCount,
         totalTokens: usageData.length,

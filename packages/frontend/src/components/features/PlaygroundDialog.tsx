@@ -81,6 +81,7 @@ import EmptyPlaceholder from '../common/EmptyPlaceholder';
 import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog';
 import ContextFieldChip, { ContextFieldInfo } from '../common/ContextFieldChip';
 
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 interface ContextField {
   fieldName: string;
   displayName: string;
@@ -189,6 +190,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
   initialFlagDetails,
 }) => {
   const { t } = useTranslation();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -329,14 +332,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   const loadEnvironments = async () => {
     try {
-      const envs = await environmentService.getEnvironments();
+      const envs = await environmentService.getEnvironments(projectApiPath);
       const filteredEnvs = envs
         .filter((e) => !e.isHidden)
         .sort((a, b) => a.displayOrder - b.displayOrder);
       setEnvironments(filteredEnvs);
       // In embedded mode, auto-select all environments
       if (embedded && filteredEnvs.length > 0 && selectedEnvironments.length === 0) {
-        setSelectedEnvironments(filteredEnvs.map((e) => e.environment));
+        setSelectedEnvironments(filteredEnvs.map((e) => e.environmentId));
       }
     } catch {
       setEnvironments([]);
@@ -345,7 +348,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   const loadContextFields = async () => {
     try {
-      const response = await api.get('/admin/features/context-fields');
+      const response = await api.get(`${projectApiPath}/features/context-fields`);
       setContextFields(response.data?.contextFields || []);
     } catch {
       setContextFields([]);
@@ -354,7 +357,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
 
   const loadAvailableFlags = async () => {
     try {
-      const response = await api.get('/admin/features', {
+      const response = await api.get(`${projectApiPath}/features`, {
         params: { page: 1, limit: 1000, isArchived: false },
       });
       const flags = response.data?.data || [];
@@ -385,7 +388,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       setLoadingFlagDetails(true);
       setFlagDetails(null);
       featureFlagService
-        .getFeatureFlag(selectedEvaluation.flagName)
+        .getFeatureFlag(selectedEvaluation.flagName, projectApiPath)
         .then((flag) => {
           setFlagDetails(flag);
         })
@@ -415,8 +418,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       ALL_STRATEGIES_DISABLED: t('playground.reasons.ALL_STRATEGIES_DISABLED'),
       STRATEGY_MATCHED: reasonDetails?.strategyName
         ? t('playground.reasons.strategyMatched', {
-          strategy: localizeStrategyName(reasonDetails.strategyName),
-        })
+            strategy: localizeStrategyName(reasonDetails.strategyName),
+          })
         : t('playground.reasons.defaultStrategy'),
       NO_MATCHING_STRATEGY: t('playground.reasons.NO_MATCHING_STRATEGY'),
       CONTEXT_VALIDATION_FAILED: t('playground.reasons.contextValidationFailed'),
@@ -544,7 +547,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     // Determine which environments to check (selected or all)
     const envsToCheck =
       selectedEnvironments.length > 0
-        ? environments.filter((e) => selectedEnvironments.includes(e.environment))
+        ? environments.filter((e) => selectedEnvironments.includes(e.environmentId))
         : environments;
 
     if (envsToCheck.length > 0) {
@@ -552,8 +555,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       for (const flagName of flagNames) {
         for (const env of envsToCheck) {
           try {
-            const response = await api.get(`/admin/features/${flagName}`, {
-              headers: { 'x-environment': env.environment },
+            const response = await api.get(`${projectApiPath}/features/${flagName}`, {
+              headers: { 'x-environment-id': env.environmentId },
             });
             const data = response.data?.flag || response.data;
             const strategies = data.strategies || [];
@@ -598,7 +601,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
     // Fetch segment constraints if any segments are used
     if (segmentNames.size > 0) {
       try {
-        const response = await api.get('/admin/features/segments');
+        const response = await api.get(`${projectApiPath}/features/segments`);
         const segments = response.data?.segments || response.data?.data?.segments || [];
         for (const segment of segments) {
           if (segmentNames.has(segment.name) && segment.constraints) {
@@ -735,7 +738,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
       const envsToEvaluate =
         selectedEnvironments.length > 0
           ? selectedEnvironments
-          : environments.map((e) => e.environment);
+          : environments.map((e) => e.environmentId);
 
       const requestBody: any = {
         environments: envsToEvaluate,
@@ -747,7 +750,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
         requestBody.flagNames = selectedFlags;
       }
 
-      const response = await api.post('/admin/features/playground', requestBody);
+      const response = await api.post(`${projectApiPath}/features/playground`, requestBody);
 
       setResults(response.data?.results || {});
       setContextWarnings(response.data?.contextWarnings || []);
@@ -953,8 +956,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 // Only use legalValues from validationRules when rules are enabled
                 const effectiveLegalValues =
                   rulesEnabled &&
-                    contextField?.validationRules?.legalValues &&
-                    contextField.validationRules.legalValues.length > 0
+                  contextField?.validationRules?.legalValues &&
+                  contextField.validationRules.legalValues.length > 0
                     ? contextField.validationRules.legalValues
                     : null;
                 const hasLegalValues =
@@ -1663,7 +1666,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   {/* Hide flag name column in embedded mode (single flag) */}
                   {!embedded && <TableCell>{t('featureFlags.flagName')}</TableCell>}
                   {evaluatedEnvs.map((env) => {
-                    const envData = environments.find((e) => e.environment === env);
+                    const envData = environments.find((e) => e.environmentId === env);
                     const label = envData?.displayName || env;
                     return (
                       <TableCell
@@ -1780,9 +1783,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                   transition: 'all 0.2s',
                                   '&:hover': hasDetails
                                     ? {
-                                      bgcolor: 'action.hover',
-                                      transform: 'scale(1.1)',
-                                    }
+                                        bgcolor: 'action.hover',
+                                        transform: 'scale(1.1)',
+                                      }
                                     : {},
                                 }}
                                 onClick={(e) => {
@@ -1932,7 +1935,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                   }}
                 >
                   <Typography variant="caption" fontWeight={700} color="text.secondary">
-                    {t('playground.environment')}
+                    {t('common.name')}
                   </Typography>
                 </Box>
                 <Box
@@ -2000,7 +2003,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 >
                   {(() => {
                     const envData = environments.find(
-                      (e) => e.environment === selectedEvaluation.env
+                      (e) => e.environmentId === selectedEvaluation.env
                     );
                     return (
                       <Chip
@@ -2088,7 +2091,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 (() => {
                   // Find environment strategies
                   const envConfig = flagDetails.environments?.find(
-                    (e: any) => e.environment === selectedEvaluation.env
+                    (e: any) => e.environmentId === selectedEvaluation.env
                   );
 
                   // If there's an environment override, use its strategies.
@@ -2159,24 +2162,24 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 position: 'relative',
                                 '&::before': isMatched
                                   ? {
-                                    content: '""',
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 0,
-                                    bottom: 0,
-                                    width: 4,
-                                    bgcolor: 'success.main',
-                                  }
-                                  : wasEvaluated && !stepResult?.passed
-                                    ? {
                                       content: '""',
                                       position: 'absolute',
                                       left: 0,
                                       top: 0,
                                       bottom: 0,
                                       width: 4,
-                                      bgcolor: 'error.main',
+                                      bgcolor: 'success.main',
                                     }
+                                  : wasEvaluated && !stepResult?.passed
+                                    ? {
+                                        content: '""',
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        width: 4,
+                                        bgcolor: 'error.main',
+                                      }
                                     : {},
                               }}
                             >
@@ -2649,7 +2652,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                             const isStrategy = step.step === 'STRATEGY_EVALUATION';
                             const stepBgColor = stepIdx % 2 === 0 ? 'transparent' : 'action.hover';
                             const envDisplayName =
-                              environments.find((e) => e.environment === selectedEvaluation.env)
+                              environments.find((e) => e.environmentId === selectedEvaluation.env)
                                 ?.displayName || selectedEvaluation.env;
 
                             return (
@@ -2658,7 +2661,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 sx={{
                                   borderBottom:
                                     stepIdx <
-                                      (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
+                                    (selectedEvaluation.result.evaluationSteps?.length || 1) - 1
                                       ? 1
                                       : 0,
                                   borderColor: 'divider',
@@ -2761,9 +2764,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     ? t('playground.contextErrors.emptyValue')
                                                     : err.type === 'TYPE_MISMATCH'
                                                       ? t('playground.contextErrors.typeMismatch', {
-                                                        expected: err.data?.expectedType,
-                                                        actual: err.data?.actualType,
-                                                      })
+                                                          expected: err.data?.expectedType,
+                                                          actual: err.data?.actualType,
+                                                        })
                                                       : err.type === 'INVALID_VALUE'
                                                         ? t('playground.contextErrors.invalidValue')
                                                         : err.type === 'WHITESPACE'
@@ -2818,9 +2821,9 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     allSkipped
                                                       ? t('playground.checkAllSkipped')
                                                       : t('playground.checkCountDetail', {
-                                                        passed: passedCount,
-                                                        total: totalCount,
-                                                      })
+                                                          passed: passedCount,
+                                                          total: totalCount,
+                                                        })
                                                   }
                                                   size="small"
                                                   sx={{
@@ -2900,7 +2903,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                   } else if (
                                                     (prevCheck.type === 'CONSTRAINTS_CHECK' ||
                                                       prevCheck.type === 'STRATEGY_CONSTRAINT') &&
-                                                    (check.type === 'ROLLOUT' || check.type === 'STRATEGY_RULE')
+                                                    (check.type === 'ROLLOUT' ||
+                                                      check.type === 'STRATEGY_RULE')
                                                   ) {
                                                     showOperator = true;
                                                     operatorType = 'AND';
@@ -2908,7 +2912,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                     (prevCheck.type === 'SEGMENTS_CHECK' ||
                                                       prevCheck.type === 'SEGMENT' ||
                                                       prevCheck.type === 'SEGMENT_CONSTRAINT') &&
-                                                    (check.type === 'ROLLOUT' || check.type === 'STRATEGY_RULE')
+                                                    (check.type === 'ROLLOUT' ||
+                                                      check.type === 'STRATEGY_RULE')
                                                   ) {
                                                     showOperator = true;
                                                     operatorType = 'AND';
@@ -3033,14 +3038,14 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                           >
                                                             {check.rollout === 100
                                                               ? t(
-                                                                'playground.checkMessages.rollout100'
-                                                              )
+                                                                  'playground.checkMessages.rollout100'
+                                                                )
                                                               : t('playground.rolloutDetail', {
-                                                                percentage:
-                                                                  check.percentage?.toFixed(1) ??
-                                                                  '?',
-                                                                rollout: check.rollout ?? 100,
-                                                              })}
+                                                                  percentage:
+                                                                    check.percentage?.toFixed(1) ??
+                                                                    '?',
+                                                                  rollout: check.rollout ?? 100,
+                                                                })}
                                                           </Typography>
                                                         ) : check.constraint ? (
                                                           <Box sx={{ mt: 0.5 }}>
@@ -3084,7 +3089,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                 >
                                                                   {check.contextValue ===
                                                                     undefined ||
-                                                                    check.contextValue === null ? (
+                                                                  check.contextValue === null ? (
                                                                     <span
                                                                       style={{
                                                                         color: '#d32f2f',
@@ -3140,15 +3145,15 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                             sx={{ display: 'block' }}
                                                           >
                                                             {check.message ===
-                                                              'Segment has no constraints - passed'
+                                                            'Segment has no constraints - passed'
                                                               ? t(
-                                                                'playground.checkMessages.segmentNoConstraints'
-                                                              )
-                                                              : check.message ===
-                                                                'Segment not found - skipped'
-                                                                ? t(
-                                                                  'playground.checkMessages.segmentNotFound'
+                                                                  'playground.checkMessages.segmentNoConstraints'
                                                                 )
+                                                              : check.message ===
+                                                                  'Segment not found - skipped'
+                                                                ? t(
+                                                                    'playground.checkMessages.segmentNotFound'
+                                                                  )
                                                                 : check.message}
                                                           </Typography>
                                                         ) : check.type === 'STRATEGY_RULE' ? (
@@ -3174,7 +3179,10 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                                                 }}
                                                               >
                                                                 {Object.entries(
-                                                                  check.details as Record<string, unknown>
+                                                                  check.details as Record<
+                                                                    string,
+                                                                    unknown
+                                                                  >
                                                                 ).map(([key, val]) => (
                                                                   <Box
                                                                     key={key}
@@ -3423,8 +3431,8 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                                 {innerValue === ''
                                   ? t('common.emptyString')
                                   : typeof innerValue === 'object' &&
-                                    innerValue !== null &&
-                                    Object.keys(innerValue).length === 0
+                                      innerValue !== null &&
+                                      Object.keys(innerValue).length === 0
                                     ? t('common.emptyObject')
                                     : innerValue}
                               </Typography>
@@ -3686,7 +3694,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                       null,
                       2
                     )}
-                    onChange={() => { }}
+                    onChange={() => {}}
                     readOnly
                     height={200}
                   />
@@ -3777,7 +3785,7 @@ const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({
                 </Box>
                 <Autocomplete
                   multiple
-                  options={environments.map((e) => e.environment)}
+                  options={environments.map((e) => e.environmentId)}
                   value={selectedEnvironments}
                   onChange={(_, value) => setSelectedEnvironments(value)}
                   renderInput={(params) => (

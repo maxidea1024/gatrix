@@ -6,7 +6,8 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "packages/sdks/*"
+    "packages/sdks/*",
+    "packages/evaluator"
   ],
   "scripts": {
     "dev": "concurrently -k \"yarn dev:backend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:frontend\" \"wait-on http://localhost:45000/api/v1/ready && yarn dev:edge\"",
@@ -23,7 +24,7 @@
     "infra:down": "docker compose -f docker-compose-infra.yml down",
     "infra:logs": "docker compose -f docker-compose-infra.yml logs -f",
     "build": "yarn build:shared && yarn build:sdk && yarn build:docs && yarn build:apps",
-    "build:shared": "yarn workspace @gatrix/shared build",
+    "build:shared": "yarn workspace @gatrix/shared build && yarn workspace @gatrix/evaluator build",
     "build:sdk": "yarn workspace @gatrix/server-sdk build",
     "build:apps": "concurrently -n backend,frontend,edge,event-lens,chat-server -c blue,green,cyan,yellow,magenta \"yarn build:backend\" \"yarn build:frontend\" \"yarn build:edge\" \"yarn build:event-lens\" \"yarn build:chat-server\"",
     "build:backend": "yarn workspace @gatrix/backend build",
@@ -42,7 +43,17 @@
     "test:chat-server": "yarn workspace @gatrix/chat-server test",
     "test:e2e": "yarn workspace @gatrix/frontend test:e2e",
     "lint": "yarn workspace @gatrix/backend lint && yarn workspace @gatrix/frontend lint && yarn workspace @gatrix/edge lint && yarn workspace @gatrix/event-lens lint && yarn workspace @gatrix/chat-server lint",
+    "lint:backend": "yarn workspace @gatrix/backend lint",
+    "lint:frontend": "yarn workspace @gatrix/frontend lint",
+    "lint:edge": "yarn workspace @gatrix/edge lint",
+    "lint:event-lens": "yarn workspace @gatrix/event-lens lint",
+    "lint:chat-server": "yarn workspace @gatrix/chat-server lint",
     "lint:fix": "yarn workspace @gatrix/backend lint:fix && yarn workspace @gatrix/frontend lint:fix && yarn workspace @gatrix/edge lint:fix && yarn workspace @gatrix/event-lens lint:fix && yarn workspace @gatrix/chat-server lint:fix",
+    "lint:fix:backend": "yarn workspace @gatrix/backend lint:fix",
+    "lint:fix:frontend": "yarn workspace @gatrix/frontend lint:fix",
+    "lint:fix:edge": "yarn workspace @gatrix/edge lint:fix",
+    "lint:fix:event-lens": "yarn workspace @gatrix/event-lens lint:fix",
+    "lint:fix:chat-server": "yarn workspace @gatrix/chat-server lint:fix",
     "typecheck": "yarn workspace @gatrix/backend typecheck && yarn workspace @gatrix/frontend typecheck && yarn workspace @gatrix/event-lens typecheck",
     "check-translations": "node scripts/check-translations.js",
     "clean": "yarn workspace @gatrix/backend clean && yarn workspace @gatrix/frontend clean && yarn workspace @gatrix/event-lens clean",

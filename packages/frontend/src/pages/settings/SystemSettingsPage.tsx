@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -25,13 +25,16 @@ import { parseApiErrorMessage } from '../../utils/errorUtils';
 import KeyValuePage from './KeyValuePage';
 
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 // System Settings Page - requires admin role + system-settings permission
 const SystemSettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user, hasPermission } = useAuth();
   const { currentEnvironmentId } = useEnvironment();
-  const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
+  const canManage = hasPermission([P.SYSTEM_SETTINGS_UPDATE]);
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -55,7 +58,7 @@ const SystemSettingsPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const [admind] = await Promise.all([varsService.get('admindUrl')]);
+        const [admind] = await Promise.all([varsService.get(projectApiPath, 'admindUrl')]);
         setAdmindUrl(admind || '');
       } catch (e) {
         // ignore load errors
@@ -65,7 +68,7 @@ const SystemSettingsPage: React.FC = () => {
 
   // Load service discovery config
   useEffect(() => {
-    if (user?.role === 'admin') {
+    if (hasPermission([P.SYSTEM_SETTINGS_UPDATE])) {
       (async () => {
         try {
           const config = await serviceDiscoveryConfigService.getConfig();
@@ -75,7 +78,7 @@ const SystemSettingsPage: React.FC = () => {
         }
       })();
     }
-  }, [user]);
+  }, []);
 
   // Save service discovery config
   const handleSaveServiceDiscoveryConfig = async () => {
@@ -136,7 +139,7 @@ const SystemSettingsPage: React.FC = () => {
                     <Button
                       variant="contained"
                       onClick={async () => {
-                        await varsService.set('admindUrl', admindUrl || null);
+                        await varsService.set(projectApiPath, 'admindUrl', admindUrl || null);
                       }}
                     >
                       {t('common.save')}
@@ -186,7 +189,7 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) =>
                     setSdConfig({
                       ...sdConfig,
-                      defaultTtl: e.target.value === '' ? '' : parseInt(e.target.value, 10) || 30,
+                      defaultTtl: parseInt(e.target.value, 10) || 30,
                     })
                   }
                   helperText={t('settings.serviceDiscovery.defaultTtlHelp')}
@@ -200,8 +203,7 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) =>
                     setSdConfig({
                       ...sdConfig,
-                      heartbeatInterval:
-                        e.target.value === '' ? '' : parseInt(e.target.value, 10) || 15,
+                      heartbeatInterval: parseInt(e.target.value, 10) || 15,
                     })
                   }
                   helperText={t('settings.serviceDiscovery.heartbeatIntervalHelp')}

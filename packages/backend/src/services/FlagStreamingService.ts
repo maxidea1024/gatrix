@@ -17,11 +17,13 @@ import { IncomingMessage } from 'http';
 import { createClient, RedisClientType } from 'redis';
 import WebSocket, { WebSocketServer } from 'ws';
 import { config } from '../config';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('FlagStreamingService');
 
 interface StreamingClient {
   id: string;
-  environment: string;
+  environmentId: string;
   response: Response;
   connectedAt: Date;
   lastEventTime: Date;
@@ -29,7 +31,7 @@ interface StreamingClient {
 
 interface WebSocketClient {
   id: string;
-  environment: string;
+  environmentId: string;
   ws: WebSocket;
   connectedAt: Date;
   lastEventTime: Date;
@@ -98,11 +100,11 @@ class FlagStreamingService {
         try {
           const event = JSON.parse(payload) as { type: string; data: Record<string, any> };
           if (event.type === 'feature_flag.changed') {
-            const environment = event.data.environment as string;
+            const environmentId = event.data.environmentId as string;
             const changedKeys = (event.data.changedKeys as string[]) ?? [];
             const revision = (event.data.revision as number) ?? 0;
-            if (environment) {
-              this.notifyClients(environment, changedKeys, revision);
+            if (environmentId) {
+              this.notifyClients(environmentId, changedKeys, revision);
             }
           }
         } catch (err) {
@@ -195,7 +197,7 @@ class FlagStreamingService {
   /**
    * Add a new SSE client connection
    */
-  async addClient(clientId: string, environment: string, res: Response): Promise<void> {
+  async addClient(clientId: string, environmentId: string, res: Response): Promise<void> {
     // Set SSE headers
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -206,7 +208,7 @@ class FlagStreamingService {
 
     const client: StreamingClient = {
       id: clientId,
-      environment,
+      environmentId,
       response: res,
       connectedAt: new Date(),
       lastEventTime: new Date(),
@@ -215,7 +217,7 @@ class FlagStreamingService {
     this.sseClients.set(clientId, client);
 
     // Send initial 'connected' event with current global revision from Redis
-    const globalRevision = await this.getGlobalRevision(environment);
+    const globalRevision = await this.getGlobalRevision(environmentId);
     this.sendSseEvent(clientId, 'connected', { globalRevision });
 
     // Handle connection close
@@ -223,7 +225,7 @@ class FlagStreamingService {
       this.removeClient(clientId);
     });
 
-    logger.debug(`Streaming client connected: ${clientId} for env: ${environment}`);
+    logger.debug(`Streaming client connected: ${clientId} for env: ${environmentId}`);
   }
 
   /**
@@ -249,10 +251,10 @@ class FlagStreamingService {
    * Add a new WebSocket client connection.
    * Called after HTTP upgrade is handled externally.
    */
-  async addWebSocketClient(clientId: string, environment: string, ws: WebSocket): Promise<void> {
+  async addWebSocketClient(clientId: string, environmentId: string, ws: WebSocket): Promise<void> {
     const client: WebSocketClient = {
       id: clientId,
-      environment,
+      environmentId,
       ws,
       connectedAt: new Date(),
       lastEventTime: new Date(),
@@ -262,7 +264,7 @@ class FlagStreamingService {
     this.wsClients.set(clientId, client);
 
     // Send initial 'connected' event with current global revision from Redis
-    const globalRevision = await this.getGlobalRevision(environment);
+    const globalRevision = await this.getGlobalRevision(environmentId);
     this.sendWebSocketEvent(clientId, 'connected', { globalRevision });
 
     // Handle WebSocket messages (ping/pong, etc.)
@@ -287,7 +289,7 @@ class FlagStreamingService {
       this.removeWebSocketClient(clientId);
     });
 
-    logger.debug(`WebSocket client connected: ${clientId} for env: ${environment}`);
+    logger.debug(`WebSocket client connected: ${clientId} for env: ${environmentId}`);
   }
 
   /**
@@ -320,7 +322,7 @@ class FlagStreamingService {
    * @param changedKeys - Flag names that changed (from backend event)
    * @param revision - Pre-computed global revision from the event producer
    */
-  private notifyClients(environment: string, changedKeys: string[], revision: number): void {
+  private notifyClients(environmentId: string, changedKeys: string[], revision: number): void {
     const payload = {
       globalRevision: revision,
       changedKeys,
@@ -331,7 +333,7 @@ class FlagStreamingService {
 
     // Notify SSE clients
     for (const [clientId, client] of this.sseClients) {
-      if (client.environment === environment) {
+      if (client.environmentId === environmentId) {
         this.sendSseEvent(clientId, 'flags_changed', payload);
         notifiedCount++;
       }
@@ -339,7 +341,7 @@ class FlagStreamingService {
 
     // Notify WebSocket clients
     for (const [clientId, client] of this.wsClients) {
-      if (client.environment === environment) {
+      if (client.environmentId === environmentId) {
         this.sendWebSocketEvent(clientId, 'flags_changed', payload);
         notifiedCount++;
       }
@@ -347,7 +349,7 @@ class FlagStreamingService {
 
     if (notifiedCount > 0) {
       logger.debug(
-        `FlagStreamingService: Notified ${notifiedCount} clients for env=${environment}, rev=${revision}, keys=[${changedKeys.join(',')}]`
+        `FlagStreamingService: Notified ${notifiedCount} clients for env=${environmentId}, rev=${revision}, keys=[${changedKeys.join(',')}]`
       );
     }
   }
@@ -441,10 +443,10 @@ class FlagStreamingService {
    * Get current global revision for an environment from Redis.
    * Falls back to 0 if Redis is unavailable.
    */
-  private async getGlobalRevision(environment: string): Promise<number> {
+  private async getGlobalRevision(environmentId: string): Promise<number> {
     if (!this.redisClient) return 0;
     try {
-      const val = await this.redisClient.get(`${REVISION_KEY_PREFIX}${environment}`);
+      const val = await this.redisClient.get(`${REVISION_KEY_PREFIX}${environmentId}`);
       return val ? parseInt(val, 10) : 0;
     } catch (err) {
       logger.warn('FlagStreamingService: Failed to get revision from Redis:', err);
@@ -456,10 +458,10 @@ class FlagStreamingService {
    * Atomically increment and return new global revision for an environment via Redis INCR.
    * Called by FeatureFlagService.invalidateCache() once at source, NOT by each instance.
    */
-  async incrementGlobalRevision(environment: string): Promise<number> {
+  async incrementGlobalRevision(environmentId: string): Promise<number> {
     if (!this.redisClient) return 0;
     try {
-      return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environment}`);
+      return await this.redisClient.incr(`${REVISION_KEY_PREFIX}${environmentId}`);
     } catch (err) {
       logger.warn('FlagStreamingService: Failed to increment revision in Redis:', err);
       return 0;
@@ -477,12 +479,12 @@ class FlagStreamingService {
   } {
     const clientsByEnvironment: Record<string, number> = {};
     for (const [, client] of this.sseClients) {
-      clientsByEnvironment[client.environment] =
-        (clientsByEnvironment[client.environment] || 0) + 1;
+      clientsByEnvironment[client.environmentId] =
+        (clientsByEnvironment[client.environmentId] || 0) + 1;
     }
     for (const [, client] of this.wsClients) {
-      clientsByEnvironment[client.environment] =
-        (clientsByEnvironment[client.environment] || 0) + 1;
+      clientsByEnvironment[client.environmentId] =
+        (clientsByEnvironment[client.environmentId] || 0) + 1;
     }
 
     return {

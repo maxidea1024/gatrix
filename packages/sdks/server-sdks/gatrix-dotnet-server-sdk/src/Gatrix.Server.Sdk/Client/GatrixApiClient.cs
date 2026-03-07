@@ -73,7 +73,6 @@ public class GatrixApiClient
             request.Headers.Add("X-API-Token", _options.ApiToken);
             request.Headers.Add("X-Application-Name", _options.ApplicationName);
             request.Headers.Add("X-SDK-Version", SdkInfo.FullName);
-            request.Headers.Add("X-Environment", _options.Environment);
 
             if (!string.IsNullOrEmpty(etag) && method == HttpMethod.Get)
             {

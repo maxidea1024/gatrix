@@ -25,7 +25,7 @@ interface AuthContextType {
   updateProfile?: (data: any) => Promise<User>;
   changePassword?: (currentPassword: string, newPassword: string) => Promise<void>;
   clearError: () => void;
-  isAdmin: () => boolean;
+
   canAccess: (requiredRoles?: string[]) => boolean;
   getToken: () => string | null;
   hasPermission: (permission: Permission | Permission[]) => boolean;
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await api.get<{
         userId: number;
         permissions: Permission[];
-      }>(`/admin/users/${userId}/permissions`);
+      }>('/admin/users/me/permissions');
       setPermissions(response.data?.permissions || []);
     } catch (error) {
       devLogger.error('Failed to fetch permissions:', error);
@@ -161,9 +161,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   };
 
-  const isAdmin = (): boolean => {
-    return user?.role === 'admin';
-  };
+
 
   const canAccess = (requiredRoles?: string[]): boolean => {
     if (!isAuthenticated || !user) {
@@ -178,7 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true;
     }
 
-    return requiredRoles.includes(user.role);
+    return permissions.length > 0;
   };
 
   const getToken = (): string | null => {
@@ -186,42 +184,62 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Check if user has a specific permission or any of the permissions
+  // Supports wildcard matching: '*:*', 'resource:*', '*:action'
   const hasPermission = useCallback(
     (permission: Permission | Permission[]): boolean => {
       if (!isAuthenticated || !user) {
         return false;
       }
 
-      // Admin users with role 'admin' need to have permissions assigned
-      if (user.role !== 'admin') {
-        return false;
-      }
+      // All users can have permissions assigned via RBAC roles
 
       // While permissions are loading, return false to prevent showing menus prematurely
       if (permissionsLoading) {
         return false;
       }
 
-      // Check for wildcard permission '*' that grants all permissions
-      if (permissions.includes('*')) {
+      // Check for wildcard permission '*' or '*:*' that grants all permissions
+      if (permissions.includes('*' as Permission) || permissions.includes('*:*' as Permission)) {
         return true;
       }
 
       const requiredPermissions = Array.isArray(permission) ? permission : [permission];
-      return requiredPermissions.some((p) => permissions.includes(p));
+
+      // Use wildcard matching: check if any granted permission matches any required permission
+      return requiredPermissions.some((required) =>
+        permissions.some((granted) => {
+          // Exact match
+          if (granted === required) return true;
+
+          // Wildcard matching for resource:action pattern
+          const grantedParts = (granted as string).split(':');
+          const requiredParts = required.split(':');
+          if (grantedParts.length === 2 && requiredParts.length === 2) {
+            const [gResource, gAction] = grantedParts;
+            const [rResource, rAction] = requiredParts;
+            // resource:* matches resource:anything
+            if (gResource === rResource && gAction === '*') return true;
+            // *:action matches anything:action
+            if (gResource === '*' && gAction === rAction) return true;
+            // *:* matches everything
+            if (gResource === '*' && gAction === '*') return true;
+          }
+          return false;
+        })
+      );
     },
     [isAuthenticated, user, permissions, permissionsLoading]
   );
 
-  // Fetch permissions when user changes
+  // Fetch permissions when user changes -- all authenticated users can have RBAC permissions
   useEffect(() => {
-    if (user?.id && user.role === 'admin') {
+    if (user?.id) {
       fetchPermissions(user.id);
     } else {
       setPermissions([]);
-      setPermissionsLoading(false); // Non-admin users don't need permission loading
+      setPermissionsLoading(false);
     }
-  }, [user?.id, user?.role, fetchPermissions]);
+  }, [user?.id, fetchPermissions]);
 
   useEffect(() => {
     // Initialize auth state from localStorage only
@@ -230,15 +248,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const MIN_LOADING_TIME = 1500; // Minimum 1.5 seconds for better UX
 
       try {
-        devLogger.info('🔄 AuthContext: Starting initialization...');
+        devLogger.info('AuthContext: Starting initialization...');
         setIsLoading(true);
 
         // Check if we have stored auth data
         const storedToken = AuthService.getStoredToken();
         const storedUser = AuthService.getStoredUser();
 
-        devLogger.debug('🔍 AuthContext: Stored token exists:', !!storedToken);
-        devLogger.debug('🔍 AuthContext: Stored user exists:', !!storedUser);
+        devLogger.debug('AuthContext: Stored token exists:', !!storedToken);
+        devLogger.debug('AuthContext: Stored user exists:', !!storedUser);
 
         if (storedToken && storedUser) {
           // Initialize API service with stored token (checks expiry)
@@ -246,23 +264,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (isValid) {
             // Use stored user data without API call to prevent infinite loop
             setUser(storedUser);
-            devLogger.info('✅ AuthContext: User authenticated from storage');
+            devLogger.info('AuthContext: User authenticated from storage');
           } else {
             // Token was expired and cleared
             setUser(null);
-            devLogger.info('❌ AuthContext: Stored token expired, user logged out');
+            devLogger.info('AuthContext: Stored token expired, user logged out');
           }
         } else if (storedToken && !storedUser) {
           // Token exists but no user data - fetch profile (OAuth callback scenario)
-          devLogger.info('🔄 AuthContext: Token exists but no user data, fetching profile...');
+          devLogger.info('AuthContext: Token exists but no user data, fetching profile...');
           const isValid = AuthService.initializeAuth();
           if (isValid) {
             try {
               const user = await AuthService.getProfile();
               setUser(user);
-              devLogger.info('✅ AuthContext: User profile fetched successfully');
+              devLogger.info('AuthContext: User profile fetched successfully');
             } catch (error: any) {
-              devLogger.error('❌ AuthContext: Failed to fetch user profile:', error);
+              devLogger.error('AuthContext: Failed to fetch user profile:', error);
 
               // Check if this is a "user not found" error
               if (
@@ -273,7 +291,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               ) {
                 // User was deleted - redirect to session expired page
                 // The API interceptor will handle the redirect, just clear data here
-                devLogger.warn('⚠️ AuthContext: User not found - account may have been deleted');
+                devLogger.warn('️ AuthContext: User not found - account may have been deleted');
               }
 
               AuthService.clearAuthData();
@@ -282,15 +300,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // Token was expired
             setUser(null);
-            devLogger.info('❌ AuthContext: Stored token expired, user logged out');
+            devLogger.info('AuthContext: Stored token expired, user logged out');
           }
         } else {
           // No stored auth data
           setUser(null);
-          devLogger.info('❌ AuthContext: No stored auth data, user not authenticated');
+          devLogger.info('AuthContext: No stored auth data, user not authenticated');
         }
       } catch (error) {
-        devLogger.error('❌ AuthContext: Auth initialization error:', error);
+        devLogger.error('AuthContext: Auth initialization error:', error);
         AuthService.clearAuthData();
         setUser(null);
       } finally {
@@ -302,11 +320,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           devLogger.debug(`⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`);
           setTimeout(() => {
             setIsLoading(false);
-            devLogger.info('✅ AuthContext: Initialization complete, isLoading = false');
+            devLogger.info('AuthContext: Initialization complete, isLoading = false');
           }, remainingTime);
         } else {
           setIsLoading(false);
-          devLogger.info('✅ AuthContext: Initialization complete, isLoading = false');
+          devLogger.info('AuthContext: Initialization complete, isLoading = false');
         }
       }
     };
@@ -326,7 +344,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     refreshAuth,
     clearError,
-    isAdmin,
+
     canAccess,
     getToken,
     hasPermission,

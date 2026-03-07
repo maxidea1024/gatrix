@@ -4,7 +4,9 @@ import { validationResult } from 'express-validator';
 import { Request, Response } from 'express';
 import { ulid } from 'ulid';
 import { pubSubService } from '../services/PubSubService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ApiTokensController');
 
 class ApiTokensController {
   /**
@@ -20,6 +22,7 @@ class ApiTokensController {
         sortBy = 'createdAt',
         sortOrder = 'desc',
       } = req.query;
+      const projectId = (req as any).projectId;
       const offset = (Number(page) - 1) * Number(limit);
 
       // Build query with user join
@@ -39,6 +42,10 @@ class ApiTokensController {
         query = query.where('tokenName', 'like', `%${search}%`);
       }
 
+      if (projectId) {
+        query = query.where('g_api_access_tokens.projectId', projectId);
+      }
+
       // Get total count (separate query)
       let countQuery = knex('g_api_access_tokens');
 
@@ -48,6 +55,10 @@ class ApiTokensController {
 
       if (search) {
         countQuery = countQuery.where('tokenName', 'like', `%${search}%`);
+      }
+
+      if (projectId) {
+        countQuery = countQuery.where('projectId', projectId);
       }
 
       const [{ count: total }] = await countQuery.count('* as count');
@@ -80,22 +91,6 @@ class ApiTokensController {
         .limit(Number(limit))
         .offset(Number(offset));
 
-      // Get environment assignments for each token (only IDs - frontend has environment list)
-      const tokenIds = tokens.map((t: any) => t.id);
-      const environmentAssignments =
-        tokenIds.length > 0
-          ? await knex('g_api_access_token_environments')
-              .whereIn('tokenId', tokenIds)
-              .select('tokenId', 'environment')
-          : [];
-
-      // Group environment names by token
-      const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
-        if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environment);
-        return acc;
-      }, {});
-
       // Format tokens (mask token for display, keep original for copying)
       const formattedTokens = tokens.map((token: any) => {
         // Mask the token: show first 4 and last 4 characters
@@ -109,9 +104,7 @@ class ApiTokensController {
           // Keep original tokenValue for copying
           // Add maskedTokenValue for display
           maskedTokenValue: maskedToken,
-          allowAllEnvironments: Boolean(token.allowAllEnvironments),
-          environments: envByToken[token.id] || [],
-          environmentIds: envByToken[token.id] || [], // Backward compatibility
+          environmentId: token.environmentId || null,
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || '',
@@ -136,7 +129,7 @@ class ApiTokensController {
 
       res.json(responseData);
     } catch (error) {
-      console.error('Error fetching API tokens:', error);
+      logger.error('Error fetching API tokens:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to fetch API tokens' },
@@ -157,14 +150,8 @@ class ApiTokensController {
         });
       }
 
-      const {
-        tokenName,
-        description,
-        tokenType,
-        expiresAt,
-        allowAllEnvironments = true,
-        environments = [],
-      } = req.body;
+      const { tokenName, description, tokenType, expiresAt, environmentId } = req.body;
+      const projectId = (req as any).projectId;
       const userId = (req as any).user.id;
 
       // Generate secure token (store as plain text)
@@ -178,27 +165,18 @@ class ApiTokensController {
         // Insert token (store plain text)
         await trx('g_api_access_tokens').insert({
           id: tokenId,
+          projectId: projectId || null,
           tokenName,
           description: description || null,
           tokenValue: tokenValue, // Store plain token value
           tokenType,
-          allowAllEnvironments: allowAllEnvironments,
+          environmentId: environmentId || null,
           expiresAt: expiresAt || null,
           createdBy: userId,
           updatedBy: userId,
           createdAt: trx.fn.now(),
           updatedAt: trx.fn.now(),
         });
-
-        // If not allowing all environments, insert environment assignments
-        if (!allowAllEnvironments && environments.length > 0) {
-          const envInserts = environments.map((envName: string) => ({
-            id: ulid(), // Generate ULID for each record
-            tokenId: tokenId,
-            environment: envName,
-          }));
-          await trx('g_api_access_token_environments').insert(envInserts);
-        }
 
         return { id: tokenId };
       });
@@ -210,7 +188,7 @@ class ApiTokensController {
           data: {
             id: result.id,
             tokenType,
-            allowAllEnvironments,
+            environmentId: environmentId || null,
             timestamp: Date.now(),
           },
         });
@@ -228,15 +206,13 @@ class ApiTokensController {
           tokenName,
           tokenType,
           tokenValue, // Only shown once!
-          allowAllEnvironments,
-          environments: allowAllEnvironments ? [] : environments,
-          environmentIds: allowAllEnvironments ? [] : environments, // Backward compatibility
+          environmentId: environmentId || null,
           expiresAt,
           createdAt: new Date().toISOString(),
         },
       });
     } catch (error) {
-      console.error('Error creating API token:', error);
+      logger.error('Error creating API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to create API token' },
@@ -250,7 +226,7 @@ class ApiTokensController {
   async updateToken(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tokenName, description, expiresAt, allowAllEnvironments, environments } = req.body;
+      const { tokenName, description, expiresAt, environmentId } = req.body;
       const userId = (req as any).user.id;
 
       // Check if token exists
@@ -273,27 +249,10 @@ class ApiTokensController {
         if (tokenName !== undefined) updateData.tokenName = tokenName;
         if (description !== undefined) updateData.description = description;
         if (expiresAt !== undefined) updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
-        if (allowAllEnvironments !== undefined)
-          updateData.allowAllEnvironments = allowAllEnvironments;
+        if (environmentId !== undefined) updateData.environmentId = environmentId;
 
         // Update token
         await trx('g_api_access_tokens').where('id', id).update(updateData);
-
-        // Update environment assignments if provided
-        if (environments !== undefined) {
-          // Delete existing assignments
-          await trx('g_api_access_token_environments').where('tokenId', id).delete();
-
-          // Insert new assignments
-          if (!allowAllEnvironments && environments.length > 0) {
-            const envInserts = environments.map((envName: string) => ({
-              id: ulid(), // Generate ULID for each record
-              tokenId: id,
-              environment: envName,
-            }));
-            await trx('g_api_access_token_environments').insert(envInserts);
-          }
-        }
       });
 
       // Get updated token with user info
@@ -307,11 +266,6 @@ class ApiTokensController {
         .where('g_api_access_tokens.id', id)
         .first();
 
-      // Get environment IDs only (frontend has environment list)
-      const envAssignments = await knex('g_api_access_token_environments')
-        .where('tokenId', id)
-        .select('environment');
-
       // Format response
       const formattedToken = {
         ...updatedToken,
@@ -319,8 +273,7 @@ class ApiTokensController {
           updatedToken.tokenValue?.substring(0, 4) +
           '••••••••' +
           updatedToken.tokenValue?.substring(updatedToken.tokenValue.length - 4),
-        allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
-        environments: envAssignments.map((e: any) => e.environment),
+        environmentId: updatedToken.environmentId || null,
         creator: {
           name: updatedToken.creatorName || 'Unknown',
           email: updatedToken.creatorEmail || '',
@@ -342,7 +295,7 @@ class ApiTokensController {
           data: {
             id,
             tokenType: updatedToken.tokenType,
-            allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
+            environmentId: updatedToken.environmentId || null,
             timestamp: Date.now(),
           },
         });
@@ -359,7 +312,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error updating API token:', error);
+      logger.error('Error updating API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to update API token' },
@@ -420,7 +373,7 @@ class ApiTokensController {
       res.json({
         success: true,
         data: {
-          id: Number(id),
+          id: id,
           tokenName: existingToken.tokenName,
           tokenType: existingToken.tokenType,
           tokenValue, // Only shown once!
@@ -429,7 +382,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error regenerating API token:', error);
+      logger.error('Error regenerating API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to regenerate API token' },
@@ -461,13 +414,8 @@ class ApiTokensController {
         await pubSubService.invalidateByPattern(`server_api_token:${tokenPrefix}.*`);
       }
 
-      // Use transaction to delete token and its environment assignments
-      await knex.transaction(async (trx) => {
-        // Delete environment assignments first
-        await trx('g_api_access_token_environments').where('tokenId', id).delete();
-        // Delete token
-        await trx('g_api_access_tokens').where('id', id).delete();
-      });
+      // Delete token (no junction table needed)
+      await knex('g_api_access_tokens').where('id', id).delete();
 
       // Publish token deleted event for Edge mirroring
       try {
@@ -490,7 +438,7 @@ class ApiTokensController {
         message: 'API token deleted successfully',
       });
     } catch (error) {
-      console.error('Error deleting API token:', error);
+      logger.error('Error deleting API token:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to delete API token' },
@@ -503,20 +451,29 @@ class ApiTokensController {
    */
   async getTokenStats(req: Request, res: Response) {
     try {
+      const projectId = (req as any).projectId;
+
+      // Build base query with optional org filter
+      const baseQuery = () => {
+        let q = knex('g_api_access_tokens');
+        if (projectId) q = q.where('projectId', projectId);
+        return q;
+      };
+
       // Get total tokens
-      const [{ count: totalTokens }] = await knex('g_api_access_tokens').count('* as count');
+      const [{ count: totalTokens }] = await baseQuery().count('* as count');
 
       // Get all tokens (no isActive filter needed)
-      const [{ count: activeTokens }] = await knex('g_api_access_tokens').count('* as count');
+      const [{ count: activeTokens }] = await baseQuery().count('* as count');
 
       // Get expired tokens
-      const [{ count: expiredTokens }] = await knex('g_api_access_tokens')
+      const [{ count: expiredTokens }] = await baseQuery()
         .whereNotNull('expiresAt')
         .where('expiresAt', '<', knex.fn.now())
         .count('* as count');
 
       // Get recently used tokens (last 7 days)
-      const [{ count: recentlyUsed }] = await knex('g_api_access_tokens')
+      const [{ count: recentlyUsed }] = await baseQuery()
         .where('lastUsedAt', '>=', knex.raw('DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)'))
         .count('* as count');
 
@@ -530,7 +487,7 @@ class ApiTokensController {
         },
       });
     } catch (error) {
-      console.error('Error fetching token stats:', error);
+      logger.error('Error fetching token stats:', error);
       res.status(500).json({
         success: false,
         error: { message: 'Failed to fetch token statistics' },

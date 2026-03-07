@@ -68,10 +68,10 @@ export interface StrategyParameters {
   rollout?: number;
   stickiness?: string;
   groupId?: string;
-  percentage?: number;      // gradualRolloutUserId, gradualRolloutRandom, gradualRolloutSessionId
-  userIds?: string;          // userWithId (comma-separated)
-  IPs?: string;              // remoteAddress (comma-separated, CIDR supported)
-  hostNames?: string;        // applicationHostname (comma-separated)
+  percentage?: number; // gradualRolloutUserId, gradualRolloutRandom, gradualRolloutSessionId
+  userIds?: string; // userWithId (comma-separated)
+  IPs?: string; // remoteAddress (comma-separated, CIDR supported)
+  hostNames?: string; // applicationHostname (comma-separated)
 }
 
 export interface Constraint {

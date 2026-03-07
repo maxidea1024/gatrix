@@ -110,72 +110,82 @@ class SurveyService {
   /**
    * Get all surveys with pagination
    */
-  async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
-    const response = await api.get('/admin/surveys', { params });
+  async getSurveys(projectApiPath: string, params?: GetSurveysParams): Promise<GetSurveysResponse> {
+    const response = await api.get(`${projectApiPath}/surveys`, { params });
     return response.data;
   }
 
   /**
    * Get survey by ID
    */
-  async getSurveyById(id: string): Promise<Survey> {
-    const response = await api.get(`/admin/surveys/${id}`);
+  async getSurveyById(projectApiPath: string, id: string): Promise<Survey> {
+    const response = await api.get(`${projectApiPath}/surveys/${id}`);
     return response.data.survey;
   }
 
   /**
    * Get survey by platform survey ID
    */
-  async getSurveyByPlatformId(platformSurveyId: string): Promise<Survey> {
-    const response = await api.get(`/admin/surveys/platform/${platformSurveyId}`);
+  async getSurveyByPlatformId(projectApiPath: string, platformSurveyId: string): Promise<Survey> {
+    const response = await api.get(`${projectApiPath}/surveys/platform/${platformSurveyId}`);
     return response.data.survey;
   }
 
   /**
    * Create a new survey
    */
-  async createSurvey(input: CreateSurveyInput): Promise<MutationResult<Survey>> {
-    const response = await api.post('/admin/surveys', input);
+  async createSurvey(
+    projectApiPath: string,
+    input: CreateSurveyInput
+  ): Promise<MutationResult<Survey>> {
+    const response = await api.post(`${projectApiPath}/surveys`, input);
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
    * Update a survey
    */
-  async updateSurvey(id: string, input: UpdateSurveyInput): Promise<MutationResult<Survey>> {
-    const response = await api.put(`/admin/surveys/${id}`, input);
+  async updateSurvey(
+    projectApiPath: string,
+    id: string,
+    input: UpdateSurveyInput
+  ): Promise<MutationResult<Survey>> {
+    const response = await api.put(`${projectApiPath}/surveys/${id}`, input);
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
    * Delete a survey
    */
-  async deleteSurvey(id: string): Promise<MutationResult<void>> {
-    const response = await api.delete(`/admin/surveys/${id}`);
+  async deleteSurvey(projectApiPath: string, id: string): Promise<MutationResult<void>> {
+    const response = await api.delete(`${projectApiPath}/surveys/${id}`);
     return parseChangeRequestResponse<void>(response, () => undefined);
   }
 
   /**
    * Toggle survey active status
    */
-  async toggleActive(id: string): Promise<MutationResult<Survey>> {
-    const response = await api.patch(`/admin/surveys/${id}/toggle-active`);
+  async toggleActive(projectApiPath: string, id: string): Promise<MutationResult<Survey>> {
+    const response = await api.patch(`${projectApiPath}/surveys/${id}/toggle-active`);
     return parseChangeRequestResponse<Survey>(response, (r) => r?.survey);
   }
 
   /**
    * Get survey configuration
    */
-  async getSurveyConfig(): Promise<SurveyConfig> {
-    const response = await api.get('/admin/surveys/config');
+  async getSurveyConfig(projectApiPath: string): Promise<SurveyConfig> {
+    const response = await api.get(`${projectApiPath}/surveys/config`);
     return response.data.config;
   }
 
   /**
    * Update survey configuration
    */
-  async updateSurveyConfig(input: Partial<SurveyConfig>): Promise<SurveyConfig> {
-    const response = await api.put('/admin/surveys/config', input);
+  async updateSurveyConfig(
+    projectApiPath: string,
+    input: Partial<SurveyConfig>
+  ): Promise<SurveyConfig> {
+    const response = await api.put(`${projectApiPath}/surveys/config`, input);
     return response.data.config;
   }
 }

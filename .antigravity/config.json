@@ -1,0 +1,9 @@
+{
+    "agent": {
+        "shell": "powershell",
+        "spawn": {
+            "windowsHide": true,
+            "detached": false
+        }
+    }
+}

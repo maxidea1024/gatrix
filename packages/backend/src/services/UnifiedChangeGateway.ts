@@ -1,7 +1,9 @@
 import { Environment } from '../models/Environment';
 import { ChangeRequest } from '../models/ChangeRequest';
 import { ChangeRequestService } from './ChangeRequestService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UnifiedChangeGateway');
 import knex from '../config/knex';
 import { ErrorCodes } from '@gatrix/shared';
 import { GatrixError } from '../middleware/errorHandler';
@@ -21,7 +23,7 @@ export class UnifiedChangeGateway {
    * Request a modification (update) through the Change Request system
    */
   static async requestModification(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -34,7 +36,7 @@ export class UnifiedChangeGateway {
    * Request a creation through the Change Request system
    */
   static async requestCreation(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     createData: any,
@@ -61,7 +63,7 @@ export class UnifiedChangeGateway {
       // 3. CR Required - Create a change request for the new item
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
@@ -82,7 +84,7 @@ export class UnifiedChangeGateway {
         mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error('[UnifiedChangeGateway.requestCreation] Error:', error);
+      logger.error('requestCreation error:', error);
       throw error;
     }
   }
@@ -91,7 +93,7 @@ export class UnifiedChangeGateway {
    * Request a deletion through the Change Request system
    */
   static async requestDeletion(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -148,7 +150,7 @@ export class UnifiedChangeGateway {
 
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
@@ -169,7 +171,7 @@ export class UnifiedChangeGateway {
         mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error('[UnifiedChangeGateway.requestDeletion] Error:', error);
+      logger.error('requestDeletion error:', error);
       throw error;
     }
   }
@@ -178,7 +180,7 @@ export class UnifiedChangeGateway {
    * Internal method to process update changes
    */
   public static async processChange(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -250,7 +252,7 @@ export class UnifiedChangeGateway {
       // CASE B: Change Request Required
       const existingDraft = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'draft')
         .orderBy('updatedAt', 'desc')
         .first();
@@ -271,7 +273,7 @@ export class UnifiedChangeGateway {
         mode: 'CHANGE_REQUEST',
       };
     } catch (error) {
-      logger.error('[UnifiedChangeGateway] Error:', error);
+      logger.error('processChange error:', error);
       throw error;
     }
   }

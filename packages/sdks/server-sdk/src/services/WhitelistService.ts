@@ -1,7 +1,7 @@
 /**
  * Whitelist Service
  * Handles IP and Account whitelist retrieval and caching
- * Uses per-environment API pattern: GET /api/v1/server/:env/whitelists
+ * Uses per-environment API pattern: GET /api/v1/server/whitelists
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
@@ -96,10 +96,10 @@ export class WhitelistService {
 
   /**
    * Get all whitelists (IP and Account) for a specific environment
-   * GET /api/v1/server/:env/whitelists
+   * GET /api/v1/server/whitelists
    */
   async listByEnvironment(environment: string): Promise<WhitelistData> {
-    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/whitelists`;
+    const endpoint = `/api/v1/server/whitelists`;
 
     this.logger.debug('Fetching whitelists', { environment });
 

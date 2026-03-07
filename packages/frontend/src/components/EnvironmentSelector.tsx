@@ -1,35 +1,29 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
-  Select,
-  MenuItem,
   Box,
   Typography,
-  SelectChangeEvent,
-  Tooltip,
-  Divider,
-  ListItemIcon,
+  Popover,
   alpha,
-  keyframes,
+  ButtonBase,
+  Collapse,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
-import { Settings as SettingsIcon, Public as EnvironmentIcon } from '@mui/icons-material';
+import {
+  Public as EnvironmentIcon,
+  Business as OrgIcon,
+  Folder as ProjectIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Check as CheckIcon,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
-
-// Shine animation - light sweeping across periodically
-const shineAnimation = keyframes`
-  0% {
-    left: -100%;
-  }
-  10% {
-    left: 100%;
-  }
-  100% {
-    left: 100%;
-  }
-`;
+import { environmentService, Environment } from '@/services/environmentService';
 
 // Environment type colors
 const getEnvironmentColor = (type: string, customColor?: string): string => {
@@ -51,160 +45,147 @@ interface EnvironmentSelectorProps {
   size?: 'small' | 'medium';
 }
 
-export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
-  variant = 'select',
-  size = 'small',
-}) => {
+export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({ size = 'small' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { hasPermission } = useAuth();
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
   const { environments, currentEnvironment, currentEnvironmentId, isLoading, switchEnvironment } =
     useEnvironment();
 
-  const canManageEnvironments = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
+  const { organisations, currentOrg, projects, currentProject, currentProjectId } = useOrgProject();
 
-  const handleSelectOpen = useCallback(() => {
-    setIsSelectOpen(true);
-  }, []);
+  // Track expanded state for org and project tree nodes
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
-  const handleSelectClose = useCallback(() => {
-    setIsSelectOpen(false);
-  }, []);
+  // Per-project environment cache
+  const [projectEnvMap, setProjectEnvMap] = useState<Record<string, Environment[]>>({});
+  const [loadingProjects, setLoadingProjects] = useState<Set<string>>(new Set());
+  const loadedProjectsRef = useRef<Set<string>>(new Set());
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value;
-    // Skip if manage menu item (handled by onClick)
-    if (value === '__manage__') {
-      return;
+  // Load environments for a specific project
+  const loadProjectEnvironments = useCallback(async (projectId: string, orgId: string) => {
+    if (loadedProjectsRef.current.has(projectId)) return;
+    loadedProjectsRef.current.add(projectId);
+
+    setLoadingProjects((prev) => new Set(prev).add(projectId));
+    try {
+      const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
+      const envs = await environmentService.getEnvironments(apiPath);
+      setProjectEnvMap((prev) => ({ ...prev, [projectId]: envs }));
+    } catch (error) {
+      console.error(`Failed to load environments for project ${projectId}:`, error);
+      loadedProjectsRef.current.delete(projectId);
+    } finally {
+      setLoadingProjects((prev) => {
+        const next = new Set(prev);
+        next.delete(projectId);
+        return next;
+      });
     }
-    switchEnvironment(value);
-  };
+  }, []);
 
-  const handleManageClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsSelectOpen(false);
-    navigate('/settings/environments');
-  };
+  const handleOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+
+      // Auto-expand current org and project, and load environments
+      if (currentOrg) {
+        setExpandedOrgs((prev) => new Set(prev).add(currentOrg.id));
+      }
+      if (currentProject && currentOrg) {
+        setExpandedProjects((prev) => new Set(prev).add(currentProject.id));
+        loadProjectEnvironments(currentProject.id, currentOrg.id);
+      }
+    },
+    [currentOrg, currentProject, loadProjectEnvironments]
+  );
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleToggleOrg = useCallback((orgId: string) => {
+    setExpandedOrgs((prev) => {
+      const next = new Set(prev);
+      if (next.has(orgId)) {
+        next.delete(orgId);
+      } else {
+        next.add(orgId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleToggleProject = useCallback(
+    (projectId: string, orgId: string) => {
+      setExpandedProjects((prev) => {
+        const next = new Set(prev);
+        if (next.has(projectId)) {
+          next.delete(projectId);
+        } else {
+          next.add(projectId);
+          // Load environments when expanding
+          loadProjectEnvironments(projectId, orgId);
+        }
+        return next;
+      });
+    },
+    [loadProjectEnvironments]
+  );
+
+  const handleSelectEnvironment = useCallback(
+    (envId: string, projectId: string, orgId: string) => {
+      switchEnvironment(orgId, projectId, envId);
+      handleClose();
+    },
+    [switchEnvironment, handleClose]
+  );
+
+  // Build display label: Org / Project / Environment
+  const displayLabel = useMemo(() => {
+    const parts: string[] = [];
+    if (organisations.length > 1 && currentOrg) {
+      parts.push(currentOrg.displayName || currentOrg.orgName);
+    }
+    if (currentProject) {
+      parts.push(currentProject.displayName || currentProject.projectName);
+    }
+    if (currentEnvironment) {
+      parts.push(currentEnvironment.displayName || currentEnvironment.environmentName);
+    }
+    return parts.join(' / ');
+  }, [organisations.length, currentOrg, currentProject, currentEnvironment]);
+
+  const isOpen = Boolean(anchorEl);
 
   // Show nothing only if there are truly no environments (not just loading)
-  // Keep the component mounted during loading to prevent flickering
-  if (!isLoading && environments.length === 0) {
+  if (!isLoading && environments.length === 0 && organisations.length === 0) {
     return null;
   }
 
   // During initial load with no data, show a placeholder to prevent layout shift
   if (isLoading && environments.length === 0) {
     return (
-      <Select
-        value=""
-        size={size}
+      <ButtonBase
         disabled
-        displayEmpty
         sx={{
-          minWidth: 140,
-          '.MuiSelect-select': {
-            py: 0.75,
-            display: 'flex',
-            alignItems: 'center',
-          },
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          color: 'inherit',
-          '.MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-          },
-          '.MuiSvgIcon-root': {
-            color: 'inherit',
-          },
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          px: 1.5,
+          py: size === 'small' ? 0.5 : 0.75,
+          borderRadius: 1,
+          backgroundColor: '#757575',
+          color: '#fff',
         }}
       >
-        <MenuItem value="">
-          <Typography variant="body2" sx={{ opacity: 0.5 }}>
-            {t('common.loading')}
-          </Typography>
-        </MenuItem>
-      </Select>
-    );
-  }
-
-  // If only one environment exists, just show a highlighted badge (no dropdown needed)
-  if (environments.length === 1 && currentEnvironment) {
-    const envColor = getEnvironmentColor(
-      currentEnvironment.environmentType,
-      currentEnvironment.color
-    );
-    return (
-      <Tooltip title={t('environments.currentEnvironment')} arrow>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            px: 1.5,
-            py: 0.5,
-            borderRadius: 1,
-            backgroundColor: envColor,
-            boxShadow: `0 0 8px ${alpha(envColor, 0.5)}, inset 0 1px 0 ${alpha('#fff', 0.2)}`,
-            border: `1px solid ${alpha('#fff', 0.3)}`,
-          }}
-        >
-          <EnvironmentIcon sx={{ fontSize: 18, color: '#fff', opacity: 0.9 }} />
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              color: '#fff',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            }}
-          >
-            {currentEnvironment.displayName || currentEnvironment.environmentName}
-          </Typography>
-        </Box>
-      </Tooltip>
-    );
-  }
-
-  if (variant === 'chip' && currentEnvironment) {
-    const envColor = getEnvironmentColor(
-      currentEnvironment.environmentType,
-      currentEnvironment.color
-    );
-    // Chip variant with dropdown on click - simplified as just showing current
-    return (
-      <Tooltip title={t('environments.switchEnvironment')} arrow>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            px: 1.5,
-            py: 0.5,
-            borderRadius: 1,
-            backgroundColor: envColor,
-            boxShadow: `0 0 8px ${alpha(envColor, 0.5)}, inset 0 1px 0 ${alpha('#fff', 0.2)}`,
-            border: `1px solid ${alpha('#fff', 0.3)}`,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease-in-out',
-            '&:hover': {
-              boxShadow: `0 0 12px ${alpha(envColor, 0.7)}, inset 0 1px 0 ${alpha('#fff', 0.3)}`,
-              transform: 'scale(1.02)',
-            },
-          }}
-        >
-          <EnvironmentIcon sx={{ fontSize: 18, color: '#fff', opacity: 0.9 }} />
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              color: '#fff',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            }}
-          >
-            {currentEnvironment.displayName || currentEnvironment.environmentName}
-          </Typography>
-        </Box>
-      </Tooltip>
+        <EnvironmentIcon sx={{ fontSize: 18, opacity: 0.9 }} />
+        <Typography variant="body2" sx={{ fontWeight: 500, opacity: 0.5 }}>
+          {t('common.loading')}
+        </Typography>
+      </ButtonBase>
     );
   }
 
@@ -213,142 +194,373 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     : '#757575';
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        px: 1.5,
-        py: 0.5,
-        borderRadius: 1,
-        backgroundColor: envColor,
-        boxShadow: `0 0 8px ${alpha(envColor, 0.5)}, inset 0 1px 0 ${alpha('#fff', 0.2)}`,
-        border: `1px solid ${alpha('#fff', 0.3)}`,
-        transition: 'all 0.2s ease-in-out',
-        overflow: 'hidden',
-        '&:hover': {
-          boxShadow: `0 0 12px ${alpha(envColor, 0.7)}, inset 0 1px 0 ${alpha('#fff', 0.3)}`,
-          transform: 'scale(1.02)',
-        },
-        // Shine effect overlay
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: '-100%',
-          width: '60%',
-          height: '100%',
-          background: `linear-gradient(
-              90deg,
-              transparent,
-              ${alpha('#fff', 0.15)},
-              ${alpha('#fff', 0.3)},
-              ${alpha('#fff', 0.15)},
-              transparent
-            )`,
-          animation: `${shineAnimation} 4s ease-in-out infinite`,
-          pointerEvents: 'none',
-        },
-      }}
-    >
-      <EnvironmentIcon sx={{ fontSize: 18, color: '#fff', opacity: 0.9, zIndex: 1 }} />
-      <Select
-        value={currentEnvironmentId || ''}
-        onChange={handleChange}
-        open={isSelectOpen}
-        onOpen={handleSelectOpen}
-        onClose={handleSelectClose}
-        size={size}
-        displayEmpty
-        variant="standard"
+    <>
+      {/* Trigger button */}
+      <ButtonBase
+        onClick={handleOpen}
         sx={{
-          minWidth: 100,
-          color: '#fff',
-          fontWeight: 600,
-          fontSize: '0.875rem',
-          letterSpacing: '0.02em',
-          zIndex: 1,
-          '.MuiSelect-select': {
-            py: 0.25,
-            pr: '20px !important',
-            display: 'flex',
-            alignItems: 'center',
-          },
-          '&:before, &:after': {
-            display: 'none',
-          },
-          '.MuiSvgIcon-root': {
-            color: '#fff',
-            right: 0,
-          },
-          '.MuiInput-input:focus': {
-            backgroundColor: 'transparent',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          px: 1.5,
+          py: size === 'small' ? 0.5 : 0.75,
+          borderRadius: 1,
+          backgroundColor: envColor,
+          boxShadow: `0 0 8px ${alpha(envColor, 0.5)}, inset 0 1px 0 ${alpha('#fff', 0.2)}`,
+          border: `1px solid ${alpha('#fff', 0.3)}`,
+          transition: 'all 0.2s ease-in-out',
+          cursor: 'pointer',
+          '&:hover': {
+            boxShadow: `0 0 12px ${alpha(envColor, 0.7)}, inset 0 1px 0 ${alpha('#fff', 0.3)}`,
+            transform: 'scale(1.02)',
           },
         }}
-        renderValue={() => (
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              color: '#fff',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            }}
-          >
-            {currentEnvironment?.displayName || currentEnvironment?.environmentName || ''}
-          </Typography>
-        )}
       >
-        {environments.map((env) => {
-          const itemColor = getEnvironmentColor(env.environmentType, env.color);
-          const isSelected = env.environment === currentEnvironmentId;
-          return (
-            <MenuItem
-              key={env.environment}
-              value={env.environment}
-              sx={{
-                backgroundColor: isSelected ? alpha(itemColor, 0.15) : 'transparent',
-                '&:hover': {
-                  backgroundColor: alpha(itemColor, 0.1),
-                },
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Box
-                  sx={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 0.5,
-                    backgroundColor: itemColor,
-                    boxShadow: `0 0 4px ${alpha(itemColor, 0.5)}`,
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: isSelected ? 600 : 400,
-                  }}
-                >
-                  {env.displayName || env.environmentName}
-                </Typography>
-              </Box>
-            </MenuItem>
-          );
-        })}
-        {canManageEnvironments && (
-          <>
-            <Divider sx={{ my: 0.5 }} />
-            <MenuItem value="__manage__" onClick={handleManageClick}>
-              <ListItemIcon sx={{ minWidth: 28 }}>
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography variant="body2">{t('environments.manage')}</Typography>
-            </MenuItem>
-          </>
-        )}
-      </Select>
-    </Box>
+        <EnvironmentIcon sx={{ fontSize: 18, color: '#fff', opacity: 0.9 }} />
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 600,
+            color: '#fff',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            maxWidth: 300,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            direction: 'rtl',
+            textAlign: 'left',
+          }}
+        >
+          {displayLabel || t('environments.selectEnvironment')}
+        </Typography>
+        <ArrowDropDownIcon
+          sx={{
+            fontSize: 20,
+            color: '#fff',
+            opacity: 0.8,
+            transform: isOpen ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+          }}
+        />
+      </ButtonBase>
+
+      {/* Tree dropdown popover */}
+      <Popover
+        open={isOpen}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 0.5,
+              minWidth: 280,
+              maxWidth: 400,
+              maxHeight: 400,
+              borderRadius: 2,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              overflow: 'auto',
+            },
+          },
+        }}
+      >
+        {/* Tree content */}
+        <Box sx={{ py: 0.5 }}>
+          {organisations.map((org) => {
+            const isMultiOrg = organisations.length > 1;
+            const isOrgExpanded = expandedOrgs.has(org.id) || !isMultiOrg;
+
+            // For single-org, skip the org header level
+            if (!isMultiOrg) {
+              return (
+                <React.Fragment key={org.id}>
+                  {projects.filter((p) => p.orgId === org.id).length === 0 ? (
+                    // No projects — navigate to projects management page
+                    <ListItemButton
+                      onClick={() => {
+                        handleClose();
+                        navigate(`/admin/projects?orgId=${org.id}`);
+                      }}
+                      dense
+                      sx={{ pl: 1.5, py: 0.75 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.noProjects')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  ) : (
+                    projects
+                      .filter((p) => p.orgId === org.id)
+                      .map((proj) => {
+                        const isProjExpanded = expandedProjects.has(proj.id);
+                        const isCurrentProject = proj.id === currentProjectId;
+
+                        return (
+                          <React.Fragment key={proj.id}>
+                            {/* Project node */}
+                            <ListItemButton
+                              onClick={() => handleToggleProject(proj.id, org.id)}
+                              dense
+                              sx={{
+                                py: 0.5,
+                                pl: 1.5,
+                                backgroundColor: isCurrentProject
+                                  ? (theme) =>
+                                      alpha(
+                                        theme.palette.primary.main,
+                                        theme.palette.mode === 'dark' ? 0.1 : 0.04
+                                      )
+                                  : 'transparent',
+                              }}
+                            >
+                              <ListItemIcon sx={{ minWidth: 28 }}>
+                                {isProjExpanded ? (
+                                  <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                                ) : (
+                                  <ChevronRightIcon sx={{ fontSize: 18 }} />
+                                )}
+                              </ListItemIcon>
+                              <ListItemIcon sx={{ minWidth: 24 }}>
+                                <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={proj.displayName || proj.projectName}
+                                primaryTypographyProps={{
+                                  variant: 'body2',
+                                  fontWeight: isCurrentProject ? 600 : 400,
+                                }}
+                              />
+                            </ListItemButton>
+
+                            {/* Environment nodes under this project */}
+                            <Collapse in={isProjExpanded} timeout="auto">
+                              {renderEnvironments(proj.id, org.id)}
+                            </Collapse>
+                          </React.Fragment>
+                        );
+                      })
+                  )}
+                </React.Fragment>
+              );
+            }
+
+            // Multi-org: show org header
+            return (
+              <React.Fragment key={org.id}>
+                {/* Org node */}
+                <ListItemButton onClick={() => handleToggleOrg(org.id)} dense sx={{ py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 28 }}>
+                    {isOrgExpanded ? (
+                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                    ) : (
+                      <ChevronRightIcon sx={{ fontSize: 18 }} />
+                    )}
+                  </ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 24 }}>
+                    <OrgIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={org.displayName || org.orgName}
+                    primaryTypographyProps={{
+                      variant: 'body2',
+                      fontWeight: currentOrg?.id === org.id ? 600 : 400,
+                    }}
+                  />
+                </ListItemButton>
+
+                {/* Projects under this org */}
+                <Collapse in={isOrgExpanded} timeout="auto">
+                  {projects.filter((p) => p.orgId === org.id).length === 0 && (
+                    // No projects — navigate to projects management page
+                    <ListItemButton
+                      onClick={() => {
+                        handleClose();
+                        navigate(`/admin/projects?orgId=${org.id}`);
+                      }}
+                      dense
+                      sx={{ pl: 4, py: 0.75 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.goToProjectManagement')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  )}
+                  {projects
+                    .filter((p) => p.orgId === org.id)
+                    .map((proj) => {
+                      const isProjExpanded = expandedProjects.has(proj.id);
+                      const isCurrentProject = proj.id === currentProjectId;
+
+                      return (
+                        <React.Fragment key={proj.id}>
+                          <ListItemButton
+                            onClick={() => handleToggleProject(proj.id, org.id)}
+                            dense
+                            sx={{
+                              py: 0.5,
+                              pl: 4,
+                              backgroundColor: isCurrentProject
+                                ? (theme) =>
+                                    alpha(
+                                      theme.palette.primary.main,
+                                      theme.palette.mode === 'dark' ? 0.1 : 0.04
+                                    )
+                                : 'transparent',
+                            }}
+                          >
+                            <ListItemIcon sx={{ minWidth: 28 }}>
+                              {isProjExpanded ? (
+                                <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                              ) : (
+                                <ChevronRightIcon sx={{ fontSize: 18 }} />
+                              )}
+                            </ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 24 }}>
+                              <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={proj.displayName || proj.projectName}
+                              primaryTypographyProps={{
+                                variant: 'body2',
+                                fontWeight: isCurrentProject ? 600 : 400,
+                              }}
+                            />
+                          </ListItemButton>
+
+                          <Collapse in={isProjExpanded} timeout="auto">
+                            {renderEnvironments(proj.id, org.id)}
+                          </Collapse>
+                        </React.Fragment>
+                      );
+                    })}
+                </Collapse>
+              </React.Fragment>
+            );
+          })}
+        </Box>
+      </Popover>
+    </>
   );
+
+  // Render environment items for a given project
+  function renderEnvironments(projectId: string, orgId: string) {
+    const indent = organisations.length > 1 ? 7 : 4;
+
+    // Always use projectEnvMap for consistency across all projects
+    const envList = projectEnvMap[projectId] || [];
+    const isLoadingEnvs = loadingProjects.has(projectId);
+
+    if (isLoadingEnvs && envList.length === 0) {
+      return (
+        <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <EnvironmentIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('common.loading')}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    // No environments
+    if (envList.length === 0) {
+      return (
+        <ListItemButton
+          onClick={() => {
+            handleClose();
+            navigate(`/admin/environments?orgId=${orgId}&projectId=${projectId}`);
+          }}
+          dense
+          sx={{ pl: indent, py: 0.75 }}
+        >
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <EnvironmentIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('environments.noEnvironments')}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    return envList.map((env) => {
+      const itemColor = getEnvironmentColor(env.environmentType, env.color);
+      const isSelected = env.environmentId === currentEnvironmentId;
+
+      return (
+        <ListItemButton
+          key={env.environmentId}
+          onClick={() => handleSelectEnvironment(env.environmentId, projectId, orgId)}
+          dense
+          selected={isSelected}
+          sx={{
+            pl: indent,
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: (theme) =>
+                alpha(itemColor, theme.palette.mode === 'dark' ? 0.2 : 0.1),
+              '&:hover': {
+                backgroundColor: (theme) =>
+                  alpha(itemColor, theme.palette.mode === 'dark' ? 0.25 : 0.15),
+              },
+            },
+            '&:hover': {
+              backgroundColor: (theme) =>
+                alpha(itemColor, theme.palette.mode === 'dark' ? 0.15 : 0.08),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: 0.5,
+                backgroundColor: itemColor,
+                boxShadow: isSelected ? `0 0 6px ${alpha(itemColor, 0.6)}` : 'none',
+              }}
+            />
+          </ListItemIcon>
+          <ListItemText
+            primary={env.displayName || env.environmentName}
+            primaryTypographyProps={{
+              variant: 'body2',
+              fontWeight: isSelected ? 600 : 400,
+            }}
+          />
+          {isSelected && <CheckIcon sx={{ fontSize: 18, color: 'success.main', ml: 'auto' }} />}
+        </ListItemButton>
+      );
+    });
+  }
 };
 
 export default EnvironmentSelector;

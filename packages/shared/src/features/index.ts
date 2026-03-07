@@ -1,11 +1,9 @@
 /**
- * Feature Flag Evaluation Module
- * Exports evaluator and all evaluation-related types
+ * Feature Flag Types and Constants
+ * Shared type definitions used across all Gatrix packages (frontend, backend, evaluator, SDK).
+ * Evaluation logic lives in @gatrix/evaluator.
  */
-export { FeatureFlagEvaluator } from './FeatureFlagEvaluator';
 export { VALUE_SOURCE } from './valueSource';
-export { EvaluationUtils, truncateToMinute, buildContextQueryParams } from './EvaluationUtils';
-export { getStrategy, evaluateStrategyIsEnabled, evaluateStrategyWithDetails } from './strategies/index';
 export type { ValueSourceName } from './valueSource';
 export type {
   FeatureFlag,

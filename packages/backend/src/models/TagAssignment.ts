@@ -1,19 +1,19 @@
 import db from '../config/knex';
 
 export interface TagAssignment {
-  id: number;
-  tagId: number;
+  id: string;
+  tagId: string;
   entityType: string;
-  entityId: string | number;
+  entityId: string;
   createdAt: string;
 }
 
 export default class TagAssignmentModel {
   static async setTagsForEntity(
     entityType: string,
-    entityId: string | number,
-    tagIds: number[],
-    createdBy?: number
+    entityId: string,
+    tagIds: string[],
+    createdBy?: string
   ): Promise<void> {
     await db.transaction(async (trx) => {
       await trx('g_tag_assignments')
@@ -26,19 +26,19 @@ export default class TagAssignmentModel {
           tagId,
           entityType,
           entityId,
-          createdBy: createdBy || 1, // 기본값으로 1 사용 (시스템 사용자)
+          createdBy: createdBy || '', // Default values으로 1 Used (시스템 사용자)
         }));
         await trx('g_tag_assignments').insert(insertData);
       }
     });
   }
 
-  static async listTagsForEntity(entityType: string, entityId: string | number): Promise<any[]> {
+  static async listTagsForEntity(entityType: string, entityId: string): Promise<any[]> {
     const rows = await db('g_tag_assignments as a')
       .join('g_tags as t', 't.id', 'a.tagId')
       .select('t.*')
       .where('a.entityType', entityType)
-      .where('a.entityId', String(entityId))
+      .where('a.entityId', entityId)
       .orderBy('t.name');
     return rows;
   }

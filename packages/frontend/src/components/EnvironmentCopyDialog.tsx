@@ -40,6 +40,7 @@ import {
   CopyResult,
   environmentService,
 } from '../services/environmentService';
+import { useOrgProject } from '../contexts/OrgProjectContext';
 
 interface EnvironmentCopyDialogProps {
   open: boolean;
@@ -56,6 +57,8 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   const [sourceId, setSourceId] = useState<string>('');
   const [targetId, setTargetId] = useState<string>('');
@@ -130,7 +133,11 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const previewData = await environmentService.getCopyPreview(sourceId, targetId);
+      const previewData = await environmentService.getCopyPreview(
+        projectApiPath,
+        sourceId,
+        targetId
+      );
       setPreview(previewData);
     } catch (err) {
       setError(t('environments.copyFailed'));
@@ -150,7 +157,12 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
     setCopying(true);
     setError(null);
     try {
-      const copyResult = await environmentService.copyEnvironmentData(sourceId, targetId, options);
+      const copyResult = await environmentService.copyEnvironmentData(
+        projectApiPath,
+        sourceId,
+        targetId,
+        options
+      );
       setResult(copyResult);
       enqueueSnackbar(t('environments.copyCompleted'), { variant: 'success' });
       onCopyComplete?.();
@@ -218,9 +230,9 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
             >
               {environments.map((env) => (
                 <MenuItem
-                  key={env.environment}
-                  value={env.environment}
-                  disabled={env.environment === targetId}
+                  key={env.environmentId}
+                  value={env.environmentId}
+                  disabled={env.environmentId === targetId}
                 >
                   {env.displayName}
                 </MenuItem>
@@ -238,9 +250,9 @@ export const EnvironmentCopyDialog: React.FC<EnvironmentCopyDialogProps> = ({
             >
               {environments.map((env) => (
                 <MenuItem
-                  key={env.environment}
-                  value={env.environment}
-                  disabled={env.environment === sourceId}
+                  key={env.environmentId}
+                  value={env.environmentId}
+                  disabled={env.environmentId === sourceId}
                 >
                   {env.displayName}
                 </MenuItem>

@@ -42,6 +42,7 @@ import { parseUTCForPicker } from '../../utils/dateFormat';
 import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import { useEntityLock } from '../../hooks/useEntityLock';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface IngamePopupNoticeFormDialogProps {
   open: boolean;
@@ -63,6 +64,8 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
   const requiresApproval = currentEnvironment?.requiresApproval ?? false;
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [submitting, setSubmitting] = useState(false);
 
   // Entity Lock for edit mode
@@ -108,7 +111,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
   useEffect(() => {
     const loadTemplates = async () => {
       try {
-        const result = await messageTemplateService.list({
+        const result = await messageTemplateService.list(projectApiPath, {
           isEnabled: true,
           limit: 1000,
         });
@@ -357,7 +360,11 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       };
 
       if (notice) {
-        const result = await ingamePopupNoticeService.updateIngamePopupNotice(notice.id, data);
+        const result = await ingamePopupNoticeService.updateIngamePopupNotice(
+          projectApiPath,
+          notice.id,
+          data
+        );
         if (result.isChangeRequest) {
           showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
         } else {
@@ -367,6 +374,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         }
       } else {
         const result = await ingamePopupNoticeService.createIngamePopupNotice(
+          projectApiPath,
           data as CreateIngamePopupNoticeData
         );
         if (result.isChangeRequest) {
@@ -545,9 +553,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
             label={t('ingamePopupNotices.displayPriority')}
             type="number"
             value={displayPriority}
-            onChange={(e) =>
-              setDisplayPriority(e.target.value === '' ? '' : parseInt(e.target.value) || 100)
-            }
+            onChange={(e) => setDisplayPriority(parseInt(e.target.value) || 100)}
             fullWidth
             helperText={t('ingamePopupNotices.displayPriorityHelp')}
           />

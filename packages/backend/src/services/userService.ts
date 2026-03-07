@@ -1,14 +1,18 @@
 import { UserModel } from '../models/User';
 import { UserWithoutPassword } from '../types/user';
 import { GatrixError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('userService');
 import EmailService from './EmailService';
 
 export interface UserFilters {
-  role?: string;
   status?: string;
   search?: string;
   tags?: string[];
+  orgId?: string;
+  excludeSystemAdmins?: boolean;
+  actorScopeLevel?: number;
 }
 
 export interface PaginationOptions {
@@ -29,10 +33,9 @@ export class UserService {
     name: string;
     email: string;
     password: string;
-    role?: 'admin' | 'user';
     status?: 'active' | 'pending' | 'suspended';
     emailVerified?: boolean;
-    createdBy?: number;
+    createdBy?: string;
   }): Promise<UserWithoutPassword> {
     try {
       // Check if user already exists
@@ -45,7 +48,6 @@ export class UserService {
         name: userData.name,
         email: userData.email,
         password: userData.password,
-        role: userData.role || 'user',
         status: userData.status || 'active',
         emailVerified: userData.emailVerified || true,
         createdBy: userData.createdBy,
@@ -54,7 +56,6 @@ export class UserService {
       logger.info('User created successfully:', {
         userId: user.id,
         email: user.email,
-        role: user.role,
       });
 
       return user;
@@ -87,7 +88,7 @@ export class UserService {
     }
   }
 
-  static async getUserById(id: number): Promise<UserWithoutPassword> {
+  static async getUserById(id: string): Promise<UserWithoutPassword> {
     try {
       const user = await UserModel.findById(id);
       if (!user) {
@@ -101,10 +102,10 @@ export class UserService {
     }
   }
 
-  static async updateUser(id: number, updateData: any): Promise<UserWithoutPassword> {
+  static async updateUser(id: string, updateData: any): Promise<UserWithoutPassword> {
     try {
       // Validate updates for admin
-      const allowedFields = ['name', 'email', 'status', 'role', 'avatarUrl'];
+      const allowedFields = ['name', 'email', 'status', 'avatarUrl'];
       const filteredUpdates: any = {};
 
       for (const [key, value] of Object.entries(updateData)) {
@@ -137,7 +138,7 @@ export class UserService {
     }
   }
 
-  static async deleteUser(id: number): Promise<void> {
+  static async deleteUser(id: string): Promise<void> {
     try {
       const user = await UserModel.findById(id);
       if (!user) {
@@ -172,7 +173,7 @@ export class UserService {
         UserModel.findAll(1, 1, { status: 'active' }).then((result) => result.total),
         UserModel.findAll(1, 1, { status: 'pending' }).then((result) => result.total),
         UserModel.findAll(1, 1, { status: 'suspended' }).then((result) => result.total),
-        UserModel.findAll(1, 1, { role: 'admin' }).then((result) => result.total),
+        UserModel.findAll(1, 1, {}).then((result) => result.total),
       ]);
 
       return {
@@ -188,7 +189,7 @@ export class UserService {
     }
   }
 
-  static async activateUser(userId: number): Promise<void> {
+  static async activateUser(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -209,7 +210,7 @@ export class UserService {
           email: user.email,
         });
       } catch (emailError) {
-        // 이메일 발송 실패는 로그만 남기고 전체 프로세스는 계속 진행
+        // 이메일 발송 Failed는 로그만 남기고 전체 프로세스는 계속 진행
         logger.error('Failed to send approval email:', {
           userId,
           email: user.email,
@@ -227,7 +228,7 @@ export class UserService {
     }
   }
 
-  static async suspendUser(userId: number): Promise<void> {
+  static async suspendUser(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -250,56 +251,6 @@ export class UserService {
     }
   }
 
-  static async promoteToAdmin(userId: number): Promise<void> {
-    try {
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      if (user.role === 'admin') {
-        throw new GatrixError('User is already an admin', 400);
-      }
-
-      await UserModel.update(userId, { role: 'admin' });
-
-      logger.info('User promoted to admin:', {
-        userId,
-        email: user.email,
-      });
-    } catch (error) {
-      logger.error('Error promoting user to admin:', error);
-      throw error instanceof GatrixError
-        ? error
-        : new GatrixError('Failed to promote user to admin', 500);
-    }
-  }
-
-  static async demoteFromAdmin(userId: number): Promise<void> {
-    try {
-      const user = await UserModel.findById(userId);
-      if (!user) {
-        throw new GatrixError('User not found', 404);
-      }
-
-      if (user.role !== 'admin') {
-        throw new GatrixError('User is not an admin', 400);
-      }
-
-      await UserModel.update(userId, { role: 'user' });
-
-      logger.info('User demoted from admin:', {
-        userId,
-        email: user.email,
-      });
-    } catch (error) {
-      logger.error('Error demoting user from admin:', error);
-      throw error instanceof GatrixError
-        ? error
-        : new GatrixError('Failed to demote user from admin', 500);
-    }
-  }
-
   static async getPendingUsers(): Promise<UserWithoutPassword[]> {
     try {
       const result = await UserModel.findAll(1, 100, { status: 'pending' });
@@ -310,7 +261,7 @@ export class UserService {
     }
   }
   // 태그 관련 메서드들
-  static async getUserTags(userId: number): Promise<any[]> {
+  static async getUserTags(userId: string): Promise<any[]> {
     try {
       return await UserModel.getTags(userId);
     } catch (error) {
@@ -319,9 +270,9 @@ export class UserService {
     }
   }
 
-  static async setUserTags(userId: number, tagIds: number[], updatedBy: number): Promise<void> {
+  static async setUserTags(userId: string, tagIds: string[], updatedBy: string): Promise<void> {
     try {
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await UserModel.findById(userId);
       if (!user) {
         throw new GatrixError('User not found', 404);
@@ -337,9 +288,9 @@ export class UserService {
     }
   }
 
-  static async addUserTag(userId: number, tagId: number, createdBy: number): Promise<void> {
+  static async addUserTag(userId: string, tagId: string, createdBy: string): Promise<void> {
     try {
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await UserModel.findById(userId);
       if (!user) {
         throw new GatrixError('User not found', 404);
@@ -355,9 +306,9 @@ export class UserService {
     }
   }
 
-  static async removeUserTag(userId: number, tagId: number): Promise<void> {
+  static async removeUserTag(userId: string, tagId: string): Promise<void> {
     try {
-      // 사용자 존재 확인
+      // Check if user exists
       const user = await UserModel.findById(userId);
       if (!user) {
         throw new GatrixError('User not found', 404);
@@ -373,8 +324,8 @@ export class UserService {
     }
   }
 
-  // 관리자가 사용자 이메일을 강제 인증 처리
-  static async verifyUserEmail(userId: number): Promise<void> {
+  // 관리자가 Force verify user email
+  static async verifyUserEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -399,8 +350,8 @@ export class UserService {
     }
   }
 
-  // 사용자에게 이메일 인증 메일 재전송
-  static async resendVerificationEmail(userId: number): Promise<void> {
+  // Used자에게 이메일 Resend verification email
+  static async resendVerificationEmail(userId: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -411,7 +362,7 @@ export class UserService {
         throw new GatrixError('User email is already verified', 400);
       }
 
-      // 이메일 인증 메일 발송 (현재는 웰컴 이메일로 대체)
+      // 이메일 Authentication 메일 발송 (현재는 웰컴 이메일로 대체)
       try {
         await EmailService.sendWelcomeEmail(user.email, user.name);
         logger.info('Verification email sent:', {
@@ -437,7 +388,7 @@ export class UserService {
   /**
    * Update user's preferred language
    */
-  static async updateUserLanguage(userId: number, preferredLanguage: string): Promise<void> {
+  static async updateUserLanguage(userId: string, preferredLanguage: string): Promise<void> {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
@@ -462,9 +413,9 @@ export class UserService {
   /**
    * Search users by name or email (for chat system)
    */
-  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+  static async searchUsers(query: string, limit: number = 20, orgId?: string): Promise<UserWithoutPassword[]> {
     try {
-      const users = await UserModel.searchUsers(query, limit);
+      const users = await UserModel.searchUsers(query, limit, orgId);
       return users;
     } catch (error) {
       logger.error('Error searching users:', error);

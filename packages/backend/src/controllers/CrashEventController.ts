@@ -5,7 +5,9 @@ import { CrashEvent } from '../models/CrashEvent';
 import { ClientCrash } from '../models/ClientCrash';
 import fs from 'fs/promises';
 import path from 'path';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CrashEventController');
 
 /**
  * Controller for crash event management (admin)
@@ -22,7 +24,7 @@ export class CrashEventController {
       search,
       platform,
       platformOperator,
-      environment,
+      environmentId,
       environmentOperator,
       branch,
       branchOperator,
@@ -63,10 +65,10 @@ export class CrashEventController {
     }
 
     // Environment filter - support multiple values
-    if (environment) {
-      const environments = (environment as string).split(',').map((e) => e.trim());
+    if (environmentId) {
+      const environments = (environmentId as string).split(',').map((e) => e.trim());
       if (environments.length > 0) {
-        query = query.whereIn('environment', environments);
+        query = query.whereIn('environmentId', environments);
       }
     }
 
@@ -115,7 +117,7 @@ export class CrashEventController {
     const validSortColumns = [
       'createdAt',
       'platform',
-      'environment',
+      'environmentId',
       'branch',
       'appVersion',
       'resVersion',
@@ -301,14 +303,14 @@ export class CrashEventController {
       appVersionResults,
     ] = await Promise.all([
       CrashEvent.query().distinct('platform').whereNotNull('platform'),
-      CrashEvent.query().distinct('environment').whereNotNull('environment'),
+      CrashEvent.query().distinct('environmentId').whereNotNull('environmentId'),
       CrashEvent.query().distinct('branch').whereNotNull('branch'),
       CrashEvent.query().distinct('marketType').whereNotNull('marketType'),
       CrashEvent.query().distinct('appVersion').whereNotNull('appVersion'),
     ]);
 
     const platforms = platformResults.map((r: any) => r.platform).sort();
-    const environments = environmentResults.map((r: any) => r.environment).sort();
+    const environments = environmentResults.map((r: any) => r.environmentId).sort();
     const branches = branchResults.map((r: any) => r.branch).sort();
     const marketTypes = marketTypeResults.map((r: any) => r.marketType).sort();
     const appVersions = appVersionResults.map((r: any) => r.appVersion).sort();

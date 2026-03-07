@@ -27,9 +27,9 @@ internal static class StrategyUtils
     }
 
     /// <summary>
-    /// Calculate normalized percentage (0.00-99.99) using MurmurHash3.
+    /// Calculate normalized percentage (0.00-100.00) using MurmurHash3.
     /// Must produce identical results to @gatrix/shared normalizedStrategyValue().
-    /// Both use MurmurHash3 with seed 0, formula: (hash % 10000) / 100.0
+    /// Both use MurmurHash3 with seed 0, formula: (hash % 10001) / 100.0
     /// </summary>
     internal static double CalculatePercentage(string stickinessValue, string groupId, string suffix = "")
     {
@@ -50,7 +50,7 @@ internal static class StrategyUtils
             stickinessValue.AsSpan().CopyTo(seedSpan[(groupId.Length + suffix.Length + 1)..]);
 
             var hash = MurmurHash3.Hash(seedSpan[..len]);
-            return (hash % 10000) / 100.0;
+            return (hash % 10001) / 100.0;
         }
         finally
         {

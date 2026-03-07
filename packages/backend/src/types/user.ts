@@ -9,25 +9,27 @@ export type AuthType =
   | 'service-account';
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   passwordHash?: string;
   name: string;
   avatarUrl?: string;
   preferredLanguage: SupportedLanguage;
-  role: 'admin' | 'user';
+
   status: 'pending' | 'active' | 'suspended' | 'deleted';
   authType: AuthType;
   emailVerified: boolean;
   emailVerifiedAt?: Date;
   lastLoginAt?: Date;
-  oauthProvider?: string;
-  oauthId?: string;
+  isEditor: boolean;
+  forceToEditorMode: boolean;
+  ssoProviderId?: string;
+  ssoSubjectId?: string;
+  tags?: any;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
-  createdBy?: number;
-  createdByName?: string;
-  createdByEmail?: string;
 }
 
 export interface CreateUserData {
@@ -36,13 +38,11 @@ export interface CreateUserData {
   name: string;
   avatarUrl?: string;
   preferredLanguage?: SupportedLanguage;
-  role?: 'admin' | 'user';
+
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   authType?: AuthType;
   emailVerified?: boolean;
-  oauthProvider?: string;
-  oauthId?: string;
-  createdBy?: number;
+  createdBy?: string;
 }
 
 export interface UpdateUserData {
@@ -50,58 +50,54 @@ export interface UpdateUserData {
   name?: string;
   avatarUrl?: string;
   preferredLanguage?: SupportedLanguage;
-  role?: 'admin' | 'user';
+
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   authType?: AuthType;
   emailVerified?: boolean;
   lastLoginAt?: Date;
+  isEditor?: boolean;
+  forceToEditorMode?: boolean;
 }
 
 export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 
 export interface OAuthAccount {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   provider: 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
   providerId: string;
-  providerEmail?: string;
-  providerName?: string;
-  providerAvatar?: string;
-  accessToken?: string;
-  refreshToken?: string;
-  expiresAt?: Date;
+  providerData?: any;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateOAuthAccountData {
-  userId: number;
+  userId: string;
   provider: 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
   providerId: string;
-  providerEmail?: string;
-  providerName?: string;
-  providerAvatar?: string;
-  accessToken?: string;
-  refreshToken?: string;
-  expiresAt?: Date;
+  providerData?: any;
 }
 
 export interface AuditLog {
-  id: number;
-  userId?: number;
+  id: string;
+  userId?: string;
   action: string;
   description?: string;
   entityType?: string;
-  entityId?: number;
+  entityId?: string;
   oldValues?: any;
   newValues?: any;
+  environmentId?: string;
+  resourceType?: string;
+  resourceId?: string;
+  details?: any;
   ipAddress?: string;
   userAgent?: string;
   createdAt: Date;
 }
 
 export interface CreateAuditLogData {
-  userId?: number;
+  userId?: string;
   action: string;
   description?: string;
   resourceType?: string;
@@ -110,5 +106,5 @@ export interface CreateAuditLogData {
   newValues?: any;
   ipAddress?: string;
   userAgent?: string;
-  environment?: string;
+  environmentId?: string;
 }

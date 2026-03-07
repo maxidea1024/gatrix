@@ -1,4 +1,6 @@
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ConsoleService');
 import { randomUUID } from 'crypto';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
@@ -124,12 +126,7 @@ class ConsoleService {
       .action(async (_args, ctx) => {
         const u = ctx?.user;
         if (!u) return { output: 'Not authenticated' };
-        const lines = [
-          `ID: ${u.id ?? ''}`,
-          `Name: ${u.name ?? ''}`,
-          `Email: ${u.email ?? ''}`,
-          `Role: ${u.role ?? ''}`,
-        ];
+        const lines = [`ID: ${u.id ?? ''}`, `Name: ${u.name ?? ''}`, `Email: ${u.email ?? ''}`];
         return { output: lines.join('\n') };
       });
 
@@ -1288,13 +1285,20 @@ class ConsoleService {
         return { output: '\u001b[33mUser not found\u001b[0m' };
       }
 
+      // Get RBAC roles from role bindings
+      const roleBindings = await db('g_role_bindings as rb')
+        .join('g_roles as r', 'rb.roleId', 'r.id')
+        .where('rb.userId', user.id)
+        .select('r.name as roleName');
+      const roles = roleBindings.map((rb: any) => rb.roleName).join(', ') || 'No roles assigned';
+
       const lines = [
         '\u001b[32mUser Information:\u001b[0m',
         '',
         `ID: ${user.id}`,
         `Name: ${user.name || 'N/A'}`,
         `Email: ${user.email}`,
-        `Role: ${user.role || 'user'}`,
+        `Roles: ${roles}`,
         `Status: ${user.status || 'unknown'}`,
         `Email Verified: ${user.emailVerified ? 'Yes' : 'No'}`,
         `Created: ${user.createdAt ? new Date(user.createdAt).toISOString() : 'N/A'}`,
@@ -1351,7 +1355,7 @@ class ConsoleService {
         timestamp = new Date(input).getTime();
       }
 
-      if (isNaN(timestamp)) {
+      if (!timestamp) {
         return { output: '\u001b[31mError:\u001b[0m Invalid timestamp' };
       }
 

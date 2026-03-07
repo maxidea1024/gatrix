@@ -172,18 +172,7 @@ const UserPresence: React.FC<UserPresenceProps> = ({
           {user.name || user.username}
         </Typography>
 
-        {user.role === 'admin' && (
-          <Chip
-            label={t('chat.admin')}
-            size="small"
-            color="primary"
-            variant="outlined"
-            sx={{
-              height: size === 'small' ? 16 : 20,
-              fontSize: size === 'small' ? '0.6rem' : '0.7rem',
-            }}
-          />
-        )}
+
       </Box>
 
       {user.name && (

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import redisClient from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('responseCache');
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import crypto from 'crypto';
 
@@ -194,7 +196,7 @@ export async function invalidateCache(pattern: string): Promise<number> {
 }
 
 // Invalidate cache for specific user
-export async function invalidateUserCache(userId: number): Promise<number> {
+export async function invalidateUserCache(userId: string): Promise<number> {
   return invalidateCache(`cache:*:user:${userId}*`);
 }
 

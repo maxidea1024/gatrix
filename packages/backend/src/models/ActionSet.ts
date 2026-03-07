@@ -1,43 +1,45 @@
 import db from '../config/knex';
+import { generateULID } from '../utils/ulid';
 import { createLogger } from '../config/logger';
+import { parseJsonField } from '@/utils/dbUtils';
 
 const logger = createLogger('ActionSetModel');
 
 // Types
 export interface ActionSet {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   isEnabled: boolean;
-  actorId: number | null;
+  actorId: string | null;
   actorName?: string;
   source: string;
   sourceId: number | null;
   sourceName?: string;
   filters: Record<string, any> | null;
   actions: Action[];
-  createdBy: number;
+  createdBy: string;
   createdByName?: string;
-  updatedBy: number | null;
+  updatedBy: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface Action {
-  id: number;
-  actionSetId: number;
+  id: string;
+  actionSetId: string;
   sortOrder: number;
   actionType: string;
   executionParams: Record<string, any> | null;
-  createdBy: number;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface ActionSetEvent {
-  id: number;
-  actionSetId: number;
-  signalId: number;
+  id: string;
+  actionSetId: string;
+  signalId: string;
   state: 'started' | 'success' | 'failed';
   eventSignal: Record<string, any>;
   eventActionSet: Record<string, any>;
@@ -48,12 +50,13 @@ export interface CreateActionSetData {
   name: string;
   description?: string;
   isEnabled?: boolean;
-  actorId?: number;
+  actorId?: string;
   source?: string;
   sourceId?: number;
   filters?: Record<string, any>;
   actions: CreateActionData[];
-  createdBy: number;
+  projectId?: string;
+  createdBy: string;
 }
 
 export interface CreateActionData {
@@ -66,12 +69,12 @@ export interface UpdateActionSetData {
   name?: string;
   description?: string;
   isEnabled?: boolean;
-  actorId?: number;
+  actorId?: string;
   source?: string;
   sourceId?: number;
   filters?: Record<string, any>;
   actions?: CreateActionData[];
-  updatedBy: number;
+  updatedBy: string;
 }
 
 export class ActionSetModel {
@@ -85,7 +88,9 @@ export class ActionSetModel {
     try {
       return await db
         .transaction(async (trx) => {
-          const [insertId] = await trx(this.TABLE).insert({
+          const id = generateULID();
+          await trx(this.TABLE).insert({
+            id,
             name: data.name,
             description: data.description || null,
             isEnabled: data.isEnabled !== undefined ? data.isEnabled : true,
@@ -93,13 +98,15 @@ export class ActionSetModel {
             source: data.source || 'signal-endpoint',
             sourceId: data.sourceId || null,
             filters: data.filters ? JSON.stringify(data.filters) : null,
+            projectId: data.projectId || null,
             createdBy: data.createdBy,
           });
 
           // Insert actions
           if (data.actions && data.actions.length > 0) {
             const actionsToInsert = data.actions.map((action) => ({
-              actionSetId: insertId,
+              id: generateULID(),
+              actionSetId: id,
               sortOrder: action.sortOrder,
               actionType: action.actionType,
               executionParams: action.executionParams
@@ -111,16 +118,16 @@ export class ActionSetModel {
             await trx(this.ACTIONS_TABLE).insert(actionsToInsert);
           }
 
-          return insertId;
+          return id;
         })
-        .then((insertId) => this.findById(insertId) as Promise<ActionSet>);
+        .then((id) => this.findById(id) as Promise<ActionSet>);
     } catch (error) {
       logger.error('Error creating action set:', error);
       throw error;
     }
   }
 
-  static async findById(id: number): Promise<ActionSet | null> {
+  static async findById(id: string): Promise<ActionSet | null> {
     try {
       const row = await db(this.TABLE)
         .select([
@@ -149,9 +156,9 @@ export class ActionSetModel {
     }
   }
 
-  static async findAll(): Promise<ActionSet[]> {
+  static async findAll(projectId?: string): Promise<ActionSet[]> {
     try {
-      const rows = await db(this.TABLE)
+      let query = db(this.TABLE)
         .select([
           `${this.TABLE}.*`,
           'creator.name as createdByName',
@@ -162,6 +169,12 @@ export class ActionSetModel {
         .leftJoin('g_users as actor', `${this.TABLE}.actorId`, 'actor.id')
         .leftJoin('g_signal_endpoints as sep', `${this.TABLE}.sourceId`, 'sep.id')
         .orderBy(`${this.TABLE}.createdAt`, 'desc');
+
+      if (projectId) {
+        query = query.where(`${this.TABLE}.projectId`, projectId);
+      }
+
+      const rows = await query;
 
       // Batch load actions
       const setIds = rows.map((r: any) => r.id);
@@ -194,7 +207,7 @@ export class ActionSetModel {
     }
   }
 
-  static async update(id: number, data: UpdateActionSetData): Promise<ActionSet | null> {
+  static async update(id: string, data: UpdateActionSetData): Promise<ActionSet | null> {
     try {
       await db.transaction(async (trx) => {
         const updateData: any = { updatedBy: data.updatedBy, updatedAt: db.fn.now() };
@@ -216,6 +229,7 @@ export class ActionSetModel {
 
           if (data.actions.length > 0) {
             const actionsToInsert = data.actions.map((action) => ({
+              id: generateULID(),
               actionSetId: id,
               sortOrder: action.sortOrder,
               actionType: action.actionType,
@@ -237,7 +251,7 @@ export class ActionSetModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await db(this.TABLE).where('id', id).del();
       return result > 0;
@@ -247,7 +261,7 @@ export class ActionSetModel {
     }
   }
 
-  static async toggleEnabled(id: number, updatedBy: number): Promise<ActionSet | null> {
+  static async toggleEnabled(id: string, updatedBy: string): Promise<ActionSet | null> {
     try {
       const set = await db(this.TABLE).select('isEnabled').where('id', id).first();
       if (!set) return null;
@@ -267,7 +281,7 @@ export class ActionSetModel {
 
   // ─── Actions ─────────────────────────
 
-  static async findActions(actionSetId: number): Promise<Action[]> {
+  static async findActions(actionSetId: string): Promise<Action[]> {
     try {
       const actions = await db(this.ACTIONS_TABLE)
         .where('actionSetId', actionSetId)
@@ -289,14 +303,12 @@ export class ActionSetModel {
   /**
    * Find enabled action sets that match a given signal
    */
-  static async findMatchingActionSets(source: string, sourceId: number): Promise<ActionSet[]> {
+  static async findMatchingActionSets(source: string, sourceId: string): Promise<ActionSet[]> {
     try {
       const rows = await db(this.TABLE)
         .where('isEnabled', true)
         .where('source', source)
-        .where(function () {
-          this.where('sourceId', sourceId).orWhereNull('sourceId');
-        })
+        .where('sourceId', sourceId)
         .whereNotNull('actorId');
 
       const results: ActionSet[] = [];
@@ -315,14 +327,16 @@ export class ActionSetModel {
   // ─── Events (execution log) ─────────────────────────
 
   static async createEvent(
-    actionSetId: number,
-    signalId: number,
+    actionSetId: string,
+    signalId: string,
     state: 'started' | 'success' | 'failed',
     eventSignal: Record<string, any>,
     eventActionSet: Record<string, any>
   ): Promise<ActionSetEvent> {
     try {
-      const [insertId] = await db(this.EVENTS_TABLE).insert({
+      const id = generateULID();
+      await db(this.EVENTS_TABLE).insert({
+        id,
         actionSetId,
         signalId,
         state,
@@ -330,7 +344,7 @@ export class ActionSetModel {
         eventActionSet: JSON.stringify(eventActionSet),
       });
 
-      return db(this.EVENTS_TABLE).where('id', insertId).first();
+      return db(this.EVENTS_TABLE).where('id', id).first();
     } catch (error) {
       logger.error('Error creating action set event:', error);
       throw error;
@@ -338,7 +352,7 @@ export class ActionSetModel {
   }
 
   static async updateEventState(
-    eventId: number,
+    eventId: string,
     state: 'started' | 'success' | 'failed',
     eventActionSet?: Record<string, any>
   ): Promise<void> {
@@ -356,7 +370,7 @@ export class ActionSetModel {
   }
 
   static async findEvents(
-    actionSetId: number,
+    actionSetId: string,
     limit: number = 50,
     offset: number = 0
   ): Promise<{ events: ActionSetEvent[]; total: number }> {
@@ -373,9 +387,9 @@ export class ActionSetModel {
       // Parse JSON fields
       const parsedEvents = events.map((e: any) => ({
         ...e,
-        eventSignal: typeof e.eventSignal === 'string' ? JSON.parse(e.eventSignal) : e.eventSignal,
-        eventActionSet:
-          typeof e.eventActionSet === 'string' ? JSON.parse(e.eventActionSet) : e.eventActionSet,
+        eventState: e.state,
+        eventSignal: parseJsonField(e.eventSignal),
+        eventActionSet: parseJsonField(e.eventActionSet),
       }));
 
       return {

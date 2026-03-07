@@ -15,7 +15,7 @@ class ServerLifecycleController {
         search,
         serviceType,
         instanceId,
-        environment,
+        environmentId,
         eventType,
         serviceGroup,
         hostname,
@@ -56,7 +56,7 @@ class ServerLifecycleController {
             .orWhere('g_server_lifecycle_events.instanceId', 'like', searchTerm)
             .orWhere('g_server_lifecycle_events.hostname', 'like', searchTerm)
             .orWhere('g_server_lifecycle_events.serviceGroup', 'like', searchTerm)
-            .orWhere('g_server_lifecycle_events.environment', 'like', searchTerm)
+            .orWhere('g_server_lifecycle_events.environmentId', 'like', searchTerm)
             .orWhere('g_server_lifecycle_events.externalAddress', 'like', searchTerm)
             .orWhere('g_server_lifecycle_events.internalAddress', 'like', searchTerm)
             .orWhere('g_server_lifecycle_events.appVersion', 'like', searchTerm);
@@ -69,8 +69,8 @@ class ServerLifecycleController {
       if (instanceId) {
         query.where('g_server_lifecycle_events.instanceId', instanceId as string);
       }
-      if (environment) {
-        query.where('g_server_lifecycle_events.environment', environment as string);
+      if (environmentId) {
+        query.where('g_server_lifecycle_events.environmentId', environmentId as string);
       }
       if (eventType) {
         query.where('g_server_lifecycle_events.eventType', eventType as string);

@@ -9,7 +9,9 @@
  */
 
 import { Response, NextFunction } from 'express';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('environmentMiddleware');
 import { AuthenticatedRequest } from '../types/auth';
 import { Environment } from '../models/Environment';
 
@@ -24,22 +26,23 @@ export const environmentContextMiddleware = async (
 ): Promise<void> => {
   try {
     // Extract environment from header ONLY
-    const environmentName = req.headers['x-environment'] as string;
+    // Extract environment ID (ULID) from header
+    const environmentId = req.headers['x-environment-id'] as string;
 
-    if (!environmentName) {
-      // If no environment is specified, we don't set req.environment
+    if (!environmentId) {
+      // If no environment is specified, we don't set req.environmentId
       // Controllers should handle missing environment if they need it
       return next();
     }
 
-    // Validate environment exists
-    const environment = await Environment.getByName(environmentName);
-    if (!environment) {
-      logger.warn(`Invalid environment requested: ${environmentName}`);
+    // Validate environment exists by ULID id
+    const env = await Environment.getById(environmentId);
+    if (!env) {
+      logger.warn(`Invalid environment requested: ${environmentId}`);
       return next();
     }
 
-    req.environment = environment.environment;
+    req.environmentId = env.id;
 
     next();
   } catch (error) {
@@ -55,9 +58,9 @@ export const environmentContextMiddleware = async (
 export const requireEnvironmentType = (allowedTypes: string[]) => {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const environmentName = req.environment;
+      const environmenId = req.environmentId;
 
-      if (!environmentName) {
+      if (!environmenId) {
         res.status(400).json({
           success: false,
           message: 'Environment context is required for this operation',
@@ -65,12 +68,12 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
         return;
       }
 
-      const environment = await Environment.getByName(environmentName);
+      const env = await Environment.getById(environmenId as string);
 
-      if (!environment || !allowedTypes.includes(environment.environmentType)) {
+      if (!env || !allowedTypes.includes(env.environmentType)) {
         res.status(403).json({
           success: false,
-          message: `This operation is not allowed in ${environment?.environmentType || 'unknown'} environment`,
+          message: `This operation is not allowed in ${env?.environmentType || 'unknown'} environment`,
         });
         return;
       }
@@ -96,13 +99,13 @@ export const preventProductionModification = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const environmentName = req.environment;
+    const environmentId = req.environmentId;
 
-    if (!environmentName) {
+    if (!environmentId) {
       return next();
     }
 
-    const environment = await Environment.getByName(environmentName);
+    const environment = await Environment.getById(environmentId as string);
 
     if (environment?.environmentType === 'production') {
       // For production, check if approval is required

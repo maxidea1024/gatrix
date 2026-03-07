@@ -6,13 +6,15 @@ import { Approval } from '../models/Approval';
 import { Environment } from '../models/Environment';
 import { User } from '../models/User';
 import { ActionGroup, ACTION_GROUP_TYPES, ActionGroupType } from '../models/ActionGroup';
-import logger from '../config/logger';
 import knex from '../config/knex';
 import { ChangeRequestNotifications } from './sseNotificationService';
 import { GatrixError } from '../middleware/errorHandler';
 import { ErrorCodes } from '@gatrix/shared';
 import { diff } from 'deep-diff';
 import { OutboxService } from './OutboxService';
+
+import { createLogger } from '../config/logger';
+const logger = createLogger('ChangeRequest');
 
 /**
  * Generate ops from beforeData and afterData
@@ -161,7 +163,7 @@ export class ChangeRequestService {
    * Now uses ops-based model
    */
   static async upsertChangeRequestItem(
-    userId: number,
+    userId: string,
     environmentName: string,
     targetTable: string,
     targetId: string,
@@ -176,7 +178,7 @@ export class ChangeRequestService {
       // Block new edits when review is pending
       const pendingReview = await ChangeRequest.query()
         .where('requesterId', userId)
-        .where('environment', environmentName)
+        .where('environmentId', environmentName)
         .where('status', 'open')
         .first();
 
@@ -210,7 +212,7 @@ export class ChangeRequestService {
         // Phase 2: Check if user already has a draft - enforce single draft rule
         const existingDraft = await ChangeRequest.query()
           .where('requesterId', userId)
-          .where('environment', environmentName)
+          .where('environmentId', environmentName)
           .where('status', 'draft')
           .first();
 
@@ -233,7 +235,7 @@ export class ChangeRequestService {
           cr = await ChangeRequest.query().insert({
             id: ulid(),
             requesterId: userId,
-            environment: environmentName,
+            environmentId: environmentName,
             status: 'draft',
             title: `[${cleanTable}] ${action}: ${identifier}`,
             priority: 'medium',
@@ -350,7 +352,7 @@ export class ChangeRequestService {
 
       return { changeRequestId: cr.id, status: cr.status };
     } catch (error) {
-      logger.error('[ChangeRequestService] Error upserting change request:', error);
+      logger.error('Error upserting change request:', error);
       throw error;
     }
   }
@@ -401,7 +403,7 @@ export class ChangeRequestService {
         }
       } catch (err) {
         logger.warn(
-          `[ChangeRequest] Failed to capture version for ${item.targetTable}:${item.targetId}`,
+          `Failed to capture version for ${item.targetTable}:${item.targetId}`,
           err
         );
       }
@@ -416,7 +418,7 @@ export class ChangeRequestService {
     await ChangeRequestNotifications.notifySubmitted({
       id: cr.id,
       title: cr.title,
-      environment: cr.environment,
+      environmentId: cr.environmentId,
       requesterId: cr.requesterId,
       requesterName: cr.requester?.name || cr.requester?.email,
     });
@@ -426,7 +428,7 @@ export class ChangeRequestService {
 
   static async approveChangeRequest(
     changeRequestId: string,
-    approverId: number,
+    approverId: string,
     comment?: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
@@ -482,7 +484,7 @@ export class ChangeRequestService {
         // Fallback: fetch environment directly if relation failed to load
         const env = await knex('g_environments')
           .transacting(trx)
-          .where('environment', cr.environment)
+          .where('environmentId', cr.environmentId)
           .first();
         if (env) {
           requiredApprovers = Number(env.requiredApprovers);
@@ -490,7 +492,7 @@ export class ChangeRequestService {
       }
 
       logger.info(
-        `[ChangeRequest] Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environment})`
+        `Approval threshold check for ${cr.id}: ${currentApprovals}/${requiredApprovers} (Env: ${cr.environmentId})`
       );
 
       if (currentApprovals >= requiredApprovers) {
@@ -499,14 +501,14 @@ export class ChangeRequestService {
           updatedAt: new Date().toISOString() as any,
         });
 
-        logger.info(`[ChangeRequest] Request ${cr.id} transitioned to APPROVED status.`);
+        logger.info(`Request ${cr.id} transitioned to APPROVED status.`);
 
         // Send SSE notification to requester when approved
         await ChangeRequestNotifications.notifyApproved(
           {
             id: cr.id,
             title: cr.title,
-            environment: cr.environment,
+            environmentId: cr.environmentId,
             requesterId: cr.requesterId,
           },
           approver?.name || approver?.email,
@@ -539,7 +541,7 @@ export class ChangeRequestService {
 
     if (approvalCount >= effectiveMinApprovals) {
       logger.info(
-        `[ChangeRequest] Auto-approving ${cr.id} as threshold ${effectiveMinApprovals} is met via lazy check`
+        `Auto-approving ${cr.id} as threshold ${effectiveMinApprovals} is met via lazy check`
       );
 
       const updated = await ChangeRequest.query().patchAndFetchById(cr.id, {
@@ -553,14 +555,14 @@ export class ChangeRequestService {
           {
             id: cr.id,
             title: cr.title,
-            environment: cr.environment,
+            environmentId: cr.environmentId,
             requesterId: cr.requesterId,
           },
           'System (Auto)',
-          0
+          ''
         );
       } catch (err) {
-        logger.error('[ChangeRequest] Failed to send auto-approve notification', err);
+        logger.error('Failed to send auto-approve notification', err);
       }
 
       return updated;
@@ -571,7 +573,7 @@ export class ChangeRequestService {
 
   static async rejectChangeRequest(
     changeRequestId: string,
-    rejectedBy: number | null,
+    rejectedBy: string | null,
     comment: string
   ): Promise<ChangeRequest> {
     if (!comment) throw new Error('Rejection comment is mandatory.');
@@ -597,7 +599,7 @@ export class ChangeRequestService {
     // Create Audit Log with comment
     await knex('g_audit_logs').insert({
       action: 'CHANGE_REQUEST_REJECTED',
-      userId: rejectedBy || 0, // 0 for system
+      userId: rejectedBy || '', // 0 for system
       changeRequestId: cr.id,
       entityType: 'ChangeRequest',
       entityId: 0,
@@ -609,12 +611,12 @@ export class ChangeRequestService {
       {
         id: cr.id,
         title: cr.title,
-        environment: cr.environment,
+        environmentId: cr.environmentId,
         requesterId: cr.requesterId,
       },
       rejectorName,
       comment,
-      rejectedBy || 0
+      rejectedBy || ''
     );
 
     const updated = await cr.$query().findById(cr.id);
@@ -624,7 +626,7 @@ export class ChangeRequestService {
 
   static async reopenChangeRequest(
     changeRequestId: string,
-    requesterId: number
+    requesterId: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const cr = await ChangeRequest.query(trx).findById(changeRequestId);
@@ -634,7 +636,16 @@ export class ChangeRequestService {
       }
 
       const user = await User.query(trx).findById(requesterId);
-      const isAdmin = user?.role === 'admin' || String(user?.role) === '0';
+      // Check admin status via RBAC permissions (wildcard = org admin)
+      const { permissionService } = await import('./PermissionService');
+      const userOrgs = await permissionService.getUserOrganisations(requesterId);
+      let isAdmin = false;
+      for (const org of userOrgs) {
+        if (await permissionService.isOrgAdmin(requesterId, org.orgId)) {
+          isAdmin = true;
+          break;
+        }
+      }
 
       // Validate ownership: Only the original requester or an admin can reopen
       if (cr.requesterId !== requesterId && !isAdmin) {
@@ -644,7 +655,7 @@ export class ChangeRequestService {
       // Phase 4: Check for existing draft - prevent reopen conflict
       const existingDraft = await ChangeRequest.query(trx)
         .where('requesterId', cr.requesterId)
-        .where('environment', cr.environment)
+        .where('environmentId', cr.environmentId)
         .where('status', 'draft')
         .first();
 
@@ -661,7 +672,7 @@ export class ChangeRequestService {
       // Also check for pending review
       const pendingReview = await ChangeRequest.query(trx)
         .where('requesterId', cr.requesterId)
-        .where('environment', cr.environment)
+        .where('environmentId', cr.environmentId)
         .where('status', 'open')
         .first();
 
@@ -686,7 +697,7 @@ export class ChangeRequestService {
 
   static async executeChangeRequest(
     changeRequestId: string,
-    userId: number
+    userId: string
   ): Promise<ChangeRequest> {
     // Import service registry
     const { hasServiceHandler, getServiceHandler } = await import('./ServiceRegistry');
@@ -700,7 +711,7 @@ export class ChangeRequestService {
       if (cr.status !== 'approved') throw new Error('Change Request must be APPROVED to execute');
 
       // Get environment settings for conflict check policy
-      const env = await Environment.query(trx).findById(cr.environment);
+      const env = await Environment.query(trx).findById(cr.environmentId);
       const strictConflictCheck = env?.strictConflictCheck ?? true; // Default to strict
 
       // Collect items for post-transaction service calls and Outbox events
@@ -772,7 +783,7 @@ export class ChangeRequestService {
           } else {
             // Warn but continue (dev/test environments)
             logger.warn(
-              `[ChangeRequest] Conflict detected but continuing (non-strict): ${conflictReason}`
+              `Conflict detected but continuing (non-strict): ${conflictReason}`
             );
           }
         }
@@ -801,7 +812,7 @@ export class ChangeRequestService {
             affectedRows = await trx(item.targetTable).where('id', item.targetId).delete();
           }
 
-          logger.info(`[ChangeRequest] Deleted ${item.targetTable}:${item.targetId}`);
+          logger.info(`Deleted ${item.targetTable}:${item.targetId}`);
 
           if (hasServiceHandler(item.targetTable)) {
             serviceCallsNeeded.push({
@@ -901,8 +912,8 @@ export class ChangeRequestService {
               }
 
               // Ensure environment is set for new records
-              if (!dbData.environment) {
-                dbData.environment = cr.environment;
+              if (!dbData.environmentId) {
+                dbData.environmentId = cr.environmentId;
               }
               // Ensure timestamps are set for new records
               if (!dbData.createdAt) {
@@ -933,7 +944,7 @@ export class ChangeRequestService {
                     targetId: String(realId),
                   });
                 logger.info(
-                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
+                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
                 );
               }
             } else {
@@ -987,8 +998,8 @@ export class ChangeRequestService {
               }
 
               // Ensure environment is set for new records
-              if (!dbData.environment) {
-                dbData.environment = cr.environment;
+              if (!dbData.environmentId) {
+                dbData.environmentId = cr.environmentId;
               }
               // Ensure timestamps are set for new records
               if (!dbData.createdAt) {
@@ -1012,7 +1023,7 @@ export class ChangeRequestService {
                     targetId: String(realId),
                   });
                 logger.info(
-                  `[ChangeRequest] Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
+                  `Updated ChangeItem targetId: ${item.targetId} -> ${realId}`
                 );
               }
             } else {
@@ -1038,7 +1049,7 @@ export class ChangeRequestService {
               }
             }
             logger.warn(
-              `[ChangeRequest] No service handler for ${item.targetTable}, events not published`
+              `No service handler for ${item.targetTable}, events not published`
             );
           }
         }
@@ -1074,7 +1085,7 @@ export class ChangeRequestService {
         {
           id: cr.id,
           title: cr.title,
-          environment: cr.environment,
+          environmentId: cr.environmentId,
           requesterId: cr.requesterId,
         },
         executor?.name || executor?.email,
@@ -1103,12 +1114,12 @@ export class ChangeRequestService {
             await handler.apply(
               call.targetId,
               call.afterData,
-              result.cr.environment, // Use environment from result CR
+              result.cr.environmentId, // Use environmentId from result CR
               userId // Pass executor ID to service for audit/context
             );
           } catch (err) {
             logger.error(
-              `[ChangeRequest] Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,
+              `Post-execution service hook failed for ${call.targetTable}:${call.targetId}`,
               err
             );
             // We do NOT rollback transaction here as data is already committed.
@@ -1173,7 +1184,7 @@ export class ChangeRequestService {
 
   static async revertChangeRequest(
     changeRequestId: string,
-    userId: number
+    userId: string
   ): Promise<ChangeRequest> {
     return await transaction(ChangeRequest.knex(), async (trx) => {
       const originalCr = await ChangeRequest.query(trx)
@@ -1191,7 +1202,7 @@ export class ChangeRequestService {
         title: `Revert: ${originalCr.title}`,
         description: `Revert of request #${originalCr.id}`,
         requesterId: userId,
-        environment: originalCr.environment,
+        environmentId: originalCr.environmentId,
         status: 'open',
         type: 'revert',
         priority: originalCr.priority || 'medium',
@@ -1256,7 +1267,7 @@ export class ChangeRequestService {
             }
           } catch (err) {
             logger.warn(
-              `[Revert] Could not fetch live data for ${item.targetTable}:${item.targetId}`,
+              `Could not fetch live data for ${item.targetTable}:${item.targetId}`,
               err
             );
           }
@@ -1289,12 +1300,12 @@ export class ChangeRequestService {
         await ChangeRequestNotifications.notifySubmitted({
           id: newCr.id,
           title: newCr.title,
-          environment: newCr.environment,
+          environmentId: newCr.environmentId,
           requesterId: userId,
           requesterName: requester?.name || requester?.email,
         });
       } catch (err) {
-        logger.error('[ChangeRequest] Failed to send revert notification', err);
+        logger.error('Failed to send revert notification', err);
       }
 
       // Return the full CR with items AND action groups
@@ -1335,7 +1346,7 @@ export class ChangeRequestService {
       // Delete requests
       const deleted = await ChangeRequest.query(trx).whereIn('id', ids).delete();
 
-      logger.info('[ChangeRequest] Cleanup completed', {
+      logger.info('Cleanup completed', {
         deleted,
         retentionDays,
       });
@@ -1349,11 +1360,11 @@ export class ChangeRequestService {
    * @param userId User ID (for draft visibility)
    */
   static async getChangeRequestCounts(
-    environment: string,
-    userId: number
+    environmentId: string,
+    userId: string
   ): Promise<Record<string, number>> {
     const counts = await ChangeRequest.query()
-      .where('environment', environment)
+      .where('environmentId', environmentId)
       .where((builder) => {
         builder.whereNot('status', 'draft').orWhere((subBuilder) => {
           subBuilder.where('status', 'draft').where('requesterId', userId);

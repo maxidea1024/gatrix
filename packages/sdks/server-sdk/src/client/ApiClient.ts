@@ -15,7 +15,6 @@ export interface ApiClientConfig {
   baseURL: string;
   apiToken: string;
   applicationName: string;
-  environment?: string; // Default environment for single-environment mode
   timeout?: number;
   logger?: Logger;
   retry?: RetryConfig;
@@ -57,11 +56,6 @@ export class ApiClient {
       'X-API-Token': config.apiToken,
       'X-Application-Name': config.applicationName,
     };
-
-    // Add environment header if provided
-    if (config.environment) {
-      headers['X-Environment'] = config.environment;
-    }
 
     // Create axios instance
     this.client = axios.create({

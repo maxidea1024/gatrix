@@ -1,11 +1,12 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { generateULID } from '../utils/ulid';
 import database from '../config/database';
 import { convertFromMySQLDateTime, convertToMySQLDateTime } from '../utils/dateUtils';
 import { pubSubService } from './PubSubService';
 
 export interface IngamePopupNotice {
-  id: number;
-  environment: string;
+  id: string;
+  environmentId: string;
   isActive: boolean;
   content: string; // Database field for admin UI
   message: string; // Actual message content (from template or direct)
@@ -23,13 +24,13 @@ export interface IngamePopupNotice {
   showOnce: boolean;
   startDate?: string | null;
   endDate?: string | null;
-  messageTemplateId: number | null;
+  messageTemplateId: string | null;
   useTemplate: boolean;
   description: string | null;
   createdAt: string;
   updatedAt: string;
-  createdBy: number;
-  updatedBy: number | null;
+  createdBy: string;
+  updatedBy: string | null;
 }
 
 export interface CreateIngamePopupNoticeData {
@@ -55,7 +56,7 @@ export interface CreateIngamePopupNoticeData {
   endDate?: string | null;
 }
 
-export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> {}
+export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> { }
 
 export interface IngamePopupNoticeFilters {
   isActive?: boolean;
@@ -67,7 +68,7 @@ export interface IngamePopupNoticeFilters {
   clientVersion?: string;
   accountId?: string;
   search?: string;
-  environment: string;
+  environmentId: string;
 }
 
 class IngamePopupNoticeService {
@@ -85,9 +86,9 @@ class IngamePopupNoticeService {
     const queryParams: (string | number | boolean | null)[] = [];
 
     // Environment filter (always applied)
-    const environment = filters.environment;
-    whereClauses.push('environment = ?');
-    queryParams.push(environment);
+    const environmentId = filters.environmentId;
+    whereClauses.push('environmentId = ?');
+    queryParams.push(environmentId);
 
     // Apply filters
     if (filters.isActive !== undefined) {
@@ -194,13 +195,13 @@ class IngamePopupNoticeService {
    * Get ingame popup notice by ID
    */
   async getIngamePopupNoticeById(
-    id: number,
-    environment: string
+    id: string,
+    environmentId: string
   ): Promise<IngamePopupNotice | null> {
     const pool = database.getPool();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_ingame_popup_notices WHERE id = ? AND environment = ?',
-      [id, environment]
+      'SELECT * FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?',
+      [id, environmentId]
     );
 
     if (rows.length === 0) {
@@ -215,23 +216,26 @@ class IngamePopupNoticeService {
    */
   async createIngamePopupNotice(
     data: CreateIngamePopupNoticeData,
-    createdBy: number,
-    environment: string
+    createdBy: string,
+    environmentId: string
   ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
 
+    const generatedId = generateULID();
+
     const [result] = await pool.execute<ResultSetHeader>(
       `INSERT INTO g_ingame_popup_notices (
-        environment, isActive, content, targetWorlds, targetWorldsInverted, targetPlatforms, targetPlatformsInverted,
+        id, environmentId, isActive, content, targetWorlds, targetWorldsInverted, targetPlatforms, targetPlatformsInverted,
         targetChannels, targetChannelsInverted, targetSubchannels, targetSubchannelsInverted,
         targetUserIds, targetUserIdsInverted,
         displayPriority, showOnce, startDate, endDate,
         messageTemplateId, useTemplate, description, createdBy
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        environment,
+        generatedId,
+        environmentId,
         data.isActive,
-        data.content,
+        data.content ?? null,
         data.targetWorlds ? JSON.stringify(data.targetWorlds) : null,
         data.targetWorldsInverted ?? false,
         data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null,
@@ -253,7 +257,7 @@ class IngamePopupNoticeService {
       ]
     );
 
-    const notice = await this.getIngamePopupNoticeById(result.insertId, environment);
+    const notice = await this.getIngamePopupNoticeById(generatedId, environmentId);
     if (!notice) {
       throw new Error('Failed to create ingame popup notice');
     }
@@ -265,7 +269,7 @@ class IngamePopupNoticeService {
         id: notice.id,
         timestamp: Date.now(),
         isVisible: notice.isActive,
-        environment: environment,
+        environmentId: environmentId,
       },
     });
 
@@ -276,10 +280,10 @@ class IngamePopupNoticeService {
    * Update ingame popup notice
    */
   async updateIngamePopupNotice(
-    id: number,
+    id: string,
     data: UpdateIngamePopupNoticeData,
-    updatedBy: number,
-    environment: string
+    updatedBy: string,
+    environmentId: string
   ): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     const updates: string[] = [];
@@ -369,14 +373,14 @@ class IngamePopupNoticeService {
     values.push(updatedBy);
 
     updates.push('updatedAt = UTC_TIMESTAMP()');
-    values.push(id, environment);
+    values.push(id, environmentId);
 
     await pool.execute(
-      `UPDATE g_ingame_popup_notices SET ${updates.join(', ')} WHERE id = ? AND environment = ?`,
+      `UPDATE g_ingame_popup_notices SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
       values
     );
 
-    const notice = await this.getIngamePopupNoticeById(id, environment);
+    const notice = await this.getIngamePopupNoticeById(id, environmentId);
     if (!notice) {
       throw new Error('Ingame popup notice not found');
     }
@@ -388,7 +392,7 @@ class IngamePopupNoticeService {
         id: notice.id,
         timestamp: Date.now(),
         isVisible: notice.isActive,
-        environment: environment,
+        environmentId: environmentId,
       },
     });
 
@@ -398,12 +402,12 @@ class IngamePopupNoticeService {
   /**
    * Delete ingame popup notice
    */
-  async deleteIngamePopupNotice(id: number, environment: string): Promise<void> {
+  async deleteIngamePopupNotice(id: string, environmentId: string): Promise<void> {
     const pool = database.getPool();
 
-    await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environment = ?', [
+    await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?', [
       id,
-      environment,
+      environmentId,
     ]);
 
     // Publish SDK event
@@ -412,7 +416,7 @@ class IngamePopupNoticeService {
       data: {
         id,
         timestamp: Date.now(),
-        environment: environment,
+        environmentId: environmentId,
       },
     });
   }
@@ -420,13 +424,13 @@ class IngamePopupNoticeService {
   /**
    * Delete multiple ingame popup notices
    */
-  async deleteMultipleIngamePopupNotices(ids: number[], environment: string): Promise<void> {
+  async deleteMultipleIngamePopupNotices(ids: string[], environmentId: string): Promise<void> {
     const pool = database.getPool();
     const placeholders = ids.map(() => '?').join(',');
 
     await pool.execute(
-      `DELETE FROM g_ingame_popup_notices WHERE id IN (${placeholders}) AND environment = ?`,
-      [...ids, environment]
+      `DELETE FROM g_ingame_popup_notices WHERE id IN (${placeholders}) AND environmentId = ?`,
+      [...ids, environmentId]
     );
 
     // Publish SDK events for each deleted notice
@@ -436,7 +440,7 @@ class IngamePopupNoticeService {
         data: {
           id,
           timestamp: Date.now(),
-          environment: environment,
+          environmentId: environmentId,
         },
       });
     }
@@ -445,14 +449,14 @@ class IngamePopupNoticeService {
   /**
    * Toggle active status
    */
-  async toggleActive(id: number, environment: string): Promise<IngamePopupNotice> {
+  async toggleActive(id: string, environmentId: string): Promise<IngamePopupNotice> {
     const pool = database.getPool();
     await pool.execute(
-      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environment = ?',
-      [id, environment]
+      'UPDATE g_ingame_popup_notices SET isActive = NOT isActive, updatedAt = UTC_TIMESTAMP() WHERE id = ? AND environmentId = ?',
+      [id, environmentId]
     );
 
-    const notice = await this.getIngamePopupNoticeById(id, environment);
+    const notice = await this.getIngamePopupNoticeById(id, environmentId);
     if (!notice) {
       throw new Error('Ingame popup notice not found');
     }
@@ -464,7 +468,7 @@ class IngamePopupNoticeService {
         id: notice.id,
         timestamp: Date.now(),
         isVisible: notice.isActive,
-        environment: environment,
+        environmentId: environmentId,
       },
     });
 
@@ -501,7 +505,7 @@ class IngamePopupNoticeService {
 
     return {
       id: row.id,
-      environment: row.environment,
+      environmentId: row.environmentId,
       isActive: Boolean(row.isActive),
       content: row.content, // Database field for admin UI
       message: row.content, // Map database 'content' field to SDK 'message' field
@@ -561,9 +565,9 @@ class IngamePopupNoticeService {
     // Parse targetUserIds from comma-separated string to array
     const targetUserIds = row.targetUserIds
       ? row.targetUserIds
-          .split(',')
-          .map((id: string) => id.trim())
-          .filter((id: string) => id)
+        .split(',')
+        .map((id: string) => id.trim())
+        .filter((id: string) => id)
       : [];
 
     const targetPlatforms = parseArray(row.targetPlatforms);

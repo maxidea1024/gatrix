@@ -54,10 +54,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     <Box
       sx={{
         minHeight: '100vh',
-        background:
-          theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, #0f0f0f 0%, #050505 100%)'
-            : 'linear-gradient(135deg, #9e9e9e 0%, #757575 100%)',
+        bgcolor: 'background.default',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

@@ -19,7 +19,8 @@ import {
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { User, Tag } from '@/types';
-import { TagService } from '@/services/tagService';
+import { tagService } from '@/services/tagService';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 interface UserFormProps {
   open: boolean;
@@ -40,6 +41,8 @@ export interface UserFormData {
 }
 
 const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, loading = false }) => {
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [tagsLoading, setTagsLoading] = useState(false);
@@ -61,14 +64,14 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
     },
   });
 
-  // 태그 로드
+  // Tag load
   useEffect(() => {
     if (open) {
       loadTags();
     }
   }, [open]);
 
-  // 사용자 데이터로 폼 초기화
+  // User data to form initialization
   useEffect(() => {
     if (user) {
       reset({
@@ -97,7 +100,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, onClose, onSubmit, user, load
   const loadTags = async () => {
     try {
       setTagsLoading(true);
-      const tags = await TagService.getAllTags();
+      const tags = await tagService.list(projectApiPath);
       setAllTags(tags);
     } catch (error) {
       console.error('Failed to load tags:', error);

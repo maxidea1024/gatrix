@@ -5,7 +5,7 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('ChatServerService');
 
 interface UserData {
-  id: number;
+  id: string;
   username: string;
   name?: string;
   email?: string;
@@ -25,7 +25,7 @@ export class ChatServerService {
   private serviceToken: string;
 
   private constructor() {
-    // 설정에서 API 토큰 가져오기
+    // Settings에서 API 토큰 가져오기
     this.apiToken = config.chatServer.apiToken;
     this.serviceToken =
       (config.chatServer as any).serviceToken ||
@@ -36,11 +36,11 @@ export class ChatServerService {
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Token': this.serviceToken, // Backend -> Chat Server 특수 토큰 사용
+        'X-API-Token': this.serviceToken, // Backend -> Chat Server 특수 토큰 Used
       },
     });
 
-    // 응답 인터셉터로 에러 처리
+    // Response 인터셉터로 Error handling
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
@@ -63,11 +63,11 @@ export class ChatServerService {
   }
 
   /**
-   * API 토큰이 이미 헤더에 설정되어 있으므로 추가 인증 불필요
+   * API 토큰이 이미 Headers에 Settings되어 있으므로 추가 Authentication 불필요
    */
 
   /**
-   * 사용자 정보를 Chat Server에 동기화
+   * User info를 Chat Server에 동기화
    */
   async syncUser(userData: UserData): Promise<void> {
     try {
@@ -89,28 +89,28 @@ export class ChatServerService {
   }
 
   /**
-   * 사용자가 Chat Server에 동기화되어 있는지 확인하고, 없으면 동기화
+   * Used자가 Chat Server에 동기화되어 있는지 Confirm하고, 없으면 동기화
    */
   async ensureUserSynced(userData: UserData): Promise<void> {
     try {
-      // 먼저 사용자가 존재하는지 확인
+      // 먼저 Used자가 존재하는지 Confirm
       const checkResponse = await this.axiosInstance.get(`/api/v1/users/check/${userData.id}`);
 
       if (checkResponse.data.success && checkResponse.data.data?.exists) {
-        // 사용자가 이미 존재하면 동기화 스킵
+        // Used자가 이미 존재하면 동기화 스킵
         return;
       }
     } catch (error) {
-      // 확인 실패하면 동기화 시도
+      // Confirm Failed하면 동기화 시도
       logger.debug(`🔍 Could not check user existence, proceeding with sync...`);
     }
 
-    // 사용자가 없거나 확인 실패한 경우 동기화
+    // Used자가 없거나 Confirm Failed한 경우 동기화
     await this.syncUser(userData);
   }
 
   /**
-   * 여러 사용자를 한 번에 동기화 (개선된 bulk 처리)
+   * 여러 Used자를 한 번에 동기화 (개선된 bulk 처리)
    */
   async syncUsers(users: UserData[]): Promise<void> {
     logger.info(`🔄 Bulk syncing ${users.length} users to Chat Server...`);
@@ -142,9 +142,9 @@ export class ChatServerService {
   }
 
   /**
-   * 사용자 상태 업데이트
+   * Used자 Update state
    */
-  async updateUserStatus(userId: number, status: string, customStatus?: string): Promise<void> {
+  async updateUserStatus(userId: string, status: string, customStatus?: string): Promise<void> {
     try {
       const response = await this.axiosInstance.put(`/api/v1/users/${userId}/status`, {
         status,
@@ -165,9 +165,9 @@ export class ChatServerService {
   }
 
   /**
-   * 사용자 삭제
+   * Used자 Delete
    */
-  async deleteUser(userId: number): Promise<void> {
+  async deleteUser(userId: string): Promise<void> {
     try {
       const response = await this.axiosInstance.delete(`/api/v1/users/${userId}`);
 
@@ -185,9 +185,9 @@ export class ChatServerService {
   }
 
   /**
-   * Chat WebSocket 토큰 생성
+   * Chat WebSocket 토큰 Create
    */
-  async generateChatToken(userId: number): Promise<string> {
+  async generateChatToken(userId: string): Promise<string> {
     try {
       const response = await this.axiosInstance.post('/api/v1/auth/token', {
         userId,
@@ -205,12 +205,12 @@ export class ChatServerService {
   }
 
   /**
-   * 사용자 채널 목록 조회
+   * Used자 채널 Get list
    */
-  async getUserChannels(userId: number): Promise<any> {
+  async getUserChannels(userId: string): Promise<any> {
     try {
-      // Chat Server의 /api/v1/channels/my 엔드포인트 사용
-      // 사용자 ID를 헤더로 전달
+      // Chat Server의 /api/v1/channels/my 엔드포인트 Used
+      // Used자 ID를 Headers로 전달
       const response = await this.axiosInstance.get('/api/v1/channels/my', {
         headers: {
           'X-User-ID': userId.toString(),
@@ -221,7 +221,7 @@ export class ChatServerService {
         throw new Error('Failed to get user channels');
       }
 
-      // Chat Server의 응답 구조를 그대로 반환 (data: [], pagination: {...})
+      // Chat Server의 Return response structure as-is (data: [], pagination: {...})
       return response.data.data || { data: [], pagination: {} };
     } catch (error) {
       logger.error('Error getting user channels:', error);
@@ -230,13 +230,13 @@ export class ChatServerService {
   }
 
   /**
-   * 채널 생성
+   * 채널 Create
    */
   async createChannel(channelData: {
     name: string;
     description?: string;
     type: string;
-    createdBy: number;
+    createdBy: string;
   }): Promise<any> {
     try {
       const response = await this.axiosInstance.post('/api/v1/channels', channelData);
@@ -297,7 +297,7 @@ export class ChatServerService {
   }
 
   /**
-   * Chat Server 연결 상태 확인
+   * Chat Server 연결 Status Confirm
    */
   async healthCheck(): Promise<boolean> {
     try {
@@ -309,9 +309,9 @@ export class ChatServerService {
   }
 
   /**
-   * 사용자 목록 조회
+   * Used자 Get list
    */
-  async getUsers(userId: number, search?: string): Promise<any[]> {
+  async getUsers(userId: string, search?: string): Promise<any[]> {
     try {
       const params: any = {};
       if (search) {

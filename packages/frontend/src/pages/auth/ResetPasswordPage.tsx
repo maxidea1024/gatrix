@@ -36,7 +36,7 @@ const ResetPasswordPage: React.FC = () => {
   } | null>(null);
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  // 백엔드 메시지 키를 번역하는 함수
+  // 백엔드 메시지 키를 Translation하는 함수
   const getTranslatedMessage = (messageKey: string): string => {
     const messageMap: { [key: string]: string } = {
       PASSWORD_RESET_EMAIL_SENT: t('auth.passwordResetEmailSent'),

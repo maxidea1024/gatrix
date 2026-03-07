@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { gameWorldService } from '../services/gameWorldService';
 import { useAuth } from './AuthContext';
 import { useEnvironment } from './EnvironmentContext';
-import { PERMISSIONS } from '@/types/permissions';
+import { useOrgProject } from './OrgProjectContext';
+import { P } from '@/types/permissions';
 
 export interface GameWorldOption {
   label: string;
@@ -25,15 +26,13 @@ interface GameWorldProviderProps {
 export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
   const { isAuthenticated, hasPermission, permissionsLoading } = useAuth();
   const { currentEnvironment, isLoading: environmentLoading } = useEnvironment();
+  const { getProjectApiPath } = useOrgProject();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Check if user has permission to view game worlds
-  const canViewGameWorlds = hasPermission([
-    PERMISSIONS.GAME_WORLDS_VIEW,
-    PERMISSIONS.GAME_WORLDS_MANAGE,
-  ]);
+  const canViewGameWorlds = hasPermission([P.GAME_WORLDS_READ, P.GAME_WORLDS_UPDATE]);
 
   const loadGameWorlds = async () => {
     // Don't load if no environment is selected
@@ -43,10 +42,17 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
       return;
     }
 
+    const projectApiPath = getProjectApiPath();
+    if (!projectApiPath) {
+      setWorlds([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
-      const result = await gameWorldService.getGameWorlds({ limit: 1000 });
+      const result = await gameWorldService.getGameWorlds(projectApiPath);
       const worldOptions: GameWorldOption[] = (result.worlds || []).map((world: any) => ({
         label: world.name,
         value: world.worldId,

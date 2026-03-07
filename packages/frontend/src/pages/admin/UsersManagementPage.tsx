@@ -101,7 +101,8 @@ import { tagService } from '@/services/tagService';
 import { UserService } from '@/services/users';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { P } from '@/types/permissions';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
@@ -109,8 +110,11 @@ import { invitationService } from '../../services/invitationService';
 import { Invitation, CreateInvitationRequest } from '../../types/invitation';
 import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
+import SearchTextField from '@/components/common/SearchTextField';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useLocation } from 'react-router-dom';
 import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, {
   FilterDefinition,
@@ -118,7 +122,7 @@ import DynamicFilterBar, {
 } from '../../components/common/DynamicFilterBar';
 import { usePaginatedApi, useTags } from '../../hooks/useSWR';
 import { useEnvironments } from '../../contexts/EnvironmentContext';
-import PermissionSelector from '../../components/common/PermissionSelector';
+import { rbacService, Role, UserRole as RbacUserRole } from '@/services/rbacService';
 import { getContrastColor } from '@/utils/colorUtils';
 
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
@@ -195,92 +199,26 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
   );
 };
 
-// Role chip with permissions tooltip for admin users
+// Role chip - simplified since RBAC now manages roles
 interface RoleChipWithTooltipProps {
   user: User;
 }
 
 const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
   const { t } = useTranslation();
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
 
-  const handleMouseEnter = async () => {
-    if (user.role !== 'admin' || loaded) return;
-
-    setLoading(true);
-    try {
-      const response = await apiService.get<{
-        userId: number;
-        permissions: Permission[];
-      }>(`/admin/users/${user.id}/permissions`);
-      setPermissions(response.data?.permissions || []);
-      setLoaded(true);
-    } catch (error) {
-      console.error('Failed to load user permissions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getTooltipContent = () => {
-    if (user.role !== 'admin') {
-      return t('users.noPermissionsForUser');
-    }
-
-    if (loading) {
-      return t('common.loading');
-    }
-
-    if (!loaded) {
-      return t('users.hoverToLoadPermissions');
-    }
-
-    if (permissions.length === 0) {
-      return t('users.noPermissionsAssigned');
-    }
-
-    const maxDisplay = 5;
-    const displayPermissions = permissions.slice(0, maxDisplay);
-    const remaining = permissions.length - maxDisplay;
-
-    return (
-      <Box sx={{ maxWidth: 300 }}>
-        <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
-          {t('users.assignedPermissions')} ({permissions.length})
-        </Typography>
-        {displayPermissions.map((perm) => (
-          <Typography key={perm} variant="caption" sx={{ display: 'block', color: 'inherit' }}>
-            • {t(`permissions.${perm.replace('.', '_')}`)}
-          </Typography>
-        ))}
-        {remaining > 0 && (
-          <Typography variant="caption" sx={{ display: 'block', fontStyle: 'italic', mt: 0.5 }}>
-            +{remaining} {t('users.morePermissions')}
-          </Typography>
-        )}
-      </Box>
-    );
-  };
+  // Role field is no longer returned from backend; show '-' if undefined
+  const roleLabel = user.role ? t(`users.roles.${user.role}`) : '-';
+  const isAdmin = user.role === 'admin';
 
   return (
-    <Tooltip
-      title={getTooltipContent()}
-      arrow
-      placement="top"
-      enterDelay={300}
-      onOpen={handleMouseEnter}
-    >
-      <Chip
-        icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
-        label={t(`users.roles.${user.role}`)}
-        color={user.role === 'admin' ? 'primary' : 'secondary'}
-        size="small"
-        variant="outlined"
-        sx={{ cursor: user.role === 'admin' ? 'help' : 'default' }}
-      />
-    </Tooltip>
+    <Chip
+      icon={isAdmin ? <SecurityIcon /> : <PersonIcon />}
+      label={roleLabel}
+      color={isAdmin ? 'primary' : 'default'}
+      size="small"
+      variant="outlined"
+    />
   );
 };
 
@@ -288,26 +226,32 @@ const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user: currentUser, isLoading: authLoading, hasPermission } = useAuth();
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
   const { environments } = useEnvironments();
-  const canManage = hasPermission([PERMISSIONS.USERS_MANAGE]);
+  const location = useLocation();
+
+  // Auto-open invitation drawer when navigated with ?openInvite=true
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('openInvite') === 'true') {
+      setInvitationDialogOpen(true);
+      // Clean up the URL param
+      window.history.replaceState({}, '', location.pathname);
+    }
+  }, [location.search]);
+  const canManage = hasPermission([P.USERS_UPDATE]);
 
   // Helper function to check if user is current user
   const isCurrentUser = (user: User | null): boolean => {
     return currentUser?.id === user?.id;
   };
 
-  // Helper function to check if user is super admin (admin@gatrix.com)
-  // Super admin cannot be modified by anyone except themselves (name only)
-  const isSuperAdmin = (user: User | null): boolean => {
-    return user?.email === 'admin@gatrix.com';
-  };
-
   // Check if the target user can be modified
-  // Returns true if the user CAN be modified, false if they should be protected
+  // Backend already filters out users with higher scope levels (e.g., Super Admins)
   const canModifyUser = (user: User | null): boolean => {
     if (!user) return false;
-    // Super admin can only be modified by themselves
-    if (isSuperAdmin(user) && !isCurrentUser(user)) return false;
+    if (!canManage) return false;
     return true;
   };
 
@@ -320,7 +264,7 @@ const UsersManagementPage: React.FC = () => {
     );
   };
 
-  // 페이지 상태 관리 (URL params 연동)
+  // 페이지 State management (URL params 연동)
   const { pageState, updatePage, updateLimit, updateFilters } = usePageState({
     defaultState: {
       page: 1,
@@ -332,11 +276,11 @@ const UsersManagementPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 동적 필터 상태
+  // 동적 Filter Status
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // 디바운싱된 검색어
+  // Debouncing된 Search어
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // SWR로 데이터 로딩
@@ -357,7 +301,7 @@ const UsersManagementPage: React.FC = () => {
   const total = useMemo(() => usersData?.total || 0, [usersData]);
   const loading = isLoadingUsers || isLoadingTags;
 
-  // 초기 로딩 상태 추적
+  // 초기 Loading state 추적
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   useEffect(() => {
     if (!loading && isInitialLoad) {
@@ -365,7 +309,7 @@ const UsersManagementPage: React.FC = () => {
     }
   }, [loading, isInitialLoad]);
 
-  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
+  // 동적 Filter에서 값 추출 (useMemo로 참조 안정화)
   const statusFilter = useMemo(
     () => (activeFilters.find((f) => f.key === 'status')?.value as string[]) || [],
     [activeFilters]
@@ -391,12 +335,12 @@ const UsersManagementPage: React.FC = () => {
     [activeFilters]
   );
 
-  // 배열을 문자열로 변환하여 의존성 배열에 사용
+  // 배열을 문자열로 변환하여 의존성 배열에 Used
   const statusFilterString = useMemo(() => statusFilter.join(','), [statusFilter]);
   const roleFilterString = useMemo(() => roleFilter.join(','), [roleFilter]);
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
-  // 일괄 선택 관련 상태
+  // 일괄 선택 관련 Status
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [bulkActionType, setBulkActionType] = useState<
@@ -417,7 +361,7 @@ const UsersManagementPage: React.FC = () => {
   });
   const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
-  // 초대 관련 상태
+  // 초대 관련 Status
   const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
   const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
 
@@ -444,6 +388,10 @@ const UsersManagementPage: React.FC = () => {
 
   // Permission state for new user
   const [newUserPermissions, setNewUserPermissions] = useState<Permission[]>([]);
+
+  // RBAC roles for new user
+  const [newUserRbacRoles, setNewUserRbacRoles] = useState<{ roleId: string; roleName: string; description?: string }[]>([]);
+  const [newUserSelectedRbacRoleId, setNewUserSelectedRbacRoleId] = useState<string | null>(null);
 
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
@@ -476,20 +424,22 @@ const UsersManagementPage: React.FC = () => {
   const [editUserAllowAllEnvs, setEditUserAllowAllEnvs] = useState(false);
   const [editUserEnvIds, setEditUserEnvIds] = useState<string[]>([]);
 
-  // Permission state
-  const [editUserPermissions, setEditUserPermissions] = useState<Permission[]>([]);
+  // RBAC Role management state
+  const [editUserRbacRoles, setEditUserRbacRoles] = useState<RbacUserRole[]>([]);
+  const [editUserRbacRolesLoading, setEditUserRbacRolesLoading] = useState(false);
+  const [allRbacRoles, setAllRbacRoles] = useState<Role[]>([]);
+  const [selectedRbacRoleId, setSelectedRbacRoleId] = useState<string | null>(null);
   const [permissionsLoading, setPermissionsLoading] = useState(false);
 
   // Original user data for comparison in review
   const [originalUserData, setOriginalUserData] = useState<{
     name: string;
     email: string;
-    role: 'admin' | 'user';
     status: 'pending' | 'active' | 'suspended' | 'deleted';
     tags: Tag[];
     allowAllEnvs: boolean;
     selectedEnvironments: string[];
-    permissions: Permission[];
+    rbacRoles: RbacUserRole[];
   } | null>(null);
 
   // Review dialog state
@@ -520,7 +470,7 @@ const UsersManagementPage: React.FC = () => {
     selectedEnvironments: [],
   });
 
-  // 이메일 인증 관련 상태
+  // 이메일 Authentication 관련 Status
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
   // Default column configuration
@@ -528,9 +478,9 @@ const UsersManagementPage: React.FC = () => {
     { id: 'user', labelKey: 'users.user', visible: true },
     { id: 'email', labelKey: 'users.email', visible: true },
     { id: 'emailVerified', labelKey: 'users.emailVerified', visible: true },
-    { id: 'role', labelKey: 'users.role', visible: true },
+    { id: 'role', labelKey: 'users.role', visible: false },
     { id: 'status', labelKey: 'users.status', visible: true },
-    { id: 'environments', labelKey: 'users.environmentAccess', visible: true },
+    { id: 'environments', labelKey: 'users.environmentAccess', visible: false },
     { id: 'tags', labelKey: 'users.tags', visible: true },
     { id: 'joinDate', labelKey: 'users.joinDate', visible: true },
     { id: 'lastLogin', labelKey: 'users.lastLogin', visible: true },
@@ -589,12 +539,12 @@ const UsersManagementPage: React.FC = () => {
 
   // SWR이 자동으로 데이터를 로드하므로 fetchUsers 함수 제거
 
-  // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
+  // 초대링크 Event 처리 (MainLayout에서 전달받음)
   useEffect(() => {
     const handleInvitationChange = (event: CustomEvent) => {
       const sseEvent = event.detail;
       if (sseEvent.type === 'invitation_created' || sseEvent.type === 'invitation_deleted') {
-        // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
+        // 초대링크 Status가 변경되면 현재 초대 정보를 다시 로드
         loadCurrentInvitation();
       }
     };
@@ -610,17 +560,17 @@ const UsersManagementPage: React.FC = () => {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await tagService.list();
+        const tags = await tagService.list(projectApiPath);
         setAvailableTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
       }
     };
     loadTags();
-    loadCurrentInvitation(); // 초대 기능 활성화
+    loadCurrentInvitation(); // 초대 기능 Active화
   }, []);
 
-  // 동적 필터 정의
+  // 동적 Filter 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(
     () => [
       {
@@ -675,7 +625,7 @@ const UsersManagementPage: React.FC = () => {
     const restoredFilters: ActiveFilter[] = [];
     const filters = pageState.filters;
 
-    // status 필터 복원
+    // status Filter 복원
     if (filters.status) {
       restoredFilters.push({
         key: 'status',
@@ -685,7 +635,7 @@ const UsersManagementPage: React.FC = () => {
       });
     }
 
-    // role 필터 복원
+    // role Filter 복원
     if (filters.role) {
       restoredFilters.push({
         key: 'role',
@@ -695,7 +645,7 @@ const UsersManagementPage: React.FC = () => {
       });
     }
 
-    // tags 필터 복원
+    // tags Filter 복원
     if (filters.tags) {
       restoredFilters.push({
         key: 'tags',
@@ -738,7 +688,7 @@ const UsersManagementPage: React.FC = () => {
     }
   }, [activeFilters, filtersInitialized, pageState.filters, updateFilters]);
 
-  // 동적 필터 핸들러
+  // 동적 Filter 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
   };
@@ -778,14 +728,14 @@ const UsersManagementPage: React.FC = () => {
   const handleBulkAction = (
     actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete'
   ) => {
-    // 오픈 시 값 초기화 (이전에 선택한 값 유지 방지)
+    // 오픈 시 값 Initialization (이전에 선택한 값 유지 방지)
     setBulkActionType(actionType);
     setBulkActionValue('');
     setBulkActionTags([]);
     setBulkActionDialogOpen(true);
   };
 
-  // 일괄 작업 저장 버튼 활성화 조건 확인
+  // 일괄 작업 Save 버튼 Active화 조건 Confirm
   const isBulkActionValid = () => {
     switch (bulkActionType) {
       case 'status':
@@ -1056,7 +1006,7 @@ const UsersManagementPage: React.FC = () => {
     setEditUserData({
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: user.role || 'user',
       status: user.status,
     });
     setEditUserTags(user.tags || []);
@@ -1069,36 +1019,35 @@ const UsersManagementPage: React.FC = () => {
     setEditUserAllowAllEnvs(userWithEnv.allowAllEnvironments || false);
     setEditUserEnvIds(userWithEnv.environments || []);
 
-    // Load user permissions
-    let loadedPermissions: Permission[] = [];
-    setEditUserPermissions([]);
-    if (user.role === 'admin') {
-      setPermissionsLoading(true);
-      try {
-        const response = await apiService.get<{
-          userId: number;
-          permissions: Permission[];
-        }>(`/admin/users/${user.id}/permissions`);
-        loadedPermissions = response.data?.permissions || [];
-        setEditUserPermissions(loadedPermissions);
-      } catch (error) {
-        console.error('Failed to load user permissions:', error);
-        setEditUserPermissions([]);
-      } finally {
-        setPermissionsLoading(false);
-      }
+    // Load RBAC roles for this user
+    setEditUserRbacRolesLoading(true);
+    setSelectedRbacRoleId(null);
+    let loadedUserRoles: RbacUserRole[] = [];
+    try {
+      const [userRoles, roles] = await Promise.all([
+        rbacService.getUserRoles(String(user.id)),
+        rbacService.getRoles(),
+      ]);
+      loadedUserRoles = userRoles;
+      setEditUserRbacRoles(userRoles);
+      setAllRbacRoles(roles);
+    } catch (error) {
+      console.error('Failed to load RBAC roles:', error);
+      setEditUserRbacRoles([]);
+      setAllRbacRoles([]);
+    } finally {
+      setEditUserRbacRolesLoading(false);
     }
 
-    // Save original data for comparison
+    // Save original data for comparison (includes loaded rbacRoles)
     setOriginalUserData({
       name: user.name,
       email: user.email,
-      role: user.role,
       status: user.status,
       tags: user.tags || [],
       allowAllEnvs: userWithEnv.allowAllEnvironments || false,
       selectedEnvironments: userWithEnv.environments || [],
-      permissions: loadedPermissions,
+      rbacRoles: loadedUserRoles,
     });
 
     setEditUserDialog({
@@ -1172,13 +1121,6 @@ const UsersManagementPage: React.FC = () => {
           to: editUserData.email,
         });
       }
-      if (editUserData.role !== originalUserData.role) {
-        changes.push({
-          field: t('users.role'),
-          from: t(`users.roles.${originalUserData.role}`),
-          to: t(`users.roles.${editUserData.role}`),
-        });
-      }
       if (editUserData.status !== originalUserData.status) {
         changes.push({
           field: t('users.status'),
@@ -1205,86 +1147,20 @@ const UsersManagementPage: React.FC = () => {
           to: newTagNames,
         });
       }
+    }
 
-      // Environment access
-      if (editUserAllowAllEnvs !== originalUserData.allowAllEnvs) {
+    // RBAC Roles comparison
+    if (!isOwnAccount && originalUserData.rbacRoles) {
+      const origRoleIds = originalUserData.rbacRoles.map((r) => r.roleId).sort();
+      const newRoleIds = editUserRbacRoles.map((r) => r.roleId).sort();
+      if (origRoleIds.join(',') !== newRoleIds.join(',')) {
+        const origRoleNames = originalUserData.rbacRoles.map((r) => r.roleName).join(', ') || '-';
+        const newRoleNames = editUserRbacRoles.map((r) => r.roleName).join(', ') || '-';
         changes.push({
-          field: t('users.environmentAccess'),
-          from: originalUserData.allowAllEnvs ? t('common.all') : t('users.specificEnvironments'),
-          to: editUserAllowAllEnvs ? t('common.all') : t('users.specificEnvironments'),
+          field: t('rbac.userRoles.title'),
+          from: origRoleNames,
+          to: newRoleNames,
         });
-      } else if (!editUserAllowAllEnvs) {
-        const origEnvs = originalUserData.selectedEnvironments.sort().join(',');
-        const newEnvs = editUserEnvIds.sort().join(',');
-        if (origEnvs !== newEnvs) {
-          const getEnvNames = (ids: string[]) =>
-            ids
-              .map((id) => {
-                const env = environments.find((e) => e.environment === id);
-                return env?.displayName || env?.environmentName || id;
-              })
-              .join(', ') || '-';
-          changes.push({
-            field: t('users.environmentAccess'),
-            from: getEnvNames(originalUserData.selectedEnvironments),
-            to: getEnvNames(editUserEnvIds),
-          });
-        }
-      }
-
-      // Permissions (only for admin role)
-      if (editUserData.role === 'admin') {
-        const origPerms = [...originalUserData.permissions].sort().join(',');
-        const newPerms = [...editUserPermissions].sort().join(',');
-        if (origPerms !== newPerms) {
-          const addedPerms = editUserPermissions.filter(
-            (p) => !originalUserData.permissions.includes(p)
-          );
-          const removedPerms = originalUserData.permissions.filter(
-            (p) => !editUserPermissions.includes(p)
-          );
-
-          // Build change description - if original is 0, just show "added", not "0 -> X"
-          const origCount = originalUserData.permissions.length;
-          const newCount = editUserPermissions.length;
-
-          let fromText = '';
-          let toText = '';
-
-          if (origCount === 0 && addedPerms.length > 0) {
-            // No previous permissions - just show what's being added
-            fromText = '-';
-            toText = `${newCount} ${t('users.permissionsCount')} (+${addedPerms.length} ${t('users.added')})`;
-          } else if (newCount === 0 && removedPerms.length > 0) {
-            // All permissions removed
-            fromText = `${origCount} ${t('users.permissionsCount')}`;
-            toText = `- (-${removedPerms.length} ${t('users.removed')})`;
-          } else {
-            // Mixed changes
-            let permChange = '';
-            if (addedPerms.length > 0) {
-              permChange += `+${addedPerms.length} ${t('users.added')}`;
-            }
-            if (removedPerms.length > 0) {
-              if (permChange) permChange += ', ';
-              permChange += `-${removedPerms.length} ${t('users.removed')}`;
-            }
-            fromText = `${origCount} ${t('users.permissionsCount')}`;
-            toText = `${newCount} ${t('users.permissionsCount')} (${permChange})`;
-          }
-
-          changes.push({
-            field: t('users.permissions'),
-            from: fromText,
-            to: toText,
-            details: {
-              added: addedPerms.map((p) => t(`permissions.${p.replace('.', '_')}`)),
-              removed: removedPerms.map((p) => t(`permissions.${p.replace('.', '_')}`)),
-              addedKeys: addedPerms,
-              removedKeys: removedPerms,
-            },
-          });
-        }
       }
     }
 
@@ -1312,18 +1188,30 @@ const UsersManagementPage: React.FC = () => {
         };
         await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
 
-        // Update environment access separately
-        const allowAll = Boolean(editUserAllowAllEnvs);
-        await apiService.put(`/admin/users/${editUserDialog.user.id}/environments`, {
-          allowAllEnvironments: allowAll,
-          environments: allowAll ? [] : editUserEnvIds,
-        });
+        // Save RBAC role changes
+        if (originalUserData?.rbacRoles) {
+          const origRoleIds = new Set(originalUserData.rbacRoles.map((r) => r.roleId));
+          const newRoleIds = new Set(editUserRbacRoles.map((r) => r.roleId));
 
-        // Update permissions for admin users
-        if (editUserData.role === 'admin') {
-          await apiService.put(`/admin/users/${editUserDialog.user.id}/permissions`, {
-            permissions: editUserPermissions,
-          });
+          // Deduplicate by roleId to prevent redundant API calls
+          const uniqueRolesToAdd = [...new Set(
+            editUserRbacRoles.filter((r) => !origRoleIds.has(r.roleId)).map((r) => r.roleId)
+          )];
+          const uniqueRolesToRemove = [...new Set(
+            originalUserData.rbacRoles.filter((r) => !newRoleIds.has(r.roleId)).map((r) => r.roleId)
+          )];
+
+          const userId = String(editUserDialog.user.id);
+
+          // Use Promise.allSettled for removals to gracefully handle 404 (already removed)
+          await Promise.all([
+            ...uniqueRolesToAdd.map((roleId) => rbacService.assignUserRole(userId, roleId)),
+            ...uniqueRolesToRemove.map((roleId) =>
+              rbacService.removeUserRole(userId, roleId).catch(() => {
+                // Ignore 404 - role binding may already be removed
+              })
+            ),
+          ]);
         }
       }
 
@@ -1332,7 +1220,7 @@ const UsersManagementPage: React.FC = () => {
       setReviewDialog({ open: false, saving: false });
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
-      // API 오류 응답에서 구체적인 메시지 추출
+      // API 오류 Response에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
       setReviewDialog((prev) => ({ ...prev, saving: false }));
@@ -1364,21 +1252,21 @@ const UsersManagementPage: React.FC = () => {
         mutateUsers(); // SWR cache 갱신
         setDeleteConfirmDialog({ open: false, user: null, inputValue: '' });
       } catch (error: any) {
-        // API 오류 응답에서 구체적인 메시지 추출
+        // API 오류 Response에서 구체적인 메시지 추출
         const errorMessage = error.error?.message || error.message || t('users.deleteError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
 
-  // 이메일 강제 인증 처리
+  // 이메일 강제 Authentication 처리
   const handleVerifyUserEmail = async (userId: number) => {
     try {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
       enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
-      // 편집 폼이 열려있다면 데이터 업데이트
+      // 편집 Form이 열려있다면 Update data
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
         setEditUserDialog((prev) => ({
           ...prev,
@@ -1393,7 +1281,7 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  // 이메일 인증 메일 재전송
+  // 이메일 Resend verification email
   const handleResendVerificationEmail = async (userId: number) => {
     try {
       setEmailVerificationLoading(true);
@@ -1407,8 +1295,8 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  const handleAddUser = () => {
-    // 폼 데이터 초기화
+  const handleAddUser = async () => {
+    // Form 데이터 Initialization
     setNewUserData({
       name: '',
       email: '',
@@ -1419,9 +1307,21 @@ const UsersManagementPage: React.FC = () => {
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
     setNewUserPermissions([]);
+    setNewUserRbacRoles([]);
+    setNewUserSelectedRbacRoleId(null);
     setAddUserDialog(true);
 
-    // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
+    // Load RBAC roles if not loaded yet
+    if (allRbacRoles.length === 0) {
+      try {
+        const roles = await rbacService.getRoles();
+        setAllRbacRoles(roles);
+      } catch {
+        console.error('Failed to load RBAC roles');
+      }
+    }
+
+    // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 Initialization
     setTimeout(() => {
       setNewUserData({
         name: '',
@@ -1446,6 +1346,8 @@ const UsersManagementPage: React.FC = () => {
     setNewUserAllowAllEnvs(false);
     setNewUserEnvIds([]);
     setNewUserPermissions([]);
+    setNewUserRbacRoles([]);
+    setNewUserSelectedRbacRoleId(null);
     setNewUserErrors({
       name: '',
       email: '',
@@ -1475,7 +1377,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handleCreateUser = async () => {
-    // 폼 검증
+    // Form Validation
     if (!validateNewUserForm()) {
       return;
     }
@@ -1497,11 +1399,19 @@ const UsersManagementPage: React.FC = () => {
         });
       }
 
+      // Assign RBAC roles after user creation
+      if (createdUser && newUserRbacRoles.length > 0) {
+        const userId = String(createdUser.id);
+        await Promise.all(
+          newUserRbacRoles.map((r) => rbacService.assignUserRole(userId, r.roleId))
+        );
+      }
+
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
       handleCloseAddUserDialog();
     } catch (error: any) {
-      // API 오류 응답에서 구체적인 메시지 추출
+      // API 오류 Response에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.createError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
@@ -1511,9 +1421,9 @@ const UsersManagementPage: React.FC = () => {
   const handleCreateInvitation = async (data: CreateInvitationRequest) => {
     try {
       const response = await invitationService.createInvitation(data);
-      setInvitationDialogOpen(false); // 초대 폼 닫기
-      await loadCurrentInvitation(); // 현재 초대 정보 새로고침
-      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
+      setInvitationDialogOpen(false); // 초대 Form Close
+      await loadCurrentInvitation(); // 현재 초대 정보 Refresh
+      // Success 토스트는 SSE Event에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to create invitation:', error);
       enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', {
@@ -1528,7 +1438,7 @@ const UsersManagementPage: React.FC = () => {
     try {
       await invitationService.deleteInvitation(currentInvitation.id);
       setCurrentInvitation(null);
-      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
+      // Success 토스트는 SSE Event에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to delete invitation:', error);
       enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', {
@@ -1655,7 +1565,7 @@ const UsersManagementPage: React.FC = () => {
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {userEnvIds.slice(0, 3).map((envName) => {
-              const env = environments.find((e) => e.environment === envName);
+              const env = environments.find((e) => e.environmentId === envName);
               return (
                 <Chip
                   key={envName}
@@ -1794,49 +1704,10 @@ const UsersManagementPage: React.FC = () => {
             }}
           >
             {/* Search */}
-            <TextField
+            <SearchTextField
               placeholder={t('users.searchPlaceholder')}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{
-                minWidth: 200,
-                flexGrow: 1,
-                maxWidth: 320,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    },
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    },
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              }}
-              size="small"
+              onChange={(value) => setSearchTerm(value)}
             />
 
             {/* Dynamic Filter Bar */}
@@ -1963,21 +1834,17 @@ const UsersManagementPage: React.FC = () => {
       )}
 
       {/* Users Table */}
-      <Card sx={{ position: 'relative' }}>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {isInitialLoad && loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingUsers')}</Typography>
-            </Box>
-          ) : users.length === 0 ? (
-            <EmptyState
-              message={t('users.noUsersFound')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-              onAddClick={canManage ? handleAddUser : undefined}
-              addButtonLabel={t('users.addUser')}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={isInitialLoad && loading}>
+        {users.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('users.noUsersFound')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+            onAddClick={canManage ? handleAddUser : undefined}
+            addButtonLabel={t('users.addUser')}
+          />
+        ) : (
+          <Card variant="outlined" sx={{ position: 'relative' }}>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer
                 style={{
                   opacity: !isInitialLoad && loading ? 0.5 : 1,
@@ -2049,6 +1916,7 @@ const UsersManagementPage: React.FC = () => {
                           )}
                         </TableCell>
                         <TableCell align="center">
+                          {(isCurrentUser(user) || canModifyUser(user)) && (
                           <IconButton
                             onClick={(event) => handleMenuOpen(event, user)}
                             size="small"
@@ -2056,6 +1924,7 @@ const UsersManagementPage: React.FC = () => {
                           >
                             <MoreVertIcon />
                           </IconButton>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -2075,10 +1944,10 @@ const UsersManagementPage: React.FC = () => {
                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
                 />
               )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Actions Menu */}
       <Menu
@@ -2267,23 +2136,7 @@ const UsersManagementPage: React.FC = () => {
                 }}
               />
             </Box>
-            <FormControl fullWidth>
-              <InputLabel>{t('users.role')}</InputLabel>
-              <Select
-                value={newUserData.role}
-                label={t('users.role')}
-                onChange={(e) =>
-                  setNewUserData({
-                    ...newUserData,
-                    role: e.target.value as 'admin' | 'user',
-                  })
-                }
-              >
-                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-              </Select>
-              <FormHelperText>{t('users.roleHelp')}</FormHelperText>
-            </FormControl>
+
 
             {/* Tags Selection */}
             <Box>
@@ -2348,34 +2201,119 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* Permissions & Environment Access - Only for admin role */}
-            {newUserData.role === 'admin' && (
-              <Box sx={{ mt: 2 }}>
-                <PermissionSelector
-                  permissions={newUserPermissions}
-                  onChange={setNewUserPermissions}
-                  showEnvironments={true}
-                  environments={environments.map((env) => ({
-                    id: env.environment,
-                    environment: env.environment,
-                    name: env.environmentName,
-                    displayName: env.displayName,
-                    environmentName: env.environmentName,
-                  }))}
-                  allowAllEnvs={newUserAllowAllEnvs}
-                  selectedEnvironments={newUserEnvIds}
-                  onAllowAllEnvsChange={setNewUserAllowAllEnvs}
-                  onEnvironmentsChange={setNewUserEnvIds}
+            {/* RBAC Role Assignment */}
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                {t('rbac.userRoles.title')}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                <Autocomplete
+                  size="small"
+                  sx={{ flex: 1 }}
+                  options={allRbacRoles.filter(
+                    (r) => !newUserRbacRoles.some((ur) => ur.roleId === r.id)
+                  )}
+                  getOptionLabel={(opt) => opt.roleName}
+                  value={allRbacRoles.find((r) => r.id === newUserSelectedRbacRoleId) || null}
+                  onChange={(_, val) => setNewUserSelectedRbacRoleId(val?.id || null)}
+                  slotProps={{
+                    popper: { style: { zIndex: 9999 } },
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder={t('rbac.userRoles.selectRole')} />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
+                    return (
+                      <Box component="li" key={key} {...otherProps}>
+                        <Box>
+                          <Typography variant="body2">{option.roleName}</Typography>
+                          {option.description && (
+                            <Typography variant="caption" color="text.secondary">
+                              {option.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                    );
+                  }}
                 />
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={!newUserSelectedRbacRoleId}
+                  onClick={() => {
+                    if (!newUserSelectedRbacRoleId) return;
+                    const roleToAdd = allRbacRoles.find((r) => r.id === newUserSelectedRbacRoleId);
+                    if (!roleToAdd) return;
+                    setNewUserRbacRoles((prev) => [
+                      ...prev,
+                      {
+                        roleId: roleToAdd.id,
+                        roleName: roleToAdd.roleName,
+                        description: roleToAdd.description,
+                      },
+                    ]);
+                    setNewUserSelectedRbacRoleId(null);
+                  }}
+                >
+                  {t('rbac.userRoles.addRole')}
+                </Button>
               </Box>
-            )}
-
-            {/* Non-admin users cannot set permissions */}
-            {newUserData.role !== 'admin' && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                {t('users.noEnvironmentAccessForUser')}
-              </Alert>
-            )}
+              {newUserRbacRoles.length === 0 ? (
+                <Alert severity="info" sx={{ mt: 1 }}>
+                  {t('rbac.userRoles.noRoles')}
+                </Alert>
+              ) : (
+                <Box
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    mt: 1,
+                  }}
+                >
+                  {newUserRbacRoles.map((role, index) => (
+                    <Box
+                      key={role.roleId}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        px: 2,
+                        py: 1,
+                        borderBottom: index < newUserRbacRoles.length - 1 ? 1 : 0,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {role.roleName}
+                        </Typography>
+                        {role.description && (
+                          <Typography variant="caption" color="text.secondary">
+                            {role.description}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Tooltip title={t('rbac.userRoles.removeRole')}>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => {
+                            setNewUserRbacRoles((prev) =>
+                              prev.filter((r) => r.roleId !== role.roleId)
+                            );
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
           </Box>
         </Box>
 
@@ -2624,41 +2562,6 @@ const UsersManagementPage: React.FC = () => {
                   name: promoteDialog.user.name,
                 })}
               </Alert>
-
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                {t('users.selectPermissions')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('users.selectPermissionsDesc')}
-              </Typography>
-
-              <PermissionSelector
-                permissions={promoteDialog.permissions}
-                onChange={(permissions) => setPromoteDialog((prev) => ({ ...prev, permissions }))}
-                showTitle={false}
-                showEnvironments={true}
-                environments={environments.map((env) => ({
-                  id: env.environment,
-                  environment: env.environment,
-                  name: env.environmentName,
-                  displayName: env.displayName,
-                  environmentName: env.environmentName,
-                }))}
-                allowAllEnvs={promoteDialog.allowAllEnvs}
-                selectedEnvironments={promoteDialog.selectedEnvironments}
-                onAllowAllEnvsChange={(allowAll) =>
-                  setPromoteDialog((prev) => ({
-                    ...prev,
-                    allowAllEnvs: allowAll,
-                  }))
-                }
-                onEnvironmentsChange={(environments) =>
-                  setPromoteDialog((prev) => ({
-                    ...prev,
-                    selectedEnvironments: environments,
-                  }))
-                }
-              />
             </>
           )}
 
@@ -2787,7 +2690,7 @@ const UsersManagementPage: React.FC = () => {
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {promoteDialog.selectedEnvironments.map((envName) => {
-                        const env = environments.find((e) => e.environment === envName);
+                        const env = environments.find((e) => e.environmentId === envName);
                         const displayName = env?.displayName || env?.environmentName || envName;
                         return (
                           <Tooltip
@@ -2914,7 +2817,7 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* 이메일 인증 상태 및 액션 */}
+            {/* 이메일 Authentication Status 및 액션 */}
             {editUserDialog.user && !isCurrentUser(editUserDialog.user) && (
               <Box
                 sx={{
@@ -2974,23 +2877,6 @@ const UsersManagementPage: React.FC = () => {
 
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
               <>
-                <FormControl fullWidth>
-                  <InputLabel>{t('users.role')}</InputLabel>
-                  <Select
-                    value={editUserData.role}
-                    onChange={(e) =>
-                      setEditUserData({
-                        ...editUserData,
-                        role: e.target.value as 'admin' | 'user',
-                      })
-                    }
-                    label={t('users.role')}
-                  >
-                    <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                    <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-                  </Select>
-                  <FormHelperText>{t('users.roleHelp')}</FormHelperText>
-                </FormControl>
                 <FormControl fullWidth>
                   <InputLabel>{t('users.status')}</InputLabel>
                   <Select
@@ -3075,37 +2961,148 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* Permissions & Environment Access Section - Only for admin users */}
-            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) &&
-              editUserData.role === 'admin' && (
-                <Box sx={{ mt: 2 }}>
-                  <PermissionSelector
-                    permissions={editUserPermissions}
-                    onChange={setEditUserPermissions}
-                    loading={permissionsLoading}
-                    showEnvironments={true}
-                    environments={environments.map((env) => ({
-                      id: env.environment,
-                      environment: env.environment,
-                      name: env.environmentName,
-                      displayName: env.displayName,
-                      environmentName: env.environmentName,
-                    }))}
-                    allowAllEnvs={editUserAllowAllEnvs}
-                    selectedEnvironments={editUserEnvIds}
-                    onAllowAllEnvsChange={setEditUserAllowAllEnvs}
-                    onEnvironmentsChange={setEditUserEnvIds}
+            {/* RBAC Role Management */}
+            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  {t('rbac.userRoles.title')}
+                </Typography>
+                {/* Hide role selector if target user has system-scope roles */}
+                {!editUserRbacRoles.some((r) => r.roleScopeType === 'system') && (
+                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                  <Autocomplete
+                    size="small"
+                    sx={{ flex: 1 }}
+                    options={allRbacRoles.filter(
+                      (r) => !editUserRbacRoles.some((ur) => ur.roleId === r.id)
+                    )}
+                    getOptionLabel={(opt) => opt.roleName}
+                    value={allRbacRoles.find((r) => r.id === selectedRbacRoleId) || null}
+                    onChange={(_, val) => setSelectedRbacRoleId(val?.id || null)}
+                    slotProps={{
+                      popper: { style: { zIndex: 9999 } },
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} placeholder={t('rbac.userRoles.selectRole')} />
+                    )}
+                    renderOption={(props, option) => {
+                      const { key, ...otherProps } = props;
+                      return (
+                        <Box component="li" key={key} {...otherProps}>
+                          <Box>
+                            <Typography variant="body2">{option.roleName}</Typography>
+                            {option.description && (
+                              <Typography variant="caption" color="text.secondary">
+                                {option.description}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      );
+                    }}
                   />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    disabled={!selectedRbacRoleId}
+                    onClick={() => {
+                      if (!selectedRbacRoleId) return;
+                      const roleToAdd = allRbacRoles.find((r) => r.id === selectedRbacRoleId);
+                      if (!roleToAdd) return;
+                      // Add to local state only
+                      setEditUserRbacRoles((prev) => [
+                        ...prev,
+                        {
+                          id: `pending-${roleToAdd.id}`,
+                          userId: editUserDialog.user ? String(editUserDialog.user.id) : '',
+                          roleId: roleToAdd.id,
+                          scopeType: 'org',
+                          scopeId: '',
+                          assignedBy: null,
+                          roleName: roleToAdd.roleName,
+                          roleDescription: roleToAdd.description,
+                        },
+                      ]);
+                      setSelectedRbacRoleId(null);
+                    }}
+                  >
+                    {t('rbac.userRoles.addRole')}
+                  </Button>
                 </Box>
-              )}
-
-            {/* Non-admin users cannot access environments */}
-            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) &&
-              editUserData.role !== 'admin' && (
-                <Alert severity="info" sx={{ mt: 2 }}>
-                  {t('users.noEnvironmentAccessForUser')}
-                </Alert>
-              )}
+                )}
+                {editUserRbacRolesLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <CircularProgress size={24} />
+                  </Box>
+                ) : editUserRbacRoles.length === 0 ? (
+                  <Alert severity="info" sx={{ mt: 1 }}>
+                    {t('rbac.userRoles.noRoles')}
+                  </Alert>
+                ) : (
+                  <Box
+                    sx={{
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      mt: 1,
+                    }}
+                  >
+                    {editUserRbacRoles.map((role, index) => (
+                      <Box
+                        key={role.id}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          px: 2,
+                          py: 1,
+                          borderBottom: index < editUserRbacRoles.length - 1 ? 1 : 0,
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="body2" fontWeight={500}>
+                            {role.roleName}
+                          </Typography>
+                          {role.roleDescription && (
+                            <Typography variant="caption" color="text.secondary">
+                              {role.roleDescription}
+                            </Typography>
+                          )}
+                        </Box>
+                        {role.roleScopeType === 'system' ? (
+                          <Tooltip title={t('rbac.userRoles.systemRoleCannotBeRemoved')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                disabled
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title={t('rbac.userRoles.removeRole')}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => {
+                                // Remove from local state only
+                                setEditUserRbacRoles((prev) =>
+                                  prev.filter((r) => r.roleId !== role.roleId)
+                                );
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            )}
 
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
               <Alert severity="info">{t('users.canOnlyModifyOwnName')}</Alert>
@@ -3561,7 +3558,7 @@ const UsersManagementPage: React.FC = () => {
             </Box>
           )}
 
-          {/* 공통 대상 미리보기 (삭제 외 액션에도 표시) */}
+          {/* 공통 대상 미리보기 (Delete 외 액션에도 표시) */}
           {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
@@ -3624,7 +3621,7 @@ const UsersManagementPage: React.FC = () => {
                 {t('users.bulkDeleteConfirm', { count: selectedUsers.size })}
               </Typography>
 
-              {/* 삭제 대상 사용자 목록 */}
+              {/* Delete 대상 Used자 목록 */}
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
                 {t('users.deleteTargetUsers')}:
               </Typography>
@@ -3706,78 +3703,20 @@ const UsersManagementPage: React.FC = () => {
       </Drawer>
 
       {/* Invitation Form Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={invitationDialogOpen}
         onClose={() => setInvitationDialogOpen(false)}
-        sx={{
-          zIndex: 1300,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 400 },
-            maxWidth: '100vw',
-            height: '100vh', // 전체 화면 높이 사용
-            top: 0, // 상단에 붙임
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
+        title={t('invitations.drawerTitle')}
+        storageKey="invitation-drawer-width"
+        defaultWidth={520}
+        minWidth={400}
       >
-        {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            p: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('invitations.drawerTitle')}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              onClick={loadCurrentInvitation}
-              size="small"
-              sx={{
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-              title={t('common.refresh')}
-            >
-              <RefreshIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => setInvitationDialogOpen(false)}
-              size="small"
-              sx={{
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </Box>
-
-        {/* Content - 스크롤 가능 */}
-        <Box
-          sx={{
-            flex: 1,
-            overflow: 'auto',
-          }}
-        >
-          <InvitationForm
-            onSubmit={handleCreateInvitation}
-            onCancel={() => setInvitationDialogOpen(false)}
-            isDrawer={true}
-          />
-        </Box>
-      </Drawer>
+        <InvitationForm
+          onSubmit={handleCreateInvitation}
+          onCancel={() => setInvitationDialogOpen(false)}
+          isDrawer={true}
+        />
+      </ResizableDrawer>
 
       {/* Column Settings Popover */}
       <Popover

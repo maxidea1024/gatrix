@@ -8,7 +8,7 @@ export class ProfileWorker {
 
   constructor() {
     this.worker = new Worker('event-lens-profiles', this.processJob.bind(this), {
-      connection: redis,
+      connection: redis as any,
       concurrency: 5,
     });
 

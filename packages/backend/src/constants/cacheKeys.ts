@@ -1,14 +1,14 @@
 /**
  * Cache Keys Constants
  *
- * 중앙 집중식 캐시 키 관리
- * 모든 캐시 키는 이 파일에서 관리하여 일관성과 유지보수성을 향상시킵니다.
+ * 중앙 집중식 Cache 키 관리
+ * 모든 Cache 키는 이 파일에서 관리하여 일관성과 유지보수성을 향상시킵니다.
  */
 
 /**
  * Environment-scoped cache key prefix
  * Used for data that varies by environment (game worlds, client versions, etc.)
- * Format: env:{environment}:{originalKey}
+ * Format: env:{ environmentId }:{originalKey}
  */
 export const ENV_PREFIX = 'env';
 
@@ -18,8 +18,8 @@ export const ENV_PREFIX = 'env';
  * @param key - The original cache key
  * @returns Environment-prefixed cache key
  */
-export function withEnvironment(environment: string, key: string): string {
-  return `${ENV_PREFIX}:${environment}:${key}`;
+export function withEnvironment(environmentId: string, key: string): string {
+  return `${ENV_PREFIX}:${environmentId}:${key}`;
 }
 
 /**
@@ -41,7 +41,7 @@ export function environmentPattern(environmentId: string): string {
 }
 
 /**
- * 게임월드 관련 캐시 키
+ * 게임월드 관련 Cache 키
  */
 export const GAME_WORLDS = {
   /**
@@ -62,7 +62,7 @@ export const GAME_WORLDS = {
    * 특정 게임월드 상세 정보
    * @param id 게임월드 ID
    */
-  DETAIL: (id: number) => `game_world:${id}`,
+  DETAIL: (id: string) => `game_world:${id}`,
 
   /**
    * 월드 ID로 게임월드 조회
@@ -72,7 +72,7 @@ export const GAME_WORLDS = {
 } as const;
 
 /**
- * 클라이언트 버전 관련 캐시 키
+ * 클라이언트 버전 관련 Cache 키
  */
 export const CLIENT_VERSION = {
   /**
@@ -88,36 +88,36 @@ export const CLIENT_VERSION = {
   ALL: 'client_versions:all',
 
   /**
-   * 활성화된 클라이언트 버전만
+   * Active화된 클라이언트 버전만
    */
   ACTIVE: 'client_versions:active',
 } as const;
 
 /**
- * 사용자 관련 캐시 키
+ * Used자 관련 Cache 키
  */
 export const USER = {
   /**
-   * 사용자 프로필 정보
-   * @param userId 사용자 ID
+   * Used자 프로필 정보
+   * @param userId Used자 ID
    */
-  PROFILE: (userId: number) => `user:${userId}:profile`,
+  PROFILE: (userId: string) => `user:${userId}:profile`,
 
   /**
-   * 사용자 권한 정보
-   * @param userId 사용자 ID
+   * Used자 권한 정보
+   * @param userId Used자 ID
    */
-  PERMISSIONS: (userId: number) => `user:${userId}:permissions`,
+  PERMISSIONS: (userId: string) => `user:${userId}:permissions`,
 
   /**
-   * 사용자 세션 정보
+   * Used자 세션 정보
    * @param sessionId 세션 ID
    */
   SESSION: (sessionId: string) => `user:session:${sessionId}`,
 } as const;
 
 /**
- * 태그 관련 캐시 키
+ * 태그 관련 Cache 키
  */
 export const TAG = {
   /**
@@ -127,14 +127,14 @@ export const TAG = {
 
   /**
    * 엔티티별 태그 목록
-   * @param entityType 엔티티 타입 (game_world, user 등)
+   * @param entityType 엔티티 Type (game_world, user 등)
    * @param entityId 엔티티 ID
    */
-  BY_ENTITY: (entityType: string, entityId: number) => `tags:${entityType}:${entityId}`,
+  BY_ENTITY: (entityType: string, entityId: string) => `tags:${entityType}:${entityId}`,
 } as const;
 
 /**
- * 화이트리스트 관련 캐시 키
+ * 화이트리스트 관련 Cache 키
  */
 export const WHITELIST = {
   /**
@@ -143,23 +143,23 @@ export const WHITELIST = {
   ALL: 'whitelist:all',
 
   /**
-   * 활성화된 화이트리스트 항목만
+   * Active화된 화이트리스트 항목만
    */
   ACTIVE: 'whitelist:active',
 
   /**
-   * 특정 IP의 화이트리스트 상태
+   * 특정 IP의 화이트리스트 Status
    * @param ip IP 주소
    */
   BY_IP: (ip: string) => `whitelist:ip:${ip}`,
 } as const;
 
 /**
- * 점검 관련 캐시 키
+ * 점검 관련 Cache 키
  */
 export const MAINTENANCE = {
   /**
-   * 현재 점검 상태
+   * 현재 점검 Status
    */
   STATUS: 'maintenance:status',
 
@@ -170,7 +170,7 @@ export const MAINTENANCE = {
 } as const;
 
 /**
- * 메시지 템플릿 관련 캐시 키
+ * 메시지 템플릿 관련 Cache 키
  */
 export const MESSAGE_TEMPLATE = {
   /**
@@ -179,32 +179,32 @@ export const MESSAGE_TEMPLATE = {
   ALL: 'message_templates:all',
 
   /**
-   * 타입별 메시지 템플릿
-   * @param type 템플릿 타입
+   * Type별 메시지 템플릿
+   * @param type 템플릿 Type
    */
   BY_TYPE: (type: string) => `message_templates:type:${type}`,
 } as const;
 
 /**
- * 번역 관련 캐시 키
+ * Translation 관련 Cache 키
  */
 export const TRANSLATION = {
   /**
-   * 원문 텍스트 해시 + 대상 언어별 번역 결과
+   * 원문 텍스트 해시 + 대상 언어별 Translation Results
    * @param hash 원문 텍스트 sha256 해시
    * @param lang 대상 언어 코드
    */
   BY_TEXT_LANG: (hash: string, lang: 'ko' | 'en' | 'zh') => `translate:${hash}:${lang}`,
 
   /**
-   * 언어 감지 결과 (원문 텍스트 해시 기반)
+   * Detect language Results (원문 텍스트 해시 기반)
    * @param hash 원문 텍스트 sha256 해시
    */
   DETECT: (hash: string) => `translate:detect:${hash}`,
 } as const;
 
 /**
- * 작업(Job) 관련 캐시 키
+ * 작업(Job) 관련 Cache 키
  */
 export const JOB = {
   /**
@@ -213,7 +213,7 @@ export const JOB = {
   ALL: 'jobs:all',
 
   /**
-   * 작업 타입 목록
+   * 작업 Type 목록
    */
   TYPES: 'job_types:all',
 
@@ -221,26 +221,26 @@ export const JOB = {
    * 특정 작업 상세 정보
    * @param jobId 작업 ID
    */
-  DETAIL: (jobId: number) => `job:${jobId}`,
+  DETAIL: (jobId: string) => `job:${jobId}`,
 } as const;
 
 /**
- * 감사 로그 관련 캐시 키
+ * 감사 로그 관련 Cache 키
  */
 export const AUDIT_LOG = {
   /**
-   * 최근 감사 로그 (페이지네이션)
+   * 최근 감사 로그 (Pagination)
    * @param page 페이지 번호
    * @param limit 페이지 크기
    */
   RECENT: (page: number, limit: number) => `audit_logs:recent:${page}:${limit}`,
 
   /**
-   * 사용자별 감사 로그
-   * @param userId 사용자 ID
+   * Used자별 감사 로그
+   * @param userId Used자 ID
    * @param page 페이지 번호
    */
-  BY_USER: (userId: number, page: number) => `audit_logs:user:${userId}:${page}`,
+  BY_USER: (userId: string, page: number) => `audit_logs:user:${userId}:${page}`,
 } as const;
 /**
  * Server SDK endpoint ETag cache keys
@@ -319,7 +319,7 @@ export const ENV_SCOPED = {
   GAME_WORLDS: {
     PUBLIC: 'game_worlds:public',
     ADMIN: 'game_worlds:admin',
-    DETAIL: (id: number) => `game_world:${id}`,
+    DETAIL: (id: string) => `game_world:${id}`,
     BY_WORLD_ID: (worldId: string) => `game_world:world_id:${worldId}`,
   },
 
@@ -408,75 +408,75 @@ export const ENV_SCOPED = {
 } as const;
 
 /**
- * 캐시 패턴 (패턴 기반 삭제용)
+ * Cache 패턴 (패턴 기반 Delete용)
  */
 export const PATTERNS = {
   /**
-   * 모든 게임월드 관련 캐시
+   * 모든 게임월드 관련 Cache
    */
   GAME_WORLDS: 'game_world*',
 
   /**
-   * 모든 클라이언트 버전 관련 캐시
+   * 모든 클라이언트 버전 관련 Cache
    */
   CLIENT_VERSIONS: 'client_version*',
 
   /**
-   * 특정 사용자 관련 모든 캐시
-   * @param userId 사용자 ID
+   * 특정 Used자 관련 모든 Cache
+   * @param userId Used자 ID
    */
-  USER: (userId: number) => `user:${userId}*`,
+  USER: (userId: string) => `user:${userId}*`,
 
   /**
-   * 모든 태그 관련 캐시
+   * 모든 태그 관련 Cache
    */
   TAGS: 'tags*',
 
   /**
-   * 모든 화이트리스트 관련 캐시
+   * 모든 화이트리스트 관련 Cache
    */
   WHITELIST: 'whitelist*',
 
   /**
-   * 모든 점검 관련 캐시
+   * 모든 점검 관련 Cache
    */
   MAINTENANCE: 'maintenance*',
 
   /**
-   * 모든 메시지 템플릿 관련 캐시
+   * 모든 메시지 템플릿 관련 Cache
    */
   MESSAGE_TEMPLATES: 'message_template*',
 
   /**
-   * 모든 작업 관련 캐시
+   * 모든 작업 관련 Cache
    */
   JOBS: 'job*',
 
   /**
-   * 모든 감사 로그 관련 캐시
+   * 모든 감사 로그 관련 Cache
    */
   AUDIT_LOGS: 'audit_log*',
 
   /**
-   * 모든 번역 관련 캐시
+   * 모든 Translation 관련 Cache
    */
   TRANSLATION: 'translate*',
 
   /**
-   * 특정 환경의 모든 캐시
+   * 특정 환경의 모든 Cache
    * @param environmentId 환경 ULID
    */
   ENVIRONMENT: (environmentId: string) => `${ENV_PREFIX}:${environmentId}:*`,
 
   /**
-   * 모든 환경의 특정 패턴 캐시
-   * @param pattern 캐시 패턴
+   * 모든 환경의 특정 패턴 Cache
+   * @param pattern Cache 패턴
    */
   ALL_ENVIRONMENTS: (pattern: string) => `${ENV_PREFIX}:*:${pattern}`,
 } as const;
 
 /**
- * 캐시 TTL 상수 (밀리초)
+ * Cache TTL Constants (밀리초)
  */
 export const TTL = {
   /**
@@ -511,7 +511,7 @@ export const TTL = {
 } as const;
 
 /**
- * 기본 캐시 설정
+ * 기본 Cache Settings
  */
 export const DEFAULT_CONFIG = {
   /**
@@ -525,7 +525,7 @@ export const DEFAULT_CONFIG = {
   CLIENT_VERSION_TTL: TTL.FIVE_MINUTES,
 
   /**
-   * 사용자 프로필 TTL
+   * Used자 프로필 TTL
    */
   USER_PROFILE_TTL: TTL.THIRTY_MINUTES,
 
@@ -540,7 +540,7 @@ export const DEFAULT_CONFIG = {
   WHITELIST_TTL: TTL.FIVE_MINUTES,
 
   /**
-   * 점검 상태 TTL
+   * 점검 Status TTL
    */
   MAINTENANCE_TTL: TTL.ONE_MINUTE,
 
@@ -555,17 +555,17 @@ export const DEFAULT_CONFIG = {
   SURVEYS_TTL: TTL.ONE_MINUTE,
 
   /**
-   * 설문 설정 TTL (Server SDK용)
+   * 설문 Settings TTL (Server SDK용)
    */
   SURVEY_SETTINGS_TTL: TTL.ONE_MINUTE,
 
   /**
-   * 번역 결과/언어 감지 TTL
+   * Translation Results/Detect language TTL
    */
   TRANSLATION_TTL: TTL.ONE_DAY,
 
   /**
-   * 서비스 공지 TTL (Server SDK용 - Edge)
+   * Service 공지 TTL (Server SDK용 - Edge)
    */
   SERVICE_NOTICE_TTL: TTL.ONE_MINUTE,
 

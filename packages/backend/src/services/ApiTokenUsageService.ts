@@ -1,6 +1,8 @@
 import redisClient from '../config/redis';
 import { ApiAccessToken } from '../models/ApiAccessToken';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ApiTokenUsageService');
 import { queueService } from './QueueService';
 import { getInstanceId } from '../utils/AppInstance';
 
@@ -159,7 +161,7 @@ export class ApiTokenUsageService {
 
       logger.info(`Found ${countKeys.length} token usage counters to sync`);
 
-      const tokenAggregates = new Map<number, AggregatedStats>();
+      const tokenAggregates = new Map<string, AggregatedStats>();
 
       for (const countKey of countKeys) {
         try {
@@ -172,7 +174,7 @@ export class ApiTokenUsageService {
             const parts = countKey.split(':');
             // token_usage:count:{tokenId}:{instanceId}
             if (parts.length === 4) {
-              const tokenId = parseInt(parts[2], 10);
+              const tokenId = parts[2];
               const instanceId = parts[3];
               const metaKey = `token_usage:meta:${tokenId}:${instanceId}`;
 
@@ -236,7 +238,7 @@ export class ApiTokenUsageService {
    * Update usage in DB
    */
   private async updateTokenUsageInDatabase(
-    tokenId: number,
+    tokenId: string,
     aggregate: AggregatedStats
   ): Promise<void> {
     try {
@@ -277,7 +279,7 @@ export class ApiTokenUsageService {
     }
   }
 
-  private async invalidateTokenCache(tokenId: number): Promise<void> {
+  private async invalidateTokenCache(tokenId: string): Promise<void> {
     try {
       const client = redisClient.getClient();
       if (!client) return;

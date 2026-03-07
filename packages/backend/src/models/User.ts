@@ -1,28 +1,21 @@
 import bcrypt from 'bcryptjs';
+import { generateULID } from '../utils/ulid';
 import db from '../config/knex';
-import logger from '../config/logger';
-import {
-  User as UserType,
-  CreateUserData,
-  UpdateUserData,
-  UserWithoutPassword,
-} from '../types/user';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UserModel');
+import { CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
 import { Model } from 'objection';
-import {
-  convertDateFieldsForMySQL,
-  convertDateFieldsFromMySQL,
-  COMMON_DATE_FIELDS,
-} from '../utils/dateUtils';
 
 // Export User class for Objection.js models
 export class User extends Model {
   static tableName = 'g_users';
 
-  id!: number;
+  id!: string;
   email!: string;
   name!: string;
   passwordHash?: string;
-  role!: string;
+
   status!: string;
   authType!: string;
   emailVerified!: boolean;
@@ -30,14 +23,14 @@ export class User extends Model {
   lastLoginAt?: Date;
   avatarUrl?: string;
   preferredLanguage?: string;
-  createdBy?: number;
-  updatedBy?: number;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt!: Date;
   updatedAt!: Date;
 }
 
 export class UserModel {
-  static async findById(id: number): Promise<UserWithoutPassword | null> {
+  static async findById(id: string): Promise<UserWithoutPassword | null> {
     try {
       const user = await db('g_users')
         .select([
@@ -46,7 +39,6 @@ export class UserModel {
           'g_users.name',
           'g_users.avatarUrl',
           'g_users.preferredLanguage',
-          'g_users.role',
           'g_users.status',
           'g_users.authType',
           'g_users.emailVerified',
@@ -95,7 +87,7 @@ export class UserModel {
           'name',
           'avatarUrl',
           'preferredLanguage',
-          'role',
+
           'status',
           'emailVerified',
           'emailVerifiedAt',
@@ -121,20 +113,23 @@ export class UserModel {
         passwordHash = await bcrypt.hash(userData.password, 12);
       }
 
-      const [insertId] = await db('g_users').insert({
+      const id = generateULID();
+
+      await db('g_users').insert({
+        id,
         email: userData.email,
         passwordHash: passwordHash || null,
         name: userData.name,
         avatarUrl: userData.avatarUrl || null,
         preferredLanguage: userData.preferredLanguage || 'en',
-        role: userData.role || 'user',
+
         status: userData.status || 'pending',
         authType: userData.authType || 'local',
         emailVerified: userData.emailVerified || false,
         createdBy: userData.createdBy || null,
       });
 
-      const user = await this.findById(insertId);
+      const user = await this.findById(id);
       if (!user) {
         throw new Error('Failed to create user');
       }
@@ -146,7 +141,7 @@ export class UserModel {
     }
   }
 
-  static async update(id: number, userData: UpdateUserData): Promise<UserWithoutPassword | null> {
+  static async update(id: string, userData: UpdateUserData): Promise<UserWithoutPassword | null> {
     try {
       const updateData: any = {};
 
@@ -171,7 +166,7 @@ export class UserModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: string): Promise<boolean> {
     try {
       const result = await db('g_users').where('id', id).del();
 
@@ -186,13 +181,14 @@ export class UserModel {
     page: number = 1,
     limit: number = 10,
     filters: {
-      role?: string | string[];
-      role_operator?: 'any_of' | 'include_all';
       status?: string | string[];
       status_operator?: 'any_of' | 'include_all';
       search?: string;
       tags?: string[];
       tags_operator?: 'any_of' | 'include_all';
+      orgId?: string;
+      excludeSystemAdmins?: boolean;
+      actorScopeLevel?: number;
     } = {}
   ): Promise<{
     users: UserWithoutPassword[];
@@ -206,29 +202,54 @@ export class UserModel {
       const limitNum = parseInt(limit.toString());
       const offset = (pageNum - 1) * limitNum;
 
-      // Build base query
-      const baseQuery = () => db('g_users');
+      // Build base query — scope to org if orgId filter is present
+      const baseQuery = () => {
+        const q = db('g_users').whereNot('g_users.authType', 'service-account');
+        if (filters.orgId) {
+          q.join('g_organisation_members as om', function () {
+            this.on('om.userId', '=', 'g_users.id').andOn(
+              'om.orgId',
+              '=',
+              db.raw('?', [filters.orgId])
+            );
+          });
+        }
+        // Exclude users with roles above actor's scope level (hierarchy-based)
+        if (filters.excludeSystemAdmins && filters.actorScopeLevel != null) {
+          const { SCOPE_LEVELS } = require('../utils/scopeHierarchy');
+          const higherScopes = Object.entries(SCOPE_LEVELS)
+            .filter(([, level]) => (level as number) < filters.actorScopeLevel!)
+            .map(([key]) => key);
+          if (higherScopes.length > 0) {
+            q.whereNotExists(function (this: any) {
+              this.select('*')
+                .from('g_role_bindings as rb')
+                .join('g_roles as r', 'rb.roleId', 'r.id')
+                .whereRaw('rb.userId = g_users.id')
+                .whereIn('r.scopeType', higherScopes);
+            });
+          }
+          // Also exclude users with wildcard (*:*) permissions (effectively system-level)
+          q.whereNotExists(function (this: any) {
+            this.select('*')
+              .from('g_role_bindings as rb2')
+              .join('g_role_permissions as rp2', 'rb2.roleId', 'rp2.roleId')
+              .whereRaw('rb2.userId = g_users.id')
+              .where('rp2.permission', '*:*');
+          });
+        }
+        return q;
+      };
 
       // Apply filters function
       const applyFilters = (query: any) => {
-        // Handle role filter (single or multiple)
-        if (filters.role) {
-          if (Array.isArray(filters.role)) {
-            logger.info(`[UserModel] Applying role filter (array): ${filters.role.join(', ')}`);
-            query.whereIn('g_users.role', filters.role);
-          } else {
-            logger.info(`[UserModel] Applying role filter (single): ${filters.role}`);
-            query.where('g_users.role', filters.role);
-          }
-        }
-
         // Handle status filter (single or multiple)
         if (filters.status) {
           if (Array.isArray(filters.status)) {
-            logger.info(`[UserModel] Applying status filter (array): ${filters.status.join(', ')}`);
+            logger.info(`Applying status filter (array): ${filters.status.join(', ')}`);
             query.whereIn('g_users.status', filters.status);
           } else {
-            logger.info(`[UserModel] Applying status filter (single): ${filters.status}`);
+            logger.info(`Applying status filter (single): ${filters.status}`);
             query.where('g_users.status', filters.status);
           }
         }
@@ -247,7 +268,7 @@ export class UserModel {
           const tagsOperator = filters.tags_operator || 'include_all'; // Default to include_all (AND)
 
           if (tagsOperator === 'include_all') {
-            // AND 조건: 모든 태그를 가진 사용자만 반환
+            // AND: only users with all specified tags
             filters.tags.forEach((tagId: string) => {
               query.whereExists(function (this: any) {
                 this.select('*')
@@ -258,7 +279,7 @@ export class UserModel {
               });
             });
           } else {
-            // OR 조건: 태그 중 하나라도 가진 사용자 반환
+            // OR: users with any of the specified tags
             query.whereExists(function (this: any) {
               this.select('*')
                 .from('g_tag_assignments')
@@ -277,7 +298,7 @@ export class UserModel {
 
       // Get users with camelCase field names
       const usersQuery = applyFilters(
-        db('g_users').leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+        baseQuery().leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
       )
         .select([
           'g_users.id',
@@ -285,7 +306,6 @@ export class UserModel {
           'g_users.name',
           'g_users.avatarUrl',
           'g_users.preferredLanguage',
-          'g_users.role',
           'g_users.status',
           'g_users.authType',
           'g_users.emailVerified',
@@ -294,7 +314,6 @@ export class UserModel {
           'g_users.createdAt',
           'g_users.updatedAt',
           'g_users.createdBy',
-          'g_users.allowAllEnvironments',
           'creator.name as createdByName',
           'creator.email as createdByEmail',
         ])
@@ -310,29 +329,13 @@ export class UserModel {
       // Get all user IDs for batch loading
       const userIds = users.map((u: any) => u.id);
 
-      // Batch load environment assignments
-      const envAssignments =
-        userIds.length > 0
-          ? await db('g_user_environments')
-              .whereIn('userId', userIds)
-              .select('userId', 'environment')
-          : [];
-
-      // Group environment names by user
-      const envByUser = envAssignments.reduce((acc: any, env: any) => {
-        if (!acc[env.userId]) acc[env.userId] = [];
-        acc[env.userId].push(env.environment);
-        return acc;
-      }, {});
-
-      // 각 사용자에 대해 태그 및 환경 정보 로드
+      // Load tags for all users
       const usersWithExtras = await Promise.all(
         users.map(async (user: any) => {
           const tags = await this.getTags(user.id);
           return {
             ...user,
             tags,
-            environments: envByUser[user.id] || [],
           };
         })
       );
@@ -361,7 +364,7 @@ export class UserModel {
     }
   }
 
-  static async updatePassword(id: number, newPassword: string): Promise<boolean> {
+  static async updatePassword(id: string, newPassword: string): Promise<boolean> {
     try {
       const passwordHash = await bcrypt.hash(newPassword, 12);
       const result = await db('g_users').where('id', id).update({
@@ -376,7 +379,7 @@ export class UserModel {
     }
   }
 
-  static async updateLastLogin(id: number): Promise<void> {
+  static async updateLastLogin(id: string): Promise<void> {
     try {
       await db('g_users').where('id', id).update({
         lastLoginAt: db.fn.now(),
@@ -388,7 +391,7 @@ export class UserModel {
   }
 
   // 태그 관련 메서드들
-  static async getTags(userId: number): Promise<any[]> {
+  static async getTags(userId: string): Promise<any[]> {
     try {
       const tags = await db('g_tag_assignments')
         .join('g_tags', 'g_tag_assignments.tagId', 'g_tags.id')
@@ -411,10 +414,14 @@ export class UserModel {
     }
   }
 
-  static async setTags(userId: number, tagIds: number[], updatedBy: number): Promise<void> {
+  static async setTags(
+    userId: string,
+    tagIds: (string | number)[],
+    updatedBy: string
+  ): Promise<void> {
     try {
       await db.transaction(async (trx) => {
-        // 기존 태그 할당 삭제
+        // Existing 태그 할당 Delete
         await trx('g_tag_assignments').where('entityType', 'user').where('entityId', userId).del();
 
         // 새 태그 할당 추가
@@ -438,7 +445,7 @@ export class UserModel {
     }
   }
 
-  static async addTag(userId: number, tagId: number, createdBy: number): Promise<void> {
+  static async addTag(userId: string, tagId: string, createdBy: string): Promise<void> {
     try {
       await db('g_tag_assignments').insert({
         tagId,
@@ -455,7 +462,7 @@ export class UserModel {
     }
   }
 
-  static async removeTag(userId: number, tagId: number): Promise<void> {
+  static async removeTag(userId: string, tagId: string): Promise<void> {
     try {
       await db('g_tag_assignments')
         .where('entityType', 'user')
@@ -471,7 +478,7 @@ export class UserModel {
   /**
    * Update user's preferred language
    */
-  static async updateLanguage(userId: number, preferredLanguage: string): Promise<void> {
+  static async updateLanguage(userId: string, preferredLanguage: string): Promise<void> {
     try {
       await db('g_users').where('id', userId).update({
         preferredLanguage,
@@ -485,17 +492,27 @@ export class UserModel {
   /**
    * Search users by name or email
    */
-  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+  static async searchUsers(query: string, limit: number = 20, orgId?: string): Promise<UserWithoutPassword[]> {
     try {
-      const users = await db('g_users')
-        .select('id', 'name', 'email', 'role', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
-        .where('status', 'active') // 활성 사용자만 검색
+      const q = db('g_users')
+        .select('g_users.id', 'g_users.name', 'g_users.email', 'g_users.status', 'g_users.avatarUrl', 'g_users.createdAt', 'g_users.updatedAt')
+        .where('g_users.status', 'active')
+        .whereNot('g_users.authType', 'service-account')
         .andWhere(function () {
-          this.where('name', 'like', `%${query}%`).orWhere('email', 'like', `%${query}%`);
+          this.where('g_users.name', 'like', `%${query}%`).orWhere('g_users.email', 'like', `%${query}%`);
         })
-        .orderBy('name', 'asc')
+        .orderBy('g_users.name', 'asc')
         .limit(limit);
 
+      // Scope to organisation members if orgId is provided
+      if (orgId) {
+        q.join('g_organisation_members as om', function () {
+          this.on('om.userId', '=', 'g_users.id')
+            .andOn('om.orgId', '=', db.raw('?', [orgId]));
+        });
+      }
+
+      const users = await q;
       return users;
     } catch (error) {
       logger.error('Error searching users:', error);
@@ -514,13 +531,14 @@ export class UserModel {
           'email',
           'name',
           'avatarUrl',
-          'role',
+
           'status',
           'lastLoginAt',
           'createdAt',
           'updatedAt',
         ])
-        .where('status', 'active') // 활성 사용자만 동기화
+        .where('status', 'active') // Active Used자만 동기화
+        .whereNot('authType', 'service-account')
         .andWhere(function () {
           this.where('updatedAt', '>=', since).orWhere('createdAt', '>=', since);
         })
@@ -533,144 +551,43 @@ export class UserModel {
     }
   }
 
-  // Environment access methods
-
-  /**
-   * Get user's environment access settings
-   */
-  static async getEnvironmentAccess(userId: number): Promise<{
-    allowAllEnvironments: boolean;
-    environments: string[];
-  }> {
-    try {
-      // Get allowAllEnvironments flag
-      const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
-
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      // Get specific environment assignments
-      const environments = await db('g_user_environments')
-        .select('environment')
-        .where('userId', userId);
-
-      return {
-        allowAllEnvironments: !!user.allowAllEnvironments,
-        environments: environments.map((e: any) => e.environment),
-      };
-    } catch (error) {
-      logger.error('Error getting user environment access:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Set user's environment access
-   */
-  static async setEnvironmentAccess(
-    userId: number,
-    allowAllEnvironments: boolean,
-    environments: string[],
-    updatedBy: number
-  ): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Update allowAllEnvironments flag
-        await trx('g_users').where('id', userId).update({
-          allowAllEnvironments,
-          updatedBy,
-          updatedAt: trx.fn.now(),
-        });
-
-        // Clear existing environment assignments
-        await trx('g_user_environments').where('userId', userId).del();
-
-        // Add new environment assignments (only if not allowAllEnvironments)
-        if (!allowAllEnvironments && environments.length > 0) {
-          const assignments = environments.map((environment) => ({
-            userId,
-            environment,
-            createdBy: updatedBy,
-            createdAt: new Date(),
-          }));
-
-          await trx('g_user_environments').insert(assignments);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting user environment access:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Check if user has access to a specific environment
-   */
-  static async hasEnvironmentAccess(userId: number, environment: string): Promise<boolean> {
-    try {
-      const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
-
-      if (!user) {
-        return false;
-      }
-
-      // Admin with all environments access
-      if (user.allowAllEnvironments) {
-        return true;
-      }
-
-      // Check specific environment assignment
-      const assignment = await db('g_user_environments')
-        .where('userId', userId)
-        .where('environment', environment)
-        .first();
-
-      return !!assignment;
-    } catch (error) {
-      logger.error('Error checking user environment access:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Get accessible environment names for a user
-   */
-  static async getAccessibleEnvironments(userId: number): Promise<string[] | 'all'> {
-    try {
-      const user = await db('g_users').select('allowAllEnvironments').where('id', userId).first();
-
-      if (!user) {
-        return [];
-      }
-
-      if (user.allowAllEnvironments) {
-        return 'all';
-      }
-
-      const environments = await db('g_user_environments')
-        .select('environment')
-        .where('userId', userId);
-
-      return environments.map((e: any) => e.environment);
-    } catch (error) {
-      logger.error('Error getting accessible environment names:', error);
-      return [];
-    }
-  }
-
   // Permission methods for RBAC
 
   /**
-   * Get all permissions for a user
+   * Get all permissions for a user (from role bindings + role permissions)
    */
-  static async getPermissions(userId: number): Promise<string[]> {
+  static async getPermissions(userId: string): Promise<string[]> {
     try {
-      const permissions = await db('g_user_permissions')
-        .select('permission')
-        .where('userId', userId);
+      // Get all role IDs from direct bindings
+      const directBindings = await db('g_role_bindings')
+        .where('userId', userId)
+        .select('roleId');
 
-      return permissions.map((p: any) => p.permission);
+      // Get all role IDs from group bindings
+      const groupBindings = await db('g_role_bindings as rb')
+        .join('g_group_members as gm', 'rb.groupId', 'gm.groupId')
+        .where('gm.userId', userId)
+        .whereNotNull('rb.groupId')
+        .select('rb.roleId');
+
+      const roleIds = [
+        ...new Set([
+          ...directBindings.map((r: any) => r.roleId),
+          ...groupBindings.map((r: any) => r.roleId),
+        ]),
+      ];
+
+      if (roleIds.length === 0) {
+        return [];
+      }
+
+      // Get permissions from g_role_permissions
+      const perms = await db('g_role_permissions')
+        .whereIn('roleId', roleIds)
+        .select('permission')
+        .distinct();
+
+      return perms.map((p: any) => p.permission);
     } catch (error) {
       logger.error('Error getting user permissions:', error);
       throw error;
@@ -681,17 +598,10 @@ export class UserModel {
    * Check if user has a specific permission
    * Supports wildcard '*' permission that grants all permissions
    */
-  static async hasPermission(userId: number, permission: string): Promise<boolean> {
+  static async hasPermission(userId: string, permission: string): Promise<boolean> {
     try {
-      // Check for wildcard permission or exact match
-      const result = await db('g_user_permissions')
-        .where('userId', userId)
-        .where(function () {
-          this.where('permission', permission).orWhere('permission', '*');
-        })
-        .first();
-
-      return !!result;
+      const permissions = await this.getPermissions(userId);
+      return permissions.includes('*') || permissions.includes(permission);
     } catch (error) {
       logger.error('Error checking user permission:', error);
       return false;
@@ -702,72 +612,14 @@ export class UserModel {
    * Check if user has any of the specified permissions
    * Supports wildcard '*' permission that grants all permissions
    */
-  static async hasAnyPermission(userId: number, permissions: string[]): Promise<boolean> {
+  static async hasAnyPermission(userId: string, permissions: string[]): Promise<boolean> {
     try {
-      // Check for wildcard permission or any of the specified permissions
-      const result = await db('g_user_permissions')
-        .where('userId', userId)
-        .where(function () {
-          this.whereIn('permission', permissions).orWhere('permission', '*');
-        })
-        .first();
-
-      return !!result;
+      const userPerms = await this.getPermissions(userId);
+      if (userPerms.includes('*')) return true;
+      return permissions.some((p) => userPerms.includes(p));
     } catch (error) {
       logger.error('Error checking user permissions:', error);
       return false;
-    }
-  }
-
-  /**
-   * Set permissions for a user (replaces all existing permissions)
-   */
-  static async setPermissions(userId: number, permissions: string[]): Promise<void> {
-    try {
-      await db.transaction(async (trx) => {
-        // Delete all existing permissions
-        await trx('g_user_permissions').where('userId', userId).del();
-
-        // Insert new permissions
-        if (permissions.length > 0) {
-          const permissionsToInsert = permissions.map((permission) => ({
-            userId,
-            permission,
-          }));
-
-          await trx('g_user_permissions').insert(permissionsToInsert);
-        }
-      });
-    } catch (error) {
-      logger.error('Error setting user permissions:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Add a permission to a user
-   */
-  static async addPermission(userId: number, permission: string): Promise<void> {
-    try {
-      await db('g_user_permissions')
-        .insert({ userId, permission })
-        .onConflict(['userId', 'permission'])
-        .ignore();
-    } catch (error) {
-      logger.error('Error adding user permission:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Remove a permission from a user
-   */
-  static async removePermission(userId: number, permission: string): Promise<void> {
-    try {
-      await db('g_user_permissions').where('userId', userId).where('permission', permission).del();
-    } catch (error) {
-      logger.error('Error removing user permission:', error);
-      throw error;
     }
   }
 }

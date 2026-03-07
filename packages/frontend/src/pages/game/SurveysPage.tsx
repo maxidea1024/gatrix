@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { PERMISSIONS } from '@/types/permissions';
+import { P } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -22,6 +22,10 @@ import {
   Checkbox,
   Skeleton,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Poll as PollIcon,
@@ -33,13 +37,14 @@ import {
   ViewColumn as ViewColumnIcon,
   Close as CloseIcon,
   Refresh as RefreshIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import surveyService, { Survey } from '../../services/surveyService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
@@ -54,13 +59,17 @@ import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardDisplay from '../../components/game/RewardDisplay';
 import { showChangeRequestCreatedToast } from '../../utils/changeRequestToast';
 import { useHandleApiError } from '../../hooks/useHandleApiError';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
-  const canManage = hasPermission([PERMISSIONS.SURVEYS_MANAGE]);
+  const canManage = hasPermission([P.SURVEYS_UPDATE]);
+  const { getProjectApiPath } = useOrgProject();
+  const projectApiPath = getProjectApiPath();
 
   // State
   const [surveys, setSurveys] = useState<Survey[]>([]);
@@ -79,6 +88,20 @@ const SurveysPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+
+  // Action menu state
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [actionMenuTarget, setActionMenuTarget] = useState<Survey | null>(null);
+
+  const handleActionMenuOpen = (event: React.MouseEvent<HTMLElement>, survey: Survey) => {
+    setActionMenuAnchorEl(event.currentTarget);
+    setActionMenuTarget(survey);
+  };
+
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+    setActionMenuTarget(null);
+  };
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { handleApiError, ErrorDialog } = useHandleApiError();
@@ -167,7 +190,7 @@ const SurveysPage: React.FC = () => {
         filters.conditionType = conditionTypeFilter;
       }
 
-      const result = await surveyService.getSurveys({
+      const result = await surveyService.getSurveys(projectApiPath, {
         page: page + 1,
         limit: rowsPerPage,
         ...filters,
@@ -271,7 +294,7 @@ const SurveysPage: React.FC = () => {
     if (!deletingSurvey) return;
 
     try {
-      await surveyService.deleteSurvey(deletingSurvey.id);
+      await surveyService.deleteSurvey(projectApiPath, deletingSurvey.id);
       enqueueSnackbar(t('surveys.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadSurveys();
@@ -297,7 +320,7 @@ const SurveysPage: React.FC = () => {
     if (selectedIds.length === 0) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => surveyService.deleteSurvey(id)));
+      await Promise.all(selectedIds.map((id) => surveyService.deleteSurvey(projectApiPath, id)));
       enqueueSnackbar(t('surveys.bulkDeleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadSurveys();
@@ -314,7 +337,7 @@ const SurveysPage: React.FC = () => {
 
   const handleToggleActive = async (survey: Survey) => {
     try {
-      const result = await surveyService.toggleActive(survey.id);
+      const result = await surveyService.toggleActive(projectApiPath, survey.id);
       if (result.isChangeRequest) {
         showChangeRequestCreatedToast(enqueueSnackbar, closeSnackbar, navigate);
       } else {
@@ -492,21 +515,17 @@ const SurveysPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading && isInitialLoad ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : surveys.length === 0 ? (
-            <EmptyState
-              message={t('surveys.noSurveysFound')}
-              onAddClick={canManage ? handleCreate : undefined}
-              addButtonLabel={t('surveys.createSurvey')}
-              subtitle={canManage ? t('common.addFirstItem') : undefined}
-            />
-          ) : (
-            <>
+      <PageContentLoader loading={loading && isInitialLoad}>
+        {surveys.length === 0 ? (
+          <EmptyPagePlaceholder
+            message={t('surveys.noSurveysFound')}
+            onAddClick={canManage ? handleCreate : undefined}
+            addButtonLabel={t('surveys.createSurvey')}
+            subtitle={canManage ? t('common.addFirstItem') : undefined}
+          />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table>
                   <TableHead>
@@ -608,7 +627,7 @@ const SurveysPage: React.FC = () => {
                                     } else if (condition.type === 'joinDays') {
                                       label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
                                     } else {
-                                      label = `${t(`surveys.condition.${condition.type}`)}: ${condition.value}`;
+                                      label = `${t(`surveys.condition.${condition.type}` as any)}: ${condition.value}`;
                                     }
 
                                     return (
@@ -668,24 +687,12 @@ const SurveysPage: React.FC = () => {
                             if (!canManage) return null;
                             return (
                               <TableCell key={column.id} align="center">
-                                <Box
-                                  sx={{
-                                    display: 'flex',
-                                    gap: 0.5,
-                                    justifyContent: 'center',
-                                  }}
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => handleActionMenuOpen(e, survey)}
                                 >
-                                  <Tooltip title={t('common.edit')}>
-                                    <IconButton size="small" onClick={() => handleEdit(survey)}>
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title={t('common.delete')}>
-                                    <IconButton size="small" onClick={() => handleDelete(survey)}>
-                                      <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </Box>
+                                  <MoreVertIcon fontSize="small" />
+                                </IconButton>
                               </TableCell>
                             );
                           }
@@ -708,10 +715,40 @@ const SurveysPage: React.FC = () => {
                   setPage(0);
                 }}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
+
+      {/* Action Menu */}
+      <Menu
+        anchorEl={actionMenuAnchorEl}
+        open={Boolean(actionMenuAnchorEl)}
+        onClose={handleActionMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleEdit(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (actionMenuTarget) handleDelete(actionMenuTarget);
+            handleActionMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Column Settings Dialog */}
       <ColumnSettingsDialog

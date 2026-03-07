@@ -112,7 +112,7 @@ public class FeatureFlagService : IFeatureFlagService
         {
             _etagsByEnv.TryGetValue(environment, out var etag);
 
-            var endpoint = $"/api/v1/server/{Uri.EscapeDataString(environment)}/features";
+            var endpoint = $"/api/v1/server/features";
             if (_options.FeatureFlags.Compact)
             {
                 endpoint += "?compact=true";
@@ -172,7 +172,7 @@ public class FeatureFlagService : IFeatureFlagService
     {
         try
         {
-            var endpoint = $"/api/v1/server/{Uri.EscapeDataString(environment)}/features/{Uri.EscapeDataString(flagName)}";
+            var endpoint = $"/api/v1/server/features/{Uri.EscapeDataString(flagName)}";
             var response = await _apiClient.GetAsync<SingleFlagApiResponse>(endpoint, etag: null, ct);
 
             if (!response.Success || response.Data?.Flag is null)

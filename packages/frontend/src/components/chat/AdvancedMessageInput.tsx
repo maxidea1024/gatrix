@@ -20,7 +20,7 @@ interface AdvancedMessageInputProps {
   disabled?: boolean;
   autoFocus?: boolean;
   focusTrigger?: number;
-  isThreadOpen?: boolean; // 스레드 열림 상태를 전달받아 포커스 관리에 활용
+  isThreadOpen?: boolean; // 스레드 열림 Status를 전달받아 포커스 관리에 활용
   threadId?: number; // 스레드 메시지인 경우 threadId
 }
 
@@ -70,7 +70,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
     }
   }, [focusTrigger, disabled, isThreadOpen]);
 
-  // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스(기존 동작 유지)
+  // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스(Existing 동작 유지)
   useEffect(() => {
     if (
       channelId &&
@@ -82,7 +82,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       !isThreadOpen
     ) {
       // 스레드가 열려있지 않을 때만 자동 포커스
-      // WebSocket 연결, 채널 존재, 비활성화 상태가 아닐 때만 포커스
+      // WebSocket 연결, 채널 존재, 비Active화 Status가 아닐 때만 포커스
       const timer = setTimeout(() => {
         textFieldRef.current?.focus();
       }, 50); // 딜레이를 더 줄임
@@ -109,9 +109,9 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       return;
     }
 
-    // 타이핑 중일 때만 타임아웃 설정
+    // 타이핑 중일 때만 타임아웃 Settings
     if (hasContent && isTyping) {
-      // 기존 타임아웃 클리어
+      // Existing 타임아웃 클리어
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
@@ -217,7 +217,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       message.substring(0, cursorPosition) + emoji + message.substring(cursorPosition);
     setMessage(newMessage);
 
-    // 이모지 선택창 닫기
+    // 이모지 선택창 Close
     setEmojiAnchorEl(null);
 
     // Focus back to input with proper cursor position (더 강화된 포커스)
@@ -387,7 +387,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
 
       {/* Mention Autocomplete */}
       <MentionAutocomplete
-        users={channelUsers}
+        users={channelUsers.map((m: any) => m.user || m)}
         query={mentionQuery}
         position={mentionPosition}
         visible={showMentions}

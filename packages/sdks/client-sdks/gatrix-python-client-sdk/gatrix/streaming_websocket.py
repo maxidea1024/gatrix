@@ -141,7 +141,7 @@ class WebSocketConnection:
                 .replace("http://", "ws://")
             )
             base_url += (
-                f"/client/features/{self._environment}/stream/ws"
+                f"/client/features/stream/ws"
             )
 
         params = (
@@ -177,7 +177,6 @@ class WebSocketConnection:
             extra_headers = {
                 "X-API-Token": self._api_token,
                 "X-Application-Name": self._app_name,
-                "X-Environment": self._environment,
                 "X-Connection-Id": self._connection_id,
                 "X-SDK-Version": self._sdk_version,
             }

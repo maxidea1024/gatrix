@@ -80,7 +80,8 @@ import {
 } from '@/types/crash';
 import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
-import EmptyState from '../../components/common/EmptyState';
+import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import DynamicFilterBar, {
   FilterDefinition,
   ActiveFilter,
@@ -240,7 +241,7 @@ const CrashEventsPage: React.FC = () => {
     },
     {
       id: 'environment',
-      labelKey: 'crashes.table.environment',
+      labelKey: 'crashes.table.environmentId',
       sortable: true,
       visible: true,
     },
@@ -368,7 +369,7 @@ const CrashEventsPage: React.FC = () => {
       },
       {
         key: 'environment',
-        label: t('crashes.filters.environment'),
+        label: t('crashes.filters.environmentId'),
         type: 'multiselect',
         operator: 'any_of',
         allowOperatorToggle: false,
@@ -709,7 +710,7 @@ const CrashEventsPage: React.FC = () => {
         ['ID', event.id],
         ['Created At', dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')],
         ['Platform', getPlatformName(event.platform)],
-        ['Environment', getEnvironmentName(event.environment)],
+        ['Environment', getEnvironmentName(event.environmentId)],
         ['Branch', event.branch],
         ['App Version', event.appVersion || '-'],
         ['Res Version', event.resVersion || '-'],
@@ -834,7 +835,7 @@ const CrashEventsPage: React.FC = () => {
       case 'environment':
         return (
           <Chip
-            label={getEnvironmentName(event.environment)}
+            label={getEnvironmentName(event.environmentId)}
             size="small"
             color="secondary"
             variant="outlined"
@@ -1044,16 +1045,12 @@ const CrashEventsPage: React.FC = () => {
       </Card>
 
       {/* Table */}
-      <Card>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <Typography color="text.secondary">{t('common.loadingData')}</Typography>
-            </Box>
-          ) : events.length === 0 ? (
-            <EmptyState message={t('crashes.noEvents')} />
-          ) : (
-            <>
+      <PageContentLoader loading={loading && events.length === 0}>
+        {events.length === 0 ? (
+          !loading && <EmptyPagePlaceholder message={t('crashes.noEvents')} />
+        ) : (
+          <Card variant="outlined">
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
               <TableContainer>
                 <Table sx={{ tableLayout: 'auto' }}>
                   <TableHead>
@@ -1159,7 +1156,7 @@ const CrashEventsPage: React.FC = () => {
                             </Box>
                           </TableCell>
                         </TableRow>
-                        <TableRow>
+                        <TableRow hover>
                           <TableCell
                             colSpan={columns.filter((col) => col.visible).length + 2}
                             sx={{ p: 0, border: 0 }}
@@ -1190,7 +1187,7 @@ const CrashEventsPage: React.FC = () => {
                                     <Table size="small">
                                       <TableBody>
                                         {/* ID */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1238,7 +1235,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* Created At */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1256,7 +1253,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* Platform */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1304,7 +1301,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* Environment */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1312,7 +1309,7 @@ const CrashEventsPage: React.FC = () => {
                                               whiteSpace: 'nowrap',
                                             }}
                                           >
-                                            {t('crashes.table.environment')}
+                                            {t('crashes.table.environmentId')}
                                           </TableCell>
                                           <TableCell>
                                             <Box
@@ -1323,7 +1320,7 @@ const CrashEventsPage: React.FC = () => {
                                               }}
                                             >
                                               <Chip
-                                                label={getEnvironmentName(event.environment)}
+                                                label={getEnvironmentName(event.environmentId)}
                                                 size="small"
                                                 color="secondary"
                                                 variant="outlined"
@@ -1332,7 +1329,7 @@ const CrashEventsPage: React.FC = () => {
                                                 size="small"
                                                 onClick={async () => {
                                                   await copyToClipboardWithNotification(
-                                                    event.environment,
+                                                    event.environmentId,
                                                     () =>
                                                       enqueueSnackbar(
                                                         t('common.copiedToClipboard'),
@@ -1352,7 +1349,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* Branch */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1400,7 +1397,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* App Version */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1451,7 +1448,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* Res Version */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1503,7 +1500,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* Account ID */}
                                         {event.accountId != null && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1552,7 +1549,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* Character ID */}
                                         {event.characterId != null && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1601,7 +1598,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* Game User ID */}
                                         {event.gameUserId != null && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1650,7 +1647,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* User Name */}
                                         {!!event.userName && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1699,7 +1696,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* Game Server ID */}
                                         {event.gameServerId != null && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1748,7 +1745,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* Market Type */}
                                         {!!event.marketType && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1797,7 +1794,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* Is Editor */}
                                         {!!event.isEditor && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1814,7 +1811,7 @@ const CrashEventsPage: React.FC = () => {
                                         )}
 
                                         {/* IP Address */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1866,7 +1863,7 @@ const CrashEventsPage: React.FC = () => {
                                         </TableRow>
 
                                         {/* User Agent */}
-                                        <TableRow>
+                                        <TableRow hover>
                                           <TableCell
                                             sx={{
                                               fontWeight: 600,
@@ -1923,7 +1920,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* First Line */}
                                         {!!(event as any).firstLine && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -1979,7 +1976,7 @@ const CrashEventsPage: React.FC = () => {
 
                                         {/* User Message */}
                                         {!!event.userMessage && (
-                                          <TableRow>
+                                          <TableRow hover>
                                             <TableCell
                                               sx={{
                                                 fontWeight: 600,
@@ -2121,7 +2118,6 @@ const CrashEventsPage: React.FC = () => {
                 </Table>
               </TableContainer>
 
-              {/* Pagination */}
               <SimplePagination
                 count={total}
                 page={pageState.page - 1} // SimplePagination uses 0-based
@@ -2129,10 +2125,10 @@ const CrashEventsPage: React.FC = () => {
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
               />
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+      </PageContentLoader>
 
       {/* Drawer for Stack Trace and Log */}
       <Drawer

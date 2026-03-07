@@ -100,7 +100,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         }
       }
 
-      // 에디터 옵션 설정
+      // 에디터 옵션 Settings
       if (editor?.updateOptions) {
         editor.updateOptions({
           minimap: { enabled: false },
@@ -123,7 +123,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
         editorElement.style.border = 'none';
       }
 
-      // 포맷팅 단축키 설정
+      // 포맷팅 단축키 Settings
       if (editor?.addAction && monaco?.KeyMod && monaco?.KeyCode) {
         editor.addAction({
           id: 'format-json',
@@ -257,7 +257,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
               lineNumbersMinChars: 3,
               renderLineHighlight: 'none',
               selectionHighlight: false,
-              occurrencesHighlight: false,
+              occurrencesHighlight: 'off',
               overviewRulerLanes: 0,
               hideCursorInOverviewRuler: true,
               overviewRulerBorder: false,

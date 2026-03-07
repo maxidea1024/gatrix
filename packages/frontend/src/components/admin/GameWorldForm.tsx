@@ -167,7 +167,11 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   // Copy settings to clipboard
   const handleCopySettings = () => {
     const settings = infraSettingsText.trim() || '{}';
-    copyToClipboardWithNotification(settings, t('gameWorlds.form.settingsCopied'), enqueueSnackbar);
+    copyToClipboardWithNotification(
+      settings,
+      () => enqueueSnackbar(t('gameWorlds.form.settingsCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   return (
@@ -187,58 +191,45 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
         {/* Basic Info Tab */}
         {activeTab === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            {/* World ID */}
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.worldId')}
-                value={formData.worldId}
-                onChange={(e) => {
-                  const newWorldId = e.target.value;
-                  const newFormData = { ...formData, worldId: newWorldId };
+            {/* World ID + Name */}
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  label={t('gameWorlds.worldId')}
+                  value={formData.worldId}
+                  onChange={(e) => {
+                    const newWorldId = e.target.value;
+                    const newFormData = { ...formData, worldId: newWorldId };
 
-                  if (
-                    !editingWorld &&
-                    (formData.name === '' || formData.name === formData.worldId)
-                  ) {
-                    newFormData.name = newWorldId;
-                  }
+                    if (
+                      !editingWorld &&
+                      (formData.name === '' || formData.name === formData.worldId)
+                    ) {
+                      newFormData.name = newWorldId;
+                    }
 
-                  onFormDataChange(newFormData);
-                }}
-                error={!!formErrors.worldId}
-                helperText={formErrors.worldId}
-                required
-                inputRef={refToUse}
-                autoFocus
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('gameWorlds.form.worldIdHelp')}
-              </Typography>
-            </Box>
+                    onFormDataChange(newFormData);
+                  }}
+                  error={!!formErrors.worldId}
+                  helperText={formErrors.worldId || t('gameWorlds.form.worldIdHelp')}
+                  required
+                  inputRef={refToUse}
+                  autoFocus
+                />
+              </Box>
 
-            {/* Name */}
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.name')}
-                value={formData.name}
-                onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
-                error={!!formErrors.name}
-                helperText={formErrors.name}
-                required
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 0.5, display: 'block' }}
-              >
-                {t('gameWorlds.form.nameHelp')}
-              </Typography>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  label={t('gameWorlds.name')}
+                  value={formData.name}
+                  onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
+                  error={!!formErrors.name}
+                  helperText={formErrors.name || t('gameWorlds.form.nameHelp')}
+                  required
+                />
+              </Box>
             </Box>
 
             {/* Description */}
@@ -408,10 +399,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                     message: l.message,
                   }));
                   onMaintenanceLocalesChange(newLocales);
-                  onFormDataChange((prev) => ({
-                    ...prev,
+                  onFormDataChange({
+                    ...formData,
                     maintenanceLocales: newLocales,
-                  }));
+                  });
                   const hasNonEmptyLocales = locales.some(
                     (l) => l.message && l.message.trim() !== ''
                   );
@@ -446,7 +437,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               error={customPayloadError}
               helperText={
                 t('gameWorlds.form.customPayloadHelp') ||
-                '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'
+                'Game world related additional data(JSON). If left empty, it will be saved as {}.'
               }
             />
           </Box>
