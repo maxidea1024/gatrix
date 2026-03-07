@@ -136,6 +136,7 @@ interface StrategyEditorProps {
   index: number;
   segments: any[];
   contextFields: ContextField[];
+  readonly?: boolean;
 }
 
 const StrategyEditor: React.FC<StrategyEditorProps> = ({
@@ -145,6 +146,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
   index,
   segments,
   contextFields,
+  readonly = false,
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
@@ -188,9 +190,11 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
             />
           )}
         </Box>
-        <IconButton size="small" color="error" onClick={onRemove}>
-          <DeleteIcon fontSize="small" />
-        </IconButton>
+        {!readonly && (
+          <IconButton size="small" color="error" onClick={onRemove}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
       {/* Tabs: General | Targeting */}
@@ -230,6 +234,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
               value={strategy.title || ''}
               onChange={(e) => onChange({ ...strategy, title: e.target.value })}
               placeholder={t('releaseFlow.strategyTitlePlaceholder')}
+              disabled={readonly}
             />
 
             {/* Strategy Type */}
@@ -249,6 +254,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                         : {},
                   })
                 }
+                disabled={readonly}
               >
                 {STRATEGY_TYPES.map((type) => (
                   <MenuItem key={type.name} value={type.name}>
@@ -289,6 +295,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       valueLabelDisplay="on"
                       min={0}
                       max={100}
+                      disabled={readonly}
                       marks={[
                         { value: 0, label: '0%' },
                         { value: 25, label: '25%' },
@@ -325,6 +332,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             parameters: { ...strategy.parameters, stickiness: e.target.value },
                           })
                         }
+                        disabled={readonly}
                       >
                         <MenuItem value="default">
                           <Box>
@@ -394,6 +402,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                             parameters: { ...strategy.parameters, groupId: e.target.value },
                           })
                         }
+                        disabled={readonly}
                       />
                     </Box>
                   </Grid>
@@ -425,6 +434,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       parameters: { ...strategy.parameters, userIds: newValue },
                     })
                   }
+                  disabled={readonly}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -467,6 +477,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       parameters: { ...strategy.parameters, IPs: newValue },
                     })
                   }
+                  disabled={readonly}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -508,6 +519,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                       parameters: { ...strategy.parameters, hostNames: newValue },
                     })
                   }
+                  disabled={readonly}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -547,6 +559,7 @@ const StrategyEditor: React.FC<StrategyEditorProps> = ({
                     valueLabelDisplay="on"
                     min={0}
                     max={100}
+                    disabled={readonly}
                     marks={[
                       { value: 0, label: '0%' },
                       { value: 50, label: '50%' },
@@ -603,6 +616,7 @@ interface TemplateEditorDrawerProps {
   onClose: () => void;
   onSave: (data: CreateTemplateInput) => Promise<void>;
   initialData: ReleaseFlowTemplate | null;
+  readonly?: boolean;
 }
 
 const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
@@ -610,6 +624,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
   onClose,
   onSave,
   initialData,
+  readonly = false,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -861,7 +876,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={initialData ? t('releaseFlow.editTemplate') : t('releaseFlow.createTemplate')}
+      title={readonly ? t('releaseFlow.viewTemplate') : (initialData ? t('releaseFlow.editTemplate') : t('releaseFlow.createTemplate'))}
       subtitle={t('releaseFlow.templatesSubtitle')}
       storageKey="releaseFlowTemplateDrawerWidth"
       defaultWidth={800}
@@ -883,8 +898,8 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 fullWidth
                 size="small"
                 placeholder={t('releaseFlow.templateNamePlaceholder')}
-                disabled={!!initialData}
-                helperText={t('releaseFlow.templateNameHelp')}
+                disabled={!!initialData || readonly}
+                helperText={!readonly ? t('releaseFlow.templateNameHelp') : undefined}
               />
             </Box>
             <Box>
@@ -897,7 +912,8 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 fullWidth
                 size="small"
                 placeholder={t('releaseFlow.displayNamePlaceholder')}
-                helperText={t('releaseFlow.displayNameHelp')}
+                disabled={readonly}
+                helperText={!readonly ? t('releaseFlow.displayNameHelp') : undefined}
               />
             </Box>
             <Box>
@@ -912,6 +928,7 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                 multiline
                 rows={2}
                 placeholder={t('releaseFlow.descriptionPlaceholder')}
+                disabled={readonly}
               />
             </Box>
 
@@ -932,41 +949,46 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                         value={milestone.name}
                         onChange={(e) => handleMilestoneNameChange(mIdx, e.target.value)}
                         sx={{ flex: 1 }}
+                        disabled={readonly}
                       />
-                      <Tooltip title={t('common.moveUp')}>
-                        <span>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleMoveMilestone(mIdx, 'up')}
-                            disabled={mIdx === 0}
-                          >
-                            <ArrowUpIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                      <Tooltip title={t('common.moveDown')}>
-                        <span>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleMoveMilestone(mIdx, 'down')}
-                            disabled={mIdx === milestones.length - 1}
-                          >
-                            <ArrowDownIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                      <Tooltip title={t('common.delete')}>
-                        <span>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleRemoveMilestone(mIdx)}
-                            disabled={milestones.length <= 1}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
+                      {!readonly && (
+                        <>
+                          <Tooltip title={t('common.moveUp')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleMoveMilestone(mIdx, 'up')}
+                                disabled={mIdx === 0}
+                              >
+                                <ArrowUpIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title={t('common.moveDown')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleMoveMilestone(mIdx, 'down')}
+                                disabled={mIdx === milestones.length - 1}
+                              >
+                                <ArrowDownIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title={t('common.delete')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => handleRemoveMilestone(mIdx)}
+                                disabled={milestones.length <= 1}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </>
+                      )}
                     </Box>
 
                     {/* Strategies */}
@@ -983,25 +1005,30 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
                           contextFields={contextFields}
                           onChange={(updated) => handleStrategyChange(mIdx, sIdx, updated)}
                           onRemove={() => handleRemoveStrategy(mIdx, sIdx)}
+                          readonly={readonly}
                         />
                       ))}
                     </Stack>
-                    <Button
-                      size="small"
-                      startIcon={<AddIcon />}
-                      onClick={() => handleAddStrategy(mIdx)}
-                      sx={{ mt: 1 }}
-                    >
-                      {t('releaseFlow.addStrategy')}
-                    </Button>
+                    {!readonly && (
+                      <Button
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={() => handleAddStrategy(mIdx)}
+                        sx={{ mt: 1 }}
+                      >
+                        {t('releaseFlow.addStrategy')}
+                      </Button>
+                    )}
                   </Paper>
                 ))}
               </Stack>
-              <Box sx={{ mt: 2, textAlign: 'right' }}>
-                <Button size="small" startIcon={<AddIcon />} onClick={handleAddMilestone}>
-                  {t('releaseFlow.addMilestone')}
-                </Button>
-              </Box>
+              {!readonly && (
+                <Box sx={{ mt: 2, textAlign: 'right' }}>
+                  <Button size="small" startIcon={<AddIcon />} onClick={handleAddMilestone}>
+                    {t('releaseFlow.addMilestone')}
+                  </Button>
+                </Box>
+              )}
             </Box>
           </Stack>
         </Box>
@@ -1018,11 +1045,13 @@ const TemplateEditorDrawer: React.FC<TemplateEditorDrawerProps> = ({
           }}
         >
           <Button onClick={onClose} disabled={saving}>
-            {t('common.cancel')}
+            {readonly ? t('common.close') : t('common.cancel')}
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={saving}>
-            {saving ? <CircularProgress size={20} /> : t('common.save')}
-          </Button>
+          {!readonly && (
+            <Button variant="contained" onClick={handleSave} disabled={saving}>
+              {saving ? <CircularProgress size={20} /> : t('common.save')}
+            </Button>
+          )}
         </Box>
       </Box>
     </ResizableDrawer>
@@ -1522,12 +1551,10 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                                 <Typography
                                   variant="subtitle2"
                                   sx={{
-                                    ...(canManage && {
-                                      cursor: 'pointer',
-                                      '&:hover': { textDecoration: 'underline' },
-                                    }),
+                                    cursor: 'pointer',
+                                    '&:hover': { textDecoration: 'underline' },
                                   }}
-                                  onClick={canManage ? () => handleEdit(template) : undefined}
+                                  onClick={() => handleEdit(template)}
                                 >
                                   {template.displayName || template.flowName}
                                 </Typography>
@@ -1636,6 +1663,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         onClose={() => setEditorOpen(false)}
         onSave={handleSave}
         initialData={editingTemplate}
+        readonly={!canManage}
       />
 
       {/* Delete Confirmation Dialog */}

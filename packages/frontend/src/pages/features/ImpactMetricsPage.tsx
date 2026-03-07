@@ -10,9 +10,13 @@ import { Box, Typography } from '@mui/material';
 import { ShowChart as ChartIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import ImpactMetricsChart from '../../components/features/ImpactMetricsChart';
+import { useAuth } from '@/hooks/useAuth';
+import { P } from '@/types/permissions';
 
 const ImpactMetricsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([P.FEATURES_UPDATE]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -30,7 +34,7 @@ const ImpactMetricsPage: React.FC = () => {
       </Box>
 
       {/* Chart Dashboard */}
-      <ImpactMetricsChart canManage hideTitle />
+      <ImpactMetricsChart canManage={canManage} hideTitle />
     </Box>
   );
 };

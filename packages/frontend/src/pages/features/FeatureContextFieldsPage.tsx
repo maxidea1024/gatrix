@@ -1137,7 +1137,9 @@ const FeatureContextFieldsPage: React.FC = () => {
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         title={
-          editingField?.id ? t('featureFlags.editContextField') : t('featureFlags.addContextField')
+          !canManage && editingField?.id
+            ? t('featureFlags.viewContextField')
+            : editingField?.id ? t('featureFlags.editContextField') : t('featureFlags.addContextField')
         }
         subtitle={t('featureFlags.contextFieldsDescription')}
         storageKey="featureContextFieldDrawerWidth"
@@ -1156,6 +1158,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                         isEnabled: e.target.checked,
                       }))
                     }
+                    disabled={!canManage}
                   />
                 }
                 label={t('featureFlags.visibility')}
@@ -1178,7 +1181,7 @@ const FeatureContextFieldsPage: React.FC = () => {
                     fieldName: e.target.value.replace(/[^a-zA-Z0-9_]/g, ''),
                   }))
                 }
-                disabled={!!editingField?.id}
+                disabled={!!editingField?.id || !canManage}
                 helperText={t('featureFlags.fieldNameHelp')}
                 placeholder="userId, deviceType, country..."
               />
@@ -1192,7 +1195,8 @@ const FeatureContextFieldsPage: React.FC = () => {
                     displayName: e.target.value,
                   }))
                 }
-                helperText={t('featureFlags.displayNameHelp')}
+                helperText={canManage ? t('featureFlags.displayNameHelp') : undefined}
+                disabled={!canManage}
               />
             </Box>
 
@@ -1481,14 +1485,18 @@ const FeatureContextFieldsPage: React.FC = () => {
             justifyContent: 'flex-end',
           }}
         >
-          <Button onClick={() => setEditDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            disabled={!hasChanges() || !editingField?.fieldName}
-          >
-            {editingField?.id ? t('common.update') : t('common.create')}
+          <Button onClick={() => setEditDialogOpen(false)}>
+            {canManage ? t('common.cancel') : t('common.close')}
           </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              disabled={!hasChanges() || !editingField?.fieldName}
+            >
+              {editingField?.id ? t('common.update') : t('common.create')}
+            </Button>
+          )}
         </Box>
       </ResizableDrawer>
 

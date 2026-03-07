@@ -63,6 +63,8 @@ import { ErrorCodes, extractErrorCode } from '@gatrix/shared';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useAuth } from '@/hooks/useAuth';
+import { P } from '@/types/permissions';
 // Action type options
 const ACTION_TYPES = [
   { value: 'TOGGLE_FLAG', labelKey: 'actionSets.actionTypes.toggleFlag' },
@@ -437,6 +439,9 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ open, name, onClose, onConf
 
 // ==================== Main Page ====================
 const ActionSetsPage: React.FC = () => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([P.ACTIONS_UPDATE]);
+
   const { t } = useTranslation();
   const [actionSets, setActionSets] = useState<ActionSet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -625,7 +630,7 @@ const ActionSetsPage: React.FC = () => {
         {actionSets.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('actionSets.noActionSets')}
-            onAddClick={() => setEditDialog({ open: true, actionSet: null })}
+            onAddClick={canManage ? () => setEditDialog({ open: true, actionSet: null }) : undefined}
             addButtonLabel={t('actionSets.createActionSet')}
           />
         ) : (

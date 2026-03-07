@@ -62,6 +62,8 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { useAuth } from '@/hooks/useAuth';
+import { P } from '@/types/permissions';
 
 // ==================== Create/Edit Dialog ====================
 interface EndpointDialogProps {
@@ -311,6 +313,9 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
 
 // ==================== Main Page ====================
 const SignalEndpointsPage: React.FC = () => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([P.SIGNAL_ENDPOINTS_UPDATE]);
+
   const { t } = useTranslation();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
@@ -464,7 +469,7 @@ const SignalEndpointsPage: React.FC = () => {
           <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchEndpoints}>
             {t('common.refresh')}
           </Button>
-          {endpoints.length > 0 && (
+          {endpoints.length > 0 && canManage && (
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -481,7 +486,7 @@ const SignalEndpointsPage: React.FC = () => {
         {endpoints.length === 0 ? (
           <EmptyPagePlaceholder
             message={t('signalEndpoints.noEndpoints')}
-            onAddClick={() => setEditDialog({ open: true, endpoint: null })}
+            onAddClick={canManage ? () => setEditDialog({ open: true, endpoint: null }) : undefined}
             addButtonLabel={t('signalEndpoints.createEndpoint')}
           />
         ) : (
