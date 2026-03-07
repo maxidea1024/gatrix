@@ -127,7 +127,9 @@ router.post('/organisations', requireOrgAdmin as any, async (req: any, res) => {
           roleId: managerRole.id,
           scopeType: 'org',
           scopeId: org.id,
-          createdAt: db.raw('UTC_TIMESTAMP()'),
+          assignedBy: req.user.id,
+          assignedAt: db.raw('UTC_TIMESTAMP()'),
+          description: `Auto-assigned: org creator (${orgName})`,
         });
         // Invalidate permission cache for the creator
         await permissionService.invalidateUserCache(req.user.id);
