@@ -7,14 +7,14 @@
  * by the backend FeatureFlagService.
  *
  * Edge clients connect via:
- *   - SSE: GET `/client/features/:environment/stream/sse`
- *   - WebSocket: GET `/client/features/:environment/stream/ws`
+ *   - SSE: GET `/client/features/stream/sse`
+ *   - WebSocket: GET `/client/features/stream/ws`
  *
  * Revision management uses Redis INCR for consistency across multiple Edge instances.
  */
 
 import { Response } from 'express';
-import { createClient, RedisClientType } from 'redis';
+import Redis from 'ioredis';
 import WebSocket, { WebSocketServer } from 'ws';
 import { config } from '../config/env';
 import { createLogger } from '../config/logger';
@@ -49,8 +49,8 @@ class FlagStreamingService {
   private wss: WebSocketServer | null = null;
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private cleanupInterval: NodeJS.Timeout | null = null;
-  private subscriber: RedisClientType | null = null;
-  private redisClient: RedisClientType | null = null;
+  private subscriber: Redis | null = null;
+  private redisClient: Redis | null = null;
   private started = false;
 
   private constructor() {
@@ -72,13 +72,17 @@ class FlagStreamingService {
     this.started = true;
 
     const redisOptions = {
-      socket: { host: config.redis.host, port: config.redis.port },
+      host: config.redis.host,
+      port: config.redis.port,
       password: config.redis.password || undefined,
+      db: config.redis.db,
+      lazyConnect: true,
+      maxRetriesPerRequest: null,
     };
 
     // Create Redis client for commands (INCR, GET)
     try {
-      this.redisClient = createClient(redisOptions);
+      this.redisClient = new Redis(redisOptions);
       this.redisClient.on('error', (err) => {
         logger.error('Redis client error:', err);
       });
@@ -89,7 +93,7 @@ class FlagStreamingService {
 
     // Subscribe to Redis PubSub for SDK events
     try {
-      this.subscriber = createClient(redisOptions);
+      this.subscriber = new Redis(redisOptions);
 
       this.subscriber.on('error', (err) => {
         logger.error('Redis subscriber error:', err);
@@ -97,9 +101,9 @@ class FlagStreamingService {
 
       await this.subscriber.connect();
 
-      await this.subscriber.pSubscribe(`${SDK_EVENTS_PREFIX}:*`, (payload: string) => {
+      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
         try {
-          const event = JSON.parse(payload) as { type: string; data: Record<string, any> };
+          const event = JSON.parse(message) as { type: string; data: Record<string, any> };
           if (event.type === 'feature_flag.changed') {
             const environmentId = event.data.environmentId as string;
             const changedKeys = (event.data.changedKeys as string[]) ?? [];
@@ -113,6 +117,8 @@ class FlagStreamingService {
           logger.error('Failed to parse SDK event:', err);
         }
       });
+
+      await this.subscriber.psubscribe(`${SDK_EVENTS_PREFIX}:*`);
 
       logger.info(`Subscribed to Redis pattern: ${SDK_EVENTS_PREFIX}:*`);
     } catch (err) {
@@ -174,7 +180,7 @@ class FlagStreamingService {
     // Disconnect Redis subscriber
     if (this.subscriber) {
       try {
-        await this.subscriber.pUnsubscribe(`${SDK_EVENTS_PREFIX}:*`);
+        await this.subscriber.punsubscribe(`${SDK_EVENTS_PREFIX}:*`);
         await this.subscriber.quit();
       } catch {
         // Ignore cleanup errors
