@@ -19,7 +19,6 @@ const client = new GatrixClient({
   apiUrl: 'https://your-api.com/api/v1', // Base URL only (required)
   apiToken: 'your-api-token', // Client API token (required)
   appName: 'my-app', // Application name (required)
-  environment: 'production', // Environment name (required)
   features: {
     context: {
       userId: 'user-123',
@@ -47,15 +46,11 @@ client.stop();
 
 ### Required Fields
 
-| Field         | Type     | Description                                                                                                                     |
-| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `apiUrl`      | `string` | Base API URL for Edge or Backend server (e.g., `https://edge.your-api.com/api/v1`). The SDK constructs endpoints automatically. |
-| `apiToken`    | `string` | Client API token for authentication.                                                                                            |
-| `appName`     | `string` | Application name for identification.                                                                                            |
-| `environment` | `string` | Environment name (e.g., `development`, `staging`, `production`).                                                                |
-
-> **Note:** The SDK automatically constructs the feature flag endpoint as:
-> `{apiUrl}/client/features/{environment}/eval`
+| Field      | Type     | Description                                                                                                                     |
+| ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apiUrl`   | `string` | Base API URL for Edge or Backend server (e.g., `https://edge.your-api.com/api/v1`). The SDK constructs endpoints automatically. |
+| `apiToken` | `string` | Client API token for authentication.                                                                                            |
+| `appName`  | `string` | Application name for identification.                                                                                            |
 
 ### Optional Fields
 
