@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { tokenMirrorService } from '../services/token-mirror-service';
 import { metricsAggregator } from '../services/metrics-aggregator';
 import { performEvaluation } from '../utils/evaluation-helper';
+import { environmentRegistry } from '../services/environment-registry';
 import {
   ErrorCodes,
   sendUnauthorized,
@@ -14,19 +15,71 @@ const logger = createLogger('ServerRoute');
 
 const router = Router();
 
+// Unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
+const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+
+// Legacy unsecured tokens — auto-resolve to default/default/development
+const LEGACY_TOKENS: Record<string, boolean> = {
+  'gatrix-unsecured-client-api-token': true,
+  'gatrix-unsecured-server-api-token': true,
+  'gatrix-unsecured-edge-api-token': true,
+};
+const LEGACY_ENV_NAME = 'development';
+
+/**
+ * Extended request with resolved environment
+ */
+interface ServerRequest extends Request {
+  environmentId?: string;
+  cacheKey?: string;
+  applicationName?: string;
+}
+
 /**
  * Server SDK authentication middleware for Edge
+ * Resolves environment from token (no :env path parameter)
  */
-function serverAuth(req: Request, res: Response, next: NextFunction): void {
+function serverAuth(req: ServerRequest, res: Response, next: NextFunction): void {
   const apiToken = req.headers['x-api-token'] as string;
-  const environmentId = req.params.env;
 
   if (!apiToken) {
     sendUnauthorized(res, 'x-api-token header is required', ErrorCodes.AUTH_TOKEN_REQUIRED);
     return;
   }
 
-  const validation = tokenMirrorService.validateToken(apiToken, 'server', environmentId);
+  // 1. Try unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
+  const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);
+  if (unsecuredMatch) {
+    const [, , , envId] = unsecuredMatch;
+    // The token IS the cache key for the SDK
+    req.cacheKey = apiToken;
+    // Resolve actual environment ID from the registry
+    req.environmentId = environmentRegistry.resolveEnvironmentId(envId) || envId;
+    req.applicationName = (req.headers['x-application-name'] as string) || 'unknown';
+    return next();
+  }
+
+  // 2. Legacy unsecured tokens → resolve to development
+  if (LEGACY_TOKENS[apiToken]) {
+    const cacheKey = environmentRegistry.resolveEnvironmentToken(LEGACY_ENV_NAME);
+    if (!cacheKey) {
+      sendUnauthorized(
+        res,
+        'Could not resolve environment for legacy token',
+        ErrorCodes.AUTH_TOKEN_INVALID
+      );
+      return;
+    }
+    req.cacheKey = cacheKey;
+    // Get actual environment ID
+    req.environmentId =
+      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
+    req.applicationName = (req.headers['x-application-name'] as string) || 'unknown';
+    return next();
+  }
+
+  // 3. Real production token — validate and resolve environment
+  const validation = tokenMirrorService.validateToken(apiToken, 'server');
   if (!validation.valid) {
     sendUnauthorized(
       res,
@@ -36,21 +89,47 @@ function serverAuth(req: Request, res: Response, next: NextFunction): void {
     return;
   }
 
+  // Resolve environment from token's environments array
+  const token = validation.token;
+  const envName = token?.environments?.[0];
+  if (!envName || envName === '*') {
+    sendUnauthorized(
+      res,
+      'Token does not have a specific environment binding',
+      ErrorCodes.AUTH_TOKEN_INVALID
+    );
+    return;
+  }
+
+  const cacheKey = environmentRegistry.resolveEnvironmentToken(envName);
+  if (!cacheKey) {
+    sendUnauthorized(
+      res,
+      `Could not resolve environment: ${envName}`,
+      ErrorCodes.AUTH_TOKEN_INVALID
+    );
+    return;
+  }
+
+  req.cacheKey = cacheKey;
+  req.environmentId = environmentRegistry.resolveEnvironmentId(envName) || envName;
+  req.applicationName = (req.headers['x-application-name'] as string) || 'unknown';
+
   next();
 }
 
 /**
- * GET /api/v1/server/:env/features
- * Returns cached feature flags and segments for the given environment
+ * GET /api/v1/server/features
+ * Returns cached feature flags and segments for the token's environment
  */
-router.get('/:env/features', serverAuth, async (req: Request, res: Response) => {
+router.get('/features', serverAuth, async (req: ServerRequest, res: Response) => {
   try {
     const { getSDKOrError } = await import('../utils/evaluation-helper');
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const env = req.params.env;
-    let flags = sdk.featureFlag.getCached(env);
+    const cacheKey = req.cacheKey!;
+    let flags = sdk.featureFlag.getCached(cacheKey);
 
     // Filter by flagNames query parameter (comma-separated) if provided
     const flagNamesParam = req.query.flagNames as string | undefined;
@@ -121,7 +200,7 @@ router.get('/:env/features', serverAuth, async (req: Request, res: Response) => 
  * GET /api/v1/server/segments
  * Returns all cached segments
  */
-router.get('/segments', serverAuth, async (req: Request, res: Response) => {
+router.get('/segments', serverAuth, async (req: ServerRequest, res: Response) => {
   try {
     const { getSDKOrError } = await import('../utils/evaluation-helper');
     const sdk = getSDKOrError(res);
@@ -157,13 +236,13 @@ router.get('/segments', serverAuth, async (req: Request, res: Response) => {
 });
 
 /**
- * POST /api/v1/server/:env/features/metrics
+ * POST /api/v1/server/features/metrics
  * Buffers and aggregates server metrics
  */
-router.post('/:env/features/metrics', serverAuth, async (req: Request, res: Response) => {
+router.post('/features/metrics', serverAuth, async (req: ServerRequest, res: Response) => {
   try {
-    const env = req.params.env;
-    const appName = (req.headers['x-application-name'] as string) || 'unknown';
+    const environmentId = req.environmentId!;
+    const appName = req.applicationName || 'unknown';
     const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
     const { metrics } = req.body;
 
@@ -171,7 +250,7 @@ router.post('/:env/features/metrics', serverAuth, async (req: Request, res: Resp
       return sendBadRequest(res, 'metrics must be an array');
     }
 
-    metricsAggregator.addServerMetrics(env, appName, metrics, sdkVersion);
+    metricsAggregator.addServerMetrics(environmentId, appName, metrics, sdkVersion);
     res.json({ success: true, buffered: true });
   } catch (error) {
     sendInternalError(res, 'Failed to buffer server metrics', error);
@@ -179,13 +258,13 @@ router.post('/:env/features/metrics', serverAuth, async (req: Request, res: Resp
 });
 
 /**
- * POST /api/v1/server/:env/features/unknown
+ * POST /api/v1/server/features/unknown
  * Buffers and aggregates unknown flag reporting
  */
-router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Response) => {
+router.post('/features/unknown', serverAuth, async (req: ServerRequest, res: Response) => {
   try {
-    const env = req.params.env;
-    const appName = (req.headers['x-application-name'] as string) || 'unknown';
+    const environmentId = req.environmentId!;
+    const appName = req.applicationName || 'unknown';
     const sdkVersion = req.headers['x-sdk-version'] as string | undefined;
     const { flagName, count = 1 } = req.body;
 
@@ -193,7 +272,7 @@ router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Resp
       return sendBadRequest(res, 'flagName is required');
     }
 
-    metricsAggregator.addServerUnknownReport(env, appName, flagName, count, sdkVersion);
+    metricsAggregator.addServerUnknownReport(environmentId, appName, flagName, count, sdkVersion);
     res.json({ success: true, buffered: true });
   } catch (error) {
     sendInternalError(res, 'Failed to buffer server unknown flag report', error);
@@ -201,19 +280,35 @@ router.post('/:env/features/unknown', serverAuth, async (req: Request, res: Resp
 });
 
 /**
- * POST /api/v1/server/:env/features/eval
+ * POST /api/v1/server/features/eval
  */
-router.post('/:env/features/eval', serverAuth, async (req: Request, res: Response) => {
-  const applicationName = (req.headers['x-application-name'] as string) || 'unknown';
-  await performEvaluation(req, res, { environment: req.params.env, applicationName }, true);
+router.post('/features/eval', serverAuth, async (req: ServerRequest, res: Response) => {
+  await performEvaluation(
+    req,
+    res,
+    {
+      environmentId: req.environmentId,
+      applicationName: req.applicationName,
+      cacheKey: req.cacheKey,
+    },
+    true
+  );
 });
 
 /**
- * GET /api/v1/server/:env/features/eval
+ * GET /api/v1/server/features/eval
  */
-router.get('/:env/features/eval', serverAuth, async (req: Request, res: Response) => {
-  const applicationName = (req.headers['x-application-name'] as string) || 'unknown';
-  await performEvaluation(req, res, { environment: req.params.env, applicationName }, false);
+router.get('/features/eval', serverAuth, async (req: ServerRequest, res: Response) => {
+  await performEvaluation(
+    req,
+    res,
+    {
+      environmentId: req.environmentId,
+      applicationName: req.applicationName,
+      cacheKey: req.cacheKey,
+    },
+    false
+  );
 });
 
 export default router;

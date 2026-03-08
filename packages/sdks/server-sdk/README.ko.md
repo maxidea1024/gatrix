@@ -30,12 +30,11 @@ import { GatrixServerSDK } from '@gatrix/server-sdk';
 // SDK 인스턴스 생성
 const sdk = new GatrixServerSDK({
   // 필수
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token', // 선택: 테스트용은 기본 토큰 사용
   applicationName: 'your-app-name',
   service: 'worldd',       // 서비스 이름 (예: 'auth', 'lobby', 'world', 'chat')
   group: 'kr-1',           // 서비스 그룹 (예: 'kr', 'us', 'production')
-  environment: 'env_prod', // 환경 식별자 (예: 'env_prod', 'env_staging')
 });
 
 // SDK 초기화 (캐시 로드)
@@ -53,12 +52,10 @@ await sdk.close();
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'http://localhost:5000',
+  apiUrl: 'http://localhost:5000',
   applicationName: 'test-server',
   service: 'test-service',
   group: 'test-group',
-  environment: 'env_dev',
-  // apiToken 생략 - 기본값: 'gatrix-unsecured-server-api-token'
 });
 ```
 
@@ -70,12 +67,11 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
 });
 ```
 
@@ -83,12 +79,11 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   redis: {
     host: 'localhost',
     port: 6379,
@@ -103,14 +98,11 @@ const sdk = new GatrixServerSDK({
 ```typescript
 const sdk = new GatrixServerSDK({
   // 필수
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
-
-  // 선택 - Redis
   redis: {
     host: 'localhost',
     port: 6379,
@@ -158,12 +150,11 @@ const sdk = new GatrixServerSDK({
 import { GatrixServerSDK, GatrixSDKConfig } from '@gatrix/server-sdk';
 
 const baseConfig: GatrixSDKConfig = {
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'my-game',
   service: 'default-service',
   group: 'default-group',
-  environment: 'production',
   redis: { host: 'localhost', port: 6379 },
   cache: { enabled: true, refreshMethod: 'event' },
 };
@@ -186,7 +177,7 @@ const worldSDK = GatrixServerSDK.createInstance(baseConfig, {
 
 | 필드              | 타입              | 설명                            | 예시                             |
 | ----------------- | ----------------- | ------------------------------- | -------------------------------- |
-| `gatrixUrl`       | string            | Gatrix 백엔드 URL               | `https://api.gatrix.com`         |
+| `apiUrl`       | string            | Gatrix 백엔드 URL               | `https://api.gatrix.com`         |
 | `apiToken`        | string            | 서버 API 토큰                   | `your-server-api-token`          |
 | `applicationName` | string            | 애플리케이션 이름               | `my-game-server`                 |
 | `service`         | string            | 서비스 이름                     | `auth`, `lobby`, `world`, `chat` |
@@ -200,7 +191,6 @@ const worldSDK = GatrixServerSDK.createInstance(baseConfig, {
 ```typescript
 const sdk = new GatrixServerSDK({
   // ...
-  environment: '*', // 멀티 환경 모드
   cache: { enabled: true, refreshMethod: 'event' },
 });
 
@@ -559,7 +549,6 @@ const metricsServer = createMetricsServer({
   applicationName: 'my-game-server',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   logger: getLogger('MY-SERVER'),
 });
 

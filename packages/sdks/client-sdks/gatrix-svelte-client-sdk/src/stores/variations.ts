@@ -19,7 +19,7 @@ import type { Variant } from '@gatrix/gatrix-js-client-sdk';
 export function boolVariation(
   flagName: string,
   fallbackValue: boolean,
-  forceRealtime = false
+  forceRealtime = true
 ): Readable<boolean> {
   const client = getGatrixClient();
   return readable<boolean>(
@@ -44,7 +44,7 @@ export function boolVariation(
 export function stringVariation(
   flagName: string,
   fallbackValue: string,
-  forceRealtime = false
+  forceRealtime = true
 ): Readable<string> {
   const client = getGatrixClient();
   return readable<string>(
@@ -69,7 +69,7 @@ export function stringVariation(
 export function numberVariation(
   flagName: string,
   fallbackValue: number,
-  forceRealtime = false
+  forceRealtime = true
 ): Readable<number> {
   const client = getGatrixClient();
   return readable<number>(
@@ -94,7 +94,7 @@ export function numberVariation(
 export function jsonVariation<T = unknown>(
   flagName: string,
   fallbackValue: T,
-  forceRealtime = false
+  forceRealtime = true
 ): Readable<T> {
   const client = getGatrixClient();
   return readable<T>(
@@ -115,7 +115,7 @@ export function jsonVariation<T = unknown>(
  * @param flagName - Feature flag key
  * @param forceRealtime - If true, reads from realtimeFlags regardless of explicitSyncMode
  */
-export function variant(flagName: string, forceRealtime = false): Readable<Variant> {
+export function variant(flagName: string, forceRealtime = true): Readable<Variant> {
   const client = getGatrixClient();
   return readable<Variant>(client.features.getVariant(flagName, forceRealtime), (set) => {
     const watchFn = forceRealtime

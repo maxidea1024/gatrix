@@ -129,7 +129,7 @@ export class FeaturesClient implements VariationProvider {
   private flagLastChangedTimes: Map<string, Date> = new Map();
 
   // System context fields (cannot be removed)
-  private static readonly SYSTEM_CONTEXT_FIELDS = ['appName', 'environment'];
+  private static readonly SYSTEM_CONTEXT_FIELDS = ['appName'];
 
   // Feature-specific config shortcuts
   private get featuresConfig() {
@@ -172,7 +172,6 @@ export class FeaturesClient implements VariationProvider {
     // Initial context with system fields
     this.context = {
       appName: config.appName,
-      environment: config.environment,
       ...config.features?.context,
     };
 
@@ -181,7 +180,6 @@ export class FeaturesClient implements VariationProvider {
       appName: config.appName,
       apiUrl: config.apiUrl,
       apiToken: config.apiToken,
-      environment: config.environment,
       customHeaders: config.customHeaders,
       disableMetrics: this.featuresConfig.disableMetrics,
       logger: this.logger,
@@ -434,15 +432,15 @@ export class FeaturesClient implements VariationProvider {
    * Look up a flag by name from the active flag set.
    * When forceRealtime=true, always reads from realtimeFlags regardless of explicitSyncMode.
    */
-  private lookupFlag(flagName: string, forceRealtime: boolean = false): EvaluatedFlag | undefined {
+  private lookupFlag(flagName: string, forceRealtime: boolean = true): EvaluatedFlag | undefined {
     return this.selectFlags(forceRealtime).get(flagName);
   }
 
-  isEnabled(flagName: string, forceRealtime: boolean = false): boolean {
+  isEnabled(flagName: string, forceRealtime: boolean = true): boolean {
     return this.isEnabledInternal(flagName, forceRealtime);
   }
 
-  getFlag(flagName: string, forceRealtime: boolean = false): EvaluatedFlag | undefined {
+  getFlag(flagName: string, forceRealtime: boolean = true): EvaluatedFlag | undefined {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getFlag');
@@ -452,18 +450,18 @@ export class FeaturesClient implements VariationProvider {
     return flag;
   }
 
-  getVariant(flagName: string, forceRealtime: boolean = false): Variant {
+  getVariant(flagName: string, forceRealtime: boolean = true): Variant {
     return this.getVariantInternal(flagName, forceRealtime);
   }
 
-  getAllFlags(forceRealtime: boolean = false): EvaluatedFlag[] {
+  getAllFlags(forceRealtime: boolean = true): EvaluatedFlag[] {
     const flags = this.selectFlags(forceRealtime);
     return Array.from(flags.values());
   }
 
   // ==================== Flag Query Methods ====================
 
-  hasFlag(flagName: string, forceRealtime: boolean = false): boolean {
+  hasFlag(flagName: string, forceRealtime: boolean = true): boolean {
     const flags = this.selectFlags(forceRealtime);
     return flags.has(flagName);
   }
@@ -472,7 +470,7 @@ export class FeaturesClient implements VariationProvider {
   // Central implementation: flag lookup + value extraction + metrics tracking.
   // FlagProxy delegates to these. Public variation methods also call these directly.
 
-  isEnabledInternal(flagName: string, forceRealtime: boolean = false): boolean {
+  isEnabledInternal(flagName: string, forceRealtime: boolean = true): boolean {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'isEnabled');
@@ -482,7 +480,7 @@ export class FeaturesClient implements VariationProvider {
     return flag.enabled;
   }
 
-  getVariantInternal(flagName: string, forceRealtime: boolean = false): Variant {
+  getVariantInternal(flagName: string, forceRealtime: boolean = true): Variant {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
@@ -495,38 +493,38 @@ export class FeaturesClient implements VariationProvider {
   // ==================== Metadata Access Internal Methods ====================
   // No metrics tracking ? read-only metadata access for FlagProxy property delegation.
 
-  hasFlagInternal(flagName: string, forceRealtime: boolean = false): boolean {
+  hasFlagInternal(flagName: string, forceRealtime: boolean = true): boolean {
     return this.lookupFlag(flagName, forceRealtime) !== undefined;
   }
 
-  getValueTypeInternal(flagName: string, forceRealtime: boolean = false): ValueType {
+  getValueTypeInternal(flagName: string, forceRealtime: boolean = true): ValueType {
     const flag = this.lookupFlag(flagName, forceRealtime);
     return flag?.valueType ?? 'none';
   }
 
-  getVersionInternal(flagName: string, forceRealtime: boolean = false): number {
+  getVersionInternal(flagName: string, forceRealtime: boolean = true): number {
     const flag = this.lookupFlag(flagName, forceRealtime);
     return flag?.version ?? 0;
   }
 
-  getReasonInternal(flagName: string, forceRealtime: boolean = false): string | undefined {
+  getReasonInternal(flagName: string, forceRealtime: boolean = true): string | undefined {
     const flag = this.lookupFlag(flagName, forceRealtime);
     return flag?.reason;
   }
 
-  getImpressionDataInternal(flagName: string, forceRealtime: boolean = false): boolean {
+  getImpressionDataInternal(flagName: string, forceRealtime: boolean = true): boolean {
     const flag = this.lookupFlag(flagName, forceRealtime);
     return flag?.impressionData ?? false;
   }
 
-  getRawFlagInternal(flagName: string, forceRealtime: boolean = false): EvaluatedFlag | undefined {
+  getRawFlagInternal(flagName: string, forceRealtime: boolean = true): EvaluatedFlag | undefined {
     return this.lookupFlag(flagName, forceRealtime);
   }
 
   variationInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -540,7 +538,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationInternal(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): boolean {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -558,7 +556,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -576,7 +574,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationInternal(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): number {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -592,7 +590,7 @@ export class FeaturesClient implements VariationProvider {
     return isNaN(value) ? fallbackValue : value;
   }
 
-  jsonVariationInternal<T>(flagName: string, fallbackValue: T, forceRealtime: boolean = false): T {
+  jsonVariationInternal<T>(flagName: string, fallbackValue: T, forceRealtime: boolean = true): T {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
@@ -615,7 +613,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationDetailsInternal(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<boolean> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -651,7 +649,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationDetailsInternal(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<string> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -687,7 +685,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationDetailsInternal(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<number> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -724,7 +722,7 @@ export class FeaturesClient implements VariationProvider {
   jsonVariationDetailsInternal<T>(
     flagName: string,
     fallbackValue: T,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<T> {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
@@ -769,7 +767,7 @@ export class FeaturesClient implements VariationProvider {
 
   // ==================== Internal Strict Variation (OrThrow) ====================
 
-  boolVariationOrThrowInternal(flagName: string, forceRealtime: boolean = false): boolean {
+  boolVariationOrThrowInternal(flagName: string, forceRealtime: boolean = true): boolean {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'isEnabled');
@@ -782,7 +780,7 @@ export class FeaturesClient implements VariationProvider {
     return Boolean(flag.variant.value);
   }
 
-  stringVariationOrThrowInternal(flagName: string, forceRealtime: boolean = false): string {
+  stringVariationOrThrowInternal(flagName: string, forceRealtime: boolean = true): string {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
@@ -795,7 +793,7 @@ export class FeaturesClient implements VariationProvider {
     return String(flag.variant.value);
   }
 
-  numberVariationOrThrowInternal(flagName: string, forceRealtime: boolean = false): number {
+  numberVariationOrThrowInternal(flagName: string, forceRealtime: boolean = true): number {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
@@ -812,7 +810,7 @@ export class FeaturesClient implements VariationProvider {
     return value;
   }
 
-  jsonVariationOrThrowInternal<T>(flagName: string, forceRealtime: boolean = false): T {
+  jsonVariationOrThrowInternal<T>(flagName: string, forceRealtime: boolean = true): T {
     const flag = this.lookupFlag(flagName, forceRealtime);
     if (!flag) {
       this.trackFlagAccess(flagName, undefined, 'getVariant');
@@ -832,41 +830,41 @@ export class FeaturesClient implements VariationProvider {
   // ==================== Public Variation Methods ====================
   // Simple delegation to internal methods.
 
-  variation(flagName: string, fallbackValue: string, forceRealtime: boolean = false): string {
+  variation(flagName: string, fallbackValue: string, forceRealtime: boolean = true): string {
     return this.variationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  boolVariation(flagName: string, fallbackValue: boolean, forceRealtime: boolean = false): boolean {
+  boolVariation(flagName: string, fallbackValue: boolean, forceRealtime: boolean = true): boolean {
     return this.boolVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  stringVariation(flagName: string, fallbackValue: string, forceRealtime: boolean = false): string {
+  stringVariation(flagName: string, fallbackValue: string, forceRealtime: boolean = true): string {
     return this.stringVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  numberVariation(flagName: string, fallbackValue: number, forceRealtime: boolean = false): number {
+  numberVariation(flagName: string, fallbackValue: number, forceRealtime: boolean = true): number {
     return this.numberVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
-  jsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime: boolean = false): T {
+  jsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime: boolean = true): T {
     return this.jsonVariationInternal(flagName, fallbackValue, forceRealtime);
   }
 
   // ==================== Strict Variation Methods (OrThrow) ====================
 
-  boolVariationOrThrow(flagName: string, forceRealtime: boolean = false): boolean {
+  boolVariationOrThrow(flagName: string, forceRealtime: boolean = true): boolean {
     return this.boolVariationOrThrowInternal(flagName, forceRealtime);
   }
 
-  stringVariationOrThrow(flagName: string, forceRealtime: boolean = false): string {
+  stringVariationOrThrow(flagName: string, forceRealtime: boolean = true): string {
     return this.stringVariationOrThrowInternal(flagName, forceRealtime);
   }
 
-  numberVariationOrThrow(flagName: string, forceRealtime: boolean = false): number {
+  numberVariationOrThrow(flagName: string, forceRealtime: boolean = true): number {
     return this.numberVariationOrThrowInternal(flagName, forceRealtime);
   }
 
-  jsonVariationOrThrow<T>(flagName: string, forceRealtime: boolean = false): T {
+  jsonVariationOrThrow<T>(flagName: string, forceRealtime: boolean = true): T {
     return this.jsonVariationOrThrowInternal<T>(flagName, forceRealtime);
   }
 
@@ -875,7 +873,7 @@ export class FeaturesClient implements VariationProvider {
   boolVariationDetails(
     flagName: string,
     fallbackValue: boolean,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<boolean> {
     return this.boolVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -883,7 +881,7 @@ export class FeaturesClient implements VariationProvider {
   stringVariationDetails(
     flagName: string,
     fallbackValue: string,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<string> {
     return this.stringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -891,7 +889,7 @@ export class FeaturesClient implements VariationProvider {
   numberVariationDetails(
     flagName: string,
     fallbackValue: number,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<number> {
     return this.numberVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }
@@ -899,7 +897,7 @@ export class FeaturesClient implements VariationProvider {
   jsonVariationDetails<T>(
     flagName: string,
     fallbackValue: T,
-    forceRealtime: boolean = false
+    forceRealtime: boolean = true
   ): VariationResult<T> {
     return this.jsonVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
   }

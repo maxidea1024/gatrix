@@ -42,13 +42,16 @@ export class VarsController {
       await VarsService.clearCache(key, environmentId);
 
       // Publish update event for SDKs
-      await pubSubService.publishSDKEvent({
-        type: 'vars.updated',
-        data: {
-          key: key,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'vars.updated',
+          data: {
+            key: key,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       // Invalidate related caches when specific KV items are updated via setVar
       if (key === '$clientVersionPassiveData' || key === 'kv:clientVersionPassiveData') {
@@ -66,13 +69,16 @@ export class VarsController {
 
         try {
           // environment is already the name string
-          await pubSubService.publishSDKEvent({
-            type: 'client_version.updated',
-            data: {
-              id: -1, // Dummy ID to trigger refresh of the list for this environmentId
-              environmentId: environmentId,
+          await pubSubService.publishSDKEvent(
+            {
+              type: 'client_version.updated',
+              data: {
+                id: -1, // Dummy ID to trigger refresh of the list for this environmentId
+                environmentId: environmentId,
+              },
             },
-          });
+            { environmentId: environmentId }
+          );
         } catch (err) {
           // Log error but don't fail the request
           logger.error('Failed to broadcast client version update events', err);
@@ -181,13 +187,16 @@ export class VarsController {
       await VarsService.clearCache(item.varKey, environmentId);
 
       // Publish update event for SDKs
-      await pubSubService.publishSDKEvent({
-        type: 'vars.updated',
-        data: {
-          key: item.varKey,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'vars.updated',
+          data: {
+            key: item.varKey,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       res.status(201).json({
         success: true,
@@ -229,13 +238,16 @@ export class VarsController {
       await VarsService.clearCache(fullKey, environmentId);
 
       // Publish update event for SDKs
-      await pubSubService.publishSDKEvent({
-        type: 'vars.updated',
-        data: {
-          key: fullKey,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'vars.updated',
+          data: {
+            key: fullKey,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       // Invalidate related caches when specific KV items are updated
       if (fullKey === '$clientVersionPassiveData' || fullKey === 'kv:clientVersionPassiveData') {
@@ -256,13 +268,16 @@ export class VarsController {
 
         try {
           // environment is already the name string
-          await pubSubService.publishSDKEvent({
-            type: 'client_version.updated',
-            data: {
-              id: -1, // Dummy ID to trigger refresh of the list for this environmentId
-              environmentId: environmentId,
+          await pubSubService.publishSDKEvent(
+            {
+              type: 'client_version.updated',
+              data: {
+                id: -1, // Dummy ID to trigger refresh of the list for this environmentId
+                environmentId: environmentId,
+              },
             },
-          });
+            { environmentId: environmentId }
+          );
         } catch (err) {
           // Log error but don't fail the request
           logger.error('Failed to broadcast client version update events', err);
@@ -326,13 +341,16 @@ export class VarsController {
       await VarsService.clearCache(fullKey, environmentId);
 
       // Publish update event for SDKs
-      await pubSubService.publishSDKEvent({
-        type: 'vars.updated',
-        data: {
-          key: fullKey,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'vars.updated',
+          data: {
+            key: fullKey,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       res.json({
         success: true,

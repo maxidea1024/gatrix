@@ -69,112 +69,112 @@ public:
 
   /** Check if a flag is enabled */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  bool IsEnabled(const FString& FlagName, bool bForceRealtime = false) const;
+  bool IsEnabled(const FString& FlagName, bool bForceRealtime = true) const;
 
   /** Get raw flag data. Returns empty flag if not found (check Name field). */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  FGatrixEvaluatedFlag GetFlag(const FString& FlagName, bool bForceRealtime = false) const;
+  FGatrixEvaluatedFlag GetFlag(const FString& FlagName, bool bForceRealtime = true) const;
 
   /** Get variant for a flag */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  FGatrixVariant GetVariant(const FString& FlagName, bool bForceRealtime = false) const;
+  FGatrixVariant GetVariant(const FString& FlagName, bool bForceRealtime = true) const;
 
   /** Get all evaluated flags */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  TArray<FGatrixEvaluatedFlag> GetAllFlags(bool bForceRealtime = false) const;
+  TArray<FGatrixEvaluatedFlag> GetAllFlags(bool bForceRealtime = true) const;
 
   /** Check if a flag is registered in the cache */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features")
-  bool HasFlag(const FString& FlagName, bool bForceRealtime = false) const;
+  bool HasFlag(const FString& FlagName, bool bForceRealtime = true) const;
 
   // ==================== Flag Access - Typed Variations ====================
 
   /** Get variant name (returns the matched variant's name, or fallback) */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FString Variation(const FString& FlagName, const FString& FallbackValue,
-                    bool bForceRealtime = false) const;
+                    bool bForceRealtime = true) const;
 
   /** Get boolean variation */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   bool BoolVariation(const FString& FlagName, bool FallbackValue,
-                     bool bForceRealtime = false) const;
+                     bool bForceRealtime = true) const;
 
   /** Get string variation */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FString StringVariation(const FString& FlagName, const FString& FallbackValue,
-                          bool bForceRealtime = false) const;
+                          bool bForceRealtime = true) const;
 
   /** Get integer variation */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   int32 IntVariation(const FString& FlagName, int32 FallbackValue,
-                     bool bForceRealtime = false) const;
+                     bool bForceRealtime = true) const;
 
   /** Get float variation */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   float FloatVariation(const FString& FlagName, float FallbackValue,
-                       bool bForceRealtime = false) const;
+                       bool bForceRealtime = true) const;
 
   /** Get double variation (C++ only - Blueprint does not support double) */
   double DoubleVariation(const FString& FlagName, double FallbackValue,
-                         bool bForceRealtime = false) const;
+                         bool bForceRealtime = true) const;
 
   /** Get JSON variation as string */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FString JsonVariation(const FString& FlagName, const FString& FallbackValue,
-                        bool bForceRealtime = false) const;
+                        bool bForceRealtime = true) const;
 
   // ==================== Variation Details ====================
 
   /** Get boolean variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FGatrixVariationResult BoolVariationDetails(const FString& FlagName, bool FallbackValue,
-                                              bool bForceRealtime = false) const;
+                                              bool bForceRealtime = true) const;
 
   /** Get string variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FGatrixVariationResult StringVariationDetails(const FString& FlagName,
                                                 const FString& FallbackValue,
-                                                bool bForceRealtime = false) const;
+                                                bool bForceRealtime = true) const;
 
   /** Get integer variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FGatrixVariationResult IntVariationDetails(const FString& FlagName, int32 FallbackValue,
-                                             bool bForceRealtime = false) const;
+                                             bool bForceRealtime = true) const;
 
   /** Get float variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FGatrixVariationResult FloatVariationDetails(const FString& FlagName, float FallbackValue,
-                                               bool bForceRealtime = false) const;
+                                               bool bForceRealtime = true) const;
 
   /** Get double variation with details (C++ only - Blueprint does not support
    * double) */
   FGatrixVariationResult DoubleVariationDetails(const FString& FlagName, double FallbackValue,
-                                                bool bForceRealtime = false) const;
+                                                bool bForceRealtime = true) const;
 
   /** Get JSON variation with details */
   UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Gatrix|Features|Variation")
   FGatrixVariationResult JsonVariationDetails(const FString& FlagName, const FString& FallbackValue,
-                                              bool bForceRealtime = false) const;
+                                              bool bForceRealtime = true) const;
 
   // ==================== OrThrow Variations ====================
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  bool BoolVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
+  bool BoolVariationOrThrow(const FString& FlagName, bool bForceRealtime = true);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  FString StringVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
+  FString StringVariationOrThrow(const FString& FlagName, bool bForceRealtime = true);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  float FloatVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
+  float FloatVariationOrThrow(const FString& FlagName, bool bForceRealtime = true);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  int32 IntVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
+  int32 IntVariationOrThrow(const FString& FlagName, bool bForceRealtime = true);
 
   /** C++ only - Blueprint does not support double */
-  double DoubleVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
+  double DoubleVariationOrThrow(const FString& FlagName, bool bForceRealtime = true);
 
   UFUNCTION(BlueprintCallable, Category = "Gatrix|Features|Variation")
-  FString JsonVariationOrThrow(const FString& FlagName, bool bForceRealtime = false);
+  FString JsonVariationOrThrow(const FString& FlagName, bool bForceRealtime = true);
 
   // ==================== Context Management ====================
 
@@ -314,71 +314,71 @@ public:
   // ==================== IGatrixVariationProvider Metadata Implementation
   // ====================
 
-  virtual bool HasFlagInternal(const FString& FlagName, bool bForceRealtime = false) const override;
+  virtual bool HasFlagInternal(const FString& FlagName, bool bForceRealtime = true) const override;
   virtual EGatrixValueType GetValueTypeInternal(const FString& FlagName,
-                                                bool bForceRealtime = false) const override;
+                                                bool bForceRealtime = true) const override;
   virtual int32 GetVersionInternal(const FString& FlagName,
-                                   bool bForceRealtime = false) const override;
+                                   bool bForceRealtime = true) const override;
   virtual FString GetReasonInternal(const FString& FlagName,
-                                    bool bForceRealtime = false) const override;
+                                    bool bForceRealtime = true) const override;
   virtual bool GetImpressionDataInternal(const FString& FlagName,
-                                         bool bForceRealtime = false) const override;
+                                         bool bForceRealtime = true) const override;
   virtual FGatrixEvaluatedFlag GetRawFlagInternal(const FString& FlagName,
-                                                  bool bForceRealtime = false) const override;
+                                                  bool bForceRealtime = true) const override;
 
   // ==================== IGatrixVariationProvider Implementation
   // ======================================
 
-  virtual bool IsEnabledInternal(const FString& FlagName, bool bForceRealtime = false) override;
+  virtual bool IsEnabledInternal(const FString& FlagName, bool bForceRealtime = true) override;
   virtual FGatrixVariant GetVariantInternal(const FString& FlagName,
-                                            bool bForceRealtime = false) override;
+                                            bool bForceRealtime = true) override;
 
   virtual FString VariationInternal(const FString& FlagName, const FString& FallbackValue,
-                                    bool bForceRealtime = false) override;
+                                    bool bForceRealtime = true) override;
   virtual bool BoolVariationInternal(const FString& FlagName, bool FallbackValue,
-                                     bool bForceRealtime = false) override;
+                                     bool bForceRealtime = true) override;
   virtual FString StringVariationInternal(const FString& FlagName, const FString& FallbackValue,
-                                          bool bForceRealtime = false) override;
+                                          bool bForceRealtime = true) override;
   virtual float FloatVariationInternal(const FString& FlagName, float FallbackValue,
-                                       bool bForceRealtime = false) override;
+                                       bool bForceRealtime = true) override;
   virtual int32 IntVariationInternal(const FString& FlagName, int32 FallbackValue,
-                                     bool bForceRealtime = false) override;
+                                     bool bForceRealtime = true) override;
   virtual double DoubleVariationInternal(const FString& FlagName, double FallbackValue,
-                                         bool bForceRealtime = false) override;
+                                         bool bForceRealtime = true) override;
   virtual FString JsonVariationInternal(const FString& FlagName, const FString& FallbackValue,
-                                        bool bForceRealtime = false) override;
+                                        bool bForceRealtime = true) override;
 
   virtual FGatrixVariationResult BoolVariationDetailsInternal(const FString& FlagName,
                                                               bool FallbackValue,
-                                                              bool bForceRealtime = false) override;
+                                                              bool bForceRealtime = true) override;
   virtual FGatrixVariationResult
   StringVariationDetailsInternal(const FString& FlagName, const FString& FallbackValue,
-                                 bool bForceRealtime = false) override;
+                                 bool bForceRealtime = true) override;
   virtual FGatrixVariationResult
   FloatVariationDetailsInternal(const FString& FlagName, float FallbackValue,
-                                bool bForceRealtime = false) override;
+                                bool bForceRealtime = true) override;
   virtual FGatrixVariationResult IntVariationDetailsInternal(const FString& FlagName,
                                                              int32 FallbackValue,
-                                                             bool bForceRealtime = false) override;
+                                                             bool bForceRealtime = true) override;
   virtual FGatrixVariationResult
   DoubleVariationDetailsInternal(const FString& FlagName, double FallbackValue,
-                                 bool bForceRealtime = false) override;
+                                 bool bForceRealtime = true) override;
   virtual FGatrixVariationResult JsonVariationDetailsInternal(const FString& FlagName,
                                                               const FString& FallbackValue,
-                                                              bool bForceRealtime = false) override;
+                                                              bool bForceRealtime = true) override;
 
   virtual bool BoolVariationOrThrowInternal(const FString& FlagName,
-                                            bool bForceRealtime = false) override;
+                                            bool bForceRealtime = true) override;
   virtual FString StringVariationOrThrowInternal(const FString& FlagName,
-                                                 bool bForceRealtime = false) override;
+                                                 bool bForceRealtime = true) override;
   virtual float FloatVariationOrThrowInternal(const FString& FlagName,
-                                              bool bForceRealtime = false) override;
+                                              bool bForceRealtime = true) override;
   virtual int32 IntVariationOrThrowInternal(const FString& FlagName,
-                                            bool bForceRealtime = false) override;
+                                            bool bForceRealtime = true) override;
   virtual double DoubleVariationOrThrowInternal(const FString& FlagName,
-                                                bool bForceRealtime = false) override;
+                                                bool bForceRealtime = true) override;
   virtual FString JsonVariationOrThrowInternal(const FString& FlagName,
-                                               bool bForceRealtime = false) override;
+                                               bool bForceRealtime = true) override;
 
 private:
   // ==================== Internal Structs ====================

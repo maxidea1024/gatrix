@@ -106,7 +106,8 @@ export class ApiTokenUsageService {
           lastUsedAt: now,
           instanceId,
         }),
-        { EX: ttlSeconds }
+        'EX',
+        ttlSeconds
       );
 
       // Ensure count key also has TTL (refresh on every usage)
@@ -145,15 +146,19 @@ export class ApiTokenUsageService {
 
     try {
       const pattern = 'token_usage:count:*';
-      const countKeys: string[] = [];
-
       // Use SCAN instead of KEYS to prevent blocking
-      for await (const key of client.scanIterator({
-        MATCH: pattern,
-        COUNT: 100,
-      })) {
-        countKeys.push(key);
-      }
+      const countKeys: string[] = [];
+      await new Promise<void>((resolve, reject) => {
+        const stream = client.scanStream({
+          match: pattern,
+          count: 100,
+        });
+        stream.on('data', (resultKeys: string[]) => {
+          countKeys.push(...resultKeys);
+        });
+        stream.on('end', () => resolve());
+        stream.on('error', (err: Error) => reject(err));
+      });
 
       if (countKeys.length === 0) {
         return;
@@ -166,7 +171,7 @@ export class ApiTokenUsageService {
       for (const countKey of countKeys) {
         try {
           // Atomic GETSET to 0 to claim the current count without losing concurrent increments
-          const countStr = await client.getSet(countKey, '0');
+          const countStr = await client.getset(countKey, '0');
           const count = parseInt(countStr || '0', 10);
 
           if (count > 0) {
@@ -285,18 +290,22 @@ export class ApiTokenUsageService {
       if (!client) return;
 
       const pattern = 'api_token:*';
-      const keys: string[] = [];
-
       // Use SCAN instead of KEYS
-      for await (const key of client.scanIterator({
-        MATCH: pattern,
-        COUNT: 100,
-      })) {
-        keys.push(key);
-      }
+      const keys: string[] = [];
+      await new Promise<void>((resolve, reject) => {
+        const stream = client.scanStream({
+          match: pattern,
+          count: 100,
+        });
+        stream.on('data', (resultKeys: string[]) => {
+          keys.push(...resultKeys);
+        });
+        stream.on('end', () => resolve());
+        stream.on('error', (err: Error) => reject(err));
+      });
 
       if (keys.length > 0) {
-        await client.del(keys);
+        await client.del(...keys);
       }
     } catch (error) {
       logger.error(`Failed to invalidate token cache for token ${tokenId}:`, error);

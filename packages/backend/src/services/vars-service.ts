@@ -81,9 +81,12 @@ export class VarsService {
     await this.clearCache(key, environmentId);
 
     // Publish change event with full data for direct SDK cache update
-    await pubSubService.publishSDKEvent({
-      type: 'vars.updated',
-      data: { key, value, environmentId },
-    });
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'vars.updated',
+        data: { key, value, environmentId },
+      },
+      { environmentId }
+    );
   }
 }

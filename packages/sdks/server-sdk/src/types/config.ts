@@ -2,6 +2,8 @@
  * SDK Configuration Types
  */
 
+import { ITokenProvider } from '../utils/token-provider';
+
 export interface RedisConfig {
   host: string;
   port: number;
@@ -88,7 +90,7 @@ export interface CloudConfig {
  * Existing features default to true for backward compatibility.
  * New features (for Edge server) default to false.
  */
-export interface FeaturesConfig {
+export interface UsesConfig {
   // Existing features - default: true (backward compatible)
   gameWorld?: boolean; // Game world caching (default: true)
   popupNotice?: boolean; // Popup notice caching (default: true)
@@ -118,29 +120,32 @@ export interface FeatureFlagConfig {
  * Main SDK Configuration
  */
 export interface GatrixSDKConfig {
-  // Required
-  gatrixUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
+  // Required — only url + token + applicationName
+  apiUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
   apiToken: string; // Server API Token (required; use 'gatrix-unsecured-server-api-token' for testing)
   applicationName: string; // Application name
-  service: string; // Service name for identification (e.g., 'auth', 'lobby', 'world', 'chat'). Used in metrics labels and service discovery.
-  group: string; // Service group for categorization (e.g., 'kr', 'us', 'production'). Used in metrics labels and service discovery.
 
-  // Optional - Environment metadata (used for metrics labels and service discovery only, NOT for API auth)
-  // API authentication is handled entirely by the apiToken
-  environment?: string; // Environment label (e.g., 'production', 'staging'). Used in metrics labels and service discovery.
+  // Optional - Service identification (for metrics labels and service discovery)
+  service?: string; // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group?: string; // Service group (e.g., 'kr', 'us', 'production')
+
+  // Optional - Token provider for multi-token mode (e.g., Edge server)
+  // When not provided, SDK uses SingleTokenProvider with the apiToken.
+  // Each token maps to exactly one environment (1:1).
+  tokenProvider?: ITokenProvider;
 
   // Optional - Cloud configuration for auto-detecting region
-  cloud?: CloudConfig; // Cloud provider configuration. Region is auto-detected from cloud metadata.
+  cloud?: CloudConfig;
 
   // Optional - World ID for world-specific maintenance checks
-  worldId?: string; // Game world ID (e.g., 'world-1', 'asia-1'). Required for isMaintenance() to check world-level maintenance.
+  worldId?: string;
 
   // Optional - Version information (for service discovery)
-  version?: string; // Application version (e.g., git tag like 'v1.0.0'). Included in service meta during registration.
-  commitHash?: string; // Git commit hash (short, 8 chars). Included in service meta during registration.
-  gitBranch?: string; // Git branch name (e.g., 'main', 'develop'). Included in service meta during registration.
+  version?: string;
+  commitHash?: string;
+  gitBranch?: string;
 
-  // Optional - Redis (for BullMQ events)
+  // Optional - Redis (for PubSub events)
   redis?: RedisConfig;
 
   // Optional - Cache settings
@@ -156,15 +161,10 @@ export interface GatrixSDKConfig {
   metrics?: MetricsConfig;
 
   // Optional - Feature toggles (for selective caching)
-  features?: FeaturesConfig;
+  uses?: UsesConfig;
 
   // Optional - Feature flag specific settings
   featureFlags?: FeatureFlagConfig;
-
-  // Optional - Target environments (for Edge server mode)
-  // Edge server uses this to serve requests for multiple environments
-  // Values: '*' = all environments, ['env1', 'env2'] = specific, undefined = token-determined
-  environments?: string[] | '*';
 }
 
 /**
@@ -188,27 +188,26 @@ export interface GatrixSDKConfig {
  */
 export interface GatrixSDKInitOptions {
   // Core identification overrides
-  service?: string; // Override service name
-  group?: string; // Override service group
-  environment?: string; // Override environment label (for metrics/discovery only)
+  service?: string;
+  group?: string;
 
   // Optional overrides
-  gatrixUrl?: string; // Override Gatrix backend URL
-  apiToken?: string; // Override API token
-  applicationName?: string; // Override application name
-  worldId?: string; // Override world ID
-  version?: string; // Override version
-  commitHash?: string; // Override commit hash
-  gitBranch?: string; // Override git branch
+  apiUrl?: string;
+  apiToken?: string;
+  applicationName?: string;
+  worldId?: string;
+  version?: string;
+  commitHash?: string;
+  gitBranch?: string;
 
   // Configuration overrides (deep merged)
-  redis?: Partial<RedisConfig>; // Override Redis config
-  cache?: Partial<CacheConfig>; // Override cache settings
-  logger?: Partial<LoggerConfig>; // Override logger settings
-  retry?: Partial<RetryConfig>; // Override retry settings
-  metrics?: Partial<MetricsConfig>; // Override metrics settings
-  features?: Partial<FeaturesConfig>; // Override feature toggles
-  featureFlags?: Partial<FeatureFlagConfig>; // Override feature flag settings
-  environments?: string[] | '*'; // Override target environments (Edge mode)
-  cloud?: Partial<CloudConfig>; // Override cloud configuration
+  redis?: Partial<RedisConfig>;
+  cache?: Partial<CacheConfig>;
+  logger?: Partial<LoggerConfig>;
+  retry?: Partial<RetryConfig>;
+  metrics?: Partial<MetricsConfig>;
+  uses?: Partial<UsesConfig>;
+  featureFlags?: Partial<FeatureFlagConfig>;
+  cloud?: Partial<CloudConfig>;
+  tokenProvider?: ITokenProvider;
 }

@@ -15,24 +15,13 @@ export const config = {
   // Edge bypass token - allows access to all environments and internal APIs
   // Can be configured via EDGE_BYPASS_TOKEN or EDGE_API_TOKEN environment variable
   apiToken:
-    process.env.EDGE_BYPASS_TOKEN ||
-    process.env.EDGE_API_TOKEN ||
-    'gatrix-edge-internal-bypass-token',
+    process.env.EDGE_BYPASS_TOKEN || process.env.EDGE_API_TOKEN || 'gatrix-infra-server-token',
   applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
   // SDK required fields for metrics labels and service discovery
   service: process.env.EDGE_SERVICE || 'edge',
   group: process.env.EDGE_GROUP || 'gatrix',
   environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
-
-  // Target environments (comma-separated, or '*' for all environments)
-  environments:
-    process.env.EDGE_ENVIRONMENTS === '*'
-      ? ('*' as const)
-      : (process.env.EDGE_ENVIRONMENTS || '')
-          .split(',')
-          .map((e) => e.trim())
-          .filter(Boolean),
 
   // Redis configuration (for cache PubSub in event mode)
   // Edge cache-specific Redis settings take priority over global settings
@@ -65,10 +54,6 @@ export function validateConfig(): void {
 
   if (!config.apiToken) {
     errors.push('EDGE_API_TOKEN is required');
-  }
-
-  if (config.environments !== '*' && config.environments.length === 0) {
-    errors.push('EDGE_ENVIRONMENTS is required (comma-separated environment IDs or "*" for all)');
   }
 
   if (errors.length > 0) {

@@ -103,7 +103,6 @@ describe('FlagProxy', () => {
       apiUrl: 'https://api.example.com/api/v1',
       apiToken: 'test-token',
       appName: 'test-app',
-      environment: 'test',
       features: {
         bootstrap: bootstrapFlags,
         offlineMode: true, // Use offline mode for tests (no network requests)

@@ -101,7 +101,7 @@ export class GatrixServerSDK {
    * ```typescript
    * // Base config from config file
    * const baseConfig: GatrixSDKConfig = {
-   *   gatrixUrl: 'https://api.gatrix.com',
+   *   apiUrl: 'https://api.gatrix.com',
    *   apiToken: 'my-token',
    *   applicationName: 'my-game',
    *   service: 'default-service',
@@ -147,15 +147,14 @@ export class GatrixServerSDK {
     // Override simple fields if provided
     if (overrides.service !== undefined) merged.service = overrides.service;
     if (overrides.group !== undefined) merged.group = overrides.group;
-    if (overrides.environment !== undefined) merged.environment = overrides.environment;
-    if (overrides.gatrixUrl !== undefined) merged.gatrixUrl = overrides.gatrixUrl;
+    if (overrides.apiUrl !== undefined) merged.apiUrl = overrides.apiUrl;
     if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
     if (overrides.applicationName !== undefined) merged.applicationName = overrides.applicationName;
     if (overrides.worldId !== undefined) merged.worldId = overrides.worldId;
     if (overrides.version !== undefined) merged.version = overrides.version;
     if (overrides.commitHash !== undefined) merged.commitHash = overrides.commitHash;
     if (overrides.gitBranch !== undefined) merged.gitBranch = overrides.gitBranch;
-    if (overrides.environments !== undefined) merged.environments = overrides.environments;
+    if (overrides.tokenProvider !== undefined) merged.tokenProvider = overrides.tokenProvider;
 
     // Deep merge nested objects
     if (overrides.redis) {
@@ -176,8 +175,8 @@ export class GatrixServerSDK {
     if (overrides.metrics) {
       merged.metrics = { ...baseConfig.metrics, ...overrides.metrics };
     }
-    if (overrides.features) {
-      merged.features = { ...baseConfig.features, ...overrides.features };
+    if (overrides.uses) {
+      merged.uses = { ...baseConfig.uses, ...overrides.uses };
     }
     if (overrides.featureFlags) {
       merged.featureFlags = { ...baseConfig.featureFlags, ...overrides.featureFlags };
@@ -194,7 +193,6 @@ export class GatrixServerSDK {
     const configWithDefaults = {
       ...config,
       apiToken: config.apiToken || 'gatrix-unsecured-server-api-token',
-      environment: config.environment || 'development', // Temporary fallback
     };
 
     // Auto-configure Loki from environment variables if enabled
@@ -226,9 +224,8 @@ export class GatrixServerSDK {
         ...loggerConfig.loki,
         labels: {
           job: 'gatrix',
-          service: configWithDefaults.service,
-          group: configWithDefaults.group,
-          environment: configWithDefaults.environment,
+          service: configWithDefaults.service || '',
+          group: configWithDefaults.group || '',
           application: configWithDefaults.applicationName,
           hostname: require('os').hostname(),
           ...loggerConfig.loki.labels,
@@ -240,9 +237,8 @@ export class GatrixServerSDK {
     // Initialize metrics first
     this.metrics = new SdkMetrics({
       enabled: configWithDefaults.metrics?.enabled !== false,
-      service: configWithDefaults.service,
-      group: configWithDefaults.group,
-      environment: configWithDefaults.environment,
+      service: configWithDefaults.service || '',
+      group: configWithDefaults.group || '',
       applicationName: configWithDefaults.applicationName,
       registry: configWithDefaults.metrics?.registry,
     });
@@ -264,9 +260,9 @@ export class GatrixServerSDK {
         if (!this.metrics?.getRegistry()) {
           this.httpRegistry.setDefaultLabels({
             sdk: 'gatrix-server-sdk',
-            service: configWithDefaults.service,
-            group: configWithDefaults.group,
-            environment: configWithDefaults.environment,
+            service: configWithDefaults.service || '',
+            group: configWithDefaults.group || '',
+
             application: configWithDefaults.applicationName,
           });
         }
@@ -285,7 +281,7 @@ export class GatrixServerSDK {
 
     // Initialize API client (inject metrics for HTTP instrumentation)
     this.apiClient = new ApiClient({
-      baseURL: configWithDefaults.gatrixUrl,
+      baseURL: configWithDefaults.apiUrl,
       apiToken: configWithDefaults.apiToken,
       applicationName: configWithDefaults.applicationName,
       logger: this.logger,
@@ -304,16 +300,14 @@ export class GatrixServerSDK {
     this.impactMetricDataSource = this.impactMetricRegistry;
     const impactContext: ImpactMetricsStaticContext = {
       appName: configWithDefaults.applicationName,
-      environment: configWithDefaults.environment,
-      service: configWithDefaults.service,
+      service: configWithDefaults.service || '',
     };
     this._impactMetrics = new MetricsAPI(this.impactMetricRegistry, impactContext, this.logger);
 
     this.logger.info('GatrixServerSDK created', {
-      gatrixUrl: configWithDefaults.gatrixUrl,
+      apiUrl: configWithDefaults.apiUrl,
       applicationName: configWithDefaults.applicationName,
-      environment: configWithDefaults.environment,
-      environments: configWithDefaults.environments,
+
       apiToken:
         configWithDefaults.apiToken === 'gatrix-unsecured-server-api-token'
           ? 'unsecured (testing)'
@@ -326,8 +320,8 @@ export class GatrixServerSDK {
    */
   private validateConfig(config: GatrixSDKConfig): void {
     // Required fields
-    if (!config.gatrixUrl) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'gatrixUrl is required');
+    if (!config.apiUrl) {
+      throw createError(ErrorCode.INVALID_CONFIG, 'apiUrl is required');
     }
 
     if (!config.apiToken) {
@@ -338,13 +332,7 @@ export class GatrixServerSDK {
       throw createError(ErrorCode.INVALID_CONFIG, 'applicationName is required');
     }
 
-    if (!config.service) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'service is required');
-    }
-
-    if (!config.group) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'group is required');
-    }
+    // service and group are optional
 
     // environment is now optional (token handles it)
     // if (!config.environment) {
@@ -353,9 +341,9 @@ export class GatrixServerSDK {
 
     // Validate URL format
     try {
-      new URL(config.gatrixUrl);
+      new URL(config.apiUrl);
     } catch (_error) {
-      throw createError(ErrorCode.INVALID_CONFIG, 'gatrixUrl must be a valid URL');
+      throw createError(ErrorCode.INVALID_CONFIG, 'apiUrl must be a valid URL');
     }
 
     // Validate worldId format if provided
@@ -398,27 +386,7 @@ export class GatrixServerSDK {
       );
     }
 
-    // Validate environments config
-    // - '*' means wildcard mode (fetch all environments from backend)
-    // - Array of strings means explicit mode (use only specified environments)
-    // - Cannot mix '*' with specific environments
-    if (config.environments !== undefined) {
-      if (Array.isArray(config.environments)) {
-        if (config.environments.includes('*')) {
-          if (config.environments.length > 1) {
-            throw createError(
-              ErrorCode.INVALID_CONFIG,
-              'environments cannot mix "*" with specific environment names. Use either "*" for all environments or an array of specific environment names.'
-            );
-          }
-        }
-      } else if (config.environments !== '*') {
-        throw createError(
-          ErrorCode.INVALID_CONFIG,
-          'environments must be "*" or an array of environment names'
-        );
-      }
-    }
+    // environments config removed - using tokenProvider instead
   }
 
   /**
@@ -469,17 +437,16 @@ export class GatrixServerSDK {
       // Initialize cache manager
       // CacheManager creates all services internally based on feature flags
       const cacheConfig = this.config.cache || {};
-      const defaultEnv = this.config.environment || 'development';
       this.cacheManager = new CacheManager(
         cacheConfig,
         this.apiClient,
         this.logger,
-        defaultEnv,
+        this.config.apiToken,
         this.metrics,
-        this.config.worldId, // Pass worldId for maintenance watcher
-        this.config.features, // Pass features config for conditional loading
-        this.config.environments, // Pass target environments for Edge mode
-        this.config.featureFlags // Pass feature flag specific settings
+        this.config.worldId,
+        this.config.uses,
+        this.config.tokenProvider,
+        this.config.featureFlags
       );
 
       // Register maintenance state change listener to emit SDK events
@@ -537,7 +504,6 @@ export class GatrixServerSDK {
           collectDefaultMetrics: this.config.metrics?.collectDefaultMetrics,
           service: this.config.service,
           group: this.config.group,
-          environment: this.config.environment,
           applicationName: this.config.applicationName,
           logger: this.logger,
           registry: primaryRegistry as any,
@@ -549,7 +515,7 @@ export class GatrixServerSDK {
       }
 
       // Auto-start feature flag metrics collection if enabled
-      if (this.config.features?.featureFlag !== false) {
+      if (this.config.uses?.featureFlag !== false) {
         const featureFlagService = this.cacheManager?.getFeatureFlagService();
         if (featureFlagService && featureFlagService.getMetricsConfig().enabled) {
           featureFlagService.startMetricsCollection();
@@ -888,19 +854,17 @@ export class GatrixServerSDK {
    * - environments is set to '*' (wildcard mode)
    * - environments is an array with multiple values
    */
-  isMultiEnvironmentMode(): boolean {
-    return (
-      this.config.environments === '*' ||
-      (Array.isArray(this.config.environments) && this.config.environments.length > 0)
-    );
+  isMultiTokenMode(): boolean {
+    const provider = this.config.tokenProvider;
+    return !!provider && provider.getTokens().length > 1;
   }
 
   /**
    * Get the default environment from SDK config
    * Used in single-environment mode (game servers)
    */
-  getDefaultEnvironment(): string {
-    return this.config.environment || 'unknown';
+  getDefaultToken(): string {
+    return this.config.apiToken;
   }
 
   /**
@@ -908,22 +872,22 @@ export class GatrixServerSDK {
    * In single-environment mode: uses config.environment if not provided
    * In multi-environment mode: throws error if not provided
    *
-   * @param environment Optional environment parameter
+   * @param environmentId Optional environment parameter
    * @param methodName Method name for error message
-   * @returns Resolved environment name
+   * @returns Resolved environment ID
    */
-  private resolveEnvironment(environmentId: string | undefined, methodName: string): string {
-    if (environmentId) {
-      return environmentId;
+  private resolveToken(token: string | undefined, methodName: string): string {
+    if (token) {
+      return token;
     }
 
-    if (this.isMultiEnvironmentMode()) {
+    if (this.isMultiTokenMode()) {
       throw new Error(
-        `GatrixServerSDK.${methodName}(): environment parameter is required in multi-environment mode`
+        `GatrixServerSDK.${methodName}(): token parameter is required in multi-token mode`
       );
     }
 
-    return this.config.environment || 'unknown';
+    return this.config.apiToken;
   }
 
   // ============================================================================
@@ -933,13 +897,13 @@ export class GatrixServerSDK {
   /**
    * Redeem a coupon
    * @param request Coupon redemption request
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async redeemCoupon(
     request: RedeemCouponRequest,
     environmentId?: string
   ): Promise<RedeemCouponResponse> {
-    const env = this.resolveEnvironment(environmentId, 'redeemCoupon');
+    const env = this.resolveToken(environmentId, 'redeemCoupon');
     return await this.coupon.redeem(request, env);
   }
 
@@ -949,56 +913,56 @@ export class GatrixServerSDK {
 
   /**
    * Fetch all game worlds
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchGameWorlds(environmentId?: string): Promise<GameWorld[]> {
-    const env = this.resolveEnvironment(environmentId, 'fetchGameWorlds');
+    const env = this.resolveToken(environmentId, 'fetchGameWorlds');
     return await this.gameWorld.listByEnvironment(env);
   }
 
   /**
    * Fetch game world by ID
    * @param id Game world ID
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
-  async fetchGameWorldById(id: number, environmentId?: string): Promise<GameWorld> {
-    const env = this.resolveEnvironment(environmentId, 'fetchGameWorldById');
+  async fetchGameWorldById(id: string, environmentId?: string): Promise<GameWorld> {
+    const env = this.resolveToken(environmentId, 'fetchGameWorldById');
     return await this.gameWorld.getById(id, env);
   }
 
   /**
    * Fetch game world by worldId
    * @param worldId World ID string
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchGameWorldByWorldId(worldId: string, environmentId?: string): Promise<GameWorld> {
-    const env = this.resolveEnvironment(environmentId, 'fetchGameWorldByWorldId');
+    const env = this.resolveToken(environmentId, 'fetchGameWorldByWorldId');
     return await this.gameWorld.getByWorldId(worldId, env);
   }
 
   /**
    * Get cached game worlds
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getGameWorlds(environmentId?: string): GameWorld[] {
-    const env = this.resolveEnvironment(environmentId, 'getGameWorlds');
+    const env = this.resolveToken(environmentId, 'getGameWorlds');
     return this.gameWorld.getCached(env);
   }
 
   /**
    * Check if a world is in maintenance (time-based check)
    * @param worldId World ID
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   isWorldMaintenanceActive(worldId: string, environmentId?: string): boolean {
-    const env = this.resolveEnvironment(environmentId, 'isWorldMaintenanceActive');
+    const env = this.resolveToken(environmentId, 'isWorldMaintenanceActive');
     return this.gameWorld.isWorldMaintenanceActive(worldId, env);
   }
 
   /**
    * Get maintenance message for a world
    * @param worldId World ID
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    * @param lang Language code (default: 'en')
    */
   getWorldMaintenanceMessage(
@@ -1006,47 +970,47 @@ export class GatrixServerSDK {
     environmentId?: string,
     lang: 'ko' | 'en' | 'zh' = 'en'
   ): string | null {
-    const env = this.resolveEnvironment(environmentId, 'getWorldMaintenanceMessage');
+    const env = this.resolveToken(environmentId, 'getWorldMaintenanceMessage');
     return this.gameWorld.getWorldMaintenanceMessage(worldId, env, lang);
   }
 
   /**
    * Fetch global service maintenance status
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchServiceMaintenanceStatus(environmentId?: string) {
-    const env = this.resolveEnvironment(environmentId, 'fetchServiceMaintenanceStatus');
+    const env = this.resolveToken(environmentId, 'fetchServiceMaintenanceStatus');
     return await this.serviceMaintenance.getStatusByEnvironment(env);
   }
 
   /**
    * Get cached global service maintenance status
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   getServiceMaintenanceStatus(environmentId?: string) {
-    const env = this.resolveEnvironment(environmentId, 'getServiceMaintenanceStatus');
+    const env = this.resolveToken(environmentId, 'getServiceMaintenanceStatus');
     return this.serviceMaintenance.getCached(env);
   }
 
   /**
    * Check if global service is currently in maintenance (time-based check)
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   isServiceMaintenanceActive(environmentId?: string): boolean {
-    const env = this.resolveEnvironment(environmentId, 'isServiceMaintenanceActive');
+    const env = this.resolveToken(environmentId, 'isServiceMaintenanceActive');
     return this.serviceMaintenance.isMaintenanceActive(env);
   }
 
   /**
    * Get localized maintenance message for global service
    * @param lang Language code
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   getServiceMaintenanceMessage(
     lang: 'ko' | 'en' | 'zh' = 'en',
     environmentId?: string
   ): string | null {
-    const env = this.resolveEnvironment(environmentId, 'getServiceMaintenanceMessage');
+    const env = this.resolveToken(environmentId, 'getServiceMaintenanceMessage');
     return this.serviceMaintenance.getMessage(lang, env);
   }
 
@@ -1059,11 +1023,11 @@ export class GatrixServerSDK {
    * - If worldId is configured in SDK, only that world is checked
    * - Time-based maintenance (startsAt/endsAt) is calculated to determine actual status
    *
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    * @returns CurrentMaintenanceStatus with isMaintenanceActive, source, and detail
    */
   getCurrentMaintenanceStatus(environmentId?: string): CurrentMaintenanceStatus {
-    const env = this.resolveEnvironment(environmentId, 'getCurrentMaintenanceStatus');
+    const env = this.resolveToken(environmentId, 'getCurrentMaintenanceStatus');
 
     // Check global service maintenance first (uses time calculation internally)
     if (this.serviceMaintenance.isMaintenanceActive(env)) {
@@ -1135,7 +1099,7 @@ export class GatrixServerSDK {
    *
    * @param options.clientIp Client IP address (for IP whitelist check)
    * @param options.accountId Account ID (for account whitelist check, typically after auth)
-   * @param options.environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param options.environment environment ID. Optional in single-env mode, required in multi-env mode.
    * @returns CurrentMaintenanceStatus with isWhitelisted field
    */
   getMaintenanceStatusForClient(options: {
@@ -1144,7 +1108,7 @@ export class GatrixServerSDK {
     environmentId?: string;
   }): CurrentMaintenanceStatus {
     const { clientIp, accountId, environmentId } = options;
-    const env = this.resolveEnvironment(environmentId, 'getMaintenanceStatusForClient');
+    const env = this.resolveToken(environmentId, 'getMaintenanceStatusForClient');
 
     // First get the raw maintenance status
     const status = this.getCurrentMaintenanceStatus(env);
@@ -1197,11 +1161,11 @@ export class GatrixServerSDK {
    * - If neither is set: checks global service + ALL worlds (returns true if any world is in maintenance)
    *
    * @param worldId Optional world ID to check (uses config.worldId if not provided)
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    * @returns true if either global service or world(s) is in maintenance
    */
   isMaintenanceActive(worldId?: string, environmentId?: string): boolean {
-    const env = this.resolveEnvironment(environmentId, 'isMaintenanceActive');
+    const env = this.resolveToken(environmentId, 'isMaintenanceActive');
 
     // First check global service maintenance
     if (this.serviceMaintenance.isMaintenanceActive(env)) {
@@ -1238,14 +1202,14 @@ export class GatrixServerSDK {
    *
    * @param worldId Optional world ID to check (uses config.worldId if not provided)
    * @param lang Language for maintenance message
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getMaintenanceInfo(
     worldId?: string,
     lang: 'ko' | 'en' | 'zh' = 'en',
     environmentId?: string
   ): MaintenanceInfo {
-    const env = this.resolveEnvironment(environmentId, 'getMaintenanceInfo');
+    const env = this.resolveToken(environmentId, 'getMaintenanceInfo');
     const targetWorldId = worldId ?? this.config.worldId;
 
     // Check global service maintenance first
@@ -1323,29 +1287,29 @@ export class GatrixServerSDK {
 
   /**
    * Fetch active popup notices
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchPopupNotices(environmentId?: string): Promise<PopupNotice[]> {
-    const env = this.resolveEnvironment(environmentId, 'fetchPopupNotices');
+    const env = this.resolveToken(environmentId, 'fetchPopupNotices');
     return await this.popupNotice.listByEnvironment(env);
   }
 
   /**
    * Get cached popup notices
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getPopupNotices(environmentId?: string): PopupNotice[] {
-    const env = this.resolveEnvironment(environmentId, 'getPopupNotices');
+    const env = this.resolveToken(environmentId, 'getPopupNotices');
     return this.popupNotice.getCached(env);
   }
 
   /**
    * Get popup notices for a specific world
    * @param worldId World ID
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getPopupNoticesForWorld(worldId: string, environmentId?: string): PopupNotice[] {
-    const env = this.resolveEnvironment(environmentId, 'getPopupNoticesForWorld');
+    const env = this.resolveToken(environmentId, 'getPopupNoticesForWorld');
     return this.popupNotice.getNoticesForWorld(worldId, env);
   }
 
@@ -1363,7 +1327,7 @@ export class GatrixServerSDK {
     userId?: string;
     environmentId?: string;
   }): PopupNotice[] {
-    const env = this.resolveEnvironment(options?.environmentId, 'getActivePopupNotices');
+    const env = this.resolveToken(options?.environmentId, 'getActivePopupNotices');
     return this.popupNotice.getActivePopupNotices({
       ...options,
       environmentId: env,
@@ -1376,38 +1340,38 @@ export class GatrixServerSDK {
 
   /**
    * Fetch all store products
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   async fetchStoreProducts(environmentId?: string): Promise<StoreProduct[]> {
-    const env = this.resolveEnvironment(environmentId, 'fetchStoreProducts');
+    const env = this.resolveToken(environmentId, 'fetchStoreProducts');
     return await this.storeProduct.listByEnvironment(env);
   }
 
   /**
    * Get cached store products
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getStoreProducts(environmentId?: string): StoreProduct[] {
-    const env = this.resolveEnvironment(environmentId, 'getStoreProducts');
+    const env = this.resolveToken(environmentId, 'getStoreProducts');
     return this.storeProduct.getCached(env);
   }
 
   /**
    * Get active store products (filtered by time and status)
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getActiveStoreProducts(environmentId?: string): StoreProduct[] {
-    const env = this.resolveEnvironment(environmentId, 'getActiveStoreProducts');
+    const env = this.resolveToken(environmentId, 'getActiveStoreProducts');
     return this.storeProduct.getActive(env);
   }
 
   /**
    * Get store product by ID
    * @param id Store product ID
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   async getStoreProductById(id: string, environmentId?: string): Promise<StoreProduct> {
-    const env = this.resolveEnvironment(environmentId, 'getStoreProductById');
+    const env = this.resolveToken(environmentId, 'getStoreProductById');
     return await this.storeProduct.getById(id, env);
   }
 
@@ -1417,18 +1381,18 @@ export class GatrixServerSDK {
 
   /**
    * Fetch surveys with settings
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchSurveys(
     environmentId?: string
   ): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
-    const env = this.resolveEnvironment(environmentId, 'fetchSurveys');
+    const env = this.resolveToken(environmentId, 'fetchSurveys');
     return await this.survey.listByEnvironment(env, { isActive: true });
   }
 
   /**
    * Get cached surveys with settings
-   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   * @param environmentId environment ID. Only used in multi-environment mode (Edge).
    *                    For game servers, can be omitted to use default environment.
    *                    For edge servers, must be provided from client request.
    */
@@ -1436,7 +1400,7 @@ export class GatrixServerSDK {
     surveys: Survey[];
     settings: SurveySettings | null;
   } {
-    const env = this.resolveEnvironment(environmentId, 'getSurveys');
+    const env = this.resolveToken(environmentId, 'getSurveys');
     return {
       surveys: this.survey.getCached(env),
       settings: this.survey.getCachedSettings(env),
@@ -1445,20 +1409,20 @@ export class GatrixServerSDK {
 
   /**
    * Get surveys for a specific world
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param environmentId environment ID. Only used in multi-environment mode.
    */
   getSurveysForWorld(worldId: string, environmentId?: string): Survey[] {
-    const env = this.resolveEnvironment(environmentId, 'getSurveysForWorld');
+    const env = this.resolveToken(environmentId, 'getSurveysForWorld');
     return this.survey.getSurveysForWorld(worldId, env);
   }
 
   /**
    * Update survey settings only
    * Called when survey settings change (e.g., survey configuration updates)
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param environmentId environment ID. Only used in multi-environment mode.
    */
   updateSurveySettings(newSettings: SurveySettings, environmentId?: string): void {
-    const env = this.resolveEnvironment(environmentId, 'updateSurveySettings');
+    const env = this.resolveToken(environmentId, 'updateSurveySettings');
     this.survey.updateSettings(newSettings, env);
   }
 
@@ -1471,7 +1435,7 @@ export class GatrixServerSDK {
    * @param worldId User's world ID
    * @param userLevel User's level
    * @param joinDays User's join days
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param environmentId environment ID. Only used in multi-environment mode.
    * @returns Array of appropriate surveys, empty array if none match
    */
   getActiveSurveys(
@@ -1483,7 +1447,7 @@ export class GatrixServerSDK {
     joinDays: number,
     environmentId?: string
   ): Survey[] {
-    const env = this.resolveEnvironment(environmentId, 'getActiveSurveys');
+    const env = this.resolveToken(environmentId, 'getActiveSurveys');
     return this.survey.getActiveSurveys(
       platform,
       channel,
@@ -1512,49 +1476,49 @@ export class GatrixServerSDK {
 
   /**
    * Refresh game worlds cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async refreshGameWorldsCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
     }
-    const env = this.resolveEnvironment(environmentId, 'refreshGameWorldsCache');
+    const env = this.resolveToken(environmentId, 'refreshGameWorldsCache');
     await this.cacheManager.refreshGameWorlds(env);
   }
 
   /**
    * Refresh popup notices cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async refreshPopupNoticesCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
     }
-    const env = this.resolveEnvironment(environmentId, 'refreshPopupNoticesCache');
+    const env = this.resolveToken(environmentId, 'refreshPopupNoticesCache');
     await this.cacheManager.refreshPopupNotices(env);
   }
 
   /**
    * Refresh surveys cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async refreshSurveysCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
     }
-    const env = this.resolveEnvironment(environmentId, 'refreshSurveysCache');
+    const env = this.resolveToken(environmentId, 'refreshSurveysCache');
     await this.cacheManager.refreshSurveys(env);
   }
 
   /**
    * Refresh service maintenance cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async refreshServiceMaintenanceCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
     }
-    const env = this.resolveEnvironment(environmentId, 'refreshServiceMaintenanceCache');
+    const env = this.resolveToken(environmentId, 'refreshServiceMaintenanceCache');
     await this.cacheManager.refreshServiceMaintenance(env);
   }
 
@@ -1725,6 +1689,9 @@ export class GatrixServerSDK {
     hostname: string;
     internalAddress: string;
     externalAddress: string;
+    orgId: string | null;
+    projectId: string | null;
+    environmentId: string | null;
   }> {
     // Auto-add environment and region labels from SDK config if not already provided
     const enhancedLabels: RegisterServiceInput['labels'] = {
@@ -1732,9 +1699,7 @@ export class GatrixServerSDK {
     };
 
     // Add environment from SDK config if not provided in labels
-    if (this.config.environment && !input.labels.environment) {
-      enhancedLabels.environment = this.config.environment;
-    }
+    // environment label removed - token handles environment identification
 
     // Add cloud metadata labels (auto-detected, always override any input)
     // Use 'cloud' prefix to avoid conflicts with other fields (e.g., instanceId from service registration)
@@ -1781,6 +1746,21 @@ export class GatrixServerSDK {
       meta: Object.keys(enhancedMeta).length > 0 ? enhancedMeta : input.meta,
     };
     const result = await this.serviceDiscovery.register(inputWithEnhancements);
+
+    // After registration, subscribe to org/project channels for 3-level event delivery
+    if (this.eventListener && (result.orgId || result.projectId)) {
+      try {
+        await this.eventListener.subscribeChannels({
+          orgId: result.orgId || undefined,
+          projectId: result.projectId || undefined,
+        });
+      } catch (error: any) {
+        this.logger.warn('Failed to subscribe to org/project channels after registration', {
+          error: error.message,
+        });
+      }
+    }
+
     return result;
   }
 
@@ -1927,10 +1907,10 @@ export class GatrixServerSDK {
   /**
    * Fetch whitelists (IP and Account)
    * Performs API call via WhitelistService and updates cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async fetchWhitelists(environmentId?: string) {
-    const env = this.resolveEnvironment(environmentId, 'fetchWhitelists');
+    const env = this.resolveToken(environmentId, 'fetchWhitelists');
     return await this.whitelist.listByEnvironment(env);
   }
 
@@ -1938,10 +1918,10 @@ export class GatrixServerSDK {
    * Check if IP is whitelisted using cached data
    * Note: Uses WhitelistService cache; call fetchWhitelists or initialize cache beforehand.
    * @param ip IP address to check
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async isIpWhitelisted(ip: string, environmentId?: string): Promise<boolean> {
-    const env = this.resolveEnvironment(environmentId, 'isIpWhitelisted');
+    const env = this.resolveToken(environmentId, 'isIpWhitelisted');
     return this.whitelist.isIpWhitelisted(ip, env);
   }
 
@@ -1949,10 +1929,10 @@ export class GatrixServerSDK {
    * Check if account is whitelisted using cached data
    * Note: Uses WhitelistService cache; call fetchWhitelists or initialize cache beforehand.
    * @param accountId Account ID to check
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async isAccountWhitelisted(accountId: string, environmentId?: string): Promise<boolean> {
-    const env = this.resolveEnvironment(environmentId, 'isAccountWhitelisted');
+    const env = this.resolveToken(environmentId, 'isAccountWhitelisted');
     return this.whitelist.isAccountWhitelisted(accountId, env);
   }
 
@@ -1963,26 +1943,26 @@ export class GatrixServerSDK {
   /**
    * Get cached whitelists (IP and Account)
    * Returns cached data without making API call
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   getWhitelists(environmentId?: string) {
     if (!this.cacheManager) {
       this.logger.warn('Cache manager not initialized');
       return { ipWhitelist: [], accountWhitelist: [] };
     }
-    const env = this.resolveEnvironment(environmentId, 'getWhitelists');
+    const env = this.resolveToken(environmentId, 'getWhitelists');
     return this.cacheManager.getWhitelists(env);
   }
 
   /**
    * Refresh whitelist cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async refreshWhitelistCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.INVALID_CONFIG, 'Cache manager not initialized');
     }
-    const env = this.resolveEnvironment(environmentId, 'refreshWhitelistCache');
+    const env = this.resolveToken(environmentId, 'refreshWhitelistCache');
     await this.cacheManager.refreshWhitelists(env);
   }
 
@@ -2046,14 +2026,14 @@ export class GatrixServerSDK {
   /**
    * Get cached client versions
    * Only available when features.clientVersion is enabled
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getClientVersions(environmentId?: string): ClientVersion[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    const env = this.resolveEnvironment(environmentId, 'getClientVersions');
+    const env = this.resolveToken(environmentId, 'getClientVersions');
     return this.cacheManager.getClientVersions(env);
   }
 
@@ -2072,14 +2052,14 @@ export class GatrixServerSDK {
   /**
    * Get cached service notices
    * Only available when features.serviceNotice is enabled
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getServiceNotices(environmentId?: string): ServiceNotice[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    const env = this.resolveEnvironment(environmentId, 'getServiceNotices');
+    const env = this.resolveToken(environmentId, 'getServiceNotices');
     return this.cacheManager.getServiceNotices(env);
   }
 
@@ -2098,14 +2078,14 @@ export class GatrixServerSDK {
   /**
    * Get cached banners
    * Only available when features.banner is enabled
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getBanners(environmentId?: string): Banner[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    const env = this.resolveEnvironment(environmentId, 'getBanners');
+    const env = this.resolveToken(environmentId, 'getBanners');
     return this.cacheManager.getBanners(env);
   }
 
@@ -2123,48 +2103,48 @@ export class GatrixServerSDK {
 
   /**
    * Get all cached vars
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getVars(environmentId?: string): any[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    const env = this.resolveEnvironment(environmentId, 'getVars');
+    const env = this.resolveToken(environmentId, 'getVars');
     return this.cacheManager.getVars(env);
   }
 
   /**
    * Get a variable value by key from cache
    * @param key Variable key (e.g., '$channel', 'kv:some-setting')
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getVarValue(key: string, environmentId?: string): string | null {
     if (!this.cacheManager) return null;
-    const env = this.resolveEnvironment(environmentId, 'getVarValue');
+    const env = this.resolveToken(environmentId, 'getVarValue');
     return this.vars.getValue(key, env);
   }
 
   /**
    * Get a variable value parsed as JSON if it's an object or array
    * @param key Variable key
-   * @param environment Environment name. Optional in single-env mode, required in multi-env mode.
+   * @param environmentId environment ID. Optional in single-env mode, required in multi-env mode.
    */
   getVarParsedValue<T = any>(key: string, environmentId?: string): T | null {
     if (!this.cacheManager) return null;
-    const env = this.resolveEnvironment(environmentId, 'getVarParsedValue');
+    const env = this.resolveToken(environmentId, 'getVarParsedValue');
     return this.vars.getParsedValue<T>(key, env);
   }
 
   /**
    * Refresh vars cache
-   * @param environment Optional in single-env mode, required in multi-env mode
+   * @param environmentId Optional in single-env mode, required in multi-env mode
    */
   async refreshVarsCache(environmentId?: string): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
     }
-    const env = this.resolveEnvironment(environmentId, 'refreshVarsCache');
+    const env = this.resolveToken(environmentId, 'refreshVarsCache');
     await this.vars.refreshByEnvironment(env);
   }
 
@@ -2178,6 +2158,19 @@ export class GatrixServerSDK {
       return {};
     }
     return this.cacheManager.getAllCachedData();
+  }
+
+  /**
+   * Resolve an environment ID to the cache token key.
+   * In multi-mode, cache keys differ from raw environment IDs.
+   * @param environmentId Raw environment ID (ULID)
+   * @returns The cache token key, or the original environmentId in single-mode
+   */
+  resolveTokenForEnvironmentId(environmentId: string): string {
+    if (!this.cacheManager) {
+      return environmentId;
+    }
+    return this.cacheManager.resolveTokenForEnvironmentId(environmentId);
   }
 
   /**

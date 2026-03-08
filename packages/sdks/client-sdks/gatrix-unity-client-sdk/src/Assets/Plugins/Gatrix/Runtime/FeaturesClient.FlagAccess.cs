@@ -13,7 +13,7 @@ namespace Gatrix.Unity.SDK
         // ==================== Flag Access ====================
 
         /// <summary>Lookup a flag from the active cache.</summary>
-        private EvaluatedFlag LookupFlag(string flagName, bool forceRealtime = false)
+        private EvaluatedFlag LookupFlag(string flagName, bool forceRealtime = true)
         {
             var flags = SelectFlags(forceRealtime);
             flags.TryGetValue(flagName, out var flag);
@@ -31,7 +31,7 @@ namespace Gatrix.Unity.SDK
         }
 
         /// <summary>Get all flags</summary>
-        public List<EvaluatedFlag> GetAllFlags(bool forceRealtime = false)
+        public List<EvaluatedFlag> GetAllFlags(bool forceRealtime = true)
         {
             var flags = SelectFlags(forceRealtime);
             var result = new List<EvaluatedFlag>(flags.Count);
@@ -45,7 +45,7 @@ namespace Gatrix.Unity.SDK
         // ==================== VariationProvider Internal Methods ====================
         // All flag lookup + value extraction + metrics tracking happen here.
 
-        public bool IsEnabledInternal(string flagName, bool forceRealtime = false)
+        public bool IsEnabledInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -57,7 +57,7 @@ namespace Gatrix.Unity.SDK
             return flag.Enabled;
         }
 
-        public Variant GetVariantInternal(string flagName, bool forceRealtime = false)
+        public Variant GetVariantInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -72,24 +72,24 @@ namespace Gatrix.Unity.SDK
         // ==================== Metadata Access Internal Methods ====================
         // No metrics tracking ??read-only metadata access for FlagProxy property delegation.
 
-        public bool HasFlagInternal(string flagName, bool forceRealtime = false)
+        public bool HasFlagInternal(string flagName, bool forceRealtime = true)
         {
             return LookupFlag(flagName, forceRealtime) != null;
         }
 
-        public ValueType GetValueTypeInternal(string flagName, bool forceRealtime = false)
+        public ValueType GetValueTypeInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             return flag?.ValueType ?? ValueType.None;
         }
 
-        public int GetVersionInternal(string flagName, bool forceRealtime = false)
+        public int GetVersionInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             return flag?.Version ?? 0;
         }
 
-        public string GetReasonInternal(string flagName, bool forceRealtime = false)
+        public string GetReasonInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null) return null;
@@ -97,18 +97,18 @@ namespace Gatrix.Unity.SDK
             return string.IsNullOrEmpty(flag.Reason) ? "evaluated" : flag.Reason;
         }
 
-        public bool GetImpressionDataInternal(string flagName, bool forceRealtime = false)
+        public bool GetImpressionDataInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             return flag?.ImpressionData ?? false;
         }
 
-        public EvaluatedFlag GetRawFlagInternal(string flagName, bool forceRealtime = false)
+        public EvaluatedFlag GetRawFlagInternal(string flagName, bool forceRealtime = true)
         {
             return LookupFlag(flagName, forceRealtime);
         }
 
-        public string VariationInternal(string flagName, string fallbackValue, bool forceRealtime = false)
+        public string VariationInternal(string flagName, string fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -120,7 +120,7 @@ namespace Gatrix.Unity.SDK
             return string.IsNullOrEmpty(flag.Variant.Name) ? fallbackValue : flag.Variant.Name;
         }
 
-        public bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = false)
+        public bool BoolVariationInternal(string flagName, bool fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -138,7 +138,7 @@ namespace Gatrix.Unity.SDK
             catch { return fallbackValue; }
         }
 
-        public string StringVariationInternal(string flagName, string fallbackValue, bool forceRealtime = false)
+        public string StringVariationInternal(string flagName, string fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -152,7 +152,7 @@ namespace Gatrix.Unity.SDK
             return val?.ToString() ?? fallbackValue;
         }
 
-        public int IntVariationInternal(string flagName, int fallbackValue, bool forceRealtime = false)
+        public int IntVariationInternal(string flagName, int fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -168,7 +168,7 @@ namespace Gatrix.Unity.SDK
             catch { return fallbackValue; }
         }
 
-        public float FloatVariationInternal(string flagName, float fallbackValue, bool forceRealtime = false)
+        public float FloatVariationInternal(string flagName, float fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -184,7 +184,7 @@ namespace Gatrix.Unity.SDK
             catch { return fallbackValue; }
         }
 
-        public double DoubleVariationInternal(string flagName, double fallbackValue, bool forceRealtime = false)
+        public double DoubleVariationInternal(string flagName, double fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -201,7 +201,7 @@ namespace Gatrix.Unity.SDK
         }
 
         public Dictionary<string, object> JsonVariationInternal(
-            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false)
+            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -250,23 +250,23 @@ namespace Gatrix.Unity.SDK
             };
         }
 
-        public VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool fallbackValue, bool forceRealtime = false)
+        public VariationResult<bool> BoolVariationDetailsInternal(string flagName, bool fallbackValue, bool forceRealtime = true)
             => MakeDetails(flagName, BoolVariationInternal(flagName, fallbackValue, forceRealtime), "boolean");
 
-        public VariationResult<string> StringVariationDetailsInternal(string flagName, string fallbackValue, bool forceRealtime = false)
+        public VariationResult<string> StringVariationDetailsInternal(string flagName, string fallbackValue, bool forceRealtime = true)
             => MakeDetails(flagName, StringVariationInternal(flagName, fallbackValue, forceRealtime), "string");
 
-        public VariationResult<int> IntVariationDetailsInternal(string flagName, int fallbackValue, bool forceRealtime = false)
+        public VariationResult<int> IntVariationDetailsInternal(string flagName, int fallbackValue, bool forceRealtime = true)
             => MakeDetails(flagName, IntVariationInternal(flagName, fallbackValue, forceRealtime), "number");
 
-        public VariationResult<float> FloatVariationDetailsInternal(string flagName, float fallbackValue, bool forceRealtime = false)
+        public VariationResult<float> FloatVariationDetailsInternal(string flagName, float fallbackValue, bool forceRealtime = true)
             => MakeDetails(flagName, FloatVariationInternal(flagName, fallbackValue, forceRealtime), "number");
 
-        public VariationResult<double> DoubleVariationDetailsInternal(string flagName, double fallbackValue, bool forceRealtime = false)
+        public VariationResult<double> DoubleVariationDetailsInternal(string flagName, double fallbackValue, bool forceRealtime = true)
             => MakeDetails(flagName, DoubleVariationInternal(flagName, fallbackValue, forceRealtime), "number");
 
         public VariationResult<Dictionary<string, object>> JsonVariationDetailsInternal(
-            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false)
+            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true)
             => MakeDetails(flagName, JsonVariationInternal(flagName, fallbackValue, forceRealtime), "json");
 
         // -------------------- OrThrow Internal --------------------
@@ -288,7 +288,7 @@ namespace Gatrix.Unity.SDK
             throw GatrixFeatureException.TypeMismatchError(flagName, expected, ValueTypeHelper.ToApiString(actual));
         }
 
-        public bool BoolVariationOrThrowInternal(string flagName, bool forceRealtime = false)
+        public bool BoolVariationOrThrowInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Boolean) ThrowTypeMismatch(flagName, "boolean", flag.ValueType);
@@ -299,7 +299,7 @@ namespace Gatrix.Unity.SDK
             return Convert.ToBoolean(val, CultureInfo.InvariantCulture);
         }
 
-        public string StringVariationOrThrowInternal(string flagName, bool forceRealtime = false)
+        public string StringVariationOrThrowInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.String) ThrowTypeMismatch(flagName, "string", flag.ValueType);
@@ -308,7 +308,7 @@ namespace Gatrix.Unity.SDK
             return val.ToString();
         }
 
-        public int IntVariationOrThrowInternal(string flagName, bool forceRealtime = false)
+        public int IntVariationOrThrowInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
@@ -317,7 +317,7 @@ namespace Gatrix.Unity.SDK
             return Convert.ToInt32(val, CultureInfo.InvariantCulture);
         }
 
-        public float FloatVariationOrThrowInternal(string flagName, bool forceRealtime = false)
+        public float FloatVariationOrThrowInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
@@ -326,7 +326,7 @@ namespace Gatrix.Unity.SDK
             return Convert.ToSingle(val, CultureInfo.InvariantCulture);
         }
 
-        public double DoubleVariationOrThrowInternal(string flagName, bool forceRealtime = false)
+        public double DoubleVariationOrThrowInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Number) ThrowTypeMismatch(flagName, "number", flag.ValueType);
@@ -335,7 +335,7 @@ namespace Gatrix.Unity.SDK
             return Convert.ToDouble(val, CultureInfo.InvariantCulture);
         }
 
-        public Dictionary<string, object> JsonVariationOrThrowInternal(string flagName, bool forceRealtime = false)
+        public Dictionary<string, object> JsonVariationOrThrowInternal(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlagOrThrow(flagName);
             if (flag.ValueType != ValueType.Json) ThrowTypeMismatch(flagName, "json", flag.ValueType);
@@ -353,10 +353,10 @@ namespace Gatrix.Unity.SDK
         // ==================== Public Methods (delegate to internal) ====================
 
         /// <summary>Check if a flag is enabled</summary>
-        public bool IsEnabled(string flagName, bool forceRealtime = false) => IsEnabledInternal(flagName, forceRealtime);
+        public bool IsEnabled(string flagName, bool forceRealtime = true) => IsEnabledInternal(flagName, forceRealtime);
 
         /// <summary>Get raw flag data (returns null if not found)</summary>
-        public EvaluatedFlag GetFlag(string flagName, bool forceRealtime = false)
+        public EvaluatedFlag GetFlag(string flagName, bool forceRealtime = true)
         {
             var flag = LookupFlag(flagName, forceRealtime);
             if (flag == null)
@@ -373,59 +373,59 @@ namespace Gatrix.Unity.SDK
         /// Use this for editor tools, monitors, and inspector visualizations
         /// that read flag state for display purposes only.
         /// </summary>
-        public EvaluatedFlag GetFlagRaw(string flagName, bool forceRealtime = false)
+        public EvaluatedFlag GetFlagRaw(string flagName, bool forceRealtime = true)
             => LookupFlag(flagName, forceRealtime);
 
         /// <summary>Get variant (never returns null)</summary>
-        public Variant GetVariant(string flagName, bool forceRealtime = false) => GetVariantInternal(flagName, forceRealtime);
+        public Variant GetVariant(string flagName, bool forceRealtime = true) => GetVariantInternal(flagName, forceRealtime);
 
-        public string Variation(string flagName, string fallbackValue, bool forceRealtime = false)
+        public string Variation(string flagName, string fallbackValue, bool forceRealtime = true)
             => VariationInternal(flagName, fallbackValue, forceRealtime);
 
-        public bool BoolVariation(string flagName, bool fallbackValue, bool forceRealtime = false)
+        public bool BoolVariation(string flagName, bool fallbackValue, bool forceRealtime = true)
             => BoolVariationInternal(flagName, fallbackValue, forceRealtime);
 
-        public string StringVariation(string flagName, string fallbackValue, bool forceRealtime = false)
+        public string StringVariation(string flagName, string fallbackValue, bool forceRealtime = true)
             => StringVariationInternal(flagName, fallbackValue, forceRealtime);
 
-        public int IntVariation(string flagName, int fallbackValue, bool forceRealtime = false)
+        public int IntVariation(string flagName, int fallbackValue, bool forceRealtime = true)
             => IntVariationInternal(flagName, fallbackValue, forceRealtime);
 
-        public float FloatVariation(string flagName, float fallbackValue, bool forceRealtime = false)
+        public float FloatVariation(string flagName, float fallbackValue, bool forceRealtime = true)
             => FloatVariationInternal(flagName, fallbackValue, forceRealtime);
 
-        public double DoubleVariation(string flagName, double fallbackValue, bool forceRealtime = false)
+        public double DoubleVariation(string flagName, double fallbackValue, bool forceRealtime = true)
             => DoubleVariationInternal(flagName, fallbackValue, forceRealtime);
 
 
 
         public Dictionary<string, object> JsonVariation(
-            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false)
+            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true)
             => JsonVariationInternal(flagName, fallbackValue, forceRealtime);
 
         // Strict variations - delegate
-        public bool BoolVariationOrThrow(string flagName, bool forceRealtime = false)
+        public bool BoolVariationOrThrow(string flagName, bool forceRealtime = true)
             => BoolVariationOrThrowInternal(flagName, forceRealtime);
 
-        public string StringVariationOrThrow(string flagName, bool forceRealtime = false)
+        public string StringVariationOrThrow(string flagName, bool forceRealtime = true)
             => StringVariationOrThrowInternal(flagName, forceRealtime);
 
 
 
-        public Dictionary<string, object> JsonVariationOrThrow(string flagName, bool forceRealtime = false)
+        public Dictionary<string, object> JsonVariationOrThrow(string flagName, bool forceRealtime = true)
             => JsonVariationOrThrowInternal(flagName, forceRealtime);
 
         // Variation details - delegate
-        public VariationResult<bool> BoolVariationDetails(string flagName, bool fallbackValue, bool forceRealtime = false)
+        public VariationResult<bool> BoolVariationDetails(string flagName, bool fallbackValue, bool forceRealtime = true)
             => BoolVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 
-        public VariationResult<string> StringVariationDetails(string flagName, string fallbackValue, bool forceRealtime = false)
+        public VariationResult<string> StringVariationDetails(string flagName, string fallbackValue, bool forceRealtime = true)
             => StringVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 
 
 
         public VariationResult<Dictionary<string, object>> JsonVariationDetails(
-            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = false)
+            string flagName, Dictionary<string, object> fallbackValue, bool forceRealtime = true)
             => JsonVariationDetailsInternal(flagName, fallbackValue, forceRealtime);
 
         // ==================== Explicit Sync Mode ====================

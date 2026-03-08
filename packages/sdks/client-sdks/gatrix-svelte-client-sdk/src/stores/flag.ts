@@ -39,7 +39,7 @@ function proxyToFlagState(proxy: FlagProxy): FlagState {
  * {/if}
  * ```
  */
-export function flagState(flagName: string, forceRealtime = false): Readable<FlagState> {
+export function flagState(flagName: string, forceRealtime = true): Readable<FlagState> {
   const client = getGatrixClient();
   const initial: FlagState = {
     enabled: client.features.isEnabled(flagName, forceRealtime),
@@ -77,7 +77,7 @@ export function flagState(flagName: string, forceRealtime = false): Readable<Fla
  * {/if}
  * ```
  */
-export function flag(flagName: string, forceRealtime = false): Readable<boolean> {
+export function flag(flagName: string, forceRealtime = true): Readable<boolean> {
   const client = getGatrixClient();
   return readable<boolean>(client.features.isEnabled(flagName, forceRealtime), (set) => {
     const watchFn = forceRealtime

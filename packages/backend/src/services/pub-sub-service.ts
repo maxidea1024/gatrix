@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { Queue, Worker, Job } from 'bullmq';
-import { createClient, RedisClientType } from 'redis';
+import Redis from 'ioredis';
 import { config } from '../config';
 import redisClient from '../config/redis';
 import { createLogger } from '../config/logger';
@@ -38,7 +38,7 @@ export class PubSubService extends EventEmitter {
   private sdkEventsQueue: Queue | null = null;
 
   // Redis Pub/Sub for SSE broadcast
-  private sseSubscriber: RedisClientType | null = null;
+  private sseSubscriber: Redis | null = null;
   private readonly SSE_CHANNEL = 'sse:notifications';
   private readonly CACHE_CHANNEL = 'cache:invalidation';
 
@@ -136,30 +136,34 @@ export class PubSubService extends EventEmitter {
 
       // New: Redis Pub/Sub subscriber for true broadcast to all instances
       try {
-        this.sseSubscriber = createClient({
-          socket: { host: config.redis.host, port: config.redis.port },
+        this.sseSubscriber = new Redis({
+          host: config.redis.host,
+          port: config.redis.port,
           password: config.redis.password || undefined,
+          lazyConnect: true,
+          maxRetriesPerRequest: null,
         });
         await this.sseSubscriber.connect();
-        await this.sseSubscriber.subscribe(this.SSE_CHANNEL, (payload: string) => {
+
+        this.sseSubscriber.on('message', (channel: string, payload: string) => {
           try {
-            const message = JSON.parse(payload) as SSENotificationBusMessage;
-            this.emit('sse-notification', message);
+            if (channel === this.SSE_CHANNEL) {
+              const message = JSON.parse(payload) as SSENotificationBusMessage;
+              this.emit('sse-notification', message);
+            } else if (channel === this.CACHE_CHANNEL) {
+              const message = JSON.parse(payload) as CacheInvalidationMessage;
+              this.processLocalCacheInvalidation(message);
+            }
           } catch (err) {
-            logger.error('Failed to parse SSE Pub/Sub message:', err);
+            logger.error('Failed to parse Pub/Sub message:', err);
           }
         });
+
+        await this.sseSubscriber.subscribe(this.SSE_CHANNEL);
         logger.info(`Subscribed to Redis channel: ${this.SSE_CHANNEL}`);
 
         // Subscribe to cache invalidation channel for cross-instance L1 cache sync
-        await this.sseSubscriber.subscribe(this.CACHE_CHANNEL, (payload: string) => {
-          try {
-            const message = JSON.parse(payload) as CacheInvalidationMessage;
-            this.processLocalCacheInvalidation(message);
-          } catch (err) {
-            logger.error('Failed to parse cache Pub/Sub message:', err);
-          }
-        });
+        await this.sseSubscriber.subscribe(this.CACHE_CHANNEL);
         logger.info(`Subscribed to Redis channel: ${this.CACHE_CHANNEL}`);
       } catch (err) {
         logger.warn(
@@ -356,7 +360,7 @@ export class PubSubService extends EventEmitter {
     // Direct Redis deletion to handle persistent keys that might not be in local registry (e.g. after restart)
     try {
       const client = redisClient.getClient();
-      if (client && client.isOpen) {
+      if (client && client.status === 'ready') {
         // Keyv default namespace is 'keyv'
         // We need to match 'keyv:pattern'
         // Note: This assumes default Keyv namespace. If CacheService changes, this needs update.
@@ -478,33 +482,49 @@ export class PubSubService extends EventEmitter {
   /**
    * Publish SDK event to Redis Pub/Sub for real-time delivery to all SDK instances
    * Uses Pub/Sub instead of BullMQ queue to ensure all subscribers receive the event
+   *
+   * channelTarget determines which level channel(s) to publish to:
+   * - environmentId → env:{environmentId} (environment-level data: vars, whitelist, maintenance, etc.)
+   * - projectId → project:{projectId} (project-level data: segments, feature flags, etc.)
+   * - orgId → org:{orgId} (org-level data: member changes, etc.)
    */
-  async publishSDKEvent(event: { type: string; data: Record<string, any> }): Promise<void> {
+  async publishSDKEvent(
+    event: { type: string; data: Record<string, any> },
+    channelTarget: { orgId?: string; projectId?: string; environmentId?: string }
+  ): Promise<void> {
     try {
-      // Convert MySQL 0/1 to boolean
+      // Convert MySQL 0/1 to boolean and auto-fill timestamp
       const convertedEvent = {
         ...event,
-        data: this.convertBooleanFields(event.data),
+        data: {
+          ...this.convertBooleanFields(event.data),
+          timestamp: Date.now(),
+        },
       };
 
       // Publish to Redis Pub/Sub channel so all SDK instances receive the event
       const client = redisClient.getClient();
       const eventJson = JSON.stringify(convertedEvent);
 
-      logger.info('Publishing SDK event to Pub/Sub', {
-        type: convertedEvent.type,
-        id: convertedEvent.data.id,
-        channel: 'gatrix-sdk-events',
-      });
+      const channels = this.resolveChannels(channelTarget);
 
-      const numSubscribers = await client.publish('gatrix-sdk-events', eventJson);
+      for (const channel of channels) {
+        logger.info('Publishing SDK event to Pub/Sub', {
+          type: convertedEvent.type,
+          id: convertedEvent.data.id,
+          channel,
+        });
 
-      logger.info('SDK event published to Pub/Sub', {
-        type: convertedEvent.type,
-        id: convertedEvent.data.id,
-        numSubscribers,
-        messageLength: eventJson.length,
-      });
+        const numSubscribers = await client.publish(channel, eventJson);
+
+        logger.info('SDK event published to Pub/Sub', {
+          type: convertedEvent.type,
+          id: convertedEvent.data.id,
+          channel,
+          numSubscribers,
+          messageLength: eventJson.length,
+        });
+      }
     } catch (error: any) {
       logger.error('Failed to publish SDK event:', error);
     }
@@ -513,22 +533,64 @@ export class PubSubService extends EventEmitter {
   /**
    * Publish standard event (for SDK real-time events like maintenance.started, maintenance.ended)
    */
-  async publishEvent(event: {
-    type: string;
-    data: { id: string; timestamp: number; [key: string]: any };
-  }): Promise<void> {
+  async publishEvent(
+    event: {
+      type: string;
+      data: { id: string; [key: string]: any };
+    },
+    channelTarget: { orgId?: string; projectId?: string; environmentId?: string }
+  ): Promise<void> {
     try {
+      // Auto-fill timestamp
+      const fullEvent = {
+        ...event,
+        data: {
+          ...event.data,
+          timestamp: Date.now(),
+        },
+      };
+
       const client = redisClient.getClient();
-      const eventChannel = 'gatrix-sdk-events';
-      await client.publish(eventChannel, JSON.stringify(event));
-      logger.info('Standard event published to SDK channel', {
-        type: event.type,
-        id: event.data.id,
-        channel: eventChannel,
-      });
+      const channels = this.resolveChannels(channelTarget);
+
+      for (const channel of channels) {
+        await client.publish(channel, JSON.stringify(fullEvent));
+        logger.info('Standard event published to SDK channel', {
+          type: fullEvent.type,
+          id: fullEvent.data.id,
+          channel,
+        });
+      }
     } catch (error: any) {
       logger.error('Failed to publish standard event:', error);
     }
+  }
+
+  /**
+   * Resolve target channel from channelTarget.
+   * Unified pattern: gatrix-sdk-events:{orgId|-}:{projId|-}:{envId|-}
+   * System-level (no target): gatrix-sdk-events
+   */
+  private resolveChannels(channelTarget: {
+    orgId?: string;
+    projectId?: string;
+    environmentId?: string;
+  }): string[] {
+    const prefix = 'gatrix-sdk-events';
+
+    // System-level event: no target specified
+    if (!channelTarget.orgId && !channelTarget.projectId && !channelTarget.environmentId) {
+      logger.warn('publishSDKEvent called with empty channelTarget — using system channel', {
+        channelTarget,
+      });
+      return [prefix];
+    }
+
+    // Build unified channel: prefix:orgId|-:projId|-:envId|-
+    const org = channelTarget.orgId || '-';
+    const proj = channelTarget.projectId || '-';
+    const env = channelTarget.environmentId || '-';
+    return [`${prefix}:${org}:${proj}:${env}`];
   }
 
   /**
@@ -585,12 +647,12 @@ export class PubSubService extends EventEmitter {
 
       if (this.sseSubscriber) {
         try {
-          await this.sseSubscriber.unsubscribe(this.SSE_CHANNEL);
+          await this.sseSubscriber.unsubscribe(this.SSE_CHANNEL, this.CACHE_CHANNEL);
         } catch (error: any) {
           // Ignore unsubscribe errors during shutdown
         }
         try {
-          await this.sseSubscriber.disconnect();
+          await this.sseSubscriber.quit();
         } catch (error: any) {
           // Ignore disconnect errors during shutdown
         }

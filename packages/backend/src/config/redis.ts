@@ -1,18 +1,18 @@
-import { createClient, RedisClientType } from 'redis';
+import Redis from 'ioredis';
 import { config } from './index';
 import logger from './logger';
 
 export class RedisClient {
   private static instance: RedisClient;
-  private client: RedisClientType;
+  private client: Redis;
 
   private constructor() {
-    this.client = createClient({
-      socket: {
-        host: config.redis.host,
-        port: config.redis.port,
-      },
+    this.client = new Redis({
+      host: config.redis.host,
+      port: config.redis.port,
       password: config.redis.password || undefined,
+      lazyConnect: true,
+      maxRetriesPerRequest: null,
     });
 
     this.client.on('error', (err) => {
@@ -49,14 +49,14 @@ export class RedisClient {
     }
   }
 
-  public getClient(): RedisClientType {
+  public getClient(): Redis {
     return this.client;
   }
 
   public async set(key: string, value: string, expireInSeconds?: number): Promise<void> {
     try {
       if (expireInSeconds) {
-        await this.client.setEx(key, expireInSeconds, value);
+        await this.client.setex(key, expireInSeconds, value);
       } else {
         await this.client.set(key, value);
       }
@@ -95,17 +95,14 @@ export class RedisClient {
   }
 
   /**
-   * Acquire a distributed lock using Redis SETNX
+   * Acquire a distributed lock using Redis SET NX EX
    * @param lockKey - The key for the lock
    * @param ttlSeconds - Time-to-live for the lock in seconds
    * @returns true if lock was acquired, false otherwise
    */
   public async acquireLock(lockKey: string, ttlSeconds: number): Promise<boolean> {
     try {
-      const result = await this.client.set(lockKey, Date.now().toString(), {
-        NX: true, // Only set if key doesn't exist
-        EX: ttlSeconds, // Set expiration time
-      });
+      const result = await this.client.set(lockKey, Date.now().toString(), 'EX', ttlSeconds, 'NX');
       return result === 'OK';
     } catch (error) {
       logger.error('Redis acquireLock error:', error);
@@ -127,7 +124,7 @@ export class RedisClient {
 
   public async disconnect(): Promise<void> {
     try {
-      await this.client.disconnect();
+      await this.client.quit();
       logger.info('Redis client disconnected');
     } catch (error) {
       logger.error('Error disconnecting Redis:', error);

@@ -28,7 +28,7 @@ async function startServer() {
   console.log(chalk.cyan(`\n🚀 Starting ${type} server on port ${port}...`));
 
   const sdk = new GatrixServerSDK({
-    gatrixUrl: GATRIX_URL,
+    apiUrl: GATRIX_URL,
     applicationName: 'test-server',
     apiToken: API_TOKEN,
   });

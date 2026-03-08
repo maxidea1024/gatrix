@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { isValidResourceName } from '../../utils/validation';
 import { useAuth } from '../../hooks/useAuth';
 import { P } from '@/types/permissions';
 import {
@@ -205,6 +206,7 @@ const EnvironmentsPage: React.FC = () => {
 
   const handleOpenAddDialog = () => {
     setNewEnv({
+      name: '',
       displayName: '',
       description: '',
       environmentType: 'development',
@@ -876,6 +878,19 @@ const EnvironmentsPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
               inputRef={addNameFieldRef}
+              label={t('environments.name')}
+              value={newEnv.name || ''}
+              onChange={(e) => setNewEnv({ ...newEnv, name: e.target.value })}
+              placeholder={t('environments.namePlaceholder')}
+              fullWidth
+              required
+              disabled={creating}
+              autoFocus
+              error={(newEnv.name || '').length > 0 && !isValidResourceName(newEnv.name || '')}
+              helperText={t('environments.nameHelperText')}
+            />
+
+            <TextField
               label={t('environments.displayName')}
               value={newEnv.displayName}
               onChange={(e) => setNewEnv({ ...newEnv, displayName: e.target.value })}
@@ -883,7 +898,6 @@ const EnvironmentsPage: React.FC = () => {
               fullWidth
               required
               disabled={creating}
-              autoFocus
             />
 
             <FormControl fullWidth>
@@ -1017,7 +1031,12 @@ const EnvironmentsPage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreateEnvironment}
-            disabled={!newEnv.displayName || creating}
+            disabled={
+              !newEnv.displayName ||
+              !newEnv.name ||
+              !isValidResourceName(newEnv.name || '') ||
+              creating
+            }
             startIcon={creating ? <CircularProgress size={20} /> : <AddIcon />}
           >
             {t('environments.create')}

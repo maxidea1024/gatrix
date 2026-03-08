@@ -5,22 +5,21 @@
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
- * - Environment resolution is delegated to EnvironmentResolver
+ * - Environment resolution is delegated to string
  * - In multi-environment mode (edge), environment MUST always be provided
  */
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 
 export interface IpWhitelistEntry {
-  id: number;
+  id: string;
   ipAddress: string;
 }
 
 export interface AccountWhitelistEntry {
-  id: number;
+  id: string;
   accountId: string;
 }
 
@@ -40,7 +39,7 @@ export interface WhitelistResponse {
 export class WhitelistService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private envResolver: EnvironmentResolver;
+  private defaultToken: string;
   private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), WhitelistData>
   private cachedWhitelistByEnv: Map<string, WhitelistData> = new Map();
@@ -50,12 +49,12 @@ export class WhitelistService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.envResolver = envResolver;
+    this.defaultToken = defaultToken;
     this.storage = storage;
   }
 
@@ -151,7 +150,7 @@ export class WhitelistService {
 
   /**
    * Refresh whitelist cache for a specific environment
-   * @param environment Environment name
+   * @param environmentId environment ID
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
@@ -169,7 +168,7 @@ export class WhitelistService {
 
   /**
    * Get cached whitelists
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCached(environmentId: string): WhitelistData {
     return (
@@ -207,7 +206,7 @@ export class WhitelistService {
 
   /**
    * Get cached IP whitelist
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCachedIpWhitelist(environmentId: string): IpWhitelistEntry[] {
     return this.getCached(environmentId).ipWhitelist;
@@ -215,7 +214,7 @@ export class WhitelistService {
 
   /**
    * Get cached Account whitelist
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCachedAccountWhitelist(environmentId: string): AccountWhitelistEntry[] {
     return this.getCached(environmentId).accountWhitelist;
@@ -225,7 +224,7 @@ export class WhitelistService {
    * Check if IP is whitelisted (supports CIDR notation)
    * Note: Backend already filters for enabled and valid entries
    * @param ip IP address to check
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   isIpWhitelisted(ip: string, environmentId: string): boolean {
     const whitelist = this.getCached(environmentId);
@@ -302,7 +301,7 @@ export class WhitelistService {
    * Check if account is whitelisted
    * Note: Backend already filters for enabled and valid entries
    * @param accountId Account ID to check
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   isAccountWhitelisted(accountId: string, environmentId: string): boolean {
     const whitelist = this.getCached(environmentId);
@@ -315,7 +314,7 @@ export class WhitelistService {
    * Update cached whitelist data
    * Called when whitelist.updated event is received
    * @param whitelist Whitelist data to cache
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   updateCache(whitelist: WhitelistData, environmentId: string): void {
     this.logger.debug('Updating whitelist cache', {

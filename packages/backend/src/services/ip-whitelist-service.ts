@@ -153,14 +153,17 @@ export class IpWhitelistService {
       try {
         const environmentId = created.environmentId;
 
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: created.id,
-            timestamp: Date.now(),
-            environmentId,
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: created.id,
+
+              environmentId,
+            },
           },
-        });
+          { environmentId }
+        );
 
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
       } catch (eventError) {
@@ -236,14 +239,17 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: updated.id,
-            timestamp: Date.now(),
-            environmentId: updated.environmentId,
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: updated.id,
+
+              environmentId: updated.environmentId,
+            },
           },
-        });
+          { environmentId: updated.environmentId }
+        );
 
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`);
       } catch (eventError) {
@@ -280,14 +286,17 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id,
-            timestamp: Date.now(),
-            environmentId: existing.environmentId,
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id,
+
+              environmentId: existing.environmentId,
+            },
           },
-        });
+          { environmentId: existing.environmentId }
+        );
 
         await pubSubService.invalidateKey(
           `${SERVER_SDK_ETAG.WHITELISTS}:${existing.environmentId}`
@@ -335,14 +344,17 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: updated.id,
-            timestamp: Date.now(),
-            environmentId: updated.environmentId,
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: updated.id,
+
+              environmentId: updated.environmentId,
+            },
           },
-        });
+          { environmentId: updated.environmentId }
+        );
 
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${updated.environmentId}`);
       } catch (eventError) {

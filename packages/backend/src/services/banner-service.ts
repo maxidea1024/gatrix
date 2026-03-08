@@ -168,15 +168,17 @@ class BannerService {
         // Invalidate cache (including ETag cache for SDK)
         await this.invalidateCache(banner.environmentId);
 
-        await pubSubService.publishSDKEvent({
-          type: 'banner.created',
-          data: {
-            id: banner.bannerId,
-            environmentId,
-            status: banner.status,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'banner.created',
+            data: {
+              id: banner.bannerId,
+              environmentId,
+              status: banner.status,
+            },
           },
-        });
+          { environmentId }
+        );
       } catch (err) {
         logger.error('Failed to publish banner event', err);
       }
@@ -236,15 +238,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
-          data: {
-            id: banner.bannerId,
-            environmentId: banner.environmentId,
-            status: banner.status,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'banner.updated',
+            data: {
+              id: banner.bannerId,
+              environmentId: banner.environmentId,
+              status: banner.status,
+            },
           },
-        });
+          { environmentId: banner.environmentId }
+        );
       } catch (err) {
         logger.error('Failed to publish banner event', err);
       }
@@ -284,14 +288,16 @@ class BannerService {
 
       // Publish SDK Event (Deletion)
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'banner.deleted',
-          data: {
-            id: bannerId,
-            environmentId: banner.environmentId,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'banner.deleted',
+            data: {
+              id: bannerId,
+              environmentId: banner.environmentId,
+            },
           },
-        });
+          { environmentId: banner.environmentId }
+        );
       } catch (err) {
         logger.error('Failed to publish banner event', err);
       }
@@ -330,15 +336,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
-          data: {
-            id: banner.bannerId,
-            environmentId: banner.environmentId,
-            status: banner.status,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'banner.updated',
+            data: {
+              id: banner.bannerId,
+              environmentId: banner.environmentId,
+              status: banner.status,
+            },
           },
-        });
+          { environmentId: banner.environmentId }
+        );
       } catch (err) {
         logger.error('Failed to publish banner event', err);
       }
@@ -377,15 +385,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
-          data: {
-            id: banner.bannerId,
-            environmentId: banner.environmentId,
-            status: banner.status,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'banner.updated',
+            data: {
+              id: banner.bannerId,
+              environmentId: banner.environmentId,
+              status: banner.status,
+            },
           },
-        });
+          { environmentId: banner.environmentId }
+        );
       } catch (err) {
         logger.error('Failed to publish banner event', err);
       }

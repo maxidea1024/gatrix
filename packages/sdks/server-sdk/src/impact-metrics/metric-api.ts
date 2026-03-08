@@ -11,7 +11,7 @@ import type { ImpactMetricRegistry, MetricLabels } from './metric-types';
 
 export interface ImpactMetricsStaticContext {
   appName: string;
-  environment: string;
+  environment?: string;
   service?: string;
 }
 

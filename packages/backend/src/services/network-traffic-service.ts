@@ -5,6 +5,7 @@
 
 import db from '../config/knex';
 import { createLogger } from '../config/logger';
+import { ulid } from 'ulid';
 
 const logger = createLogger('NetworkTrafficService');
 
@@ -59,10 +60,10 @@ class NetworkTrafficService {
 
     try {
       await db.raw(
-        `INSERT INTO g_feature_network_traffic (environmentId, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
-                 VALUES (?, ?, ?, ?, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
+        `INSERT INTO g_feature_network_traffic (id, environmentId, appName, endpoint, trafficBucket, requestCount, createdAt, updatedAt)
+                 VALUES (?, ?, ?, ?, ?, 1, UTC_TIMESTAMP(), UTC_TIMESTAMP())
                  ON DUPLICATE KEY UPDATE requestCount = requestCount + 1, updatedAt = UTC_TIMESTAMP()`,
-        [environmentId, appName || 'unknown', endpoint, bucket]
+        [ulid(), environmentId, appName || 'unknown', endpoint, bucket]
       );
     } catch (error) {
       // Log but don't throw - this is fire-and-forget

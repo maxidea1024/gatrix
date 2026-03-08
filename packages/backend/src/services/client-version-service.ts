@@ -350,15 +350,17 @@ export class ClientVersionService {
         ? await prepareClientVersionForSDK(fullClientVersion, environmentId)
         : null;
 
-      await pubSubService.publishSDKEvent({
-        type: 'client_version.created',
-        data: {
-          id: result.id,
-          environmentId,
-          timestamp: Date.now(),
-          clientVersion: sdkReadyClientVersion,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'client_version.created',
+          data: {
+            id: result.id,
+            environmentId,
+            clientVersion: sdkReadyClientVersion,
+          },
         },
-      });
+        { environmentId }
+      );
     } catch (err) {
       logger.error('Failed to publish client version event', err);
     }
@@ -434,10 +436,13 @@ export class ClientVersionService {
     await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 
     // Publish generic update event (bulk op)
-    await pubSubService.publishSDKEvent({
-      type: 'client_version.updated',
-      data: { timestamp: Date.now(), environmentId },
-    });
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'client_version.updated',
+        data: { environmentId },
+      },
+      { environmentId }
+    );
 
     return result;
   }
@@ -474,15 +479,17 @@ export class ClientVersionService {
           environmentId
         );
 
-        await pubSubService.publishSDKEvent({
-          type: 'client_version.updated',
-          data: {
-            id: updatedClientVersion.id,
-            environmentId,
-            timestamp: Date.now(),
-            clientVersion: sdkReadyClientVersion,
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'client_version.updated',
+            data: {
+              id: updatedClientVersion.id,
+              environmentId,
+              clientVersion: sdkReadyClientVersion,
+            },
           },
-        });
+          { environmentId }
+        );
       } catch (err) {
         logger.error('Failed to publish client version event', err);
       }
@@ -498,10 +505,13 @@ export class ClientVersionService {
 
     if (deletedRowsCount > 0) {
       // Publish generic update event (deletion)
-      await pubSubService.publishSDKEvent({
-        type: 'client_version.deleted',
-        data: { id, environmentId, timestamp: Date.now() },
-      });
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'client_version.deleted',
+          data: { id, environmentId },
+        },
+        { environmentId }
+      );
 
       // Invalidate client version cache (including ETag cache - all environments for deletion)
       await pubSubService.invalidateByPattern('*client_version:*');
@@ -521,10 +531,13 @@ export class ClientVersionService {
 
     if (result > 0) {
       // Publish generic update event (bulk status)
-      await pubSubService.publishSDKEvent({
-        type: 'client_version.updated',
-        data: { timestamp: Date.now() },
-      });
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'client_version.updated',
+          data: {},
+        },
+        { environmentId }
+      );
 
       // Invalidate client version cache (including ETag cache - all environments for bulk op)
       await pubSubService.invalidateByPattern('*client_version:*');

@@ -4,21 +4,44 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('ClientAuth');
 import { tokenMirrorService } from '../services/token-mirror-service';
 import { tokenUsageTracker } from '../services/token-usage-tracker';
+import { environmentRegistry } from '../services/environment-registry';
 
-// Unsecured tokens for testing purposes
-const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
-const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
-const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+// Unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
+const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
+
+// Legacy unsecured tokens — auto-resolve to default/default/development
+const LEGACY_TOKENS: Record<string, boolean> = {
+  'gatrix-unsecured-client-api-token': true,
+  'gatrix-unsecured-server-api-token': true,
+  'gatrix-unsecured-edge-api-token': true,
+};
+const LEGACY_ENV_NAME = 'development';
+
+// Exported constants used by other services
+export const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
+export const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+export const UNSECURED_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+export const UNSECURED_TOKENS = [
+  UNSECURED_CLIENT_TOKEN,
+  UNSECURED_SERVER_TOKEN,
+  UNSECURED_EDGE_TOKEN,
+];
 
 export interface ClientRequest extends Request {
   clientContext?: {
     apiToken: string;
     applicationName: string;
     /**
-     * Environment identifier (environmentName value).
-     * This is the standard external identifier for environments.
+     * Actual environment ID (ULID).
+     * Resolved from token, not from URL path.
      */
     environmentId: string;
+    /**
+     * SDK cache key for this environment.
+     * Format: unsecured-{orgId}:{projectId}:{envId}-server-api-token
+     * Falls back to environmentId if not resolved.
+     */
+    cacheKey: string;
     clientVersion?: string;
     platform?: string;
     tokenName?: string;
@@ -28,10 +51,7 @@ export interface ClientRequest extends Request {
 /**
  * Client authentication middleware
  * Validates required headers and API token from client requests
- * Uses locally mirrored tokens for validation (no backend call needed)
- *
- * Environment is extracted from URL path parameter (:environment)
- * instead of x-environment header for cleaner API design.
+ * Environment is resolved from the token (not from URL path)
  */
 export function clientAuth(req: ClientRequest, res: Response, next: NextFunction): void {
   // Extract token from multiple sources
@@ -53,8 +73,6 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     (req.query.appName as string) ||
     (req.query.applicationName as string);
 
-  // Get environment from URL path parameter instead of header
-  const environmentId = req.params.environment as string;
   const clientVersion = req.headers['x-client-version'] as string | undefined;
   const platform = req.headers['x-platform'] as string | undefined;
 
@@ -83,38 +101,54 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     return;
   }
 
-  // Handle Unsecured Tokens (Bypass)
-  if (
-    apiToken === UNSECURED_CLIENT_TOKEN ||
-    apiToken === UNSECURED_SERVER_TOKEN ||
-    apiToken === UNSECURED_EDGE_TOKEN
-  ) {
+  // 1. Try unsecured token format: unsecured-{org}:{project}:{env}-{type}-api-token
+  const unsecuredMatch = apiToken.match(UNSECURED_TOKEN_REGEX);
+  if (unsecuredMatch) {
+    const [, , , envId] = unsecuredMatch;
+    const environmentId = environmentRegistry.resolveEnvironmentId(envId) || envId;
     req.clientContext = {
       apiToken,
       applicationName,
       environmentId,
+      cacheKey: apiToken,
       clientVersion,
       platform,
-      tokenName: 'Unsecured Testing Token',
+      tokenName: `Unsecured Token (${envId})`,
     };
-    logger.debug('Authenticated with unsecured token', { token: apiToken, environmentId });
+    logger.debug('Authenticated with unsecured format token', { environmentId });
     return next();
   }
 
-  // Validate environment from path parameter
-  if (!environmentId) {
-    res.status(400).json({
-      success: false,
-      error: {
-        code: 'MISSING_ENVIRONMENT',
-        message: 'Environment is required in URL path (e.g., /api/v1/client/{environment}/...)',
-      },
-    });
-    return;
+  // 2. Legacy unsecured tokens → resolve to default/default/development
+  if (LEGACY_TOKENS[apiToken]) {
+    const cacheKey = environmentRegistry.resolveEnvironmentToken(LEGACY_ENV_NAME);
+    if (!cacheKey) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'ENVIRONMENT_NOT_FOUND',
+          message: 'Could not resolve environment for legacy token',
+        },
+      });
+      return;
+    }
+    const environmentId =
+      environmentRegistry.resolveEnvironmentId(LEGACY_ENV_NAME) || LEGACY_ENV_NAME;
+    req.clientContext = {
+      apiToken,
+      applicationName,
+      environmentId,
+      cacheKey,
+      clientVersion,
+      platform,
+      tokenName: 'Legacy Unsecured Token',
+    };
+    logger.debug('Authenticated with legacy unsecured token', { environmentId, cacheKey });
+    return next();
   }
 
-  // Validate API token using mirrored tokens
-  const validation = tokenMirrorService.validateToken(apiToken, 'client', environmentId);
+  // 3. Real production token — validate and resolve environment
+  const validation = tokenMirrorService.validateToken(apiToken, 'client');
 
   if (!validation.valid) {
     const errorMessages: Record<string, { code: string; message: string }> = {
@@ -134,7 +168,6 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
 
     logger.warn('Client authentication failed', {
       reason: validation.reason,
-      environmentId,
       applicationName,
     });
 
@@ -150,11 +183,38 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     tokenUsageTracker.recordUsage(validation.token.id);
   }
 
-  // Set client context
+  // Resolve environment from token
+  const token = validation.token;
+  const envName = token?.environments?.[0];
+  if (!envName || envName === '*') {
+    res.status(401).json({
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Token does not have a specific environment binding',
+      },
+    });
+    return;
+  }
+
+  const cacheKey = environmentRegistry.resolveEnvironmentToken(envName);
+  if (!cacheKey) {
+    res.status(401).json({
+      success: false,
+      error: {
+        code: 'ENVIRONMENT_NOT_FOUND',
+        message: `Could not resolve environment: ${envName}`,
+      },
+    });
+    return;
+  }
+
+  const environmentId = environmentRegistry.resolveEnvironmentId(envName) || envName;
   req.clientContext = {
     apiToken,
     applicationName,
     environmentId,
+    cacheKey,
     clientVersion,
     platform,
     tokenName: validation.token?.tokenName,

@@ -348,7 +348,7 @@ namespace Gatrix.Unity.SDK
             _metrics.Start((int)(featCfg.MetricsInterval * 1000), (int)(featCfg.MetricsIntervalInitial * 1000));
         }
 
-        private Dictionary<string, EvaluatedFlag> SelectFlags(bool forceRealtime = false)
+        private Dictionary<string, EvaluatedFlag> SelectFlags(bool forceRealtime = true)
         {
             if (forceRealtime) return _realtimeFlags;
             return FeaturesConfig.ExplicitSyncMode ? _synchronizedFlags : _realtimeFlags;

@@ -263,15 +263,18 @@ class IngamePopupNoticeService {
     }
 
     // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'popup.created',
-      data: {
-        id: notice.id,
-        timestamp: Date.now(),
-        isVisible: notice.isActive,
-        environmentId: environmentId,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'popup.created',
+        data: {
+          id: notice.id,
+
+          isVisible: notice.isActive,
+          environmentId: environmentId,
+        },
       },
-    });
+      { environmentId: environmentId }
+    );
 
     return notice;
   }
@@ -386,15 +389,18 @@ class IngamePopupNoticeService {
     }
 
     // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'popup.updated',
-      data: {
-        id: notice.id,
-        timestamp: Date.now(),
-        isVisible: notice.isActive,
-        environmentId: environmentId,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'popup.updated',
+        data: {
+          id: notice.id,
+
+          isVisible: notice.isActive,
+          environmentId: environmentId,
+        },
       },
-    });
+      { environmentId: environmentId }
+    );
 
     return notice;
   }
@@ -411,14 +417,17 @@ class IngamePopupNoticeService {
     ]);
 
     // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'popup.deleted',
-      data: {
-        id,
-        timestamp: Date.now(),
-        environmentId: environmentId,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'popup.deleted',
+        data: {
+          id,
+
+          environmentId: environmentId,
+        },
       },
-    });
+      { environmentId: environmentId }
+    );
   }
 
   /**
@@ -435,14 +444,17 @@ class IngamePopupNoticeService {
 
     // Publish SDK events for each deleted notice
     for (const id of ids) {
-      await pubSubService.publishSDKEvent({
-        type: 'popup.deleted',
-        data: {
-          id,
-          timestamp: Date.now(),
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'popup.deleted',
+          data: {
+            id,
+
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     }
   }
 
@@ -462,15 +474,18 @@ class IngamePopupNoticeService {
     }
 
     // Publish SDK event for toggle
-    await pubSubService.publishSDKEvent({
-      type: 'popup.updated',
-      data: {
-        id: notice.id,
-        timestamp: Date.now(),
-        isVisible: notice.isActive,
-        environmentId: environmentId,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'popup.updated',
+        data: {
+          id: notice.id,
+
+          isVisible: notice.isActive,
+          environmentId: environmentId,
+        },
       },
-    });
+      { environmentId: environmentId }
+    );
 
     return notice;
   }

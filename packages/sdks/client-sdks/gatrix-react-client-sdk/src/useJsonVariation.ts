@@ -19,7 +19,7 @@
 import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 
-export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = false): T {
+export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = true): T {
   const { features } = useGatrixContext();
   const [value, setValue] = useState<T>(() =>
     features.jsonVariation<T>(flagName, fallbackValue, forceRealtime)

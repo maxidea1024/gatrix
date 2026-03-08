@@ -442,22 +442,22 @@ const startServer = async () => {
         }
 
         const backendUrl = `http://localhost:${config.port}`;
-        const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+        // Backend is infrastructure — use the shorthand infra token
+        const apiToken = 'gatrix-infra-server-token';
 
         gatrixSdk = new GatrixServerSDK({
-          gatrixUrl: backendUrl,
+          apiUrl: backendUrl,
           apiToken: apiToken,
           applicationName: 'backend',
           service: 'backend',
           group: process.env.SERVICE_GROUP || 'gatrix',
-          environment: process.env.ENVIRONMENT || 'gatrix-env',
           logger: { level: 'info' },
           cache: {
             enabled: false, // Backend doesn't need caching - it IS the data source
             skipBackendReady: true, // Backend must skip waiting for itself
           },
           // Disable all features since backend doesn't need cached data from itself
-          features: {
+          uses: {
             serviceNotice: false,
             banner: false,
           },

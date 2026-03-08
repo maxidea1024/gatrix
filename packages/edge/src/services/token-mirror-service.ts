@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Redis from 'ioredis';
 import { config } from '../config/env';
+import { UNSECURED_TOKENS } from '../middleware/client-auth';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('TokenMirror');
@@ -39,7 +40,7 @@ class TokenMirrorService {
   private tokenById: Map<number, MirroredToken> = new Map(); // id -> token
   private subscriber: Redis | null = null;
   private initialized = false;
-  private readonly CHANNEL_NAME = 'gatrix-sdk-events';
+  private readonly CHANNEL_PREFIX = 'gatrix-sdk-events';
 
   /**
    * Initialize the token mirror service
@@ -70,7 +71,7 @@ class TokenMirrorService {
   async shutdown(): Promise<void> {
     if (this.subscriber) {
       try {
-        await this.subscriber.unsubscribe(this.CHANNEL_NAME);
+        await this.subscriber.punsubscribe(`${this.CHANNEL_PREFIX}:*`);
         await this.subscriber.quit();
         this.subscriber = null;
       } catch (error) {
@@ -134,15 +135,13 @@ class TokenMirrorService {
 
       await this.subscriber.connect();
 
-      this.subscriber.on('message', (channel: string, message: string) => {
-        if (channel === this.CHANNEL_NAME) {
-          this.handleEvent(message);
-        }
+      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
+        this.handleEvent(message);
       });
 
-      await this.subscriber.subscribe(this.CHANNEL_NAME);
+      await this.subscriber.psubscribe(`${this.CHANNEL_PREFIX}:*`);
 
-      logger.info(`Subscribed to Redis channel: ${this.CHANNEL_NAME}`);
+      logger.info(`Subscribed to Redis pattern: ${this.CHANNEL_PREFIX}:*`);
     } catch (error: any) {
       logger.error('Failed to subscribe to events:', error.message);
       // Continue without real-time updates - will rely on manual refresh
@@ -179,17 +178,17 @@ class TokenMirrorService {
    */
   validateToken(
     tokenValue: string,
-    requiredType: 'client' | 'server' | 'all',
+    requiredType: 'client' | 'server' | 'edge' | 'all',
     environmentId?: string
   ): TokenValidationResult {
-    // Check for unsecured client token (for testing purposes, client -> edge)
+    // Check for unsecured tokens (for testing purposes)
     // Note: id=0 is used for unsecured tokens to skip usage tracking
-    if (tokenValue === config.unsecuredClientToken) {
-      logger.debug('Unsecured client token used for testing');
+    if (tokenValue === config.unsecuredClientToken || UNSECURED_TOKENS.includes(tokenValue)) {
+      logger.debug('Unsecured token used for testing');
       const unsecuredToken: MirroredToken = {
         id: 0, // 0 indicates unsecured token, usage tracking will be skipped
-        tokenName: 'Unsecured Client Token (Testing)',
-        tokenValue: config.unsecuredClientToken,
+        tokenName: 'Unsecured Token (Testing)',
+        tokenValue,
         tokenType: 'all',
         allowAllEnvironments: true,
         environments: ['*'],

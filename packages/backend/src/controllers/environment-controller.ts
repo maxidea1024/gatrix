@@ -221,13 +221,16 @@ export class EnvironmentController {
 
       // Publish SDK event for dynamic environment detection
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'environment.created',
-          data: {
-            environmentId: newEnv.id,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'environment.created',
+            data: {
+              environmentId: newEnv.id,
+              timestamp: Date.now(),
+            },
           },
-        });
+          { environmentId: newEnv.id }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish environment created SDK event', {
           eventError,
@@ -399,13 +402,16 @@ export class EnvironmentController {
 
       // Publish SDK event for dynamic environment detection
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'environment.deleted',
-          data: {
-            environmentId: environmentName,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'environment.deleted',
+            data: {
+              environmentId: environmentName,
+              timestamp: Date.now(),
+            },
           },
-        });
+          { environmentId: environmentName }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish environment deleted SDK event', {
           eventError,

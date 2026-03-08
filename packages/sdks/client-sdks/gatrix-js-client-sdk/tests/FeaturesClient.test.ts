@@ -1,4 +1,4 @@
-﻿import { FeaturesClient } from '../src/FeaturesClient';
+import { FeaturesClient } from '../src/FeaturesClient';
 import { EventEmitter } from '../src/EventEmitter';
 import { EvaluatedFlag, GatrixClientConfig } from '../src/types';
 import { EVENTS } from '../src/events';
@@ -113,7 +113,6 @@ describe('FeaturesClient', () => {
     apiUrl: 'https://api.example.com/api/v1',
     apiToken: 'test-api-token',
     appName: 'test-app',
-    environment: 'test',
     features: {
       bootstrap: bootstrapFlags,
       offlineMode: true, // Use offline mode for tests (no network requests)

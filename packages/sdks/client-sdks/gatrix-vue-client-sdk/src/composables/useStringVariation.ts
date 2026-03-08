@@ -1,7 +1,7 @@
 import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
 
-export function useStringVariation(flagName: string, fallbackValue: string, forceRealtime = false) {
+export function useStringVariation(flagName: string, fallbackValue: string, forceRealtime = true) {
   const client = useGatrixClient();
   const value = ref(client.features.stringVariation(flagName, fallbackValue, forceRealtime));
 

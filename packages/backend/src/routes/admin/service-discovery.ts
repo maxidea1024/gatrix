@@ -70,13 +70,6 @@ const authenticateSSE = (req: Request, res: Response, next: NextFunction) => {
 router.get('/sse', authenticateSSE, async (req, res) => {
   try {
     const userId = (req as any).user?.userId;
-    const userRole = (req as any).user?.role;
-
-    // Check if user is admin
-    if (userRole !== 'admin') {
-      logger.warn('SSE authorization failed: User is not admin', { userId });
-      return res.status(403).json({ error: 'Admin access required' });
-    }
 
     // Set SSE headers (Safari compatibility)
     res.setHeader('Content-Type', 'text/event-stream');

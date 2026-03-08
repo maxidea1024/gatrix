@@ -6,7 +6,7 @@
 import { GatrixContext } from './types';
 
 /** System fields that cannot be removed via updateContext(null/undefined) */
-export const SYSTEM_CONTEXT_FIELDS: ReadonlySet<string> = new Set(['appName', 'environment']);
+export const SYSTEM_CONTEXT_FIELDS: ReadonlySet<string> = new Set(['appName']);
 
 /**
  * Truncate an ISO 8601 time string to minute precision.
@@ -27,7 +27,6 @@ export function truncateToMinute(isoString: string): string {
 export function buildContextQueryParams(url: URL, context: GatrixContext): void {
   const topLevelFields: (keyof GatrixContext)[] = [
     'appName',
-    'environment',
     'userId',
     'sessionId',
     'remoteAddress',

@@ -81,6 +81,9 @@ export class ServiceDiscoveryService {
     hostname: string;
     internalAddress: string;
     externalAddress: string;
+    orgId: string | null;
+    projectId: string | null;
+    environmentId: string | null;
   }> {
     // Auto-detect hostname and internalAddress if not provided
     const internalAddress = input.internalAddress || getFirstNicAddress();
@@ -99,13 +102,16 @@ export class ServiceDiscoveryService {
       hostname: string;
       internalAddress: string;
       externalAddress: string;
+      orgId: string | null;
+      projectId: string | null;
+      environmentId: string | null;
     }>('/api/v1/server/services/register', registrationInput);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to register service');
     }
 
-    const { instanceId, externalAddress } = response.data;
+    const { instanceId, externalAddress, orgId, projectId, environmentId } = response.data;
     this.instanceId = instanceId;
     this.labels = input.labels;
 
@@ -130,7 +136,15 @@ export class ServiceDiscoveryService {
     // Start heartbeat to keep service alive in Redis
     this.startHeartbeat();
 
-    return { instanceId, hostname, internalAddress, externalAddress };
+    return {
+      instanceId,
+      hostname,
+      internalAddress,
+      externalAddress,
+      orgId: orgId || null,
+      projectId: projectId || null,
+      environmentId: environmentId || null,
+    };
   }
 
   /**

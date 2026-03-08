@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { sdkManager } from '../services/sdk-manager';
+import { environmentRegistry } from '../services/environment-registry';
 import { EvaluationUtils } from '@gatrix/evaluator';
 
 import { createLogger } from '../config/logger';
@@ -38,7 +39,13 @@ export async function performEvaluation(
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId, applicationName } = clientContext;
+    const { environmentId, applicationName, cacheKey: contextCacheKey } = clientContext;
+
+    // Use pre-resolved cacheKey from middleware, or resolve here as fallback
+    const cacheKey =
+      contextCacheKey ||
+      environmentRegistry.resolveEnvironmentToken(environmentId) ||
+      environmentId;
 
     // 1. Extract context and flag names from request
     const { context, flagNames } = EvaluationUtils.extractFromRequest(req);
@@ -57,14 +64,14 @@ export async function performEvaluation(
     let keysToEvaluate =
       flagNames.length > 0
         ? flagNames
-        : sdk.featureFlag.getCached(environmentId).map((f: any) => f.name);
+        : sdk.featureFlag.getCached(cacheKey).map((f: any) => f.name);
 
     // Sort keys to ensure consistent iteration order
     keysToEvaluate = [...keysToEvaluate].sort();
 
     for (const key of keysToEvaluate) {
-      const result = sdk.featureFlag.evaluate(key, context, environmentId);
-      const flagDef = sdk.featureFlag.getFlagByName(environmentId, key);
+      const result = sdk.featureFlag.evaluate(key, context, cacheKey);
+      const flagDef = sdk.featureFlag.getFlagByName(cacheKey, key);
 
       // Format result using common utility
       results[key] = EvaluationUtils.formatResult(
@@ -75,6 +82,7 @@ export async function performEvaluation(
           valueType: flagDef?.valueType,
           version: flagDef?.version,
           impressionDataEnabled: flagDef?.impressionDataEnabled,
+          valueSource: flagDef?.valueSource,
           // SDK already resolved these, but we pass them if needed for formatResult
           enabledValue: result.enabled ? (result.variant?.value ?? undefined) : undefined,
           disabledValue: !result.enabled ? (result.variant?.value ?? undefined) : undefined,

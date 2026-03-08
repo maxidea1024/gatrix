@@ -438,7 +438,7 @@ const EventRow: React.FC<EventRowProps> = ({ event, visibleColumns, index, enque
                   {/* Environment */}
                   <Box>
                     <Typography variant="caption" color="textSecondary" display="block">
-                      {t('serverLifecycle.environmentId')}
+                      {t('serverLifecycle.environment')}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <Typography variant="body2">{event.environmentId || '-'}</Typography>
@@ -767,7 +767,7 @@ const ServerLifecyclePage: React.FC = () => {
     { id: 'group', labelKey: 'serverLifecycle.group', visible: true },
     {
       id: 'environment',
-      labelKey: 'serverLifecycle.environmentId',
+      labelKey: 'serverLifecycle.environment',
       visible: true,
     },
     { id: 'instanceId', labelKey: 'serverLifecycle.instanceId', visible: true },

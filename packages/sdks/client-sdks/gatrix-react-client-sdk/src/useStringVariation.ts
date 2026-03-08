@@ -22,7 +22,7 @@ import { useGatrixContext } from './useGatrixContext';
 export function useStringVariation(
   flagName: string,
   fallbackValue: string,
-  forceRealtime = false
+  forceRealtime = true
 ): string {
   const { features } = useGatrixContext();
   const [value, setValue] = useState(() =>

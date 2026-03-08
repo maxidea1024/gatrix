@@ -226,10 +226,13 @@ export const TABLE_SERVICE_REGISTRY: Record<string, ServiceHandler> = {
       // Publish appropriate events based on the key
       if (varKey === 'isMaintenance' || varKey === 'maintenanceDetail') {
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.MAINTENANCE}:${environmentId}`);
-        await pubSubService.publishEvent({
-          type: 'maintenance.settings.updated',
-          data: { id: 'maintenance', environmentId, timestamp: Date.now() },
-        });
+        await pubSubService.publishEvent(
+          {
+            type: 'maintenance.settings.updated',
+            data: { id: 'maintenance', environmentId },
+          },
+          { environmentId }
+        );
         await pubSubService.publishNotification({
           type: 'maintenance_status_change',
           data: { varKey, value: data.value, environmentId },

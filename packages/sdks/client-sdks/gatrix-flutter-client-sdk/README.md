@@ -99,7 +99,7 @@ GatrixFlagBuilder(
 
 ### Flag Access (via `client.features`)
 
-All variation methods accept an optional `forceRealtime: bool` parameter (default: `false`).
+All variation methods accept an optional `forceRealtime: bool` parameter (default: `true`).
 When `forceRealtime: true`, the method reads directly from the realtime flag state, bypassing the synchronized snapshot used in explicit sync mode.
 
 | Method                   | Signature                                                         | Description                              |

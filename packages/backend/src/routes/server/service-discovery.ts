@@ -5,6 +5,7 @@
  */
 
 import express from 'express';
+import knex from '../../config/knex';
 import { serverSDKAuth } from '../../middleware/api-token-auth';
 import serviceDiscoveryService from '../../services/service-discovery-service';
 import { IpWhitelistModel } from '../../models/ip-whitelist';
@@ -190,9 +191,25 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
       targetChannels: ['service', 'admin'],
     });
 
+    // Retrieve orgId/projectId/environmentId for SDK channel subscription
+    const environmentId = req.environmentId || null;
+    const projectId = req.apiToken?.projectId || null;
+    let orgId = null;
+    if (projectId) {
+      const project = await knex('g_projects').select('orgId').where('id', projectId).first();
+      orgId = project?.orgId || null;
+    }
+
     res.json({
       success: true,
-      data: { instanceId, hostname, externalAddress },
+      data: {
+        instanceId,
+        hostname,
+        externalAddress,
+        orgId,
+        projectId,
+        environmentId,
+      },
     });
   } catch (error: any) {
     logger.error('Failed to register service:', error);

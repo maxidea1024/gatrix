@@ -1,5 +1,9 @@
 import express from 'express';
 import { authLimiter } from '../middleware/rate-limiter';
+import { ApiAccessToken } from '../models/api-access-token';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('routes');
 
 // Import organized route modules
 import clientRoutes from './client';
@@ -19,14 +23,29 @@ import signalIngestionRoutes from './public/signals';
 const router = express.Router();
 
 // Readiness check endpoint
-router.get('/ready', (req, res) => {
+router.get('/ready', async (req, res) => {
+  const responseData: Record<string, any> = {
+    status: 'ready',
+    timestamp: new Date().toISOString(),
+    service: 'gatrix-backend',
+  };
+
+  // If API token is provided, resolve and return environment info
+  const token = (req.headers['x-api-token'] as string) || (req.query.token as string);
+  if (token) {
+    try {
+      const tokenData = await ApiAccessToken.validateAndUse(token);
+      if (tokenData?.environmentId) {
+        responseData.environmentId = tokenData.environmentId;
+      }
+    } catch (error) {
+      logger.debug('Failed to resolve token in /ready endpoint', { error });
+    }
+  }
+
   res.json({
     success: true,
-    data: {
-      status: 'ready',
-      timestamp: new Date().toISOString(),
-      service: 'gatrix-backend',
-    },
+    data: responseData,
   });
 });
 

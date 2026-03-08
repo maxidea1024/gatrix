@@ -7,14 +7,14 @@
  * by the backend FeatureFlagService.
  *
  * Edge clients connect via:
- *   - SSE: GET `/client/features/:environment/stream/sse`
- *   - WebSocket: GET `/client/features/:environment/stream/ws`
+ *   - SSE: GET `/client/features/stream/sse`
+ *   - WebSocket: GET `/client/features/stream/ws`
  *
  * Revision management uses Redis INCR for consistency across multiple Edge instances.
  */
 
 import { Response } from 'express';
-import { createClient, RedisClientType } from 'redis';
+import Redis from 'ioredis';
 import WebSocket, { WebSocketServer } from 'ws';
 import { config } from '../config/env';
 import { createLogger } from '../config/logger';
@@ -39,7 +39,7 @@ interface WebSocketClient {
   authenticated: boolean;
 }
 
-const SDK_EVENTS_CHANNEL = 'gatrix-sdk-events';
+const SDK_EVENTS_PREFIX = 'gatrix-sdk-events';
 const REVISION_KEY_PREFIX = 'gatrix:streaming:revision:';
 
 class FlagStreamingService {
@@ -49,8 +49,8 @@ class FlagStreamingService {
   private wss: WebSocketServer | null = null;
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private cleanupInterval: NodeJS.Timeout | null = null;
-  private subscriber: RedisClientType | null = null;
-  private redisClient: RedisClientType | null = null;
+  private subscriber: Redis | null = null;
+  private redisClient: Redis | null = null;
   private started = false;
 
   private constructor() {
@@ -72,13 +72,17 @@ class FlagStreamingService {
     this.started = true;
 
     const redisOptions = {
-      socket: { host: config.redis.host, port: config.redis.port },
+      host: config.redis.host,
+      port: config.redis.port,
       password: config.redis.password || undefined,
+      db: config.redis.db,
+      lazyConnect: true,
+      maxRetriesPerRequest: null,
     };
 
     // Create Redis client for commands (INCR, GET)
     try {
-      this.redisClient = createClient(redisOptions);
+      this.redisClient = new Redis(redisOptions);
       this.redisClient.on('error', (err) => {
         logger.error('Redis client error:', err);
       });
@@ -89,7 +93,7 @@ class FlagStreamingService {
 
     // Subscribe to Redis PubSub for SDK events
     try {
-      this.subscriber = createClient(redisOptions);
+      this.subscriber = new Redis(redisOptions);
 
       this.subscriber.on('error', (err) => {
         logger.error('Redis subscriber error:', err);
@@ -97,11 +101,11 @@ class FlagStreamingService {
 
       await this.subscriber.connect();
 
-      await this.subscriber.subscribe(SDK_EVENTS_CHANNEL, (payload: string) => {
+      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
         try {
-          const event = JSON.parse(payload) as { type: string; data: Record<string, any> };
+          const event = JSON.parse(message) as { type: string; data: Record<string, any> };
           if (event.type === 'feature_flag.changed') {
-            const environmentId = event.data.environment as string;
+            const environmentId = event.data.environmentId as string;
             const changedKeys = (event.data.changedKeys as string[]) ?? [];
             if (environmentId) {
               // Refresh Edge's own cache BEFORE notifying clients
@@ -114,7 +118,9 @@ class FlagStreamingService {
         }
       });
 
-      logger.info(`Subscribed to Redis channel: ${SDK_EVENTS_CHANNEL}`);
+      await this.subscriber.psubscribe(`${SDK_EVENTS_PREFIX}:*`);
+
+      logger.info(`Subscribed to Redis pattern: ${SDK_EVENTS_PREFIX}:*`);
     } catch (err) {
       logger.error('Failed to subscribe to Redis PubSub:', err);
     }
@@ -174,7 +180,7 @@ class FlagStreamingService {
     // Disconnect Redis subscriber
     if (this.subscriber) {
       try {
-        await this.subscriber.unsubscribe(SDK_EVENTS_CHANNEL);
+        await this.subscriber.punsubscribe(`${SDK_EVENTS_PREFIX}:*`);
         await this.subscriber.quit();
       } catch {
         // Ignore cleanup errors
@@ -327,9 +333,13 @@ class FlagStreamingService {
     try {
       const sdk = sdkManager.getSDK();
       if (sdk) {
-        await sdk.featureFlag.refreshByEnvironment(environmentId);
+        // Resolve raw environment ID to cache token key using Edge's environment registry
+        const { environmentRegistry } = await import('./environment-registry');
+        const cacheKey =
+          environmentRegistry.resolveEnvironmentToken(environmentId) || environmentId;
+        await sdk.featureFlag.refreshByEnvironment(cacheKey);
         logger.debug(
-          `Edge FlagStreamingService: Cache refreshed for env=${environmentId} before notify`
+          `Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
         );
       }
     } catch (err) {
@@ -368,7 +378,7 @@ class FlagStreamingService {
 
     if (notifiedCount > 0) {
       logger.debug(
-        `Edge FlagStreamingService: Notified ${notifiedCount} clients for env=${environmentId}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
+        `Notified ${notifiedCount} clients for env=${environmentId}, rev=${newRevision}, keys=[${changedKeys.join(',')}]`
       );
     }
   }
@@ -386,10 +396,7 @@ class FlagStreamingService {
       client.lastEventTime = new Date();
       return true;
     } catch (error) {
-      logger.warn(
-        `Edge FlagStreamingService: Failed to send SSE event to client ${clientId}:`,
-        error
-      );
+      logger.warn(`Failed to send SSE event to client ${clientId}:`, error);
       this.removeClient(clientId);
       return false;
     }
@@ -408,10 +415,7 @@ class FlagStreamingService {
       client.lastEventTime = new Date();
       return true;
     } catch (error) {
-      logger.warn(
-        `Edge FlagStreamingService: Failed to send WS event to client ${clientId}:`,
-        error
-      );
+      logger.warn(`Failed to send WS event to client ${clientId}:`, error);
       this.removeWebSocketClient(clientId);
       return false;
     }

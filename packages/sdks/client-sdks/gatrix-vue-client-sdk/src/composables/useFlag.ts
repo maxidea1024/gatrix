@@ -2,7 +2,7 @@ import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
 import type { FlagProxy } from '@gatrix/gatrix-js-client-sdk';
 
-export function useFlagProxy(flagName: string, forceRealtime = false) {
+export function useFlagProxy(flagName: string, forceRealtime = true) {
   const client = useGatrixClient();
   const flag = ref<FlagProxy | null>(null);
 
@@ -19,7 +19,7 @@ export function useFlagProxy(flagName: string, forceRealtime = false) {
   return flag;
 }
 
-export function useFlag(flagName: string, forceRealtime = false) {
+export function useFlag(flagName: string, forceRealtime = true) {
   const flagProxy = useFlagProxy(flagName, forceRealtime);
   return computed(() => flagProxy.value?.enabled ?? false);
 }

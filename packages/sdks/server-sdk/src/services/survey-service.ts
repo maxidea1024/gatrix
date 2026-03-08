@@ -5,20 +5,19 @@
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
- * - Environment resolution is delegated to EnvironmentResolver
+ * - Environment resolution is delegated to string
  * - In multi-environment mode (edge), environment MUST always be provided
  */
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { Survey, SurveyListParams, SurveySettings } from '../types/api';
 
 export class SurveyService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private envResolver: EnvironmentResolver;
+  private defaultToken: string;
   private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), Survey[]>
   private cachedSurveysByEnv: Map<string, Survey[]> = new Map();
@@ -30,12 +29,12 @@ export class SurveyService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.envResolver = envResolver;
+    this.defaultToken = defaultToken;
     this.storage = storage;
   }
 
@@ -157,7 +156,7 @@ export class SurveyService {
 
   /**
    * Get cached surveys
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCached(environmentId: string): Survey[] {
     return this.cachedSurveysByEnv.get(environmentId) || [];
@@ -179,7 +178,7 @@ export class SurveyService {
 
   /**
    * Get cached survey settings
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCachedSettings(environmentId: string): SurveySettings | null {
     return this.cachedSettingsByEnv.get(environmentId) || null;
@@ -205,7 +204,7 @@ export class SurveyService {
 
   /**
    * Refresh cached surveys for a specific environment
-   * @param environment Environment name
+   * @param environmentId environment ID
    * @param params Optional list parameters
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
@@ -227,7 +226,7 @@ export class SurveyService {
    * Get survey by ID
    * GET /api/v1/server/surveys/:id
    * @param id Survey ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async getById(id: string, environmentId: string): Promise<Survey> {
     this.logger.debug('Fetching survey by ID', { id, environmentId });
@@ -246,7 +245,7 @@ export class SurveyService {
   /**
    * Refresh survey settings only
    * GET /api/v1/server/surveys/settings
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshSettings(environmentId: string): Promise<SurveySettings> {
     this.logger.info('Refreshing survey settings', { environmentId });
@@ -276,7 +275,7 @@ export class SurveyService {
   /**
    * Update cache with new data
    * @param surveys Surveys to cache
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   updateCache(surveys: Survey[], environmentId: string): void {
     this.cachedSurveysByEnv.set(environmentId, surveys);
@@ -292,7 +291,7 @@ export class SurveyService {
    * If isActive is true but not in cache, fetches and adds it to cache
    * If isActive is true and in cache, fetches and updates it
    * @param id Survey ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isActive Optional active status
    */
   async updateSingleSurvey(
@@ -375,7 +374,7 @@ export class SurveyService {
   /**
    * Remove a survey from cache (immutable)
    * @param id Survey ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   removeSurvey(id: string, environmentId: string): void {
     this.logger.debug('Removing survey from cache', { id, environmentId });
@@ -392,7 +391,7 @@ export class SurveyService {
   /**
    * Get surveys for a specific world
    * @param worldId World ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getSurveysForWorld(worldId: string, environmentId: string): Survey[] {
     const surveys = this.getCached(environmentId);
@@ -410,7 +409,7 @@ export class SurveyService {
    * Update survey settings only
    * Called when settings change (e.g., survey configuration updates)
    * @param newSettings New settings to cache
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   updateSettings(newSettings: SurveySettings, environmentId: string): void {
     const oldSettings = this.cachedSettingsByEnv.get(environmentId);
@@ -457,7 +456,7 @@ export class SurveyService {
    * @param worldId User's world ID
    * @param userLevel User's level
    * @param joinDays User's join days
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @returns Array of appropriate surveys, empty array if none match
    */
   getActiveSurveys(

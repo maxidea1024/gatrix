@@ -7,7 +7,6 @@
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { ClientVersion, ClientVersionListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
@@ -15,20 +14,20 @@ import { BaseEnvironmentService } from './base-environment-service';
 export class ClientVersionService extends BaseEnvironmentService<
   ClientVersion,
   ClientVersionListResponse,
-  number
+  string
 > {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, envResolver, storage);
+    super(apiClient, logger, defaultToken, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environmentId: string): string {
+  protected getEndpoint(): string {
     return `/api/v1/server/client-versions`;
   }
 
@@ -40,14 +39,14 @@ export class ClientVersionService extends BaseEnvironmentService<
     return 'client versions';
   }
 
-  protected getItemId(item: ClientVersion): number {
+  protected getItemId(item: ClientVersion): string {
     return item.id;
   }
 
   /**
    * Update a single client version in cache (immutable)
    * @param item Client version to update
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   updateSingleClientVersion(item: ClientVersion, environmentId: string): void {
     this.updateItemInCache(item, environmentId);
@@ -59,7 +58,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Get client version by platform and version string
    * @param platform Platform name
    * @param version Version string
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getByPlatformAndVersion(
     platform: string,
@@ -74,7 +73,7 @@ export class ClientVersionService extends BaseEnvironmentService<
    * Get latest client version by platform
    * Returns the first version with ONLINE status for the given platform
    * @param platform Platform name
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param status Optional status filter
    */
   getLatestByPlatform(
@@ -102,7 +101,7 @@ export class ClientVersionService extends BaseEnvironmentService<
   /**
    * Get all client versions by platform
    * @param platform Platform name
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getByPlatform(platform: string, environmentId: string): ClientVersion[] {
     const versions = this.getCached(environmentId);

@@ -15,6 +15,20 @@ import { ErrorCodes } from '../utils/api-response';
 const ALLOW_UNSECURED_TOKENS = process.env.ALLOW_UNSECURED_TOKENS === 'true';
 const UNSECURED_TOKEN_REGEX = /^unsecured-([^:]+):([^:]+):(.+)-(server|client|edge)-api-token$/;
 
+// Shorthand infrastructure token — auto-resolves to __internal__/__infrastructure__/default
+export const INFRA_SERVER_TOKEN = process.env.INFRA_SERVER_TOKEN || 'gatrix-infra-server-token';
+const INFRA_ORG = '__internal__';
+const INFRA_PROJECT = '__infrastructure__';
+const INFRA_ENV = 'default';
+
+// Legacy unsecured tokens — auto-resolve to default/default/default for backward compatibility
+const LEGACY_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
+const LEGACY_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+const LEGACY_EDGE_TOKEN = 'gatrix-unsecured-edge-api-token';
+const LEGACY_ORG = 'default';
+const LEGACY_PROJECT = 'default';
+const LEGACY_ENV = 'development';
+
 export const EDGE_BYPASS_TOKEN =
   process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
 
@@ -64,8 +78,57 @@ function handleSpecialTokens(token: string): {
   unsecuredProjectId?: string;
   unsecuredEnvironmentId?: string;
 } | null {
-  // Unsecured tokens — only allowed when explicitly enabled
-  if (ALLOW_UNSECURED_TOKENS) {
+  // Infrastructure shorthand token — resolves to __internal__/__infrastructure__/default
+  if (token === INFRA_SERVER_TOKEN) {
+    return {
+      apiToken: {
+        id: 'infra-server',
+        tokenType: 'server' as any,
+        tokenName: 'Infrastructure Server Token',
+      },
+      isUnsecured: true,
+      unsecuredOrgId: INFRA_ORG,
+      unsecuredProjectId: INFRA_PROJECT,
+      unsecuredEnvironmentId: INFRA_ENV,
+    };
+  }
+
+  // Legacy unsecured tokens — resolve to default/default/development for backward compatibility
+  const LEGACY_TOKENS: Record<string, { id: string; tokenType: string; tokenName: string }> = {
+    [LEGACY_CLIENT_TOKEN]: {
+      id: 'legacy-unsecured-client',
+      tokenType: 'client',
+      tokenName: 'Legacy Unsecured Client Token',
+    },
+    [LEGACY_SERVER_TOKEN]: {
+      id: 'legacy-unsecured-server',
+      tokenType: 'server',
+      tokenName: 'Legacy Unsecured Server Token',
+    },
+    [LEGACY_EDGE_TOKEN]: {
+      id: 'legacy-unsecured-edge',
+      tokenType: 'server',
+      tokenName: 'Legacy Unsecured Edge Token',
+    },
+  };
+  const legacyEntry = LEGACY_TOKENS[token];
+  if (legacyEntry) {
+    return {
+      apiToken: {
+        id: legacyEntry.id,
+        tokenType: legacyEntry.tokenType as any,
+        tokenName: legacyEntry.tokenName,
+      },
+      isUnsecured: true,
+      unsecuredOrgId: LEGACY_ORG,
+      unsecuredProjectId: LEGACY_PROJECT,
+      unsecuredEnvironmentId: LEGACY_ENV,
+    };
+  }
+
+  // Unsecured tokens — always accepted (format is strict: unsecured-{org}:{project}:{env}-{type}-api-token)
+  // Used by Edge for multi-environment data fetching in trusted infrastructure
+  {
     const match = token.match(UNSECURED_TOKEN_REGEX);
     if (match) {
       const [, orgId, projectId, envId, tokenType] = match;
@@ -134,7 +197,13 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       req.isUnsecuredToken = special.isUnsecured || false;
       req.isEdgeBypassToken = special.isEdgeBypass || false;
       req.apiToken = special.apiToken as ApiAccessToken;
-      // For unsecured tokens, auto-set environmentId from parsed token
+      // For unsecured/infra tokens, propagate org/project/env identifiers
+      if (special.unsecuredOrgId) {
+        req.unsecuredOrgId = special.unsecuredOrgId;
+      }
+      if (special.unsecuredProjectId) {
+        req.unsecuredProjectId = special.unsecuredProjectId;
+      }
       if (special.unsecuredEnvironmentId) {
         req.environmentId = special.unsecuredEnvironmentId;
       }
@@ -276,6 +345,18 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
     if (!env) {
       env = (await Environment.getById(environmentId)) || null;
+
+      // For unsecured tokens, org/project/env fields are names (not ULIDs)
+      // Resolve via full path: org.orgName → project.projectName → env.name
+      if (!env && req.isUnsecuredToken && req.unsecuredOrgId && req.unsecuredProjectId) {
+        env =
+          (await Environment.getByFullPath(
+            req.unsecuredOrgId,
+            req.unsecuredProjectId,
+            environmentId
+          )) || null;
+      }
+
       if (!env) {
         logger.warn('Auth: Environment not found', { environmentId });
         return res.status(404).json({

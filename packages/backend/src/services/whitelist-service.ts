@@ -84,16 +84,18 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: whitelist.id,
-            timestamp: Date.now(),
-            environmentId,
-          },
-        });
-
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: whitelist.id,
+              environmentId,
+            },
+          },
+          { environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -139,16 +141,18 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: updated.id,
-            timestamp: Date.now(),
-            environmentId,
-          },
-        });
-
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: updated.id,
+              environmentId,
+            },
+          },
+          { environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -182,16 +186,18 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id,
-            timestamp: Date.now(),
-            environmentId,
-          },
-        });
-
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id,
+              environmentId,
+            },
+          },
+          { environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -252,16 +258,18 @@ export class WhitelistService {
 
       try {
         // Publish event for SDK update (using 0 as ID to signify bulk change)
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: 0,
-            timestamp: Date.now(),
-            environmentId,
-          },
-        });
-
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: 0,
+              environmentId,
+            },
+          },
+          { environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to invalidate whitelist ETag cache after bulk create:', eventError);
       }
@@ -310,16 +318,18 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: {
-            id: updated.id,
-            timestamp: Date.now(),
-            environmentId,
-          },
-        });
-
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.WHITELISTS}:${environmentId}`);
+
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'whitelist.updated',
+            data: {
+              id: updated.id,
+              environmentId,
+            },
+          },
+          { environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request

@@ -21,7 +21,7 @@
 import { useEffect, useState } from 'react';
 import { useGatrixContext } from './useGatrixContext';
 
-export function useFlag(flagName: string, forceRealtime = false): boolean {
+export function useFlag(flagName: string, forceRealtime = true): boolean {
   const { features } = useGatrixContext();
   const [flag, setFlag] = useState(() => features.isEnabled(flagName, forceRealtime));
 

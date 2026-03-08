@@ -101,15 +101,18 @@ export class GameWorldService {
       await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`);
 
       // Publish event for SDK real-time updates
-      await pubSubService.publishSDKEvent({
-        type: 'gameworld.created',
-        data: {
-          id: result.id,
-          timestamp: Date.now(),
-          isVisible: result.isVisible,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'gameworld.created',
+          data: {
+            id: result.id,
+
+            isVisible: result.isVisible,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       return result;
     } catch (error) {
@@ -151,15 +154,18 @@ export class GameWorldService {
       await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`);
 
       // Publish event for SDK real-time updates
-      await pubSubService.publishSDKEvent({
-        type: 'gameworld.updated',
-        data: {
-          id: updatedWorld.id,
-          timestamp: Date.now(),
-          isVisible: updatedWorld.isVisible,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'gameworld.updated',
+          data: {
+            id: updatedWorld.id,
+
+            isVisible: updatedWorld.isVisible,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       return updatedWorld;
     } catch (error) {
@@ -189,14 +195,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`);
 
       // Publish event for SDK real-time updates
-      await pubSubService.publishSDKEvent({
-        type: 'gameworld.deleted',
-        data: {
-          id,
-          timestamp: Date.now(),
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'gameworld.deleted',
+          data: {
+            id,
+
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (error) {
       if (error instanceof GatrixError) {
         throw error;
@@ -240,15 +249,18 @@ export class GameWorldService {
       logger.info('Cache invalidation completed');
 
       // Publish event for SDK real-time updates
-      await pubSubService.publishSDKEvent({
-        type: 'gameworld.updated',
-        data: {
-          id: updatedWorld.id,
-          timestamp: Date.now(),
-          isVisible: updatedWorld.isVisible,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'gameworld.updated',
+          data: {
+            id: updatedWorld.id,
+
+            isVisible: updatedWorld.isVisible,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       return updatedWorld;
     } catch (error) {
@@ -284,14 +296,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`);
 
       // Publish event for SDK real-time updates
-      await pubSubService.publishSDKEvent({
-        type: 'gameworld.updated',
-        data: {
-          id: updatedWorld.id,
-          timestamp: Date.now(),
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'gameworld.updated',
+          data: {
+            id: updatedWorld.id,
+
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       return updatedWorld;
     } catch (error) {
@@ -316,14 +331,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(`${ENV_SCOPED.SDK_ETAG.GAME_WORLDS}:${environmentId}`);
 
       // Publish event for SDK to clear entire game worlds cache
-      await pubSubService.publishSDKEvent({
-        type: 'gameworld.order_changed',
-        data: {
-          id: 0, // Dummy id for order_changed event
-          timestamp: Date.now(),
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'gameworld.order_changed',
+          data: {
+            id: 0, // Dummy id for order_changed event
+
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (error) {
       logger.error('Error in updateDisplayOrders service:', error);
       throw new GatrixError('Failed to update display orders', 500);

@@ -123,9 +123,9 @@ router.get('/:environment/service-notices/:noticeId', async (req: Request, res: 
     if (!sdk) return;
 
     const environmentId = req.params.environment;
-    const noticeId = parseInt(req.params.noticeId, 10);
+    const noticeId = req.params.noticeId;
 
-    if (isNaN(noticeId)) {
+    if (!noticeId) {
       res.status(400).json({
         success: false,
         error: {
@@ -138,7 +138,7 @@ router.get('/:environment/service-notices/:noticeId', async (req: Request, res: 
 
     // Get service notices from cache for this environment
     const envNotices = sdk.getServiceNotices(environmentId);
-    const notice = envNotices.find((n: { id: number }) => n.id === noticeId);
+    const notice = envNotices.find((n: { id: string }) => n.id === noticeId);
 
     if (!notice) {
       res.status(404).json({

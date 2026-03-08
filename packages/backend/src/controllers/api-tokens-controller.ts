@@ -183,15 +183,18 @@ class ApiTokensController {
 
       // Publish token created event for Edge mirroring
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'api_token.created',
-          data: {
-            id: result.id,
-            tokenType,
-            environmentId: environmentId || null,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'api_token.created',
+            data: {
+              id: result.id,
+              tokenType,
+              environmentId: environmentId || null,
+              timestamp: Date.now(),
+            },
           },
-        });
+          { environmentId: environmentId || null }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.created event', {
           eventError,
@@ -290,15 +293,18 @@ class ApiTokensController {
 
       // Publish token updated event for Edge mirroring
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'api_token.updated',
-          data: {
-            id,
-            tokenType: updatedToken.tokenType,
-            environmentId: updatedToken.environmentId || null,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'api_token.updated',
+            data: {
+              id,
+              tokenType: updatedToken.tokenType,
+              environmentId: updatedToken.environmentId || null,
+              timestamp: Date.now(),
+            },
           },
-        });
+          { environmentId: updatedToken.environmentId || null }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.updated event', {
           eventError,
@@ -356,15 +362,18 @@ class ApiTokensController {
 
       // Publish token updated event for Edge mirroring (regenerate = token value changed)
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'api_token.updated',
-          data: {
-            id,
-            tokenType: existingToken.tokenType,
-            regenerated: true,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'api_token.updated',
+            data: {
+              id,
+              tokenType: existingToken.tokenType,
+              regenerated: true,
+              timestamp: Date.now(),
+            },
           },
-        });
+          { environmentId: existingToken.environmentId || undefined }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.updated event for regenerate', { eventError });
       }
@@ -419,14 +428,17 @@ class ApiTokensController {
 
       // Publish token deleted event for Edge mirroring
       try {
-        await pubSubService.publishSDKEvent({
-          type: 'api_token.deleted',
-          data: {
-            id,
-            tokenType: existingToken.tokenType,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'api_token.deleted',
+            data: {
+              id,
+              tokenType: existingToken.tokenType,
+              timestamp: Date.now(),
+            },
           },
-        });
+          { environmentId: existingToken.environmentId || undefined }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish api_token.deleted event', {
           eventError,

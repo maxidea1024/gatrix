@@ -22,7 +22,7 @@ import { useGatrixContext } from './useGatrixContext';
 export function useNumberVariation(
   flagName: string,
   fallbackValue: number,
-  forceRealtime = false
+  forceRealtime = true
 ): number {
   const { features } = useGatrixContext();
   const [value, setValue] = useState(() =>

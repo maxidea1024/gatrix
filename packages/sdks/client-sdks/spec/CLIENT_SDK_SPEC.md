@@ -1,4 +1,4 @@
-﻿# Gatrix Client SDK Specification
+# Gatrix Client SDK Specification
 
 This document defines the core architecture, API, and behavior for all Gatrix Client SDKs.
 
@@ -268,7 +268,6 @@ interface GatrixClientConfig {
   apiUrl: string; // Base API URL for Edge or Backend server (e.g., https://edge.your-api.com/api/v1)
   apiToken: string; // Client API token
   appName: string; // Application name
-  environment: string; // Environment name (required)
 
   // Optional - Global
   customHeaders?: Record<string, string>;
@@ -486,7 +485,6 @@ By default, SDKs use **GET** requests with context in query parameters for flag 
 
 | Header          | Value           | Description                                                                   |
 | --------------- | --------------- | ----------------------------------------------------------------------------- |
-| `X-Environment` | `{environment}` | Environment name from config                                                  |
 | `If-None-Match` | `{etag}`        | ETag from previous response (only when etag exists, enables 304 Not Modified) |
 
 #### X-SDK-Version Format
@@ -531,7 +529,6 @@ All client SDKs MUST validate configuration at initialization time and fail fast
 | `apiUrl`      | Non-empty, trimmed | `"apiUrl is required"`      |
 | `apiToken`    | Non-empty, trimmed | `"apiToken is required"`    |
 | `appName`     | Non-empty, trimmed | `"appName is required"`     |
-| `environment` | Non-empty, trimmed | `"environment is required"` |
 
 #### Format Validation
 
@@ -780,7 +777,7 @@ class FeaturesClient implements VariationProvider {
   updateContext(context: Partial<GatrixContext>): Promise<void>;
 
   // Flag Access - Basic
-  // All flag access methods accept an optional `forceRealtime` parameter (default: false).
+  // All flag access methods accept an optional `forceRealtime` parameter (default: true).
   // When `forceRealtime: true`, the method always returns values from `realtimeFlags`
   // regardless of `explicitSyncMode`. This is useful for displaying real-time
   // status in dashboards or debug UIs while keeping the main app synchronized.
@@ -1054,7 +1051,7 @@ All SDKs MUST implement the `variationInternal` pattern for centralized flag log
 - `FeaturesClient` contains `*VariationInternal()` methods that handle **all** logic: flag lookup + value extraction + metrics tracking.
 - Public variation methods (e.g., `boolVariation`) simply delegate to the internal methods.
 - `FlagProxy` is a **convenience shell** that delegates all variation calls back to `FeaturesClient`'s internal methods.
-- All internal methods accept an optional `forceRealtime` parameter (default: `false`). When `true`, the method reads from `realtimeFlags` directly, bypassing `selectFlags()` logic.
+- All internal methods accept an optional `forceRealtime` parameter (default: `true`). When `true`, the method reads from `realtimeFlags` directly, bypassing `selectFlags()` logic.
 
 ```typescript
 // VariationProvider interface (separate file to avoid circular deps)
@@ -1263,10 +1260,10 @@ When `explicitSyncMode: true`:
 
 ### forceRealtime Parameter
 
-All flag access methods (`isEnabled`, `*Variation`, `getVariant`, etc.) accept an optional `forceRealtime` parameter (default: `false`):
+All flag access methods (`isEnabled`, `*Variation`, `getVariant`, etc.) accept an optional `forceRealtime` parameter (default: `true`):
 
-- When `forceRealtime: false` (default): Returns values from `synchronizedFlags` if `explicitSyncMode` is enabled, otherwise from `realtimeFlags`.
-- When `forceRealtime: true`: Always returns values from `realtimeFlags`, regardless of `explicitSyncMode` setting.
+- When `forceRealtime: true` (default): Always returns values from `realtimeFlags`, regardless of `explicitSyncMode` setting.
+- When `forceRealtime: false`: Returns values from `synchronizedFlags` if `explicitSyncMode` is enabled, otherwise from `realtimeFlags`.
 
 This is useful for:
 - Debug/monitoring UIs that need to show the latest server values

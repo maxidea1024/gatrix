@@ -328,15 +328,18 @@ class ServiceNoticeService {
       // Invalidate ETag cache so SDK fetches fresh data
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
 
-      await pubSubService.publishSDKEvent({
-        type: 'service_notice.created',
-        data: {
-          id: notice.id,
-          environmentId: environmentId,
-          timestamp: Date.now(),
-          serviceNotice: notice,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'service_notice.created',
+          data: {
+            id: notice.id,
+            environmentId: environmentId,
+
+            serviceNotice: notice,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       logger.error('Failed to publish service notice event', err);
     }
@@ -442,15 +445,18 @@ class ServiceNoticeService {
       // Invalidate ETag cache so SDK fetches fresh data
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
 
-      await pubSubService.publishSDKEvent({
-        type: 'service_notice.updated',
-        data: {
-          id: notice.id,
-          environmentId: environmentId,
-          timestamp: Date.now(),
-          serviceNotice: notice,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'service_notice.updated',
+          data: {
+            id: notice.id,
+            environmentId: environmentId,
+
+            serviceNotice: notice,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
 
       logger.info('Service notice update event published', {
         id: notice.id,
@@ -478,14 +484,16 @@ class ServiceNoticeService {
       // Invalidate ETag cache so SDK fetches fresh data
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
 
-      await pubSubService.publishSDKEvent({
-        type: 'service_notice.deleted',
-        data: {
-          id: id,
-          environmentId: environmentId,
-          timestamp: Date.now(),
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'service_notice.deleted',
+          data: {
+            id: id,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       logger.error('Failed to publish service notice event', err);
     }
@@ -506,13 +514,15 @@ class ServiceNoticeService {
 
     // Publish SDK Event (Deletion)
     try {
-      await pubSubService.publishSDKEvent({
-        type: 'service_notice.deleted',
-        data: {
-          environmentId: environmentId,
-          timestamp: Date.now(),
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'service_notice.deleted',
+          data: {
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       logger.error('Failed to publish service notice event', err);
     }
@@ -538,15 +548,18 @@ class ServiceNoticeService {
       // Invalidate ETag cache so SDK fetches fresh data
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environmentId}`);
 
-      await pubSubService.publishSDKEvent({
-        type: 'service_notice.updated',
-        data: {
-          id: notice.id,
-          environmentId: environmentId,
-          timestamp: Date.now(),
-          serviceNotice: notice,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'service_notice.updated',
+          data: {
+            id: notice.id,
+            environmentId: environmentId,
+
+            serviceNotice: notice,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       logger.error('Failed to publish service notice event', err);
     }

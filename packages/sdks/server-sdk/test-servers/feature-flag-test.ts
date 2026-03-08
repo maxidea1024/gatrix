@@ -15,7 +15,7 @@ async function main() {
   console.log('='.repeat(60));
 
   const sdk = new GatrixServerSDK({
-    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
+    apiUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'feature-flag-test',
     service: 'test',
@@ -27,7 +27,7 @@ async function main() {
       refreshMethod: 'polling',
     },
 
-    features: {
+    uses: {
       gameWorld: false,
       popupNotice: false,
       survey: false,

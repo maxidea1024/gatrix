@@ -224,16 +224,23 @@ export class OutboxService {
     const channel = channelMap[event.entityType] || event.entityType.replace('g_', '');
     const eventName = `${channel}.${event.eventType}`;
 
-    await pubSubService.publishSDKEvent({
-      type: eventName,
-      data: {
-        entityId: event.entityId,
-        eventType: event.eventType,
-        payload: event.payload,
-        changeRequestId: event.changeRequestId,
-        timestamp: new Date().toISOString(),
+    // Extract environmentId from event's payload for channel targeting
+    const environmentId =
+      event.payload?.after?.environmentId || event.payload?.before?.environmentId || undefined;
+
+    await pubSubService.publishSDKEvent(
+      {
+        type: eventName,
+        data: {
+          entityId: event.entityId,
+          eventType: event.eventType,
+          payload: event.payload,
+          changeRequestId: event.changeRequestId,
+          timestamp: new Date().toISOString(),
+        },
       },
-    });
+      { environmentId }
+    );
 
     logger.debug(`Published event: ${eventName}`);
   }

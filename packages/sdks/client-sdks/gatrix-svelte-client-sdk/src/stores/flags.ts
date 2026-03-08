@@ -18,7 +18,7 @@ import { EVENTS, type EvaluatedFlag } from '@gatrix/gatrix-js-client-sdk';
  * {/each}
  * ```
  */
-export function allFlags(forceRealtime = false): Readable<EvaluatedFlag[]> {
+export function allFlags(forceRealtime = true): Readable<EvaluatedFlag[]> {
   const client = getGatrixClient();
 
   return readable<EvaluatedFlag[]>(client.features.getAllFlags(forceRealtime), (set) => {

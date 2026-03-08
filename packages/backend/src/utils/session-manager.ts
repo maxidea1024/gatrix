@@ -14,7 +14,7 @@ export class SessionManager {
   static async getUserSessions(userId: string): Promise<string[]> {
     try {
       const client = redisClient.getClient();
-      const sessionIds = await client.sMembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
+      const sessionIds = await client.smembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
       return sessionIds;
     } catch (error) {
       logger.error('Error getting user sessions:', error);
@@ -31,7 +31,7 @@ export class SessionManager {
       const userSessionsKey = `${this.USER_SESSIONS_PREFIX}${userId}`;
 
       // Add session to user's session set
-      await client.sAdd(userSessionsKey, sessionId);
+      await client.sadd(userSessionsKey, sessionId);
 
       // Set TTL for user sessions tracking
       await client.expire(userSessionsKey, config.session.ttl);
@@ -48,10 +48,10 @@ export class SessionManager {
       const client = redisClient.getClient();
       const userSessionsKey = `${this.USER_SESSIONS_PREFIX}${userId}`;
 
-      await client.sRem(userSessionsKey, sessionId);
+      await client.srem(userSessionsKey, sessionId);
 
       // If no more sessions, remove the key
-      const remainingSessions = await client.sCard(userSessionsKey);
+      const remainingSessions = await client.scard(userSessionsKey);
       if (remainingSessions === 0) {
         await client.del(userSessionsKey);
       }
@@ -115,7 +115,7 @@ export class SessionManager {
   static async getUserSessionCount(userId: string): Promise<number> {
     try {
       const client = redisClient.getClient();
-      return await client.sCard(`${this.USER_SESSIONS_PREFIX}${userId}`);
+      return await client.scard(`${this.USER_SESSIONS_PREFIX}${userId}`);
     } catch (error) {
       logger.error('Error getting user session count:', error);
       return 0;
@@ -133,7 +133,7 @@ export class SessionManager {
       const userSessionKeys = await client.keys(`${this.USER_SESSIONS_PREFIX}*`);
 
       for (const userKey of userSessionKeys) {
-        const sessionIds = await client.sMembers(userKey);
+        const sessionIds = await client.smembers(userKey);
         const validSessions: string[] = [];
 
         // Check which sessions still exist
@@ -147,7 +147,7 @@ export class SessionManager {
         // Update the user sessions set with only valid sessions
         if (validSessions.length > 0) {
           await client.del(userKey);
-          await client.sAdd(userKey, validSessions);
+          await client.sadd(userKey, ...validSessions);
           await client.expire(userKey, config.session.ttl);
         } else {
           await client.del(userKey);

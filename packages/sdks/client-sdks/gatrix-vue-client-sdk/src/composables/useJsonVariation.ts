@@ -1,7 +1,7 @@
 import { ref, computed, onUnmounted } from 'vue';
 import { useGatrixClient } from './useGatrixClient';
 
-export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = false) {
+export function useJsonVariation<T>(flagName: string, fallbackValue: T, forceRealtime = true) {
   const client = useGatrixClient();
   const value = ref<T>(client.features.jsonVariation<T>(flagName, fallbackValue, forceRealtime));
 
