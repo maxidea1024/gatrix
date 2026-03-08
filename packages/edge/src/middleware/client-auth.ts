@@ -4,6 +4,7 @@ import { createLogger } from '../config/logger';
 const logger = createLogger('ClientAuth');
 import { tokenMirrorService } from '../services/token-mirror-service';
 import { tokenUsageTracker } from '../services/token-usage-tracker';
+import { environmentRegistry } from '../services/environment-registry';
 
 // Unsecured tokens for backward compatibility
 export const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
