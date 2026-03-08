@@ -72,6 +72,37 @@ client.stop();
 | `features.usePOSTRequests` | `boolean` | `false` | GET 대신 POST 요청 사용 |
 | `features.streaming` | `StreamingConfig` | - | 스트리밍 설정 |
 
+### 스트리밍 설정
+
+SSE 또는 WebSocket을 통한 실시간 플래그 무효화. 스트리밍은 **기본적으로 활성화**됩니다.
+
+#### StreamingConfig
+
+| 필드 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `enabled` | `boolean` | `true` | 스트리밍 활성화/비활성화 |
+| `transport` | `'sse' \| 'websocket'` | `'sse'` | 전송 타입 |
+| `sse` | `SseStreamingConfig` | - | SSE 전용 설정 |
+| `websocket` | `WebSocketStreamingConfig` | - | WebSocket 전용 설정 |
+
+#### SseStreamingConfig
+
+| 필드 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `url` | `string` | - | SSE 엔드포인트 URL 오버라이드 (기본: apiUrl에서 파생) |
+| `reconnectBase` | `number` | `1` | 재연결 초기 지연 (초) |
+| `reconnectMax` | `number` | `30` | 재연결 최대 지연 (초) |
+| `pollingJitter` | `number` | `5` | 폴링 지터 범위 (초, 동시 재연결 방지) |
+
+#### WebSocketStreamingConfig
+
+| 필드 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `url` | `string` | - | WebSocket 엔드포인트 URL 오버라이드 (기본: apiUrl에서 파생) |
+| `reconnectBase` | `number` | `1` | 재연결 초기 지연 (초) |
+| `reconnectMax` | `number` | `30` | 재연결 최대 지연 (초) |
+| `pingInterval` | `number` | `30` | Ping 인터벌 (초) |
+
 ## 로깅 & 디버그 모드
 
 ### 개발 모드 활성화
@@ -119,6 +150,21 @@ interface EvaluatedFlag {
   impressionData?: boolean; // 임프레션 추적 여부
 }
 ```
+
+### 예약된 배리언트 이름
+
+SDK는 `$`로 시작하는 예약된 배리언트 이름을 사용하여 특수한 평가 상태를 나타냅니다. 반환된 값의 출처를 판단하는 데 매우 중요합니다.
+
+| 배리언트 이름 | 설명 |
+|--------------|------|
+| `$missing` | SDK 캐시에서 플래그를 찾을 수 없음 |
+| `$type-mismatch` | 요청한 값 타입이 플래그의 실제 `valueType`과 불일치 |
+| `$env-default-enabled` | 환경 수준 `enabledValue` 기본값에서 가져온 값 |
+| `$flag-default-enabled` | 플래그 수준 (글로벌) `enabledValue` 기본값에서 가져온 값 |
+| `$env-default-disabled` | 환경 수준 `disabledValue` 기본값에서 가져온 값 |
+| `$flag-default-disabled` | 플래그 수준 (글로벌) `disabledValue` 기본값에서 가져온 값 |
+
+이 이름들은 `variant.name` (또는 `VariationResult`의 `variantName`)에 나타나며, 반환된 값의 정확한 출처를 판단하는 데 사용됩니다.
 
 ### 기본값이 필수인 이유
 

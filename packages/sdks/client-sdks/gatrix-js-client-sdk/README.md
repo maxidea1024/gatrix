@@ -73,6 +73,37 @@ client.stop();
 | `features.usePOSTRequests`   | `boolean`         | `false`        | Use POST instead of GET requests.     |
 | `features.streaming`         | `StreamingConfig` | -              | Streaming configuration.              |
 
+### Streaming Configuration
+
+Real-time flag invalidation via SSE or WebSocket. Streaming is **enabled by default**.
+
+#### StreamingConfig
+
+| Field       | Type                   | Default | Description                             |
+| ----------- | ---------------------- | ------- | --------------------------------------- |
+| `enabled`   | `boolean`              | `true`  | Enable/disable streaming                |
+| `transport` | `'sse' \| 'websocket'` | `'sse'` | Transport type                          |
+| `sse`       | `SseStreamingConfig`   | -       | SSE-specific settings                   |
+| `websocket` | `WebSocketStreamingConfig` | -   | WebSocket-specific settings             |
+
+#### SseStreamingConfig
+
+| Field            | Type     | Default | Description                                           |
+| ---------------- | -------- | ------- | ----------------------------------------------------- |
+| `url`            | `string` | -       | SSE endpoint URL override (default: derived from apiUrl) |
+| `reconnectBase`  | `number` | `1`     | Reconnect initial delay in seconds                    |
+| `reconnectMax`   | `number` | `30`    | Reconnect max delay in seconds                        |
+| `pollingJitter`  | `number` | `5`     | Polling jitter range in seconds (prevents thundering herd) |
+
+#### WebSocketStreamingConfig
+
+| Field            | Type     | Default | Description                                              |
+| ---------------- | -------- | ------- | -------------------------------------------------------- |
+| `url`            | `string` | -       | WebSocket endpoint URL override (default: derived from apiUrl) |
+| `reconnectBase`  | `number` | `1`     | Reconnect initial delay in seconds                       |
+| `reconnectMax`   | `number` | `30`    | Reconnect max delay in seconds                           |
+| `pingInterval`   | `number` | `30`    | Ping interval in seconds                                 |
+
 ## Logging & Debug Mode
 
 ### Enable Dev Mode
@@ -148,6 +179,21 @@ interface EvaluatedFlag {
   impressionData?: boolean; // Whether to track impressions
 }
 ```
+
+### Reserved Variant Names
+
+The SDK uses `$`-prefixed variant names to indicate special evaluation states. These are critical for understanding why a particular value was returned.
+
+| Variant Name            | Description                                                         |
+| ----------------------- | ------------------------------------------------------------------- |
+| `$missing`              | Flag was not found in the SDK cache                                 |
+| `$type-mismatch`        | Requested value type does not match the flag's actual `valueType`   |
+| `$env-default-enabled`  | Value comes from the environment-level `enabledValue` default       |
+| `$flag-default-enabled` | Value comes from the flag-level (global) `enabledValue` default     |
+| `$env-default-disabled` | Value comes from the environment-level `disabledValue` default      |
+| `$flag-default-disabled`| Value comes from the flag-level (global) `disabledValue` default    |
+
+These names appear in `variant.name` (or `variantName` in `VariationResult`) and can be used to determine the exact source of the returned value.
 
 ### Why Default Values Are Required
 
