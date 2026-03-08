@@ -12,6 +12,7 @@
  */
 
 import { ApiClient } from '../client/api-client';
+import { ApiClientFactory } from '../client/api-client-factory';
 import { Logger } from '../utils/logger';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import {
@@ -54,6 +55,8 @@ export class FeatureFlagService {
   };
   // Compact mode: strip evaluation data from disabled flags to reduce bandwidth (default: true)
   private compactFlags: boolean = true;
+  // Optional factory for multi-token mode (each token gets its own ApiClient with isolated ETag cache)
+  private apiClientFactory?: ApiClientFactory;
 
   constructor(
     apiClient: ApiClient,
@@ -141,6 +144,25 @@ export class FeatureFlagService {
   setCompactFlags(enabled: boolean): void {
     this.compactFlags = enabled;
     this.logger.debug('Compact flags mode set', { enabled });
+  }
+
+  /**
+   * Set ApiClientFactory for multi-token mode.
+   * When set, listByEnvironment() uses the factory to get a per-token ApiClient.
+   */
+  setApiClientFactory(factory: ApiClientFactory): void {
+    this.apiClientFactory = factory;
+  }
+
+  /**
+   * Get the appropriate ApiClient for a given token.
+   * Uses the factory if available, otherwise falls back to the default client.
+   */
+  private getApiClient(token?: string): ApiClient {
+    if (this.apiClientFactory) {
+      return this.apiClientFactory.getClient(token);
+    }
+    return this.apiClient;
   }
 
   /**
@@ -238,7 +260,8 @@ export class FeatureFlagService {
 
     this.logger.debug('Fetching feature flags', { environmentId, compact: this.compactFlags });
 
-    const response = await this.apiClient.get<{
+    const client = this.getApiClient(environmentId);
+    const response = await client.get<{
       flags: FeatureFlag[];
       segments: FeatureSegment[];
     }>(endpoint);
@@ -293,8 +316,8 @@ export class FeatureFlagService {
     this.logger.info('Refreshing feature flags cache', { environmentId });
 
     // Invalidate ETag cache for features endpoint to avoid stale 304 responses
-    const endpoint = this.compactFlags ? '/api/v1/server/features?compact=true' : '/api/v1/server/features';
-    this.apiClient.invalidateEtagCache('/api/v1/server/features');
+    const client = this.getApiClient(environmentId);
+    client.invalidateEtagCache('/api/v1/server/features');
 
     return await this.listByEnvironment(environmentId);
   }
@@ -1056,10 +1079,11 @@ export class FeatureFlagService {
       }
 
       // Invalidate ETag cache for this specific flag endpoint
-      this.apiClient.invalidateEtagCache(`/api/v1/server/features/${encodeURIComponent(flagName)}`);
+      const client = this.getApiClient(environmentId);
+      client.invalidateEtagCache(`/api/v1/server/features/${encodeURIComponent(flagName)}`);
 
       // Fetch updated flag from server
-      const response = await this.apiClient.get<{ flag: FeatureFlag }>(
+      const response = await client.get<{ flag: FeatureFlag }>(
         `/api/v1/server/features/${encodeURIComponent(flagName)}`
       );
 

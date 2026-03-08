@@ -194,6 +194,7 @@ export class CacheManager {
         this.storage
       );
       this.featureFlagService.setFeatureEnabled(true);
+      this.featureFlagService.setApiClientFactory(this.apiClientFactory);
       // Apply feature flag specific config (compact defaults to true)
       this.featureFlagService.setCompactFlags(featureFlagConfig?.compact !== false);
     }
