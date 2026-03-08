@@ -7,7 +7,6 @@
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { StoreProduct, StoreProductListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
@@ -20,15 +19,15 @@ export class StoreProductService extends BaseEnvironmentService<
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, envResolver, storage);
+    super(apiClient, logger, defaultToken, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environmentId: string): string {
+  protected getEndpoint(): string {
     return `/api/v1/server/store-products`;
   }
 
@@ -61,7 +60,7 @@ export class StoreProductService extends BaseEnvironmentService<
     }
     this.logger.info('Refreshing store products cache', { environmentId });
     // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache(this.getEndpoint(environmentId));
+    this.apiClient.invalidateEtagCache(this.getEndpoint());
     return await this.listByEnvironment(environmentId);
   }
 
@@ -71,9 +70,9 @@ export class StoreProductService extends BaseEnvironmentService<
    * Get a single store product by ID from API
    * Used for updating cache with fresh data
    * @param id Store product ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
-  async getById(id: string, environmentId: string): Promise<StoreProduct> {
+  async getById(id: string, _environmentId: string): Promise<StoreProduct> {
     const response = await this.apiClient.get<{ product: StoreProduct }>(
       `/api/v1/server/store-products/${id}`
     );
@@ -89,7 +88,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * If isActive is true but not in cache, fetches and adds it to cache
    * If isActive is true and in cache, fetches and updates it
    * @param id Store product ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isActive Optional active status
    */
   /**
@@ -98,7 +97,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * If isActive is true but not in cache, fetches and adds it to cache
    * If isActive is true and in cache, fetches and updates it
    * @param id Store product ID (ULID from event)
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isActive Optional active status
    */
   async updateSingleProduct(
@@ -184,7 +183,7 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Get store product by productId from cache
    * @param productId Product ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getByProductId(productId: string, environmentId: string): StoreProduct | null {
     const products = this.getCached(environmentId);
@@ -194,7 +193,7 @@ export class StoreProductService extends BaseEnvironmentService<
   /**
    * Get store products by store type (google, apple, onestore, etc.)
    * @param store Store type
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getByStore(store: string, environmentId: string): StoreProduct[] {
     const products = this.getCached(environmentId);
@@ -205,7 +204,7 @@ export class StoreProductService extends BaseEnvironmentService<
    * Get active store products only
    * Note: All cached products are already active (filtered by backend)
    * This method only filters by sale period
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getActive(environmentId: string): StoreProduct[] {
     const products = this.getCached(environmentId);

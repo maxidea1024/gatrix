@@ -4,7 +4,7 @@
  */
 
 import { Logger } from '../utils/logger';
-import { CacheConfig, FeaturesConfig, FeatureFlagConfig } from '../types/config';
+import { CacheConfig, UsesConfig, FeatureFlagConfig } from '../types/config';
 import { GameWorldService } from '../services/game-world-service';
 import { PopupNoticeService } from '../services/popup-notice-service';
 import { SurveyService } from '../services/survey-service';
@@ -16,9 +16,9 @@ import { BannerService } from '../services/banner-service';
 import { StoreProductService } from '../services/store-product-service';
 import { FeatureFlagService } from '../services/feature-flag-service';
 import { VarsService } from '../services/vars-service';
-import { EnvironmentService } from '../services/environment-service';
-import { EnvironmentResolver } from '../utils/environment-resolver';
+import { ITokenProvider, SingleTokenProvider } from '../utils/token-provider';
 import { ApiClient } from '../client/api-client';
+import { ApiClientFactory } from '../client/api-client-factory';
 import { SdkMetrics } from '../utils/sdk-metrics';
 import {
   MaintenanceStatus,
@@ -34,10 +34,13 @@ import { CacheStorageProvider, FileCacheStorageProvider } from './storage-provid
 export class CacheManager {
   private logger: Logger;
   private config: CacheConfig;
-  private features: FeaturesConfig;
+  private uses: UsesConfig;
   private storage: CacheStorageProvider;
-  // Environment resolver for all services
-  private envResolver: EnvironmentResolver;
+  // Default API token (used as cache key in single-token mode)
+  private defaultToken: string;
+  private readonly multiMode: boolean;
+  // Token provider for multi-token mode
+  private tokenProvider: ITokenProvider;
   // All services are optional - controlled by feature flags
   private gameWorldService?: GameWorldService;
   private popupNoticeService?: PopupNoticeService;
@@ -51,30 +54,27 @@ export class CacheManager {
   private featureFlagService?: FeatureFlagService;
   private varsService?: VarsService;
   private apiClient: ApiClient;
+  private apiClientFactory: ApiClientFactory;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
   private metrics?: SdkMetrics;
   private maintenanceWatcher: MaintenanceWatcher;
-  // Multi-environment mode: list of environments to cache
-  private environments?: string[] | '*';
-  // Environment service for wildcard mode
-  private environmentService?: EnvironmentService;
-  // Cached environment list (for '*' mode)
-  private cachedEnvironmentList: string[] = [];
   // Last cache refresh timestamp
   private lastRefreshedAt: Date | null = null;
   // Cache invalidation counter
   private invalidationCount: number = 0;
+  // Environment ID resolved from backend /ready endpoint
+  private resolvedEnvironmentId: string | null = null;
 
   constructor(
     config: CacheConfig,
     apiClient: ApiClient,
     logger: Logger,
-    defaultEnvironment: string = 'development',
+    defaultToken: string,
     metrics?: SdkMetrics,
     configWorldId?: string,
-    features?: FeaturesConfig,
-    environments?: string[] | '*',
+    uses?: UsesConfig,
+    tokenProvider?: ITokenProvider,
     featureFlagConfig?: FeatureFlagConfig
   ) {
     this.config = {
@@ -83,120 +83,124 @@ export class CacheManager {
       refreshMethod: config.refreshMethod ?? 'polling', // Default: polling
       skipBackendReady: config.skipBackendReady ?? false, // Default: wait for backend
     };
-    this.features = features || {};
+    this.uses = uses || {};
     this.apiClient = apiClient;
     this.logger = logger;
     this.metrics = metrics;
     this.maintenanceWatcher = new MaintenanceWatcher(logger, configWorldId);
     this.storage = new FileCacheStorageProvider(logger);
 
-    // Store environments for multi-environment mode
-    this.environments = environments;
+    // Store default token and token provider
+    this.defaultToken = defaultToken;
+    this.multiMode = tokenProvider !== undefined;
+    this.tokenProvider = tokenProvider || new SingleTokenProvider(defaultToken);
 
-    // Create environment service for wildcard mode
-    if (environments === '*') {
-      this.environmentService = new EnvironmentService(apiClient, logger, this.storage);
-    }
-
-    // Determine if we're in multi-environment mode
-    const isMultiEnvMode =
-      environments === '*' || (Array.isArray(environments) && environments.length > 0);
-
-    // Create EnvironmentResolver for all services
-    this.envResolver = new EnvironmentResolver(defaultEnvironment);
-    if (isMultiEnvMode) {
-      this.envResolver.setMultiEnvironmentMode(true);
-    }
+    // Create ApiClientFactory for multi-token ETag isolation
+    this.apiClientFactory = new ApiClientFactory(apiClient, defaultToken, {
+      baseURL: apiClient.getAxiosInstance().defaults.baseURL || '',
+      applicationName:
+        (apiClient.getAxiosInstance().defaults.headers?.common?.['X-Application-Name'] as string) ||
+        (apiClient.getAxiosInstance().defaults.headers?.['X-Application-Name'] as string) ||
+        '',
+      logger: logger,
+      metrics: metrics,
+    });
 
     // Initialize ALL services internally based on feature flags
     // All services are optional and controlled by feature flags
     // Default features (gameWorld, popupNotice, survey, whitelist, serviceMaintenance) use !== false for backward compatibility
     // New features (clientVersion, serviceNotice, banner, storeProduct) require explicit === true
-    if (this.features.gameWorld !== false) {
+    if (this.uses.gameWorld !== false) {
       this.gameWorldService = new GameWorldService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.gameWorldService.setFeatureEnabled(true);
+      this.gameWorldService.setApiClientFactory(this.apiClientFactory);
     }
-    if (this.features.popupNotice !== false) {
+    if (this.uses.popupNotice !== false) {
       this.popupNoticeService = new PopupNoticeService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.popupNoticeService.setFeatureEnabled(true);
+      this.popupNoticeService.setApiClientFactory(this.apiClientFactory);
     }
-    if (this.features.survey !== false) {
-      this.surveyService = new SurveyService(apiClient, logger, this.envResolver, this.storage);
+    if (this.uses.survey !== false) {
+      this.surveyService = new SurveyService(apiClient, logger, this.defaultToken, this.storage);
       this.surveyService.setFeatureEnabled(true);
     }
-    if (this.features.whitelist !== false) {
+    if (this.uses.whitelist !== false) {
       this.whitelistService = new WhitelistService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.whitelistService.setFeatureEnabled(true);
     }
-    if (this.features.serviceMaintenance !== false) {
+    if (this.uses.serviceMaintenance !== false) {
       this.serviceMaintenanceService = new ServiceMaintenanceService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.serviceMaintenanceService.setFeatureEnabled(true);
     }
-    if (this.features.clientVersion === true) {
+    if (this.uses.clientVersion === true) {
       this.clientVersionService = new ClientVersionService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.clientVersionService.setFeatureEnabled(true);
+      this.clientVersionService.setApiClientFactory(this.apiClientFactory);
     }
-    if (this.features.serviceNotice === true) {
+    if (this.uses.serviceNotice === true) {
       this.serviceNoticeService = new ServiceNoticeService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.serviceNoticeService.setFeatureEnabled(true);
     }
-    if (this.features.banner === true) {
-      this.bannerService = new BannerService(apiClient, logger, this.envResolver, this.storage);
+    if (this.uses.banner === true) {
+      this.bannerService = new BannerService(apiClient, logger, this.defaultToken, this.storage);
       this.bannerService.setFeatureEnabled(true);
+      this.bannerService.setApiClientFactory(this.apiClientFactory);
     }
-    if (this.features.storeProduct === true) {
+    if (this.uses.storeProduct === true) {
       this.storeProductService = new StoreProductService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.storeProductService.setFeatureEnabled(true);
+      this.storeProductService.setApiClientFactory(this.apiClientFactory);
     }
-    if (this.features.featureFlag === true) {
+    if (this.uses.featureFlag === true) {
       this.featureFlagService = new FeatureFlagService(
         apiClient,
         logger,
-        this.envResolver,
+        this.defaultToken,
         this.storage
       );
       this.featureFlagService.setFeatureEnabled(true);
       // Apply feature flag specific config (compact defaults to true)
       this.featureFlagService.setCompactFlags(featureFlagConfig?.compact !== false);
     }
-    if (this.features.vars === true) {
-      this.varsService = new VarsService(apiClient, logger, this.envResolver, this.storage);
+    if (this.uses.vars === true) {
+      this.varsService = new VarsService(apiClient, logger, this.defaultToken, this.storage);
       this.varsService.setFeatureEnabled(true);
+      this.varsService.setApiClientFactory(this.apiClientFactory);
     }
   }
 
@@ -263,35 +267,9 @@ export class CacheManager {
         this.logger.info('Skipping backend ready check (skipBackendReady: true)');
       }
 
-      // 1. Initial load for environment list (wildcard mode)
-      if (this.environments === '*' && this.environmentService) {
-        // First try to load from local storage to have SOMETHING immediately
-        await this.environmentService.initializeAsync();
-        this.cachedEnvironmentList = this.environmentService.getEnvironmentNames();
-
-        // Then try to fetch fresh list from backend in background (don't block for too long)
-        try {
-          const environments = await this.environmentService.fetchEnvironments();
-          this.cachedEnvironmentList = environments.map((e) => e.environment);
-          this.logger.info('Multi-environment mode (*): fetched environment list from backend', {
-            count: this.cachedEnvironmentList.length,
-          });
-        } catch (error: any) {
-          this.logger.warn('Failed to fetch environment list from backend, using local cache', {
-            error: error.message,
-            cachedCount: this.cachedEnvironmentList.length,
-          });
-        }
-      } else if (Array.isArray(this.environments) && this.environments.length > 0) {
-        this.logger.info('Multi-environment mode (explicit): using configured environments', {
-          count: this.environments.length,
-          environments: this.environments,
-        });
-      }
-
-      // 2. Initial load from local storage for ALL enabled services
+      // 1. Initial load from local storage for ALL enabled services
       const initPromises: Promise<void>[] = [];
-      const envList = this.getTargetEnvironments();
+      const envList = this.tokenProvider.getTokens();
 
       if (envList.length > 0) {
         this.logger.debug('Loading initial data from local storage for environments', { envList });
@@ -323,16 +301,14 @@ export class CacheManager {
       const featureTypes: string[] = [];
 
       // Get target environments for multi-environment mode
-      const isMultiEnvMode =
-        this.environments === '*' ||
-        (Array.isArray(this.environments) && this.environments.length > 0);
+      const isMultiToken = this.multiMode;
 
-      // If no environments available even after local load, skip remote sync
-      if (isMultiEnvMode && envList.length === 0) {
+      // If multi-env mode but no environments available, skip remote sync
+      if (isMultiToken && envList.length === 0) {
         this.logger.warn(
           'Multi-environment mode enabled but no environments available. Skipping remote sync.',
           {
-            mode: this.environments === '*' ? 'wildcard' : 'explicit',
+            mode: false ? 'wildcard' : 'explicit',
           }
         );
       }
@@ -343,8 +319,8 @@ export class CacheManager {
       // All services use optional chaining since they are controlled by feature flags
       // Use !== false check to maintain backward compatibility
       // In multi-environment mode, use listByEnvironments for environment-specific features
-      if (this.features.gameWorld !== false && this.gameWorldService) {
-        if (isMultiEnvMode) {
+      if (this.uses.gameWorld !== false && this.gameWorldService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.gameWorldService.listByEnvironments(envList).catch((error) => {
@@ -358,7 +334,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.gameWorldService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load game worlds', { error: error.message });
@@ -369,8 +345,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.popupNotice !== false && this.popupNoticeService) {
-        if (isMultiEnvMode) {
+      if (this.uses.popupNotice !== false && this.popupNoticeService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.popupNoticeService.listByEnvironments(envList).catch((error) => {
@@ -384,7 +360,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.popupNoticeService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load popup notices', { error: error.message });
@@ -395,8 +371,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.survey !== false && this.surveyService) {
-        if (isMultiEnvMode) {
+      if (this.uses.survey !== false && this.surveyService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.surveyService.listByEnvironments(envList, { isActive: true }).catch((error) => {
@@ -408,7 +384,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.surveyService.listByEnvironment(defaultEnv, { isActive: true }).catch((error) => {
               this.logger.warn('Failed to load surveys', { error: error.message });
@@ -419,8 +395,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.whitelist !== false && this.whitelistService) {
-        if (isMultiEnvMode) {
+      if (this.uses.whitelist !== false && this.whitelistService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.whitelistService.listByEnvironments(envList).catch((error) => {
@@ -434,7 +410,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.whitelistService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load whitelists', {
@@ -447,8 +423,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.serviceMaintenance !== false && this.serviceMaintenanceService) {
-        if (isMultiEnvMode) {
+      if (this.uses.serviceMaintenance !== false && this.serviceMaintenanceService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
@@ -462,7 +438,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.refreshServiceMaintenanceInternal(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load service maintenance status', {
@@ -476,7 +452,7 @@ export class CacheManager {
 
       // Edge-specific features: these always use multi-environment APIs
       // Only load if we have environments available
-      if (this.features.clientVersion === true && this.clientVersionService) {
+      if (this.uses.clientVersion === true && this.clientVersionService) {
         if (envList.length > 0) {
           promises.push(
             this.clientVersionService.listByEnvironments(envList).catch((error) => {
@@ -491,7 +467,7 @@ export class CacheManager {
         // Skip if no environments available
       }
 
-      if (this.features.serviceNotice === true && this.serviceNoticeService) {
+      if (this.uses.serviceNotice === true && this.serviceNoticeService) {
         if (envList.length > 0) {
           promises.push(
             this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
@@ -506,7 +482,7 @@ export class CacheManager {
         // Skip if no environments available
       }
 
-      if (this.features.banner === true && this.bannerService) {
+      if (this.uses.banner === true && this.bannerService) {
         if (envList.length > 0) {
           promises.push(
             this.bannerService.listByEnvironments(envList).catch((error) => {
@@ -521,8 +497,8 @@ export class CacheManager {
         // Skip if no environments available
       }
 
-      if (this.features.storeProduct === true && this.storeProductService) {
-        if (isMultiEnvMode) {
+      if (this.uses.storeProduct === true && this.storeProductService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.storeProductService.listByEnvironments(envList).catch((error) => {
@@ -536,7 +512,7 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.storeProductService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load store products', {
@@ -550,8 +526,8 @@ export class CacheManager {
       }
 
       // Feature flags - requires explicit opt-in
-      if (this.features.featureFlag === true && this.featureFlagService) {
-        if (isMultiEnvMode) {
+      if (this.uses.featureFlag === true && this.featureFlagService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.featureFlagService.listByEnvironments(envList).catch((error) => {
@@ -564,7 +540,7 @@ export class CacheManager {
             featureTypes.push('featureFlag');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.featureFlagService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load feature flags', {
@@ -578,8 +554,8 @@ export class CacheManager {
       }
 
       // Vars (KV) - requires explicit opt-in
-      if (this.features.vars === true && this.varsService) {
-        if (isMultiEnvMode) {
+      if (this.uses.vars === true && this.varsService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.varsService.listByEnvironments(envList).catch((error) => {
@@ -592,7 +568,7 @@ export class CacheManager {
             featureTypes.push('vars');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.varsService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load vars', {
@@ -614,20 +590,36 @@ export class CacheManager {
 
       this.logger.info('SDK cache initialized', {
         enabledFeatures: featureTypes,
-        environments:
-          this.environments === '*'
-            ? `* (${this.cachedEnvironmentList.length} envs)`
-            : this.environments,
+        environments: false ? `* (${this.tokenProvider.getTokens().length} envs)` : null,
       });
 
       // Initialize maintenance watcher with current state (no events emitted on first check)
-      if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {
+      if (this.uses.serviceMaintenance !== false || this.uses.gameWorld !== false) {
         this.checkMaintenanceStateChanges();
       }
 
       // Setup auto-refresh if using polling method
       if (this.config.refreshMethod === 'polling' && this.config.ttl) {
         this.startAutoRefresh();
+      }
+
+      // Subscribe to token changes (e.g., environment added/removed)
+      if (this.tokenProvider.onTokensChanged) {
+        this.tokenProvider.onTokensChanged((added, removed) => {
+          this.logger.info('Token list changed', { added: added.length, removed: removed.length });
+
+          // Remove cache for deleted tokens
+          if (removed.length > 0) {
+            this.clearDataForEnvironments(removed);
+          }
+
+          // Fetch data for new tokens
+          if (added.length > 0) {
+            this.fetchDataForTokens(added).catch((error: any) => {
+              this.logger.error('Failed to fetch data for new tokens', { error: error.message });
+            });
+          }
+        });
       }
     } catch (error: any) {
       this.logger.error('Failed to initialize cache', { error: error.message });
@@ -646,10 +638,20 @@ export class CacheManager {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         // Check backend ready status via dedicated endpoint
-        const response = await this.apiClient.get<{ status: string }>('/api/v1/ready');
+        const response = await this.apiClient.get<{ status: string; environmentId?: string }>(
+          '/api/v1/ready'
+        );
 
         if (response.success && response.data?.status === 'ready') {
           this.logger.info('Gatrix backend is ready');
+
+          // Extract environmentId from token-based lookup (single-env mode)
+          if (response.data.environmentId) {
+            this.resolvedEnvironmentId = response.data.environmentId;
+            this.logger.info('Environment resolved from backend', {
+              environmentId: this.resolvedEnvironmentId,
+            });
+          }
           return;
         }
       } catch (_error: any) {
@@ -699,179 +701,6 @@ export class CacheManager {
   }
 
   /**
-   * Get target environments for multi-environment mode
-   * Returns the cached environment list for '*' mode, or the explicit list
-   */
-  private getTargetEnvironments(): string[] {
-    if (this.environments === '*') {
-      return this.cachedEnvironmentList;
-    }
-    if (Array.isArray(this.environments)) {
-      return this.environments;
-    }
-    // Default: single environment mode
-    return ['development'];
-  }
-
-  /**
-   * Refresh environment list and load data for new environments
-   * Used when environment.created event is received
-   */
-  async refreshEnvironmentList(): Promise<{
-    added: string[];
-    removed: string[];
-  }> {
-    if (this.environments !== '*' || !this.environmentService) {
-      return { added: [], removed: [] };
-    }
-
-    const oldEnvList = [...this.cachedEnvironmentList];
-    const environments = await this.environmentService.fetchEnvironments();
-    this.cachedEnvironmentList = environments.map((e) => e.environment);
-
-    const added = this.cachedEnvironmentList.filter((e) => !oldEnvList.includes(e));
-    const removed = oldEnvList.filter((e) => !this.cachedEnvironmentList.includes(e));
-
-    this.logger.info('Environment list refreshed', {
-      total: this.cachedEnvironmentList.length,
-      added,
-      removed,
-    });
-
-    // Load data for newly added environments
-    if (added.length > 0) {
-      await this.loadDataForEnvironments(added);
-    }
-
-    // Remove cached data for removed environments
-    if (removed.length > 0) {
-      this.clearDataForEnvironments(removed);
-    }
-
-    return { added, removed };
-  }
-
-  /**
-   * Load data for specific environments (ALL features, not just Edge-specific ones)
-   * This ensures full data synchronization when new environments are added
-   */
-  private async loadDataForEnvironments(environments: string[]): Promise<void> {
-    this.logger.info('Loading data for new environments', { environments });
-
-    const promises: Promise<any>[] = [];
-
-    // All services use optional chaining since they are controlled by feature flags
-    // gameWorld - uses !== false check for backward compatibility
-    if (this.features.gameWorld !== false && this.gameWorldService) {
-      promises.push(
-        this.gameWorldService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load game worlds for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    // popupNotice - uses !== false check for backward compatibility
-    if (this.features.popupNotice !== false && this.popupNoticeService) {
-      promises.push(
-        this.popupNoticeService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load popup notices for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    // survey - uses !== false check for backward compatibility
-    if (this.features.survey !== false && this.surveyService) {
-      promises.push(
-        this.surveyService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load surveys for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    // whitelist - uses !== false check for backward compatibility
-    if (this.features.whitelist !== false && this.whitelistService) {
-      promises.push(
-        this.whitelistService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load whitelists for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    // serviceMaintenance - uses !== false check for backward compatibility
-    if (this.features.serviceMaintenance !== false && this.serviceMaintenanceService) {
-      promises.push(
-        this.serviceMaintenanceService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load service maintenance for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    // Edge-specific features (default: false, must be explicitly enabled)
-    if (this.features.clientVersion === true && this.clientVersionService) {
-      promises.push(
-        this.clientVersionService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load client versions for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    if (this.features.serviceNotice === true && this.serviceNoticeService) {
-      promises.push(
-        this.serviceNoticeService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load service notices for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    if (this.features.banner === true && this.bannerService) {
-      promises.push(
-        this.bannerService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load banners for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    if (this.features.storeProduct === true && this.storeProductService) {
-      promises.push(
-        this.storeProductService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load store products for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    if (this.features.vars === true && this.varsService) {
-      promises.push(
-        this.varsService.listByEnvironments(environments).catch((error) => {
-          this.logger.warn('Failed to load vars for new environments', {
-            error: error.message,
-          });
-        })
-      );
-    }
-
-    await Promise.all(promises);
-    this.logger.info('Data loaded for new environments', { environments });
-  }
-
-  /**
    * Clear cached data for removed environments (ALL services)
    */
   private clearDataForEnvironments(environments: string[]): void {
@@ -895,6 +724,45 @@ export class CacheManager {
   }
 
   /**
+   * Fetch data for newly added tokens (environments)
+   */
+  private async fetchDataForTokens(tokens: string[]): Promise<void> {
+    this.logger.info('Fetching data for new tokens', { count: tokens.length });
+
+    for (const token of tokens) {
+      const promises: Promise<any>[] = [];
+
+      if (this.gameWorldService)
+        promises.push(this.gameWorldService.listByEnvironment(token).catch(() => []));
+      if (this.popupNoticeService)
+        promises.push(this.popupNoticeService.listByEnvironment(token).catch(() => []));
+      if (this.surveyService)
+        promises.push(this.surveyService.listByEnvironment(token).catch(() => []));
+      if (this.whitelistService)
+        promises.push(this.whitelistService.listByEnvironment(token).catch(() => []));
+      if (this.serviceMaintenanceService) promises.push(this.serviceMaintenanceService.getStatusByEnvironment(token).catch(() => null));
+      if (this.clientVersionService)
+        promises.push(this.clientVersionService.listByEnvironment(token).catch(() => []));
+      if (this.serviceNoticeService)
+        promises.push(this.serviceNoticeService.listByEnvironment(token).catch(() => []));
+      if (this.bannerService)
+        promises.push(this.bannerService.listByEnvironment(token).catch(() => []));
+      if (this.storeProductService)
+        promises.push(this.storeProductService.listByEnvironment(token).catch(() => []));
+      if (this.featureFlagService)
+        promises.push(this.featureFlagService.listByEnvironment(token).catch(() => []));
+      if (this.varsService)
+        promises.push(this.varsService.listByEnvironment(token).catch(() => []));
+
+      await Promise.all(promises);
+    }
+
+    this.lastRefreshedAt = new Date();
+    this.invalidationCount++;
+    this.logger.info('Data fetched for new tokens', { count: tokens.length });
+  }
+
+  /**
    * Refresh all cached data based on enabled features
    */
   async refreshAll(): Promise<void> {
@@ -905,34 +773,26 @@ export class CacheManager {
       const promises: Promise<any>[] = [];
       const refreshedTypes: string[] = [];
 
-      // For wildcard mode, refresh environment list first
-      if (this.environments === '*' && this.environmentService) {
-        const environments = await this.environmentService.fetchEnvironments();
-        this.cachedEnvironmentList = environments.map((e) => e.environment);
-      }
-
       // Get target environments for multi-environment mode
-      const envList = this.getTargetEnvironments();
-      const isMultiEnvMode =
-        this.environments === '*' ||
-        (Array.isArray(this.environments) && this.environments.length > 0);
+      const envList = this.tokenProvider.getTokens();
+      const isMultiToken = this.multiMode;
 
       // In multi-environment mode, if envList is empty, we should skip refresh
       // rather than falling back to default environment
-      if (isMultiEnvMode && envList.length === 0) {
+      if (isMultiToken && envList.length === 0) {
         this.logger.warn(
           'Multi-environment mode enabled but no environments available. Skipping refresh.',
           {
-            mode: this.environments === '*' ? 'wildcard' : 'explicit',
-            configuredEnvironments: this.environments,
+            mode: false ? 'wildcard' : 'explicit',
+            configuredEnvironments: null,
           }
         );
       }
 
       // All services use optional chaining since they are controlled by feature flags
       // In multi-environment mode, use listByEnvironments for environment-specific features
-      if (this.features.gameWorld !== false && this.gameWorldService) {
-        if (isMultiEnvMode) {
+      if (this.uses.gameWorld !== false && this.gameWorldService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.gameWorldService.listByEnvironments(envList).catch((error) => {
@@ -945,14 +805,14 @@ export class CacheManager {
             refreshedTypes.push('gameWorld');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(this.gameWorldService.refreshByEnvironment(defaultEnv, true)); // suppressWarnings=true for refreshAll
           refreshedTypes.push('gameWorld');
         }
       }
 
-      if (this.features.popupNotice !== false && this.popupNoticeService) {
-        if (isMultiEnvMode) {
+      if (this.uses.popupNotice !== false && this.popupNoticeService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.popupNoticeService.listByEnvironments(envList).catch((error) => {
@@ -965,14 +825,14 @@ export class CacheManager {
             refreshedTypes.push('popupNotice');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(this.popupNoticeService.refreshByEnvironment(defaultEnv, true)); // suppressWarnings=true for refreshAll
           refreshedTypes.push('popupNotice');
         }
       }
 
-      if (this.features.survey !== false && this.surveyService) {
-        if (isMultiEnvMode) {
+      if (this.uses.survey !== false && this.surveyService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.surveyService.listByEnvironments(envList, { isActive: true }).catch((error) => {
@@ -985,7 +845,7 @@ export class CacheManager {
             refreshedTypes.push('survey');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.surveyService
               .refreshByEnvironment(defaultEnv, { isActive: true }, true)
@@ -1000,8 +860,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.whitelist !== false && this.whitelistService) {
-        if (isMultiEnvMode) {
+      if (this.uses.whitelist !== false && this.whitelistService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.whitelistService.listByEnvironments(envList).catch((error) => {
@@ -1014,7 +874,7 @@ export class CacheManager {
             refreshedTypes.push('whitelist');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.whitelistService.refreshByEnvironment(defaultEnv, true).catch((error) => {
               // suppressWarnings=true for refreshAll
@@ -1027,8 +887,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.serviceMaintenance !== false && this.serviceMaintenanceService) {
-        if (isMultiEnvMode) {
+      if (this.uses.serviceMaintenance !== false && this.serviceMaintenanceService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
@@ -1041,7 +901,7 @@ export class CacheManager {
             refreshedTypes.push('serviceMaintenance');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.refreshServiceMaintenanceInternal(defaultEnv).catch((error) => {
               this.logger.warn('Failed to refresh service maintenance', {
@@ -1055,7 +915,7 @@ export class CacheManager {
 
       // Edge-specific features: these always use multi-environment APIs
       // Only refresh if we have environments available
-      if (this.features.clientVersion === true && this.clientVersionService) {
+      if (this.uses.clientVersion === true && this.clientVersionService) {
         if (envList.length > 0) {
           promises.push(
             this.clientVersionService.listByEnvironments(envList).catch((error) => {
@@ -1068,7 +928,7 @@ export class CacheManager {
         }
       }
 
-      if (this.features.serviceNotice === true && this.serviceNoticeService) {
+      if (this.uses.serviceNotice === true && this.serviceNoticeService) {
         if (envList.length > 0) {
           promises.push(
             this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
@@ -1081,7 +941,7 @@ export class CacheManager {
         }
       }
 
-      if (this.features.banner === true && this.bannerService) {
+      if (this.uses.banner === true && this.bannerService) {
         if (envList.length > 0) {
           promises.push(
             this.bannerService.listByEnvironments(envList).catch((error) => {
@@ -1094,8 +954,8 @@ export class CacheManager {
         }
       }
 
-      if (this.features.storeProduct === true && this.storeProductService) {
-        if (isMultiEnvMode) {
+      if (this.uses.storeProduct === true && this.storeProductService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.storeProductService.listByEnvironments(envList).catch((error) => {
@@ -1107,7 +967,7 @@ export class CacheManager {
             refreshedTypes.push('storeProduct');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.storeProductService.refreshByEnvironment(defaultEnv, true).catch((error) => {
               this.logger.warn('Failed to refresh store products', {
@@ -1120,8 +980,8 @@ export class CacheManager {
       }
 
       // Feature flags - requires explicit opt-in
-      if (this.features.featureFlag === true && this.featureFlagService) {
-        if (isMultiEnvMode) {
+      if (this.uses.featureFlag === true && this.featureFlagService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.featureFlagService.listByEnvironments(envList).catch((error) => {
@@ -1133,7 +993,7 @@ export class CacheManager {
             refreshedTypes.push('featureFlag');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.featureFlagService.refreshByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to refresh feature flags', {
@@ -1146,8 +1006,8 @@ export class CacheManager {
       }
 
       // Vars (KV) - requires explicit opt-in
-      if (this.features.vars === true && this.varsService) {
-        if (isMultiEnvMode) {
+      if (this.uses.vars === true && this.varsService) {
+        if (isMultiToken) {
           if (envList.length > 0) {
             promises.push(
               this.varsService.listByEnvironments(envList).catch((error) => {
@@ -1159,7 +1019,7 @@ export class CacheManager {
             refreshedTypes.push('vars');
           }
         } else {
-          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          const defaultEnv = this.defaultToken;
           promises.push(
             this.varsService.refreshByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to refresh vars', {
@@ -1190,7 +1050,7 @@ export class CacheManager {
       this.invalidationCount++;
 
       // Check and emit maintenance state changes
-      if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {
+      if (this.uses.serviceMaintenance !== false || this.uses.gameWorld !== false) {
         this.checkMaintenanceStateChanges();
       }
 
@@ -1213,7 +1073,7 @@ export class CacheManager {
   /**
    * Refresh game worlds cache
    * Also checks and emits maintenance state change events
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshGameWorlds(environmentId: string): Promise<void> {
     if (!this.gameWorldService) return;
@@ -1231,7 +1091,7 @@ export class CacheManager {
 
   /**
    * Refresh popup notices cache
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshPopupNotices(environmentId: string): Promise<void> {
     if (!this.popupNoticeService) return;
@@ -1247,7 +1107,7 @@ export class CacheManager {
 
   /**
    * Refresh surveys cache
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshSurveys(environmentId: string): Promise<void> {
     if (!this.surveyService) return;
@@ -1265,7 +1125,7 @@ export class CacheManager {
 
   /**
    * Refresh survey settings only
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshSurveySettings(environmentId: string): Promise<void> {
     await this.surveyService?.refreshSettings(environmentId);
@@ -1275,11 +1135,11 @@ export class CacheManager {
    * Update a single game world in cache (immutable)
    * Also checks and emits maintenance state change events
    * @param id Game world ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isVisible Optional visibility flag
    */
   async updateSingleGameWorld(
-    id: number,
+    id: string,
     environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
@@ -1337,7 +1197,7 @@ export class CacheManager {
 
   /**
    * Get cached game worlds
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getGameWorlds(environmentId: string): any[] {
     return this.gameWorldService?.getCached(environmentId) || [];
@@ -1346,20 +1206,20 @@ export class CacheManager {
   /**
    * Remove a game world from cache (immutable)
    * @param id Game world ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
-  removeGameWorld(id: number, environmentId: string): void {
+  removeGameWorld(id: string, environmentId: string): void {
     this.gameWorldService?.removeFromCache(id, environmentId);
   }
 
   /**
    * Update a single popup notice in cache (immutable)
    * @param id Popup notice ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isVisible Optional visibility status
    */
   async updateSinglePopupNotice(
-    id: number,
+    id: string,
     environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
@@ -1369,16 +1229,16 @@ export class CacheManager {
   /**
    * Remove a popup notice from cache (immutable)
    * @param id Popup notice ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
-  removePopupNotice(id: number, environmentId: string): void {
+  removePopupNotice(id: string, environmentId: string): void {
     this.popupNoticeService?.removeFromCache(id, environmentId);
   }
 
   /**
    * Update a single survey in cache (immutable)
    * @param id Survey ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isActive Optional active status
    */
   async updateSingleSurvey(
@@ -1392,7 +1252,7 @@ export class CacheManager {
   /**
    * Remove a survey from cache (immutable)
    * @param id Survey ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   removeSurvey(id: string, environmentId: string): void {
     this.surveyService?.removeSurvey(id, environmentId);
@@ -1400,7 +1260,7 @@ export class CacheManager {
 
   /**
    * Refresh whitelist cache only
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshWhitelists(environmentId: string): Promise<void> {
     if (!this.whitelistService) return;
@@ -1417,7 +1277,7 @@ export class CacheManager {
 
   /**
    * Get cached whitelists
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getWhitelists(environmentId: string) {
     return this.whitelistService?.getCached(environmentId);
@@ -1426,7 +1286,7 @@ export class CacheManager {
   /**
    * Internal service maintenance refresh (without maintenance state check)
    * Used by refreshAll() to avoid duplicate state checks
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   private async refreshServiceMaintenanceInternal(environmentId: string): Promise<void> {
     if (!this.serviceMaintenanceService) return;
@@ -1451,7 +1311,7 @@ export class CacheManager {
   /**
    * Refresh service maintenance status
    * Also checks and emits maintenance state change events
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshServiceMaintenance(environmentId: string): Promise<void> {
     await this.refreshServiceMaintenanceInternal(environmentId);
@@ -1462,7 +1322,7 @@ export class CacheManager {
   /**
    * Check and emit maintenance state change events
    * Compares current state with previous state and emits events if changed
-   * @param environment Optional environment name. If not provided, checks all cached environments.
+   * @param environmentId Optional environment ID. If not provided, checks all cached environments.
    */
   private checkMaintenanceStateChanges(environmentId?: string): void {
     try {
@@ -1494,7 +1354,7 @@ export class CacheManager {
 
   /**
    * Get cached service maintenance status
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getServiceMaintenanceStatus(environmentId: string): MaintenanceStatus | null {
     return this.serviceMaintenanceService?.getCached(environmentId) || null;
@@ -1522,7 +1382,7 @@ export class CacheManager {
 
   /**
    * Get cached client versions
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getClientVersions(environmentId: string): ClientVersion[] {
     return this.clientVersionService?.getCached(environmentId) || [];
@@ -1531,7 +1391,7 @@ export class CacheManager {
   /**
    * Update a single client version in cache (immutable)
    * @param item Client version to update
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async updateSingleClientVersion(item: any, environmentId: string): Promise<void> {
     this.clientVersionService?.updateSingleClientVersion(item, environmentId);
@@ -1539,7 +1399,7 @@ export class CacheManager {
 
   /**
    * Get cached service notices
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getServiceNotices(environmentId: string): ServiceNotice[] {
     return this.serviceNoticeService?.getCached(environmentId) || [];
@@ -1548,7 +1408,7 @@ export class CacheManager {
   /**
    * Update a single service notice in cache (immutable)
    * @param notice Service notice to update
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async updateSingleServiceNotice(notice: any, environmentId: string): Promise<void> {
     this.serviceNoticeService?.updateSingleServiceNotice(notice, environmentId);
@@ -1556,7 +1416,7 @@ export class CacheManager {
 
   /**
    * Get cached banners
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getBanners(environmentId: string): Banner[] {
     return this.bannerService?.getCached(environmentId) || [];
@@ -1622,7 +1482,7 @@ export class CacheManager {
 
   /**
    * Get cached store products
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getStoreProducts(environmentId: string): StoreProduct[] {
     return this.storeProductService?.getCached(environmentId) || [];
@@ -1651,7 +1511,7 @@ export class CacheManager {
 
   /**
    * Get cached vars
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getVars(environmentId: string): any[] {
     return this.varsService?.getCached(environmentId) || [];
@@ -1660,7 +1520,7 @@ export class CacheManager {
   /**
    * Update a single store product in cache (immutable)
    * @param id Store product ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isActive Optional active status
    */
   async updateSingleStoreProduct(
@@ -1674,7 +1534,7 @@ export class CacheManager {
   /**
    * Remove a store product from cache (immutable)
    * @param id Store product ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   removeStoreProduct(id: string, environmentId: string): void {
     this.storeProductService?.removeFromCache(id, environmentId);
@@ -1682,7 +1542,7 @@ export class CacheManager {
 
   /**
    * Refresh store products cache for an environment
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async refreshStoreProducts(environmentId: string): Promise<void> {
     await this.storeProductService?.refreshByEnvironment(environmentId);
@@ -1691,7 +1551,7 @@ export class CacheManager {
   /**
    * Update a single banner in cache (immutable)
    * @param bannerId Banner ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param status Optional status
    */
   async updateSingleBanner(
@@ -1705,7 +1565,7 @@ export class CacheManager {
   /**
    * Remove a banner from cache (immutable)
    * @param bannerId Banner ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   removeBanner(bannerId: string, environmentId: string): void {
     this.bannerService?.removeFromCache(bannerId, environmentId);
@@ -1714,8 +1574,34 @@ export class CacheManager {
   /**
    * Get features configuration
    */
-  getFeatures(): FeaturesConfig {
-    return this.features;
+  /**
+   * Check if SDK is in multi-environment mode (tokenProvider was explicitly provided)
+   */
+  isMultiMode(): boolean {
+    return this.multiMode;
+  }
+
+  /**
+   * Get the list of environment IDs that are currently cached.
+   * Available after initialize() has been called.
+   */
+  getKnownEnvironmentIds(): string[] {
+    const envIds = new Set<string>();
+    // Collect environment IDs from all active services
+    const addEnvIds = (ids: string[]) => ids.forEach((id) => envIds.add(id));
+    if (this.gameWorldService) addEnvIds(this.gameWorldService.getEnvironmentIds());
+    if (this.popupNoticeService) addEnvIds(this.popupNoticeService.getEnvironmentIds());
+    if (this.clientVersionService) addEnvIds(this.clientVersionService.getEnvironmentIds());
+    if (this.bannerService) addEnvIds(this.bannerService.getEnvironmentIds());
+    if (this.storeProductService) addEnvIds(this.storeProductService.getEnvironmentIds());
+    if (this.varsService) addEnvIds(this.varsService.getEnvironmentIds());
+    // Include environment resolved from /ready endpoint (single-token mode)
+    if (this.resolvedEnvironmentId) envIds.add(this.resolvedEnvironmentId);
+    return Array.from(envIds);
+  }
+
+  getUses(): UsesConfig {
+    return this.uses;
   }
 
   // ==================== CACHE MANAGEMENT ====================

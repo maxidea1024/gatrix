@@ -38,7 +38,7 @@ export class CouponService {
    * - COUPON_INVALID_SUBCHANNEL: Coupon not available for this subchannel
    * - COUPON_INVALID_USER: Coupon not available for this user
    * @param request Coupon redemption request
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   async redeem(request: RedeemCouponRequest, environmentId: string): Promise<RedeemCouponResponse> {
     this.logger.info('Redeeming coupon', {

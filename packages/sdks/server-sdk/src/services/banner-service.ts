@@ -7,7 +7,6 @@
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { Banner, BannerListResponse } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
@@ -16,15 +15,15 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, envResolver, storage);
+    super(apiClient, logger, defaultToken, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environmentId: string): string {
+  protected getEndpoint(): string {
     return `/api/v1/server/banners`;
   }
 
@@ -48,7 +47,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   async refreshByEnvironment(environmentId: string): Promise<Banner[]> {
     this.logger.info('Refreshing banners cache', { environmentId });
     // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache(this.getEndpoint(environmentId));
+    this.apiClient.invalidateEtagCache(this.getEndpoint());
     return await this.listByEnvironment(environmentId);
   }
 
@@ -58,9 +57,9 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * Get a single banner by ID from API
    * Used for updating cache with fresh data
    * @param bannerId Banner ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
-  async fetchById(bannerId: string, environmentId: string): Promise<Banner> {
+  async fetchById(bannerId: string, _environmentId: string): Promise<Banner> {
     const response = await this.apiClient.get<{ banner: Banner }>(
       `/api/v1/server/banners/${bannerId}`
     );
@@ -76,7 +75,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
    * If status is 'published' but not in cache, fetches and adds it to cache
    * If status is 'published' and in cache, fetches and updates it
    * @param bannerId Banner ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param status Optional status
    */
   async updateSingleBanner(
@@ -126,7 +125,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   /**
    * Get banner by ID from cache
    * @param bannerId Banner ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getById(bannerId: string, environmentId: string): Banner | null {
     const banners = this.getCached(environmentId);
@@ -136,7 +135,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   /**
    * Get banner by name
    * @param name Banner name
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getByName(name: string, environmentId: string): Banner | null {
     const banners = this.getCached(environmentId);
@@ -145,7 +144,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
 
   /**
    * Get published banners only
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getPublished(environmentId: string): Banner[] {
     const banners = this.getCached(environmentId);
@@ -155,7 +154,7 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
   /**
    * Get banners by status
    * @param status Banner status
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getByStatus(status: 'draft' | 'published' | 'archived', environmentId: string): Banner[] {
     const banners = this.getCached(environmentId);

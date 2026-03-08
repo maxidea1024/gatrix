@@ -1680,7 +1680,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(
                                 fontWeight: 600,
                               }}
                             >
-                              {t('serverList.table.environmentId')}
+                              {t('serverList.table.environment')}
                             </TableCell>
                             <TableCell sx={{ fontSize: '0.75rem' }}>
                               <Chip
@@ -2421,7 +2421,7 @@ const ServerListPage: React.FC = () => {
     { id: 'group', labelKey: 'serverList.table.group', visible: true },
     {
       id: 'environment',
-      labelKey: 'serverList.table.environmentId',
+      labelKey: 'serverList.table.environment',
       visible: true,
     },
     {

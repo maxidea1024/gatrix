@@ -13,9 +13,54 @@ import {
 import { createLogger } from '../config/logger';
 const logger = createLogger('InternalApiTokens');
 
+// Internal org name used by infrastructure services (Edge)
+const INTERNAL_ORG_NAME = '__internal__';
+
+/**
+ * Check if the request uses an internal infrastructure token
+ * (belongs to the __internal__ organisation)
+ */
+async function isInternalInfraToken(req: SDKRequest): Promise<boolean> {
+  const apiToken = req.apiToken;
+  if (!apiToken?.environmentId) return false;
+
+  try {
+    const result = await knex('g_environments as e')
+      .join('g_projects as p', 'e.projectId', 'p.id')
+      .join('g_organisations as o', 'p.orgId', 'o.id')
+      .where('e.id', apiToken.environmentId)
+      .where('o.orgName', INTERNAL_ORG_NAME)
+      .select('o.id')
+      .first();
+
+    return !!result;
+  } catch (error) {
+    logger.error('Failed to check internal infra token:', error);
+    return false;
+  }
+}
+
+/**
+ * Check if Edge bypass token or internal infrastructure token
+ */
+async function requireEdgeAccess(req: SDKRequest, res: Response): Promise<boolean> {
+  if (req.isEdgeBypassToken) return true;
+
+  const isInternal = await isInternalInfraToken(req);
+  if (!isInternal) {
+    sendForbidden(
+      res,
+      'This endpoint is only accessible with Edge infrastructure token',
+      ErrorCodes.AUTH_PERMISSION_DENIED
+    );
+    return false;
+  }
+  return true;
+}
+
 /**
  * Internal API controller for Edge server to fetch API tokens
- * Only accessible with Edge bypass token
+ * Only accessible with Edge bypass token or internal infrastructure token
  */
 class InternalApiTokensController {
   /**
@@ -26,14 +71,7 @@ class InternalApiTokensController {
    */
   async getAllTokens(req: SDKRequest, res: Response) {
     try {
-      // Only allow Edge bypass token to access this endpoint
-      if (!req.isEdgeBypassToken) {
-        return sendForbidden(
-          res,
-          'This endpoint is only accessible with Edge bypass token',
-          ErrorCodes.AUTH_PERMISSION_DENIED
-        );
-      }
+      if (!(await requireEdgeAccess(req, res))) return;
 
       // Get all valid tokens (not expired)
       const tokens = await knex('g_api_access_tokens')
@@ -42,7 +80,7 @@ class InternalApiTokensController {
           'tokenName',
           'tokenValue',
           'tokenType',
-          'allowAllEnvironments',
+          'environmentId',
           'expiresAt',
           'createdAt',
           'updatedAt'
@@ -51,30 +89,14 @@ class InternalApiTokensController {
           builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
         });
 
-      // Get environment assignments for each token
-      const tokenIds = tokens.map((t: any) => t.id);
-      const environmentAssignments =
-        tokenIds.length > 0
-          ? await knex('g_api_access_token_environments')
-              .whereIn('tokenId', tokenIds)
-              .select('tokenId', 'environmentId')
-          : [];
-
-      // Group environment names by token
-      const envByToken = environmentAssignments.reduce((acc: any, env: any) => {
-        if (!acc[env.tokenId]) acc[env.tokenId] = [];
-        acc[env.tokenId].push(env.environmentId);
-        return acc;
-      }, {});
-
       // Format tokens for Edge
       const formattedTokens = tokens.map((token: any) => ({
         id: token.id,
         tokenName: token.tokenName,
         tokenValue: token.tokenValue,
         tokenType: token.tokenType,
-        allowAllEnvironments: Boolean(token.allowAllEnvironments),
-        environments: token.allowAllEnvironments ? ['*'] : envByToken[token.id] || [],
+        allowAllEnvironments: !token.environmentId,
+        environments: token.environmentId ? [token.environmentId] : ['*'],
         expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString() : null,
         createdAt: new Date(token.createdAt).toISOString(),
         updatedAt: new Date(token.updatedAt).toISOString(),
@@ -104,14 +126,7 @@ class InternalApiTokensController {
    */
   async receiveUsageReport(req: SDKRequest, res: Response) {
     try {
-      // Only allow Edge bypass token to access this endpoint
-      if (!req.isEdgeBypassToken) {
-        return sendForbidden(
-          res,
-          'This endpoint is only accessible with Edge bypass token',
-          ErrorCodes.AUTH_PERMISSION_DENIED
-        );
-      }
+      if (!(await requireEdgeAccess(req, res))) return;
 
       const { edgeInstanceId, usageData, reportedAt } = req.body;
 
@@ -166,6 +181,89 @@ class InternalApiTokensController {
       return sendInternalError(
         res,
         'Failed to process usage report',
+        error,
+        ErrorCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  /**
+   * Get full organisation/project/environment tree for Edge
+   * Returns all non-internal orgs with their projects and environments
+   *
+   * GET /api/v1/server/internal/environment-tree
+   */
+  async getEnvironmentTree(req: SDKRequest, res: Response) {
+    try {
+      if (!(await requireEdgeAccess(req, res))) return;
+
+      // Get all non-internal organisations
+      const orgs = await knex('g_organisations')
+        .select('id', 'orgName', 'displayName')
+        .where('isInternal', false)
+        .where('isActive', true);
+
+      // Get all projects for these orgs
+      const orgIds = orgs.map((o: any) => o.id);
+      const projects =
+        orgIds.length > 0
+          ? await knex('g_projects')
+              .select('id', 'orgId', 'projectName', 'displayName')
+              .whereIn('orgId', orgIds)
+              .where('isActive', true)
+          : [];
+
+      // Get all environments for these projects
+      const projectIds = projects.map((p: any) => p.id);
+      const environments =
+        projectIds.length > 0
+          ? await knex('g_environments')
+              .select('id', 'projectId', 'name', 'displayName', 'environmentType')
+              .whereIn('projectId', projectIds)
+          : [];
+
+      // Build tree structure
+      const envByProject = environments.reduce((acc: any, env: any) => {
+        if (!acc[env.projectId]) acc[env.projectId] = [];
+        acc[env.projectId].push({
+          id: env.id,
+          name: env.name,
+          displayName: env.displayName,
+          environmentType: env.environmentType,
+        });
+        return acc;
+      }, {});
+
+      const projectsByOrg = projects.reduce((acc: any, proj: any) => {
+        if (!acc[proj.orgId]) acc[proj.orgId] = [];
+        acc[proj.orgId].push({
+          id: proj.id,
+          projectName: proj.projectName,
+          displayName: proj.displayName,
+          environments: envByProject[proj.id] || [],
+        });
+        return acc;
+      }, {});
+
+      const tree = orgs.map((org: any) => ({
+        id: org.id,
+        orgName: org.orgName,
+        displayName: org.displayName,
+        projects: projectsByOrg[org.id] || [],
+      }));
+
+      logger.info(
+        `Edge fetched environment tree: ${orgs.length} orgs, ${projects.length} projects, ${environments.length} environments`
+      );
+
+      return sendSuccessResponse(res, {
+        organisations: tree,
+        fetchedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      return sendInternalError(
+        res,
+        'Failed to fetch environment tree',
         error,
         ErrorCodes.INTERNAL_SERVER_ERROR
       );

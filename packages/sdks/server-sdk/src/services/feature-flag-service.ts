@@ -13,7 +13,6 @@
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import {
   FeatureFlag,
@@ -30,10 +29,10 @@ import { SDK_VERSION } from '../version';
 export class FeatureFlagService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private envResolver: EnvironmentResolver;
+  private defaultToken: string;
   private storage?: CacheStorageProvider;
-  // Multi-environment flag cache: Map<environment, Map<flagName, FeatureFlag>>
-  // Using nested Map for O(1) flag lookup by name
+  // Multi-token flag cache: Map<token, Map<flagName, FeatureFlag>>
+  // Using nested Map for O(1) flag lookup by name (keyed by token)
   private cachedFlagsByEnv: Map<string, Map<string, FeatureFlag>> = new Map();
   // Segment cache: Map<segmentName, FeatureSegment> (global, not per-environment)
   private cachedSegments: Map<string, FeatureSegment> = new Map();
@@ -59,12 +58,12 @@ export class FeatureFlagService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.envResolver = envResolver;
+    this.defaultToken = defaultToken;
     this.storage = storage;
   }
 
@@ -370,7 +369,7 @@ export class FeatureFlagService {
 
   /**
    * Get all cached flags as array
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCached(environmentId: string): FeatureFlag[] {
     const envCache = this.cachedFlagsByEnv.get(environmentId);
@@ -497,7 +496,7 @@ export class FeatureFlagService {
   /**
    * Check if a feature flag exists in the cache
    * @param flagName Name of the flag
-   * @param environment Environment name
+   * @param environmentId environment ID
    * @returns true if the flag is defined, false otherwise
    */
   hasFlag(flagName: string, environmentId: string): boolean {
@@ -513,7 +512,7 @@ export class FeatureFlagService {
    * @param flagName Name of the flag
    * @param fallbackValue Value to return if flag not found (must be explicit)
    * @param context Evaluation context
-   * @param environment Environment name
+   * @param environmentId environment ID
    */
   isEnabled(
     flagName: string,
@@ -845,7 +844,7 @@ export class FeatureFlagService {
    * Get variant for a feature flag
    * @param flagName Name of the flag
    * @param context Evaluation context
-   * @param environment Environment name
+   * @param environmentId environment ID
    * @param defaultVariant Default variant if flag not found or has no variants
    * @deprecated Use stringVariation(), numberVariation(), or jsonVariation() instead
    */
@@ -867,7 +866,7 @@ export class FeatureFlagService {
    * Uses FeatureFlagEvaluator from @gatrix/shared for consistent evaluation logic
    * @param flagName Name of the flag
    * @param context Evaluation context (merged with static context)
-   * @param environment Environment name
+   * @param environmentId environment ID
    */
   evaluate(
     flagName: string,
@@ -875,7 +874,7 @@ export class FeatureFlagService {
     environmentId?: string
   ): EvaluationResult {
     // Resolve environment using the configured resolver
-    const resolvedEnv = environmentId || this.envResolver.resolve(environmentId, 'evaluate');
+    const resolvedEnv = environmentId || environmentId || this.defaultToken;
 
     // Merge static context with per-evaluation context
     const mergedContext = this.mergeContext(context || {});
@@ -1029,7 +1028,7 @@ export class FeatureFlagService {
   /**
    * Update a single flag in cache
    * @param flagName Flag name
-   * @param environment Environment name
+   * @param environmentId environment ID
    * @param isEnabled Optional enabled status (if false, removes from cache)
    */
   async updateSingleFlag(

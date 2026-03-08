@@ -371,15 +371,17 @@ class StoreProductService {
         // Invalidate ETag cache so SDK fetches fresh data
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
-        await pubSubService.publishSDKEvent({
-          type: 'store_product.created',
-          data: {
-            id,
-            environmentId: environmentId,
-            isActive: product?.isActive ? 1 : 0,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'store_product.created',
+            data: {
+              id,
+              environmentId: environmentId,
+              isActive: product?.isActive ? 1 : 0,
+            },
           },
-        });
+          { environmentId: environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish store product SDK event', {
           eventError,
@@ -506,15 +508,17 @@ class StoreProductService {
         // Invalidate ETag cache so SDK fetches fresh data
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
-        await pubSubService.publishSDKEvent({
-          type: 'store_product.updated',
-          data: {
-            id,
-            environmentId: environmentId,
-            isActive: product?.isActive ? 1 : 0,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'store_product.updated',
+            data: {
+              id,
+              environmentId: environmentId,
+              isActive: product?.isActive ? 1 : 0,
+            },
           },
-        });
+          { environmentId: environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish store product SDK event', {
           eventError,
@@ -557,14 +561,16 @@ class StoreProductService {
         // Invalidate ETag cache so SDK fetches fresh data
         await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
-        await pubSubService.publishSDKEvent({
-          type: 'store_product.deleted',
-          data: {
-            id,
-            environmentId: environmentId,
-            timestamp: Date.now(),
+        await pubSubService.publishSDKEvent(
+          {
+            type: 'store_product.deleted',
+            data: {
+              id,
+              environmentId: environmentId,
+            },
           },
-        });
+          { environmentId: environmentId }
+        );
       } catch (eventError) {
         logger.warn('Failed to publish store product SDK event', {
           eventError,
@@ -605,14 +611,16 @@ class StoreProductService {
           await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
           for (const id of ids) {
-            await pubSubService.publishSDKEvent({
-              type: 'store_product.deleted',
-              data: {
-                id,
-                environmentId: environmentId,
-                timestamp: Date.now(),
+            await pubSubService.publishSDKEvent(
+              {
+                type: 'store_product.deleted',
+                data: {
+                  id,
+                  environmentId: environmentId,
+                },
               },
-            });
+              { environmentId: environmentId }
+            );
           }
         } catch (eventError) {
           logger.warn('Failed to publish store product SDK event', {
@@ -668,15 +676,17 @@ class StoreProductService {
           await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
           for (const id of ids) {
-            await pubSubService.publishSDKEvent({
-              type: 'store_product.updated',
-              data: {
-                id,
-                environmentId: environmentId,
-                isActive: isActive ? 1 : 0,
-                timestamp: Date.now(),
+            await pubSubService.publishSDKEvent(
+              {
+                type: 'store_product.updated',
+                data: {
+                  id,
+                  environmentId: environmentId,
+                  isActive: isActive ? 1 : 0,
+                },
               },
-            });
+              { environmentId: environmentId }
+            );
           }
         } catch (eventError) {
           logger.warn('Failed to publish store product SDK event', {
@@ -757,15 +767,17 @@ class StoreProductService {
           await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${environmentId}`);
 
           // Publish a batch event instead of individual events for performance
-          await pubSubService.publishSDKEvent({
-            type: 'store_product.bulk_updated',
-            data: {
-              count: result.affectedRows,
-              environmentId: environmentId,
-              isActive: params.targetIsActive ? 1 : 0,
-              timestamp: Date.now(),
+          await pubSubService.publishSDKEvent(
+            {
+              type: 'store_product.bulk_updated',
+              data: {
+                count: result.affectedRows,
+                environmentId: environmentId,
+                isActive: params.targetIsActive ? 1 : 0,
+              },
             },
-          });
+            { environmentId: environmentId }
+          );
 
           logger.info('Published store product bulk update SDK event', {
             count: result.affectedRows,

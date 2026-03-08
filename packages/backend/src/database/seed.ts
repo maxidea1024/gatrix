@@ -117,6 +117,89 @@ async function createDefaultEnvironments(projectId: string, createdBy: string) {
   }
 }
 
+// ==================== Internal Infrastructure (for Edge server) ====================
+
+async function createInternalInfrastructure(adminUserId: string) {
+  const orgName = '__internal__';
+
+  // 1. Create internal organisation
+  const existingOrg = await database.query('SELECT id FROM g_organisations WHERE orgName = ?', [
+    orgName,
+  ]);
+  let orgId: string;
+  if (existingOrg.length > 0) {
+    orgId = existingOrg[0].id;
+    logger.info('Internal infrastructure organisation already exists, skipping');
+  } else {
+    orgId = ulid();
+    await database.query(
+      `INSERT INTO g_organisations (id, orgName, displayName, description, isActive, isInternal, isVisible, createdAt, updatedAt)
+       VALUES (?, ?, 'Internal Infrastructure', 'System-internal organisation for Edge and infrastructure services', TRUE, TRUE, FALSE, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [orgId, orgName]
+    );
+    logger.info(`Internal infrastructure organisation created: ${orgId}`);
+  }
+
+  // 2. Create internal project
+  const projectName = '__infrastructure__';
+  const existingProject = await database.query(
+    'SELECT id FROM g_projects WHERE orgId = ? AND projectName = ?',
+    [orgId, projectName]
+  );
+  let projectId: string;
+  if (existingProject.length > 0) {
+    projectId = existingProject[0].id;
+    logger.info('Internal infrastructure project already exists, skipping');
+  } else {
+    projectId = ulid();
+    await database.query(
+      `INSERT INTO g_projects (id, orgId, projectName, displayName, isDefault, isActive, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, ?, 'Infrastructure', FALSE, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [projectId, orgId, projectName, adminUserId]
+    );
+    logger.info(`Internal infrastructure project created: ${projectId}`);
+  }
+
+  // 3. Create internal environment (single)
+  const envName = 'default';
+  const existingEnv = await database.query(
+    'SELECT id FROM g_environments WHERE projectId = ? AND name = ?',
+    [projectId, envName]
+  );
+  let envId: string;
+  if (existingEnv.length > 0) {
+    envId = existingEnv[0].id;
+    logger.info('Internal infrastructure environment already exists, skipping');
+  } else {
+    envId = ulid();
+    await database.query(
+      `INSERT INTO g_environments (id, name, displayName, environmentType, isSystemDefined, displayOrder, color, projectId, isDefault, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, 'Default', 'production', TRUE, 0, '#607D8B', ?, TRUE, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [envId, envName, projectId, adminUserId]
+    );
+    logger.info(`Internal infrastructure environment created: ${envId}`);
+  }
+
+  // 4. Create server API token bound to this environment
+  const existingToken = await database.query(
+    `SELECT id, tokenValue FROM g_api_access_tokens WHERE environmentId = ? AND tokenType = 'server' AND tokenName = 'Edge Infrastructure Token'`,
+    [envId]
+  );
+  if (existingToken.length > 0) {
+    logger.info(`Internal infrastructure token already exists: ${existingToken[0].tokenValue}`);
+  } else {
+    const crypto = require('crypto');
+    const tokenValue = `gatrix_infra_${crypto.randomBytes(24).toString('hex')}`;
+    await database.query(
+      `INSERT INTO g_api_access_tokens (id, projectId, environmentId, tokenName, description, tokenValue, tokenType, createdBy, createdAt, updatedAt)
+       VALUES (?, ?, ?, 'Edge Infrastructure Token', 'Auto-generated token for Edge server SDK', ?, 'server', ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())`,
+      [ulid(), projectId, envId, tokenValue, adminUserId]
+    );
+    logger.info(`Internal infrastructure token created: ${tokenValue}`);
+    logger.info('>>> Set GATRIX_API_TOKEN in .env.local to this value for Edge server');
+  }
+}
+
 // ==================== Users & RBAC ====================
 
 async function createAdminUser(orgId: string): Promise<string> {
@@ -661,6 +744,9 @@ async function seedDatabase() {
 
     // 8. Create default RBAC roles (Super Admin, Viewer, Editor, Manager) + bind admin
     await createDefaultRoles(orgId, adminUserId);
+
+    // 9. Create internal infrastructure for Edge server
+    await createInternalInfrastructure(adminUserId);
 
     logger.info('Database seeding completed successfully');
   } catch (error) {

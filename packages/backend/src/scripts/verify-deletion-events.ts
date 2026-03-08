@@ -22,26 +22,32 @@ async function main() {
 
   // Verify Service Notice Deleted Event
   console.log('\n--- Verifying Service Notice Deleted Event ---');
-  await pubSubService.publishSDKEvent({
-    type: 'service_notice.deleted',
-    data: {
-      id: 9999,
-      environmentId: 'development',
-      timestamp: Date.now(),
+  await pubSubService.publishSDKEvent(
+    {
+      type: 'service_notice.deleted',
+      data: {
+        id: 9999,
+        environmentId: 'development',
+        timestamp: Date.now(),
+      },
     },
-  });
+    { environmentId: 'development' }
+  );
   console.log('Published service_notice.deleted event');
 
   // Verify Client Version Deleted Event
   console.log('\n--- Verifying Client Version Deleted Event ---');
-  await pubSubService.publishSDKEvent({
-    type: 'client_version.deleted',
-    data: {
-      id: 8888,
-      environmentId: 'development',
-      timestamp: Date.now(),
+  await pubSubService.publishSDKEvent(
+    {
+      type: 'client_version.deleted',
+      data: {
+        id: 8888,
+        environmentId: 'development',
+        timestamp: Date.now(),
+      },
     },
-  });
+    { environmentId: 'development' }
+  );
   console.log('Published client_version.deleted event');
 
   // Wait a bit for events to be processed and logs to appear

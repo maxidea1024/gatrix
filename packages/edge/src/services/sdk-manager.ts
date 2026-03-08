@@ -1,8 +1,48 @@
-import { GatrixServerSDK, GatrixSDKConfig } from '@gatrix/server-sdk';
+import { GatrixServerSDK, GatrixSDKConfig, ITokenProvider } from '@gatrix/server-sdk';
 import { config } from '../config/env';
 import { createLogger } from '../config/logger';
+import { environmentRegistry } from './environment-registry';
 
 const logger = createLogger('SDKManager');
+
+/**
+ * EdgeTokenProvider - Generates unsecured tokens from EnvironmentRegistry
+ * for SDK's CacheManager multi-environment caching.
+ *
+ * Token format: unsecured-{orgId}:{projectId}:{envId}-server-api-token
+ * environmentRegistry is lazily read — returns empty list until initialized.
+ */
+class EdgeTokenProvider implements ITokenProvider {
+  private previousTokens: Set<string> = new Set();
+
+  getTokens(): string[] {
+    const tree = environmentRegistry.getTree();
+    if (tree.length === 0) {
+      return [];
+    }
+    const tokens: string[] = [];
+    for (const org of tree) {
+      for (const project of org.projects) {
+        for (const env of project.environments) {
+          tokens.push(`unsecured-${org.id}:${project.id}:${env.id}-server-api-token`);
+        }
+      }
+    }
+    return tokens;
+  }
+
+  onTokensChanged(callback: (added: string[], removed: string[]) => void): () => void {
+    return environmentRegistry.onTreeChanged(() => {
+      const currentTokens = new Set(this.getTokens());
+      const added = [...currentTokens].filter((t) => !this.previousTokens.has(t));
+      const removed = [...this.previousTokens].filter((t) => !currentTokens.has(t));
+      this.previousTokens = currentTokens;
+      if (added.length > 0 || removed.length > 0) {
+        callback(added, removed);
+      }
+    });
+  }
+}
 
 /**
  * SDK Manager - Singleton for managing GatrixServerSDK instance
@@ -26,48 +66,19 @@ class SDKManager {
   private async doInitialize(): Promise<void> {
     logger.info('Initializing GatrixServerSDK...');
 
-    // Resolve environment name to ULID ID from backend
-    let resolvedEnvironmentId = config.environment;
-    try {
-      const axios = require('axios');
-      const envResponse = await axios.get(`${config.gatrixUrl}/api/v1/server/environments`, {
-        headers: {
-          'x-api-token': config.apiToken,
-        },
-        timeout: 10000,
-      });
-
-      if (envResponse.data?.success && envResponse.data?.data?.environments) {
-        const envList = envResponse.data.data.environments;
-        // Find environment by name match
-        const matched = envList.find((e: any) => e.name === config.environment);
-        if (matched) {
-          resolvedEnvironmentId = matched.environmentId;
-          logger.info(
-            `Resolved environment '${config.environment}' -> ID: ${resolvedEnvironmentId}`
-          );
-        } else {
-          logger.warn(`Environment '${config.environment}' not found in backend, using as-is`);
-        }
-      }
-    } catch (error: any) {
-      logger.warn(
-        `Failed to resolve environment from backend: ${error.message}, using '${config.environment}' as-is`
-      );
-    }
+    const tokenProvider = new EdgeTokenProvider();
 
     const sdkConfig: GatrixSDKConfig = {
-      gatrixUrl: config.gatrixUrl,
+      apiUrl: config.gatrixUrl,
       apiToken: config.apiToken,
       applicationName: config.applicationName,
 
       // SDK required fields
       service: config.service,
       group: config.group,
-      environment: resolvedEnvironmentId,
 
-      // Multi-environment mode for Edge
-      environments: config.environments,
+      // Multi-environment token provider
+      tokenProvider,
 
       // Redis for PubSub (optional)
       redis: config.redis.host
@@ -85,7 +96,7 @@ class SDKManager {
       },
 
       // Enable all features for Edge (cache everything)
-      features: {
+      uses: {
         gameWorld: true,
         popupNotice: true,
         survey: true,
@@ -123,7 +134,7 @@ class SDKManager {
       this.sdk = new GatrixServerSDK(sdkConfig);
       await this.sdk.initialize();
       logger.info('GatrixServerSDK initialized successfully', {
-        environments: config.environments,
+        serverTokenCount: tokenProvider.getTokens().length,
         syncMethod: config.cache.syncMethod,
       });
 

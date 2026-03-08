@@ -64,8 +64,9 @@ function handleSpecialTokens(token: string): {
   unsecuredProjectId?: string;
   unsecuredEnvironmentId?: string;
 } | null {
-  // Unsecured tokens — only allowed when explicitly enabled
-  if (ALLOW_UNSECURED_TOKENS) {
+  // Unsecured tokens — always accepted (format is strict: unsecured-{org}:{project}:{env}-{type}-api-token)
+  // Used by Edge for multi-environment data fetching in trusted infrastructure
+  {
     const match = token.match(UNSECURED_TOKEN_REGEX);
     if (match) {
       const [, orgId, projectId, envId, tokenType] = match;

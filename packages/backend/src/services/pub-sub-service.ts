@@ -478,33 +478,49 @@ export class PubSubService extends EventEmitter {
   /**
    * Publish SDK event to Redis Pub/Sub for real-time delivery to all SDK instances
    * Uses Pub/Sub instead of BullMQ queue to ensure all subscribers receive the event
+   *
+   * channelTarget determines which level channel(s) to publish to:
+   * - environmentId → env:{environmentId} (environment-level data: vars, whitelist, maintenance, etc.)
+   * - projectId → project:{projectId} (project-level data: segments, feature flags, etc.)
+   * - orgId → org:{orgId} (org-level data: member changes, etc.)
    */
-  async publishSDKEvent(event: { type: string; data: Record<string, any> }): Promise<void> {
+  async publishSDKEvent(
+    event: { type: string; data: Record<string, any> },
+    channelTarget: { orgId?: string; projectId?: string; environmentId?: string }
+  ): Promise<void> {
     try {
-      // Convert MySQL 0/1 to boolean
+      // Convert MySQL 0/1 to boolean and auto-fill timestamp
       const convertedEvent = {
         ...event,
-        data: this.convertBooleanFields(event.data),
+        data: {
+          ...this.convertBooleanFields(event.data),
+          timestamp: Date.now(),
+        },
       };
 
       // Publish to Redis Pub/Sub channel so all SDK instances receive the event
       const client = redisClient.getClient();
       const eventJson = JSON.stringify(convertedEvent);
 
-      logger.info('Publishing SDK event to Pub/Sub', {
-        type: convertedEvent.type,
-        id: convertedEvent.data.id,
-        channel: 'gatrix-sdk-events',
-      });
+      const channels = this.resolveChannels(channelTarget);
 
-      const numSubscribers = await client.publish('gatrix-sdk-events', eventJson);
+      for (const channel of channels) {
+        logger.info('Publishing SDK event to Pub/Sub', {
+          type: convertedEvent.type,
+          id: convertedEvent.data.id,
+          channel,
+        });
 
-      logger.info('SDK event published to Pub/Sub', {
-        type: convertedEvent.type,
-        id: convertedEvent.data.id,
-        numSubscribers,
-        messageLength: eventJson.length,
-      });
+        const numSubscribers = await client.publish(channel, eventJson);
+
+        logger.info('SDK event published to Pub/Sub', {
+          type: convertedEvent.type,
+          id: convertedEvent.data.id,
+          channel,
+          numSubscribers,
+          messageLength: eventJson.length,
+        });
+      }
     } catch (error: any) {
       logger.error('Failed to publish SDK event:', error);
     }
@@ -513,22 +529,64 @@ export class PubSubService extends EventEmitter {
   /**
    * Publish standard event (for SDK real-time events like maintenance.started, maintenance.ended)
    */
-  async publishEvent(event: {
-    type: string;
-    data: { id: string; timestamp: number; [key: string]: any };
-  }): Promise<void> {
+  async publishEvent(
+    event: {
+      type: string;
+      data: { id: string; [key: string]: any };
+    },
+    channelTarget: { orgId?: string; projectId?: string; environmentId?: string }
+  ): Promise<void> {
     try {
+      // Auto-fill timestamp
+      const fullEvent = {
+        ...event,
+        data: {
+          ...event.data,
+          timestamp: Date.now(),
+        },
+      };
+
       const client = redisClient.getClient();
-      const eventChannel = 'gatrix-sdk-events';
-      await client.publish(eventChannel, JSON.stringify(event));
-      logger.info('Standard event published to SDK channel', {
-        type: event.type,
-        id: event.data.id,
-        channel: eventChannel,
-      });
+      const channels = this.resolveChannels(channelTarget);
+
+      for (const channel of channels) {
+        await client.publish(channel, JSON.stringify(fullEvent));
+        logger.info('Standard event published to SDK channel', {
+          type: fullEvent.type,
+          id: fullEvent.data.id,
+          channel,
+        });
+      }
     } catch (error: any) {
       logger.error('Failed to publish standard event:', error);
     }
+  }
+
+  /**
+   * Resolve target channel from channelTarget.
+   * Unified pattern: gatrix-sdk-events:{orgId|-}:{projId|-}:{envId|-}
+   * System-level (no target): gatrix-sdk-events
+   */
+  private resolveChannels(channelTarget: {
+    orgId?: string;
+    projectId?: string;
+    environmentId?: string;
+  }): string[] {
+    const prefix = 'gatrix-sdk-events';
+
+    // System-level event: no target specified
+    if (!channelTarget.orgId && !channelTarget.projectId && !channelTarget.environmentId) {
+      logger.warn('publishSDKEvent called with empty channelTarget — using system channel', {
+        channelTarget,
+      });
+      return [prefix];
+    }
+
+    // Build unified channel: prefix:orgId|-:projId|-:envId|-
+    const org = channelTarget.orgId || '-';
+    const proj = channelTarget.projectId || '-';
+    const env = channelTarget.environmentId || '-';
+    return [`${prefix}:${org}:${proj}:${env}`];
   }
 
   /**

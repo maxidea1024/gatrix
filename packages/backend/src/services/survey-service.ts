@@ -348,15 +348,18 @@ export class SurveyService {
 
     // Publish SDK event
     try {
-      await pubSubService.publishSDKEvent({
-        type: 'survey.created',
-        data: {
-          id: survey.id,
-          timestamp: Date.now(),
-          isActive: survey.isActive,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'survey.created',
+          data: {
+            id: survey.id,
+
+            isActive: survey.isActive,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       // ignore
     }
@@ -451,15 +454,18 @@ export class SurveyService {
 
     // Publish SDK event
     try {
-      await pubSubService.publishSDKEvent({
-        type: 'survey.updated',
-        data: {
-          id: survey.id,
-          timestamp: Date.now(),
-          isActive: survey.isActive,
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'survey.updated',
+          data: {
+            id: survey.id,
+
+            isActive: survey.isActive,
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       // ignore
     }
@@ -482,14 +488,17 @@ export class SurveyService {
 
     // Publish SDK event
     try {
-      await pubSubService.publishSDKEvent({
-        type: 'survey.deleted',
-        data: {
-          id,
-          timestamp: Date.now(),
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'survey.deleted',
+          data: {
+            id,
+
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       // ignore
     }
@@ -564,14 +573,17 @@ export class SurveyService {
 
     // Publish SDK event
     try {
-      await pubSubService.publishSDKEvent({
-        type: 'survey.settings.updated',
-        data: {
-          id: 0,
-          timestamp: Date.now(),
-          environmentId: environmentId,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'survey.settings.updated',
+          data: {
+            id: 0,
+
+            environmentId: environmentId,
+          },
         },
-      });
+        { environmentId: environmentId }
+      );
     } catch (err) {
       // ignore
     }

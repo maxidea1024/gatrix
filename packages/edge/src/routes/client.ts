@@ -732,7 +732,7 @@ router.post(
         logger.error('Error proxying crash upload to backend:', {
           status: error.response?.status,
           message: error.response?.data?.message || error.message,
-          environment: req.clientContext?.environment,
+          environment: req.clientContext?.environmentId,
           platform: req.body?.platform,
           branch: req.body?.branch,
         });

@@ -39,7 +39,7 @@ class TokenMirrorService {
   private tokenById: Map<number, MirroredToken> = new Map(); // id -> token
   private subscriber: Redis | null = null;
   private initialized = false;
-  private readonly CHANNEL_NAME = 'gatrix-sdk-events';
+  private readonly CHANNEL_PREFIX = 'gatrix-sdk-events';
 
   /**
    * Initialize the token mirror service
@@ -70,7 +70,7 @@ class TokenMirrorService {
   async shutdown(): Promise<void> {
     if (this.subscriber) {
       try {
-        await this.subscriber.unsubscribe(this.CHANNEL_NAME);
+        await this.subscriber.punsubscribe(`${this.CHANNEL_PREFIX}:*`);
         await this.subscriber.quit();
         this.subscriber = null;
       } catch (error) {
@@ -134,15 +134,13 @@ class TokenMirrorService {
 
       await this.subscriber.connect();
 
-      this.subscriber.on('message', (channel: string, message: string) => {
-        if (channel === this.CHANNEL_NAME) {
-          this.handleEvent(message);
-        }
+      this.subscriber.on('pmessage', (_pattern: string, _channel: string, message: string) => {
+        this.handleEvent(message);
       });
 
-      await this.subscriber.subscribe(this.CHANNEL_NAME);
+      await this.subscriber.psubscribe(`${this.CHANNEL_PREFIX}:*`);
 
-      logger.info(`Subscribed to Redis channel: ${this.CHANNEL_NAME}`);
+      logger.info(`Subscribed to Redis pattern: ${this.CHANNEL_PREFIX}:*`);
     } catch (error: any) {
       logger.error('Failed to subscribe to events:', error.message);
       // Continue without real-time updates - will rely on manual refresh
@@ -179,7 +177,7 @@ class TokenMirrorService {
    */
   validateToken(
     tokenValue: string,
-    requiredType: 'client' | 'server' | 'all',
+    requiredType: 'client' | 'server' | 'edge' | 'all',
     environmentId?: string
   ): TokenValidationResult {
     // Check for unsecured client token (for testing purposes, client -> edge)

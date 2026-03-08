@@ -39,7 +39,7 @@ interface WebSocketClient {
   authenticated: boolean;
 }
 
-const SDK_EVENTS_CHANNEL = 'gatrix-sdk-events';
+const SDK_EVENTS_PREFIX = 'gatrix-sdk-events';
 const REVISION_KEY_PREFIX = 'gatrix:streaming:revision:';
 
 class FlagStreamingService {
@@ -97,11 +97,11 @@ class FlagStreamingService {
 
       await this.subscriber.connect();
 
-      await this.subscriber.subscribe(SDK_EVENTS_CHANNEL, (payload: string) => {
+      await this.subscriber.pSubscribe(`${SDK_EVENTS_PREFIX}:*`, (payload: string) => {
         try {
           const event = JSON.parse(payload) as { type: string; data: Record<string, any> };
           if (event.type === 'feature_flag.changed') {
-            const environmentId = event.data.environment as string;
+            const environmentId = event.data.environmentId as string;
             const changedKeys = (event.data.changedKeys as string[]) ?? [];
             if (environmentId) {
               // Refresh Edge's own cache BEFORE notifying clients
@@ -114,7 +114,7 @@ class FlagStreamingService {
         }
       });
 
-      logger.info(`Subscribed to Redis channel: ${SDK_EVENTS_CHANNEL}`);
+      logger.info(`Subscribed to Redis pattern: ${SDK_EVENTS_PREFIX}:*`);
     } catch (err) {
       logger.error('Failed to subscribe to Redis PubSub:', err);
     }
@@ -174,7 +174,7 @@ class FlagStreamingService {
     // Disconnect Redis subscriber
     if (this.subscriber) {
       try {
-        await this.subscriber.unsubscribe(SDK_EVENTS_CHANNEL);
+        await this.subscriber.pUnsubscribe(`${SDK_EVENTS_PREFIX}:*`);
         await this.subscriber.quit();
       } catch {
         // Ignore cleanup errors

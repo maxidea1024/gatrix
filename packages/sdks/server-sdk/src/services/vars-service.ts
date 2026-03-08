@@ -7,7 +7,6 @@
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { VarItem } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
@@ -16,15 +15,15 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, envResolver, storage);
+    super(apiClient, logger, defaultToken, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environmentId: string): string {
+  protected getEndpoint(): string {
     return `/api/v1/server/vars`;
   }
 
@@ -45,10 +44,10 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
   /**
    * Get a variable value by key from cache
    * @param key Variable key (e.g., '$channel', 'kv:some-setting')
-   * @param environment Environment name (optional if envResolver can provide default)
+   * @param environmentId environment ID (optional if envResolver can provide default)
    */
   getValue(key: string, environmentId?: string): string | null {
-    const env = environmentId || this.envResolver.resolve(environmentId);
+    const env = environmentId || this.resolveToken(environmentId);
     const item = this.getByKey(key, env);
     return item ? item.varValue : null;
   }
@@ -56,14 +55,14 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
   /**
    * Get a variable value parsed as JSON if it's an object or array
    * @param key Variable key
-   * @param environment Environment name
+   * @param environmentId environment ID
    */
   getParsedValue<T = any>(key: string, environmentId?: string): T | null {
     const value = this.getValue(key, environmentId);
     if (value === null) return null;
 
     try {
-      const item = this.getByKey(key, environmentId || this.envResolver.resolve(environmentId));
+      const item = this.getByKey(key, environmentId || this.resolveToken(environmentId));
       if (item && (item.valueType === 'object' || item.valueType === 'array')) {
         return JSON.parse(value) as T;
       }
@@ -77,7 +76,7 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
   /**
    * Get a single VarItem by key
    * @param key Variable key
-   * @param environment Environment name
+   * @param environmentId environment ID
    */
   getByKey(key: string, environmentId: string): VarItem | null {
     const items = this.getCached(environmentId);
@@ -89,7 +88,7 @@ export class VarsService extends BaseEnvironmentService<VarItem, VarItem[], stri
    * Used for granular event-driven updates (vars.updated event with value data)
    * @param key Variable key
    * @param value New variable value (null means deleted)
-   * @param environment Environment name
+   * @param environmentId environment ID
    */
   updateSingleVar(key: string, value: string | null, environmentId: string): void {
     const items = this.getCached(environmentId);

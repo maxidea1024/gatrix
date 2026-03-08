@@ -7,6 +7,7 @@ import { initEdgeMetrics, sdkInitialized } from './services/edge-metrics';
 import { tokenMirrorService } from './services/token-mirror-service';
 import { tokenUsageTracker } from './services/token-usage-tracker';
 import { metricsAggregator } from './services/metrics-aggregator';
+import { environmentRegistry } from './services/environment-registry';
 
 import { createLogger } from './config/logger';
 const logger = createLogger('EdgeServer');
@@ -23,7 +24,7 @@ async function main(): Promise<void> {
     logger.info('Configuration validated');
 
     // Initialize SDK first (waits for backend to be ready)
-    // This also starts the SDK metrics serverinternally
+    // This also starts the SDK metrics server internally
     await sdkManager.initialize();
 
     // Initialize custom edge metrics using the SDK registry
@@ -34,6 +35,12 @@ async function main(): Promise<void> {
     // This comes after SDK initialization since backend should be ready at this point
     await tokenMirrorService.initialize();
     logger.info(`Token mirror initialized with ${tokenMirrorService.getTokenCount()} tokens`);
+
+    // Initialize environment registry (org/project/env tree management)
+    await environmentRegistry.initialize();
+    logger.info(
+      `Environment registry initialized with ${environmentRegistry.getAllEnvironmentIds().length} environments`
+    );
 
     // Initialize token usage tracker (for reporting usage to backend)
     await tokenUsageTracker.initialize();
@@ -120,9 +127,7 @@ async function main(): Promise<void> {
     server.listen(config.port, () => {
       logger.info(`Edge server listening on port ${config.port}`);
       logger.info(`Environment: ${config.nodeEnv}`);
-      logger.info(
-        `Target environments: ${config.environments === '*' ? '*' : config.environments.join(', ')}`
-      );
+      logger.info(`Server tokens: ${tokenMirrorService.getTokenCount()}`);
     });
 
     // Start internal HTTP server on separate port (main port + 10)
@@ -151,6 +156,7 @@ async function main(): Promise<void> {
           await tokenUsageTracker.shutdown();
           await sdkManager.shutdown();
           await tokenMirrorService.shutdown();
+          await environmentRegistry.shutdown();
           sdkInitialized.set(0);
           logger.info('Shutdown complete');
           process.exit(0);

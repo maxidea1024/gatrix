@@ -35,8 +35,7 @@ export type StandardEventType =
   | 'store_product.updated'
   | 'store_product.deleted'
   | 'store_product.bulk_updated'
-  | 'environment.created'
-  | 'environment.deleted'
+  // Note: environment.created/deleted removed — handled externally via TokenProvider
   | 'feature_flag.changed'
   | 'feature_flag.created'
   | 'feature_flag.updated'
@@ -52,10 +51,11 @@ export interface StandardEventData {
   value?: string | null; // For vars.updated events (direct cache update)
   timestamp: number;
   /**
-   * Environment identifier (environmentName value).
-   * This is the standard external identifier for environments.
+   * @deprecated Use environmentId instead. Kept for backward compatibility.
    */
   environment?: string;
+  /** Environment identifier sent by backend */
+  environmentId?: string;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
   isActive?: boolean | number; // For survey.updated, store_product.updated events (MySQL returns 0/1)
   status?: string; // For banner.created, banner.updated events (draft, published, archived)

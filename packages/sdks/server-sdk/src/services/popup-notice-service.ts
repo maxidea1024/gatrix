@@ -7,7 +7,6 @@
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { PopupNotice } from '../types/api';
 import { BaseEnvironmentService } from './base-environment-service';
@@ -18,20 +17,20 @@ type PopupNoticeListResponse = PopupNotice[];
 export class PopupNoticeService extends BaseEnvironmentService<
   PopupNotice,
   PopupNoticeListResponse,
-  number
+  string
 > {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
-    super(apiClient, logger, envResolver, storage);
+    super(apiClient, logger, defaultToken, storage);
   }
 
   // ==================== Abstract Method Implementations ====================
 
-  protected getEndpoint(environmentId: string): string {
+  protected getEndpoint(): string {
     return `/api/v1/server/ingame-popup-notices`;
   }
 
@@ -43,7 +42,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
     return 'popup notices';
   }
 
-  protected getItemId(item: PopupNotice): number {
+  protected getItemId(item: PopupNotice): string {
     return item.id;
   }
 
@@ -53,9 +52,9 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * Get popup notice by ID
    * GET /api/v1/server/ingame-popup-notices/:id
    * @param id Popup notice ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
-  async getById(id: number, environmentId: string): Promise<PopupNotice> {
+  async getById(id: string, environmentId: string): Promise<PopupNotice> {
     this.logger.debug('Fetching popup notice by ID', { id, environmentId });
 
     const response = await this.apiClient.get<{ notice: PopupNotice }>(
@@ -77,11 +76,11 @@ export class PopupNoticeService extends BaseEnvironmentService<
    * If isVisible is true but not in cache, fetches and adds it to cache
    * If isVisible is true and in cache, fetches and updates it
    * @param id Popup notice ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    * @param isVisible Optional visibility status
    */
   async updateSingleNotice(
-    id: number,
+    id: string,
     environmentId: string,
     isVisible?: boolean | number
   ): Promise<void> {
@@ -135,7 +134,7 @@ export class PopupNoticeService extends BaseEnvironmentService<
   /**
    * Get active notices for a specific world
    * @param worldId World ID
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getNoticesForWorld(worldId: string, environmentId: string): PopupNotice[] {
     const notices = this.getCached(environmentId);

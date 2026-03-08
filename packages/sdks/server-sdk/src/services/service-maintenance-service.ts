@@ -5,20 +5,19 @@
  *
  * DESIGN PRINCIPLES:
  * - All methods that access cached data MUST receive environment explicitly in multi-env mode
- * - Environment resolution is delegated to EnvironmentResolver
+ * - Environment resolution is delegated to string
  * - In multi-environment mode (edge), environment MUST always be provided
  */
 
 import { ApiClient } from '../client/api-client';
 import { Logger } from '../utils/logger';
-import { EnvironmentResolver } from '../utils/environment-resolver';
 import { CacheStorageProvider } from '../cache/storage-provider';
 import { MaintenanceStatus } from '../types/api';
 
 export class ServiceMaintenanceService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private envResolver: EnvironmentResolver;
+  private defaultToken: string;
   private storage?: CacheStorageProvider;
   // Multi-environment cache: Map<environment (environmentName), MaintenanceStatus>
   private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
@@ -28,12 +27,12 @@ export class ServiceMaintenanceService {
   constructor(
     apiClient: ApiClient,
     logger: Logger,
-    envResolver: EnvironmentResolver,
+    defaultToken: string,
     storage?: CacheStorageProvider
   ) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.envResolver = envResolver;
+    this.defaultToken = defaultToken;
     this.storage = storage;
   }
 
@@ -135,7 +134,7 @@ export class ServiceMaintenanceService {
 
   /**
    * Refresh service maintenance cache for a specific environment
-   * @param environment Environment name
+   * @param environmentId environment ID
    * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
   async refreshByEnvironment(
@@ -153,7 +152,7 @@ export class ServiceMaintenanceService {
 
   /**
    * Get cached service maintenance status
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getCached(environmentId: string): MaintenanceStatus | null {
     return this.cachedStatusByEnv.get(environmentId) || null;
@@ -188,7 +187,7 @@ export class ServiceMaintenanceService {
    * Update cached service maintenance status
    * Used by cache manager or event listener when maintenance changes
    * @param status Maintenance status to cache
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   updateCache(status: MaintenanceStatus | null, environmentId: string): void {
     if (status) {
@@ -200,7 +199,7 @@ export class ServiceMaintenanceService {
 
   /**
    * Check if service is currently in maintenance based on flag and time window
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   isMaintenanceActive(environmentId: string): boolean {
     const cachedStatus = this.cachedStatusByEnv.get(environmentId);
@@ -239,7 +238,7 @@ export class ServiceMaintenanceService {
    * Get localized maintenance message for the service
    * Returns null when maintenance is not active
    * @param lang Language code
-   * @param environment Environment name (required)
+   * @param environmentId environment ID (required)
    */
   getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environmentId: string): string | null {
     const cachedStatus = this.cachedStatusByEnv.get(environmentId);

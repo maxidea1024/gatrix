@@ -1150,14 +1150,17 @@ class FeatureFlagService {
 
     // Publish segment.created event with full segment data
     // SDKs can update their segment cache directly without an API call
-    await pubSubService.publishSDKEvent({
-      type: 'segment.created',
-      data: {
-        id: segment.id,
-        segmentName: segment.segmentName,
-        segment: segment,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'segment.created',
+        data: {
+          id: segment.id,
+          segmentName: segment.segmentName,
+          segment: segment,
+        },
       },
-    });
+      { projectId: segment.projectId }
+    );
 
     return segment;
   }
@@ -1182,14 +1185,17 @@ class FeatureFlagService {
 
     // Publish segment.updated event with full segment data
     // SDKs can update their segment cache directly without an API call
-    await pubSubService.publishSDKEvent({
-      type: 'segment.updated',
-      data: {
-        id: updated.id,
-        segmentName: updated.segmentName,
-        segment: updated,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'segment.updated',
+        data: {
+          id: updated.id,
+          segmentName: updated.segmentName,
+          segment: updated,
+        },
       },
-    });
+      { projectId: updated.projectId }
+    );
 
     // Propagate change to all flags referencing this segment
     await this.invalidateReferencingFlagsBySegment(id);
@@ -1221,13 +1227,16 @@ class FeatureFlagService {
     await FeatureSegmentModel.delete(id);
 
     // Publish segment.deleted event (segments are global, no environment)
-    await pubSubService.publishSDKEvent({
-      type: 'segment.deleted',
-      data: {
-        id: segment.id,
-        segmentName: segment.segmentName,
+    await pubSubService.publishSDKEvent(
+      {
+        type: 'segment.deleted',
+        data: {
+          id: segment.id,
+          segmentName: segment.segmentName,
+        },
       },
-    });
+      { projectId: segment.projectId }
+    );
   }
 
   // ==================== Context Fields ====================
@@ -1505,16 +1514,18 @@ class FeatureFlagService {
       //   - enabled_changed: toggle isEnabled only, no need to re-fetch flag definition
       //   - deleted: remove from cache, no API call needed
       //   - definition_changed: re-fetch only the changed flags (not all flags)
-      await pubSubService.publishSDKEvent({
-        type: 'feature_flag.changed',
-        data: {
-          environmentId,
-          changedKeys: changedFlagNames ?? [],
-          changeType,
-          timestamp: Date.now(),
-          revision,
+      await pubSubService.publishSDKEvent(
+        {
+          type: 'feature_flag.changed',
+          data: {
+            environmentId,
+            changedKeys: changedFlagNames ?? [],
+            changeType,
+            revision,
+          },
         },
-      });
+        { environmentId }
+      );
 
       logger.debug(`Feature flags cache invalidated for environmentId: ${environmentId}`);
     } catch (error) {

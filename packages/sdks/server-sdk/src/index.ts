@@ -8,6 +8,9 @@ export { GatrixServerSDK } from './gatrix-server-sdk';
 // Export types
 export * from './types';
 
+// Export token provider interface (for Edge multi-env)
+export { ITokenProvider } from './utils/token-provider';
+
 // Export maintenance watcher types
 export { MaintenanceEventData, MaintenanceStateSnapshot } from './cache/maintenance-watcher';
 
@@ -27,10 +30,8 @@ export {
 export { Logger, LogLevel, LogFormat, getLogger } from './utils/logger';
 
 // Export environment service for wildcard mode
-export { EnvironmentService } from './services/environment-service';
 
 // Export base service for custom extensions
-export { BaseEnvironmentService } from './services/base-environment-service';
 
 // Export metrics helpers
 export { SdkMetrics } from './utils/sdk-metrics';
@@ -55,7 +56,6 @@ export {
 } from './impact-metrics/metric-types';
 
 // Export environment resolver
-export { EnvironmentResolver } from './utils/environment-resolver';
 
 // Export cloud metadata detection utilities
 export { CloudMetadata, CloudProvider, detectCloudMetadata } from './utils/cloud-metadata';

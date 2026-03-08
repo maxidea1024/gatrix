@@ -55,7 +55,7 @@ export interface ClientVersionMaintenanceLocale {
 }
 
 export interface ClientVersion {
-  id: number;
+  id: string;
   platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
@@ -96,7 +96,7 @@ export interface ClientVersionByEnvResponse {
 export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
 
 export interface ServiceNotice {
-  id: number;
+  id: string;
   isActive: boolean;
   isPinned: boolean;
   category: ServiceNoticeCategory;
@@ -265,7 +265,7 @@ export interface RedeemCouponResponse {
 // ============================================================================
 
 export interface GameWorld {
-  id: number;
+  id: string;
   worldId: string;
   name: string;
   isMaintenance: boolean;
@@ -293,7 +293,7 @@ export interface GameWorldListResponse {
 // ============================================================================
 
 export interface PopupNotice {
-  id: number;
+  id: string;
   content: string; // Actual message content (from template or direct)
   targetWorlds: string[] | null;
   targetWorldsInverted?: boolean;
@@ -317,7 +317,7 @@ export interface PopupNotice {
 
 export interface Reward {
   type: number;
-  id: number;
+  id: string;
   quantity: number;
 }
 
@@ -604,7 +604,7 @@ export interface CurrentMaintenanceStatus {
 // ============================================================================
 
 export interface VarItem {
-  id: number;
+  id: string;
   varKey: string;
   varValue: string;
   valueType: 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';

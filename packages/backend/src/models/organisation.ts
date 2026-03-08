@@ -12,6 +12,8 @@ export interface OrganisationRecord {
   displayName: string;
   description: string | null;
   isActive: boolean;
+  isInternal: boolean;
+  isVisible: boolean;
   createdBy: string | null;
   updatedBy: string | null;
   createdAt: Date;
@@ -23,12 +25,15 @@ export interface CreateOrgData {
   displayName: string;
   description?: string;
   createdBy: string;
+  isInternal?: boolean;
+  isVisible?: boolean;
 }
 
 export interface UpdateOrgData {
   displayName?: string;
   description?: string;
   isActive?: boolean;
+  isVisible?: boolean;
   updatedBy: string;
 }
 
@@ -47,6 +52,8 @@ export class Organisation {
       orgName: data.orgName,
       displayName: data.displayName,
       description: data.description || null,
+      isInternal: data.isInternal || false,
+      isVisible: data.isVisible !== undefined ? data.isVisible : true,
       createdBy: data.createdBy,
     });
 
@@ -66,7 +73,7 @@ export class Organisation {
   }
 
   static async findAll(): Promise<OrganisationRecord[]> {
-    return db(this.TABLE).orderBy('createdAt', 'desc');
+    return db(this.TABLE).where('isInternal', false).orderBy('createdAt', 'desc');
   }
 
   static async update(id: string, data: UpdateOrgData): Promise<OrganisationRecord | null> {

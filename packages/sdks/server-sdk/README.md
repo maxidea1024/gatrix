@@ -30,12 +30,11 @@ import { GatrixServerSDK } from '@gatrix/server-sdk';
 // Create SDK instance
 const sdk = new GatrixServerSDK({
   // Required
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token', // Optional: defaults to 'gatrix-unsecured-server-api-token' for testing
   applicationName: 'your-app-name',
-  service: 'worldd', // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
-  group: 'kr-1', // Service group (e.g., 'kr', 'us', 'production')
-  environment: 'env_prod', // Environment identifier (e.g., 'env_prod', 'env_staging')
+  service: 'worldd', // Optional: Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group: 'kr-1', // Optional: Service group (e.g., 'kr', 'us', 'production')
 });
 
 // Initialize SDK (loads cache)
@@ -55,12 +54,10 @@ For testing purposes, you can omit the `apiToken` field. The SDK will automatica
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'http://localhost:5000',
+  apiUrl: 'http://localhost:5000',
   applicationName: 'test-server',
   service: 'test-service',
   group: 'test-group',
-  environment: 'env_dev',
-  // apiToken is optional - defaults to 'gatrix-unsecured-server-api-token'
 });
 ```
 
@@ -78,12 +75,11 @@ const sdk = new GatrixServerSDK({
 ```typescript
 const sdk = new GatrixServerSDK({
   // Required
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
-  service: 'worldd', // Service name for identification
-  group: 'kr-1', // Service group for categorization
-  environment: 'env_prod', // Environment identifier
+  service: 'worldd', // Optional: Service name for identification
+  group: 'kr-1', // Optional: Service group for categorization
 });
 ```
 
@@ -92,14 +88,11 @@ const sdk = new GatrixServerSDK({
 ```typescript
 const sdk = new GatrixServerSDK({
   // Required
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
-
-  // Optional - Redis (for event handling)
   redis: {
     host: 'localhost',
     port: 6379,
@@ -114,12 +107,11 @@ const sdk = new GatrixServerSDK({
 ```typescript
 const sdk = new GatrixServerSDK({
   // Required
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
-  service: 'worldd', // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
-  group: 'kr-1', // Service group (e.g., 'kr', 'us', 'production')
-  environment: 'env_prod', // Environment (e.g., 'env_prod', 'env_staging')
+  service: 'worldd', // Optional: Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group: 'kr-1', // Optional: Service group (e.g., 'kr', 'us', 'production')
 
   // Optional - Redis (for event handling)
   redis: {
@@ -174,12 +166,11 @@ import { GatrixServerSDK, GatrixSDKConfig, GatrixSDKInitOptions } from '@gatrix/
 
 // Base config (shared across programs, typically from config file)
 const baseConfig: GatrixSDKConfig = {
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'my-game',
   service: 'default-service',
   group: 'default-group',
-  environment: 'production',
   redis: {
     host: 'localhost',
     port: 6379,
@@ -210,7 +201,6 @@ const worldSDK = GatrixServerSDK.createInstance(baseConfig, {
 const authSDK = GatrixServerSDK.createInstance(baseConfig, {
   service: 'authd',
   group: 'global',
-  environment: 'staging', // Override environment
   cache: { ttl: 60 }, // Override cache TTL
 });
 ```
@@ -225,7 +215,7 @@ All fields in `GatrixSDKInitOptions` are optional. Unspecified fields use values
 | `group`           | string                    | Override service group                  |
 | `environment`     | string                    | Override environment identifier         |
 | `region`          | string                    | Override region identifier              |
-| `gatrixUrl`       | string                    | Override Gatrix backend URL             |
+| `apiUrl`       | string                    | Override Gatrix backend URL             |
 | `apiToken`        | string                    | Override API token                      |
 | `applicationName` | string                    | Override application name               |
 | `worldId`         | string                    | Override world ID                       |
@@ -234,7 +224,7 @@ All fields in `GatrixSDKInitOptions` are optional. Unspecified fields use values
 | `logger`          | Partial\<LoggerConfig\>   | Override logger settings (deep merged)  |
 | `retry`           | Partial\<RetryConfig\>    | Override retry settings (deep merged)   |
 | `metrics`         | Partial\<MetricsConfig\>  | Override metrics settings (deep merged) |
-| `features`        | Partial\<FeaturesConfig\> | Override feature toggles (deep merged)  |
+| `features`        | Partial\<UsesConfig\> | Override feature toggles (deep merged)  |
 | `environments`    | string[] \| '\*'          | Override target environments            |
 
 #### Using mergeConfig Directly
@@ -256,7 +246,7 @@ const sdk = new GatrixServerSDK(mergedConfig);
 
 | Field             | Type            | Description                                                | Example                          |
 | ----------------- | --------------- | ---------------------------------------------------------- | -------------------------------- |
-| `gatrixUrl`       | string          | Gatrix backend URL                                         | `https://api.gatrix.com`         |
+| `apiUrl`       | string          | Gatrix backend URL                                         | `https://api.gatrix.com`         |
 | `apiToken`        | string          | Server API Token                                           | `your-server-api-token`          |
 | `applicationName` | string          | Application name                                           | `my-game-server`                 |
 | `service`         | string          | Service name for identification                            | `auth`, `lobby`, `world`, `chat` |
@@ -275,12 +265,11 @@ For Edge servers or services that need to cache data for ALL environments, use t
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-bypass-token', // Must have access to all environments
   applicationName: 'edge-server',
   service: 'edge',
   group: 'default',
-  environment: '*', // Multi-environment mode
   redis: {
     host: 'localhost',
     port: 6379,
@@ -700,12 +689,11 @@ The SDK supports three cache refresh methods:
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   cache: {
     enabled: true,
     ttl: 300, // Required for polling: refresh every 300 seconds
@@ -724,12 +712,11 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   redis: {
     host: 'localhost',
     port: 6379,
@@ -752,12 +739,11 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   cache: {
     enabled: true,
     // ttl is NOT used in manual mode
@@ -1252,9 +1238,8 @@ const logger = getLogger('MY-SERVER');
 const metricsServer = createMetricsServer({
   port: 9337, // Default: 9337 or SDK_METRICS_PORT env
   applicationName: 'my-game-server',
-  service: 'worldd', // Service name (required)
-  group: 'kr-1', // Service group (required)
-  environment: 'env_prod', // Environment (required)
+  service: 'worldd', // Optional: Service name (required)
+  group: 'kr-1', // Optional: Service group (required)
   logger,
 });
 
@@ -1355,13 +1340,11 @@ By default, the SDK retries failed requests up to 10 times with exponential back
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
-  // Default retry config (no need to specify)
   retry: {
     enabled: true,
     maxRetries: 10,
@@ -1386,12 +1369,11 @@ With default settings, retry delays follow this pattern:
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   retry: {
     enabled: true,
     maxRetries: -1, // Infinite retries
@@ -1407,12 +1389,11 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
+  apiUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
   service: 'worldd',
   group: 'kr-1',
-  environment: 'env_prod',
   retry: {
     enabled: false,
   },

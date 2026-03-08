@@ -48,6 +48,13 @@ router.post(
   InternalApiTokensController.receiveUsageReport as any
 );
 
+// Get full organisation/project/environment tree for Edge
+router.get(
+  '/internal/environment-tree',
+  serverAuthBase,
+  InternalApiTokensController.getEnvironmentTree as any
+);
+
 // ============================================================================
 // Global routes (environment-independent) - No environment required
 // ============================================================================

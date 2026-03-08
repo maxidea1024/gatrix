@@ -12,7 +12,7 @@ async function main() {
   logger.info('Starting Maintenance Watcher Test...');
 
   const sdk = new GatrixServerSDK({
-    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
+    apiUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'maintenance-test',
 

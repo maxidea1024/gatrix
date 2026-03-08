@@ -24,7 +24,7 @@ async function main() {
 
   // SDK will provide its Registry for HTTP metrics to merge into
   const sdk = new GatrixServerSDK({
-    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
+    apiUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'idle',
     service: 'idle', // Required: service name for identification
@@ -44,7 +44,7 @@ async function main() {
     },
 
     // Enable all features for testing
-    features: {
+    uses: {
       clientVersion: true,
       serviceNotice: true,
       banner: true,
@@ -174,7 +174,7 @@ async function main() {
         testMetrics[10].value += Math.random() < 0.05 ? 1 : 0; // payment fail ~5%
         testMetrics[11].value = 120 + Math.floor(Math.random() * 600); // session 2-12min
 
-        const gatrixUrl = process.env.GATRIX_URL || 'http://localhost:45000';
+        const apiUrl = process.env.GATRIX_URL || 'http://localhost:45000';
         const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
         const payload = {
@@ -188,7 +188,7 @@ async function main() {
           sdkVersion: '1.0.0-test',
         };
 
-        const response = await fetch(`${gatrixUrl}/api/v1/server/impact-metrics`, {
+        const response = await fetch(`${apiUrl}/api/v1/server/impact-metrics`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

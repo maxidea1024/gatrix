@@ -188,10 +188,13 @@ export class MaintenanceController {
       const isUnderMaintenance = payload.isMaintenance;
 
       // Publish maintenance.settings.updated event to SDK
-      await pubSubService.publishEvent({
-        type: 'maintenance.settings.updated',
-        data: { id: 'maintenance', environmentId, timestamp: Date.now() },
-      });
+      await pubSubService.publishEvent(
+        {
+          type: 'maintenance.settings.updated',
+          data: { id: 'maintenance', environmentId },
+        },
+        { environmentId }
+      );
 
       // Broadcast via PubSub so all instances fan-out to their SSE clients
       await pubSubService.publishNotification({

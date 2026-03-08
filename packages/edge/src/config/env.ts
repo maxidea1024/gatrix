@@ -25,15 +25,6 @@ export const config = {
   group: process.env.EDGE_GROUP || 'gatrix',
   environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
 
-  // Target environments (comma-separated, or '*' for all environments)
-  environments:
-    process.env.EDGE_ENVIRONMENTS === '*'
-      ? ('*' as const)
-      : (process.env.EDGE_ENVIRONMENTS || '')
-          .split(',')
-          .map((e) => e.trim())
-          .filter(Boolean),
-
   // Redis configuration (for cache PubSub in event mode)
   // Edge cache-specific Redis settings take priority over global settings
   redis: {
@@ -65,10 +56,6 @@ export function validateConfig(): void {
 
   if (!config.apiToken) {
     errors.push('EDGE_API_TOKEN is required');
-  }
-
-  if (config.environments !== '*' && config.environments.length === 0) {
-    errors.push('EDGE_ENVIRONMENTS is required (comma-separated environment IDs or "*" for all)');
   }
 
   if (errors.length > 0) {
