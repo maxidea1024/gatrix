@@ -1172,6 +1172,16 @@ export class CacheManager {
       return obj;
     };
 
+    // Helper to convert Map<string, Map<string, T>> (nested maps like featureFlags)
+    const nestedMapToObject = <T>(map: Map<string, Map<string, T>> | undefined): Record<string, T[]> => {
+      if (!map) return {};
+      const obj: Record<string, T[]> = {};
+      for (const [key, innerMap] of map.entries()) {
+        obj[key] = Array.from(innerMap.values());
+      }
+      return obj;
+    };
+
     return {
       lastRefreshedAt: this.lastRefreshedAt?.toISOString() || null,
       invalidationCount: this.invalidationCount,
@@ -1184,6 +1194,7 @@ export class CacheManager {
       serviceNotices: mapToObject(this.serviceNoticeService?.getAllCached()),
       banners: mapToObject(this.bannerService?.getAllCached()),
       storeProducts: mapToObject(this.storeProductService?.getAllCached()),
+      featureFlags: nestedMapToObject(this.featureFlagService?.getAllCached()),
       vars: mapToObject(this.varsService?.getAllCached()),
     };
   }
