@@ -639,7 +639,10 @@ export class ClientController {
             impressionDataEnabled: dbFlag.impressionDataEnabled,
             enabledValue: resolvedEnabledValue,
             disabledValue: resolvedDisabledValue,
-            valueSource: envSettings ? 'environment' : 'flag',
+            valueSource:
+              envSettings?.overrideEnabledValue || envSettings?.overrideDisabledValue
+                ? 'environment'
+                : 'flag',
           },
           environmentId
         );

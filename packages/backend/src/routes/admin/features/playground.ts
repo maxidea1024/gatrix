@@ -355,7 +355,7 @@ router.post(
               (e: any) => e.environmentId === env
             );
             if ((flag as any).isEnabled) {
-              if (envOverride?.enabledValue !== undefined) {
+              if (envOverride?.overrideEnabledValue && envOverride?.enabledValue !== undefined) {
                 value = envOverride.enabledValue;
                 valueSource = 'environment';
               } else if ((flag as any).enabledValue !== undefined) {
@@ -363,7 +363,7 @@ router.post(
                 valueSource = 'flag';
               }
             } else {
-              if (envOverride?.disabledValue !== undefined) {
+              if (envOverride?.overrideDisabledValue && envOverride?.disabledValue !== undefined) {
                 value = envOverride.disabledValue;
                 valueSource = 'environment';
               } else if ((flag as any).disabledValue !== undefined) {
@@ -520,10 +520,11 @@ function evaluateFlagWithDetails(
       passed: false,
       message: 'Flag is disabled in this environment',
     });
-    const envDisabledValue = flag.environments?.find(
+    const envOverrideRow = flag.environments?.find(
       (e: any) => e.environmentId === environmentId
-    )?.disabledValue;
-    const isEnvSource = envDisabledValue !== undefined;
+    );
+    const envDisabledValue = envOverrideRow?.overrideDisabledValue ? envOverrideRow.disabledValue : undefined;
+    const isEnvSource = envOverrideRow?.overrideDisabledValue === true;
     return {
       enabled: false,
       reason: 'FLAG_DISABLED',
@@ -555,20 +556,21 @@ function evaluateFlagWithDetails(
         : 'No strategies defined - enabled by default',
     });
     if (contextFailed) {
-      const ctxEnvDisVal = flag.environments?.find(
+      const ctxEnvRow = flag.environments?.find(
         (e: any) => e.environmentId === environmentId
-      )?.disabledValue;
+      );
+      const ctxEnvDisVal = ctxEnvRow?.overrideDisabledValue ? ctxEnvRow.disabledValue : undefined;
+      const ctxIsEnvSource = ctxEnvRow?.overrideDisabledValue === true;
       return {
         enabled: false,
         reason: 'CONTEXT_VALIDATION_FAILED',
         variant: {
-          name:
-            ctxEnvDisVal !== undefined
-              ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
-              : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
+          name: ctxIsEnvSource
+            ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+            : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
           value: getFallbackValue(ctxEnvDisVal ?? flag.disabledValue, flag.valueType),
           valueType: flag.valueType || 'string',
-          valueSource: ctxEnvDisVal !== undefined ? 'environment' : 'flag',
+          valueSource: ctxIsEnvSource ? 'environment' : 'flag',
         },
         evaluationSteps,
       };
@@ -740,20 +742,21 @@ function evaluateFlagWithDetails(
 
   // Context validation failed - return after full evaluation
   if (contextFailed) {
-    const ctxFailEnvDisVal = flag.environments?.find(
+    const ctxFailEnvRow = flag.environments?.find(
       (e: any) => e.environmentId === environmentId
-    )?.disabledValue;
+    );
+    const ctxFailEnvDisVal = ctxFailEnvRow?.overrideDisabledValue ? ctxFailEnvRow.disabledValue : undefined;
+    const ctxFailIsEnvSource = ctxFailEnvRow?.overrideDisabledValue === true;
     return {
       enabled: false,
       reason: 'CONTEXT_VALIDATION_FAILED',
       variant: {
-        name:
-          ctxFailEnvDisVal !== undefined
-            ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
-            : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
+        name: ctxFailIsEnvSource
+          ? VALUE_SOURCE.ENV_DEFAULT_DISABLED
+          : VALUE_SOURCE.FLAG_DEFAULT_DISABLED,
         value: getFallbackValue(ctxFailEnvDisVal ?? flag.disabledValue, flag.valueType),
         valueType: flag.valueType || 'string',
-        valueSource: ctxFailEnvDisVal !== undefined ? 'environment' : 'flag',
+        valueSource: ctxFailIsEnvSource ? 'environment' : 'flag',
       },
       evaluationSteps,
     };
@@ -779,10 +782,11 @@ function evaluateFlagWithDetails(
     };
   }
 
-  const noMatchEnvDisVal = flag.environments?.find(
+  const noMatchEnvRow = flag.environments?.find(
     (e: any) => e.environmentId === environmentId
-  )?.disabledValue;
-  const noMatchIsEnvSource = noMatchEnvDisVal !== undefined;
+  );
+  const noMatchEnvDisVal = noMatchEnvRow?.overrideDisabledValue ? noMatchEnvRow.disabledValue : undefined;
+  const noMatchIsEnvSource = noMatchEnvRow?.overrideDisabledValue === true;
   return {
     enabled: false,
     reason: 'NO_MATCHING_STRATEGY',
@@ -1014,8 +1018,8 @@ function selectVariantForFlag(
     ? flag.environments?.find((e: any) => e.environmentId === environmentId)
     : undefined;
 
-  const resolvedEnabledValue = envSettings?.enabledValue ?? flag.enabledValue;
-  const valueSource = envSettings?.enabledValue !== undefined ? 'environment' : 'flag';
+  const resolvedEnabledValue = envSettings?.overrideEnabledValue ? envSettings.enabledValue : flag.enabledValue;
+  const valueSource = envSettings?.overrideEnabledValue === true ? 'environment' : 'flag';
 
   if (variants.length === 0) {
     return {

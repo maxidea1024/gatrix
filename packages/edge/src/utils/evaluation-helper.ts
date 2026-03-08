@@ -79,6 +79,7 @@ export async function performEvaluation(
           valueType: flagDef?.valueType,
           version: flagDef?.version,
           impressionDataEnabled: flagDef?.impressionDataEnabled,
+          valueSource: flagDef?.valueSource,
           // SDK already resolved these, but we pass them if needed for formatResult
           enabledValue: result.enabled ? (result.variant?.value ?? undefined) : undefined,
           disabledValue: !result.enabled ? (result.variant?.value ?? undefined) : undefined,
