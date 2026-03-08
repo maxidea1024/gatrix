@@ -294,6 +294,22 @@ class EnvironmentRegistry {
   }
 
   /**
+   * Resolve an environment name to the actual environment ID (ULID).
+   * @returns The environment ID, or null if not found
+   */
+  resolveEnvironmentId(environmentName: string): string | null {
+    const byName = this.envNameMap.get(environmentName);
+    if (byName) {
+      return byName.envId;
+    }
+    // If it's already an ID, check if it exists
+    if (this.envMap.has(environmentName)) {
+      return environmentName;
+    }
+    return null;
+  }
+
+  /**
    * Check if an environment ID exists
    */
   hasEnvironment(environmentId: string): boolean {

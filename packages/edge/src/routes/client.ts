@@ -120,12 +120,12 @@ setTimeout(() => {
 // Public Routes (No Authentication Required - Same as Backend)
 // ============================================================================
 
-router.get('/:environment/client-version', async (req: Request, res: Response) => {
+router.get('/client-version', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const environmentId = req.params.environment;
+    const { environmentId, cacheKey } = req.clientContext!;
     const { platform, version, status, lang, channel, subChannel } = req.query as {
       platform?: string;
       version?: string;
@@ -140,17 +140,6 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
       return res.status(400).json({
         success: false,
         message: 'platform is a required query parameter',
-      });
-    }
-
-    // Validate required headers (same as Backend)
-    const appName = req.headers['x-application-name'];
-    const apiToken = req.headers['x-api-token'];
-
-    if (!appName || !apiToken) {
-      return res.status(400).json({
-        success: false,
-        message: 'X-Application-Name and X-API-Token headers are required',
       });
     }
 
@@ -176,7 +165,7 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
     }
 
     // Get client versions from cache for this environment
-    const envVersions = sdk.getClientVersions(environmentId) as ClientVersion[];
+    const envVersions = sdk.getClientVersions(cacheKey || environmentId) as ClientVersion[];
 
     // Filter by platform
     const platformVersions = envVersions.filter(
@@ -336,15 +325,15 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
   }
 });
 
-router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
+router.get('/game-worlds', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const environmentId = req.params.environment;
+    const { environmentId, cacheKey } = req.clientContext!;
 
     // Get game worlds from cache for this environment
-    const envWorlds = sdk.getGameWorlds(environmentId) as GameWorld[];
+    const envWorlds = sdk.getGameWorlds(cacheKey || environmentId) as GameWorld[];
 
     // Record cache hit/miss
     if (envWorlds.length > 0) {
@@ -432,7 +421,7 @@ router.get('/cache-stats', async (_req: Request, res: Response) => {
 // Authenticated Routes (Require clientAuth middleware)
 // ============================================================================
 
-router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response) => {
+router.get('/test', clientAuth, (req: ClientRequest, res: Response) => {
   const { applicationName, environmentId } = req.clientContext!;
 
   res.json({
@@ -448,7 +437,7 @@ router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response)
   });
 });
 
-router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: Response) => {
+router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
@@ -502,7 +491,7 @@ router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: 
 });
 
 router.get(
-  '/:environment/banners/:bannerId',
+  '/banners/:bannerId',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -570,7 +559,7 @@ router.get(
 // ============================================================================
 
 router.get(
-  '/:environment/client-versions',
+  '/client-versions',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -624,7 +613,7 @@ router.get(
 );
 
 router.get(
-  '/:environment/service-notices',
+  '/service-notices',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -683,7 +672,7 @@ router.get(
 // ============================================================================
 
 router.post(
-  '/:environment/crashes/upload',
+  '/crashes/upload',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -769,19 +758,19 @@ router.post(
 // ============================================================================
 
 router.post(
-  '/features/:environment/eval',
+  '/features/eval',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     await performEvaluation(req, res, req.clientContext, true);
   }
 );
 
-router.get('/features/:environment/eval', clientAuth, async (req: ClientRequest, res: Response) => {
+router.get('/features/eval', clientAuth, async (req: ClientRequest, res: Response) => {
   await performEvaluation(req, res, req.clientContext, false);
 });
 
 router.get(
-  '/features/:environment/stream/sse',
+  '/features/stream/sse',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
@@ -811,7 +800,7 @@ router.get(
 );
 
 router.post(
-  '/features/:environment/metrics',
+  '/features/metrics',
   clientAuth,
   async (req: ClientRequest, res: Response) => {
     try {
