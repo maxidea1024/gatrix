@@ -1611,6 +1611,35 @@ export class CacheManager {
     return Array.from(envIds);
   }
 
+  /**
+   * Resolve an environment ID to the token key used in cache.
+   * In multi-mode, cache keys are token strings (e.g. unsecured-{orgId}:{projectId}:{envId}-server-api-token)
+   * while events carry raw environment IDs (ULIDs).
+   * This method searches registered tokens for one containing the given environment ID.
+   *
+   * @returns The matching token key, or the original environmentId if not found (single-mode fallback)
+   */
+  resolveTokenForEnvironmentId(environmentId: string): string {
+    if (!this.multiMode) {
+      return environmentId;
+    }
+
+    // Search registered tokens for one containing this environment ID
+    const tokens = this.tokenProvider.getTokens();
+    for (const token of tokens) {
+      if (token.includes(environmentId)) {
+        return token;
+      }
+    }
+
+    // Fallback: return original (will likely not match cache, but avoids breaking)
+    this.logger.warn('Could not resolve token for environment ID', {
+      environmentId,
+      registeredTokens: tokens.length,
+    });
+    return environmentId;
+  }
+
   getUses(): UsesConfig {
     return this.uses;
   }

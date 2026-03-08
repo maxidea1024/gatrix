@@ -424,11 +424,18 @@ export class EventListener {
 
     // Extract and validate environmentId (centralized)
     // Segments are global events — no environmentId required
-    const environmentId = (event.data.environmentId || event.data.environment || '') as string;
+    let environmentId = (event.data.environmentId || event.data.environment || '') as string;
     const requiresEnvironment = !event.type.startsWith('segment.');
     if (requiresEnvironment && !environmentId) {
       this.logger.warn('Event missing environmentId', { event: event.type });
       return;
+    }
+
+    // In multi-mode, resolve raw environment ID to cache token key
+    // Cache keys are token strings (e.g. unsecured-{orgId}:{projectId}:{envId}-server-api-token)
+    // while events carry raw environment IDs (ULIDs)
+    if (requiresEnvironment && environmentId) {
+      environmentId = this.cacheManager.resolveTokenForEnvironmentId(environmentId);
     }
 
     await handler.handle(event, environmentId);

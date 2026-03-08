@@ -2161,6 +2161,19 @@ export class GatrixServerSDK {
   }
 
   /**
+   * Resolve an environment ID to the cache token key.
+   * In multi-mode, cache keys differ from raw environment IDs.
+   * @param environmentId Raw environment ID (ULID)
+   * @returns The cache token key, or the original environmentId in single-mode
+   */
+  resolveTokenForEnvironmentId(environmentId: string): string {
+    if (!this.cacheManager) {
+      return environmentId;
+    }
+    return this.cacheManager.resolveTokenForEnvironmentId(environmentId);
+  }
+
+  /**
    * Get last cache refresh timestamp
    */
   getLastRefreshedAt(): Date | null {

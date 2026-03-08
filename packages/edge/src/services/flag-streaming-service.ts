@@ -327,9 +327,11 @@ class FlagStreamingService {
     try {
       const sdk = sdkManager.getSDK();
       if (sdk) {
-        await sdk.featureFlag.refreshByEnvironment(environmentId);
+        // Resolve raw environment ID to cache token key
+        const cacheKey = sdk.resolveTokenForEnvironmentId(environmentId);
+        await sdk.featureFlag.refreshByEnvironment(cacheKey);
         logger.debug(
-          `Edge FlagStreamingService: Cache refreshed for env=${environmentId} before notify`
+          `Edge FlagStreamingService: Cache refreshed for env=${environmentId} (cacheKey=${cacheKey}) before notify`
         );
       }
     } catch (err) {
