@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { isValidResourceName } from '../../utils/validation';
 import {
   Box,
   Typography,
@@ -703,6 +704,7 @@ const ProjectsPage: React.FC = () => {
             disabled={dialogMode === 'edit'}
             autoFocus
             required
+            error={dialogMode === 'create' && formData.projectName.length > 0 && !isValidResourceName(formData.projectName)}
             helperText={t('rbac.projects.nameHelp')}
           />
           <TextField
@@ -745,7 +747,7 @@ const ProjectsPage: React.FC = () => {
             disabled={
               saving ||
               (dialogMode === 'create'
-                ? !formData.projectName.trim() || !formData.displayName.trim()
+                ? !formData.projectName.trim() || !formData.displayName.trim() || !isValidResourceName(formData.projectName)
                 : !isEditDirty)
             }
           >

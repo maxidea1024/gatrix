@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { isValidResourceName } from '../../utils/validation';
 import {
   Box,
   Typography,
@@ -714,6 +715,7 @@ const WorkspacePage: React.FC = () => {
             required
             autoFocus
             size="small"
+            error={createData.orgName.length > 0 && !isValidResourceName(createData.orgName)}
             helperText={t('rbac.orgs.orgNameHelp')}
           />
           <TextField
@@ -750,7 +752,7 @@ const WorkspacePage: React.FC = () => {
           <Button
             variant="contained"
             onClick={handleCreate}
-            disabled={saving || !createData.orgName.trim() || !createData.displayName.trim()}
+            disabled={saving || !createData.orgName.trim() || !createData.displayName.trim() || !isValidResourceName(createData.orgName)}
           >
             {saving ? <CircularProgress size={20} /> : t('common.add')}
           </Button>
