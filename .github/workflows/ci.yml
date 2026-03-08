@@ -223,14 +223,14 @@ jobs:
           CYPRESS_baseUrl: http://localhost:3000
 
       - name: Upload E2E artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: packages/frontend/cypress/screenshots
 
       - name: Upload E2E videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-videos
