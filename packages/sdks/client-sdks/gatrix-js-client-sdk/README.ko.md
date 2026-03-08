@@ -19,11 +19,10 @@ const client = new GatrixClient({
   apiUrl: 'https://your-api.com/api/v1', // 기본 URL (필수)
   apiToken: 'your-api-token',            // 클라이언트 API 토큰 (필수)
   appName: 'my-app',                     // 애플리케이션 이름 (필수)
-  environment: 'production',             // 환경 이름 (필수)
-  context: {
-    userId: 'user-123',
-  },
   features: {
+    context: {
+      userId: 'user-123',
+    },
     refreshInterval: 30, // 초 (기본값: 30)
   },
 });
@@ -52,22 +51,26 @@ client.stop();
 | `apiUrl` | `string` | Edge 또는 Backend 서버의 기본 API URL. SDK가 엔드포인트를 자동 구성합니다. |
 | `apiToken` | `string` | 인증용 클라이언트 API 토큰 |
 | `appName` | `string` | 식별을 위한 애플리케이션 이름 |
-| `environment` | `string` | 환경 이름 (예: `development`, `staging`, `production`) |
-
-> **참고:** SDK가 피처 플래그 엔드포인트를 자동 구성합니다:
-> `{apiUrl}/client/features/{environment}/eval`
 
 ### 선택 필드
 
 | 필드 | 타입 | 기본값 | 설명 |
 |------|------|--------|------|
-| `context` | `object` | `{}` | 초기 평가 컨텍스트 |
 | `enableDevMode` | `boolean` | `false` | 상세 디버그 로깅 활성화 |
 | `logger` | `Logger` | Console | 커스텀 로거 구현 |
+| `features.context` | `object` | `{}` | 초기 평가 컨텍스트 |
 | `features.refreshInterval` | `number` | `30` | 폴링 간격 (초) |
 | `features.disableRefresh` | `boolean` | `false` | 자동 폴링 비활성화 |
+| `features.explicitSyncMode` | `boolean` | `true` | 명시적 동기화 모드 활성화 |
 | `features.bootstrap` | `EvaluatedFlag[]` | - | 오프라인/SSR용 초기 플래그 데이터 |
+| `features.bootstrapOverride` | `boolean` | `true` | 저장된 플래그를 부트스트랩으로 덮어쓰기 |
 | `features.offlineMode` | `boolean` | `false` | 캐시/부트스트랩 데이터만 사용 |
+| `features.storageProvider` | `StorageProvider` | Auto | 커스텀 스토리지 프로바이더 |
+| `features.cacheKeyPrefix` | `string` | `gatrix_cache` | 캐시 키 접두사 |
+| `features.disableMetrics` | `boolean` | `false` | 메트릭 수집 비활성화 |
+| `features.impressionDataAll` | `boolean` | `false` | 모든 플래그에 대해 임프레션 추적 |
+| `features.usePOSTRequests` | `boolean` | `false` | GET 대신 POST 요청 사용 |
+| `features.streaming` | `StreamingConfig` | - | 스트리밍 설정 |
 
 ## 로깅 & 디버그 모드
 
@@ -136,7 +139,7 @@ const value = client.features.stringVariation('my-flag');
 ### 평가 시나리오
 
 | 시나리오 | `enabled` | `variant` | 반환 값 |
-|----------|-----------|-----------|---------|
+|----------|-----------|-----------|---------| 
 | 플래그 존재 & 활성 | `true` | 서버 배리언트 | 배리언트 값 |
 | 플래그 존재하나 비활성 | `false` | 비활성 배리언트 | **기본값** |
 | 플래그 없음 | N/A | N/A | **기본값** |
@@ -188,15 +191,27 @@ try {
 
 ### 단일 플래그
 
+두 가지 감시 모드가 있습니다:
+
+| 메서드 | 콜백 타이밍 |
+|--------|------------|
+| `watchSyncedFlag` | `explicitSyncMode`에서: `syncFlags()` 호출 후에만. 일반 모드: 즉시 |
+| `watchRealtimeFlag` | 서버 페치가 새 데이터를 가져올 때 항상 즉시 |
+
 ```typescript
-// 변경 시에만 콜백
-const unwatch = client.features.watchFlag('my-feature', (flag) => {
+// Synced watch - explicitSyncMode 존중 (게임 로직 / UI에 권장)
+const unwatch = client.features.watchSyncedFlag('my-feature', (flag) => {
   console.log('플래그 변경:', flag.enabled);
 });
 
-// 초기 상태 포함 즉시 콜백
-const unwatch = client.features.watchFlagWithInitialState('my-feature', (flag) => {
+// Synced watch - 초기 상태 포함 즉시 콜백
+const unwatch = client.features.watchSyncedFlagWithInitialState('my-feature', (flag) => {
   console.log('현재 상태:', flag.enabled);
+});
+
+// Realtime watch - explicitSyncMode 무관하게 즉시 반응
+const unwatch = client.features.watchRealtimeFlag('my-feature', (flag) => {
+  console.log('실시간 변경:', flag.enabled);
 });
 
 // 감시 중지
@@ -211,9 +226,9 @@ unwatch();
 const group = client.features.createWatchFlagGroup('my-component');
 
 group
-  .watchFlag('feature-a', (flag) => console.log('A:', flag.enabled))
-  .watchFlag('feature-b', (flag) => console.log('B:', flag.enabled))
-  .watchFlagWithInitialState('feature-c', (flag) => console.log('C:', flag.enabled));
+  .watchRealtimeFlag('feature-a', (flag) => console.log('A:', flag.enabled))
+  .watchSyncedFlag('feature-b', (flag) => console.log('B:', flag.enabled))
+  .watchSyncedFlagWithInitialState('feature-c', (flag) => console.log('C:', flag.enabled));
 
 console.log(group.size); // 3
 
@@ -282,43 +297,65 @@ await client.features.syncFlags();
 | `stop()` | 폴링 중지 및 정리 |
 | `isReady()` | SDK 준비 여부 확인 |
 | `getError()` | 마지막 에러 가져오기 |
-| `on(event, callback)` | 이벤트 구독 |
-| `off(event, callback)` | 이벤트 구독 해제 |
+| `getStats()` | SDK 통계 가져오기 |
+| `getLightStats()` | 경량 통계 가져오기 |
+| `on(event, cb, name?)` | 이벤트 구독 |
+| `once(event, cb, name?)` | 일회성 이벤트 구독 |
+| `off(event, cb?)` | 이벤트 구독 해제 |
+| `onAny(cb, name?)` | 모든 이벤트 구독 |
+| `offAny(cb?)` | 모든 이벤트 구독 해제 |
+| `track(eventName, props?)` | 커스텀 이벤트 추적 (예약) |
 | `features` | FeaturesClient 접근 |
 
 ### FeaturesClient (`client.features`)
 
+모든 플래그 접근 메서드는 선택적 `forceRealtime` 파라미터를 받습니다 (기본값: `true`). `true`이면 최신 서버 상태를 읽고, `false`이면 `explicitSyncMode`를 존중합니다.
+
 | 메서드 | 설명 |
 |--------|------|
-| `isEnabled(flagName)` | 플래그 활성화 확인 |
-| `boolVariation(flagName, default)` | Boolean 값 (flag.enabled) |
-| `stringVariation(flagName, default)` | String 값 |
-| `numberVariation(flagName, default)` | Number 값 |
-| `jsonVariation(flagName, default)` | JSON 값 |
-| `stringVariationDetails(flagName, default)` | String + 상세 정보 |
-| `numberVariationDetails(flagName, default)` | Number + 상세 정보 |
-| `jsonVariationDetails(flagName, default)` | JSON + 상세 정보 |
-| `stringVariationOrThrow(flagName)` | String 또는 예외 |
-| `numberVariationOrThrow(flagName)` | Number 또는 예외 |
-| `jsonVariationOrThrow(flagName)` | JSON 또는 예외 |
-| `getVariant(flagName)` | 원시 배리언트 |
-| `getAllFlags()` | 모든 플래그 |
-| `watchFlag(flagName, callback)` | 변경 감시 |
-| `watchFlagWithInitialState(flagName, callback)` | 초기 콜백 포함 감시 |
+| `isEnabled(flagName, forceRealtime?)` | 플래그 활성화 확인 |
+| `hasFlag(flagName, forceRealtime?)` | 플래그 존재 여부 확인 |
+| `getFlag(flagName, forceRealtime?)` | 원시 EvaluatedFlag 또는 undefined |
+| `getVariant(flagName, forceRealtime?)` | 원시 배리언트 |
+| `getAllFlags(forceRealtime?)` | 모든 플래그 |
+| `variation(flagName, fallback, forceRealtime?)` | 배리언트 이름 (string) |
+| `boolVariation(flagName, fallback, forceRealtime?)` | Boolean 값 |
+| `stringVariation(flagName, fallback, forceRealtime?)` | String 값 |
+| `numberVariation(flagName, fallback, forceRealtime?)` | Number 값 |
+| `jsonVariation(flagName, fallback, forceRealtime?)` | JSON 값 |
+| `boolVariationDetails(flagName, fallback, forceRealtime?)` | Boolean + 상세 정보 |
+| `stringVariationDetails(flagName, fallback, forceRealtime?)` | String + 상세 정보 |
+| `numberVariationDetails(flagName, fallback, forceRealtime?)` | Number + 상세 정보 |
+| `jsonVariationDetails(flagName, fallback, forceRealtime?)` | JSON + 상세 정보 |
+| `boolVariationOrThrow(flagName, forceRealtime?)` | Boolean 또는 예외 |
+| `stringVariationOrThrow(flagName, forceRealtime?)` | String 또는 예외 |
+| `numberVariationOrThrow(flagName, forceRealtime?)` | Number 또는 예외 |
+| `jsonVariationOrThrow(flagName, forceRealtime?)` | JSON 또는 예외 |
+| `watchSyncedFlag(flagName, callback)` | 변경 감시 (explicitSyncMode 존중) |
+| `watchSyncedFlagWithInitialState(flagName, callback)` | 초기 콜백 포함 감시 (synced) |
+| `watchRealtimeFlag(flagName, callback)` | 서버 페치 시 즉시 감시 |
+| `watchRealtimeFlagWithInitialState(flagName, callback)` | 초기 콜백 포함 즉시 감시 |
 | `createWatchFlagGroup(name)` | Watch 그룹 생성 |
-| `isFetching()` | 현재 페칭 중인지 확인 |
-| `isExplicitSync()` | 명시적 동기화 모드 확인 |
-| `hasPendingSyncFlags()` | 보류 중인 변경 존재 여부 |
+| `fetchFlags()` | 수동 플래그 페치 트리거 |
 | `syncFlags(fetchNow?)` | 수동 동기화 (명시적 모드) |
+| `isFetching()` | 현재 페칭 중인지 확인 |
+| `isExplicitSyncEnabled()` | 명시적 동기화 모드 확인 |
+| `setExplicitSyncMode(enabled)` | 런타임에 명시적 동기화 모드 변경 |
+| `hasPendingSyncFlags()` | 보류 중인 변경 존재 여부 |
+| `isOfflineMode()` | 오프라인 모드 확인 |
 | `updateContext(context)` | 평가 컨텍스트 업데이트 |
 | `getContext()` | 현재 컨텍스트 가져오기 |
+| `getConfig()` | 현재 features 설정 가져오기 |
+| `getConnectionId()` | 클라이언트 연결 ID 가져오기 |
 
 ### WatchFlagGroup
 
 | 메서드 | 설명 |
 |--------|------|
-| `watchFlag(flagName, callback)` | 워처 추가 (체이닝 가능) |
-| `watchFlagWithInitialState(flagName, callback)` | 초기 상태 포함 워처 추가 (체이닝 가능) |
+| `watchRealtimeFlag(flagName, callback)` | 실시간 워처 추가 (체이닝 가능) |
+| `watchRealtimeFlagWithInitialState(flagName, callback)` | 초기 상태 포함 실시간 워처 추가 |
+| `watchSyncedFlag(flagName, callback)` | 동기화 워처 추가 (체이닝 가능) |
+| `watchSyncedFlagWithInitialState(flagName, callback)` | 초기 상태 포함 동기화 워처 추가 |
 | `unwatchAll()` | 모든 워처 제거 |
 | `destroy()` | unwatchAll의 별칭 |
 | `size` | 활성 워처 수 |
@@ -326,8 +363,4 @@ await client.features.syncFlags();
 
 ## 라이선스
 
-MIT
-
-## License
-
-이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](../../../../LICENSE) 파일을 참조하세요.
